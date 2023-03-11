@@ -1,5 +1,4 @@
 import { Router as RemixRouter } from "@remix-run/router/dist/router";
-import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
