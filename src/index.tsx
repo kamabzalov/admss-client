@@ -1,16 +1,44 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { Router as RemixRouter } from "@remix-run/router/dist/router";
 import "bootstrap/dist/css/bootstrap.min.css";
+import React from "react";
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+import App from "App";
+import Dashboard from "dashboard";
+import SignIn from "auth/sign-in";
+import SignUp from "auth/sign-up";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
+
+const router: RemixRouter = createBrowserRouter([
+    {
+        path: '/',
+        element: <App/>,
+        children: [
+            {
+                path: '',
+                element: <SignIn/>
+            },
+            {
+                path: 'sign-up',
+                element: <SignUp/>
+            },
+            {
+                path: '/dashboard',
+                element: <Dashboard/>,
+            }
+        ]
+    },
+])
+
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <RouterProvider router={router}/>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
