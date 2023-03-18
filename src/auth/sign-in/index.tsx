@@ -1,19 +1,23 @@
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { FormEvent, useState } from "react";
+
+interface LoginForm {
+    username: string;
+    password: string;
+    rememberMe: boolean
+}
 
 export default function SignIn() {
 
-    const [validated, setValidationStatus] = useState(false);
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+        mode: "all",
+        reValidateMode: "onSubmit",
+    });
 
-    const login = (event: FormEvent<HTMLFormElement>) => {
-        const form = event.currentTarget;
-        if (!form.checkValidity()) {
-            event.preventDefault();
-        }
-
-        setValidationStatus(true);
-    };
+    const login: SubmitHandler<LoginForm> = (data) => {
+        
+    }
 
     return (
         <Container>
@@ -27,24 +31,42 @@ export default function SignIn() {
                                     <Card.Title>
                                         <h2 className="text-center">Sign in</h2>
                                     </Card.Title>
-                                    <Form noValidate validated={validated} onSubmit={login}>
+                                    <Form noValidate onSubmit={handleSubmit(login)}>
                                         <Form.Group className="mb-3" controlId="userName">
                                             <Form.Label>Username</Form.Label>
-                                            <Form.Control type="text" required placeholder="Enter username"/>
-                                            <Form.Control.Feedback type="invalid">
-                                                Invalid username.
-                                            </Form.Control.Feedback>
+                                            <Form.Control type="text" required
+                                                          className={`${errors.username ? "is-invalid" : ""}`}
+                                                          placeholder="Enter username" {...register('username',
+                                                {
+                                                    required: true,
+                                                    validate: { notEmpty: v => !!v.trim() }
+                                                })} />
+                                            {errors.username && (
+                                                <Form.Text className="text-danger">
+                                                    Invalid username
+                                                </Form.Text>
+                                            )}
                                         </Form.Group>
 
                                         <Form.Group className="mb-3" controlId="userPassword">
                                             <Form.Label>Password</Form.Label>
-                                            <Form.Control type="password" required placeholder="Password"/>
-                                            <Form.Control.Feedback type="invalid">
-                                                Invalid password.
-                                            </Form.Control.Feedback>
+                                            <Form.Control type="password" required
+                                                          className={`${errors.password ? "is-invalid" : ""}`}
+                                                          placeholder="Password" {...register('password', {
+                                                required: true,
+                                                validate: { notEmpty: v => !!v.trim() }
+                                            })} />
+                                            {errors.password && (
+                                                <Form.Text className="text-danger">
+                                                    Invalid password
+                                                </Form.Text>
+                                            )}
+
+
                                         </Form.Group>
                                         <Form.Group className="mb-3" controlId="rememberMe">
-                                            <Form.Check type="checkbox" label="Remember me"/>
+                                            <Form.Check type="checkbox" {...register('rememberMe')}
+                                                        label="Remember me"/>
                                         </Form.Group>
                                         <Button variant="primary" type="submit" className="w-100 mb-3">
                                             Login
