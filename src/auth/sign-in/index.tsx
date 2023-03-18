@@ -41,7 +41,7 @@ export default function SignIn() {
                                                 placeholder="Enter username"
                                                 {...register('username', {
                                                     required: true,
-                                                    validate: { notEmpty: v => !!v.trim() },
+                                                    validate: { notEmpty: (v: string) => !!v.trim() },
                                                 })}
                                             />
                                             {errors.username && (
@@ -58,7 +58,7 @@ export default function SignIn() {
                                                 placeholder="Password"
                                                 {...register('password', {
                                                     required: true,
-                                                    validate: { notEmpty: v => !!v.trim() },
+                                                    validate: { notEmpty: (v: string) => !!v.trim() },
                                                 })}
                                             />
                                             {errors.password && (
