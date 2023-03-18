@@ -8,6 +8,7 @@ import App from "App";
 import Dashboard from "dashboard";
 import SignIn from "auth/sign-in";
 import SignUp from "auth/sign-up";
+import NotFound from "not-found";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -17,6 +18,7 @@ const router: RemixRouter = createBrowserRouter([
     {
         path: '/',
         element: <App/>,
+        errorElement: <NotFound/>,
         children: [
             {
                 path: '',
