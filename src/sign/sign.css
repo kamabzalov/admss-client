@@ -1,0 +1,53 @@
+.sign {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background: url("./background-sign.png");
+}
+
+.sign-in {
+    background: var(--surface-a);
+    width: 640px;
+    border-radius: 10px;
+    padding: 90px 110px 100px;
+}
+
+.sign__title {
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+    text-align: center;
+    font-size: 3rem;
+}
+
+.sign__button {
+    font-size: 1.33rem;
+    font-weight: 700;
+}
+
+.sign__input {
+    height: 53px;
+    width: 100%;
+}
+
+.sign-controls {
+    text-align: center;
+    margin: 0;
+}
+
+.sign-controls__link {
+    text-decoration: none;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.user-help {
+    color: #676767;
+}
+
+.user-help__link {
+    color: var(--primary-color);
+    text-decoration: none;
+}

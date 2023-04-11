@@ -6,10 +6,11 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import App from 'App';
 import Dashboard from 'dashboard';
-import SignIn from 'auth/sign-in';
-import SignUp from 'auth/sign-up';
 import NotFound from 'not-found';
 import Home from './dashboard/home';
+import Inventory from './dashboard/inventory';
+import SignUp from './sign/sign-up';
+import SignIn from './sign/sign-in';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -37,7 +38,7 @@ const router: RemixRouter = createBrowserRouter([
                     },
                     {
                         path: 'inventory',
-                        element: <h1>Inventory</h1>,
+                        element: <Inventory />,
                     },
                     {
                         path: 'contacts',

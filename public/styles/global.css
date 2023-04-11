@@ -1,0 +1,32 @@
+/* App variables */
+
+:root {
+    --adsm-app-font: 'Open Sans', Arial, Helvetica, sans-serif;
+    --adsm-app-font-weight: 400;
+    --adsm-app-base-font-size: 18px;
+}
+
+html {
+    font-size: var(--adsm-app-base-font-size);
+}
+
+body {
+    font-family: var(--adsm-app-font);
+    font-weight: var(--adsm-app-font-weight);
+}
+
+.m-b-5 {
+    margin-bottom: 5px !important;
+}
+
+.m-b-10 {
+    margin-bottom: 10px !important;
+}
+
+.m-b-15 {
+    margin-bottom: 15px !important;
+}
+
+.m-b-40 {
+    margin-bottom: 40px !important;
+}
