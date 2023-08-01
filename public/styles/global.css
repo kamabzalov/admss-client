@@ -1,0 +1,38 @@
+/* App variables */
+
+@import "../icon-font/adsm/styles.css";
+
+:root {
+    --admss-app-font: 'Open Sans', Arial, Helvetica, sans-serif;
+    --admss-app-font-weight: 400;
+    --admss-app-base-font-size: 18px;
+    --admss-app-light-grey: #ccc;
+    --admss-app-secondary-deep-blue: #292C33;
+    --admss-app-primary-blue-text: #292B2E;
+    --admss-secondary-checbox-input-stroke: #5F5F5F;
+}
+
+html {
+    font-size: var(--admss-app-base-font-size);
+}
+
+body {
+    font-family: var(--admss-app-font);
+    font-weight: var(--admss-app-font-weight);
+}
+
+.m-b-5 {
+    margin-bottom: 5px !important;
+}
+
+.m-b-10 {
+    margin-bottom: 10px !important;
+}
+
+.m-b-15 {
+    margin-bottom: 15px !important;
+}
+
+.m-b-40 {
+    margin-bottom: 40px !important;
+}
