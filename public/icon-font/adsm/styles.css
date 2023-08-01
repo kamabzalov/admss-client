@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 @font-face {
-  font-family: "adms";
+  font-family: "admss-icon";
   src:url("fonts/adms.eot");
   src:url("fonts/adms.eot?#iefix") format("embedded-opentype"),
     url("fonts/adms.woff") format("woff"),
@@ -13,7 +13,7 @@
 }
 
 [data-icon]:before {
-  font-family: "adms" !important;
+  font-family: "admss-icon" !important;
   content: attr(data-icon);
   font-style: normal !important;
   font-weight: normal !important;
@@ -25,9 +25,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-[class^="adms-"]:before,
-[class*=" adms-"]:before {
-  font-family: "adms" !important;
+[class^="admss-icon"]:before,
+[class*=" admss-icon"]:before {
+  font-family: "admss-icon" !important;
   font-style: normal !important;
   font-weight: normal !important;
   font-variant: normal !important;
@@ -38,93 +38,93 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.adms-browse-all-inventory:before {
+.admss-icon-browse-all-inventory:before {
   content: "\61";
 }
-.adms-hide:before {
+.admss-icon-hide:before {
   content: "\62";
 }
-.adms-test-drive:before {
+.admss-icon-test-drive:before {
   content: "\63";
 }
-.adms-search:before {
+.admss-icon-search:before {
   content: "\64";
 }
-.adms-print:before {
+.admss-icon-print:before {
   content: "\65";
 }
-.adms-new-inventory:before {
+.admss-icon-new-inventory:before {
   content: "\66";
 }
-.adms-new-contact:before {
+.admss-icon-new-contact:before {
   content: "\67";
 }
-.adms-new-deal:before {
+.admss-icon-new-deal:before {
   content: "\69";
 }
-.adms-browse-all-deals:before {
+.admss-icon-browse-all-deals:before {
   content: "\6a";
 }
-.adms-blank:before {
+.admss-icon-blank:before {
   content: "\6b";
 }
-.adms-settings:before {
+.admss-icon-settings:before {
   content: "\6c";
 }
-.adms-email:before {
+.admss-icon-email:before {
   content: "\6d";
 }
-.adms-show:before {
+.admss-icon-show:before {
   content: "\6e";
 }
-.adms-browse-all-contacts:before {
+.admss-icon-browse-all-contacts:before {
   content: "\6f";
 }
-.adms-close:before {
+.admss-icon-close:before {
   content: "\70";
 }
-.adms-sign-up:before {
+.admss-icon-sign-up:before {
   content: "\71";
 }
-.adms-log-out:before {
+.admss-icon-log-out:before {
   content: "\72";
 }
-.adms-support-history:before {
+.admss-icon-support-history:before {
   content: "\73";
 }
-.adms-help:before {
+.admss-icon-help:before {
   content: "\74";
 }
-.adms-location:before {
+.admss-icon-location:before {
   content: "\75";
 }
-.adms-user-cabinet:before {
+.admss-icon-user-cabinet:before {
   content: "\76";
 }
-.adms-inventory:before {
+.admss-icon-inventory:before {
   content: "\77";
 }
-.adms-home:before {
+.admss-icon-home:before {
   content: "\78";
 }
-.adms-deals:before {
+.admss-icon-deals:before {
   content: "\79";
 }
-.adms-contacts:before {
+.admss-icon-contacts:before {
   content: "\7a";
 }
-.adms-accounts:before {
+.admss-icon-accounts:before {
   content: "\41";
 }
-.adms-reports:before {
+.admss-icon-reports:before {
   content: "\42";
 }
-.adms-password:before {
+.admss-icon-password:before {
   content: "\43";
 }
-.adms-username:before {
+.admss-icon-username:before {
   content: "\44";
 }
-.adms-arrow:before {
+.admss-icon-arrow:before {
   content: "\68";
 }

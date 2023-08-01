@@ -1,6 +1,5 @@
 {
-  "name": "adms-react-app",
-  "homepage": "https://app.admss.com:3002/",
+  "name": "admss-react-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

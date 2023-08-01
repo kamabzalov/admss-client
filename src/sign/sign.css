@@ -9,20 +9,21 @@
 
 .sign-in {
     background: var(--surface-a);
-    width: 640px;
-    border-radius: 10px;
-    padding: 90px 110px 100px;
+    width: 545px;
+    border-radius: 15px;
+    padding: 85px 70px 70px 70px;
 }
 
 .sign__title {
     margin-top: 0;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     color: var(--primary-color);
     text-align: center;
     font-size: 3rem;
 }
 
 .sign__button {
+    width: 300px;
     font-size: 1.33rem;
     font-weight: 700;
 }
@@ -30,6 +31,12 @@
 .sign__input {
     height: 53px;
     width: 100%;
+    border-color: var(--admss-app-light-grey);
+    color: var(--admss-app-light-grey);
+}
+
+.sign__icon {
+    color: var(--admss-app-light-grey) !important;
 }
 
 .sign-controls {
@@ -47,7 +54,12 @@
     color: #676767;
 }
 
+.user-help__label {
+    color: var(--admss-app-primary-blue-text);
+}
+
 .user-help__link {
-    color: var(--primary-color);
+    color: var(--admss-app-secondary-deep-blue);
     text-decoration: none;
+    font-weight: 600;
 }
