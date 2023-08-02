@@ -1,3 +1,5 @@
 export default function Home() {
-    return <></>;
+    return <>
+        <h1>Dashboard main page</h1>
+    </>;
 }
