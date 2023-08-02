@@ -10,13 +10,13 @@ export default function Home() {
   return <>
     <div className="card bottom-space">
       <div className="card-header">
-        <h2 className="uppercase m-0">Common tasks</h2>
+        <h2 className="card-header__title uppercase m-0">Common tasks</h2>
       </div>
     </div>
 
     <div className="card bottom-space">
       <div className="card-header">
-        <h2 className="uppercase m-0">Tasks</h2>
+        <h2 className="card-header__title uppercase m-0">Tasks</h2>
       </div>
       <div className="card-content">
         <div className="flex justify-content-between">
@@ -52,9 +52,9 @@ export default function Home() {
     </div>
 
     <div className="flex justify-content-between">
-      <div className="card right-space">
+      <div style={{flexBasis: '686px'}} className="card right-space">
         <div className="card-header">
-          <h2 className="uppercase m-0">Recent messages</h2>
+          <h2 className="card-header__title uppercase m-0">Recent messages</h2>
         </div>
         <div className="card-content">
           <DataTable>
@@ -64,9 +64,9 @@ export default function Home() {
           </DataTable>
         </div>
       </div>
-      <div className="card right-space">
+      <div style={{flexBasis: '455px'}} className="card right-space">
         <div className="card-header">
-          <h2 className="uppercase m-0">Recently added contact</h2>
+          <h2 className="card-header__title uppercase m-0">Recently added contact</h2>
         </div>
         <div className="card-content">
           <dl>
@@ -83,9 +83,9 @@ export default function Home() {
           </dl>
         </div>
       </div>
-      <div className="card">
+      <div style={{flexBasis: '338px'}} className="card">
         <div className="card-header">
-          <h2 className="uppercase m-0">Printing</h2>
+          <h2 className="card-header__title uppercase m-0">Printing</h2>
         </div>
       </div>
     </div>
