@@ -11,7 +11,11 @@
 }
 
 .header__logo {
-    width: 201px;
+    width: 176px;
+}
+
+.header-dealer-info {
+    margin-left: 60px;
 }
 
 .header-dealer-info__name {

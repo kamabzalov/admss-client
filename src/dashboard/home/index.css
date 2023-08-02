@@ -1,0 +1,19 @@
+.card {
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.80);
+    padding: 40px;
+}
+
+.card.bottom-space {
+    margin-bottom: 30px;
+}
+
+.card.right-space {
+    margin-right: 30px;
+}
+
+.card-header {
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+}
