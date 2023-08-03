@@ -28,19 +28,12 @@ export default function Home() {
                   inventory</label>
               </li>
               <li className="mb-2">
-                <Checkbox name="category" value="Add new arrivals to inventory" checked={false} />
-                <label className="ml-2">Add new arrivals to
-                  inventory</label>
+                <Checkbox name="category" value="Complete all daily tasks" checked={false} />
+                <label className="ml-2">Complete all daily tasks</label>
               </li>
               <li className="mb-2">
-                <Checkbox name="category" value="Add new arrivals to inventory" checked={false} />
-                <label className="ml-2">Add new arrivals to
-                  inventory</label>
-              </li>
-              <li className="mb-2">
-                <Checkbox name="category" value="Add new arrivals to inventory" checked={false} />
-                <label className="ml-2">Add new arrivals to
-                  inventory</label>
+                <Checkbox name="category" value="Create new tasks" checked={false} />
+                <label className="ml-2">Create new tasks</label>
               </li>
             </ul>
           </div>
