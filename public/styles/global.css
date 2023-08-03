@@ -11,6 +11,8 @@
     --admss-app-primary-blue-text: #292B2E;
     --admss-secondary-checbox-input-stroke: #5F5F5F;
     --admss-primary-bg: #F9FBFF;
+    --admss-secondary-light-blue: #E5EDFD;
+    --admss-primary-main-green: #0DB564;
 }
 
 html {
@@ -20,6 +22,7 @@ html {
 body {
     font-family: var(--admss-app-font);
     font-weight: var(--admss-app-font-weight);
+    background-color: var(--admss-primary-bg);
 }
 
 .m-b-5 {
@@ -36,4 +39,12 @@ body {
 
 .m-b-40 {
     margin-bottom: 40px !important;
+}
+
+.success {
+    color: var(--admss-primary-main-green);
+}
+
+.fw-600 {
+    font-weight: 600;
 }

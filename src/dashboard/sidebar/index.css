@@ -25,6 +25,7 @@
     align-items: center;
     height: 90px;
     cursor: pointer;
+    padding: 8px 0;
 }
 
 .sidebar-nav__item:hover {
@@ -32,11 +33,22 @@
 }
 
 .sidebar-nav__link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
     color: #fff;
     text-decoration: none;
     font-weight: 700;
+    width: 100%;
+    height: 100%;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__link {
     color: var(--primary-color);
+}
+
+.sidebar-nav__icon {
+    font-size: 50px;
+    width: 50px;
+    height: 50px;
 }

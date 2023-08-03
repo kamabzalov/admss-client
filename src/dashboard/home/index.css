@@ -14,9 +14,81 @@
 }
 
 .card-header {
-    margin-bottom: 32px;
+    margin-bottom: 30px;
 }
 
-.card-header__title {
-    font-size: 1rem;
+.card-content__title {
+    margin-bottom: 30px;
+    margin-top: 0;
 }
+
+.contact-item__label {
+    color: var(--primary-color);
+    font-weight: 600;
+    width: 110px;
+}
+
+.printing-menu__item {
+    margin-bottom: 15px;
+}
+
+.printing-menu__icon {
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.table-message {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-message thead {
+    background: var(--admss-secondary-light-blue);
+    text-align: left;
+}
+
+.table-message th,
+.table-message td {
+    padding: 8px 10px;
+}
+
+.table-message th {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.table-message tr {
+    border-bottom: 1px solid var(--admss-app-light-grey);
+}
+
+.table-message tr:last-child {
+    border: none;
+}
+
+.common-tasks-menu__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 160px;
+    margin-right: 57px;
+    border-radius: 3px;
+    box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.80);
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 25px 30px;
+    text-align: center;
+}
+
+.common-tasks-menu__item:last-child {
+    margin-right: 0;
+}
+
+.common-tasks-menu__icon {
+    font-size: 55px;
+    height: 55px;
+    margin-bottom: 24px;
+}
+

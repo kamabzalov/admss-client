@@ -8,7 +8,18 @@ export default function Header() {
   const menuRight = useRef<Menu>(null);
   let items: MenuItem[] = [
     { label: "My Profile" },
-    { label: "Log out" }
+    { label: "General Settings" },
+    { separator: true},
+    { label: "Change location" },
+    { label: "Users" },
+    { separator: true},
+    { label: "Contact support" },
+    { label: "Support history" },
+    { label: "Help" },
+    { separator: true},
+    { label: "Logout" },
+    { separator: true},
+    { label: "Sign up" },
   ];
   if (menuRight) {
     return <header className="header">
