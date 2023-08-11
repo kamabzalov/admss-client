@@ -1,5 +1,6 @@
 {
-  "name": "admss-react-app",
+  "name": "adms-react-app",
+  "homepage": "https://app.admss.com:3002/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,7 +11,7 @@
     "@types/node": "^16.18.14",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
-    "formik": "^2.4.2",
+    "primeicons": "^6.0.1",
     "primereact": "^9.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
