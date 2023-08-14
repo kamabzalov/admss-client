@@ -2,11 +2,11 @@
 
 @font-face {
   font-family: "admss-icon";
-  src:url("fonts/adms.eot");
-  src:url("fonts/adms.eot?#iefix") format("embedded-opentype"),
-    url("fonts/adms.woff") format("woff"),
-    url("fonts/adms.ttf") format("truetype"),
-    url("fonts/adms.svg#adms") format("svg");
+  src:url("fonts/admss.eot");
+  src:url("fonts/admss.eot?#iefix") format("embedded-opentype"),
+    url("fonts/admss.woff") format("woff"),
+    url("fonts/admss.ttf") format("truetype"),
+    url("fonts/admss.svg#admss-icon") format("svg");
   font-weight: normal;
   font-style: normal;
 
@@ -25,8 +25,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-[class^="admss-icon"]:before,
-[class*=" admss-icon"]:before {
+[class^="admss-icon-"]:before,
+[class*=" admss-icon-"]:before {
   font-family: "admss-icon" !important;
   font-style: normal !important;
   font-weight: normal !important;
@@ -86,9 +86,6 @@
 .admss-icon-sign-up:before {
   content: "\71";
 }
-.admss-icon-log-out:before {
-  content: "\72";
-}
 .admss-icon-support-history:before {
   content: "\73";
 }
@@ -127,4 +124,13 @@
 }
 .admss-icon-arrow:before {
   content: "\68";
+}
+.admss-icon-log-out-icon:before {
+  content: "\72";
+}
+.admss-icon-my-profile:before {
+  content: "\45";
+}
+.admss-icon-user:before {
+  content: "\46";
 }
