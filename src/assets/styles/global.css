@@ -1,7 +1,5 @@
 /* App variables */
 
-@import "../icon-font/admss/styles.css";
-
 :root {
     --admss-app-font: 'Open Sans', Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
@@ -13,6 +11,15 @@
     --admss-primary-bg: #F9FBFF;
     --admss-secondary-light-blue: #E5EDFD;
     --admss-primary-main-green: #0DB564;
+    --admss-aside-small-width: 130px;
+}
+
+::placeholder {
+    color: var(--admss-app-light-grey);
+}
+
+html, body, #root {
+    height: 100%;
 }
 
 html {
@@ -25,18 +32,26 @@ body {
     background-color: var(--admss-primary-bg);
 }
 
-::placeholder {
-    color: var(--admss-app-light-grey);
+.container {
+    width: 824px;
+    margin: auto;
+}
+
+
+@media screen and (min-width: 1400px) {
+    .container {
+        width: 1160px;
+    }
 }
 
 @media screen and (min-width: 1400px) {
-    html {
-        font-size: 20px;
+    .container {
+        width: 1160px;
     }
 }
 
 @media screen and (min-width: 1920px) {
-    html {
-        font-size: 28px;
+    .container {
+        width: 1539px;
     }
 }

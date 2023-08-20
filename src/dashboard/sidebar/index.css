@@ -1,9 +1,8 @@
 .sidebar {
     position: fixed;
     left: 0;
-    width: 201px;
+    width: var(--admss-aside-small-width);
     top: 150px;
-    padding-top: 50px;
     height: 100vh;
     background: var(--primary-color);
 }

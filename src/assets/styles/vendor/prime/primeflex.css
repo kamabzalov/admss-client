@@ -176,7 +176,7 @@
     width: 100%;
   }
 }
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 1200px) {
   .md\:col {
     flex-grow: 1;
     flex-basis: 0;
@@ -247,7 +247,7 @@
     width: 100%;
   }
 }
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1400px) {
   .lg\:col {
     flex-grow: 1;
     flex-basis: 0;
@@ -318,7 +318,7 @@
     width: 100%;
   }
 }
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 1600px) {
   .xl\:col {
     flex-grow: 1;
     flex-basis: 0;

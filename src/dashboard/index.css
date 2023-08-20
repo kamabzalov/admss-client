@@ -1,5 +1,5 @@
 .main {
-    max-width: 1539px;
-    margin: 200px auto auto 261px;
-    width: 80vw;
+    padding-top: 190px;
+    margin-left: var(--admss-aside-small-width);
+    height: 100%;
 }
