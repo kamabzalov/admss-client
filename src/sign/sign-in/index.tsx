@@ -12,10 +12,11 @@ interface LoginForm {
 
 export default function SignIn() {
   const navigate = useNavigate();
-  const formik = useFormik({
+  const formik = useFormik<LoginForm>({
     initialValues: {
       username: "",
-      password: ""
+      password: "",
+      rememberMe: false
     },
     validate: (data: { username: string, password: string }) => {
       let errors: any = {};
@@ -38,41 +39,43 @@ export default function SignIn() {
   return (
     <section className="sign">
       <div className="sign-in">
-        <h1 className="sign__title">Sign In</h1>
-        <form onSubmit={formik.handleSubmit}>
-          <div className="m-b-15">
-            <div className="p-input-icon-right w-full">
-              <i className="admss-icon-username sign__icon" />
-              <InputText className="sign__input" id="username" onChange={formik.handleChange}
-                         value={formik.values.username} />
-              {formik.errors.username ? <div>{formik.errors.username}</div> : null}
+        <div className='sign-in-wrapper'>
+          <h1 className="sign__title">Sign In</h1>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="sign-in__input-space">
+              <div className="p-input-icon-right w-full">
+                <i className="admss-icon-user sign__icon" />
+                <InputText placeholder='Username' className="sign__input" id="username" onChange={formik.handleChange}
+                           value={formik.values.username} />
+                {formik.errors.username ? <span>{formik.errors.username}</span> : null}
+              </div>
             </div>
-          </div>
 
-          <div className="m-b-10">
-            <div className="p-input-icon-right w-full">
-              <i className="admss-icon-password sign__icon" />
-              <InputText className="sign__input" id="password" type="password" onChange={formik.handleChange}
-                         value={formik.values.password} />
-              {formik.errors.password ? <div>{formik.errors.password}</div> : null}
+            <div className="sign-in__input-space">
+              <div className="p-input-icon-right w-full">
+                <i className="admss-icon-password sign__icon" />
+                <InputText placeholder='Password' className="sign__input" id="password" type="password" onChange={formik.handleChange}
+                           value={formik.values.password} />
+                {formik.errors.password ? <span>{formik.errors.password}</span> : null}
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-content-between m-b-40 user-help">
-            <div className="flex align-items-center">
-              <Checkbox inputId="remember" name="remember" checked={false} />
-              <label htmlFor="remember" className="ml-2 user-help__label">
-                Remember me
-              </label>
+            <div className="flex justify-content-between user-help">
+              <div className="flex align-items-center">
+                <Checkbox inputId="remember" name="remember" checked={false} />
+                <label htmlFor="remember" className="ml-2 user-help__label">
+                  Remember me
+                </label>
+              </div>
+              <Link className="user-help__link font-semibold" to="/">
+                Forgot password?
+              </Link>
             </div>
-            <Link className="user-help__link" to="/">
-              Forgot password?
-            </Link>
-          </div>
-          <p className="text-center">
-            <Button label="Sign in" severity="success" type="submit" className="sign__button" />
-          </p>
-        </form>
+            <div className='text-center'>
+              <Button label="Sign in" severity="success" type="submit" className="sign__button font-bold" />
+            </div>
+          </form>
+        </div>
       </div>
     </section>
   );

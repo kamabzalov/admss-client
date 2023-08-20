@@ -25,26 +25,18 @@ body {
     background-color: var(--admss-primary-bg);
 }
 
-.m-b-5 {
-    margin-bottom: 5px !important;
+::placeholder {
+    color: var(--admss-app-light-grey);
 }
 
-.m-b-10 {
-    margin-bottom: 10px !important;
+@media screen and (min-width: 1400px) {
+    html {
+        font-size: 20px;
+    }
 }
 
-.m-b-15 {
-    margin-bottom: 15px !important;
-}
-
-.m-b-40 {
-    margin-bottom: 40px !important;
-}
-
-.success {
-    color: var(--admss-primary-main-green);
-}
-
-.fw-600 {
-    font-weight: 600;
+@media screen and (min-width: 1920px) {
+    html {
+        font-size: 28px;
+    }
 }

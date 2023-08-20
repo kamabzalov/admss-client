@@ -1,1 +1,4 @@
 @import "primereact/resources/primereact.min.css";
+@import "assets/styles/vendor/prime/primeflex.css";
+@import "assets/styles/vendor/prime/theme.css";
+@import "assets/styles/global.css";

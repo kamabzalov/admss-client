@@ -105,7 +105,7 @@
   width: 100%;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:col {
     flex-grow: 1;
     flex-basis: 0;
@@ -441,7 +441,7 @@
   margin-left: 100% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:col-offset-0 {
     margin-left: 0 !important;
   }
@@ -1137,7 +1137,7 @@
   background-color: transparent !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:bg-transparent {
     background-color: transparent !important;
   }
@@ -1161,7 +1161,7 @@
   border-color: transparent !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:border-transparent {
     border-color: transparent !important;
   }
@@ -6937,7 +6937,7 @@
   border-color: var(--surface-border) !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:text-primary {
     color: var(--primary-color) !important;
   }
@@ -7808,7 +7808,7 @@
   display: inline-flex !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:hidden {
     display: none !important;
   }
@@ -7904,7 +7904,7 @@
   text-align: right !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:text-center {
     text-align: center !important;
   }
@@ -8028,7 +8028,7 @@
   text-overflow: ellipsis !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:text-overflow-clip {
     text-overflow: clip !important;
   }
@@ -8080,7 +8080,7 @@
   font-weight: 700 !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:font-light {
     font-weight: 300 !important;
   }
@@ -8200,7 +8200,7 @@
   font-size: 6rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:text-xs {
     font-size: 0.75rem !important;
   }
@@ -8408,7 +8408,7 @@
   vertical-align: super !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:vertical-align-baseline {
     vertical-align: baseline !important;
   }
@@ -8528,7 +8528,7 @@
   flex-direction: column-reverse !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-row {
     flex-direction: row !important;
   }
@@ -8596,7 +8596,7 @@
   flex-wrap: nowrap !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-wrap {
     flex-wrap: wrap !important;
   }
@@ -8664,7 +8664,7 @@
   justify-content: space-evenly !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:justify-content-start {
     justify-content: flex-start !important;
   }
@@ -8768,7 +8768,7 @@
   align-content: space-evenly !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:align-content-start {
     align-content: flex-start !important;
   }
@@ -8868,7 +8868,7 @@
   align-items: baseline !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:align-items-stretch {
     align-items: stretch !important;
   }
@@ -8960,7 +8960,7 @@
   align-self: baseline !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:align-self-auto {
     align-self: auto !important;
   }
@@ -9068,7 +9068,7 @@
   order: 6 !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-order-0 {
     order: 0 !important;
   }
@@ -9176,7 +9176,7 @@
   flex: none !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-1 {
     flex: 1 1 0% !important;
   }
@@ -9240,7 +9240,7 @@
   flex-grow: 1 !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-grow-0 {
     flex-grow: 0 !important;
   }
@@ -9280,7 +9280,7 @@
   flex-shrink: 1 !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:flex-shrink-0 {
     flex-shrink: 0 !important;
   }
@@ -9420,7 +9420,7 @@
   column-gap: 5rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:gap-0 {
     gap: 0rem !important;
   }
@@ -10126,7 +10126,7 @@
   padding-bottom: 5rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:p-0 {
     padding: 0rem !important;
   }
@@ -11750,7 +11750,7 @@
   margin-bottom: auto !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:m-0 {
     margin: 0rem !important;
   }
@@ -14058,7 +14058,7 @@
   box-shadow: 0px 9px 46px 8px rgba(0, 0, 0, 0.12), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 11px 15px rgba(0, 0, 0, 0.2) !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:shadow-none {
     box-shadow: none !important;
   }
@@ -14654,7 +14654,7 @@
   border-bottom-style: solid;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:border-none {
     border-width: 0px !important;
     border-style: none;
@@ -15190,7 +15190,7 @@
   border-style: double !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:border-solid {
     border-style: solid !important;
   }
@@ -15286,7 +15286,7 @@
   border-radius: 50% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:border-noround {
     border-radius: 0 !important;
   }
@@ -15614,7 +15614,7 @@
   border-bottom-right-radius: 50% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:border-noround-left {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
@@ -16454,7 +16454,7 @@
   width: 30rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:w-full {
     width: 100% !important;
   }
@@ -17182,7 +17182,7 @@
   height: 30rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:h-full {
     height: 100% !important;
   }
@@ -17642,7 +17642,7 @@
   min-width: max-content !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:min-w-0 {
     min-width: 0px !important;
   }
@@ -17854,7 +17854,7 @@
   max-width: 30rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:max-w-0 {
     max-width: 0px !important;
   }
@@ -18306,7 +18306,7 @@
   min-height: 100vh !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:min-h-0 {
     min-height: 0px !important;
   }
@@ -18494,7 +18494,7 @@
   max-height: 30rem !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:max-h-0 {
     max-height: 0px !important;
   }
@@ -18954,7 +18954,7 @@
   position: sticky !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:static {
     position: static !important;
   }
@@ -19038,7 +19038,7 @@
   top: 100% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:top-auto {
     top: auto !important;
   }
@@ -19110,7 +19110,7 @@
   left: 100% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:left-auto {
     left: auto !important;
   }
@@ -19182,7 +19182,7 @@
   right: 100% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:right-auto {
     right: auto !important;
   }
@@ -19254,7 +19254,7 @@
   bottom: 100% !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:bottom-auto {
     bottom: auto !important;
   }
@@ -19326,7 +19326,7 @@
   overflow: scroll !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:overflow-auto {
     overflow: auto !important;
   }
@@ -19398,7 +19398,7 @@
   overflow-x: scroll !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:overflow-x-auto {
     overflow-x: auto !important;
   }
@@ -19470,7 +19470,7 @@
   overflow-y: scroll !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:overflow-y-auto {
     overflow-y: auto !important;
   }
@@ -19554,7 +19554,7 @@
   z-index: 5 !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:z-auto {
     z-index: auto !important;
   }
@@ -19670,7 +19670,7 @@
   background-repeat: space !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:bg-repeat {
     background-repeat: repeat !important;
   }
@@ -19762,7 +19762,7 @@
   background-size: contain !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:bg-auto {
     background-size: auto !important;
   }
@@ -19842,7 +19842,7 @@
   background-position: top !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:bg-bottom {
     background-position: bottom !important;
   }
@@ -20202,7 +20202,7 @@
   transform: translateY(-100%) !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:translate-x-0 {
     transform: translateX(0%) !important;
   }
@@ -20306,7 +20306,7 @@
   transform: rotate(-180deg) !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:rotate-45 {
     transform: rotate(45deg) !important;
   }
@@ -20422,7 +20422,7 @@
   transform-origin: top-left !important;
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 1024px) {
   .sm\:origin-center {
     transform-origin: center !important;
   }
