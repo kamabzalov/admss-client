@@ -1,5 +1,6 @@
 .sidebar {
     position: fixed;
+    padding-top: 40px;
     left: 0;
     width: var(--admss-aside-small-width);
     top: 150px;
@@ -47,7 +48,7 @@
 }
 
 .sidebar-nav__icon {
-    font-size: 50px;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
 }

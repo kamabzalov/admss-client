@@ -2,7 +2,7 @@
     border-radius: 5px;
     background: #fff;
     box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.80);
-    padding: 40px;
+    padding: 25px 30px;
 }
 
 .card.bottom-space {
@@ -70,9 +70,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 160px;
-    height: 160px;
-    margin-right: 57px;
     border-radius: 3px;
     box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.80);
     color: var(--primary-color);

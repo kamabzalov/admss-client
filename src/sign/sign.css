@@ -4,7 +4,8 @@
     height: 100vh;
     align-items: center;
     justify-content: center;
-    background: url("./background-sign.png");
+    background: url("./background-sign.png") no-repeat;
+    background-size: 100%;
 }
 
 .sign-in {
@@ -74,63 +75,4 @@
     color: var(--admss-app-secondary-deep-blue);
     text-decoration: none;
     font-size: 14px;
-}
-
-@media screen and (min-width: 1400px) {
-    .sign-in {
-        width: 23rem;
-        padding-top: 4rem;
-        padding-bottom: 4rem;
-    }
-
-    .sign-in-wrapper {
-        width: 16rem;
-    }
-
-    .sign__title {
-        font-size: 1.6rem;
-    }
-
-    .sign__input {
-        height: 2.3rem;
-    }
-
-    .user-help__label, .user-help__link {
-        font-size: 16px;
-    }
-
-    .sign__button {
-        font-size: 22px;
-    }
-}
-
-@media screen and (min-width: 1920px) {
-    .sign-in {
-        width: 545px;
-    }
-
-    .sign-in-wrapper {
-        width: 405px;
-    }
-
-    .sign__title {
-        font-size: 48px;
-    }
-
-    .sign__input {
-        height: 50px;
-    }
-
-    .user-help__label, .user-help__link {
-        font-size: 18px;
-    }
-
-    .sign-in__input-space {
-        margin-bottom: 30px;
-    }
-
-    .sign__button {
-        width: 300px;
-        font-size: 24px;
-    }
 }
