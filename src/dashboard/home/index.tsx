@@ -2,12 +2,20 @@ import './index.css';
 import { Checkbox } from 'primereact/checkbox';
 import { Calendar } from 'primereact/calendar';
 import { useState } from 'react';
+import newContact from 'assets/images/icons/new-contact.svg';
+import browseAllContacts from 'assets/images/icons/browse-all-contacts.svg';
+import newInventory from 'assets/images/icons/new-inventory.svg';
+import browseAllInventory from 'assets/images/icons/browse-all-inventory.svg';
+import newDeal from 'assets/images/icons/new-deal.svg';
+import browseAllDeals from 'assets/images/icons/browse-all-deals.svg';
+import testDrive from 'assets/images/icons/test-drive.svg';
 
 export default function Home() {
     const [date, setDate] = useState(null);
     const [first, setFirst] = useState<boolean>(false);
     const [second, setSecond] = useState<boolean>(false);
     const [third, setThird] = useState<boolean>(false);
+    const [fourth, setFourth] = useState<boolean>(false);
 
     const clickCommonTask = () => {
         alert('This action will be ready soon');
@@ -23,44 +31,70 @@ export default function Home() {
                     <div className="card-content">
                         <div className="flex flex-wrap">
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-new-contact"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img src={newContact} alt="Add new contact" className="common-tasks-menu__icon" />
                                     New Contact
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-browse-all-contacts"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img
+                                        src={browseAllContacts}
+                                        alt="Browse all contact"
+                                        className="common-tasks-menu__icon"
+                                    />
                                     Browse all contacts
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-new-inventory"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img src={newInventory} alt="New inventory" className="common-tasks-menu__icon" />
                                     New inventory
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-browse-all-inventory"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img
+                                        src={browseAllInventory}
+                                        alt="Browse all inventory"
+                                        className="common-tasks-menu__icon"
+                                    />
                                     Browse all inventory
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-new-deal"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img src={newDeal} alt="New deal" className="common-tasks-menu__icon" />
                                     New deal
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-browse-all-deals"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img
+                                        src={browseAllDeals}
+                                        alt="Browse all deals"
+                                        className="common-tasks-menu__icon"
+                                    />
                                     Browse all deals
                                 </div>
                             </div>
                             <div className="col-3">
-                                <div className="common-tasks-menu__item" onClick={() => clickCommonTask()}>
-                                    <i className="common-tasks-menu__icon admss-icon-test-drive"></i>
+                                <div
+                                    className="common-tasks-menu__item cursor-pointer"
+                                    onClick={() => clickCommonTask()}>
+                                    <img src={testDrive} alt="New inventory" className="common-tasks-menu__icon" />
                                     Print (for test drive)
                                 </div>
                             </div>
@@ -85,12 +119,20 @@ export default function Home() {
                                     </li>
                                     <li className="mb-2">
                                         <Checkbox onChange={e => setThird(!!e.checked)} checked={third}></Checkbox>
+                                        <label className="ml-2">Complete all daily tasks</label>
+                                    </li>
+                                    <li className="mb-2">
+                                        <Checkbox onChange={e => setFourth(!!e.checked)} checked={fourth}></Checkbox>
                                         <label className="ml-2">Create new tasks</label>
                                     </li>
                                 </ul>
+                                <span className="add-task-control font-semibold cursor-pointer">
+                                    <i className="pi pi-plus add-task-control__icon"></i>
+                                    Add new task
+                                </span>
                             </div>
-                            <div className="col-12 sm:col-6">
-                                <Calendar value={date} inline showWeek />
+                            <div className="col-12 sm:col-6 text-right">
+                                <Calendar value={date} inline />
                             </div>
                         </div>
                     </div>
@@ -123,6 +165,7 @@ export default function Home() {
                                 </tr>
                             </tbody>
                         </table>
+                        <p className="text-right cursor-pointer underline messages-more">See more...</p>
                     </div>
                 </div>
             </div>

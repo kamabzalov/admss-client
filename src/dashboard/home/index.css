@@ -43,7 +43,7 @@
 }
 
 .table-message thead {
-    background: var(--admss-secondary-light-blue);
+    background: var(--admss-app-secondary-light-blue);
     text-align: left;
 }
 
@@ -87,5 +87,25 @@
     font-size: 55px;
     height: 55px;
     margin-bottom: 24px;
+}
+
+.add-task-control {
+    display: inline-flex;
+    align-items: center;
+    color: var(--admss-app-success);
+    cursor: pointer;
+}
+
+.add-task-control__icon {
+    margin-right: 14px;
+    font-weight: 600;
+}
+
+.messages-more {
+    text-align: right;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 600;
+    color: var(--admss-secondary-checbox-input-stroke);
 }
 

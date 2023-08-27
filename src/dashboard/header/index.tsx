@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './index.css';
 import { Menu } from 'primereact/menu';
 import { MenuItem, MenuItemCommandEvent } from 'primereact/menuitem';
@@ -16,9 +16,16 @@ export interface HeaderProps {
 export default function Header(props: HeaderProps) {
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
+    const [dealerName, setDealerName] = useState<string>('');
+    const [location, setLocation] = useState<string>('');
 
     useEffect(() => {
-        getExtendedData(props.user.useruid);
+        getExtendedData(props.user.useruid).then(response => {
+            if (response) {
+                setDealerName(response.dealerName);
+                setLocation(response.location);
+            }
+        });
     }, []);
 
     let items: MenuItem[] = [
@@ -57,8 +64,8 @@ export default function Header(props: HeaderProps) {
                     </div>
                     <div className="grid m-0 head-container  justify-content-between">
                         <div className="header-dealer-info">
-                            <p className="header-dealer-info__name font-bold">dealerName</p>
-                            <span className="header-dealer-location">Location</span>
+                            <p className="header-dealer-info__name font-bold">{dealerName}</p>
+                            <span className="header-dealer-location">{location}</span>
                         </div>
                         <div className="header-user-menu ml-auto">
                             <Menu model={items} popup ref={menuRight} popupAlignment="right" />

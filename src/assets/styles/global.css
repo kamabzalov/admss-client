@@ -5,13 +5,14 @@
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
     --admss-app-light-grey: #ccc;
-    --admss-app-secondary-deep-blue: #292C33;
-    --admss-app-primary-blue-text: #292B2E;
+    --admss-app-secondary: #292C33;
+    --admss-app-primary: #292B2E;
+    --admss-app-success: #28a745;
     --admss-secondary-checbox-input-stroke: #5F5F5F;
-    --admss-primary-bg: #F9FBFF;
-    --admss-secondary-light-blue: #E5EDFD;
-    --admss-primary-main-green: #0DB564;
-    --admss-aside-small-width: 130px;
+    --admss-app-primary-bg: #F9FBFF;
+    --admss-app-secondary-light-blue: #E5EDFD;
+    --admss-app-primary-main-green: #0DB564;
+    --admss-app-aside-small-width: 130px;
 }
 
 ::placeholder {
@@ -29,7 +30,7 @@ html {
 body {
     font-family: var(--admss-app-font);
     font-weight: var(--admss-app-font-weight);
-    background-color: var(--admss-primary-bg);
+    background-color: var(--admss-app-primary-bg);
 }
 
 .container {

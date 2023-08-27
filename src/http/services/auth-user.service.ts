@@ -1,9 +1,15 @@
 import { authorizedUserApiInstance } from '../index';
 
+export interface ExtendedUserData {
+    location: string;
+    dealerName: string;
+    status: 'OK';
+}
+
 export const getExtendedData = async (uid: string) => {
     try {
-        await authorizedUserApiInstance.get(`user/${uid}/info`);
-        return true;
+        const request = await authorizedUserApiInstance.get<ExtendedUserData>(`user/${uid}/info`);
+        return request.data;
     } catch (error) {
         // TODO: add error handler
         console.log(error);

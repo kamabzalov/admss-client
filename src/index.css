@@ -1,5 +1,7 @@
 @import "primereact/resources/primereact.min.css";
-@import "assets/icon-font/admss/styles.css";
+@import "primeicons/primeicons.css";
 @import "assets/styles/vendor/prime/primeflex.css";
+@import "assets/icon-font/admss/styles.css";
 @import "assets/styles/vendor/prime/theme.css";
+@import "assets/styles/components/datepicker.css";
 @import "assets/styles/global.css";

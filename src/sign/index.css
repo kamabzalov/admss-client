@@ -67,12 +67,12 @@
 }
 
 .user-help__label {
-    color: var(--admss-app-primary-blue-text);
+    color: var(--admss-app-primary);
     font-size: 14px;
 }
 
 .user-help__link {
-    color: var(--admss-app-secondary-deep-blue);
+    color: var(--admss-app-secondary);
     text-decoration: none;
     font-size: 14px;
 }

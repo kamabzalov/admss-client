@@ -2,7 +2,7 @@
     position: fixed;
     padding-top: 40px;
     left: 0;
-    width: var(--admss-aside-small-width);
+    width: var(--admss-app-aside-small-width);
     top: 150px;
     height: 100vh;
     background: var(--primary-color);
@@ -29,7 +29,7 @@
 }
 
 .sidebar-nav__item:hover {
-    background: var(--admss-primary-bg);
+    background: var(--admss-app-primary-bg);
 }
 
 .sidebar-nav__link {
