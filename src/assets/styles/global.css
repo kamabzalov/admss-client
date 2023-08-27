@@ -38,6 +38,10 @@ body {
     margin: auto;
 }
 
+.m-r-20px {
+    margin-right: 20px !important;
+}
+
 
 @media screen and (min-width: 1400px) {
     .container {

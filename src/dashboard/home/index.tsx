@@ -22,14 +22,14 @@ export default function Home() {
     };
 
     return (
-        <div className="flex flex-wrap">
+        <div className="grid">
             <div className="col-12">
                 <div className="card">
                     <div className="card-header">
                         <h2 className="card-header__title uppercase m-0">Common tasks</h2>
                     </div>
                     <div className="card-content">
-                        <div className="flex flex-wrap">
+                        <div className="grid">
                             <div className="col-3">
                                 <div
                                     className="common-tasks-menu__item cursor-pointer"
@@ -105,7 +105,7 @@ export default function Home() {
             <div className="col-12">
                 <div className="card">
                     <div className="card-content">
-                        <div className="flex justify-content-between flex-wrap">
+                        <div className="grid justify-content-between">
                             <div className="col-12 sm:col-6">
                                 <h2 className="card-content__title uppercase">Tasks</h2>
                                 <ul className="list-none ml-0 pl-0">

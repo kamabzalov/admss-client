@@ -9,6 +9,7 @@ import NotFound from 'not-found';
 import Home from './dashboard/home';
 import Inventory from './dashboard/inventory';
 import SignIn from './sign/sign-in';
+import Contacts from './dashboard/contacts';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -36,7 +37,7 @@ const router: RemixRouter = createBrowserRouter([
                     },
                     {
                         path: 'contacts',
-                        element: <h1>Contacts</h1>,
+                        element: <Contacts />,
                     },
                     {
                         path: 'deals',

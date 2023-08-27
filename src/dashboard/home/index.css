@@ -1,27 +1,3 @@
-.card {
-    border-radius: 5px;
-    background: #fff;
-    box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.80);
-    padding: 25px 30px;
-}
-
-.card.bottom-space {
-    margin-bottom: 30px;
-}
-
-.card.right-space {
-    margin-right: 30px;
-}
-
-.card-header {
-    margin-bottom: 30px;
-}
-
-.card-content__title {
-    margin-bottom: 30px;
-    margin-top: 0;
-}
-
 .contact-item__label {
     color: var(--primary-color);
     font-weight: 600;

@@ -36,7 +36,6 @@
 }
 
 .sign__input {
-    height: 44px;
     width: 100%;
     border-color: var(--admss-app-light-grey);
     color: var(--admss-app-light-grey);
