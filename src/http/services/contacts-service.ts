@@ -21,6 +21,7 @@ export interface ContactUser {
     email2: string;
     firstName: string;
     lastName: string;
+    fullName: string;
     messager1: string;
     messager2: string;
     phone1: string;

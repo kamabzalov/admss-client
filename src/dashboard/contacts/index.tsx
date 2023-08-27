@@ -11,15 +11,38 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { AuthUser } from '../../http/services/auth.service';
 import { getKeyValue } from '../../services/local-storage.service';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { FilterMatchMode } from 'primereact/api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [, setUser] = useState<AuthUser | null>(null);
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
+    const [filters, setFilters] = useState<DataTableFilterMeta>({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+    const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+    const filterTableData = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        let _filters: any = { ...filters };
+
+        _filters['global'].value = value;
+
+        setFilters(_filters);
+        setGlobalFilterValue(value);
+    };
+
+    const printTableData = () => {
+        const contactsDoc = new jsPDF();
+        autoTable(contactsDoc, { html: '.p-datatable-table' });
+        contactsDoc.autoPrint();
+        contactsDoc.output('dataurlnewwindow');
+    };
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue('admss-client-app-user');
         if (authUser) {
@@ -68,10 +91,15 @@ export default function Contacts() {
                                         severity="success"
                                         type="button"
                                     />
-                                    <Button severity="success" type="button" icon="pi pi-print" />
+                                    <Button
+                                        severity="success"
+                                        type="button"
+                                        icon="pi pi-print"
+                                        onClick={printTableData}
+                                    />
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-6 text-right">
                                 <Button
                                     className="contact-top-controls__button m-r-20px"
                                     label="Advanced search"
@@ -80,14 +108,19 @@ export default function Contacts() {
                                 />
                                 <span className="p-input-icon-right">
                                     <i className="pi pi-search" />
-                                    <InputText value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                                    <InputText value={globalFilterValue} onChange={filterTableData} />
                                 </span>
                             </div>
                         </div>
                         <div className="grid">
                             <div className="col-12">
-                                <DataTable value={contacts} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
-                                    <Column field="firstName" header="Name" sortable></Column>
+                                <DataTable
+                                    filters={filters}
+                                    value={contacts}
+                                    paginator
+                                    rows={5}
+                                    rowsPerPageOptions={[5, 10, 25, 50]}>
+                                    <Column field="fullName" header="Name" sortable></Column>
                                     <Column field="phone1" header="Work Phone"></Column>
                                     <Column field="phone2" header="Home Phone"></Column>
                                     <Column field="streetAddress" header="Address"></Column>
