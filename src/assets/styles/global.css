@@ -4,14 +4,28 @@
     --admss-app-font: 'Open Sans', Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
-    --admss-app-light-grey: #ccc;
-    --admss-app-secondary: #292C33;
+    --admss-app-light-grey: #CCCCCC;
+    --admss-app-lightest-grey: #E7E7E7;
+    --admss-app-medium-grey: #A4A6A8;
+    --admss-darkest-grey: #5F5F5F;
     --admss-app-primary: #292B2E;
-    --admss-app-success: #28a745;
-    --admss-secondary-checbox-input-stroke: #5F5F5F;
-    --admss-app-primary-bg: #F9FBFF;
-    --admss-app-secondary-light-blue: #E5EDFD;
+    --admss-app-yellow: #F1AE00;
+    --admss-app-focus-yellow: #FFF9C3;
+    --admss-app-red: #F10000;
+    --admss-app-focus-red: #FFC3C3;
+    --admss-app-success: #28A745;
+    --admss-app-green: #15C35B;
+    --admss-app-dark-green: #5ED69D;
+    --admss-app-focus-green: #C3FFE3;
+    --admss-app-light-green: #EFFFF7;
     --admss-app-primary-main-green: #0DB564;
+    --admss-app-blue-text: #292A2E;
+    --admss-app-white-blue: #F9FBFF;
+    --admss-app-light-blue: #E5EDFD;
+    --admss-app-medium-blue: #AFC6F3;
+    --admss-app-dark-blue: #86ADFB;
+    --admss-app-darkest-blue: #37455C;
+    --admss-app-deep-blue: #292C33;
     --admss-app-aside-small-width: 130px;
 }
 
@@ -30,7 +44,7 @@ html {
 body {
     font-family: var(--admss-app-font);
     font-weight: var(--admss-app-font-weight);
-    background-color: var(--admss-app-primary-bg);
+    background-color: var(--admss-app-bg-colour);
 }
 
 .container {

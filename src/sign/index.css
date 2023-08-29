@@ -71,7 +71,7 @@
 }
 
 .user-help__link {
-    color: var(--admss-app-secondary);
+    color: var(--admss-app-deep-blue);
     text-decoration: none;
     font-size: 14px;
 }

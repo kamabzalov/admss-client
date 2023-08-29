@@ -19,7 +19,7 @@
 }
 
 .table-message thead {
-    background: var(--admss-app-secondary-light-blue);
+    background: var(--admss-app-light-blue);
     text-align: left;
 }
 
@@ -82,6 +82,6 @@
     cursor: pointer;
     text-decoration: underline;
     font-weight: 600;
-    color: var(--admss-secondary-checbox-input-stroke);
+    color: var(--admss-darkest-grey);
 }
 
