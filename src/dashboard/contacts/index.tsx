@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import './index.css';
-import { Button } from 'primereact/button';
 import {
     ContactType,
     ContactUser,
     getContactsByUserId,
     getContactsCategories,
-} from '../../http/services/contacts-service';
-import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
-import { AuthUser } from '../../http/services/auth.service';
-import { getKeyValue } from '../../services/local-storage.service';
+} from 'http/services/contacts-service';
+import { AuthUser } from 'http/services/auth.service';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { FilterMatchMode } from 'primereact/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getKeyValue } from 'services/local-storage.service';
+import { Dropdown } from 'primereact/dropdown';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { Column } from 'primereact/column';
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
