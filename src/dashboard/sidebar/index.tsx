@@ -9,41 +9,41 @@ import reports from 'assets/images/icons/reports.svg';
 
 export default function Sidebar() {
     return (
-        <aside className="sidebar">
-            <ul className="sidebar-nav">
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={homeIcon} alt="Home" />
+        <aside className='sidebar'>
+            <ul className='sidebar-nav'>
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={homeIcon} alt='Home' />
                         <span>Home</span>
                     </Link>
                 </li>
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard/inventory" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={inventory} alt="Inventory" />
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard/inventory' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={inventory} alt='Inventory' />
                         <span>Inventory</span>
                     </Link>
                 </li>
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard/contacts" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={contacts} alt="Contacts" />
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard/contacts' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={contacts} alt='Contacts' />
                         <span>Contacts</span>
                     </Link>
                 </li>
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard/deals" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={deals} alt="Deals" />
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard/deals' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={deals} alt='Deals' />
                         <span>Deals</span>
                     </Link>
                 </li>
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard/accounts" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={accounts} alt="Accounts" />
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard/accounts' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={accounts} alt='Accounts' />
                         <span>Accounts</span>
                     </Link>
                 </li>
-                <li className="sidebar-nav__item">
-                    <Link to="/dashboard/reports" className="sidebar-nav__link">
-                        <img className="sidebar-nav__icon" src={reports} alt="Reports" />
+                <li className='sidebar-nav__item'>
+                    <Link to='/dashboard/reports' className='sidebar-nav__link'>
+                        <img className='sidebar-nav__icon' src={reports} alt='Reports' />
                         <span>Reports</span>
                     </Link>
                 </li>

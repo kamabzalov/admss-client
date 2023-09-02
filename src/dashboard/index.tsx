@@ -25,8 +25,8 @@ export default function Dashboard() {
             <>
                 <Header user={user} />
                 <Sidebar />
-                <main className="main">
-                    <div className="container">
+                <main className='main'>
+                    <div className='container'>
                         <Outlet />
                     </div>
                 </main>

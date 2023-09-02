@@ -36,11 +36,12 @@ export interface ContactUser {
 
 export const getContactsCategories = async () => {
     try {
-        const request = await authorizedUserApiInstance.get<ContactsCategories>(`contacts/0/listtypes`);
+        const request = await authorizedUserApiInstance.get<ContactsCategories>(
+            `contacts/0/listtypes`
+        );
         return request.data;
     } catch (error) {
         // TODO: add error handler
-        console.log(error);
     }
 };
 
@@ -50,6 +51,5 @@ export const getContactsByUserId = async (uid: string) => {
         return request.data;
     } catch (error) {
         // TODO: add error handler
-        console.log(error);
     }
 };

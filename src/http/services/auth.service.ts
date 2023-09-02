@@ -21,7 +21,6 @@ export const auth = async (signData: LoginForm) => {
         return response.data;
     } catch (error) {
         // TODO: add error handler
-        console.log(error);
     }
 };
 
@@ -31,6 +30,5 @@ export const logout = async (uid: string) => {
         return true;
     } catch (error) {
         // TODO: add error handler
-        console.log(error);
     }
 };

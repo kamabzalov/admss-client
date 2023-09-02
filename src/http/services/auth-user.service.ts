@@ -12,6 +12,5 @@ export const getExtendedData = async (uid: string) => {
         return request.data;
     } catch (error) {
         // TODO: add error handler
-        console.log(error);
     }
 };

@@ -20,7 +20,7 @@ export default function Header(props: HeaderProps) {
     const [location, setLocation] = useState<string>('');
 
     useEffect(() => {
-        getExtendedData(props.user.useruid).then(response => {
+        getExtendedData(props.user.useruid).then((response) => {
             if (response) {
                 setDealerName(response.dealerName);
                 setLocation(response.location);
@@ -43,7 +43,7 @@ export default function Header(props: HeaderProps) {
             label: 'Logout',
             command(event: MenuItemCommandEvent) {
                 if (props.user) {
-                    logout(props.user.useruid).then(res => {
+                    logout(props.user.useruid).then((res) => {
                         if (res) {
                             navigate('/');
                             clear();
@@ -57,23 +57,23 @@ export default function Header(props: HeaderProps) {
     ];
     if (menuRight) {
         return (
-            <header className="header">
-                <div className="flex h-full align-items-center">
-                    <div className="header__logo">
-                        <img src={logo} alt="ADMSS" />
+            <header className='header'>
+                <div className='flex h-full align-items-center'>
+                    <div className='header__logo'>
+                        <img src={logo} alt='ADMSS' />
                     </div>
-                    <div className="grid m-0 head-container  justify-content-between">
-                        <div className="header-dealer-info">
-                            <p className="header-dealer-info__name font-bold">{dealerName}</p>
-                            <span className="header-dealer-location">{location}</span>
+                    <div className='grid m-0 head-container  justify-content-between'>
+                        <div className='header-dealer-info'>
+                            <p className='header-dealer-info__name font-bold'>{dealerName}</p>
+                            <span className='header-dealer-location'>{location}</span>
                         </div>
-                        <div className="header-user-menu ml-auto">
-                            <Menu model={items} popup ref={menuRight} popupAlignment="right" />
+                        <div className='header-user-menu ml-auto'>
+                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
                             <img
-                                className="header-user-menu__toggle"
-                                onClick={event => menuRight?.current?.toggle(event)}
+                                className='header-user-menu__toggle'
+                                onClick={(event) => menuRight?.current?.toggle(event)}
                                 src={userCabinet}
-                                alt="User cabinet"
+                                alt='User cabinet'
                             />
                         </div>
                     </div>

@@ -2,8 +2,8 @@
     height: 50px;
 }
 
-.p-checkbox .p-checkbox-box.p-highlight, .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
     background: var(--admss-app-success);
     border-color: var(--admss-app-success);
 }
-

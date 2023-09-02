@@ -1,5 +1,7 @@
 export default function Inventory() {
-    return <>
-        <h1>Inventory page</h1>
-    </>;
+    return (
+        <>
+            <h1>Inventory page</h1>
+        </>
+    );
 }

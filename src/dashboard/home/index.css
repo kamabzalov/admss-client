@@ -47,7 +47,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 3px;
-    box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.80);
+    box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.8);
     color: var(--primary-color);
     font-size: 16px;
     font-weight: 600;
@@ -84,4 +84,3 @@
     font-weight: 600;
     color: var(--admss-darkest-grey);
 }
-

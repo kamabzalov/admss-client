@@ -4,28 +4,28 @@
     --admss-app-font: 'Open Sans', Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
-    --admss-app-light-grey: #CCCCCC;
-    --admss-app-lightest-grey: #E7E7E7;
-    --admss-app-medium-grey: #A4A6A8;
-    --admss-darkest-grey: #5F5F5F;
-    --admss-app-primary: #292B2E;
-    --admss-app-yellow: #F1AE00;
-    --admss-app-focus-yellow: #FFF9C3;
-    --admss-app-red: #F10000;
-    --admss-app-focus-red: #FFC3C3;
-    --admss-app-success: #28A745;
-    --admss-app-green: #15C35B;
-    --admss-app-dark-green: #5ED69D;
-    --admss-app-focus-green: #C3FFE3;
-    --admss-app-light-green: #EFFFF7;
-    --admss-app-primary-main-green: #0DB564;
-    --admss-app-blue-text: #292A2E;
-    --admss-app-white-blue: #F9FBFF;
-    --admss-app-light-blue: #E5EDFD;
-    --admss-app-medium-blue: #AFC6F3;
-    --admss-app-dark-blue: #86ADFB;
-    --admss-app-darkest-blue: #37455C;
-    --admss-app-deep-blue: #292C33;
+    --admss-app-light-grey: #cccccc;
+    --admss-app-lightest-grey: #e7e7e7;
+    --admss-app-medium-grey: #a4a6a8;
+    --admss-darkest-grey: #5f5f5f;
+    --admss-app-primary: #292b2e;
+    --admss-app-yellow: #f1ae00;
+    --admss-app-focus-yellow: #fff9c3;
+    --admss-app-red: #f10000;
+    --admss-app-focus-red: #ffc3c3;
+    --admss-app-success: #28a745;
+    --admss-app-green: #15c35b;
+    --admss-app-dark-green: #5ed69d;
+    --admss-app-focus-green: #c3ffe3;
+    --admss-app-light-green: #effff7;
+    --admss-app-primary-main-green: #0db564;
+    --admss-app-blue-text: #292a2e;
+    --admss-app-white-blue: #f9fbff;
+    --admss-app-light-blue: #e5edfd;
+    --admss-app-medium-blue: #afc6f3;
+    --admss-app-dark-blue: #86adfb;
+    --admss-app-darkest-blue: #37455c;
+    --admss-app-deep-blue: #292c33;
     --admss-app-aside-small-width: 130px;
 }
 
@@ -33,7 +33,9 @@
     color: var(--admss-app-light-grey);
 }
 
-html, body, #root {
+html,
+body,
+#root {
     height: 100%;
 }
 
@@ -55,7 +57,6 @@ body {
 .m-r-20px {
     margin-right: 20px !important;
 }
-
 
 @media screen and (min-width: 1400px) {
     .container {

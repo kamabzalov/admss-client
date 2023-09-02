@@ -35,7 +35,7 @@ export default function SignIn() {
             return errors;
         },
         onSubmit: () => {
-            auth(formik.values).then(response => {
+            auth(formik.values).then((response) => {
                 if (response) {
                     setKey('admss-client-app-user', JSON.stringify(response));
                     navigate('/dashboard');
@@ -47,63 +47,67 @@ export default function SignIn() {
     });
 
     return (
-        <section className="sign">
-            <div className="sign-in">
-                <div className="sign-in-wrapper">
-                    <h1 className="sign__title">Sign In</h1>
+        <section className='sign'>
+            <div className='sign-in'>
+                <div className='sign-in-wrapper'>
+                    <h1 className='sign__title'>Sign In</h1>
                     <form onSubmit={formik.handleSubmit}>
-                        <div className="sign-in__input-space">
-                            <div className="p-input-icon-right w-full">
-                                <i className="admss-icon-user sign__icon" />
+                        <div className='sign-in__input-space'>
+                            <div className='p-input-icon-right w-full'>
+                                <i className='admss-icon-user sign__icon' />
                                 <InputText
-                                    placeholder="Username"
-                                    className="sign__input"
-                                    id="username"
+                                    placeholder='Username'
+                                    className='sign__input'
+                                    id='username'
                                     onChange={formik.handleChange}
                                     value={formik.values.username}
                                 />
-                                {formik.errors.username ? <span>{formik.errors.username}</span> : null}
+                                {formik.errors.username ? (
+                                    <span>{formik.errors.username}</span>
+                                ) : null}
                             </div>
                         </div>
 
-                        <div className="sign-in__input-space">
-                            <div className="p-input-icon-right w-full">
-                                <i className="admss-icon-password sign__icon" />
+                        <div className='sign-in__input-space'>
+                            <div className='p-input-icon-right w-full'>
+                                <i className='admss-icon-password sign__icon' />
                                 <InputText
-                                    placeholder="Password"
-                                    className="sign__input"
-                                    id="password"
-                                    type="password"
+                                    placeholder='Password'
+                                    className='sign__input'
+                                    id='password'
+                                    type='password'
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                 />
-                                {formik.errors.password ? <span>{formik.errors.password}</span> : null}
+                                {formik.errors.password ? (
+                                    <span>{formik.errors.password}</span>
+                                ) : null}
                             </div>
                         </div>
 
-                        <div className="flex justify-content-between user-help">
-                            <div className="flex align-items-center">
+                        <div className='flex justify-content-between user-help'>
+                            <div className='flex align-items-center'>
                                 <Checkbox
-                                    inputId="rememberme"
-                                    name="rememberme"
+                                    inputId='rememberme'
+                                    name='rememberme'
                                     value={formik.values.rememberme}
                                     checked={formik.values.rememberme}
-                                    onChange={e => formik.setFieldValue('rememberme', e.checked)}
+                                    onChange={(e) => formik.setFieldValue('rememberme', e.checked)}
                                 />
-                                <label htmlFor="remember" className="ml-2 user-help__label">
+                                <label htmlFor='remember' className='ml-2 user-help__label'>
                                     Remember me
                                 </label>
                             </div>
-                            <Link className="user-help__link font-semibold" to="/">
+                            <Link className='user-help__link font-semibold' to='/'>
                                 Forgot password?
                             </Link>
                         </div>
-                        <div className="text-center">
+                        <div className='text-center'>
                             <Button
-                                label="Sign in"
-                                severity="success"
-                                type="submit"
-                                className="sign__button font-bold"
+                                label='Sign in'
+                                severity='success'
+                                type='submit'
+                                className='sign__button font-bold'
                             />
                         </div>
                     </form>

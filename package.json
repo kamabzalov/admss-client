@@ -56,7 +56,7 @@
     ],
     "rules": {
       "no-unused-vars": "warn",
-      "no-console": "warn"
+      "no-console": "error"
     }
   },
   "browserslist": {
