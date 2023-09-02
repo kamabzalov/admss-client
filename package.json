@@ -11,9 +11,12 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "axios": "^1.5.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "formik": "^2.4.2",
+    "husky": "^8.0.3",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.6.0",
+    "prettier": "^2.6.2",
     "primeicons": "^6.0.1",
     "primereact": "^9.2.2",
     "react": "^18.2.0",
@@ -28,13 +31,33 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "eslint": "eslint --fix",
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "rtl": "webpack --config=rtl.config.js",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,md}": [
+      "npm run eslint",
+      "prettier --write"
+    ]
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "warn"
+    }
   },
   "browserslist": {
     "production": [
@@ -49,6 +72,7 @@
     ]
   },
   "devDependencies": {
+    "lint-staged": "^14.0.1",
     "prettier": "2.8.4"
   }
 }
