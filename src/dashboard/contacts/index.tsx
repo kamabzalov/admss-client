@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
     ContactType,
     ContactUser,
-    getContactsByUserId,
+    getContacts,
     getContactsCategories,
 } from "http/services/contacts-service";
 import { AuthUser } from "http/services/auth.service";
-import { DataTable, DataTableFilterMeta } from "primereact/datatable";
-import { FilterMatchMode } from "primereact/api";
+import { DataTable, DataTablePageEvent } from "primereact/datatable";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
@@ -21,25 +20,24 @@ export default function Contacts() {
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
     const [, setUser] = useState<AuthUser | null>(null);
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
-    const [filters, setFilters] = useState<DataTableFilterMeta>({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    const [lazyState, setlazyState] = useState<any>({
+        first: 0,
+        rows: 5,
+        page: 1,
+        sortField: "",
+        sortOrder: "",
     });
-    const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
-    const filterTableData = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        let _filters: any = { ...filters };
-
-        _filters["global"].value = value;
-
-        setFilters(_filters);
-        setGlobalFilterValue(value);
-    };
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
         autoTable(contactsDoc, { html: ".p-datatable-table" });
         contactsDoc.autoPrint();
         contactsDoc.output("dataurlnewwindow");
+    };
+
+    const pageChanged = (event: DataTablePageEvent) => {
+        // eslint-disable-next-line no-console
+        console.log(event);
     };
 
     useEffect(() => {
@@ -51,13 +49,13 @@ export default function Contacts() {
                     setCategories(response?.contact_types);
                 }
             });
-            getContactsByUserId(authUser.useruid).then((response) => {
+            getContacts(authUser.useruid, selectedCategory?.id).then((response) => {
                 if (response?.length) {
                     setUserContacts(response);
                 }
             });
         }
-    }, []);
+    }, [selectedCategory]);
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -107,20 +105,17 @@ export default function Contacts() {
                                 />
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
-                                    <InputText
-                                        value={globalFilterValue}
-                                        onChange={filterTableData}
-                                    />
+                                    <InputText />
                                 </span>
                             </div>
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
-                                    filters={filters}
                                     value={contacts}
                                     paginator
-                                    rows={5}
+                                    rows={10}
+                                    onPage={pageChanged}
                                     rowsPerPageOptions={[5, 10, 25, 50]}
                                 >
                                     <Column field='fullName' header='Name' sortable></Column>

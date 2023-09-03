@@ -45,9 +45,16 @@ export const getContactsCategories = async () => {
     }
 };
 
-export const getContactsByUserId = async (uid: string) => {
+export const getContacts = async (uid: string, categoryId?: number, perPage?: number) => {
+    // eslint-disable-next-line no-console
+    console.log(perPage);
     try {
-        const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`);
+        const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`, {
+            params: {
+                param: categoryId,
+                top: perPage,
+            },
+        });
         return request.data;
     } catch (error) {
         // TODO: add error handler
