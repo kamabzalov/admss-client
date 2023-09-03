@@ -1,18 +1,18 @@
-import { LoginForm } from '../../sign/sign-in';
-import { authorizedUserApiInstance, MAGIC, nonAuthorizedUserApiInstance } from '../index';
+import { LoginForm } from "../../sign/sign-in";
+import { authorizedUserApiInstance, MAGIC, nonAuthorizedUserApiInstance } from "../index";
 
 export interface AuthUser {
     modified: string;
     sessionuid: string;
     started: string;
-    status: 'OK';
+    status: "OK";
     token: string;
     useruid: string;
 }
 
 export const auth = async (signData: LoginForm) => {
     try {
-        const response = await nonAuthorizedUserApiInstance.post<AuthUser>('user', {
+        const response = await nonAuthorizedUserApiInstance.post<AuthUser>("user", {
             user: signData.username,
             secret: signData.password,
             rememberme: signData.rememberme,

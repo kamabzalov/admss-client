@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-import './index.css';
-import { Menu } from 'primereact/menu';
-import { MenuItem, MenuItemCommandEvent } from 'primereact/menuitem';
-import logo from 'assets/images/logo.svg';
-import userCabinet from 'assets/images/icons/user-cabinet.svg';
-import { AuthUser, logout } from '../../http/services/auth.service';
-import { clear } from '../../services/local-storage.service';
-import { useNavigate } from 'react-router-dom';
-import { getExtendedData } from '../../http/services/auth-user.service';
+import { useEffect, useRef, useState } from "react";
+import "./index.css";
+import { Menu } from "primereact/menu";
+import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
+import logo from "assets/images/logo.svg";
+import userCabinet from "assets/images/icons/header/user-cabinet.svg";
+import { AuthUser, logout } from "http/services/auth.service";
+import { clear } from "services/local-storage.service";
+import { useNavigate } from "react-router-dom";
+import { getExtendedData } from "http/services/auth-user.service";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -16,8 +16,8 @@ export interface HeaderProps {
 export default function Header(props: HeaderProps) {
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
-    const [dealerName, setDealerName] = useState<string>('');
-    const [location, setLocation] = useState<string>('');
+    const [dealerName, setDealerName] = useState<string>("");
+    const [location, setLocation] = useState<string>("");
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
@@ -29,23 +29,23 @@ export default function Header(props: HeaderProps) {
     }, []);
 
     let items: MenuItem[] = [
-        { label: 'My Profile' },
-        { label: 'General Settings' },
+        { label: "My Profile" },
+        { label: "General Settings" },
         { separator: true },
-        { label: 'Change location' },
-        { label: 'Users' },
+        { label: "Change location" },
+        { label: "Users" },
         { separator: true },
-        { label: 'Contact support' },
-        { label: 'Support history' },
-        { label: 'Help' },
+        { label: "Contact support" },
+        { label: "Support history" },
+        { label: "Help" },
         { separator: true },
         {
-            label: 'Logout',
+            label: "Logout",
             command(event: MenuItemCommandEvent) {
                 if (props.user) {
                     logout(props.user.useruid).then((res) => {
                         if (res) {
-                            navigate('/');
+                            navigate("/");
                             clear();
                         }
                     });
@@ -53,7 +53,7 @@ export default function Header(props: HeaderProps) {
             },
         },
         { separator: true },
-        { label: 'Sign up' },
+        { label: "Sign up" },
     ];
     if (menuRight) {
         return (

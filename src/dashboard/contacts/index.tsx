@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
     ContactType,
     ContactUser,
     getContactsByUserId,
     getContactsCategories,
-} from 'http/services/contacts-service';
-import { AuthUser } from 'http/services/auth.service';
-import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
-import { FilterMatchMode } from 'primereact/api';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { getKeyValue } from 'services/local-storage.service';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Column } from 'primereact/column';
+} from "http/services/contacts-service";
+import { AuthUser } from "http/services/auth.service";
+import { DataTable, DataTableFilterMeta } from "primereact/datatable";
+import { FilterMatchMode } from "primereact/api";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { getKeyValue } from "services/local-storage.service";
+import { Dropdown } from "primereact/dropdown";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Column } from "primereact/column";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -24,12 +24,12 @@ export default function Contacts() {
     const [filters, setFilters] = useState<DataTableFilterMeta>({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
-    const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+    const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
     const filterTableData = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         let _filters: any = { ...filters };
 
-        _filters['global'].value = value;
+        _filters["global"].value = value;
 
         setFilters(_filters);
         setGlobalFilterValue(value);
@@ -37,13 +37,13 @@ export default function Contacts() {
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: '.p-datatable-table' });
+        autoTable(contactsDoc, { html: ".p-datatable-table" });
         contactsDoc.autoPrint();
-        contactsDoc.output('dataurlnewwindow');
+        contactsDoc.output("dataurlnewwindow");
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue('admss-client-app-user');
+        const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
             setUser(authUser);
             getContactsCategories().then((response) => {

@@ -1,14 +1,14 @@
-import './index.css';
-import { Checkbox } from 'primereact/checkbox';
-import { Calendar } from 'primereact/calendar';
-import { useState } from 'react';
-import newContact from 'assets/images/icons/new-contact.svg';
-import browseAllContacts from 'assets/images/icons/browse-all-contacts.svg';
-import newInventory from 'assets/images/icons/new-inventory.svg';
-import browseAllInventory from 'assets/images/icons/browse-all-inventory.svg';
-import newDeal from 'assets/images/icons/new-deal.svg';
-import browseAllDeals from 'assets/images/icons/browse-all-deals.svg';
-import testDrive from 'assets/images/icons/test-drive.svg';
+import "./index.css";
+import { Checkbox } from "primereact/checkbox";
+import { Calendar } from "primereact/calendar";
+import { useState } from "react";
+import newContact from "assets/images/icons/common-tasks/new-contact.svg";
+import browseAllContacts from "assets/images/icons/common-tasks/browse-all-contacts.svg";
+import newInventory from "assets/images/icons/common-tasks/new-inventory.svg";
+import browseAllInventory from "assets/images/icons/common-tasks/browse-all-inventory.svg";
+import newDeal from "assets/images/icons/common-tasks/new-deal.svg";
+import browseAllDeals from "assets/images/icons/common-tasks/browse-all-deals.svg";
+import testDrive from "assets/images/icons/common-tasks/test-drive.svg";
 
 export default function Home() {
     const [date] = useState(null);
@@ -18,7 +18,7 @@ export default function Home() {
     const [fourth, setFourth] = useState<boolean>(false);
 
     const clickCommonTask = () => {
-        alert('This action will be ready soon');
+        alert("This action will be ready soon");
     };
 
     return (
@@ -30,7 +30,7 @@ export default function Home() {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -43,7 +43,7 @@ export default function Home() {
                                     New Contact
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -56,7 +56,7 @@ export default function Home() {
                                     Browse all contacts
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -69,7 +69,7 @@ export default function Home() {
                                     New inventory
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -82,7 +82,7 @@ export default function Home() {
                                     Browse all inventory
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -95,7 +95,7 @@ export default function Home() {
                                     New deal
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -108,7 +108,7 @@ export default function Home() {
                                     Browse all deals
                                 </div>
                             </div>
-                            <div className='col-3'>
+                            <div className='col-12 md:col-6 lg:col-3'>
                                 <div
                                     className='common-tasks-menu__item cursor-pointer'
                                     onClick={() => clickCommonTask()}
@@ -129,7 +129,7 @@ export default function Home() {
                 <div className='card'>
                     <div className='card-content'>
                         <div className='grid justify-content-between'>
-                            <div className='col-12 sm:col-6'>
+                            <div className='col-12 md:col-5'>
                                 <h2 className='card-content__title uppercase'>Tasks</h2>
                                 <ul className='list-none ml-0 pl-0'>
                                     <li className='mb-2'>
@@ -168,7 +168,7 @@ export default function Home() {
                                     Add new task
                                 </span>
                             </div>
-                            <div className='col-12 sm:col-6 text-right'>
+                            <div className='col-12 md:col-7 md:text-right'>
                                 <Calendar value={date} inline />
                             </div>
                         </div>
@@ -208,7 +208,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            <div className='col-8 xl:col-4'>
+            <div className='col-12 xl:col-4'>
                 <div className='card'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Recently added contact</h2>
@@ -233,7 +233,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            <div className='col-4 xl:col-4'>
+            <div className='col-12 xl:col-4'>
                 <div className='card'>
                     <div className='card-header'>
                         <h2 className='uppercase m-0'>Printing</h2>

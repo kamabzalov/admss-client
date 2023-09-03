@@ -1,54 +1,54 @@
-import { Router as RemixRouter } from '@remix-run/router/dist/router';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import './index.css';
-import App from 'App';
-import Dashboard from 'dashboard';
-import NotFound from 'not-found';
-import Home from './dashboard/home';
-import Inventory from './dashboard/inventory';
-import SignIn from './sign/sign-in';
-import Contacts from './dashboard/contacts';
+import { Router as RemixRouter } from "@remix-run/router/dist/router";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "./index.css";
+import App from "App";
+import Dashboard from "dashboard";
+import NotFound from "not-found";
+import Home from "./dashboard/home";
+import Inventory from "./dashboard/inventory";
+import SignIn from "./sign/sign-in";
+import Contacts from "./dashboard/contacts";
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 const router: RemixRouter = createBrowserRouter([
     {
-        path: '/',
+        path: "/",
         element: <App />,
         errorElement: <NotFound />,
         children: [
             {
-                path: '',
+                path: "",
                 element: <SignIn />,
             },
             {
-                path: '/dashboard',
+                path: "/dashboard",
                 element: <Dashboard />,
                 children: [
                     {
-                        path: '',
+                        path: "",
                         element: <Home />,
                     },
                     {
-                        path: 'inventory',
+                        path: "inventory",
                         element: <Inventory />,
                     },
                     {
-                        path: 'contacts',
+                        path: "contacts",
                         element: <Contacts />,
                     },
                     {
-                        path: 'deals',
+                        path: "deals",
                         element: <h1>Deals</h1>,
                     },
                     {
-                        path: 'accounts',
+                        path: "accounts",
                         element: <h1>Accounts</h1>,
                     },
                     {
-                        path: 'reports',
+                        path: "reports",
                         element: <h1>Reports</h1>,
                     },
                 ],

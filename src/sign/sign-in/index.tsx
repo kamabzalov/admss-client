@@ -1,11 +1,11 @@
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Checkbox } from 'primereact/checkbox';
-import { Link, useNavigate } from 'react-router-dom';
-import { useFormik } from 'formik';
-import '../index.css';
-import { auth } from '../../http/services/auth.service';
-import { setKey } from '../../services/local-storage.service';
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
+import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import "../index.css";
+import { auth } from "../../http/services/auth.service";
+import { setKey } from "../../services/local-storage.service";
 
 export interface LoginForm {
     username: string;
@@ -17,19 +17,19 @@ export default function SignIn() {
     const navigate = useNavigate();
     const formik = useFormik<LoginForm>({
         initialValues: {
-            username: '',
-            password: '',
+            username: "",
+            password: "",
             rememberme: false,
         },
         validate: (data: { username: string; password: string }) => {
             let errors: any = {};
 
             if (!data.username.trim()) {
-                errors.username = 'Username is required.';
+                errors.username = "Username is required.";
             }
 
             if (!data.password.trim()) {
-                errors.password = 'Password is required.';
+                errors.password = "Password is required.";
             }
 
             return errors;
@@ -37,10 +37,10 @@ export default function SignIn() {
         onSubmit: () => {
             auth(formik.values).then((response) => {
                 if (response) {
-                    setKey('admss-client-app-user', JSON.stringify(response));
-                    navigate('/dashboard');
+                    setKey("admss-client-app-user", JSON.stringify(response));
+                    navigate("/dashboard");
                 } else {
-                    alert('Error');
+                    alert("Error");
                 }
             });
         },
@@ -92,7 +92,7 @@ export default function SignIn() {
                                     name='rememberme'
                                     value={formik.values.rememberme}
                                     checked={formik.values.rememberme}
-                                    onChange={(e) => formik.setFieldValue('rememberme', e.checked)}
+                                    onChange={(e) => formik.setFieldValue("rememberme", e.checked)}
                                 />
                                 <label htmlFor='remember' className='ml-2 user-help__label'>
                                     Remember me

@@ -52,7 +52,7 @@
 }
 
 .p-component {
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
     font-size: 1rem;
     font-weight: normal;
 }
@@ -81,7 +81,7 @@
 
 .p-link {
     font-size: 1rem;
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
     border-radius: 4px;
 }
 
@@ -270,7 +270,7 @@
 }
 
 .p-autocomplete .p-autocomplete-multiple-container .p-autocomplete-input-token input {
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
     font-size: 1rem;
     color: #212529;
     padding: 0;
@@ -815,7 +815,7 @@
 }
 
 .p-chips .p-chips-multiple-container .p-chips-input-token input {
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
     font-size: 1rem;
     color: #212529;
     padding: 0;
@@ -1254,7 +1254,7 @@
 }
 
 .p-inputtext {
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
     font-size: 1rem;
     color: #3c435a;
     background: #fff;
@@ -4215,23 +4215,23 @@
 }
 
 .fc.fc-unthemed .fc-toolbar .fc-button .fc-icon-chevron-left {
-    font-family: 'PrimeIcons' !important;
+    font-family: "PrimeIcons" !important;
     text-indent: 0;
     font-size: 1rem;
 }
 
 .fc.fc-unthemed .fc-toolbar .fc-button .fc-icon-chevron-left:before {
-    content: '';
+    content: "";
 }
 
 .fc.fc-unthemed .fc-toolbar .fc-button .fc-icon-chevron-right {
-    font-family: 'PrimeIcons' !important;
+    font-family: "PrimeIcons" !important;
     text-indent: 0;
     font-size: 1rem;
 }
 
 .fc.fc-unthemed .fc-toolbar .fc-button .fc-icon-chevron-right:before {
-    content: '';
+    content: "";
 }
 
 .fc.fc-unthemed .fc-toolbar .fc-button:focus {
@@ -4333,7 +4333,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    font-family: 'PrimeIcons' !important;
+    font-family: "PrimeIcons" !important;
     font-size: 1rem;
     width: 2rem;
     height: 2rem;
@@ -4345,7 +4345,7 @@
 }
 
 .fc.fc-theme-standard .fc-view-harness .fc-popover .fc-popover-header .fc-popover-close:before {
-    content: '';
+    content: "";
 }
 
 .fc.fc-theme-standard .fc-view-harness .fc-popover .fc-popover-header .fc-popover-close:hover {
@@ -4427,23 +4427,23 @@
 }
 
 .fc.fc-theme-standard .fc-toolbar .fc-button .fc-icon-chevron-left {
-    font-family: 'PrimeIcons' !important;
+    font-family: "PrimeIcons" !important;
     text-indent: 0;
     font-size: 1rem;
 }
 
 .fc.fc-theme-standard .fc-toolbar .fc-button .fc-icon-chevron-left:before {
-    content: '';
+    content: "";
 }
 
 .fc.fc-theme-standard .fc-toolbar .fc-button .fc-icon-chevron-right {
-    font-family: 'PrimeIcons' !important;
+    font-family: "PrimeIcons" !important;
     text-indent: 0;
     font-size: 1rem;
 }
 
 .fc.fc-theme-standard .fc-toolbar .fc-button .fc-icon-chevron-right:before {
-    content: '';
+    content: "";
 }
 
 .fc.fc-theme-standard .fc-toolbar .fc-button:focus {
@@ -7165,7 +7165,7 @@
 }
 
 .p-steps .p-steps-item:before {
-    content: ' ';
+    content: " ";
     border-top: 1px solid #dee2e6;
     width: 100%;
     top: 50%;
@@ -7918,7 +7918,7 @@
 
 .p-terminal .p-terminal-input {
     font-size: 1rem;
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
 }
 
 .p-badge {
@@ -8000,9 +8000,9 @@
 }
 
 .p-breadcrumb .p-breadcrumb-chevron {
-    font-family: 'Open Sans';
+    font-family: "Open Sans";
 }
 
 .p-breadcrumb .p-breadcrumb-chevron:before {
-    content: '/';
+    content: "/";
 }

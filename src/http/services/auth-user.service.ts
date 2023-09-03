@@ -1,9 +1,9 @@
-import { authorizedUserApiInstance } from '../index';
+import { authorizedUserApiInstance } from "../index";
 
 export interface ExtendedUserData {
     location: string;
     dealerName: string;
-    status: 'OK';
+    status: "OK";
 }
 
 export const getExtendedData = async (uid: string) => {

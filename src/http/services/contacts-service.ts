@@ -1,7 +1,7 @@
-import { authorizedUserApiInstance } from '../index';
+import { authorizedUserApiInstance } from "../index";
 
 export interface ContactsCategories {
-    status: 'OK';
+    status: "OK";
     contact_types: ContactType[];
 }
 
