@@ -16,6 +16,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
+import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -24,13 +25,7 @@ export default function Contacts() {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
-    const [lazyState, setLazyState] = useState<any>({
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-    });
+    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
@@ -64,12 +59,12 @@ export default function Contacts() {
     useEffect(() => {
         const params: QueryParams = {
             ...(selectedCategory?.id && { param: selectedCategory.id }),
-            ...(lazyState.sortOrder === 1 && { type: "ASC" }),
-            ...(lazyState.sortOrder === -1 && { type: "DESC" }),
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(globalSearch && { qry: globalSearch }),
             skip: lazyState.first,
             top: lazyState.rows,
-            column: "firstName",
+            column: lazyState.column,
         };
         if (authUser) {
             getContacts(authUser.useruid, params).then((response) => {
@@ -154,7 +149,7 @@ export default function Contacts() {
                                     sortField={lazyState.sortField}
                                 >
                                     <Column field='fullName' header='Name' sortable></Column>
-                                    <Column field='phone1' header='Work Phone' sortable></Column>
+                                    <Column field='phone1' header='Work Phone'></Column>
                                     <Column field='phone2' header='Home Phone'></Column>
                                     <Column field='streetAddress' header='Address'></Column>
                                     <Column field='email1' header='Email'></Column>

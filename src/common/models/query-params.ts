@@ -4,6 +4,6 @@ export interface QueryParams {
     skip?: number;
     qry?: string;
     column?: string;
-    type?: "ASC" | "DESC";
+    type?: "asc" | "desc";
     total?: number;
 }
