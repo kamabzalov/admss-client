@@ -3,10 +3,11 @@ import {
     ContactType,
     ContactUser,
     getContacts,
+    getContactsAmount,
     getContactsCategories,
 } from "http/services/contacts-service";
 import { AuthUser } from "http/services/auth.service";
-import { DataTable, DataTablePageEvent } from "primereact/datatable";
+import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
@@ -14,30 +15,35 @@ import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
+import { QueryParams } from "common/models/query-params";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
-    const [, setUser] = useState<AuthUser | null>(null);
+    const [authUser, setUser] = useState<AuthUser | null>(null);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
-    const [lazyState, setlazyState] = useState<any>({
+    const [lazyState, setLazyState] = useState<any>({
         first: 0,
-        rows: 5,
+        rows: 10,
         page: 1,
-        sortField: "",
-        sortOrder: "",
+        sortField: null,
+        sortOrder: null,
     });
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
         autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.autoPrint();
         contactsDoc.output("dataurlnewwindow");
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
-        // eslint-disable-next-line no-console
-        console.log(event);
+        setLazyState(event);
+    };
+
+    const sortData = (event: DataTableSortEvent) => {
+        setLazyState(event);
     };
 
     useEffect(() => {
@@ -49,13 +55,32 @@ export default function Contacts() {
                     setCategories(response?.contact_types);
                 }
             });
-            getContacts(authUser.useruid, selectedCategory?.id).then((response) => {
+            getContactsAmount(authUser.useruid, { total: 1 }).then((response) => {
+                setTotalRecords(response?.total ?? 0);
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        const params: QueryParams = {
+            ...(selectedCategory?.id && { param: selectedCategory.id }),
+            ...(lazyState.sortOrder === 1 && { type: "ASC" }),
+            ...(lazyState.sortOrder === -1 && { type: "DESC" }),
+            ...(globalSearch && { qry: globalSearch }),
+            skip: lazyState.first,
+            top: lazyState.rows,
+            column: "firstName",
+        };
+        if (authUser) {
+            getContacts(authUser.useruid, params).then((response) => {
                 if (response?.length) {
                     setUserContacts(response);
+                } else {
+                    setUserContacts([]);
                 }
             });
         }
-    }, [selectedCategory]);
+    }, [selectedCategory, lazyState, authUser, globalSearch]);
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -105,7 +130,10 @@ export default function Contacts() {
                                 />
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
-                                    <InputText />
+                                    <InputText
+                                        value={globalSearch}
+                                        onChange={(e) => setGlobalSearch(e.target.value)}
+                                    />
                                 </span>
                             </div>
                         </div>
@@ -113,13 +141,20 @@ export default function Contacts() {
                             <div className='col-12'>
                                 <DataTable
                                     value={contacts}
+                                    lazy
                                     paginator
-                                    rows={10}
+                                    filterDisplay='row'
+                                    first={lazyState.first}
+                                    rows={lazyState.rows}
+                                    rowsPerPageOptions={[5, 10, 20]}
+                                    totalRecords={totalRecords}
                                     onPage={pageChanged}
-                                    rowsPerPageOptions={[5, 10, 25, 50]}
+                                    onSort={sortData}
+                                    sortOrder={lazyState.sortOrder}
+                                    sortField={lazyState.sortField}
                                 >
                                     <Column field='fullName' header='Name' sortable></Column>
-                                    <Column field='phone1' header='Work Phone'></Column>
+                                    <Column field='phone1' header='Work Phone' sortable></Column>
                                     <Column field='phone2' header='Home Phone'></Column>
                                     <Column field='streetAddress' header='Address'></Column>
                                     <Column field='email1' header='Email'></Column>

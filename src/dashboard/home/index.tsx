@@ -9,6 +9,7 @@ import browseAllInventory from "assets/images/icons/common-tasks/browse-all-inve
 import newDeal from "assets/images/icons/common-tasks/new-deal.svg";
 import browseAllDeals from "assets/images/icons/common-tasks/browse-all-deals.svg";
 import testDrive from "assets/images/icons/common-tasks/test-drive.svg";
+import { Link } from "react-router-dom";
 
 export default function Home() {
     const [date] = useState(null);
@@ -16,10 +17,6 @@ export default function Home() {
     const [second, setSecond] = useState<boolean>(false);
     const [third, setThird] = useState<boolean>(false);
     const [fourth, setFourth] = useState<boolean>(false);
-
-    const clickCommonTask = () => {
-        alert("This action will be ready soon");
-    };
 
     return (
         <div className='grid'>
@@ -31,9 +28,9 @@ export default function Home() {
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
+                                <Link
+                                    to='contacts'
                                     className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
                                 >
                                     <img
                                         src={newContact}
@@ -41,12 +38,12 @@ export default function Home() {
                                         className='common-tasks-menu__icon'
                                     />
                                     New Contact
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
+                                <Link
+                                    to='contacts'
                                     className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
                                 >
                                     <img
                                         src={browseAllContacts}
@@ -54,12 +51,12 @@ export default function Home() {
                                         className='common-tasks-menu__icon'
                                     />
                                     Browse all contacts
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
+                                <Link
+                                    to='inventory'
                                     className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
                                 >
                                     <img
                                         src={newInventory}
@@ -67,12 +64,12 @@ export default function Home() {
                                         className='common-tasks-menu__icon'
                                     />
                                     New inventory
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
+                                <Link
+                                    to='inventory'
                                     className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
                                 >
                                     <img
                                         src={browseAllInventory}
@@ -80,39 +77,30 @@ export default function Home() {
                                         className='common-tasks-menu__icon'
                                     />
                                     Browse all inventory
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
-                                    className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
-                                >
+                                <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
                                     <img
                                         src={newDeal}
                                         alt='New deal'
                                         className='common-tasks-menu__icon'
                                     />
                                     New deal
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
-                                    className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
-                                >
+                                <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
                                     <img
                                         src={browseAllDeals}
                                         alt='Browse all deals'
                                         className='common-tasks-menu__icon'
                                     />
                                     Browse all deals
-                                </div>
+                                </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div
-                                    className='common-tasks-menu__item cursor-pointer'
-                                    onClick={() => clickCommonTask()}
-                                >
+                                <div className='common-tasks-menu__item cursor-pointer'>
                                     <img
                                         src={testDrive}
                                         alt='New inventory'

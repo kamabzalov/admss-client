@@ -1,5 +1,6 @@
-import { LoginForm } from "../../sign/sign-in";
+import { LoginForm } from "sign/sign-in";
 import { authorizedUserApiInstance, MAGIC, nonAuthorizedUserApiInstance } from "../index";
+import { BaseResponse } from "common/models/base-response";
 
 export interface AuthUser {
     modified: string;
@@ -26,8 +27,8 @@ export const auth = async (signData: LoginForm) => {
 
 export const logout = async (uid: string) => {
     try {
-        authorizedUserApiInstance.post(`user/${uid}/logout`);
-        return true;
+        const response = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/logout`);
+        return response.data;
     } catch (error) {
         // TODO: add error handler
     }

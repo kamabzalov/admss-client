@@ -1,4 +1,6 @@
 import { authorizedUserApiInstance } from "../index";
+import { QueryParams } from "common/models/query-params";
+import { BaseResponse } from "common/models/base-response";
 
 export interface ContactsCategories {
     status: "OK";
@@ -34,6 +36,10 @@ export interface ContactUser {
     useruid: string;
 }
 
+export interface TotalUsers extends BaseResponse {
+    total: number;
+}
+
 export const getContactsCategories = async () => {
     try {
         const request = await authorizedUserApiInstance.get<ContactsCategories>(
@@ -45,15 +51,21 @@ export const getContactsCategories = async () => {
     }
 };
 
-export const getContacts = async (uid: string, categoryId?: number, perPage?: number) => {
-    // eslint-disable-next-line no-console
-    console.log(perPage);
+export const getContacts = async (uid: string, queryParams: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`, {
-            params: {
-                param: categoryId,
-                top: perPage,
-            },
+            params: queryParams,
+        });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getContactsAmount = async (uid: string, queryParams: QueryParams) => {
+    try {
+        const request = await authorizedUserApiInstance.get<TotalUsers>(`contacts/${uid}/list`, {
+            params: queryParams,
         });
         return request.data;
     } catch (error) {

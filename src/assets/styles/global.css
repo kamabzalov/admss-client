@@ -50,7 +50,7 @@ body {
 }
 
 .container {
-    width: 824px;
+    width: 100%;
     margin: auto;
 }
 
@@ -58,9 +58,9 @@ body {
     margin-right: 20px !important;
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 992px) {
     .container {
-        width: 1160px;
+        width: 824px;
     }
 }
 
@@ -70,8 +70,8 @@ body {
     }
 }
 
-@media screen and (min-width: 1920px) {
+@media screen and (min-width: 1600px) {
     .container {
-        width: 1539px;
+        width: 1340px;
     }
 }

@@ -5,9 +5,9 @@ import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
-import { clear } from "services/local-storage.service";
 import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
+import { clear } from "services/local-storage.service";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -26,6 +26,7 @@ export default function Header(props: HeaderProps) {
                 setLocation(response.location);
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     let items: MenuItem[] = [
@@ -44,16 +45,14 @@ export default function Header(props: HeaderProps) {
             command(event: MenuItemCommandEvent) {
                 if (props.user) {
                     logout(props.user.useruid).then((res) => {
-                        if (res) {
-                            navigate("/");
+                        if (res?.status === "OK") {
                             clear();
+                            navigate("/");
                         }
                     });
                 }
             },
         },
-        { separator: true },
-        { label: "Sign up" },
     ];
     if (menuRight) {
         return (
