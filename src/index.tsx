@@ -10,6 +10,9 @@ import Home from "./dashboard/home";
 import Inventory from "./dashboard/inventory";
 import SignIn from "./sign/sign-in";
 import Contacts from "./dashboard/contacts";
+import Deals from "dashboard/deals";
+import Accounts from "dashboard/accounts";
+import Reports from "dashboard/reports";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -41,15 +44,15 @@ const router: RemixRouter = createBrowserRouter([
                     },
                     {
                         path: "deals",
-                        element: <h1>Deals</h1>,
+                        element: <Deals />,
                     },
                     {
                         path: "accounts",
-                        element: <h1>Accounts</h1>,
+                        element: <Accounts />,
                     },
                     {
                         path: "reports",
-                        element: <h1>Reports</h1>,
+                        element: <Reports />,
                     },
                 ],
             },

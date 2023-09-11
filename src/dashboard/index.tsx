@@ -3,8 +3,8 @@ import Header from "./header";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./index.css";
 import { useEffect, useState } from "react";
-import { getKeyValue } from "../services/local-storage.service";
-import { AuthUser } from "../http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http";
 
 export default function Dashboard() {

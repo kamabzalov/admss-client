@@ -45,9 +45,9 @@ export default function Inventories() {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(globalSearch && { qry: globalSearch }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
             skip: lazyState.first,
             top: lazyState.rows,
-            column: lazyState.column,
         };
         if (authUser) {
             getInventoryList(authUser.useruid, params).then((response) => {
