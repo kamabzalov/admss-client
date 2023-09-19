@@ -5,6 +5,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
+import { getDealsList } from "http/services/deals.service";
 
 export default function Deals() {
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -31,6 +32,7 @@ export default function Deals() {
         const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
             setUser(authUser);
+            getDealsList(authUser.useruid, { total: 1 }).then((response) => {});
         }
     }, []);
 
