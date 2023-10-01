@@ -5,7 +5,7 @@
     width: var(--admss-app-aside-small-width);
     top: 150px;
     height: 100vh;
-    background: var(--primary-color);
+    background: var(--admss-app-main-blue);
 }
 
 .sidebar-nav {
@@ -44,7 +44,7 @@
 }
 
 .sidebar-nav__item:hover .sidebar-nav__link {
-    color: var(--primary-color);
+    color: var(--admss-app-main-blue);
 }
 
 .sidebar-nav__icon {

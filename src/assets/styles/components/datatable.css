@@ -1,0 +1,8 @@
+.datatable-controls {
+    margin-bottom: 20px;
+}
+
+.p-datatable .p-datatable-thead>tr>th {
+    border: none;
+    background: var(--admss-app-light-blue);
+}

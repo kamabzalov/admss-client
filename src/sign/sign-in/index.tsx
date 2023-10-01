@@ -4,8 +4,10 @@ import { Checkbox } from "primereact/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
-import { auth } from "../../http/services/auth.service";
-import { setKey } from "../../services/local-storage.service";
+import { auth } from "http/services/auth.service";
+import { setKey } from "services/local-storage.service";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
 
 export interface LoginForm {
     username: string;
@@ -15,6 +17,7 @@ export interface LoginForm {
 
 export default function SignIn() {
     const navigate = useNavigate();
+    const toast = useRef<Toast>(null);
     const formik = useFormik<LoginForm>({
         initialValues: {
             username: "",
@@ -36,11 +39,16 @@ export default function SignIn() {
         },
         onSubmit: () => {
             auth(formik.values).then((response) => {
-                if (response) {
+                if (response.status === "OK") {
                     setKey("admss-client-app-user", JSON.stringify(response));
                     navigate("/dashboard");
                 } else {
-                    alert("Error");
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: response.error,
+                        sticky: true,
+                    });
                 }
             });
         },
@@ -52,24 +60,29 @@ export default function SignIn() {
                 <div className='sign-in-wrapper'>
                     <h1 className='sign__title'>Sign In</h1>
                     <form onSubmit={formik.handleSubmit}>
-                        <div className='sign-in__input-space'>
-                            <div className='p-input-icon-right w-full'>
-                                <i className='admss-icon-user sign__icon' />
+                        <div className='sign-in__input space pt-2 pb-2'>
+                            <span className='w-full p-float-label p-input-icon-right'>
+                                <i className='admss-icon-username-my-profile sign__icon' />
                                 <InputText
                                     placeholder='Username'
-                                    className='sign__input'
+                                    className={`sign__input ${
+                                        formik.errors.username ? "p-invalid" : ""
+                                    }`}
                                     id='username'
                                     onChange={formik.handleChange}
                                     value={formik.values.username}
                                 />
-                                {formik.errors.username ? (
-                                    <span>{formik.errors.username}</span>
-                                ) : null}
-                            </div>
+                                <label htmlFor='username'>Username</label>
+                            </span>
+                            {formik.errors.username ? (
+                                <small className='p-error error-space'>
+                                    {formik.errors.username}
+                                </small>
+                            ) : null}
                         </div>
 
-                        <div className='sign-in__input-space'>
-                            <div className='p-input-icon-right w-full'>
+                        <div className='sign-in__input space pt-2 pb-2'>
+                            <span className='w-full p-float-label p-input-icon-right'>
                                 <i className='admss-icon-password sign__icon' />
                                 <InputText
                                     placeholder='Password'
@@ -79,10 +92,11 @@ export default function SignIn() {
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                 />
-                                {formik.errors.password ? (
-                                    <span>{formik.errors.password}</span>
-                                ) : null}
-                            </div>
+                                <label htmlFor='password'>Password</label>
+                            </span>
+                            {formik.errors.password ? (
+                                <small className='p-error'>{formik.errors.password}</small>
+                            ) : null}
                         </div>
 
                         <div className='flex justify-content-between user-help'>
@@ -113,6 +127,7 @@ export default function SignIn() {
                     </form>
                 </div>
             </div>
+            <Toast ref={toast} />
         </section>
     );
 }

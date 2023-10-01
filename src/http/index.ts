@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { getKeyValue } from "../services/local-storage.service";
+import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
 
 export const API_URL = "https://app.admss.com/api/v1/";

@@ -1,5 +1,5 @@
 .contact-item__label {
-    color: var(--primary-color);
+    color: var(--admss-app-main-blue);
     font-weight: 600;
     width: 110px;
 }
@@ -9,7 +9,7 @@
 }
 
 .printing-menu__icon {
-    color: var(--primary-color);
+    color: var(--admss-app-main-blue);
     margin-right: 10px;
 }
 
@@ -29,7 +29,7 @@
 }
 
 .table-message th {
-    color: var(--primary-color);
+    color: var(--admss-app-main-blue);
     font-weight: 700;
 }
 
@@ -48,8 +48,8 @@
     justify-content: center;
     border-radius: 3px;
     box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.8);
-    color: var(--primary-color);
-    font-size: 16px;
+    color: var(--admss-app-main-blue);
+    font-size: .88rem;
     font-weight: 600;
     padding: 25px 30px;
     text-align: center;
@@ -57,14 +57,77 @@
     height: 100%;
 }
 
+.common-tasks-menu__item:hover {
+    background: var(--admss-app-main-blue);
+    color: #fff;
+}
+
 .common-tasks-menu__item:last-child {
     margin-right: 0;
 }
 
 .common-tasks-menu__icon {
-    font-size: 55px;
     height: 55px;
     margin-bottom: 24px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.common-tasks-menu__icon.new-contact {
+    background-image: url("assets/images/icons/common-tasks/new-contact.svg");
+}
+
+.common-tasks-menu__icon.browse-all-contacts {
+    background-image: url("assets/images/icons/common-tasks/browse-all-contacts.svg");
+}
+
+.common-tasks-menu__icon.new-inventory {
+    background-image: url("assets/images/icons/common-tasks/new-inventory.svg");
+}
+
+.common-tasks-menu__icon.browser-all-inventory {
+    background-image: url("assets/images/icons/common-tasks/browse-all-inventory.svg");
+}
+
+.common-tasks-menu__icon.new-deal {
+    background-image: url("assets/images/icons/common-tasks/new-deal.svg");
+}
+
+.common-tasks-menu__icon.browse-all-deals {
+    background-image: url("assets/images/icons/common-tasks/browse-all-deals.svg");
+}
+
+.common-tasks-menu__icon.print-test-drive {
+    background-image: url("assets/images/icons/common-tasks/test-drive.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.new-contact {
+    background-image: url("assets/images/icons/common-tasks/hover/new-contact.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.browse-all-contacts {
+    background-image: url("assets/images/icons/common-tasks/hover/browse-all-contacts.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.new-inventory {
+    background-image: url("assets/images/icons/common-tasks/hover/new-inventory.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.browser-all-inventory {
+    background-image: url("assets/images/icons/common-tasks/hover/browse-all-inventory.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.new-deal {
+    background-image: url("assets/images/icons/common-tasks/hover/new-deal.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.browse-all-deals {
+    background-image: url("assets/images/icons/common-tasks/hover/browse-all-deals.svg");
+}
+
+.common-tasks-menu__item:hover .common-tasks-menu__icon.print-test-drive {
+    background-image: url("assets/images/icons/common-tasks/hover/test-drive.svg");
 }
 
 .add-task-control {

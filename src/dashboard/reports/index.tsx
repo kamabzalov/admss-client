@@ -1,35 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
-import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { getReportById, getReportsList, makeReports } from "http/services/reports.service";
 import { Button } from "primereact/button";
 
 export default function Reports() {
-    const [reports, setReports] = useState<any[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [globalSearch, setGlobalSearch] = useState<string>("");
-    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
     const printTableData = () => {
         makeReports(authUser?.useruid).then((response) => {
-            getReportById(response.taskuid).then((response) => {
-                // eslint-disable-next-line no-console
-                console.log(response);
-            });
+            setTimeout(() => {
+                getReportById(response.taskuid).then((response) => {
+                    const url = new Blob([response], { type: "application/pdf" });
+                    let link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(url);
+                    link.download = "Report.pdf";
+                    link.click();
+                });
+            }, 5000);
         });
     };
-
-    const pageChanged = (event: DataTablePageEvent) => {
-        setLazyState(event);
-    };
-
-    const sortData = (event: DataTableSortEvent) => {
-        setLazyState(event);
-    };
-
     useEffect(() => {
         const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {

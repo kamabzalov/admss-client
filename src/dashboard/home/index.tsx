@@ -2,13 +2,6 @@ import "./index.css";
 import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { useState } from "react";
-import newContact from "assets/images/icons/common-tasks/new-contact.svg";
-import browseAllContacts from "assets/images/icons/common-tasks/browse-all-contacts.svg";
-import newInventory from "assets/images/icons/common-tasks/new-inventory.svg";
-import browseAllInventory from "assets/images/icons/common-tasks/browse-all-inventory.svg";
-import newDeal from "assets/images/icons/common-tasks/new-deal.svg";
-import browseAllDeals from "assets/images/icons/common-tasks/browse-all-deals.svg";
-import testDrive from "assets/images/icons/common-tasks/test-drive.svg";
 import { Link } from "react-router-dom";
 
 export default function Home() {
@@ -30,13 +23,9 @@ export default function Home() {
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link
                                     to='contacts'
-                                    className='common-tasks-menu__item cursor-pointer'
+                                    className='common-tasks-menu__item new-contact cursor-pointer'
                                 >
-                                    <img
-                                        src={newContact}
-                                        alt='Add new contact'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon new-contact'></div>
                                     New Contact
                                 </Link>
                             </div>
@@ -45,11 +34,7 @@ export default function Home() {
                                     to='contacts'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
-                                    <img
-                                        src={browseAllContacts}
-                                        alt='Browse all contact'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon browse-all-contacts'></div>
                                     Browse all contacts
                                 </Link>
                             </div>
@@ -58,11 +43,7 @@ export default function Home() {
                                     to='inventory'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
-                                    <img
-                                        src={newInventory}
-                                        alt='New inventory'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon new-inventory'></div>
                                     New inventory
                                 </Link>
                             </div>
@@ -71,41 +52,25 @@ export default function Home() {
                                     to='inventory'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
-                                    <img
-                                        src={browseAllInventory}
-                                        alt='Browse all inventory'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon browser-all-inventory'></div>
                                     Browse all inventory
                                 </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
-                                    <img
-                                        src={newDeal}
-                                        alt='New deal'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon new-deal'></div>
                                     New deal
                                 </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
-                                    <img
-                                        src={browseAllDeals}
-                                        alt='Browse all deals'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon browse-all-deals'></div>
                                     Browse all deals
                                 </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <div className='common-tasks-menu__item cursor-pointer'>
-                                    <img
-                                        src={testDrive}
-                                        alt='New inventory'
-                                        className='common-tasks-menu__icon'
-                                    />
+                                    <div className='common-tasks-menu__icon print-test-drive'></div>
                                     Print (for test drive)
                                 </div>
                             </div>

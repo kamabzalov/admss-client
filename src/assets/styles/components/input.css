@@ -7,3 +7,8 @@
     background: var(--admss-app-success);
     border-color: var(--admss-app-success);
 }
+
+.p-error {
+    font-size: .77rem;
+    margin-left: 12px;
+}

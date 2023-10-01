@@ -23,7 +23,12 @@ export const makeReports = async (uid: string | undefined) => {
 
 export const getReportById = async (reportId: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(`reports/${reportId}/report`);
+        const request = await authorizedUserApiInstance.get<any>(`reports/${reportId}/report`, {
+            headers: {
+                Accept: "application/pdf",
+            },
+            responseType: "blob",
+        });
         return request.data;
     } catch (error) {
         // TODO: add error handler

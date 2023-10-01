@@ -84,7 +84,7 @@ export default function Contacts() {
                         <h2 className='card-header__title uppercase m-0'>Contacts</h2>
                     </div>
                     <div className='card-content'>
-                        <div className='grid'>
+                        <div className='grid datatable-controls'>
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Dropdown
@@ -98,13 +98,7 @@ export default function Contacts() {
                                     />
                                     <Button
                                         className='contact-top-controls__button m-r-20px'
-                                        label='New contact'
-                                        severity='success'
-                                        type='button'
-                                    />
-                                    <Button
-                                        className='contact-top-controls__button m-r-20px'
-                                        label='Edit'
+                                        icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
                                     />
@@ -138,7 +132,6 @@ export default function Contacts() {
                                     value={contacts}
                                     lazy
                                     paginator
-                                    filterDisplay='row'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={[5, 10, 20]}
