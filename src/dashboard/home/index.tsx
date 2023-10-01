@@ -1,15 +1,11 @@
 import "./index.css";
-import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Tasks } from "dashboard/tasks";
 
 export default function Home() {
     const [date] = useState(null);
-    const [first, setFirst] = useState<boolean>(false);
-    const [second, setSecond] = useState<boolean>(false);
-    const [third, setThird] = useState<boolean>(false);
-    const [fourth, setFourth] = useState<boolean>(false);
 
     return (
         <div className='grid'>
@@ -83,43 +79,7 @@ export default function Home() {
                     <div className='card-content'>
                         <div className='grid justify-content-between'>
                             <div className='col-12 md:col-5'>
-                                <h2 className='card-content__title uppercase'>Tasks</h2>
-                                <ul className='list-none ml-0 pl-0'>
-                                    <li className='mb-2'>
-                                        <Checkbox
-                                            onChange={(e) => setFirst(!!e.checked)}
-                                            checked={first}
-                                        ></Checkbox>
-                                        <label className='ml-2'>
-                                            Add new arrivals to inventory
-                                        </label>
-                                    </li>
-                                    <li className='mb-2'>
-                                        <Checkbox
-                                            onChange={(e) => setSecond(!!e.checked)}
-                                            checked={second}
-                                        ></Checkbox>
-                                        <label className='ml-2'>Complete all daily tasks</label>
-                                    </li>
-                                    <li className='mb-2'>
-                                        <Checkbox
-                                            onChange={(e) => setThird(!!e.checked)}
-                                            checked={third}
-                                        ></Checkbox>
-                                        <label className='ml-2'>Complete all daily tasks</label>
-                                    </li>
-                                    <li className='mb-2'>
-                                        <Checkbox
-                                            onChange={(e) => setFourth(!!e.checked)}
-                                            checked={fourth}
-                                        ></Checkbox>
-                                        <label className='ml-2'>Create new tasks</label>
-                                    </li>
-                                </ul>
-                                <span className='add-task-control font-semibold cursor-pointer'>
-                                    <i className='pi pi-plus add-task-control__icon'></i>
-                                    Add new task
-                                </span>
+                                <Tasks />
                             </div>
                             <div className='col-12 md:col-7 md:text-right'>
                                 <Calendar value={date} inline />

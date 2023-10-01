@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import { getReportById, getReportsList, makeReports } from "http/services/reports.service";
+import {
+    getReportById,
+    getReportsList,
+    makeReports,
+    printDocumentByUser,
+} from "http/services/reports.service";
 import { Button } from "primereact/button";
 
 export default function Reports() {
@@ -20,6 +25,12 @@ export default function Reports() {
             }, 5000);
         });
     };
+
+    const printUserDocument = () => {
+        // eslint-disable-next-line no-console
+        printDocumentByUser(authUser?.useruid).then((document) => console.log(document));
+    };
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
@@ -42,9 +53,17 @@ export default function Reports() {
                                     <Button
                                         severity='success'
                                         label='Print report'
+                                        className='m-r-20px'
                                         type='button'
                                         icon='pi pi-print'
                                         onClick={printTableData}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        label='Print document'
+                                        type='button'
+                                        icon='pi pi-print'
+                                        onClick={printUserDocument}
                                     />
                                 </div>
                             </div>

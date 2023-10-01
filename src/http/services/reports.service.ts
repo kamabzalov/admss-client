@@ -34,3 +34,10 @@ export const getReportById = async (reportId: string) => {
         // TODO: add error handler
     }
 };
+
+export const printDocumentByUser = async (userId: string | undefined) => {
+    const request = await authorizedUserApiInstance
+        .get<any>(`print/${userId}/item`)
+        .then((response) => response.data);
+    return request;
+};

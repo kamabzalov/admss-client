@@ -68,12 +68,12 @@ export default function Inventories() {
                         <h2 className='card-header__title uppercase m-0'>Inventory</h2>
                     </div>
                     <div className='card-content'>
-                        <div className='grid'>
+                        <div className='grid datatable-controls'>
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button m-r-20px'
-                                        label='New inventory'
+                                        icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
                                     />
@@ -107,7 +107,6 @@ export default function Inventories() {
                                     value={inventories}
                                     lazy
                                     paginator
-                                    filterDisplay='row'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={[5, 10, 20]}
