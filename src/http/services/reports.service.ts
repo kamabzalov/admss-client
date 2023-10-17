@@ -37,7 +37,7 @@ export const getReportById = async (reportId: string) => {
 
 export const printDocumentByUser = async (userId: string | undefined) => {
     const request = await authorizedUserApiInstance
-        .get<any>(`print/${userId}/item`)
+        .get<any>(`print/${userId}/${userId}`)
         .then((response) => response.data);
     return request;
 };

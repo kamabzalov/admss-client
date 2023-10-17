@@ -31,7 +31,7 @@ export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> =>
             user: signData.username,
             secret: signData.password,
             rememberme: signData.rememberme,
-            magic: MAGIC,
+            // magic: MAGIC,
         })
         .then((response) => response.data)
         .catch((err) => err.response.data);
