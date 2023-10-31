@@ -117,13 +117,11 @@ export default function Deals() {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column field='StockNo' header='StockNo' sortable></Column>
-                                    <Column field='Make' header='Make'></Column>
-                                    <Column field='Model' header='Model'></Column>
-                                    <Column field='Year' header='Year'></Column>
-                                    <Column field='Color' header='Color'></Column>
-                                    <Column field='mileage' header='Miles'></Column>
-                                    <Column field='Price' header='Price'></Column>
+                                    <Column field='accountuid' header='Account'></Column>
+                                    <Column field='contactinfo' header='Customer'></Column>
+                                    <Column field='dealtype' header='Type'></Column>
+                                    <Column field='created' header='Date'></Column>
+                                    <Column field='inventoryinfo' header='Info (Vehicle)'></Column>
                                 </DataTable>
                             </div>
                         </div>

@@ -116,13 +116,10 @@ export default function Accounts() {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column field='StockNo' header='StockNo' sortable></Column>
-                                    <Column field='Make' header='Make'></Column>
-                                    <Column field='Model' header='Model'></Column>
-                                    <Column field='Year' header='Year'></Column>
-                                    <Column field='Color' header='Color'></Column>
-                                    <Column field='mileage' header='Miles'></Column>
-                                    <Column field='Price' header='Price'></Column>
+                                    <Column field='accountnumber' header='Account'></Column>
+                                    <Column field='accounttype' header='Type'></Column>
+                                    <Column field='accountstatus' header='Name'></Column>
+                                    <Column field='created' header='Date'></Column>
                                 </DataTable>
                             </div>
                         </div>
