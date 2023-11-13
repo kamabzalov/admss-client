@@ -1,5 +1,10 @@
 import { LoginForm } from "sign/sign-in";
-import { authorizedUserApiInstance, MAGIC, nonAuthorizedUserApiInstance } from "../index";
+import {
+    APPLICATION,
+    authorizedUserApiInstance,
+    MAGIC,
+    nonAuthorizedUserApiInstance,
+} from "../index";
 import { BaseResponse } from "common/models/base-response";
 
 export interface AppError {
@@ -31,6 +36,7 @@ export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> =>
             user: signData.username,
             secret: signData.password,
             rememberme: signData.rememberme,
+            application: APPLICATION,
             // magic: MAGIC,
         })
         .then((response) => response.data)

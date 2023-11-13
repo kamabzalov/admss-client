@@ -8,11 +8,13 @@ import { auth } from "http/services/auth.service";
 import { setKey } from "services/local-storage.service";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import { APPLICATION } from "http/index";
 
 export interface LoginForm {
     username: string;
     password: string;
     rememberme: boolean;
+    application: string;
 }
 
 export default function SignIn() {
@@ -23,6 +25,7 @@ export default function SignIn() {
             username: "",
             password: "",
             rememberme: false,
+            application: APPLICATION,
         },
         validate: (data: { username: string; password: string }) => {
             let errors: any = {};
