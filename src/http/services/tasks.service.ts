@@ -27,3 +27,38 @@ export const getTasksByUserId = async (uid: string): Promise<Task[]> => {
         .catch((err) => err.response.data);
     return response;
 };
+
+export const createTask = async (
+    taskData: Record<string, string | number>,
+    taskuid?: string | undefined
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `tasks/${taskuid || 0}/`,
+            taskData
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const deleteTask = async (taskIndex: number) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskIndex}/delete`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setTaskStatus = async (taskuid: string, taskStatus: "completed") => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid || 0}/status`, {
+            task_status: taskStatus,
+        });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
