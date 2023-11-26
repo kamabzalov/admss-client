@@ -4,7 +4,7 @@
     --admss-app-font: "Open Sans", Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
-    --admss-app-main-blue: #295DC2;
+    --admss-app-main-blue: #295dc2;
     --admss-app-light-grey: #cccccc;
     --admss-app-lightest-grey: #e7e7e7;
     --admss-app-medium-grey: #a4a6a8;
@@ -12,7 +12,7 @@
     --admss-app-primary: #292b2e;
     --admss-app-yellow: #f1ae00;
     --admss-app-focus-yellow: #fff9c3;
-    --admss-app-red: #DE0000;
+    --admss-app-red: #de0000;
     --admss-app-focus-red: #ffc3c3;
     --admss-app-success: #28a745;
     --admss-app-green: #15c35b;
@@ -28,6 +28,7 @@
     --admss-app-darkest-blue: #37455c;
     --admss-app-deep-blue: #292c33;
     --admss-app-aside-small-width: 130px;
+    --admss-app-dialog-border-radius: 15px;
 }
 
 ::placeholder {
