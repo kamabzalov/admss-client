@@ -24,3 +24,19 @@
     border-bottom-right-radius: var(--admss-app-dialog-border-radius);
     border-bottom-left-radius: var(--admss-app-dialog-border-radius);
 }
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: none !important;
+    margin-top: -20px;
+    font-weight: 700;
+    font-size: 20px;
+    color: #000;
+}
+
+.p-dialog .btn-dialog {
+    font-size: 24px;
+    font-weight: 700;
+    padding: 24px 80px;
+}
