@@ -5,7 +5,6 @@ import { Task, TaskStatus, getTasksByUserId, setTaskStatus } from "http/services
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
