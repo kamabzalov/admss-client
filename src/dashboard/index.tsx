@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             createApiDashboardInstance();
             setUser(authUser);

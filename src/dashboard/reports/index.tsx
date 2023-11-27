@@ -8,6 +8,7 @@ import {
     printDocumentByUser,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Reports() {
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -32,7 +33,7 @@ export default function Reports() {
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             getReportsList(authUser.useruid, { total: 1 }).then((response) => {});
