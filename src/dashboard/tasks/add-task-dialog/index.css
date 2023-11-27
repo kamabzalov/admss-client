@@ -7,3 +7,22 @@
     align-items: center;
 }
 
+.p-dialog > .p-dialog-header {
+    font-weight: var(--admss-app-font-weight);
+    padding: 3rem;
+    color: var(--admss-app-main-blue);
+    border: none;
+    padding-top: 2rem;
+    padding-bottom: 0;
+    border-top-right-radius: var(--admss-app-dialog-border-radius);
+    border-top-left-radius: var(--admss-app-dialog-border-radius);
+}
+
+.p-dialog .p-dialog-content:last-of-type {
+    border-bottom-right-radius: var(--admss-app-dialog-border-radius);
+    border-bottom-left-radius: var(--admss-app-dialog-border-radius);
+}
+
+.p-dialog-footer .btn-dialog {
+    padding: 20px 80px;
+}
