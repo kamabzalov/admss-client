@@ -3,7 +3,6 @@ import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
 
 export const API_URL = "https://app.admss.com/api/v1/";
-export const MAGIC: string = "avansoft";
 export const APPLICATION: string = "app";
 
 export let authorizedUserApiInstance: AxiosInstance;

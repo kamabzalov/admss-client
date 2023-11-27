@@ -1,10 +1,5 @@
 import { LoginForm } from "sign/sign-in";
-import {
-    APPLICATION,
-    authorizedUserApiInstance,
-    // MAGIC,
-    nonAuthorizedUserApiInstance,
-} from "../index";
+import { APPLICATION, authorizedUserApiInstance, nonAuthorizedUserApiInstance } from "../index";
 import { BaseResponse } from "common/models/base-response";
 
 export interface AppError {
