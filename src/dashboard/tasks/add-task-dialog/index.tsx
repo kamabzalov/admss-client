@@ -134,7 +134,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             </div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label='Save' className='btn-dialog' onClick={handleSaveTaskData} />
+                <Button label='Save' onClick={handleSaveTaskData} />
             </div>
         </Dialog>
     );
