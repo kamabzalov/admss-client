@@ -56,7 +56,6 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
 
         createTask(taskData).then((response) => {
             // eslint-disable-next-line no-console
-            console.log(response);
         });
         onHide();
     };
@@ -135,7 +134,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             </div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label='Save' className='w-4' onClick={handleSaveTaskData} />
+                <Button label='Save' className='btn-dialog' onClick={handleSaveTaskData} />
             </div>
         </Dialog>
     );
