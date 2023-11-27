@@ -5,10 +5,7 @@ export const setKey = (key: string, value: string) => {
 
 type LocalStorageKeys = typeof LS_APP_USER;
 
-export const localStorageClear = (key?: LocalStorageKeys) => {
-    if (!key) {
-        return localStorage.clear();
-    }
+export const localStorageClear = (key: LocalStorageKeys) => {
     localStorage.removeItem(key);
 };
 
