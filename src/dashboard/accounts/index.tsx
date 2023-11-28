@@ -10,6 +10,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Accounts() {
     const [accounts, setAccounts] = useState<any[]>([]);
@@ -33,7 +34,7 @@ export default function Accounts() {
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             getAccountsList(authUser.useruid, { total: 1 }).then((response) => {});

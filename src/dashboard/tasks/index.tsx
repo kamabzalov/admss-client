@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { Task, getTasksByUserId } from "http/services/tasks.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
-            // eslint-disable-next-line no-console
         }
     }, []);
     return (
