@@ -29,7 +29,14 @@ export default function Header(props: HeaderProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    let items: MenuItem[] = [
+    const signOut = ({ useruid }: AuthUser) => {
+        logout(useruid).finally(() => {
+            clear();
+            navigate("/");
+        });
+    };
+
+    const items: MenuItem[] = [
         { label: "My Profile" },
         { label: "General Settings" },
         { separator: true },
@@ -43,14 +50,7 @@ export default function Header(props: HeaderProps) {
         {
             label: "Logout",
             command(event: MenuItemCommandEvent) {
-                if (props.user) {
-                    logout(props.user.useruid).then((res) => {
-                        if (res?.status === "OK") {
-                            clear();
-                            navigate("/");
-                        }
-                    });
-                }
+                props.user && signOut(props.user);
             },
         },
     ];
