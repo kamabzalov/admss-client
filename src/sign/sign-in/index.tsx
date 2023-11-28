@@ -9,6 +9,7 @@ import { setKey } from "services/local-storage.service";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import { APPLICATION } from "http/index";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export interface LoginForm {
     username: string;
@@ -43,7 +44,7 @@ export default function SignIn() {
         onSubmit: () => {
             auth(formik.values).then((response) => {
                 if (response.status === "OK") {
-                    setKey("admss-client-app-user", JSON.stringify(response));
+                    setKey(LS_APP_USER, JSON.stringify(response));
                     navigate("/dashboard");
                 } else {
                     toast.current?.show({

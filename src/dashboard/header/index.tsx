@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
-import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
+import { MenuItem } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
-import { clear } from "services/local-storage.service";
+import { localStorageClear } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -29,7 +30,14 @@ export default function Header(props: HeaderProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    let items: MenuItem[] = [
+    const signOut = ({ useruid }: AuthUser) => {
+        logout(useruid).finally(() => {
+            localStorageClear(LS_APP_USER);
+            navigate("/");
+        });
+    };
+
+    const items: MenuItem[] = [
         { label: "My Profile" },
         { label: "General Settings" },
         { separator: true },
@@ -42,15 +50,8 @@ export default function Header(props: HeaderProps) {
         { separator: true },
         {
             label: "Logout",
-            command(event: MenuItemCommandEvent) {
-                if (props.user) {
-                    logout(props.user.useruid).then((res) => {
-                        if (res?.status === "OK") {
-                            clear();
-                            navigate("/");
-                        }
-                    });
-                }
+            command() {
+                props.user && signOut(props.user);
             },
         },
     ];

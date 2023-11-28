@@ -10,6 +10,7 @@ import { getInventoryList, Inventory } from "http/services/inventory-service";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Inventories() {
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -33,7 +34,7 @@ export default function Inventories() {
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             getInventoryList(authUser.useruid, { total: 1 }).then((response) => {});
