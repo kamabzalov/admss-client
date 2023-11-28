@@ -17,6 +17,7 @@ import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -42,7 +43,7 @@ export default function Contacts() {
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             getContactsCategories().then((response) => {

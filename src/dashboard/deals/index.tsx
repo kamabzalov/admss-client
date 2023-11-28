@@ -11,6 +11,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { getDealsList } from "http/services/deals.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
@@ -34,7 +35,7 @@ export default function Deals() {
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             getDealsList(authUser.useruid, { total: 1 }).then((response) => {});
