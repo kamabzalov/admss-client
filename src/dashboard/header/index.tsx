@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
-import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
+import { MenuItem } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
-import { clear } from "services/local-storage.service";
+import { localStorageClear } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -31,7 +32,7 @@ export default function Header(props: HeaderProps) {
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
-            clear();
+            localStorageClear(LS_APP_USER);
             navigate("/");
         });
     };
@@ -49,7 +50,7 @@ export default function Header(props: HeaderProps) {
         { separator: true },
         {
             label: "Logout",
-            command(event: MenuItemCommandEvent) {
+            command() {
                 props.user && signOut(props.user);
             },
         },
