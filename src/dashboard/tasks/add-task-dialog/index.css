@@ -1,0 +1,8 @@
+.dialog__add-task {
+    width: 660px;
+}
+
+.p-dropdown .p-inputtext {
+    display: inline-flex;
+    align-items: center;
+}
