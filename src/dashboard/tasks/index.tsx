@@ -5,6 +5,7 @@ import { Task, TaskStatus, getTasksByUserId, setTaskStatus } from "http/services
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -16,10 +17,9 @@ export const Tasks = () => {
 
     const toast = useRef<Toast>(null);
 
-    const authUser: AuthUser = getKeyValue("admss-client-app-user");
+    const authUser: AuthUser = getKeyValue(LS_APP_USER);
 
     const getTasks = () =>
-        authUser &&
         getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
 
     useEffect(() => {
