@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { SupportContactDialog } from "dashboard/profile/supportContact";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -19,6 +20,7 @@ export default function Header(props: HeaderProps) {
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
+    const [supportContact, setSupportContact] = useState<boolean>(false);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
@@ -44,7 +46,12 @@ export default function Header(props: HeaderProps) {
         { label: "Change location" },
         { label: "Users" },
         { separator: true },
-        { label: "Contact support" },
+        {
+            label: "Contact support",
+            command() {
+                setSupportContact(true);
+            },
+        },
         { label: "Support history" },
         { label: "Help" },
         { separator: true },
@@ -78,6 +85,10 @@ export default function Header(props: HeaderProps) {
                         </div>
                     </div>
                 </div>
+                <SupportContactDialog
+                    onHide={() => setSupportContact(false)}
+                    visible={supportContact}
+                />
             </header>
         );
     }
