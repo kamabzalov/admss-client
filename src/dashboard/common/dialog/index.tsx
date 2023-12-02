@@ -3,6 +3,7 @@ import { Button } from "primereact/button";
 
 interface DashboardDialogProps extends DialogProps {
     action?: () => void;
+    buttonDisabled?: boolean;
 }
 
 export const DashboardDialog = ({
@@ -13,13 +14,14 @@ export const DashboardDialog = ({
     footer,
     className,
     action,
+    buttonDisabled,
 }: DashboardDialogProps) => {
     return (
         <Dialog header={header} className={`dialog ${className}`} visible={visible} onHide={onHide}>
             <div className='p-dialog-content-body'>{children}</div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label={`${footer}`} className='bold' onClick={action} />
+                <Button label={`${footer}`} disabled={buttonDisabled} onClick={action} />
             </div>
         </Dialog>
     );
