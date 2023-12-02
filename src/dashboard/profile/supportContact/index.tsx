@@ -1,4 +1,4 @@
-import { DashboardDialog } from "dashboard/dialog";
+import { DashboardDialog } from "dashboard/common/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useEffect, useState } from "react";

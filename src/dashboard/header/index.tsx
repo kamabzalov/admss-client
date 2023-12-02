@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { SupportContactDialog } from "dashboard/profile";
+import { SupportContactDialog } from "dashboard/profile/supportContact";
 
 export interface HeaderProps {
     user: AuthUser;
