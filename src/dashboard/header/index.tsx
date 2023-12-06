@@ -10,6 +10,7 @@ import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
+import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -21,6 +22,7 @@ export default function Header(props: HeaderProps) {
     const [dealerName, setDealerName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
     const [supportContact, setSupportContact] = useState<boolean>(false);
+    const [supportHistory, setSupportHistory] = useState<boolean>(true);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
@@ -88,6 +90,10 @@ export default function Header(props: HeaderProps) {
                 <SupportContactDialog
                     onHide={() => setSupportContact(false)}
                     visible={supportContact}
+                />
+                <SupportHistoryDialog
+                    onHide={() => setSupportHistory(false)}
+                    visible={supportHistory}
                 />
             </header>
         );
