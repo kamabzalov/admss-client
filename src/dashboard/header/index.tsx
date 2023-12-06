@@ -22,7 +22,7 @@ export default function Header(props: HeaderProps) {
     const [dealerName, setDealerName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
     const [supportContact, setSupportContact] = useState<boolean>(false);
-    const [supportHistory, setSupportHistory] = useState<boolean>(true);
+    const [supportHistory, setSupportHistory] = useState<boolean>(false);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
@@ -54,7 +54,12 @@ export default function Header(props: HeaderProps) {
                 setSupportContact(true);
             },
         },
-        { label: "Support history" },
+        {
+            label: "Support history",
+            command() {
+                setSupportHistory(true);
+            },
+        },
         { label: "Help" },
         { separator: true },
         {
