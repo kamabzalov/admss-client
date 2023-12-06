@@ -21,7 +21,9 @@ export const DashboardDialog = ({
             <div className='p-dialog-content-body'>{children}</div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label={`${footer}`} disabled={buttonDisabled} onClick={action} />
+                {footer && (
+                    <Button label={`${footer}`} disabled={buttonDisabled} onClick={action} />
+                )}
             </div>
         </Dialog>
     );

@@ -2,7 +2,18 @@
     margin-bottom: 20px;
 }
 
-.p-datatable .p-datatable-thead>tr>th {
+.p-datatable .p-datatable-thead > tr > th {
     border: none;
     background: var(--admss-app-light-blue);
+}
+
+.p-datatable.p-datatable-hoverable-rows
+    .p-datatable-tbody
+    > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
+    background: var(--admss-app-light-green);
+    cursor: pointer;
+}
+
+.p-datatable tr:has(+ .p-datatable-row-expansion) {
+    background: var(--admss-app-light-green);
 }
