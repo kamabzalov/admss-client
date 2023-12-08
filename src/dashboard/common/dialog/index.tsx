@@ -17,7 +17,13 @@ export const DashboardDialog = ({
     buttonDisabled,
 }: DashboardDialogProps) => {
     return (
-        <Dialog header={header} className={`dialog ${className}`} visible={visible} onHide={onHide}>
+        <Dialog
+            draggable={false}
+            header={header}
+            className={`dialog ${className}`}
+            visible={visible}
+            onHide={onHide}
+        >
             <div className='p-dialog-content-body'>{children}</div>
 
             <div className='p-dialog-footer flex justify-content-center'>
