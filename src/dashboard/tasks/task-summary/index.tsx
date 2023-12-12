@@ -10,7 +10,9 @@ interface TaskSummaryDialogProps extends DialogProps {
 const TaskSummaryRow = ({ title, value }: { title: string; value: string }): JSX.Element => (
     <div className='task-summary__row'>
         <div className='task-summary__row-title'>{title}</div>
-        <span>{value}</span>
+        <div className='task-summary__row-value white-space-nowrap overflow-hidden text-overflow-ellipsis'>
+            {value}
+        </div>
     </div>
 );
 
@@ -28,7 +30,7 @@ export const TaskSummaryDialog = ({
             className={"dialog__task-summary "}
         >
             <div className='task-summary__body flex flex-column'>
-                <TaskSummaryRow title='Assigned to:' value={currentTask?.accountname || ""} />
+                <TaskSummaryRow title='Assigned to:' value={currentTask?.username || ""} />
                 <TaskSummaryRow title='Start date:' value={currentTask?.created || ""} />
                 <TaskSummaryRow title='Due date:' value={currentTask?.deadline || ""} />
                 <TaskSummaryRow title='Account:' value={currentTask?.accountname || ""} />
