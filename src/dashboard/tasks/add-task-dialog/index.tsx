@@ -36,12 +36,12 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
+        if (authUser && visible) {
             getTasksUserList(authUser.useruid).then((response) => {
                 if (response) setAssignToData(response);
             });
         }
-    }, []);
+    }, [visible]);
 
     const handleSaveTaskData = () => {
         const taskData: any = {

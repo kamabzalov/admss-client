@@ -1,5 +1,5 @@
 .dialog__task-summary {
-    width: 620px;
+    width: 571px;
 }
 
 .task-summary__body {
@@ -8,8 +8,15 @@
     font-size: 18px;
 }
 
+.task-summary__row {
+    display: flex;
+}
+
 .task-summary__row-title {
-    display: inline-flex;
-    width: 165px;
+    flex: 0 1 30%;
     font-weight: 600;
+}
+
+.task-summary__row-value {
+    flex: 0 0 70%;
 }
