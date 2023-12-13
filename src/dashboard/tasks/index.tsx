@@ -63,14 +63,9 @@ export const Tasks = () => {
             });
     };
 
-    const isEditable = (): boolean => {
-        if (currentTask) {
-            const validParentUid = currentTask.parentuid === authUser.useruid;
-            const validUserUid = currentTask.useruid === authUser.useruid;
-            return validParentUid || validUserUid;
-        }
-        return false;
-    };
+    const isLoggedUserTask = (): boolean =>
+        !!currentTask &&
+        (currentTask.parentuid === authUser.useruid || currentTask.useruid === authUser.useruid);
 
     return (
         <>
@@ -112,7 +107,7 @@ export const Tasks = () => {
                     onHide={() => setShowAddTaskDialog(false)}
                     header='Add Task'
                 />
-                {isEditable() ? (
+                {isLoggedUserTask() ? (
                     <AddTaskDialog
                         visible={showEditTaskDialog}
                         onHide={() => setShowEditTaskDialog(false)}
