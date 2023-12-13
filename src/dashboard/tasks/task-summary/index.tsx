@@ -27,7 +27,7 @@ export const TaskSummaryDialog = ({
             onHide={onHide}
             visible={visible}
             header={header}
-            className={"dialog__task-summary "}
+            className={"dialog__task-summary task-summary"}
         >
             <div className='task-summary__body flex flex-column'>
                 <TaskSummaryRow title='Assigned to:' value={currentTask?.username || ""} />
