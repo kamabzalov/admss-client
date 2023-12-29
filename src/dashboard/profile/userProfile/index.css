@@ -9,7 +9,7 @@
     font-size: 18px;
 }
 
-.profile-row__title {
+.profile-row__label {
     flex: 0 1 40%;
     font-weight: 600;
     text-align: right;

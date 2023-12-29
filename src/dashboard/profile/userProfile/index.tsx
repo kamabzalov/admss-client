@@ -37,11 +37,11 @@ export const UserProfileDialog = ({
             action={handleSendSupportContact}
         >
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>User name</div>
+                <div className='profile-row__label'>User name</div>
                 <div className='profile-row__value'>{user.loginname}</div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Company name</div>
+                <div className='profile-row__label'>Company name</div>
                 <div className='profile-row__value'>
                     <InputText
                         placeholder='Company name'
@@ -53,13 +53,13 @@ export const UserProfileDialog = ({
                 </div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Location</div>
+                <div className='profile-row__label'>Location</div>
                 <div className='profile-row__value'>
                     <InputText placeholder='Location' value={"Arizona"} onChange={(event) => {}} />
                 </div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Address</div>
+                <div className='profile-row__label'>Address</div>
                 <div className='profile-row__value'>
                     <InputText
                         placeholder='Address'
@@ -69,13 +69,13 @@ export const UserProfileDialog = ({
                 </div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Phone</div>
+                <div className='profile-row__label'>Phone</div>
                 <div className='profile-row__value'>
                     <InputText placeholder='Phone' value='536-587-1865' onChange={(event) => {}} />
                 </div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Current password</div>
+                <div className='profile-row__label'>Current password</div>
                 <div className='profile-row__value'>
                     <Password
                         className='w-100'
@@ -95,7 +95,7 @@ export const UserProfileDialog = ({
             {newPassword && (
                 <>
                     <div className='user-profile__row profile-row'>
-                        <div className='profile-row__title'>New password</div>
+                        <div className='profile-row__label'>New password</div>
                         <div className='profile-row__value'>
                             <Password
                                 className='w-100'
@@ -106,7 +106,7 @@ export const UserProfileDialog = ({
                         </div>
                     </div>
                     <div className='user-profile__row profile-row'>
-                        <div className='profile-row__title'>Confirm password</div>
+                        <div className='profile-row__label'>Confirm password</div>
                         <div className='profile-row__value'>
                             <Password
                                 className='w-100'
@@ -119,11 +119,11 @@ export const UserProfileDialog = ({
                 </>
             )}
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Next payment</div>
+                <div className='profile-row__label'>Next payment</div>
                 <div className='profile-row__value'>16 of May, 2023</div>
             </div>
             <div className='user-profile__row profile-row'>
-                <div className='profile-row__title'>Last login</div>
+                <div className='profile-row__label'>Last login</div>
                 <div className='profile-row__value'>04/26/2023 10:45:39 PM</div>
             </div>
         </DashboardDialog>
