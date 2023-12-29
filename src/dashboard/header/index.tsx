@@ -24,7 +24,7 @@ export default function Header(props: HeaderProps) {
     const [location, setLocation] = useState<string>("");
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
-    const [userProfile, setUserProfile] = useState<boolean>(true);
+    const [userProfile, setUserProfile] = useState<boolean>(false);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
