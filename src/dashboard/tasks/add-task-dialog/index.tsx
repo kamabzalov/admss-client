@@ -14,7 +14,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
         <span className='p-inputgroup-addon'>
-            <i className={`admss-icon-${icon}`} />
+            <i className={`adms-${icon}`} />
         </span>
     );
 };
