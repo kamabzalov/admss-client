@@ -154,19 +154,19 @@ export default function Home() {
                     <div className='card-content'>
                         <ul className='list-none pl-0 printing-menu'>
                             <li className='printing-menu__item'>
-                                <i className='admss-icon-email printing-menu__icon' />
+                                <i className='adms-email printing-menu__icon' />
                                 Mailings
                             </li>
                             <li className='printing-menu__item '>
-                                <i className='admss-icon-blank printing-menu__icon' />
+                                <i className='adms-blank printing-menu__icon' />
                                 Blank credit application
                             </li>
                             <li className='printing-menu__item'>
-                                <i className='admss-icon-print printing-menu__icon' />
+                                <i className='adms-print printing-menu__icon' />
                                 Print "Initial privacy notice"
                             </li>
                             <li className='printing-menu__item'>
-                                <i className='admss-icon-print printing-menu__icon' />
+                                <i className='adms-print printing-menu__icon' />
                                 Print deal forms
                             </li>
                         </ul>
