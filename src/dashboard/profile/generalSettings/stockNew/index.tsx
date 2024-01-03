@@ -3,7 +3,8 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import { ChangeEvent, useState } from "react";
+import {  useState } from "react";
+import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 
 interface SettingsStockNewProps {
     settings?: any;
@@ -41,10 +42,11 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
                     Fixed digits
                 </label>
                 <div className='flex-1 ml-8'>
-                    <InputText
-                        value={String(value)}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setValue(Number(e.target.value))
+                    <InputNumber
+                        value={(value)}
+                        max={10}
+                        onChange={(e: InputNumberChangeEvent) =>
+                            setValue(Number(e.value))
                         }
                         className='w-full'
                     />

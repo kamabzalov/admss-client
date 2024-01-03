@@ -3,6 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { Slider, SliderChangeEvent } from "primereact/slider";
 import { useState, ChangeEvent } from "react";
 import "./index.css";
+import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 
 interface SettingsAccountProps {
     settings?: any;
@@ -14,27 +15,29 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
     return (
         <div className='account flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Account Settings</div>
-            <div className='flex justify-content-between align-items-center'>
-                <label htmlFor='account-start-number' className='start-number__label ml-2 wrap'>
+            <div className='flex justify-content-between align-items-center account-start-number'>
+                <label
+                    htmlFor='account-start-number'
+                    className='account-start-number__label ml-2 wrap'
+                >
                     Start number (starts from 0 by default)
                 </label>
                 <InputText
                     value={"0"}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {}}
                     id='account-start-number'
-                    className='start-number__input'
+                    className='account-start-number__input'
                 />
             </div>
-            <div className='flex'>
+            <div className='flex align-items-center'>
                 <label htmlFor={settings} className='ml-2'>
                     Fixed digits
                 </label>
                 <div className='flex-1 ml-8'>
-                    <InputText
-                        value={String(valueDigits)}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setValueDigits(Number(e.target.value))
-                        }
+                    <InputNumber
+                        value={valueDigits}
+                        max={10}
+                        onChange={(e: InputNumberChangeEvent) => setValueDigits(Number(e.value))}
                         className='w-full'
                     />
                     <Slider
@@ -56,10 +59,10 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                 </span>
             </div>
             <div className='flex align-items-center justify-content-between'>
-                <div className='account__late-fee'>
+                <div className='account-late-fee'>
                     <CurrencyInput title='Late fee (min)' />
                 </div>
-                <div className='account__late-fee'>
+                <div className='account-late-fee'>
                     <CurrencyInput title='Late fee (max)' />
                 </div>
             </div>
@@ -68,12 +71,11 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                     Late fee grace period
                 </label>
                 <div className='account-grace__input'>
-                    <InputText
+                    <InputNumber
                         className='account-grace__input'
-                        value={String(value)}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setValue(Number(e.target.value))
-                        }
+                        max={10}
+                        value={value}
+                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
                     />
                     <Slider
                         value={value}

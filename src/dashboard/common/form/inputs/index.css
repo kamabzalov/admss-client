@@ -28,7 +28,7 @@
     border: 1px solid var(--admss-app-light-grey);
 }
 
-.dashboard-radio .radio-item__input {
+.radio .radio-item__input {
     order: 2;
     border-left: 1px solid var(--admss-app-light-grey);
     height: 100%;
@@ -36,12 +36,12 @@
     padding: 0 10px;
 }
 
-.dashboard-radio .radio-item__label {
+.radio .radio-item__label {
     padding-left: 10px;
     order: 1;
 }
 
-.dashboard-radio .p-radiobutton-checked .p-radiobutton-box.p-highlight {
+.radio .p-radiobutton-checked .p-radiobutton-box.p-highlight {
     border: var(--admss-app-dark-green) solid 4px;
 }
 
