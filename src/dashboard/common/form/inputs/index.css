@@ -9,12 +9,12 @@
     width: 49px;
 }
 
-.input-icon.input-icon--left {
+.input-icon.input-icon-left {
     border-radius: 4px 0 0 4px;
     border-right: none;
 }
 
-.input-icon.input-icon--right {
+.input-icon.input-icon-right {
     border-radius: 0 4px 4px 0;
     border-left: none;
 }
@@ -46,10 +46,6 @@
 }
 
 /* Currency input */
-
-.currency-item {
-    margin-bottom: 20px;
-}
 
 .currency-item__input,
 .currency-item__input input {

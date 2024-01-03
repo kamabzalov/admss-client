@@ -7,7 +7,7 @@ export const SettingsTaxes = () => {
         <>
             <div className='text-lg pb-4 font-semibold taxes'>Taxes</div>
             <div className='taxes__row flex justify-content-between'>
-                <Dropdown placeholder='State' className='taxes--dropdown' />
+                <Dropdown placeholder='State' className='taxes__dropdown' />
                 <PercentInput />
             </div>
         </>

@@ -19,7 +19,7 @@ export const SettingsContract = ({ settings }: SettingsAccountProps) => {
                     />
                 </div>
 
-                <Dropdown placeholder='Payment frequency' className='contract--dropdown' />
+                <Dropdown placeholder='Payment frequency' className='contract__dropdown' />
             </div>
         </div>
     );

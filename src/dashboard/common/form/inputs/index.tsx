@@ -39,15 +39,12 @@ export const DashboardRadio = ({ radioArray }: DashboardRadioProps): JSX.Element
 export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
-        <div
-            key={name}
-            className='flex align-items-center justify-content-between dashboard-currency__item currency-item'
-        >
+        <div key={name} className='flex align-items-center justify-content-between currency-item'>
             <label htmlFor={name} className='currency-item__label'>
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
-                <div className='currency-item__icon input-icon input-icon--left'>$</div>
+                <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
                     {...props}
                     minFractionDigits={2}
@@ -65,10 +62,7 @@ export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps
 export const PercentInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
-        <div
-            key={name}
-            className='flex align-items-center justify-content-between dashboard-percent__item percent-item'
-        >
+        <div key={name} className='flex align-items-center justify-content-between percent-item'>
             <label htmlFor={name} className='percent-item__label'>
                 {title}
             </label>
@@ -81,7 +75,7 @@ export const PercentInput = ({ name, value, title, ...props }: InputNumberProps)
                     value={inputValue}
                     onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
                 />
-                <div className='percent-item__icon input-icon input-icon--right'>%</div>
+                <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
         </div>
     );

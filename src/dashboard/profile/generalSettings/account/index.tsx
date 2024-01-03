@@ -46,11 +46,11 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                 </div>
             </div>
             <div className='flex align-items-center justify-content-between'>
-                <span className='p-float-label '>
+                <span className='p-float-label'>
                     <InputText id='account-prefix' className='account__input' />
                     <label htmlFor='account-prefix'>Prefix</label>
                 </span>
-                <span className='p-float-label '>
+                <span className='p-float-label'>
                     <InputText id='account-suffix' className='account__input' />
                     <label htmlFor='account-suffix'>Suffix</label>
                 </span>
