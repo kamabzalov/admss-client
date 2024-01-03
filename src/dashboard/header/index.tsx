@@ -114,7 +114,6 @@ export default function Header(props: HeaderProps) {
                 <GeneralSettingsDialog
                     onHide={() => setGeneralSettings(false)}
                     visible={generalSettings}
-                    // authUser={props.user}
                 />
                 <SupportContactDialog
                     onHide={() => setSupportContact(false)}
