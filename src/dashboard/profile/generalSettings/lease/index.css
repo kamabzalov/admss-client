@@ -9,7 +9,6 @@
     flex: 0 1 50%;
 }
 
-.lease-settings__row input,
 .lease-settings__row .input-icon {
     height: 50px;
 }
@@ -18,11 +17,11 @@
     width: 112px;
 }
 
-.lease-settings__factor-input input {
+.lease-settings__factor-input {
     width: 116px;
 }
 
-.lease-settings-currency .currency-item__input input {
+.lease-settings-currency .currency-item__input {
     width: 98px;
 }
 
