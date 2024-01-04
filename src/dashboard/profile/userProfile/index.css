@@ -23,8 +23,9 @@
     align-items: center;
 }
 
-.profile-row__value input,
-.profile-row__value > div {
+.profile-row__value .p-inputtext,
+.profile-row__value > .profile-row__value,
+.profile-row__value .p-inputwrapper {
     width: 100%;
 }
 

@@ -1,0 +1,51 @@
+.general-settings {
+    width: 1020px;
+}
+
+.general-settings__tabs {
+    display: flex;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.general-settings__tabs .p-tabview-nav {
+    flex-direction: column;
+    flex: 0 0;
+    width: 294px;
+    border: none;
+    min-height: 527px;
+    border-right: 5px solid var(--admss-app-light-blue);
+    gap: 10px;
+}
+
+.general-settings__tabs .p-tabview-panels {
+    flex: 1;
+    padding-top: 0;
+}
+
+.general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
+    border-radius: 0;
+}
+
+.general-settings .p-slider .p-slider-handle {
+    border-radius: 50%;
+    background: #fff;
+}
+
+.general-settings .p-slider .p-slider-handle:focus {
+    box-shadow: none;
+}
+
+.general-settings .p-inputtext:enabled:focus + .float-label {
+    margin: 0;
+}
