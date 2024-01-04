@@ -3,7 +3,8 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 
 interface SettingsStockTradeInProps {
     settings?: any;
@@ -35,12 +36,12 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
             </div>
             <div className='flex align-items-center justify-content-between'>
                 <span className='p-float-label'>
-                    <InputText id='stock-trade-in-prefix' className='stock-trade-in__input' />
-                    <label htmlFor='stock-trade-in-prefix'>Prefix</label>
+                    <InputText className='stock-trade-in__input' />
+                    <label className='float-label'>Prefix</label>
                 </span>
                 <span className='p-float-label'>
-                    <InputText id='stock-trade-in-suffix' className='stock-trade-in__input' />
-                    <label htmlFor='stock-trade-in-suffix'>Suffix</label>
+                    <InputText className='stock-trade-in__input' />
+                    <label className='float-label'>Suffix</label>
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
@@ -49,11 +50,10 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
                     Fixed digits
                 </label>
                 <div className='flex-1 ml-8'>
-                    <InputText
-                        value={String(value)}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setValue(Number(e.target.value))
-                        }
+                    <InputNumber
+                        value={value}
+                        max={10}
+                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
                         className='w-full'
                     />
                     <Slider

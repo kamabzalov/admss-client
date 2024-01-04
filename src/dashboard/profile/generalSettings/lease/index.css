@@ -9,7 +9,7 @@
     flex: 0 1 50%;
 }
 
-.lease-settings__row input,
+.lease-settings__row .p-inputnumber-input,
 .lease-settings__row .input-icon {
     height: 50px;
 }
@@ -18,15 +18,15 @@
     width: 112px;
 }
 
-.lease-settings__factor-input input {
+.lease-settings__factor-input .p-inputnumber-input {
     width: 116px;
 }
 
-.lease-settings-currency .currency-item__input input {
+.lease-settings-currency .currency-item__input .p-inputnumber-input {
     width: 98px;
 }
 
-.lease-settings-currency .input {
+.lease-settings-currency .p-inputnumber-input {
     width: 116px;
 }
 

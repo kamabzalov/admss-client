@@ -27,7 +27,7 @@
     border: none;
 }
 
-.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
     box-shadow: none;
 }
 
@@ -46,6 +46,6 @@
     box-shadow: none;
 }
 
-.general-settings .p-inputtext:enabled:focus + label {
+.general-settings .p-inputtext:enabled:focus + .float-label {
     margin: 0;
 }
