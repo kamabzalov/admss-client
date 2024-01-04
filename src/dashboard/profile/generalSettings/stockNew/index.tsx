@@ -28,12 +28,12 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
             </div>
             <div className='flex align-items-center justify-content-between'>
                 <span className='p-float-label'>
-                    <InputText id='stock-new-prefix' className='stock-new__input' />
-                    <label htmlFor='stock-new-prefix'>Prefix</label>
+                    <InputText className='stock-new__input' />
+                    <label className='float-label'>Prefix</label>
                 </span>
                 <span className='p-float-label'>
-                    <InputText id='stock-new-suffix' className='stock-new__input' />
-                    <label htmlFor='stock-new-suffix'>Suffix</label>
+                    <InputText className='stock-new__input' />
+                    <label className='float-label'>Suffix</label>
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />

@@ -36,12 +36,12 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
             </div>
             <div className='flex align-items-center justify-content-between'>
                 <span className='p-float-label'>
-                    <InputText id='stock-trade-in-prefix' className='stock-trade-in__input' />
-                    <label htmlFor='stock-trade-in-prefix'>Prefix</label>
+                    <InputText className='stock-trade-in__input' />
+                    <label className='float-label'>Prefix</label>
                 </span>
                 <span className='p-float-label'>
-                    <InputText id='stock-trade-in-suffix' className='stock-trade-in__input' />
-                    <label htmlFor='stock-trade-in-suffix'>Suffix</label>
+                    <InputText className='stock-trade-in__input' />
+                    <label className='float-label'>Suffix</label>
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />

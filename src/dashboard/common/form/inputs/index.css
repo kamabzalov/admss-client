@@ -47,7 +47,8 @@
 
 /* Currency input */
 
-.currency-item__input {
+.currency-item__input,
+.currency-item__input .p-inputnumber-input {
     height: 48px;
     border-radius: 0;
 }
