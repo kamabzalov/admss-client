@@ -1,0 +1,27 @@
+.account-start-number__input {
+    width: 158px;
+}
+
+.account__input {
+    width: 250px;
+}
+
+.account__late-fee {
+    width: 250px;
+}
+
+.account-late-fee .currency-item__input .p-inputnumber-input {
+    width: 98px;
+}
+
+.account-grace__label {
+    width: 106px;
+}
+
+.account-grace__input {
+    width: 361px;
+}
+
+.account-percentage .percent-item__label {
+    width: 106px;
+}
