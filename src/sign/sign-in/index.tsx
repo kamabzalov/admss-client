@@ -49,8 +49,8 @@ export default function SignIn() {
                 } else {
                     toast.current?.show({
                         severity: "error",
-                        summary: "Error",
-                        detail: response.error,
+                        summary: response.error || "Error",
+                        detail: response?.message || String(response),
                         sticky: true,
                     });
                 }
@@ -66,7 +66,7 @@ export default function SignIn() {
                     <form onSubmit={formik.handleSubmit}>
                         <div className='sign-in__input space pt-2 pb-2'>
                             <span className='w-full p-float-label p-input-icon-right'>
-                                <i className='adms-username-my-profile sign__icon' />
+                                <i className='admss-icon-username-my-profile sign__icon' />
                                 <InputText
                                     placeholder='Username'
                                     className={`sign__input ${
@@ -87,7 +87,7 @@ export default function SignIn() {
 
                         <div className='sign-in__input space pt-2 pb-2'>
                             <span className='w-full p-float-label p-input-icon-right'>
-                                <i className='adms-password sign__icon' />
+                                <i className='admss-icon-password sign__icon' />
                                 <InputText
                                     placeholder='Password'
                                     className='sign__input'
