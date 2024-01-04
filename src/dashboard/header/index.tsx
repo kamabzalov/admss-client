@@ -12,7 +12,6 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
-import { GeneralSettingsDialog } from "dashboard/profile/generalSettings";
 
 export interface HeaderProps {
     user: AuthUser;
@@ -25,7 +24,6 @@ export default function Header(props: HeaderProps) {
     const [location, setLocation] = useState<string>("");
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
-    const [generalSettings, setGeneralSettings] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
 
     useEffect(() => {
@@ -52,12 +50,7 @@ export default function Header(props: HeaderProps) {
                 setUserProfile(true);
             },
         },
-        {
-            label: "General Settings",
-            command() {
-                setGeneralSettings(true);
-            },
-        },
+        { label: "General Settings" },
         { separator: true },
         { label: "Change location" },
         { label: "Users" },
@@ -111,16 +104,13 @@ export default function Header(props: HeaderProps) {
                     visible={userProfile}
                     authUser={props.user}
                 />
-                <GeneralSettingsDialog
-                    onHide={() => setGeneralSettings(false)}
-                    visible={generalSettings}
-                />
                 <SupportContactDialog
                     onHide={() => setSupportContact(false)}
                     visible={supportContact}
                 />
                 <SupportHistoryDialog
                     onHide={() => setSupportHistory(false)}
+                    useruid={props.user.useruid}
                     visible={supportHistory}
                 />
             </header>
