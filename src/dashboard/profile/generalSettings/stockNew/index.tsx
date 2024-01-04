@@ -37,7 +37,7 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
-            <div className='flex'>
+            <div className='flex align-items-center'>
                 <label htmlFor={settings} className='ml-2'>
                     Fixed digits
                 </label>
