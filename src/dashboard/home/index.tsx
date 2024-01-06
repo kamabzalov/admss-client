@@ -36,7 +36,7 @@ export default function Home() {
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link
-                                    to='inventory'
+                                    to='inventory/create'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
                                     <div className='common-tasks-menu__icon new-inventory'></div>
@@ -154,19 +154,19 @@ export default function Home() {
                     <div className='card-content'>
                         <ul className='list-none pl-0 printing-menu'>
                             <li className='printing-menu__item'>
-                                <i className='adms-email printing-menu__icon' />
+                                <i className='admss-icon-email printing-menu__icon' />
                                 Mailings
                             </li>
                             <li className='printing-menu__item '>
-                                <i className='adms-blank printing-menu__icon' />
+                                <i className='admss-icon-blank printing-menu__icon' />
                                 Blank credit application
                             </li>
                             <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
+                                <i className='admss-icon-print printing-menu__icon' />
                                 Print "Initial privacy notice"
                             </li>
                             <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
+                                <i className='admss-icon-print printing-menu__icon' />
                                 Print deal forms
                             </li>
                         </ul>
