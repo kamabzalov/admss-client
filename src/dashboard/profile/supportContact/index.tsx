@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { DialogProps } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import "./index.css";
+import { createOrUpdateSupportMessage } from "http/services/support.service";
 
 export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
     const [email, setEmail] = useState<string>("");
@@ -19,6 +20,13 @@ export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Elem
     }, [email, topic, description]);
 
     const handleSendSupportContact = (): void => {
+        createOrUpdateSupportMessage({ email: email, topic: topic, message: description })
+            .then((response) => {
+                // TODO: Show success message
+            })
+            .catch((error) => {
+                // TODO: Show error message
+            });
         onHide();
         return;
     };
