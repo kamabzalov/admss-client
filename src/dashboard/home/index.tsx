@@ -36,7 +36,7 @@ export default function Home() {
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link
-                                    to='inventory'
+                                    to='inventory/create'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
                                     <div className='common-tasks-menu__icon new-inventory'></div>
