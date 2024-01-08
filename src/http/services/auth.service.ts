@@ -8,8 +8,9 @@ import {
 import { BaseResponse } from "common/models/base-response";
 
 export interface AppError {
-    error: string;
     status: "Error";
+    error?: string;
+    message?: string;
 }
 
 export interface AuthUser {
@@ -43,7 +44,9 @@ export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> =>
             localStorage.setItem("useruid", JSON.stringify(response.data));
             return response.data;
         })
-        .catch((err) => err.response.data);
+        .catch((err) => {
+            return err?.response?.data || err.message;
+        });
     return response;
 };
 

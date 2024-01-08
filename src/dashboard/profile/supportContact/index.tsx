@@ -5,6 +5,14 @@ import { useEffect, useState } from "react";
 import { DialogProps } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import "./index.css";
+import { createOrUpdateSupportMessage } from "http/services/support.service";
+
+const SUPPORT_CONTACT_TOPICS: ReadonlyArray<string> = [
+    "Question",
+    "Problem",
+    "Feature request",
+    "General",
+];
 
 export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
     const [email, setEmail] = useState<string>("");
@@ -19,6 +27,13 @@ export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Elem
     }, [email, topic, description]);
 
     const handleSendSupportContact = (): void => {
+        createOrUpdateSupportMessage({ email: email, topic: topic, message: description })
+            .then((response) => {
+                // TODO: Show success message
+            })
+            .catch((error) => {
+                // TODO: Show error message
+            });
         onHide();
         return;
     };
@@ -41,7 +56,7 @@ export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Elem
             <Dropdown
                 placeholder='Choose your topic'
                 value={topic}
-                options={["We need", "server data", "to insert", "into this field"]}
+                options={[...SUPPORT_CONTACT_TOPICS]}
                 className='flex align-items-center'
                 onChange={(event) => setTopic(event.target.value)}
             />
