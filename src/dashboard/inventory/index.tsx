@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -11,13 +11,20 @@ import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { useNavigate } from "react-router-dom";
 
 export default function Inventories() {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [totalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
+    const navigate = useNavigate();
+
+    const navigateToCreateInventory = () => {
+        navigate("create");
+    };
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
@@ -77,6 +84,7 @@ export default function Inventories() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        onClick={navigateToCreateInventory}
                                     />
                                     <Button
                                         severity='success'

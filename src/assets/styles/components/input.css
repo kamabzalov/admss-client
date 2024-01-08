@@ -9,6 +9,10 @@
 }
 
 .p-error {
-    font-size: .77rem;
+    font-size: 0.77rem;
     margin-left: 12px;
+}
+
+.p-inputtext:enabled:focus + .float-label {
+    margin: 0;
 }
