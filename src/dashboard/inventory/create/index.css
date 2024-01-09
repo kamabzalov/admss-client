@@ -23,6 +23,10 @@
     background-color: white;
 }
 
+.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
 .create-inventory__accordion .p-accordion-content {
     padding: 0;
     border: none;
