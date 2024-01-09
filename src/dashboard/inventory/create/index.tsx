@@ -48,8 +48,8 @@ export const CreateInventory = () => {
                         <h2 className='card-header__title uppercase m-0'>Create new inventory</h2>
                     </div>
                     <div className='card-content create-inventory__card'>
-                        <div className='grid'>
-                            <div className='col-4 p-0'>
+                        <div className='grid flex-nowrap'>
+                            <div className='p-0'>
                                 <Accordion
                                     activeIndex={accordionActiveIndex}
                                     onTabChange={(e) => setAccordionActiveIndex(e.index)}
@@ -82,7 +82,7 @@ export const CreateInventory = () => {
                                     ))}
                                 </Accordion>
                             </div>
-                            <div className='col-8 flex flex-column p-0 '>
+                            <div className='w-full flex flex-column p-0'>
                                 <div className='flex flex-grow-1'>
                                     {inventorySections.map((section) =>
                                         section.items.map((item: InventoryItem) => (
