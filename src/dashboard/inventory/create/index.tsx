@@ -68,7 +68,11 @@ export const CreateInventory = () => {
                                                         template,
                                                     })
                                                 )}
+                                                readOnly={false}
                                                 activeIndex={stepActiveIndex - section.startIndex}
+                                                onSelect={(e) =>
+                                                    setStepActiveIndex(e.index + section.startIndex)
+                                                }
                                                 className='vertical-step-menu'
                                                 pt={{
                                                     menu: { className: "flex-column w-full" },
