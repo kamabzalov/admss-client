@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { ChangeEvent, ReactElement, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
+import { Checkbox, CheckboxProps } from "primereact/checkbox";
+import { InputText, InputTextProps } from "primereact/inputtext";
+import { Calendar, CalendarProps } from "primereact/calendar";
 
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
 }
 
-export const DashboardRadio = ({ radioArray }: DashboardRadioProps): JSX.Element => {
+export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
 
     return (
@@ -36,7 +39,7 @@ export const DashboardRadio = ({ radioArray }: DashboardRadioProps): JSX.Element
     );
 };
 
-export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
+export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps): ReactElement => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div key={name} className='flex align-items-center justify-content-between currency-item'>
@@ -59,7 +62,7 @@ export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps
     );
 };
 
-export const PercentInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
+export const PercentInput = ({ name, value, title, ...props }: InputNumberProps): ReactElement => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div key={name} className='flex align-items-center justify-content-between percent-item'>
@@ -80,3 +83,64 @@ export const PercentInput = ({ name, value, title, ...props }: InputNumberProps)
         </div>
     );
 };
+
+export const BorderedCheckbox = ({
+    checked,
+    name,
+    height = "50px",
+}: CheckboxProps): ReactElement => {
+    const [isChecked, setIsChecked] = useState<boolean>(checked);
+    return (
+        <div
+            style={{
+                height,
+            }}
+            className='p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox'
+        >
+            <label>{name}</label>
+            <span className='p-inputgroup-addon'>
+                <Checkbox checked={isChecked} onChange={() => setIsChecked((prev) => !prev)} />
+            </span>
+        </div>
+    );
+};
+
+export const SearchInput = ({
+    name,
+    value,
+    height = "50px",
+    title,
+    ...props
+}: InputTextProps): ReactElement => {
+    const [inputValue, setInputValue] = useState<string>(value || "");
+    return (
+        <div
+            key={name}
+            style={{
+                height,
+            }}
+            className='flex align-items-center search-input'
+        >
+            <span className='p-float-label search-input__wrapper'>
+                <InputText
+                    {...props}
+                    value={inputValue}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+                />
+                <label className='float-label search-input__label'>{title}</label>
+            </span>
+            <div className='search-input__icon input-icon input-icon-right'>
+                <i className='adms-search' />
+            </div>
+        </div>
+    );
+};
+
+export const DateInput = ({ name, value }: CalendarProps): ReactElement => (
+    <div className='p-inputgroup flex-1 w-full date-input'>
+        <Calendar placeholder={name} className='date-input__calendar' />
+        <span className='p-inputgroup-addon'>
+            <i className='adms-support-history' />
+        </span>
+    </div>
+);
