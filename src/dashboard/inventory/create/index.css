@@ -7,6 +7,7 @@
 
 .create-inventory__accordion {
     border: none;
+    width: 343px;
 }
 
 .create-inventory__accordion .p-accordion-header .p-accordion-header-link,
