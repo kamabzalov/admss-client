@@ -40,9 +40,10 @@ export class InventorySection implements Inventory {
         return (
             <a
                 href='#'
-                className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
                 role='presentation'
                 data-pc-section='action'
+                {...options}
+                className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
             >
                 <label
                     className={"vertical-nav__icon p-steps-number border-circle "}
