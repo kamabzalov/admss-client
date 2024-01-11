@@ -6,12 +6,18 @@ import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { Calendar, CalendarProps } from "primereact/calendar";
 
+type LabelPosition = "left" | "right" | "top";
+
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
 }
 
 interface CurrencyInputProps extends InputNumberProps {
-    labelPosition?: "left" | "right" | "top";
+    labelPosition?: LabelPosition;
+}
+
+interface PercentInputProps extends InputNumberProps {
+    labelPosition?: LabelPosition;
 }
 
 export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElement => {
@@ -73,11 +79,23 @@ export const CurrencyInput = ({
     );
 };
 
-export const PercentInput = ({ name, value, title, ...props }: InputNumberProps): ReactElement => {
+export const PercentInput = ({
+    name,
+    value,
+    title,
+    labelPosition = "left",
+    ...props
+}: PercentInputProps): ReactElement => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
-        <div key={name} className='flex align-items-center justify-content-between percent-item'>
-            <label htmlFor={name} className='percent-item__label'>
+        <div
+            key={name}
+            className='flex align-items-center justify-content-between percent-item relative'
+        >
+            <label
+                htmlFor={name}
+                className={`percent-item__label ${labelPosition === "top" && "label-top"}`}
+            >
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>

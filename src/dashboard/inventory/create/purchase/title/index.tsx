@@ -1,8 +1,7 @@
-import { CurrencyInput, DateInput, SearchInput } from "dashboard/common/form/inputs";
+import { DateInput, SearchInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement } from "react";
 // import "./index.css";
 
@@ -23,30 +22,19 @@ export const PurchaseTitle = (): ReactElement => (
             </div>
         </div>
         <div className='col-3'>
-            <Dropdown name='Floor' title='Consignor' />
+            <Dropdown placeholder='Status' className='w-full purchase-title__dropdown' />
         </div>
         <div className='col-3'>
-            <Dropdown name='Consign Date' />
-        </div>
-        <div className='col-3'>
-            <span className='p-float-label'>
-                <InputText className='purchase-title__text-input w-full' />
-                <label className='float-label'>Net To Owner</label>
-            </span>
+            <Dropdown placeholder='State' className='w-full purchase-title__dropdown' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
                 <InputText className='purchase-title__text-input w-full' />
-                <label className='float-label'># Days</label>
+                <label className='float-label'>Number</label>
             </span>
         </div>
-        <div className='col-3'>
-            <CurrencyInput labelPosition='top' title='titlement Fee' />
-        </div>
 
-        <div className='form-line'></div>
-
-        <div className='col-3'>
+        <div className='col-3 flex align-items-center'>
             <div className='purchase-title__checkbox flex'>
                 <Checkbox
                     inputId='title-vehicle'
@@ -56,36 +44,74 @@ export const PurchaseTitle = (): ReactElement => (
                     checked={false}
                 />
                 <label htmlFor='title-vehicle' className='ml-2'>
-                    Returned to Seller Unsold
+                    Received
                 </label>
             </div>
         </div>
+
         <div className='col-3'>
-            <DateInput name='Return Date' />
+            <DateInput name='Date' />
+        </div>
+
+        <hr className='form-line' />
+
+        <div className='col-6'>
+            <SearchInput title='Holder Name' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
                 <InputText className='purchase-title__text-input w-full' />
-                <label className='float-label'>Reserve Factor</label>
+                <label className='float-label'>Holder Phone Number</label>
             </span>
         </div>
         <div className='col-3'>
-            <CurrencyInput labelPosition='top' title='Reserve Amount' />
-        </div>
-        <div className='col-12'>
-            <InputTextarea className='purchase-title__text-area' placeholder='titlement Notes' />
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Holder Payoff</label>
+            </span>
         </div>
 
-        <div className='form-line'></div>
+        <div className='col-6'>
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Holder Address</label>
+            </span>
+        </div>
+        <div className='col-3'>
+            <Dropdown placeholder='State' className='w-full' />
+        </div>
+        <div className='col-3'>
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Zip Code</label>
+            </span>
+        </div>
 
-        <div className='col-3'>
-            <CurrencyInput labelPosition='top' title='Early Removal Fee' />
+        <hr className='form-line' />
+
+        <div className='col-6'>
+            <SearchInput title='Previous Name' />
         </div>
         <div className='col-3'>
-            <CurrencyInput labelPosition='top' title='Listing Fee' />
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Previous Phone Number</label>
+            </span>
+        </div>
+        <div className='col-6'>
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Previous Address</label>
+            </span>
         </div>
         <div className='col-3'>
-            <CurrencyInput labelPosition='top' title='Owner’s Asking Price' />
+            <Dropdown placeholder='State' className='w-full' />
+        </div>
+        <div className='col-3'>
+            <span className='p-float-label'>
+                <InputText className='purchase-title__text-input w-full' />
+                <label className='float-label'>Zip Code</label>
+            </span>
         </div>
     </div>
 );

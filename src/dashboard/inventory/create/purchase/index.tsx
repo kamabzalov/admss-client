@@ -4,6 +4,7 @@ import { PurchaseConsign } from "./consign";
 import { PurchaseTitle } from "./title";
 import { PurchasePurchases } from "./purchases";
 import { PurchasePayments } from "./payments";
+import { PurchaseExpenses } from "./expenses";
 
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",
@@ -12,7 +13,7 @@ export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "Consign", component: <PurchaseConsign /> },
         { itemLabel: "Title", component: <PurchaseTitle /> },
         { itemLabel: "Purchases", component: <PurchasePurchases /> },
-        { itemLabel: "Expenses" },
+        { itemLabel: "Expenses", component: <PurchaseExpenses /> },
         { itemLabel: "Payments", component: <PurchasePayments /> },
     ],
 };

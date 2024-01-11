@@ -43,7 +43,7 @@ export const PurchaseConsign = (): ReactElement => (
             <CurrencyInput labelPosition='top' title='Consignment Fee' />
         </div>
 
-        <div className='form-line'></div>
+        <hr className='form-line' />
 
         <div className='col-3'>
             <div className='purchase-consign__checkbox flex'>
@@ -78,7 +78,7 @@ export const PurchaseConsign = (): ReactElement => (
             />
         </div>
 
-        <div className='form-line'></div>
+        <hr className='form-line' />
 
         <div className='col-3'>
             <CurrencyInput labelPosition='top' title='Early Removal Fee' />

@@ -47,7 +47,7 @@ export const PurchasePurchases = (): ReactElement => (
             </span>
         </div>
 
-        <div className='form-line'></div>
+        <hr className='form-line' />
 
         <div className='col-6'>
             <SearchInput title='Auction Company' />
@@ -56,7 +56,7 @@ export const PurchasePurchases = (): ReactElement => (
             <SearchInput title='Buyer Name' />
         </div>
         <div className='col-3'>
-            <PercentInput title='Buyer Percent' />
+            <PercentInput labelPosition='top' title='Buyer Percent' />
         </div>
         <div className='col-3'>
             <CurrencyInput labelPosition='top' title='Buyer Commission' />
@@ -68,7 +68,7 @@ export const PurchasePurchases = (): ReactElement => (
             <CurrencyInput labelPosition='top' title='Amount' />
         </div>
 
-        <div className='form-line'></div>
+        <hr className='form-line' />
 
         <div className='col-3'>
             <span className='p-float-label'>
@@ -77,7 +77,7 @@ export const PurchasePurchases = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <DateInput placeholder='Check Date' />
+            <DateInput name='Check Date' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
