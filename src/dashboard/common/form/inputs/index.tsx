@@ -10,6 +10,10 @@ interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
 }
 
+interface CurrencyInputProps extends InputNumberProps {
+    labelPosition?: "left" | "right" | "top";
+}
+
 export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
 
@@ -39,11 +43,20 @@ export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElemen
     );
 };
 
-export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps): ReactElement => {
+export const CurrencyInput = ({
+    name,
+    value,
+    title,
+    labelPosition = "left",
+    ...props
+}: CurrencyInputProps): ReactElement => {
     const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
-        <div key={name} className='flex align-items-center justify-content-between currency-item'>
-            <label htmlFor={name} className='currency-item__label'>
+        <div
+            key={name}
+            className={"flex align-items-center justify-content-between currency-item relative"}
+        >
+            <label className={`currency-item__label ${labelPosition === "top" && "label-top"}`}>
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
@@ -52,8 +65,6 @@ export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps
                     {...props}
                     minFractionDigits={2}
                     locale='en-US'
-                    inputId={name}
-                    name={name}
                     value={inputValue}
                     onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
                 />

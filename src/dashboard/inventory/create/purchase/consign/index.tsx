@@ -1,9 +1,4 @@
-import {
-    BorderedCheckbox,
-    CurrencyInput,
-    DateInput,
-    SearchInput,
-} from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, SearchInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -45,7 +40,7 @@ export const PurchaseConsign = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <CurrencyInput name='Consignment Fee' />
+            <CurrencyInput labelPosition='top' title='Consignment Fee' />
         </div>
 
         <div className='form-line'></div>
@@ -74,7 +69,7 @@ export const PurchaseConsign = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <CurrencyInput name='Reserve Amount' />
+            <CurrencyInput labelPosition='top' title='Reserve Amount' />
         </div>
         <div className='col-12'>
             <InputTextarea
@@ -86,13 +81,13 @@ export const PurchaseConsign = (): ReactElement => (
         <div className='form-line'></div>
 
         <div className='col-3'>
-            <CurrencyInput name='Reserve Amount' />
+            <CurrencyInput labelPosition='top' title='Early Removal Fee' />
         </div>
         <div className='col-3'>
-            <CurrencyInput name='Reserve Amount' />
+            <CurrencyInput labelPosition='top' title='Listing Fee' />
         </div>
         <div className='col-3'>
-            <CurrencyInput name='Reserve Amount' />
+            <CurrencyInput labelPosition='top' title='Owner’s Asking Price' />
         </div>
     </div>
 );

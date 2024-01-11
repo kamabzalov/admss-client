@@ -7,15 +7,17 @@
     background: var(--admss-app-lightest-grey);
     border: var(--admss-app-light-grey) solid 1px;
     width: 49px;
+    flex-shrink: 0;
+    color: var(--admss-app-medium-grey);
 }
 
 .input-icon.input-icon-left {
-    border-radius: 4px 0 0 4px;
+    border-radius: 5px 0 0 5px;
     border-right: none;
 }
 
 .input-icon.input-icon-right {
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 5px 5px 0;
     border-left: none;
 }
 
@@ -55,14 +57,23 @@
 
 .currency-item__input .p-inputnumber-input {
     width: 100%;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 5px 5px 0;
+}
+
+.label-top {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
 }
 
 /* Percent input */
 
 .percent-item__input .p-inputnumber-input {
     width: 81px;
-    border-radius: 4px 0 0 4px;
+    border-radius: 5px 0 0 5px;
 }
 
 /* Bordered checkbox */

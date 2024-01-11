@@ -1,0 +1,13 @@
+.vehicle-keys__checkbox {
+    border: 1px solid var(--admss-app-lightest-grey);
+    border-radius: 5px;
+    height: 50px;
+    padding-left: 10px;
+}
+
+.vehicle-keys__checkbox > .p-inputgroup-addon {
+    height: 100%;
+}
+.vehicle-keys__checkbox > .p-inputgroup-addon .p-checkbox-box {
+    border-color: var(--admss-app-light-grey);
+}
