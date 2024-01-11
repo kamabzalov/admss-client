@@ -21,8 +21,6 @@
     border-left: none;
 }
 
-/* Radio input  */
-
 .radio-item {
     width: 250px;
     height: 50px;
@@ -47,8 +45,6 @@
     border: var(--admss-app-dark-green) solid 4px;
 }
 
-/* Currency input */
-
 .currency-item__input,
 .currency-item__input .p-inputnumber-input {
     height: 50px;
@@ -69,14 +65,10 @@
     font-size: 12px;
 }
 
-/* Percent input */
-
 .percent-item__input .p-inputnumber-input {
-    width: 81px;
+    width: 100%;
     border-radius: 5px 0 0 5px;
 }
-
-/* Bordered checkbox */
 
 .bordered-checkbox {
     border: 1px solid var(--admss-app-light-grey);
@@ -96,8 +88,6 @@
 .bordered-checkbox > .p-inputgroup-addon .p-checkbox-box.p-focus {
     box-shadow: none;
 }
-
-/* Search input  */
 
 .search-input__wrapper,
 .search-input__wrapper > .p-inputtext {
