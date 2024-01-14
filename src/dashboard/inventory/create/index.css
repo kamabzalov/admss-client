@@ -24,7 +24,8 @@
     background-color: white;
 }
 
-.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus {
+.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus,
+.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:focus {
     box-shadow: none;
 }
 
