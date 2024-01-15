@@ -38,7 +38,9 @@ export default function Deals() {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getDealsList(authUser.useruid, { total: 1 }).then((response) => {});
+            getDealsList(authUser.useruid, { total: 1 }).then((response) => {
+                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+            });
         }
     }, []);
 
@@ -53,7 +55,7 @@ export default function Deals() {
         };
         if (authUser) {
             getDealsList(authUser.useruid, params).then((response) => {
-                if (response?.length) {
+                if (Array.isArray(response)) {
                     setDeals(response);
                 } else {
                     setDeals([]);
