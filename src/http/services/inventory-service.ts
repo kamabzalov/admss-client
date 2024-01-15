@@ -1,3 +1,4 @@
+import { BaseResponse } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
 
@@ -29,11 +30,18 @@ export interface Inventory {
     useruid: string;
 }
 
+export interface TotalInventoryList extends BaseResponse {
+    total: number;
+}
+
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<Inventory[]>(`inventory/${uid}/list`, {
-            params: queryParams,
-        });
+        const request = await authorizedUserApiInstance.get<Inventory[] | TotalInventoryList>(
+            `inventory/${uid}/list`,
+            {
+                params: queryParams,
+            }
+        );
         return request.data;
     } catch (error) {
         // TODO: add error handler

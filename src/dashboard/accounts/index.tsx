@@ -37,7 +37,9 @@ export default function Accounts() {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getAccountsList(authUser.useruid, { total: 1 }).then((response) => {});
+            getAccountsList(authUser.useruid, { total: 1 }).then((response) => {
+                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+            });
         }
     }, []);
 
@@ -52,7 +54,7 @@ export default function Accounts() {
         };
         if (authUser) {
             getAccountsList(authUser.useruid, params).then((response) => {
-                if (response?.length) {
+                if (Array.isArray(response)) {
                     setAccounts(response);
                 } else {
                     setAccounts([]);
