@@ -42,7 +42,7 @@ export class InventorySection implements Inventory {
                 href='#'
                 role='presentation'
                 data-pc-section='action'
-                {...options}
+                onClick={options.onClick}
                 className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
             >
                 <label

@@ -24,7 +24,8 @@
     background-color: white;
 }
 
-.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus {
+.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus,
+.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:focus {
     box-shadow: none;
 }
 
@@ -106,4 +107,11 @@
     margin-bottom: 40px;
     font-size: 20px;
     font-weight: 700;
+}
+
+.form-line {
+    width: 100%;
+    padding: 0;
+    border-top: var(--admss-app-light-grey);
+    margin: 28px 0;
 }
