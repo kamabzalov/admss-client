@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 export default function Inventories() {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
-    const [totalRecords] = useState<number>(0);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
@@ -44,7 +44,9 @@ export default function Inventories() {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getInventoryList(authUser.useruid, { total: 1 }).then((response) => {});
+            getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
+                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+            });
         }
     }, []);
 
@@ -59,7 +61,7 @@ export default function Inventories() {
         };
         if (authUser) {
             getInventoryList(authUser.useruid, params).then((response) => {
-                if (response?.length) {
+                if (Array.isArray(response)) {
                     setInventories(response);
                 } else {
                     setInventories([]);
