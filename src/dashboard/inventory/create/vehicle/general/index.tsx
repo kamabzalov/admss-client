@@ -10,7 +10,7 @@ import {
     getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
 
-export const VehicleGeneral = (): JSX.Element => {
+export const VehicleGeneral = (): ReactElement => {
     const [selectedMakes, setSelectedMakes] = useState<string>("");
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [selectedColor, setSelectedColor] = useState<string>("");
