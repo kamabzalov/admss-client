@@ -1,0 +1,8 @@
+.vehicle-options {
+    row-gap: 25px;
+    max-height: 620px;
+}
+.vehicle-options__checkbox {
+    width: 33.33%;
+    color: var(--admss-app-primary);
+}
