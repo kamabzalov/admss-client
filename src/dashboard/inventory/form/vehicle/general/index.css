@@ -1,0 +1,8 @@
+.vehicle-general__dropdown,
+.vehicle-general__text-input {
+    height: 50px;
+}
+
+.vehicle-general__number-input .p-inputnumber-input {
+    width: 100%;
+}

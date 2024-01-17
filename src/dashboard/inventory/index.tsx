@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { getKeyValue } from "services/local-storage.service";
@@ -12,6 +17,7 @@ import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 export default function Inventories() {
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -22,8 +28,12 @@ export default function Inventories() {
 
     const navigate = useNavigate();
 
-    const navigateToCreateInventory = () => {
+    const navigateToCreateInventory = (): void => {
         navigate("create");
+    };
+
+    const navigateToEditInventory = (itemuid: string): void => {
+        navigate(itemuid);
     };
 
     const printTableData = () => {
@@ -126,6 +136,10 @@ export default function Inventories() {
                                     onSort={sortData}
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    rowClassName={() => "hover:text-primary cursor-pointer"}
+                                    onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
+                                        navigateToEditInventory(itemuid)
+                                    }
                                 >
                                     <Column field='StockNo' header='StockNo' sortable></Column>
                                     <Column field='Make' header='Make'></Column>
