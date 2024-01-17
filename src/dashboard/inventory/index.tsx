@@ -28,14 +28,6 @@ export default function Inventories() {
 
     const navigate = useNavigate();
 
-    const navigateToCreateInventory = (): void => {
-        navigate("create");
-    };
-
-    const navigateToEditInventory = (itemuid: string): void => {
-        navigate(itemuid);
-    };
-
     const printTableData = () => {
         const contactsDoc = new jsPDF();
         autoTable(contactsDoc, { html: ".p-datatable-table" });
@@ -96,7 +88,7 @@ export default function Inventories() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
-                                        onClick={navigateToCreateInventory}
+                                        onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
@@ -138,7 +130,7 @@ export default function Inventories() {
                                     sortField={lazyState.sortField}
                                     rowClassName={() => "hover:text-primary cursor-pointer"}
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
-                                        navigateToEditInventory(itemuid)
+                                        navigate(itemuid)
                                     }
                                 >
                                     <Column field='StockNo' header='StockNo' sortable></Column>

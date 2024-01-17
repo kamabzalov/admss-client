@@ -21,8 +21,6 @@ export const InventoryForm = () => {
     const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const [isValidData, setIsValidData] = useState<boolean>(false);
 
     const store = useStore().inventoryStore;
     const { getInventory, clearInventory } = store;
@@ -138,11 +136,7 @@ export const InventoryForm = () => {
                             >
                                 Next
                             </Button>
-                            <Button
-                                onClick={() => {}}
-                                disabled={!isValidData}
-                                className='uppercase px-6'
-                            >
+                            <Button onClick={() => {}} className='uppercase px-6'>
                                 Save
                             </Button>
                         </div>

@@ -3,7 +3,6 @@ import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
-// import "./index.css";
 
 export const PurchaseTitle = (): ReactElement => (
     <div className='grid purchase-title row-gap-2'>
