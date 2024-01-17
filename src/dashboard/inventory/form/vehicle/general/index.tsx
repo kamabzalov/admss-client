@@ -68,23 +68,15 @@ export const VehicleGeneral = observer(() => {
                 </span>
             </div>
             <div className='col-6'>
-                {automakesList.length ? (
-                    <Dropdown
-                        optionLabel='name'
-                        value={inventory?.Make}
-                        required
-                        onChange={({ value }) => changeInventory({ key: "Make", value })}
-                        options={automakesList}
-                        placeholder='Make (required)'
-                        className='w-full vehicle-general__dropdown'
-                    />
-                ) : (
-                    <Dropdown
-                        disabled
-                        placeholder='Loading makes...'
-                        className='w-full vehicle-general__dropdown'
-                    />
-                )}
+                <Dropdown
+                    optionLabel='name'
+                    value={inventory?.Make}
+                    required
+                    onChange={({ value }) => changeInventory({ key: "Make", value })}
+                    options={automakesList}
+                    placeholder='Make (required)'
+                    className='w-full vehicle-general__dropdown'
+                />
             </div>
 
             <div className='col-6'>
