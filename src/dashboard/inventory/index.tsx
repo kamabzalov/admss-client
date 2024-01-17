@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { getKeyValue } from "services/local-storage.service";
@@ -12,6 +17,7 @@ import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 export default function Inventories() {
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -21,10 +27,6 @@ export default function Inventories() {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
     const navigate = useNavigate();
-
-    const navigateToCreateInventory = () => {
-        navigate("create");
-    };
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
@@ -86,7 +88,7 @@ export default function Inventories() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
-                                        onClick={navigateToCreateInventory}
+                                        onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
@@ -126,6 +128,10 @@ export default function Inventories() {
                                     onSort={sortData}
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    rowClassName={() => "hover:text-primary cursor-pointer"}
+                                    onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
+                                        navigate(itemuid)
+                                    }
                                 >
                                     <Column field='StockNo' header='StockNo' sortable></Column>
                                     <Column field='Make' header='Make'></Column>
