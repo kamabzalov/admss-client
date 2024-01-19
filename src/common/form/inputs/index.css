@@ -1,0 +1,103 @@
+.input-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 600;
+    background: var(--admss-app-lightest-grey);
+    border: var(--admss-app-light-grey) solid 1px;
+    width: 49px;
+    flex-shrink: 0;
+    color: var(--admss-app-medium-grey);
+}
+
+.input-icon.input-icon-left {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+}
+
+.input-icon.input-icon-right {
+    border-radius: 0 5px 5px 0;
+    border-left: none;
+}
+
+.radio-item {
+    width: 250px;
+    height: 50px;
+    flex-shrink: 0;
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.radio .radio-item__input {
+    order: 2;
+    border-left: 1px solid var(--admss-app-light-grey);
+    height: 100%;
+    background-color: var(--admss-app-lightest-grey);
+    padding: 0 10px;
+}
+
+.radio .radio-item__label {
+    padding-left: 10px;
+    order: 1;
+}
+
+.radio .p-radiobutton-checked .p-radiobutton-box.p-highlight {
+    border: var(--admss-app-dark-green) solid 4px;
+}
+
+.currency-item__input,
+.currency-item__input .p-inputnumber-input {
+    height: 50px;
+    border-radius: 0;
+}
+
+.currency-item__input .p-inputnumber-input {
+    width: 100%;
+    border-radius: 0 5px 5px 0;
+}
+
+.label-top {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
+}
+
+.percent-item__input .p-inputnumber-input {
+    width: 100%;
+    border-radius: 5px 0 0 5px;
+}
+
+.bordered-checkbox {
+    border: 1px solid var(--admss-app-light-grey);
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.bordered-checkbox > .p-inputgroup-addon {
+    height: 100%;
+    border: none;
+    border-left: 1px solid var(--admss-app-light-grey);
+}
+.bordered-checkbox > .p-inputgroup-addon .p-checkbox-box {
+    border-color: var(--admss-app-light-grey);
+}
+
+.bordered-checkbox > .p-inputgroup-addon .p-checkbox-box.p-focus {
+    box-shadow: none;
+}
+
+.search-input__wrapper,
+.search-input__wrapper > .p-inputtext {
+    width: 100%;
+}
+
+.search-input__wrapper > .p-inputtext {
+    border-radius: 5px 0 0 5px;
+}
+
+.search-input__icon {
+    height: 100%;
+}
