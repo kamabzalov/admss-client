@@ -1,5 +1,7 @@
 import {
     Inventory,
+    InventoryExtData,
+    InventoryOptionsInfo,
     getInventoryInfo,
     initialInventoryState,
 } from "http/services/inventory-service";
@@ -18,33 +20,90 @@ export class RootStore {
 
 class InventoryStore {
     public rootStore: RootStore;
-    public inventory: Inventory = initialInventoryState;
-    public isLoading = false;
+    private _inventory: Inventory = {} as Inventory;
+    private _inventoryOptions: InventoryOptionsInfo[] = [];
+    private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+    protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
     }
 
-    getInventory = async (itemuid: string) => {
-        this.isLoading = true;
+    public get inventory() {
+        return this._inventory;
+    }
+    public get inventoryOptions() {
+        return this._inventoryOptions;
+    }
+    public get inventoryExtData() {
+        return this._inventoryExtData;
+    }
+    public get isLoading() {
+        return this._isLoading;
+    }
+
+    public getInventory = async (itemuid: string) => {
+        this._isLoading = true;
         try {
             const response = await getInventoryInfo(itemuid);
-            this.rootStore.inventoryStore.inventory = response || initialInventoryState;
-            this.rootStore.inventoryStore.isLoading = false;
+            if (response) {
+                const { extdata, options_info, ...inventory } = response;
+                this.rootStore.inventoryStore._inventory = inventory || ({} as Inventory);
+                this.rootStore.inventoryStore._inventoryOptions = options_info || [];
+                this.rootStore.inventoryStore._inventoryExtData =
+                    extdata || ({} as InventoryExtData);
+                this.rootStore.inventoryStore._isLoading = false;
+            }
         } catch (error) {
-            this.rootStore.inventoryStore.isLoading = false;
+            this.rootStore.inventoryStore._isLoading = false;
         }
     };
 
-    changeInventory = action(({ key, value }: { key: keyof Inventory; value: string | number }) => {
-        if (this.rootStore.inventoryStore.inventory) {
-            //@ts-ignore
-            this.rootStore.inventoryStore.inventory[key] = value;
+    public changeInventory = action(
+        ({ key, value }: { key: keyof Inventory; value: string | number }) => {
+            if (
+                this.rootStore.inventoryStore._inventory &&
+                key !== "extdata" &&
+                key !== "options_info"
+            ) {
+                (this.rootStore.inventoryStore._inventory as Record<typeof key, string | number>)[
+                    key
+                ] = value;
+            }
+        }
+    );
+
+    public changeInventoryExtData = action(
+        ({ key, value }: { key: keyof InventoryExtData; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExtData } = inventoryStore;
+                (inventoryExtData as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
+    public changeInventoryOptions = action((optionName: InventoryOptionsInfo) => {
+        const inventoryStore = this.rootStore.inventoryStore;
+        if (inventoryStore) {
+            const { inventoryOptions } = inventoryStore;
+
+            if (inventoryOptions.includes(optionName)) {
+                const updatedOptions = inventoryOptions.filter((option) => option !== optionName);
+                inventoryStore._inventoryOptions = updatedOptions;
+            } else {
+                inventoryStore._inventoryOptions.push(optionName);
+            }
         }
     });
 
-    clearInventory = () => (this.rootStore.inventoryStore.inventory = initialInventoryState);
+    public clearInventory = () =>
+        (this.rootStore.inventoryStore._inventory = initialInventoryState);
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
 }
 
 export const store = new RootStore();

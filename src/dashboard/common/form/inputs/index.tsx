@@ -114,11 +114,10 @@ export const PercentInput = ({
 };
 
 export const BorderedCheckbox = ({
-    checked,
     name,
     height = "50px",
+    ...props
 }: CheckboxProps): ReactElement => {
-    const [isChecked, setIsChecked] = useState<boolean>(checked);
     return (
         <div
             style={{
@@ -128,7 +127,7 @@ export const BorderedCheckbox = ({
         >
             <label>{name}</label>
             <span className='p-inputgroup-addon'>
-                <Checkbox checked={isChecked} onChange={() => setIsChecked((prev) => !prev)} />
+                <Checkbox {...props} />
             </span>
         </div>
     );
@@ -165,9 +164,9 @@ export const SearchInput = ({
     );
 };
 
-export const DateInput = ({ name, value }: CalendarProps): ReactElement => (
+export const DateInput = ({ name, ...props }: CalendarProps): ReactElement => (
     <div className='p-inputgroup flex-1 w-full date-input'>
-        <Calendar placeholder={name} className='date-input__calendar' />
+        <Calendar placeholder={name} {...props} className='date-input__calendar' />
         <span className='p-inputgroup-addon'>
             <i className='adms-support-history' />
         </span>

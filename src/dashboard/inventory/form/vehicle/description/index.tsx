@@ -6,19 +6,18 @@ import {
     getInventoryDrivelineList,
     getInventoryCylindersList,
 } from "http/services/inventory-service";
+import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
+import { useStore } from "store/hooks";
 
-export const VehicleDescription = (): ReactElement => {
-    const [selectedTransmission, setSelectedTransmission] = useState<string>("");
+export const VehicleDescription = observer((): ReactElement => {
+    const store = useStore().inventoryStore;
+    const { inventory, changeInventory } = store;
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
-    const [selectedFuel, setSelectedFuel] = useState<string>("");
     const [fuelList, setFuelList] = useState<ListData[]>([]);
-    const [selectedDriveLine, setSelectedDriveLine] = useState<string>("");
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
-    const [selectedCylinders, setSelectedCylinders] = useState<string>("");
     const [cylindersList, setCylindersList] = useState<ListData[]>([]);
-    const [selectedInterior, setSelectedInterior] = useState<string>("");
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
     useEffect(() => {
         getInventoryTransmissionTypesList().then((list) => {
@@ -42,8 +41,9 @@ export const VehicleDescription = (): ReactElement => {
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedTransmission}
-                    onChange={(e) => setSelectedTransmission(e.value)}
+                    optionValue='name'
+                    value={inventory?.Transmission}
+                    onChange={({ value }) => changeInventory({ key: "Transmission", value })}
                     options={transmissionList}
                     placeholder='Transmission'
                     className='w-full vehicle-description__dropdown'
@@ -53,8 +53,9 @@ export const VehicleDescription = (): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedFuel}
-                    onChange={(e) => setSelectedFuel(e.value)}
+                    optionValue='name'
+                    value={inventory?.TypeOfFuel}
+                    onChange={({ value }) => changeInventory({ key: "TypeOfFuel", value })}
                     options={fuelList}
                     placeholder='Type of Fuel (required)'
                     className='w-full vehicle-description__dropdown'
@@ -63,8 +64,9 @@ export const VehicleDescription = (): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedDriveLine}
-                    onChange={(e) => setSelectedDriveLine(e.value)}
+                    optionValue='name'
+                    value={inventory?.DriveLine}
+                    onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
                     options={driveLineList}
                     placeholder='Drive Line'
                     className='w-full vehicle-description__dropdown'
@@ -74,8 +76,9 @@ export const VehicleDescription = (): ReactElement => {
             <div className='col-4'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedCylinders}
-                    onChange={(e) => setSelectedCylinders(e.value)}
+                    optionValue='name'
+                    value={inventory?.Cylinders}
+                    onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
                     options={cylindersList}
                     placeholder='Cylinders'
                     className='w-full vehicle-description__dropdown'
@@ -85,8 +88,9 @@ export const VehicleDescription = (): ReactElement => {
             <div className='col-8'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedInterior}
-                    onChange={(e) => setSelectedInterior(e.value)}
+                    optionValue='name'
+                    value={inventory?.InteriorColor}
+                    onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
                     options={interiorList}
                     placeholder='Interior color'
                     className='w-full vehicle-description__dropdown'
@@ -94,4 +98,4 @@ export const VehicleDescription = (): ReactElement => {
             </div>
         </div>
     );
-};
+});
