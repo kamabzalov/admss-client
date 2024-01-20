@@ -1,10 +1,24 @@
 import { Inventory } from "dashboard/inventory/common";
-import { PurchaseFloorplan } from "./froorplan";
-import { PurchaseConsign } from "./consign";
-import { PurchaseTitle } from "./title";
-import { PurchasePurchases } from "./purchases";
-import { PurchasePayments } from "./payments";
-import { PurchaseExpenses } from "./expenses";
+import { lazy } from "react";
+
+const PurchaseFloorplan = lazy(() =>
+    import("./floorplan").then((module) => ({ default: module.PurchaseFloorplan }))
+);
+const PurchaseConsign = lazy(() =>
+    import("./consign").then((module) => ({ default: module.PurchaseConsign }))
+);
+const PurchaseTitle = lazy(() =>
+    import("./title").then((module) => ({ default: module.PurchaseTitle }))
+);
+const PurchasePurchases = lazy(() =>
+    import("./purchases").then((module) => ({ default: module.PurchasePurchases }))
+);
+const PurchaseExpenses = lazy(() =>
+    import("./expenses").then((module) => ({ default: module.PurchaseExpenses }))
+);
+const PurchasePayments = lazy(() =>
+    import("./payments").then((module) => ({ default: module.PurchasePayments }))
+);
 
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",

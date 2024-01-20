@@ -5,7 +5,7 @@ import { BaseResponse } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
 
-interface ExtData {
+export interface InventoryExtData {
     bgAsIs: number;
     bgDuration: string;
     bgFullWarranty: number;
@@ -60,7 +60,7 @@ interface ExtData {
     fpReductionDate: number;
     fpReduxAmt: number;
     fpRemainBal: number;
-    inspDate: number;
+    inspDate: string;
     inspEmissions: number;
     inspNumber: string;
     inspSafety: number;
@@ -130,9 +130,38 @@ interface ExtData {
     useruid: string;
 }
 
-interface OptionsInfo {
-    [key: string]: string;
-}
+export type InventoryOptionsInfo =
+    | "A/C"
+    | "Automatic Climate Control"
+    | "Anti-Lock Brakes"
+    | "Anti-Theft System"
+    | "Anti-Skid Control"
+    | "All Wheel Drive"
+    | "Aluminum Alloy Wheels"
+    | "AM/FM Stereo"
+    | "tConvertable Top"
+    | "Cruise Control"
+    | "Cassette Player"
+    | "CD Changer"
+    | "Fog Lights"
+    | "Four Wheel Drive"
+    | "Leather Upholstry"
+    | "Luggage Rack"
+    | "MoonRoof"
+    | "Navigation System"
+    | "Overhead Console"
+    | "Power Door Locks"
+    | "Power Seats"
+    | "Power Steering"
+    | "Power Windows"
+    | "Remote Keyless Entry"
+    | "Rear Window Wiper"
+    | "Rear Window Defogger"
+    | "Sun Roof"
+    | "Sunscreen Glass"
+    | "Tinted Windows"
+    | "Android Auto"
+    | "Apple Car Play";
 
 export interface Inventory {
     BodyStyle: string;
@@ -156,11 +185,11 @@ export interface Inventory {
     VINimageUID: string;
     Year: string;
     created: string;
-    extdata: ExtData;
+    extdata?: InventoryExtData;
     itemuid: string;
     mileage: number;
     name: string;
-    options_info: string[];
+    options_info?: InventoryOptionsInfo[];
     status: string;
     updated: string;
     useruid: string;
@@ -188,7 +217,7 @@ export const initialInventoryState: Inventory = {
     VINimageUID: "",
     Year: "",
     created: "",
-    extdata: {} as ExtData,
+    extdata: {} as InventoryExtData,
     itemuid: "",
     mileage: 0,
     name: "",
@@ -258,9 +287,10 @@ export type ListData = {
 };
 
 export type MakesListData = ListData & { logo: string };
+export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
-export const getInventoryOptionsList = async (): Promise<ListData[] | undefined> =>
-    await fetchInventoryList<ListData[]>("options");
+export const getInventoryOptionsList = async (): Promise<OptionsListData[] | undefined> =>
+    await fetchInventoryList<OptionsListData[]>("options");
 export const getInventoryBodyTypesList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("bodytypes");
 export const getInventoryExteriorColorsList = async (): Promise<ListData[] | undefined> =>
