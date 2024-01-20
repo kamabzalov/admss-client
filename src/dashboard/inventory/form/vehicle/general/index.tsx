@@ -1,7 +1,7 @@
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -13,9 +13,9 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
 
-export const VehicleGeneral = observer(() => {
+export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory, isLoading } = store;
+    const { inventory, changeInventory } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -23,7 +23,13 @@ export const VehicleGeneral = observer(() => {
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
-            list && setAutomakesList(list);
+            if (list) {
+                const upperCasedList = list.map((item) => ({
+                    ...item,
+                    name: item.name.toUpperCase(),
+                }));
+                setAutomakesList(upperCasedList);
+            }
         });
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
@@ -33,13 +39,6 @@ export const VehicleGeneral = observer(() => {
         });
     }, []);
 
-    if (isLoading)
-        return (
-            <div className='flex justify-content-center align-items-center w-full h-full'>
-                Loading...
-            </div>
-        );
-
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6'>
@@ -47,9 +46,7 @@ export const VehicleGeneral = observer(() => {
                     <InputText
                         className='vehicle-general__text-input w-full'
                         value={inventory?.VIN}
-                        onChange={({ target }) =>
-                            changeInventory({ key: "VIN", value: target.value })
-                        }
+                        onChange={({ target: { value } }) => changeInventory({ key: "VIN", value })}
                     />
                     <label className='float-label'>VIN (required)</label>
                 </span>
@@ -60,8 +57,8 @@ export const VehicleGeneral = observer(() => {
                     <InputText
                         className='vehicle-general__text-input w-full'
                         value={inventory?.StockNo}
-                        onChange={({ target }) =>
-                            changeInventory({ key: "StockNo", value: target.value })
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "StockNo", value })
                         }
                     />
                     <label className='float-label'>Stock#</label>
@@ -70,6 +67,7 @@ export const VehicleGeneral = observer(() => {
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.Make}
                     required
                     onChange={({ value }) => changeInventory({ key: "Make", value })}
@@ -82,6 +80,11 @@ export const VehicleGeneral = observer(() => {
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
+                    value={inventory?.Model}
+                    //TODO: add options
+                    options={[{ name: inventory?.Model }]}
+                    onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -92,6 +95,9 @@ export const VehicleGeneral = observer(() => {
                         className='vehicle-general__text-input w-full'
                         required
                         value={inventory?.Year}
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "Year", value })
+                        }
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
@@ -103,6 +109,9 @@ export const VehicleGeneral = observer(() => {
                         className='vehicle-general__number-input w-full'
                         required
                         value={inventory?.mileage}
+                        onChange={({ value }) =>
+                            value && changeInventory({ key: "mileage", value })
+                        }
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
@@ -110,10 +119,11 @@ export const VehicleGeneral = observer(() => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.ExteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={colorList}
+                    options={[...colorList, { name: inventory?.ExteriorColor }]}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -122,10 +132,11 @@ export const VehicleGeneral = observer(() => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.InteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={interiorList}
+                    options={[...interiorList, { name: inventory?.InteriorColor }]}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
                 />

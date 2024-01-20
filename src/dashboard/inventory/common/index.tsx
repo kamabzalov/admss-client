@@ -1,11 +1,12 @@
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
+import { ReactElement } from "react";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 export interface InventoryItem extends MenuItem {
     itemLabel: string;
     itemIndex?: number;
-    component?: JSX.Element;
+    component?: ReactElement;
 }
 
 export interface Inventory {
