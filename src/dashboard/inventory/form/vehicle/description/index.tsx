@@ -1,10 +1,10 @@
 import {
     ListData,
-    getInventoryInteriorColorsList,
     getInventoryTransmissionTypesList,
     getInventoryFuelTypesList,
     getInventoryDrivelineList,
     getInventoryCylindersList,
+    getInventoryEngineList,
 } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
@@ -18,7 +18,7 @@ export const VehicleDescription = observer((): ReactElement => {
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
     const [cylindersList, setCylindersList] = useState<ListData[]>([]);
-    const [interiorList, setInteriorList] = useState<ListData[]>([]);
+    const [engineList, setEngineList] = useState<ListData[]>([]);
     useEffect(() => {
         getInventoryTransmissionTypesList().then((list) => {
             list && setTransmissionList(list);
@@ -32,8 +32,8 @@ export const VehicleDescription = observer((): ReactElement => {
         getInventoryCylindersList().then((list) => {
             list && setCylindersList(list);
         });
-        getInventoryInteriorColorsList().then((list) => {
-            list && setInteriorList(list);
+        getInventoryEngineList().then((list) => {
+            list && setEngineList(list);
         });
     }, []);
     return (
@@ -89,10 +89,11 @@ export const VehicleDescription = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
-                    value={inventory?.InteriorColor}
-                    onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={interiorList}
-                    placeholder='Interior color'
+                    value={inventory?.Engine}
+                    onChange={({ value }) => changeInventory({ key: "Engine", value })}
+                    //TODO: Remove name value from dropdown list
+                    options={[...engineList, { name: inventory?.Engine }]}
+                    placeholder='Engine description'
                     className='w-full vehicle-description__dropdown'
                 />
             </div>
