@@ -14,6 +14,7 @@ import Deals from "dashboard/deals";
 import Accounts from "dashboard/accounts";
 import Reports from "dashboard/reports";
 import { InventoryForm } from "dashboard/inventory/form";
+import { ContactForm } from "dashboard/contacts/form";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -45,7 +46,11 @@ const router: RemixRouter = createBrowserRouter([
                     },
                     {
                         path: "contacts",
-                        element: <Contacts />,
+                        children: [
+                            { path: "", element: <Contacts /> },
+                            { path: "create", element: <ContactForm /> },
+                            { path: ":id", element: <ContactForm /> },
+                        ],
                     },
                     {
                         path: "deals",

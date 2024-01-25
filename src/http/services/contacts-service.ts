@@ -14,6 +14,7 @@ export interface ContactType {
 
 export interface ContactUser {
     ZIP: string;
+    city: string;
     companyName: string;
     contactuid: string;
     created: string;
@@ -23,9 +24,9 @@ export interface ContactUser {
     email2: string;
     firstName: string;
     lastName: string;
-    fullName: string;
     messager1: string;
     messager2: string;
+    middleName: string;
     phone1: string;
     phone2: string;
     state: string;
@@ -51,7 +52,7 @@ export const getContactsCategories = async () => {
     }
 };
 
-export const getContacts = async (uid: string, queryParams: QueryParams) => {
+export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`, {
             params: queryParams,
@@ -67,6 +68,15 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
         const request = await authorizedUserApiInstance.get<TotalUsers>(`contacts/${uid}/list`, {
             params: queryParams,
         });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getContactInfo = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ContactUser>(`contact/${uid}/info`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
