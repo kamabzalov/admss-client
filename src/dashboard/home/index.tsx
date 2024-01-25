@@ -18,7 +18,7 @@ export default function Home() {
                         <div className='grid'>
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link
-                                    to='dashboard/contact/create'
+                                    to='dashboard/contacts/create'
                                     className='common-tasks-menu__item new-contact cursor-pointer'
                                 >
                                     <div className='common-tasks-menu__icon new-contact'></div>
