@@ -20,7 +20,7 @@ export const inventorySections = [
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(14);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
 
     const store = useStore().inventoryStore;
