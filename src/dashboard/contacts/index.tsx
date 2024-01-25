@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ContactType,
     ContactUser,
@@ -7,7 +7,12 @@ import {
     getContactsCategories,
 } from "http/services/contacts-service";
 import { AuthUser } from "http/services/auth.service";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
@@ -18,6 +23,8 @@ import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -27,6 +34,8 @@ export default function Contacts() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
+    const navigate = useNavigate();
 
     const printTableData = () => {
         const contactsDoc = new jsPDF();
@@ -102,6 +111,7 @@ export default function Contacts() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
@@ -141,6 +151,10 @@ export default function Contacts() {
                                     onSort={sortData}
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    rowClassName={() => "hover:text-primary cursor-pointer"}
+                                    onRowClick={({
+                                        data: { contactuid },
+                                    }: DataTableRowClickEvent) => navigate(contactuid)}
                                 >
                                     <Column field='fullName' header='Name' sortable></Column>
                                     <Column field='phone1' header='Work Phone'></Column>
