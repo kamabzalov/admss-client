@@ -1,6 +1,5 @@
 import "./index.css";
 import { ReactElement, useRef, useState } from "react";
-// import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
 import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
@@ -14,17 +13,6 @@ export const ImagesMedia = observer((): ReactElement => {
     const [totalSize, setTotalSize] = useState(0);
 
     const fileUploadRef = useRef<FileUpload>(null);
-
-    const onTemplateSelect = (e: FileUploadUploadEvent) => {
-        let _totalSize = totalSize;
-        let files = e.files;
-
-        for (let i = 0; i < files.length; i++) {
-            _totalSize += files[i].size || 0;
-        }
-
-        setTotalSize(_totalSize);
-    };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
         let _totalSize = 0;

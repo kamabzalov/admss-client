@@ -19,6 +19,7 @@ export default function Dashboard() {
         } else {
             navigate("/");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (user) {
