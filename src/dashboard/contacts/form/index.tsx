@@ -9,10 +9,7 @@ import { ContactItem, ContactSection } from "../common";
 import { InventoryPurchaseData } from "./info";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
-import { ContactUser, getContacts } from "http/services/contacts-service";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
+import { ContactUser, getContactInfo } from "http/services/contacts-service";
 
 export const contactSections = [InventoryVehicleData, InventoryPurchaseData].map(
     (sectionData) => new ContactSection(sectionData)
@@ -22,12 +19,10 @@ export const ContactForm = () => {
     const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-    const [contacts, setContacts] = useState<ContactUser[]>([]);
+    const [contact, setContact] = useState<ContactUser>();
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser)
-            getContacts(authUser.useruid).then((response) => response && setContacts(response));
+        id && getContactInfo(id).then((response) => response && setContact(response));
     }, [id]);
 
     const accordionSteps = contactSections.map((item) => item.startIndex);
@@ -123,11 +118,7 @@ export const ContactForm = () => {
                                                             }
                                                         >
                                                             <pre>
-                                                                {JSON.stringify(
-                                                                    contacts[item.itemIndex],
-                                                                    null,
-                                                                    2
-                                                                )}
+                                                                {JSON.stringify(contact, null, 2)}
                                                             </pre>
                                                         </Suspense>
                                                     )}
