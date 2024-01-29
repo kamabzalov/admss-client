@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
 import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
@@ -7,8 +7,25 @@ import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { useStore } from "store/hooks";
+import { getInventoryMediaItem } from "http/services/inventory-service";
+import { Image } from "primereact/image";
 
 export const ImagesMedia = observer((): ReactElement => {
+    const store = useStore().inventoryStore;
+    const { inventoryImages } = store;
+    const [images, setImages] = useState<string[]>([
+        "https://dummyjson.com/image/150",
+        "https://dummyjson.com/image/150",
+        "https://dummyjson.com/image/150",
+    ]);
+
+    useEffect(() => {
+        inventoryImages.forEach((image) => {
+            getInventoryMediaItem(image).then((item: any) => {});
+        });
+    }, []);
+
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
 
@@ -125,10 +142,62 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
-                <span className='media-uploaded__label mx-2'>(0)</span>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        images.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({images.length})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
-            <div className='media__images'>No images added yet.</div>
+            <div className='media-images'>
+                {images.length
+                    ? images.map((image) => {
+                          return (
+                              <div className='media-images__item'>
+                                  <Image
+                                      src={image}
+                                      alt='inventory-item'
+                                      width='75'
+                                      height='75'
+                                      pt={{
+                                          image: {
+                                              className: "media-images__image",
+                                          },
+                                      }}
+                                  />
+                                  <div className='media-images__info image-info'>
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <i className='pi pi-th-large' />
+                                          </span>
+                                          <span className='image-info__text--bold'>Exterior</span>
+                                      </div>
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <span className='image-info__icon'>
+                                                  <i className='pi pi-comment' />
+                                              </span>
+                                          </span>
+                                          <span className='image-info__text'>
+                                              Renewed colour and new tires
+                                          </span>
+                                      </div>
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <i className='pi pi-calendar' />
+                                          </span>
+                                          <span className='image-info__text'>
+                                              10/11/2023 08:51:39
+                                          </span>
+                                      </div>
+                                  </div>
+                              </div>
+                          );
+                      })
+                    : "No images added yet."}
+            </div>
         </div>
     );
 });
