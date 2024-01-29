@@ -24,10 +24,13 @@ export const InventoryForm = () => {
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
 
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory } = store;
+    const { getInventory, getInventoryMedia, clearInventory } = store;
 
     useEffect(() => {
-        id && getInventory(id);
+        if (id) {
+            getInventory(id);
+            getInventoryMedia(id);
+        }
         return () => {
             clearInventory();
         };
