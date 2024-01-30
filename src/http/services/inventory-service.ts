@@ -195,38 +195,6 @@ export interface Inventory {
     useruid: string;
 }
 
-export const initialInventoryState: Inventory = {
-    BodyStyle: "",
-    Category: "",
-    Cylinders: "",
-    DriveLine: "",
-    Engine: "",
-    ExteriorColor: "",
-    GroupClass: 0,
-    GroupClassName: "",
-    InteriorColor: "",
-    Make: "",
-    Model: "",
-    Notes: "",
-    Options: 0,
-    Status: "",
-    StockNo: "",
-    Transmission: "",
-    TypeOfFuel: "",
-    VIN: "",
-    VINimageUID: "",
-    Year: "",
-    created: "",
-    extdata: {} as InventoryExtData,
-    itemuid: "",
-    mileage: 0,
-    name: "",
-    options_info: [],
-    status: "",
-    updated: "",
-    useruid: "",
-};
-
 export interface TotalInventoryList extends BaseResponse {
     total: number;
 }
@@ -246,6 +214,19 @@ type EndpointType =
     | "category"
     | "status"
     | "group";
+
+export interface InventoryMedia {
+    contenttype: number;
+    created: string;
+    index: number;
+    inventoryuid: string;
+    itemuid: string;
+    mediauid: string;
+    notes: string;
+    type: number;
+    updated: string;
+    useruid: string;
+}
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
     try {
@@ -317,3 +298,37 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
     await fetchInventoryList<ListData[]>("status");
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
+
+export const getInventoryMediaItemList = async (
+    inventoryID: string
+): Promise<InventoryMedia[] | undefined> => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
+            `inventory/${inventoryID}/media`
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryMediaItem = async (mediaID: string): Promise<string | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.get(`media/${mediaID}/media`, {
+            responseType: "blob",
+        });
+
+        const dataUrl = await new Promise<string>((resolve) => {
+            const reader = new window.FileReader();
+            reader.addEventListener("load", (event) => {
+                resolve(event.target?.result as string);
+            });
+            reader.readAsDataURL(response.data);
+        });
+
+        return dataUrl;
+    } catch (error) {
+        // TODO: add error handler
+        return undefined;
+    }
+};
