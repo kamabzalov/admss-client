@@ -312,11 +312,23 @@ export const getInventoryMediaItemList = async (
     }
 };
 
-export const getInventoryMediaItem = async (mediaID: string): Promise<any[] | undefined> => {
+export const getInventoryMediaItem = async (mediaID: string): Promise<string | undefined> => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`media/${mediaID}/media`);
-        return request.data;
+        const response = await authorizedUserApiInstance.get(`media/${mediaID}/media`, {
+            responseType: "blob",
+        });
+
+        const dataUrl = await new Promise<string>((resolve) => {
+            const reader = new window.FileReader();
+            reader.addEventListener("load", (event) => {
+                resolve(event.target?.result as string);
+            });
+            reader.readAsDataURL(response.data);
+        });
+
+        return dataUrl;
     } catch (error) {
         // TODO: add error handler
+        return undefined;
     }
 };
