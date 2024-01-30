@@ -24,7 +24,7 @@ export const InventoryForm = () => {
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
 
     const store = useStore().inventoryStore;
-    const { getInventory, getInventoryMedia, clearInventory } = store;
+    const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
 
     useEffect(() => {
         if (id) {
@@ -53,6 +53,13 @@ export const InventoryForm = () => {
             }
         });
     }, [stepActiveIndex]);
+
+    const handleSave = () => {
+        // eslint-disable-next-line no-console
+        saveInventory().then((res) => {
+            //TODO: add actions after saving
+        });
+    };
 
     return (
         <Suspense>
@@ -158,7 +165,7 @@ export const InventoryForm = () => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6'>
+                                <Button onClick={handleSave} className='uppercase px-6'>
                                     Save
                                 </Button>
                             </div>
