@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import { AxiosResponse } from "axios";
+import { AxiosResponse, HttpStatusCode } from "axios";
 import { BaseResponse } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -128,6 +128,10 @@ export interface InventoryExtData {
     titleStatus: number;
     updated: string;
     useruid: string;
+}
+
+export interface InventorySetResponse extends BaseResponse {
+    itemuid: string;
 }
 
 export type InventoryOptionsInfo =
@@ -330,5 +334,23 @@ export const getInventoryMediaItem = async (mediaID: string): Promise<string | u
     } catch (error) {
         // TODO: add error handler
         return undefined;
+    }
+};
+
+export const setInventory = async (
+    inventoryUid: string,
+    inventoryData: Partial<Inventory>
+): Promise<InventorySetResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${inventoryUid || 0}/set`,
+            inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
     }
 };

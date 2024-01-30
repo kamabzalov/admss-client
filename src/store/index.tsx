@@ -4,6 +4,7 @@ import {
     InventoryOptionsInfo,
     getInventoryInfo,
     getInventoryMediaItemList,
+    setInventory,
 } from "http/services/inventory-service";
 import { action, configure, makeAutoObservable } from "mobx";
 
@@ -21,6 +22,7 @@ export class RootStore {
 class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
+    private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryImagesID: string[] = [];
@@ -56,6 +58,7 @@ class InventoryStore {
             const response = await getInventoryInfo(itemuid);
             if (response) {
                 const { extdata, options_info, ...inventory } = response;
+                this._inventoryID = response.itemuid;
                 this._inventory = inventory || ({} as Inventory);
                 this._inventoryOptions = options_info || [];
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
@@ -126,6 +129,16 @@ class InventoryStore {
             } else {
                 inventoryStore._inventoryOptions.push(optionName);
             }
+        }
+    });
+
+    public saveInventory = action(async (): Promise<string | undefined> => {
+        try {
+            const response = await setInventory(this._inventoryID, this._inventory);
+            if (response?.status === "OK") return response.itemuid;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
         }
     });
 
