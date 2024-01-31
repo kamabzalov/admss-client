@@ -5,6 +5,7 @@ import {
     getInventoryInfo,
     getInventoryMediaItemList,
     setInventory,
+    uploadInventoryMedia,
 } from "http/services/inventory-service";
 import { action, configure, makeAutoObservable } from "mobx";
 
@@ -29,6 +30,7 @@ class InventoryStore {
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
+    private _fileImages: File[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -45,11 +47,18 @@ class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
-    public get inventoryImages() {
+    public get inventoryImagesID() {
         return this._inventoryImagesID;
+    }
+    public get fileImages() {
+        return this._fileImages;
     }
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -142,16 +151,30 @@ class InventoryStore {
         }
     });
 
+    public saveInventoryImages = action(async (): Promise<string | undefined> => {
+        try {
+            const formData = new FormData();
+            this._fileImages.forEach((file) => {
+                formData.append("file", this._fileImages[0]);
+            });
+            const response = await uploadInventoryMedia(this._inventoryID, formData);
+            if (response) return "OK";
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        }
+    });
+
+    public set fileImages(files: File[]) {
+        this._fileImages = files;
+    }
+
     public clearInventory = () => {
         this._inventory = {} as Inventory;
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
     };
-
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
-    }
 }
 
 export const store = new RootStore();

@@ -354,3 +354,18 @@ export const setInventory = async (
         // TODO: add error handler
     }
 };
+
+export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: FormData) => {
+    try {
+        const response = await authorizedUserApiInstance.post(
+            `inventory/${inventoryUid || 0}/media`,
+            inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
