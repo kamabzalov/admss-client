@@ -100,7 +100,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         {chooseButton}
                         <div className='flex w-full justify-content-center align-items-center mt-4'>
                             <span className='media__upload-text-info media__upload-text-info--bold'>
-                                Up to {} items
+                                Up to 16 items
                             </span>
                             <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
                             <Tag className='media__upload-tag' value='png' />

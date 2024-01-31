@@ -155,7 +155,7 @@ class InventoryStore {
         try {
             const formData = new FormData();
             this._fileImages.forEach((file) => {
-                formData.append("file", this._fileImages[0]);
+                formData.append("file", file);
             });
             const response = await uploadInventoryMedia(this._inventoryID, formData);
             if (response) return "OK";
