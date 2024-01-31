@@ -358,8 +358,9 @@ export const setInventory = async (
 export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: FormData) => {
     try {
         const response = await authorizedUserApiInstance.post(
-            `inventory/${inventoryUid || 0}/media`,
-            inventoryData
+            `media/${inventoryUid || 0}/media`,
+            inventoryData,
+            { headers: { "Content-Type": "multipart/form-data" } }
         );
 
         if (response.status === 200) {
