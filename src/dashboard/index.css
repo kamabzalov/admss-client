@@ -19,6 +19,10 @@
     margin-top: 0;
 }
 
+.p-paginator .p-dropdown .p-inputtext {
+    height: 100%;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
