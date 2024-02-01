@@ -134,6 +134,10 @@ export interface InventorySetResponse extends BaseResponse {
     itemuid: string;
 }
 
+export interface CreateMediaItemRecordResponse extends BaseResponse {
+    itemUID: string;
+}
+
 export type InventoryOptionsInfo =
     | "A/C"
     | "Automatic Climate Control"
@@ -345,6 +349,54 @@ export const setInventory = async (
         const response = await authorizedUserApiInstance.post<InventorySetResponse>(
             `inventory/${inventoryUid || 0}/set`,
             inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const createMediaItemRecord = async () => {
+    try {
+        const response = await authorizedUserApiInstance.post<CreateMediaItemRecordResponse>(
+            "media/0/meta",
+            { mediaType: 1 }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: FormData) => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `media/${inventoryUid || 0}/media`,
+            inventoryData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<any>(
+            `inventory/${inventoryUid}/media`,
+            {
+                mediaitemuid,
+            }
         );
 
         if (response.status === 200) {

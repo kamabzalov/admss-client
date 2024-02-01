@@ -1,5 +1,9 @@
-.media .p-fileupload-content {
+.media .p-fileupload {
     background: var(--admss-app-white-blue);
+    border: dotted 1px var(--admss-app-medium-blue);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .p-button.media__button {
@@ -9,17 +13,17 @@
     font-size: 20px;
 }
 
-.p-button.media__button:hover {
-    background: var(--admss-app-medium-blue);
-}
-
 .p-button.media__button:focus,
 .p-button.media__button:active {
     box-shadow: none;
 }
 
-.media__button:hover {
-    background: var(--admss-app-main-blue);
+.p-button.media__button:not(button):not(a):not(.p-disabled):hover {
+    background: var(--admss-app-dark-blue);
+}
+
+.p-button.media__button > .p-button-icon {
+    display: none;
 }
 
 .media__upload-icon {
@@ -31,11 +35,6 @@
     color: var(--admss-app-primary);
     font-weight: 600;
     font-size: 20px;
-}
-
-.media .p-fileupload-content {
-    border-color: var(--admss-app-medium-blue);
-    border-radius: 5px;
 }
 
 .media__upload-tag {
@@ -90,28 +89,11 @@
     align-items: center;
 }
 
-.media__remove-button.p-button {
-    background: transparent;
-    color: var(--admss-app-primary);
-    border: none;
-}
-
 .media .p-fileupload-content {
+    border: none;
+    background: transparent;
     width: 100%;
-}
-
-.media > .p-fileupload-content:has(div) {
-    display: flex;
-    width: 100%;
-}
-
-.media .p-fileupload-content > div:nth-child(3) {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.media .p-fileupload-row {
-    width: 22%;
+    padding-bottom: 16px;
 }
 
 .media__remove-button.p-button:hover {
@@ -222,4 +204,56 @@
     top: 15px;
     right: 15px;
     cursor: pointer;
+}
+
+.image-choose,
+.image-choose__selected > .media__button {
+    font-size: 16px;
+}
+
+.media > .p-fileupload-content:has(div) {
+    display: flex;
+    width: 100%;
+}
+
+.media .p-fileupload-content > div:nth-child(2) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.media .p-fileupload-row {
+    width: 24%;
+}
+
+.media .p-fileupload-row .presentation {
+    justify-content: space-between;
+    box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 0 4px;
+}
+
+.presentation__image {
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.presentation__remove-button.p-button {
+    background: transparent;
+    color: var(--admss-app-medium-grey);
+    border: none;
+    height: auto;
+    width: 24px;
+}
+
+.presentation__remove-button.p-button > .pi {
+    font-size: 12px;
+}
+
+.presentation__remove-button.p-button:hover {
+    background: transparent;
+    color: var(--admss-app-primary);
+    border: none;
+    height: auto;
 }

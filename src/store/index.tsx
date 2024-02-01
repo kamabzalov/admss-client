@@ -1,10 +1,14 @@
+import { Status } from "common/models/base-response";
 import {
     Inventory,
     InventoryExtData,
     InventoryOptionsInfo,
+    createMediaItemRecord,
     getInventoryInfo,
     getInventoryMediaItemList,
+    pairMediaWithInventoryItem,
     setInventory,
+    uploadInventoryMedia,
 } from "http/services/inventory-service";
 import { action, configure, makeAutoObservable } from "mobx";
 
@@ -29,6 +33,7 @@ class InventoryStore {
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
+    private _fileImages: File[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -45,11 +50,18 @@ class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
-    public get inventoryImages() {
+    public get inventoryImagesID() {
         return this._inventoryImagesID;
+    }
+    public get fileImages() {
+        return this._fileImages;
     }
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -69,7 +81,7 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async (itemuid: string) => {
+    public getInventoryMedia = async (itemuid: string = this._inventoryID) => {
         this._isLoading = true;
         try {
             const response = await getInventoryMediaItemList(itemuid);
@@ -135,12 +147,59 @@ class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             const response = await setInventory(this._inventoryID, this._inventory);
-            if (response?.status === "OK") return response.itemuid;
+            if (response?.status === Status.OK) return response.itemuid;
         } catch (error) {
             // TODO: add error handler
             return undefined;
         }
     });
+
+    public saveInventoryImages = action(async (): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+
+            const uploadPromises = this._fileImages.map(async (file) => {
+                const formData = new FormData();
+                formData.append("file", file);
+
+                try {
+                    const createMediaResponse = await createMediaItemRecord();
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(
+                            createMediaResponse.itemUID,
+                            formData
+                        );
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await pairMediaWithInventoryItem(
+                                this._inventoryID,
+                                uploadMediaResponse.itemuid
+                            );
+                            this._inventoryImagesID.push(uploadMediaResponse.itemuid);
+                        }
+                    }
+                } catch (error) {
+                    // TODO: add error handler
+                }
+            });
+
+            await Promise.all(uploadPromises);
+
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public set fileImages(files: File[]) {
+        this._fileImages = files;
+    }
+
+    public set inventoryImagesID(images: string[]) {
+        this._inventoryImagesID = images;
+    }
 
     public clearInventory = () => {
         this._inventory = {} as Inventory;
@@ -148,10 +207,6 @@ class InventoryStore {
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
     };
-
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
-    }
 }
 
 export const store = new RootStore();

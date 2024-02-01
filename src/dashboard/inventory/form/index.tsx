@@ -8,7 +8,7 @@ import { Button } from "primereact/button";
 import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
 
@@ -25,11 +25,14 @@ export const InventoryForm = () => {
 
     const store = useStore().inventoryStore;
     const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
             getInventory(id);
             getInventoryMedia(id);
+        } else {
+            clearInventory();
         }
         return () => {
             clearInventory();
@@ -55,9 +58,11 @@ export const InventoryForm = () => {
     }, [stepActiveIndex]);
 
     const handleSave = () => {
-        // eslint-disable-next-line no-console
         saveInventory().then((res) => {
             //TODO: add actions after saving
+            if (res && !id) {
+                navigate(`/dashboard/inventory/${res}`);
+            }
         });
     };
 
