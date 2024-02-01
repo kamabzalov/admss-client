@@ -11,6 +11,7 @@ import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { ROWS_PER_PAGE } from "common/settings";
 
 export default function Accounts() {
     const [accounts, setAccounts] = useState<any[]>([]);
@@ -112,7 +113,7 @@ export default function Accounts() {
                                     paginator
                                     first={lazyState.first}
                                     rows={lazyState.rows}
-                                    rowsPerPageOptions={[5, 10, 20]}
+                                    rowsPerPageOptions={ROWS_PER_PAGE}
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
