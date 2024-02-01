@@ -1,9 +1,12 @@
+import { Status } from "common/models/base-response";
 import {
     Inventory,
     InventoryExtData,
     InventoryOptionsInfo,
+    createMediaItemRecord,
     getInventoryInfo,
     getInventoryMediaItemList,
+    pairMediaWithInventoryItem,
     setInventory,
     uploadInventoryMedia,
 } from "http/services/inventory-service";
@@ -78,7 +81,7 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async (itemuid: string) => {
+    public getInventoryMedia = async (itemuid: string = this._inventoryID) => {
         this._isLoading = true;
         try {
             const response = await getInventoryMediaItemList(itemuid);
@@ -144,29 +147,58 @@ class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             const response = await setInventory(this._inventoryID, this._inventory);
-            if (response?.status === "OK") return response.itemuid;
+            if (response?.status === Status.OK) return response.itemuid;
         } catch (error) {
             // TODO: add error handler
             return undefined;
         }
     });
 
-    public saveInventoryImages = action(async (): Promise<string | undefined> => {
+    public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
-            const formData = new FormData();
-            this._fileImages.forEach((file) => {
+            this._isLoading = true;
+
+            const uploadPromises = this._fileImages.map(async (file) => {
+                const formData = new FormData();
                 formData.append("file", file);
+
+                try {
+                    const createMediaResponse = await createMediaItemRecord();
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(
+                            createMediaResponse.itemUID,
+                            formData
+                        );
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await pairMediaWithInventoryItem(
+                                this._inventoryID,
+                                uploadMediaResponse.itemuid
+                            );
+                            this._inventoryImagesID.push(uploadMediaResponse.itemuid);
+                        }
+                    }
+                } catch (error) {
+                    // TODO: add error handler
+                }
             });
-            const response = await uploadInventoryMedia(this._inventoryID, formData);
-            if (response) return "OK";
+
+            await Promise.all(uploadPromises);
+
+            return Status.OK;
         } catch (error) {
             // TODO: add error handler
             return undefined;
+        } finally {
+            this._isLoading = false;
         }
     });
 
     public set fileImages(files: File[]) {
         this._fileImages = files;
+    }
+
+    public set inventoryImagesID(images: string[]) {
+        this._inventoryImagesID = images;
     }
 
     public clearInventory = () => {
