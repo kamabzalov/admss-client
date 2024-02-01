@@ -12,6 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { ROWS_PER_PAGE } from "common/settings";
 
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
@@ -113,7 +114,7 @@ export default function Deals() {
                                     paginator
                                     first={lazyState.first}
                                     rows={lazyState.rows}
-                                    rowsPerPageOptions={[5, 10, 20]}
+                                    rowsPerPageOptions={ROWS_PER_PAGE}
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
