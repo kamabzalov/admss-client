@@ -61,7 +61,7 @@ export const InventoryForm = () => {
         saveInventory().then((res) => {
             //TODO: add actions after saving
             if (res && !id) {
-                navigate(`/dashboard/inventory/${res}`);
+                navigate(`/dashboard/inventory`);
             }
         });
     };
