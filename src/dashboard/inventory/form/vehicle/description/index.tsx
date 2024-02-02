@@ -90,6 +90,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Engine}
+                    filter
                     onChange={({ value }) => changeInventory({ key: "Engine", value })}
                     //TODO: Remove name value from dropdown list
                     options={[...engineList, { name: inventory?.Engine }]}
