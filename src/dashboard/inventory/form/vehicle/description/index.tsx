@@ -42,6 +42,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     value={inventory?.Transmission}
                     onChange={({ value }) => changeInventory({ key: "Transmission", value })}
                     options={transmissionList}
@@ -54,6 +55,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     value={inventory?.TypeOfFuel}
                     onChange={({ value }) => changeInventory({ key: "TypeOfFuel", value })}
                     options={fuelList}
@@ -65,6 +67,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     value={inventory?.DriveLine}
                     onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
                     options={driveLineList}
@@ -77,6 +80,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     value={inventory?.Cylinders}
                     onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
                     options={cylindersList}
