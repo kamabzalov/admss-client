@@ -15,10 +15,10 @@ export const PurchaseExpenses = (): ReactElement => (
                     <DateInput name='Date' />
                 </div>
                 <div className='col-6'>
-                    <Dropdown placeholder='Type' className='w-full' />
+                    <Dropdown placeholder='Type' filter className='w-full' />
                 </div>
                 <div className='col-12'>
-                    <Dropdown placeholder='Vendor' className='w-full' />
+                    <Dropdown placeholder='Vendor' filter className='w-full' />
                 </div>
                 <div className='col-6'>
                     <CurrencyInput labelPosition='top' title='Amount' />

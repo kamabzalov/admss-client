@@ -77,6 +77,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={damSalvageState}
+                    filter
                     onChange={({ value }) =>
                         changeInventoryExtData({ key: "damSalvageState", value })
                     }

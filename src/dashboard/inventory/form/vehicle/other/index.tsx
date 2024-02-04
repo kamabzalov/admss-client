@@ -34,6 +34,7 @@ export const VehicleOther = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     options={statusList}
                     value={inventory?.Status}
                     onChange={({ value }) => changeInventory({ key: "Status", value })}
@@ -44,6 +45,7 @@ export const VehicleOther = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    filter
                     //TODO: add value, options, onChange
                     placeholder='Location name'
                     className='w-full vehicle-other__dropdown'
@@ -53,6 +55,7 @@ export const VehicleOther = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     options={groupClassList}
                     value={inventory?.GroupClass}
                     onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
@@ -65,6 +68,7 @@ export const VehicleOther = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
+                    filter
                     options={categoryList}
                     value={inventory?.Category}
                     onChange={({ value }) => changeInventory({ key: "Category", value })}
