@@ -115,3 +115,8 @@
     border-top: var(--admss-app-light-grey);
     margin: 28px 0;
 }
+
+.p-dropdown-panel .p-dropdown-header {
+    border: none;
+    background-color: var(--admss-app-light-blue);
+}
