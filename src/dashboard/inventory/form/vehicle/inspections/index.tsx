@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { BorderedCheckbox, DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { InventoryExtData } from "http/services/inventory-service";
+import { InventoryExtData } from "common/models/inventory";
 
 export const VehicleInspections = observer((): ReactElement => {
     const store = useStore().inventoryStore;

@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { InventoryExtData } from "http/services/inventory-service";
+import { InventoryExtData } from "common/models/inventory";
 
 export const VehicleChecks = observer((): ReactElement => {
     const store = useStore().inventoryStore;
