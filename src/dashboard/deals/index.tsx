@@ -5,7 +5,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
-import { Inventory } from "http/services/inventory-service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -13,6 +12,7 @@ import { Column } from "primereact/column";
 import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
+import { Inventory } from "common/models/inventory";
 
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
