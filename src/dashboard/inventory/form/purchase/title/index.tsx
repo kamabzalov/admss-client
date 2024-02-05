@@ -21,10 +21,10 @@ export const PurchaseTitle = (): ReactElement => (
             </div>
         </div>
         <div className='col-3'>
-            <Dropdown placeholder='Status' className='w-full purchase-title__dropdown' />
+            <Dropdown placeholder='Status' filter className='w-full purchase-title__dropdown' />
         </div>
         <div className='col-3'>
-            <Dropdown placeholder='State' className='w-full purchase-title__dropdown' />
+            <Dropdown placeholder='State' filter className='w-full purchase-title__dropdown' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
@@ -77,7 +77,7 @@ export const PurchaseTitle = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <Dropdown placeholder='State' className='w-full' />
+            <Dropdown placeholder='State' filter className='w-full' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
@@ -104,7 +104,7 @@ export const PurchaseTitle = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <Dropdown placeholder='State' className='w-full' />
+            <Dropdown placeholder='State' filter className='w-full' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>

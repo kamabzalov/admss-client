@@ -69,6 +69,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Make}
+                    filter
                     required
                     onChange={({ value }) => changeInventory({ key: "Make", value })}
                     options={automakesList}
@@ -82,6 +83,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Model}
+                    filter
                     //TODO: add options
                     options={[{ name: inventory?.Model }]}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
@@ -121,6 +123,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.ExteriorColor}
+                    filter
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
                     options={[...colorList, { name: inventory?.ExteriorColor }]}
@@ -134,6 +137,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.InteriorColor}
+                    filter
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
                     options={[...interiorList, { name: inventory?.InteriorColor }]}
