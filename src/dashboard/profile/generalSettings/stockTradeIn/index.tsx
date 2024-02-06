@@ -45,7 +45,7 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
-            <div className='flex align-items-center'>
+            <div className='flex'>
                 <label htmlFor={settings} className='ml-2'>
                     Fixed digits
                 </label>

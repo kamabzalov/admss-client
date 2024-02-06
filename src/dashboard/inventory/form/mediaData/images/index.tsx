@@ -16,22 +16,36 @@ import { useStore } from "store/hooks";
 import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
+import { Status } from "common/models/base-response";
+import { InventoryMediaItemID } from "common/models/inventory";
+
+interface ImageItem {
+    src: string;
+    itemuid: string;
+}
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading } = store;
-    const [images, setImages] = useState<string[]>([]);
+    const {
+        inventoryImagesID,
+        saveInventoryImages,
+        fileImages,
+        getInventoryMedia,
+        isLoading,
+        removeImage,
+    } = store;
+    const [images, setImages] = useState<ImageItem[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
     const getInventoryImagesID = () => {
-        inventoryImagesID.forEach((image: string) => {
-            image &&
-                getInventoryMediaItem(image).then((item: string | undefined) => {
+        inventoryImagesID.forEach(({ mediauid, itemuid }: Partial<InventoryMediaItemID>) => {
+            mediauid &&
+                getInventoryMediaItem(mediauid).then((item: string | undefined) => {
                     if (item) {
-                        if (images.some((image) => image === item)) return;
-                        item && setImages((prev) => [...prev, item]);
+                        if (images.some((image) => image.src === item)) return;
+                        item && setImages((prev) => [...prev, { itemuid: itemuid!, src: item }]);
                     }
                 });
         });
@@ -62,8 +76,22 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
-                getInventoryImagesID();
+                getInventoryMedia().then(getInventoryImagesID);
             }
+        });
+    };
+
+    const handleDeleteImage = (mediauid: string) => {
+        removeImage(mediauid).then((res) => {
+            store.inventoryImagesID = [];
+            res === Status.OK &&
+                getInventoryMedia().then((res) => {
+                    res === Status.OK && getInventoryImagesID();
+                    const filteredImages = [...images].filter(
+                        (image) => image.itemuid !== mediauid
+                    );
+                    setImages(filteredImages);
+                });
         });
     };
 
@@ -194,9 +222,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map((image, index) => {
+                    images.map(({ itemuid, src }) => {
                         return (
-                            <div key={index} className='media-images__item'>
+                            <div key={itemuid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={false}
@@ -205,7 +233,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 )}
 
                                 <Image
-                                    src={image}
+                                    src={src}
                                     alt='inventory-item'
                                     width='75'
                                     height='75'
@@ -241,9 +269,12 @@ export const ImagesMedia = observer((): ReactElement => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className='media-images__close'>
+                                <button
+                                    className='media-images__close'
+                                    onClick={() => handleDeleteImage(itemuid)}
+                                >
                                     <i className='pi pi-times' />
-                                </div>
+                                </button>
                             </div>
                         );
                     })

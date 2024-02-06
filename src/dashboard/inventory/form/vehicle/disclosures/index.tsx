@@ -3,9 +3,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement } from "react";
 import "./index.css";
 import { Checkbox } from "primereact/checkbox";
-import { InventoryExtData } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
+import { InventoryExtData } from "common/models/inventory";
 
 export const VehicleDisclosures = observer((): ReactElement => {
     const store = useStore().inventoryStore;

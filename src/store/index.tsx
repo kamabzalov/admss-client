@@ -2,8 +2,12 @@ import { Status } from "common/models/base-response";
 import {
     Inventory,
     InventoryExtData,
+    InventoryMediaItemID,
     InventoryOptionsInfo,
+} from "common/models/inventory";
+import {
     createMediaItemRecord,
+    deleteMediaImage,
     getInventoryInfo,
     getInventoryMediaItemList,
     pairMediaWithInventoryItem,
@@ -29,7 +33,7 @@ class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryImagesID: string[] = [];
+    private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
@@ -81,15 +85,15 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async (itemuid: string = this._inventoryID) => {
+    public getInventoryMedia = async (itemuid: string = this._inventoryID): Promise<Status> => {
         this._isLoading = true;
         try {
             const response = await getInventoryMediaItemList(itemuid);
             if (response) {
-                response.forEach(({ contenttype, mediauid }) => {
+                response.forEach(({ contenttype, mediauid, itemuid }) => {
                     switch (contenttype) {
                         case 0:
-                            this._inventoryImagesID.push(mediauid);
+                            this._inventoryImagesID.push({ itemuid, mediauid });
                             break;
                         case 1:
                             this._inventoryVideoID.push(mediauid);
@@ -106,7 +110,9 @@ class InventoryStore {
                     }
                 });
             }
+            return Status.OK;
         } catch (error) {
+            return Status.ERROR;
         } finally {
             this._isLoading = false;
         }
@@ -174,7 +180,6 @@ class InventoryStore {
                                 this._inventoryID,
                                 uploadMediaResponse.itemuid
                             );
-                            this._inventoryImagesID.push(uploadMediaResponse.itemuid);
                         }
                     }
                 } catch (error) {
@@ -193,11 +198,30 @@ class InventoryStore {
         }
     });
 
+    public removeImage = action(async (imageuid: string): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+
+            try {
+                await deleteMediaImage(imageuid);
+            } catch (error) {
+                // TODO: add error handler
+            }
+
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
     public set fileImages(files: File[]) {
         this._fileImages = files;
     }
 
-    public set inventoryImagesID(images: string[]) {
+    public set inventoryImagesID(images: Partial<InventoryMediaItemID>[]) {
         this._inventoryImagesID = images;
     }
 
