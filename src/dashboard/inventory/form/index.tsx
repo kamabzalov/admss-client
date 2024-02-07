@@ -15,11 +15,13 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { deleteInventory } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { InventoryExportWebData } from "./exportWeb";
 
 export const inventorySections = [
     InventoryVehicleData,
     InventoryPurchaseData,
     InventoryMediaData,
+    InventoryExportWebData,
 ].map((sectionData) => new InventorySection(sectionData));
 
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
