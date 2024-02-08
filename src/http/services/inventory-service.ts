@@ -91,7 +91,9 @@ export const getInventoryMediaItemList = async (
         const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
             `inventory/${inventoryID}/media`
         );
-        return request.data;
+        if (request) {
+            return request.data;
+        } else throw new Error();
     } catch (error) {
         // TODO: add error handler
     }
