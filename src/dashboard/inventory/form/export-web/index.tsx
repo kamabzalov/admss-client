@@ -1,4 +1,3 @@
-import "./index.css";
 import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
