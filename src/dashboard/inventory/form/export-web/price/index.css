@@ -12,3 +12,7 @@
 .export-web-price__item > .export-web-price__checkbox {
     margin-left: 0;
 }
+
+.export-web-price__text-area {
+    height: 100px;
+}

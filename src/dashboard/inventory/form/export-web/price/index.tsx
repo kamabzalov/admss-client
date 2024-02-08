@@ -54,13 +54,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                 <InputTextarea
                     placeholder='Dealer comments on vehicle'
                     className='w-full export-web-price__text-area'
-                    pt={{
-                        root: {
-                            style: {
-                                height: "100px",
-                            },
-                        },
-                    }}
                 />
             </div>
         </div>
