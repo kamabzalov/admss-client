@@ -34,13 +34,12 @@ export const InventoryForm = () => {
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
+    const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
             getInventory(id);
-            getInventoryMedia(id);
         } else {
             clearInventory();
         }
