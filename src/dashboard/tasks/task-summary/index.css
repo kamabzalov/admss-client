@@ -1,4 +1,4 @@
-.task-summary {
+.dialog__task-summary {
     width: 571px;
 }
 
@@ -20,3 +20,5 @@
 .task-summary__row-value {
     flex: 0 0 70%;
 }
+
+

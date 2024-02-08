@@ -28,19 +28,18 @@ const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(DELETE_ACTIVE_INDEX);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
+    const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
             getInventory(id);
-            getInventoryMedia(id);
         } else {
             clearInventory();
         }

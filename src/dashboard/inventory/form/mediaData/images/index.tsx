@@ -13,37 +13,24 @@ import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
-import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading } = store;
-    const [images, setImages] = useState<string[]>([]);
+    const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
+        store;
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
-    const getInventoryImagesID = () => {
-        inventoryImagesID.forEach((image: string) => {
-            image &&
-                getInventoryMediaItem(image).then((item: string | undefined) => {
-                    if (item) {
-                        if (images.some((image) => image === item)) return;
-                        item && setImages((prev) => [...prev, item]);
-                    }
-                });
-        });
-    };
-
     useEffect(() => {
-        getInventoryImagesID();
+        fetchImages();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inventoryImagesID]);
+    }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
-        store.fileImages = e.files;
+        store.uploadFileImages = e.files;
         setTotalCount(e.files.length);
     };
 
@@ -52,8 +39,8 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
-        const newFiles = fileImages.filter((item) => item.name !== file.name);
-        store.fileImages = newFiles;
+        const newFiles = uploadFileImages.filter((item) => item.name !== file.name);
+        store.uploadFileImages = newFiles;
         setTotalCount(newFiles.length);
         callback();
     };
@@ -62,9 +49,12 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
-                getInventoryImagesID();
             }
         });
+    };
+
+    const handleDeleteImage = (mediauid: string) => {
+        removeImage(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -194,9 +184,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map((image, index) => {
+                    images.map(({ itemuid, src }) => {
                         return (
-                            <div key={index} className='media-images__item'>
+                            <div key={itemuid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={false}
@@ -205,7 +195,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 )}
 
                                 <Image
-                                    src={image}
+                                    src={src}
                                     alt='inventory-item'
                                     width='75'
                                     height='75'
@@ -241,9 +231,12 @@ export const ImagesMedia = observer((): ReactElement => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className='media-images__close'>
+                                <button
+                                    className='media-images__close'
+                                    onClick={() => handleDeleteImage(itemuid)}
+                                >
                                     <i className='pi pi-times' />
-                                </div>
+                                </button>
                             </div>
                         );
                     })

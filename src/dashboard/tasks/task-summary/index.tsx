@@ -23,7 +23,12 @@ export const TaskSummaryDialog = ({
     currentTask,
 }: TaskSummaryDialogProps) => {
     return (
-        <DashboardDialog onHide={onHide} visible={visible} header={header} className='task-summary'>
+        <DashboardDialog
+            onHide={onHide}
+            visible={visible}
+            header={header}
+            className={"dialog__task-summary task-summary"}
+        >
             <div className='task-summary__body flex flex-column'>
                 <TaskSummaryRow title='Assigned to:' value={currentTask?.username || ""} />
                 <TaskSummaryRow title='Start date:' value={currentTask?.created || ""} />
