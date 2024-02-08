@@ -9,6 +9,7 @@ import {
     createMediaItemRecord,
     deleteMediaImage,
     getInventoryInfo,
+    getInventoryMediaItem,
     getInventoryMediaItemList,
     pairMediaWithInventoryItem,
     setInventory,
@@ -27,17 +28,25 @@ export class RootStore {
     }
 }
 
+interface ImageItem {
+    src: string;
+    itemuid: string;
+}
+
 class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileImages: File[] = [];
+    private _images: ImageItem[] = [];
+
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
-    private _fileImages: File[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -54,11 +63,11 @@ class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
-    public get inventoryImagesID() {
-        return this._inventoryImagesID;
+    public get uploadFileImages() {
+        return this._uploadFileImages;
     }
-    public get fileImages() {
-        return this._fileImages;
+    public get images() {
+        return this._images;
     }
     public get isLoading() {
         return this._isLoading;
@@ -85,31 +94,33 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async (itemuid: string = this._inventoryID): Promise<Status> => {
+    private getInventoryMedia = async (): Promise<Status> => {
         this._isLoading = true;
         try {
-            const response = await getInventoryMediaItemList(itemuid);
-            if (response) {
+            const response = await getInventoryMediaItemList(this._inventoryID);
+            if (response && response.length > 0) {
                 response.forEach(({ contenttype, mediauid, itemuid }) => {
-                    switch (contenttype) {
-                        case 0:
-                            this._inventoryImagesID.push({ itemuid, mediauid });
-                            break;
-                        case 1:
-                            this._inventoryVideoID.push(mediauid);
-                            break;
-                        case 2:
-                            this._inventoryAudioID.push(mediauid);
-                            break;
-                        case 3:
-                            this._inventoryDocumentsID.push(mediauid);
-                            break;
-
-                        default:
-                            break;
+                    if (mediauid) {
+                        switch (contenttype) {
+                            case 0:
+                                this._inventoryImagesID.push({ itemuid, mediauid });
+                                break;
+                            case 1:
+                                this._inventoryVideoID.push(mediauid);
+                                break;
+                            case 2:
+                                this._inventoryAudioID.push(mediauid);
+                                break;
+                            case 3:
+                                this._inventoryDocumentsID.push(mediauid);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 });
             }
+
             return Status.OK;
         } catch (error) {
             return Status.ERROR;
@@ -163,8 +174,8 @@ class InventoryStore {
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
             this._isLoading = true;
-
-            const uploadPromises = this._fileImages.map(async (file) => {
+            this._images = [];
+            const uploadPromises = this._uploadFileImages.map(async (file) => {
                 const formData = new FormData();
                 formData.append("file", file);
 
@@ -188,11 +199,40 @@ class InventoryStore {
             });
 
             await Promise.all(uploadPromises);
+            this._uploadFileImages = [];
+            this.fetchImages();
 
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
             return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public fetchImages = action(async () => {
+        try {
+            this._isLoading = true;
+            this._inventoryImagesID = [];
+            await this.getInventoryMedia();
+
+            const result: ImageItem[] = [];
+
+            await Promise.all(
+                this._inventoryImagesID.map(async ({ mediauid, itemuid }) => {
+                    if (mediauid && itemuid) {
+                        const response = await getInventoryMediaItem(mediauid);
+                        if (response) {
+                            result.push({ itemuid, src: response });
+                        }
+                    }
+                })
+            );
+
+            this._images = result;
+        } catch (error) {
+            // Handle or log the error
         } finally {
             this._isLoading = false;
         }
@@ -204,6 +244,7 @@ class InventoryStore {
 
             try {
                 await deleteMediaImage(imageuid);
+                await this.fetchImages();
             } catch (error) {
                 // TODO: add error handler
             }
@@ -217,12 +258,8 @@ class InventoryStore {
         }
     });
 
-    public set fileImages(files: File[]) {
-        this._fileImages = files;
-    }
-
-    public set inventoryImagesID(images: Partial<InventoryMediaItemID>[]) {
-        this._inventoryImagesID = images;
+    public set uploadFileImages(files: File[]) {
+        this._uploadFileImages = files;
     }
 
     public clearInventory = () => {
