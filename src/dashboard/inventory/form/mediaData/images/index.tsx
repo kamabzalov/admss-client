@@ -13,51 +13,24 @@ import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
-import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
-import { Status } from "common/models/base-response";
-import { InventoryMediaItemID } from "common/models/inventory";
-
-interface ImageItem {
-    src: string;
-    itemuid: string;
-}
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const {
-        inventoryImagesID,
-        saveInventoryImages,
-        fileImages,
-        getInventoryMedia,
-        isLoading,
-        removeImage,
-    } = store;
-    const [images, setImages] = useState<ImageItem[]>([]);
+    const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
+        store;
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
-    const getInventoryImagesID = () => {
-        inventoryImagesID.forEach(({ mediauid, itemuid }: Partial<InventoryMediaItemID>) => {
-            mediauid &&
-                getInventoryMediaItem(mediauid).then((item: string | undefined) => {
-                    if (item) {
-                        if (images.some((image) => image.src === item)) return;
-                        item && setImages((prev) => [...prev, { itemuid: itemuid!, src: item }]);
-                    }
-                });
-        });
-    };
-
     useEffect(() => {
-        getInventoryImagesID();
+        fetchImages();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inventoryImagesID]);
+    }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
-        store.fileImages = e.files;
+        store.uploadFileImages = e.files;
         setTotalCount(e.files.length);
     };
 
@@ -66,8 +39,8 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
-        const newFiles = fileImages.filter((item) => item.name !== file.name);
-        store.fileImages = newFiles;
+        const newFiles = uploadFileImages.filter((item) => item.name !== file.name);
+        store.uploadFileImages = newFiles;
         setTotalCount(newFiles.length);
         callback();
     };
@@ -76,23 +49,12 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
-                getInventoryMedia().then(getInventoryImagesID);
             }
         });
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeImage(mediauid).then((res) => {
-            store.inventoryImagesID = [];
-            res === Status.OK &&
-                getInventoryMedia().then((res) => {
-                    res === Status.OK && getInventoryImagesID();
-                    const filteredImages = [...images].filter(
-                        (image) => image.itemuid !== mediauid
-                    );
-                    setImages(filteredImages);
-                });
-        });
+        removeImage(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
