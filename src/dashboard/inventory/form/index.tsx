@@ -15,11 +15,13 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { deleteInventory } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
+import { InventoryExportWebData } from "./exportWeb";
 
 export const inventorySections = [
     InventoryVehicleData,
     InventoryPurchaseData,
     InventoryMediaData,
+    InventoryExportWebData,
 ].map((sectionData) => new InventorySection(sectionData));
 
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
@@ -28,18 +30,19 @@ const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(DELETE_ACTIVE_INDEX);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, saveInventory } = store;
+    const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
             getInventory(id);
+            getInventoryMedia(id);
         } else {
             clearInventory();
         }
