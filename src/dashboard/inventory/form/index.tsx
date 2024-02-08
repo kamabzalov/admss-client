@@ -7,7 +7,7 @@ import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
 import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
-import { InventoryMediaData } from "./mediaData";
+import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
@@ -15,7 +15,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { deleteInventory } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
-import { InventoryExportWebData } from "./exportWeb";
+import { InventoryExportWebData } from "./export-web";
 
 export const inventorySections = [
     InventoryVehicleData,

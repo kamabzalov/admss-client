@@ -168,7 +168,7 @@ export const DateInput = ({ name, ...props }: CalendarProps): ReactElement => (
     <div className='p-inputgroup flex-1 w-full date-input'>
         <Calendar placeholder={name} {...props} className='date-input__calendar' />
         <span className='p-inputgroup-addon'>
-            <i className='adms-support-history' />
+            <i className='adms-calendar' />
         </span>
     </div>
 );

@@ -11,8 +11,7 @@ import {
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { getKeyValue } from "services/local-storage.service";
-import { getInventoryList } from "http/services/inventory-service";
-import { Inventory } from "common/models/inventory";
+import { getInventoryList, Inventory } from "http/services/inventory-service";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
