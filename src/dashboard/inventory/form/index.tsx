@@ -7,7 +7,6 @@ import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
 import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
-import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
@@ -15,17 +14,13 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
-import { InventoryExportWebData } from "./export-web";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
-export const inventorySections = [
-    InventoryVehicleData,
-    InventoryPurchaseData,
-    InventoryMediaData,
-    InventoryExportWebData,
-].map((sectionData) => new InventorySection(sectionData));
+export const inventorySections = [InventoryVehicleData, InventoryPurchaseData].map(
+    (sectionData) => new InventorySection(sectionData)
+);
 
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
