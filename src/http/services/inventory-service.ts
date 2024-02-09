@@ -49,6 +49,7 @@ export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T |
 
 export type ListData = {
     index?: number;
+    id?: number;
     name: string;
 };
 
@@ -88,11 +89,11 @@ export const getInventoryDeleteReasonsList = async (
     useruid: string
 ): Promise<string[] | unknown> => {
     try {
-        const request = await authorizedUserApiInstance.get<string[]>(
+        const request = await authorizedUserApiInstance.get<ListData[]>(
             `inventory/${useruid}/listdeletionreasons`
         );
         if (request.status === 200) {
-            return request.data as string[];
+            return request.data;
         } else throw new Error();
     } catch (error) {
         return error;
