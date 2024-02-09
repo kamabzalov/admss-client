@@ -194,20 +194,15 @@ export const InventoryForm = () => {
                                                 <div className='grid'>
                                                     <div className='col-6'>
                                                         <Dropdown
+                                                            optionLabel='name'
+                                                            optionValue='name'
                                                             value={reason}
                                                             required
+                                                            filter
                                                             onChange={({ value }) => {
                                                                 setReason(value);
                                                             }}
-                                                            options={
-                                                                deleteReasonsList || [
-                                                                    "Entered by mistake",
-                                                                    "Information is outdated",
-                                                                    "Duplicated record",
-                                                                    "Inventory cleanup",
-                                                                    "Other",
-                                                                ]
-                                                            }
+                                                            options={deleteReasonsList}
                                                             placeholder='Reason'
                                                             className='w-full vehicle-general__dropdown'
                                                         />
