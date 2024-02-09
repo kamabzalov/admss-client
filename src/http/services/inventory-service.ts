@@ -13,6 +13,15 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
 
+export type ListData = {
+    index?: number;
+    id?: number;
+    name: string;
+};
+
+export type MakesListData = ListData & { logo: string };
+export type OptionsListData = ListData & { name: InventoryOptionsInfo };
+
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<Inventory[] | TotalInventoryList>(
@@ -47,19 +56,9 @@ export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T |
     }
 };
 
-export type ListData = {
-    index?: number;
-    id?: number;
-    name: string;
-};
-
-export type MakesListData = ListData & { logo: string };
-export type OptionsListData = ListData & { name: InventoryOptionsInfo };
-
 export const getInventoryOptionsList = async (): Promise<OptionsListData[] | undefined> =>
     await fetchInventoryList<OptionsListData[]>("options");
-export const getInventoryBodyTypesList = async (): Promise<ListData[] | undefined> =>
-    await fetchInventoryList<ListData[]>("bodytypes");
+
 export const getInventoryExteriorColorsList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("exteriorcolors");
 export const getInventoryInteriorColorsList = async (): Promise<ListData[] | undefined> =>
@@ -70,8 +69,6 @@ export const getInventoryDrivelineList = async (): Promise<ListData[] | undefine
     await fetchInventoryList<ListData[]>("driveline");
 export const getInventoryEngineList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("engine");
-export const getInventoryExpenseTypesList = async (): Promise<ListData[] | undefined> =>
-    await fetchInventoryList<ListData[]>("expensetypes");
 export const getInventoryFuelTypesList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("fueltypes");
 export const getInventoryTransmissionTypesList = async (): Promise<ListData[] | undefined> =>
