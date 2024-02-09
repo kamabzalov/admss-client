@@ -84,21 +84,6 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
 
-export const getInventoryDeleteReasonsList = async (
-    useruid: string
-): Promise<string[] | unknown> => {
-    try {
-        const request = await authorizedUserApiInstance.get<string[]>(
-            `inventory/${useruid}/listdeletionreasons`
-        );
-        if (request.status === 200) {
-            return request.data as string[];
-        } else throw new Error();
-    } catch (error) {
-        return error;
-    }
-};
-
 export const getInventoryMediaItemList = async (
     inventoryID: string
 ): Promise<InventoryMedia[] | undefined> => {

@@ -49,8 +49,8 @@ export default function SignIn() {
                 } else {
                     toast.current?.show({
                         severity: "error",
-                        summary: "Error",
-                        detail: response.error,
+                        summary: response.error || "Error",
+                        detail: response?.message || String(response),
                         sticky: true,
                     });
                 }
