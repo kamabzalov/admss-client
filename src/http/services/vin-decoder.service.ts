@@ -1,4 +1,3 @@
-import { Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "http/index";
 
 interface VehicleDecodeInfo {
@@ -35,8 +34,8 @@ interface VehicleDecodeInfo {
         statuscode: number;
     };
     mileage: number;
-    options_codes: unknown; // You may need to define a specific type for this array
-    options_info: unknown; // You may need to define a specific type for this array
+    options_codes: unknown;
+    options_info: unknown;
     trim: string;
 }
 

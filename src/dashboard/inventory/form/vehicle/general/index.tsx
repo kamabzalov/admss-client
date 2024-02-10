@@ -47,8 +47,6 @@ export const VehicleGeneral = observer((): ReactElement => {
         if (value.length === VIN_VALID_LENGTH) {
             inventoryDecodeVIN(value).then((response) => {
                 if (response) {
-                    // eslint-disable-next-line no-console
-                    console.log(response);
                     changeInventory({ key: "Make", value: response.Make });
                     changeInventory({ key: "Model", value: response.Model });
                     changeInventory({ key: "Year", value: response.Year });
