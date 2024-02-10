@@ -45,7 +45,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     filter
                     value={inventory?.Transmission}
                     onChange={({ value }) => changeInventory({ key: "Transmission", value })}
-                    options={transmissionList}
+                    options={[...transmissionList, { name: inventory?.Transmission }]}
                     placeholder='Transmission'
                     className='w-full vehicle-description__dropdown'
                 />
@@ -58,7 +58,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     filter
                     value={inventory?.TypeOfFuel}
                     onChange={({ value }) => changeInventory({ key: "TypeOfFuel", value })}
-                    options={fuelList}
+                    options={[...fuelList, { name: inventory?.TypeOfFuel }]}
                     placeholder='Type of Fuel (required)'
                     className='w-full vehicle-description__dropdown'
                 />
@@ -70,7 +70,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     filter
                     value={inventory?.DriveLine}
                     onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
-                    options={driveLineList}
+                    options={[...driveLineList, { name: inventory?.DriveLine }]}
                     placeholder='Drive Line'
                     className='w-full vehicle-description__dropdown'
                 />
@@ -83,7 +83,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     filter
                     value={inventory?.Cylinders}
                     onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
-                    options={cylindersList}
+                    options={[...cylindersList, { name: inventory?.Cylinders }]}
                     placeholder='Cylinders'
                     className='w-full vehicle-description__dropdown'
                 />
