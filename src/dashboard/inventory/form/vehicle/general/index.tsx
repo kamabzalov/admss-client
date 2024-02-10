@@ -17,6 +17,8 @@ import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 
+//TODO: add validation
+
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory } = store;
