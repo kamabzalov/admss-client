@@ -14,9 +14,8 @@ import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 
-const VIN_VALID_LENGTH = 17;
-
 //TODO: add validation
+const VIN_VALID_LENGTH = 17;
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
