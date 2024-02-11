@@ -7,7 +7,7 @@ import "../index.css";
 import { auth } from "http/services/auth.service";
 import { setKey } from "services/local-storage.service";
 import { Toast } from "primereact/toast";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { APPLICATION } from "http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 
@@ -21,6 +21,7 @@ export interface LoginForm {
 export default function SignIn() {
     const navigate = useNavigate();
     const toast = useRef<Toast>(null);
+    const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
     const formik = useFormik<LoginForm>({
         initialValues: {
             username: "",
@@ -86,16 +87,22 @@ export default function SignIn() {
                         </div>
 
                         <div className='sign-in__input space pt-2 pb-2'>
-                            <span className='w-full p-float-label p-input-icon-right'>
-                                <i className='adms-password sign__icon' />
+                            <span className='w-full p-float-label sign-in__password'>
                                 <InputText
                                     placeholder='Password'
                                     className='sign__input'
                                     id='password'
-                                    type='password'
+                                    type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                 />
+                                <i
+                                    className={`adms-${
+                                        !passwordVisible ? "show" : "hide"
+                                    } sign__icon sign__icon--toggle`}
+                                    onClick={() => setPasswordVisible((prev) => !prev)}
+                                />
+                                <i className='adms-password sign__icon' />
                                 <label htmlFor='password'>Password</label>
                             </span>
                             {formik.errors.password ? (
