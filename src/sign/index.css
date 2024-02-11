@@ -40,6 +40,32 @@
     color: var(--admss-app-primary);
 }
 
+.sign-in__password {
+    position: relative;
+}
+
+.sign-in__password .sign__icon {
+    position: absolute;
+    right: 0.75em;
+}
+
+.sign-in__password .sign__icon--toggle {
+    right: 2em;
+    font-size: 1.1rem;
+    padding-top: 2px;
+    cursor: pointer;
+    transition: color 0.4s;
+}
+
+.sign-in .sign-in__password .sign__icon--toggle:hover {
+    color: var(--admss-app-medium-grey) !important;
+}
+
+.sign-in__password {
+    display: flex;
+    align-items: center;
+}
+
 .sign-in__input.space {
     margin-bottom: 1rem;
 }
@@ -66,13 +92,13 @@
 
 .user-help__label {
     color: var(--admss-app-primary);
-    font-size: .77rem;
+    font-size: 0.77rem;
 }
 
 .user-help__link {
     color: var(--admss-app-deep-blue);
     text-decoration: none;
-    font-size: .77rem;
+    font-size: 0.77rem;
 }
 
 @media (min-width: 768px) {
