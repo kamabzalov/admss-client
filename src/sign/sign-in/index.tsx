@@ -92,13 +92,13 @@ export default function SignIn() {
                                     placeholder='Password'
                                     className='sign__input'
                                     id='password'
-                                    type={passwordVisible ? "password" : "text"}
+                                    type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                 />
                                 <i
                                     className={`adms-${
-                                        passwordVisible ? "show" : "hide"
+                                        !passwordVisible ? "show" : "hide"
                                     } sign__icon sign__icon--toggle`}
                                     onClick={() => setPasswordVisible((prev) => !prev)}
                                 />
