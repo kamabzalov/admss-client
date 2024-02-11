@@ -112,7 +112,7 @@ export default function SignIn() {
                                     checked={formik.values.rememberme}
                                     onChange={(e) => formik.setFieldValue("rememberme", e.checked)}
                                 />
-                                <label htmlFor='remember' className='ml-2 user-help__label'>
+                                <label htmlFor='rememberme' className='ml-2 user-help__label'>
                                     Remember me
                                 </label>
                             </div>
