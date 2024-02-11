@@ -12,10 +12,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { deleteInventory } from "http/services/inventory-service";
+import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InventoryExportWebData } from "./export-web";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -38,6 +41,17 @@ export const InventoryForm = () => {
     const store = useStore().inventoryStore;
     const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
+    const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser) {
+            getInventoryDeleteReasonsList(authUser.useruid).then((res) => {
+                Array.isArray(res) && setDeleteReasonsList(res);
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (id) {
@@ -180,18 +194,15 @@ export const InventoryForm = () => {
                                                 <div className='grid'>
                                                     <div className='col-6'>
                                                         <Dropdown
+                                                            optionLabel='name'
+                                                            optionValue='name'
                                                             value={reason}
                                                             required
+                                                            filter
                                                             onChange={({ value }) => {
                                                                 setReason(value);
                                                             }}
-                                                            options={[
-                                                                "Entered by mistake",
-                                                                "Information is outdated",
-                                                                "Duplicated record",
-                                                                "Inventory cleanup",
-                                                                "Other",
-                                                            ]}
+                                                            options={deleteReasonsList}
                                                             placeholder='Reason'
                                                             className='w-full vehicle-general__dropdown'
                                                         />
