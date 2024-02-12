@@ -47,7 +47,11 @@ export const VehicleGeneral = observer((): ReactElement => {
         if (option) {
             return (
                 <div className='flex align-items-center'>
-                    <img alt='' src={option.logo} className='mr-2 vehicle-general__dropdown-icon' />
+                    <img
+                        alt={option.name}
+                        src={option.logo}
+                        className='mr-2 vehicle-general__dropdown-icon'
+                    />
                     <div>{option.name}</div>
                 </div>
             );
@@ -59,7 +63,11 @@ export const VehicleGeneral = observer((): ReactElement => {
     const autoMakesOptionTemplate = (option: MakesListData) => {
         return (
             <div className='flex align-items-center'>
-                <img alt='' src={option.logo} className='mr-2 vehicle-general__dropdown-icon' />
+                <img
+                    alt={option.name}
+                    src={option.logo}
+                    className='mr-2 vehicle-general__dropdown-icon'
+                />
                 <div>{option.name}</div>
             </div>
         );
