@@ -1,0 +1,39 @@
+.limitations__panel {
+    border-radius: 10px;
+    width: 330px;
+}
+.limitations__button {
+    border-radius: 50%;
+    border: none;
+    background: var(--admss-app-medium-blue);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.limitations__button.p-button:hover,
+.limitations__button.p-button:active,
+.limitations__button.p-button:focus {
+    box-shadow: none;
+    border: none;
+    background-color: var(--admss-app-main-blue);
+}
+
+.limitations__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--admss-app-main-blue);
+}
+
+.limitations__body {
+    font-size: 16px;
+}
+
+.limitations__icon {
+    font-size: 2.6rem;
+    cursor: pointer;
+    color: #fff;
+    line-height: 1;
+}
