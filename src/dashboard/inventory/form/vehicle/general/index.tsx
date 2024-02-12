@@ -1,4 +1,4 @@
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
@@ -42,6 +42,28 @@ export const VehicleGeneral = observer((): ReactElement => {
             list && setInteriorList(list);
         });
     }, []);
+
+    const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
+        if (option) {
+            return (
+                <div className='flex align-items-center'>
+                    <img alt='' src={option.logo} className='mr-2 vehicle-general__dropdown-icon' />
+                    <div>{option.name}</div>
+                </div>
+            );
+        }
+
+        return <span>{props.placeholder}</span>;
+    };
+
+    const autoMakesOptionTemplate = (option: MakesListData) => {
+        return (
+            <div className='flex align-items-center'>
+                <img alt='' src={option.logo} className='mr-2 vehicle-general__dropdown-icon' />
+                <div>{option.name}</div>
+            </div>
+        );
+    };
 
     const handleVINchange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
         changeInventory({ key: "VIN", value });
@@ -95,6 +117,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     required
                     onChange={({ value }) => changeInventory({ key: "Make", value })}
                     options={[...automakesList, { name: inventory.Make }]}
+                    valueTemplate={selectedAutoMakesTemplate}
+                    itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
                     className='w-full vehicle-general__dropdown'
                 />

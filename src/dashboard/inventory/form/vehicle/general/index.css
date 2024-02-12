@@ -6,3 +6,8 @@
 .vehicle-general__number-input .p-inputnumber-input {
     width: 100%;
 }
+
+.vehicle-general__dropdown-icon {
+    height: 30px;
+    width: 30px;
+}
