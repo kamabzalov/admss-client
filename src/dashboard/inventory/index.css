@@ -144,3 +144,9 @@
     border: none;
     background-color: var(--admss-app-light-blue);
 }
+
+.media-tooltip {
+    position: absolute;
+    bottom: -10px;
+    right: 10px;
+}

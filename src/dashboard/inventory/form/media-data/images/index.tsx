@@ -15,6 +15,16 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
+import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
+import { MediaLimitations } from "common/models/inventory";
+
+const limitations: MediaLimitations = {
+    formats: ["PNG", "JPEG", "TIFF"],
+    minResolution: "512x512",
+    maxResolution: "8192x8192",
+    maxSize: 8,
+    maxUpload: 16,
+};
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -96,14 +106,41 @@ export const ImagesMedia = observer((): ReactElement => {
                 ) : (
                     <>
                         {chooseButton}
-                        <div className='flex w-full justify-content-center align-items-center mt-4'>
+                        <div className='flex w-full justify-content-center align-items-center mt-4 relative'>
                             <span className='media__upload-text-info media__upload-text-info--bold'>
-                                Up to 16 items
+                                Up to {limitations.maxUpload} items
                             </span>
-                            <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
-                            <Tag className='media__upload-tag' value='png' />
-                            <Tag className='media__upload-tag' value='jpeg' />
-                            <Tag className='media__upload-tag' value='tiff' />
+                            <span className='media__upload-text-info'>
+                                Maximal size is {limitations.maxSize} Mb
+                            </span>
+                            {limitations.formats.map((format) => (
+                                <Tag key={format} className='media__upload-tag' value={format} />
+                            ))}
+                            <div className='media-tooltip'>
+                                <InfoOverlayPanel panelTitle='Limitations:'>
+                                    <p>
+                                        <b>Supported formats</b>:{" "}
+                                        {limitations.formats.map((format, index) => (
+                                            <span key={index}>
+                                                {format}
+                                                {index !== limitations.formats.length - 1 && ", "}
+                                            </span>
+                                        ))}
+                                    </p>
+                                    <p>
+                                        <b>Minimal resolution</b>: {limitations.minResolution}
+                                    </p>
+                                    <p>
+                                        <b>Maximal resolution</b>: {limitations.maxResolution}
+                                    </p>
+                                    <p>
+                                        <b>Maximal size</b>: {limitations.maxSize} MBytes
+                                    </p>
+                                    <p>
+                                        <b>Batch upload</b>: Up to {limitations.maxUpload} items
+                                    </p>
+                                </InfoOverlayPanel>
+                            </div>
                         </div>
                     </>
                 )}
@@ -139,7 +176,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 ref={fileUploadRef}
                 multiple
                 accept='image/*'
-                maxFileSize={8000000}
+                maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}

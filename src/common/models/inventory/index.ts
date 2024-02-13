@@ -233,3 +233,14 @@ export interface InventoryMedia extends InventoryMediaItemID {
     updated: string;
     useruid: string;
 }
+
+export interface MediaLimitations {
+    formats: string[];
+    codecs?: string;
+    minResolution?: string;
+    prefResolution?: string;
+    maxResolution?: string;
+    maxDuration?: number;
+    maxSize: number;
+    maxUpload: number;
+}
