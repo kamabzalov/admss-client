@@ -45,11 +45,10 @@
 .info-panel__panel {
     position: absolute;
     border-radius: 10px;
-    min-width: 330px;
     z-index: 999;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
     background-color: #fff;
     padding: 20px;
     bottom: 64px;
     right: -4px;
 }
-
