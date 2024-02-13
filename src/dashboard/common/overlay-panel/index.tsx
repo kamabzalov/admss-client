@@ -9,10 +9,9 @@ export const InfoOverlayPanel = ({ panelTitle, children }: InfoOverlayPanelProps
     const [panelShow, setPanelShow] = useState<boolean>(false);
     return (
         <div className='info-panel'>
-            <i
-                onClick={() => setPanelShow((prev) => !prev)}
-                className='icon adms-help p-text-secondary p-overlay-badge info-panel__icon'
-            />
+            <div className='info-panel__icon-wrapper' onClick={() => setPanelShow((prev) => !prev)}>
+                <i className='icon adms-question-mark p-text-secondary p-overlay-badge info-panel__icon' />
+            </div>
             {panelShow && (
                 <div className='info-panel__panel shadow-3'>
                     <div className='info-panel__title'>{panelTitle}</div>
