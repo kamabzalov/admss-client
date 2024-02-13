@@ -262,3 +262,7 @@
     border: none;
     height: auto;
 }
+
+.image-choose .info-panel__panel {
+    min-width: 330px;
+}
