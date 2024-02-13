@@ -66,9 +66,9 @@
     align-items: center;
 }
 
-.limitations__button:hover,
-.limitations__button:active,
-.limitations__button:focus {
+.limitations__button.p-button:hover,
+.limitations__button.p-button:active,
+.limitations__button.p-button:focus {
     box-shadow: none;
     border: none;
     background-color: var(--admss-app-main-blue);
