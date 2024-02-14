@@ -136,12 +136,12 @@ export default function Inventories() {
                                     }
                                 >
                                     <Column field='StockNo' header='StockNo' sortable></Column>
-                                    <Column field='Make' header='Make'></Column>
-                                    <Column field='Model' header='Model'></Column>
-                                    <Column field='Year' header='Year'></Column>
-                                    <Column field='Color' header='Color'></Column>
-                                    <Column field='mileage' header='Miles'></Column>
-                                    <Column field='Price' header='Price'></Column>
+                                    <Column field='Make' header='Make' sortable></Column>
+                                    <Column field='Model' header='Model' sortable></Column>
+                                    <Column field='Year' header='Year' sortable></Column>
+                                    <Column field='Color' header='Color' sortable></Column>
+                                    <Column field='mileage' header='Miles' sortable></Column>
+                                    <Column field='Price' header='Price' sortable></Column>
                                 </DataTable>
                             </div>
                         </div>
