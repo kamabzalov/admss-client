@@ -30,7 +30,7 @@ export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
         store;
-    const [checked, setChecked] = useState<boolean>(false);
+    const [checked, setChecked] = useState<boolean>(true);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
