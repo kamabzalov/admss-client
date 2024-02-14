@@ -158,11 +158,15 @@ export default function Contacts() {
                                     }: DataTableRowClickEvent) => navigate(contactuid)}
                                 >
                                     <Column field='fullName' header='Name' sortable></Column>
-                                    <Column field='phone1' header='Work Phone'></Column>
-                                    <Column field='phone2' header='Home Phone'></Column>
-                                    <Column field='streetAddress' header='Address'></Column>
-                                    <Column field='email1' header='Email'></Column>
-                                    <Column field='created' header='Created'></Column>
+                                    <Column field='phone1' header='Work Phone' sortable></Column>
+                                    <Column field='phone2' header='Home Phone' sortable></Column>
+                                    <Column
+                                        field='streetAddress'
+                                        header='Address'
+                                        sortable
+                                    ></Column>
+                                    <Column field='email1' header='Email' sortable></Column>
+                                    <Column field='created' header='Created' sortable></Column>
                                 </DataTable>
                             </div>
                         </div>
