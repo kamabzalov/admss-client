@@ -27,7 +27,7 @@ const limitations: MediaLimitations = {
 };
 
 export const VideoMedia = observer((): ReactElement => {
-    const [checked, setChecked] = useState<boolean>(false);
+    const [checked, setChecked] = useState<boolean>(true);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
