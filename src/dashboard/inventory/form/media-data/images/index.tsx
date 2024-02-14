@@ -30,14 +30,19 @@ export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
         store;
-    const [checked, setChecked] = useState<boolean>(false);
+    const [checked, setChecked] = useState<boolean>(true);
+    const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        fetchImages();
+        if (images.length) {
+            setImagesChecked(new Array(images.length).fill(checked));
+        } else {
+            fetchImages();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchImages, images, checked]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = e.files;
@@ -61,6 +66,24 @@ export const ImagesMedia = observer((): ReactElement => {
                 fileUploadRef.current?.clear();
             }
         });
+    };
+
+    const handleCheckedChange = (index?: number) => {
+        const updatedImagesChecked = [...imagesChecked];
+
+        if (index === undefined && !checked) {
+            setChecked(true);
+            const allChecked = updatedImagesChecked.map(() => true);
+            setImagesChecked(allChecked);
+        } else if (index === undefined && checked) {
+            setChecked(false);
+            const allUnchecked = updatedImagesChecked.map(() => false);
+            setImagesChecked(allUnchecked);
+        } else if (index !== undefined) {
+            const updatedCheckboxState = [...updatedImagesChecked];
+            updatedCheckboxState[index] = !updatedCheckboxState[index];
+            setImagesChecked(updatedCheckboxState);
+        }
     };
 
     const handleDeleteImage = (mediauid: string) => {
@@ -210,10 +233,8 @@ export const ImagesMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
                 <label className='cursor-pointer media-uploaded__label'>
                     <Checkbox
-                        checked={checked}
-                        onChange={() => {
-                            setChecked(!checked);
-                        }}
+                        checked={imagesChecked.every((checked) => checked) && checked}
+                        onChange={() => handleCheckedChange()}
                         className='media-uploaded__checkbox'
                     />
                     Export to Web
@@ -221,16 +242,16 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map(({ itemuid, src }) => {
+                    images.map(({ itemuid, src }, index: number) => {
                         return (
                             <div key={itemuid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
-                                        checked={false}
+                                        checked={imagesChecked[index]}
+                                        onChange={() => handleCheckedChange(index)}
                                         className='media-uploaded__checkbox'
                                     />
                                 )}
-
                                 <Image
                                     src={src}
                                     alt='inventory-item'
