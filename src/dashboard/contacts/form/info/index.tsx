@@ -1,6 +1,6 @@
 import { Inventory } from "dashboard/inventory/common";
-import { PurchaseFloorplan } from "./froorplan";
-import { PurchaseConsign } from "./consign";
+import { PurchaseFloorplan } from "dashboard/inventory/form/purchase/floorplan";
+import { PurchaseConsign } from "dashboard/inventory/form/purchase/consign";
 
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Contact info",
