@@ -33,13 +33,15 @@ const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 
 export const InventoryForm = () => {
     const { id } = useParams();
+
+    const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, saveInventory } = store;
+    const { getInventory, clearInventory, saveInventory, getInventoryExportWeb } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
 
@@ -74,6 +76,13 @@ export const InventoryForm = () => {
                 });
             }
         });
+        if (
+            stepActiveIndex >= ACCORDION_STEPS[ACCORDION_STEPS.length - 1] &&
+            !isInventoryWebExported
+        ) {
+            getInventoryExportWeb();
+            setIsInventoryWebExported(true);
+        }
     }, [stepActiveIndex]);
 
     const handleSave = () => {
