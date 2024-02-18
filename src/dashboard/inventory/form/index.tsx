@@ -54,6 +54,10 @@ export const InventoryForm = () => {
     }, []);
 
     useEffect(() => {
+        // inventorySections.map((section) => (section.activeIndex = stepActiveIndex));
+    }, [stepActiveIndex]);
+
+    useEffect(() => {
         if (id) {
             getInventory(id);
         } else {

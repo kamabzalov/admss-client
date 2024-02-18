@@ -69,6 +69,24 @@
     background: #ccc;
 }
 
+.vertical-step-menu.p-steps
+    .p-steps-item:not(:last-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number--green::before,
+.vertical-step-menu.p-steps
+    .p-steps-item:not(:first-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number--green::after {
+    background-color: var(--admss-app-primary-main-green);
+}
+
+.vertical-step-menu.p-steps
+    .p-steps-item[aria-selected="true"]
+    .p-menuitem-link.vertical-nav
+    .p-steps-number::before {
+    background-color: #ccc;
+}
+
 .vertical-step-menu .p-menuitem-link.vertical-nav {
     margin-left: 44px;
     gap: 20px;
