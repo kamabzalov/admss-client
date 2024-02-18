@@ -17,8 +17,10 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InventoryExportWebData } from "./export-web";
 import { AuthUser } from "http/services/auth.service";
-import { getKeyValue, setKey } from "services/local-storage.service";
-import { LS_APP_INVENTORY_TAB, LS_APP_USER } from "common/constants/localStorage";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+
+import { useLocation } from "react-router-dom";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -30,12 +32,14 @@ export const inventorySections = [
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const STEP = "step";
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(
-        getKeyValue(LS_APP_INVENTORY_TAB) || 0
-    );
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = Number(searchParams.get(STEP));
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
@@ -94,11 +98,6 @@ export const InventoryForm = () => {
             );
     };
 
-    const handleChangeStep = (index: number) => {
-        setKey(LS_APP_INVENTORY_TAB, String(index));
-        setStepActiveIndex(index);
-    };
-
     return (
         <Suspense>
             <div className='grid'>
@@ -124,21 +123,28 @@ export const InventoryForm = () => {
                                                 header={section.label}
                                             >
                                                 <Steps
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                        })
-                                                    )}
                                                     readOnly={false}
                                                     activeIndex={
                                                         stepActiveIndex - section.startIndex
                                                     }
                                                     onSelect={(e) => {
-                                                        handleChangeStep(
+                                                        setStepActiveIndex(
                                                             e.index + section.startIndex
                                                         );
                                                     }}
+                                                    model={section.items.map(
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    `/dashboard/inventory/${id}?${STEP}=${
+                                                                        section.startIndex + idx
+                                                                    }`
+                                                                );
+                                                            },
+                                                        })
+                                                    )}
                                                     className='vertical-step-menu'
                                                     pt={{
                                                         menu: { className: "flex-column w-full" },
