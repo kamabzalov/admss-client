@@ -15,6 +15,7 @@ import Accounts from "dashboard/accounts";
 import Reports from "dashboard/reports";
 import { InventoryForm } from "dashboard/inventory/form";
 import { ContactForm } from "dashboard/contacts/form";
+import { ExportToWeb } from "dashboard/export-web";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -63,6 +64,10 @@ const router: RemixRouter = createBrowserRouter([
                     {
                         path: "reports",
                         element: <Reports />,
+                    },
+                    {
+                        path: "export-web",
+                        element: <ExportToWeb />,
                     },
                 ],
             },
