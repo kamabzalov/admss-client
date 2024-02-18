@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 
 export const ExportWebPrice = observer((): ReactElement => {
-    const [checked, setChecked] = useState<boolean>(false);
+    const [checked, setChecked] = useState<boolean>(true);
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
