@@ -251,7 +251,15 @@ export const InventoryForm = () => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => --prev)}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev - 1;
+                                            navigate(
+                                                `/dashboard/inventory/${id}?${STEP}=${newStep}`
+                                            );
+                                            return newStep;
+                                        })
+                                    }
                                     disabled={!stepActiveIndex}
                                     className='uppercase px-6 inventory__button'
                                     outlined
@@ -259,7 +267,15 @@ export const InventoryForm = () => {
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => ++prev)}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev + 1;
+                                            navigate(
+                                                `/dashboard/inventory/${id}?${STEP}=${newStep}`
+                                            );
+                                            return newStep;
+                                        })
+                                    }
                                     disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
                                     severity={
                                         stepActiveIndex === DELETE_ACTIVE_INDEX
