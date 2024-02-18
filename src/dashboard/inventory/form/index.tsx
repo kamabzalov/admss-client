@@ -17,8 +17,8 @@ import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InventoryExportWebData } from "./export-web";
 import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
+import { getKeyValue, setKey } from "services/local-storage.service";
+import { LS_APP_INVENTORY_TAB, LS_APP_USER } from "common/constants/localStorage";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -33,7 +33,9 @@ const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(
+        getKeyValue(LS_APP_INVENTORY_TAB) || 0
+    );
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
@@ -92,6 +94,11 @@ export const InventoryForm = () => {
             );
     };
 
+    const handleChangeStep = (index: number) => {
+        setKey(LS_APP_INVENTORY_TAB, String(index));
+        setStepActiveIndex(index);
+    };
+
     return (
         <Suspense>
             <div className='grid'>
@@ -127,11 +134,11 @@ export const InventoryForm = () => {
                                                     activeIndex={
                                                         stepActiveIndex - section.startIndex
                                                     }
-                                                    onSelect={(e) =>
-                                                        setStepActiveIndex(
+                                                    onSelect={(e) => {
+                                                        handleChangeStep(
                                                             e.index + section.startIndex
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
                                                     className='vertical-step-menu'
                                                     pt={{
                                                         menu: { className: "flex-column w-full" },
