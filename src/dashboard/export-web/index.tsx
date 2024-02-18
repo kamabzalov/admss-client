@@ -107,10 +107,8 @@ export const ExportToWeb = () => {
                                     <Column sortable field='Model' header='Model' />
                                     <Column sortable field='Year' header='Year' />
                                     <Column sortable field='VIN' header='VIN' />
-                                    {/* TODO: missed media value */}
                                     <Column sortable field='Media' header='Media' />
                                     <Column sortable field='Status' header='Status' />
-                                    {/* TODO: missed lastexportdate value */}
                                     <Column
                                         sortable
                                         field='lastexportdate'
