@@ -7,10 +7,10 @@ import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
-import { ContactUser, getContactInfo } from "http/services/contacts-service";
 import { GeneralInfoData } from "./general-info";
 import { ContactInfoData } from "./contact-info";
 import { ContactMediaData } from "./media-data";
+import { useStore } from "store/hooks";
 
 export const contactSections = [GeneralInfoData, ContactInfoData, ContactMediaData].map(
     (sectionData) => new ContactSection(sectionData)
@@ -20,11 +20,19 @@ export const ContactForm = () => {
     const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-    const [contact, setContact] = useState<ContactUser>();
+    const store = useStore().contactStore;
+    const { getContact, clearContact } = store;
 
     useEffect(() => {
-        id && getContactInfo(id).then((response) => response && setContact(response));
-    }, [id]);
+        if (id) {
+            getContact(id);
+        } else {
+            clearContact();
+        }
+        return () => {
+            clearContact();
+        };
+    }, [id, store]);
 
     const accordionSteps = contactSections.map((item) => item.startIndex);
     const itemsMenuCount = contactSections.reduce((acc, current) => acc + current.getLength(), -1);
