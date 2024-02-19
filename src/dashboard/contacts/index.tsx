@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-    ContactType,
-    ContactUser,
     getContacts,
     getContactsAmount,
     getContactsCategories,
@@ -26,6 +24,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
+import { ContactType, ContactUser } from "common/models/contact";
 
 export default function Contacts() {
     const [categories, setCategories] = useState<ContactType[]>([]);

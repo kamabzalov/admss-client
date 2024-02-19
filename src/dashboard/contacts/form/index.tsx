@@ -3,33 +3,52 @@
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicleData } from "./options";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common";
-import { InventoryPurchaseData } from "./info";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
-import { ContactUser, getContactInfo } from "http/services/contacts-service";
+import { GeneralInfoData } from "./general-info";
+import { ContactInfoData } from "./contact-info";
+import { ContactMediaData } from "./media-data";
+import { useStore } from "store/hooks";
+import { useLocation } from "react-router-dom";
 
-export const contactSections = [InventoryVehicleData, InventoryPurchaseData].map(
+export const contactSections = [GeneralInfoData, ContactInfoData, ContactMediaData].map(
     (sectionData) => new ContactSection(sectionData)
 );
+const ACCORDION_STEPS = contactSections.map((item) => item.startIndex);
+const ITEMS_MENU_COUNT = contactSections.reduce((acc, current) => acc + current.getLength(), -1);
+
+const STEP = "step";
 
 export const ContactForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-    const [contact, setContact] = useState<ContactUser>();
+    const store = useStore().contactStore;
+    const { getContact, clearContact } = store;
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (id) {
+            getContact(id);
+        } else {
+            clearContact();
+        }
+        return () => {
+            clearContact();
+        };
+    }, [id, store]);
+
+    const getUrl = (activeIndex: number) => {
+        const currentPath = id ? id : "create";
+        return `/dashboard/contacts/${currentPath}?step=${activeIndex + 1}`;
+    };
 
     useEffect(() => {
-        id && getContactInfo(id).then((response) => response && setContact(response));
-    }, [id]);
-
-    const accordionSteps = contactSections.map((item) => item.startIndex);
-    const itemsMenuCount = contactSections.reduce((acc, current) => acc + current.getLength(), -1);
-
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
+        ACCORDION_STEPS.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
                 return setAccordionActiveIndex((prev) => {
                     const updatedArray = Array.isArray(prev) ? [...prev] : [0];
@@ -66,9 +85,14 @@ export const ContactForm = () => {
                                             >
                                                 <Steps
                                                     model={section.items.map(
-                                                        ({ itemLabel, template }) => ({
+                                                        ({ itemLabel, template }, idx) => ({
                                                             label: itemLabel,
                                                             template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
+                                                                );
+                                                            },
                                                         })
                                                     )}
                                                     readOnly={false}
@@ -117,9 +141,7 @@ export const ContactForm = () => {
                                                                 />
                                                             }
                                                         >
-                                                            <pre>
-                                                                {JSON.stringify(contact, null, 2)}
-                                                            </pre>
+                                                            {item.component}
                                                         </Suspense>
                                                     )}
                                                 </div>
@@ -130,7 +152,13 @@ export const ContactForm = () => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => --prev)}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev - 1;
+                                            navigate(getUrl(newStep));
+                                            return newStep;
+                                        })
+                                    }
                                     disabled={!stepActiveIndex}
                                     className='uppercase px-6'
                                     outlined
@@ -138,8 +166,14 @@ export const ContactForm = () => {
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => ++prev)}
-                                    disabled={stepActiveIndex >= itemsMenuCount}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev + 1;
+                                            navigate(getUrl(newStep));
+                                            return newStep;
+                                        })
+                                    }
+                                    disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
                                     className='uppercase px-6'
                                     outlined
                                 >
