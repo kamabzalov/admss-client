@@ -259,7 +259,7 @@ export interface Contact {
 }
 
 export interface ContactsCategories {
-    status: Status.OK;
+    status: Status;
     contact_types: ContactType[];
 }
 
