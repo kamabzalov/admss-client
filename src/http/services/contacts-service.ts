@@ -1,46 +1,7 @@
 import { authorizedUserApiInstance } from "../index";
 import { QueryParams } from "common/models/query-params";
-import { BaseResponse } from "common/models/base-response";
-import { Contact } from "common/models/contact";
-
-export interface ContactsCategories {
-    status: "OK";
-    contact_types: ContactType[];
-}
-
-export interface ContactType {
-    id: number;
-    name: string;
-}
-
-export interface ContactUser {
-    ZIP: string;
-    city: string;
-    companyName: string;
-    contactuid: string;
-    created: string;
-    dluidback: string;
-    dluidfront: string;
-    email1: string;
-    email2: string;
-    firstName: string;
-    lastName: string;
-    messager1: string;
-    messager2: string;
-    middleName: string;
-    phone1: string;
-    phone2: string;
-    state: string;
-    streetAddress: string;
-    type: number;
-    updated: string;
-    userName: string;
-    useruid: string;
-}
-
-export interface TotalUsers extends BaseResponse {
-    total: number;
-}
+import { Contact, ContactUser, ContactsCategories, TotalUsers } from "common/models/contact";
+import { Status } from "common/models/base-response";
 
 export const getContactsCategories = async () => {
     try {
@@ -78,7 +39,35 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
 export const getContactInfo = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<Contact>(`contacts/${uid}/info`);
-        return request.data;
+        if (request.data.status === Status.OK) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getContactsTypeList = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ContactsCategories>(
+            `contacts/${uid}/listtypes`
+        );
+        if (request.data.status === Status.OK) {
+            return request.data.contact_types;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getContactsSalesmanList = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ContactsCategories>(
+            `user/${uid}/salespersons`
+        );
+        if (request.data.status === Status.OK) {
+            return request.data.contact_types;
+        }
     } catch (error) {
         // TODO: add error handler
     }

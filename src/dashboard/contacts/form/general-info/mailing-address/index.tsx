@@ -4,6 +4,7 @@ import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { STATES_LIST } from "common/constants/states";
 
 export const ContactsMailingAddressInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
@@ -27,7 +28,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     placeholder='State'
                     value={contact?.state}
                     //TODO: missing options
-                    options={[{ name: contact.state }]}
+                    options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
                 />
             </div>

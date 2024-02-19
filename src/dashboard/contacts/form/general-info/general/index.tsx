@@ -1,13 +1,37 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { useParams } from "react-router-dom";
+import { getContactsTypeList } from "http/services/contacts-service";
+import { ContactType } from "common/models/contact";
+
+const titleList = [
+    {
+        name: "Mr.",
+    },
+    {
+        name: "Mrs.",
+    },
+];
 
 export const ContactsGeneralInfo = observer((): ReactElement => {
+    const { id } = useParams();
+    const [title, setTitle] = useState<string>("");
+    const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
     const { contact } = store;
+
+    useEffect(() => {
+        if (id) {
+            getContactsTypeList(id).then((response) => {
+                response && setTypeList(response);
+            });
+        }
+    }, [id]);
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-4'>
@@ -16,7 +40,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Title'
-                    //TODO: add missing contact.title
+                    //TODO: missing init API value
+                    value={title}
+                    options={titleList}
+                    onChange={({ target: { value } }) => setTitle(value)}
                     className='w-full general-info__dropdown'
                 />
             </div>
@@ -54,10 +81,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             <div className='col-4'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={contact.type}
                     filter
-                    //TODO: missing options
+                    options={typeList}
                     placeholder='Type (required)'
                     className='w-full general-info__dropdown'
                 />

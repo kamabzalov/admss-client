@@ -4,10 +4,12 @@ import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { STATES_LIST } from "common/constants/states";
 
 export const ContactsAddressInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact } = store;
+
     return (
         <div className='grid address-info row-gap-2'>
             <div className='col-6'>
@@ -22,12 +24,11 @@ export const ContactsAddressInfo = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     filter
                     placeholder='State'
                     value={contact?.state}
-                    //TODO: missing options
-                    options={[{ name: contact.state }]}
+                    options={STATES_LIST}
                     className='w-full address-info__dropdown'
                 />
             </div>
