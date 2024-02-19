@@ -25,7 +25,7 @@ export const ContactForm = () => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const tabParam = Number(searchParams.get(STEP)) - 1;
+    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;

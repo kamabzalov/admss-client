@@ -38,7 +38,7 @@ export const InventoryForm = () => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+    const tabParam = Number(searchParams.get(STEP));
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
@@ -48,7 +48,6 @@ export const InventoryForm = () => {
     const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
-
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -58,6 +57,11 @@ export const InventoryForm = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const getUrl = (activeIndex: number) => {
+        const currentPath = id ? id : "create";
+        return `/dashboard/inventory/${currentPath}?step=${activeIndex + 1}`;
+    };
 
     useEffect(() => {
         if (id) {
@@ -138,9 +142,7 @@ export const InventoryForm = () => {
                                                             template,
                                                             command: () => {
                                                                 navigate(
-                                                                    `/dashboard/inventory/${id}?${STEP}=${
-                                                                        section.startIndex + idx
-                                                                    }`
+                                                                    getUrl(section.startIndex + idx)
                                                                 );
                                                             },
                                                         })
@@ -254,9 +256,7 @@ export const InventoryForm = () => {
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
-                                            navigate(
-                                                `/dashboard/inventory/${id}?${STEP}=${newStep}`
-                                            );
+                                            navigate(getUrl(newStep));
                                             return newStep;
                                         })
                                     }
@@ -270,9 +270,7 @@ export const InventoryForm = () => {
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev + 1;
-                                            navigate(
-                                                `/dashboard/inventory/${id}?${STEP}=${newStep}`
-                                            );
+                                            navigate(getUrl(newStep));
                                             return newStep;
                                         })
                                     }
