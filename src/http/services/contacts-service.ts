@@ -1,6 +1,12 @@
 import { authorizedUserApiInstance } from "../index";
 import { QueryParams } from "common/models/query-params";
-import { Contact, ContactUser, ContactsCategories, TotalUsers } from "common/models/contact";
+import {
+    Contact,
+    ContactUser,
+    ContactsCategories,
+    SalespersonsList,
+    TotalUsers,
+} from "common/models/contact";
 import { Status } from "common/models/base-response";
 
 export const getContactsCategories = async () => {
@@ -62,11 +68,11 @@ export const getContactsTypeList = async (uid: string) => {
 
 export const getContactsSalesmanList = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<ContactsCategories>(
+        const request = await authorizedUserApiInstance.get<SalespersonsList[]>(
             `user/${uid}/salespersons`
         );
-        if (request.data.status === Status.OK) {
-            return request.data.contact_types;
+        if (request.status === 200) {
+            return request.data;
         }
     } catch (error) {
         // TODO: add error handler
