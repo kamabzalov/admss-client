@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
@@ -34,17 +34,12 @@ const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + curren
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 const STEP = "step";
 
-const createParamString = (str: string | null) =>
-    str ? str.toLowerCase().replaceAll(" ", "_") : "";
-
 export const InventoryForm = () => {
     const { id } = useParams();
-    const stepsRef = useRef<Steps>(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get(STEP);
-
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const tabParam = Number(searchParams.get(STEP));
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
@@ -53,7 +48,6 @@ export const InventoryForm = () => {
     const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
-
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -64,21 +58,10 @@ export const InventoryForm = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        if (inventorySections) {
-            const [currentStep] = inventorySections
-                .flatMap(({ items, label }) => {
-                    return items.find(
-                        (item) =>
-                            createParamString(tabParam) ===
-                            `${createParamString(label)}-${createParamString(item.itemLabel)}
-                                `
-                    );
-                })
-                .filter(Boolean);
-            currentStep?.itemIndex && setStepActiveIndex(currentStep.itemIndex);
-        }
-    }, [location.search]);
+    const getUrl = (activeIndex: number) => {
+        const currentPath = id ? id : "create";
+        return `/dashboard/inventory/${currentPath}?step=${activeIndex}`;
+    };
 
     useEffect(() => {
         if (id) {
@@ -145,7 +128,6 @@ export const InventoryForm = () => {
                                             >
                                                 <Steps
                                                     readOnly={false}
-                                                    ref={stepsRef}
                                                     activeIndex={
                                                         stepActiveIndex - section.startIndex
                                                     }
@@ -160,11 +142,7 @@ export const InventoryForm = () => {
                                                             template,
                                                             command: () => {
                                                                 navigate(
-                                                                    `/dashboard/inventory/${id}?${STEP}=
-                                                                    ${createParamString(
-                                                                        section.label
-                                                                    )}-
-                                                                    ${createParamString(itemLabel)}`
+                                                                    getUrl(section.startIndex + idx)
                                                                 );
                                                             },
                                                         })
@@ -278,6 +256,7 @@ export const InventoryForm = () => {
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
+                                            navigate(getUrl(newStep));
                                             return newStep;
                                         })
                                     }
@@ -291,6 +270,7 @@ export const InventoryForm = () => {
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev + 1;
+                                            navigate(getUrl(newStep));
                                             return newStep;
                                         })
                                     }
