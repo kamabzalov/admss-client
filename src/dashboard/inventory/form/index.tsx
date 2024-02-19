@@ -20,6 +20,8 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
+import { useLocation } from "react-router-dom";
+
 export const inventorySections = [
     InventoryVehicleData,
     InventoryPurchaseData,
@@ -30,21 +32,22 @@ export const inventorySections = [
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const STEP = "step";
 
 export const InventoryForm = () => {
     const { id } = useParams();
-
-    const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, saveInventory, getInventoryExportWeb } = store;
+    const { getInventory, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
-
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -54,6 +57,11 @@ export const InventoryForm = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const getUrl = (activeIndex: number) => {
+        const currentPath = id ? id : "create";
+        return `/dashboard/inventory/${currentPath}?step=${activeIndex + 1}`;
+    };
 
     useEffect(() => {
         if (id) {
@@ -76,13 +84,6 @@ export const InventoryForm = () => {
                 });
             }
         });
-        if (
-            stepActiveIndex >= ACCORDION_STEPS[ACCORDION_STEPS.length - 1] &&
-            !isInventoryWebExported
-        ) {
-            getInventoryExportWeb();
-            setIsInventoryWebExported(true);
-        }
     }, [stepActiveIndex]);
 
     const handleSave = () => {
@@ -126,21 +127,26 @@ export const InventoryForm = () => {
                                                 header={section.label}
                                             >
                                                 <Steps
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                        })
-                                                    )}
                                                     readOnly={false}
                                                     activeIndex={
                                                         stepActiveIndex - section.startIndex
                                                     }
-                                                    onSelect={(e) =>
+                                                    onSelect={(e) => {
                                                         setStepActiveIndex(
                                                             e.index + section.startIndex
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
+                                                    model={section.items.map(
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
+                                                                );
+                                                            },
+                                                        })
+                                                    )}
                                                     className='vertical-step-menu'
                                                     pt={{
                                                         menu: { className: "flex-column w-full" },
@@ -247,7 +253,13 @@ export const InventoryForm = () => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => --prev)}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev - 1;
+                                            navigate(getUrl(newStep));
+                                            return newStep;
+                                        })
+                                    }
                                     disabled={!stepActiveIndex}
                                     className='uppercase px-6 inventory__button'
                                     outlined
@@ -255,7 +267,13 @@ export const InventoryForm = () => {
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() => setStepActiveIndex((prev) => ++prev)}
+                                    onClick={() =>
+                                        setStepActiveIndex((prev) => {
+                                            const newStep = prev + 1;
+                                            navigate(getUrl(newStep));
+                                            return newStep;
+                                        })
+                                    }
                                     disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
                                     severity={
                                         stepActiveIndex === DELETE_ACTIVE_INDEX
