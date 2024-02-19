@@ -1,0 +1,66 @@
+.identification__dropdown {
+    height: 50px;
+}
+
+.identification__line {
+    border: none;
+    border-top: 1px solid var(--admss-app-light-grey);
+    margin-top: 12px;
+}
+
+.identification__title {
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.identification-dl__title {
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding-bottom: 20px;
+}
+
+.identification-dl .p-fileupload {
+    background: var(--admss-app-white-blue);
+    border: dotted 1px var(--admss-app-medium-blue);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.p-button.dl__button:focus,
+.p-button.dl__button:active {
+    box-shadow: none;
+}
+
+.p-button.dl__button > .p-button-icon {
+    display: none;
+}
+
+.identification-dl .p-fileupload-content {
+    background: transparent;
+    border: none;
+    padding-bottom: 10px;
+}
+
+.dl__upload-icon {
+    font-size: 3em;
+    color: var(--admss-app-medium-blue);
+}
+
+.dl__upload-icon-label {
+    color: var(--admss-app-primary);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.dl__upload-text-info {
+    font-size: 14px;
+    margin: 0 18px;
+}
+
+.dl__line {
+    border-top: 1px solid var(--admss-app-medium-blue);
+    margin-top: 12px;
+}
