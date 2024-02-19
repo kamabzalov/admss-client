@@ -1,15 +1,31 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
+import { useParams } from "react-router-dom";
+import { ContactType } from "common/models/contact";
+import { getContactsSalesmanList } from "http/services/contacts-service";
 
 export const ContactsProspecting = observer((): ReactElement => {
+    const { id } = useParams();
+
     const store = useStore().contactStore;
     const { contact } = store;
+    const [salesperson, setSalesperson] = useState<string>("");
+    const [salespersonsList, setSalespersonsList] = useState<ContactType[]>([]);
+
+    useEffect(() => {
+        if (id) {
+            getContactsSalesmanList(id).then((response) => {
+                response && setSalespersonsList(response);
+            });
+        }
+    }, [id]);
+
     return (
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
@@ -17,7 +33,11 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     filter
-                    //TODO: missing value and options
+                    //TODO: missing init value
+                    value={salesperson}
+                    //TODO: API list is not working
+                    options={salespersonsList}
+                    onChange={({ target: { value } }) => setSalesperson(value)}
                     placeholder='Attending Salesman'
                     className='w-full contacts-prospecting__dropdown'
                 />
