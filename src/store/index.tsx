@@ -4,6 +4,7 @@ import {
     InventoryExtData,
     InventoryMediaItemID,
     InventoryOptionsInfo,
+    InventoryWebInfo,
 } from "common/models/inventory";
 import {
     createMediaItemRecord,
@@ -11,6 +12,7 @@ import {
     getInventoryInfo,
     getInventoryMediaItem,
     getInventoryMediaItemList,
+    getInventoryWebInfo,
     pairMediaWithInventoryItem,
     setInventory,
     uploadInventoryMedia,
@@ -40,6 +42,8 @@ class InventoryStore {
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
 
+    private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
+
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
     private _images: ImageItem[] = [];
@@ -62,6 +66,9 @@ class InventoryStore {
     }
     public get inventoryExtData() {
         return this._inventoryExtData;
+    }
+    public get inventoryExportWeb() {
+        return this._inventoryExportWeb;
     }
     public get uploadFileImages() {
         return this._uploadFileImages;
@@ -124,6 +131,19 @@ class InventoryStore {
             return Status.OK;
         } catch (error) {
             return Status.ERROR;
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryExportWeb = async () => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebInfo(this._inventoryID);
+            if (response) {
+                this._inventoryExportWeb = response;
+            }
+        } catch (error) {
         } finally {
             this._isLoading = false;
         }
@@ -267,6 +287,7 @@ class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
+        this._inventoryExportWeb = {} as InventoryWebInfo;
     };
 }
 

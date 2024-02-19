@@ -5,6 +5,8 @@ import { ReactElement } from "react";
 import "./index.css";
 
 export const ExportWebHistory = observer((): ReactElement => {
+    //TODO: missing API endpoint for this table data
+
     return (
         <div className='grid export-web-history row-gap-2'>
             <div className='col-12'>
