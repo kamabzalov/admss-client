@@ -7,8 +7,8 @@ import { useStore } from "store/hooks";
 export const ContactsSocialInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact } = store;
-    const [emails, setEmails] = useState<string[]>([contact.emails[0]]);
-    const [phones, setPhones] = useState<string[]>([contact.phones[0]]);
+    const [emails, setEmails] = useState<string[]>([contact?.emails?.[0]]);
+    const [phones, setPhones] = useState<string[]>([contact?.phones?.[0]]);
 
     return (
         <div className='grid contacts-social row-gap-2'>
@@ -32,7 +32,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         <div className='col-6'>
                             <Button
                                 className='w-full'
-                                disabled={!emails[index].length}
+                                disabled={!emails[index]?.length}
                                 onClick={() => setEmails([...emails, ""])}
                             >
                                 <i className='pi pi-plus mr-2 text-xs pt-1' />
@@ -63,7 +63,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         <div className='col-6'>
                             <Button
                                 className='w-full'
-                                disabled={!phones[index].length}
+                                disabled={!phones[index]?.length}
                                 onClick={() => setPhones([...phones, ""])}
                             >
                                 <i className='pi pi-plus mr-2 text-xs pt-1' />

@@ -12,7 +12,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact.extdata.Buyer_Emp_Company}
+                        value={contact?.extdata?.Buyer_Emp_Company}
                     />
                     <label className='float-label'>Employer</label>
                 </span>
@@ -21,7 +21,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact.extdata.Buyer_Emp_Contact}
+                        value={contact?.extdata?.Buyer_Emp_Contact}
                     />
                     <label className='float-label'>Contact Name</label>
                 </span>
@@ -41,7 +41,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact.extdata.Buyer_Emp_Phone}
+                        value={contact?.extdata?.Buyer_Emp_Phone}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>

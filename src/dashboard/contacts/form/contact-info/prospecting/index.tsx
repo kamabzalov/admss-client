@@ -70,7 +70,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-12'>
                 <InputTextarea
                     placeholder='Prospecting Notes'
-                    value={contact.extdata.Notes}
+                    value={contact?.extdata?.Notes}
                     className='w-full contacts-prospecting__text-area'
                 />
             </div>
