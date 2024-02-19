@@ -1,6 +1,7 @@
 import { authorizedUserApiInstance } from "../index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse } from "common/models/base-response";
+import { Contact } from "common/models/contact";
 
 export interface ContactsCategories {
     status: "OK";
@@ -76,7 +77,7 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
 
 export const getContactInfo = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<ContactUser>(`contacts/${uid}/info`);
+        const request = await authorizedUserApiInstance.get<Contact>(`contacts/${uid}/info`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
