@@ -5,9 +5,22 @@ import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { useStore } from "store/hooks";
 
 export const ExportWebPrice = observer((): ReactElement => {
-    const [checked, setChecked] = useState<boolean>(false);
+    const store = useStore().inventoryStore;
+    const {
+        inventoryExportWeb: {
+            ModelCode,
+            CostPrice,
+            ListPrice,
+            SpecialPrice,
+            ExtraPrice1,
+            ExtraPrice2,
+            ExtraPrice3,
+        },
+    } = store;
+    const [checked, setChecked] = useState<boolean>(true);
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
@@ -25,27 +38,31 @@ export const ExportWebPrice = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='export-web-price__text-input w-full' />
+                    <InputText className='export-web-price__text-input w-full' value={ModelCode} />
                     <label className='float-label'>Model Code</label>
                 </span>
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='List price (required)' />
+                <CurrencyInput
+                    value={ListPrice}
+                    labelPosition='top'
+                    title='List price (required)'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Special price' />
+                <CurrencyInput value={SpecialPrice} labelPosition='top' title='Special price' />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Cost price' />
+                <CurrencyInput value={CostPrice} labelPosition='top' title='Cost price' />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Extra price 1' />
+                <CurrencyInput value={ExtraPrice1} labelPosition='top' title='Extra price 1' />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Extra price 2' />
+                <CurrencyInput value={ExtraPrice2} labelPosition='top' title='Extra price 2' />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Extra price 3' />
+                <CurrencyInput value={ExtraPrice3} labelPosition='top' title='Extra price 3' />
             </div>
 
             <hr className='form-line' />

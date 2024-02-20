@@ -38,16 +38,25 @@ export const InventoryForm = () => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const tabParam = Number(searchParams.get(STEP));
+    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+
+    const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, saveInventory } = store;
+    const {
+        getInventory,
+        clearInventory,
+        saveInventory,
+        getInventoryExportWeb,
+        getInventoryExportWebHistory,
+    } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -84,6 +93,16 @@ export const InventoryForm = () => {
                 });
             }
         });
+        if (
+            stepActiveIndex >= ACCORDION_STEPS[ACCORDION_STEPS.length - 1] &&
+            !isInventoryWebExported
+        ) {
+            if (id) {
+                getInventoryExportWeb(id);
+                getInventoryExportWebHistory(id);
+                setIsInventoryWebExported(true);
+            }
+        }
     }, [stepActiveIndex]);
 
     const handleSave = () => {

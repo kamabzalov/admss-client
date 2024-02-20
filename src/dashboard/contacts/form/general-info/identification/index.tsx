@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
@@ -39,6 +40,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {};
 
+    // eslint-disable-next-line no-unused-vars
     const onTemplateRemove = (file: File, callback: Function) => {
         removeImagesDL().then((res) => {
             handleUploadFiles();
