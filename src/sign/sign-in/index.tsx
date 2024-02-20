@@ -59,6 +59,12 @@ export default function SignIn() {
         },
     });
 
+    const currentPassIcon = (filled: boolean): string => {
+        if (!filled) return "password";
+        if (passwordVisible) return "hide";
+        return "show";
+    };
+
     return (
         <section className='sign'>
             <div className='sign-in'>
@@ -97,12 +103,14 @@ export default function SignIn() {
                                     value={formik.values.password}
                                 />
                                 <i
-                                    className={`adms-${
-                                        !passwordVisible ? "show" : "hide"
-                                    } sign__icon sign__icon--toggle`}
-                                    onClick={() => setPasswordVisible((prev) => !prev)}
+                                    className={`adms-${currentPassIcon(
+                                        !!formik.values.password
+                                    )} sign__icon`}
+                                    onClick={() =>
+                                        !!formik.values.password &&
+                                        setPasswordVisible((prev) => !prev)
+                                    }
                                 />
-                                <i className='adms-password sign__icon' />
                                 <label htmlFor='password'>Password</label>
                             </span>
                             {formik.errors.password ? (
