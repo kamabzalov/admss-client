@@ -4,6 +4,8 @@ import {
     InventoryOptionsInfo,
     InventoryExtData,
     InventoryMediaItemID,
+    InventoryWebInfo,
+    InventoryExportWebHistory,
 } from "common/models/inventory";
 import {
     getInventoryInfo,
@@ -14,6 +16,8 @@ import {
     pairMediaWithInventoryItem,
     getInventoryMediaItem,
     deleteMediaImage,
+    getInventoryWebInfo,
+    getInventoryWebInfoHistory,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -29,6 +33,8 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+    private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
+    private _inventoryExportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
@@ -53,8 +59,14 @@ export class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
+    public get inventoryExportWeb() {
+        return this._inventoryExportWeb;
+    }
     public get uploadFileImages() {
         return this._uploadFileImages;
+    }
+    public get inventoryExportWebHistory() {
+        return this._inventoryExportWebHistory;
     }
     public get images() {
         return this._images;
@@ -114,6 +126,32 @@ export class InventoryStore {
             return Status.OK;
         } catch (error) {
             return Status.ERROR;
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryExportWeb = async (id = this._inventoryID): Promise<void> => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebInfo(id);
+            if (response) {
+                this._inventoryExportWeb = response;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryExportWebHistory = async (id = this._inventoryID): Promise<void> => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebInfoHistory(id);
+            if (response) {
+                this._inventoryExportWebHistory = response;
+            }
+        } catch (error) {
         } finally {
             this._isLoading = false;
         }
@@ -257,5 +295,7 @@ export class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
+        this._inventoryExportWeb = {} as InventoryWebInfo;
+        this._inventoryExportWebHistory = [] as InventoryExportWebHistory[];
     };
 }

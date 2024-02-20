@@ -1,4 +1,4 @@
-import { BaseResponse } from "../base-response";
+import { BaseResponse, Status } from "../base-response";
 
 export interface InventoryExtData {
     bgAsIs: number;
@@ -125,6 +125,35 @@ export interface InventoryExtData {
     useruid: string;
 }
 
+export interface InventoryWebInfo {
+    CityMPG: string;
+    CostPrice: number;
+    DealerComments: string;
+    ExtraField1: string;
+    ExtraField2: string;
+    ExtraField3: string;
+    ExtraPrice1: number;
+    ExtraPrice2: number;
+    ExtraPrice3: number;
+    HwyMPG: string;
+    InStockDate: number;
+    LastExportDate: number;
+    LastModifiedDate: number;
+    ListPrice: number;
+    ModelCode: string;
+    PhotoURL: string;
+    SpecialPrice: number;
+    VDPLink: string;
+    VideoURL: string;
+    created: number;
+    deleted: number;
+    enabled: number;
+    itemuid: string;
+    status: Status;
+    updated: number;
+    useruid: string;
+}
+
 export interface InventorySetResponse extends BaseResponse {
     itemuid: string;
 }
@@ -243,4 +272,18 @@ export interface MediaLimitations {
     maxDuration?: number;
     maxSize: number;
     maxUpload: number;
+}
+
+export interface InventoryExportWebHistory {
+    created: string;
+    id: number;
+    info: string;
+    inventoryuid: string;
+    listprice: string;
+    servicetype: string;
+    specialprice: string;
+    taskstatus: string;
+    tasktype: string;
+    taskuid: string;
+    useruid: string;
 }
