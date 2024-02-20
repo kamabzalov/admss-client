@@ -93,6 +93,7 @@
 .user-help__label {
     color: var(--admss-app-primary);
     font-size: 0.77rem;
+    cursor: pointer;
 }
 
 .user-help__link {
