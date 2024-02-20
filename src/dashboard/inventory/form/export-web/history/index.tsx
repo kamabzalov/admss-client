@@ -18,10 +18,6 @@ export const ExportWebHistory = observer((): ReactElement => {
                     value={inventoryExportWebHistory}
                     emptyMessage='No exports yet.'
                 >
-                    <Column sortable field='created' header='Date' />
-                    <Column sortable field='servicetype' header='Service' />
-                    <Column sortable field='listprice' header='List price' />
-                    <Column sortable field='taskstatus' header='Status' />
                 </DataTable>
             </div>
         </div>
