@@ -11,6 +11,7 @@ import {
     InventorySetResponse,
     CreateMediaItemRecordResponse,
     InventoryWebInfo,
+    InventoryExportWebHistory,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -236,7 +237,9 @@ export const getInventoryWebInfo = async (inventoryuid: string) => {
         const request = await authorizedUserApiInstance.get<InventoryWebInfo>(
             `inventory/${inventoryuid}/webinfo`
         );
-        return request.data;
+        if (request.status === 200) {
+            return request.data;
+        }
     } catch (error) {
         // TODO: add error handler
     }
@@ -244,10 +247,12 @@ export const getInventoryWebInfo = async (inventoryuid: string) => {
 
 export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<unknown[]>(
+        const request = await authorizedUserApiInstance.get<InventoryExportWebHistory[]>(
             `external/${inventoryuid}/history`
         );
-        return request.data;
+        if (request.status === 200) {
+            return request.data;
+        }
     } catch (error) {
         // TODO: add error handler
     }

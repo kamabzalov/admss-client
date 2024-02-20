@@ -5,6 +5,7 @@ import {
     InventoryExtData,
     InventoryMediaItemID,
     InventoryWebInfo,
+    InventoryExportWebHistory,
 } from "common/models/inventory";
 import {
     getInventoryInfo,
@@ -33,7 +34,7 @@ export class InventoryStore {
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
-    private _inventoryExportWebHistory: unknown[] = [];
+    private _inventoryExportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
@@ -130,7 +131,7 @@ export class InventoryStore {
         }
     };
 
-    public getInventoryExportWeb = async (id = this._inventoryID) => {
+    public getInventoryExportWeb = async (id = this._inventoryID): Promise<void> => {
         this._isLoading = true;
         try {
             const response = await getInventoryWebInfo(id);
@@ -143,7 +144,7 @@ export class InventoryStore {
         }
     };
 
-    public getInventoryExportWebHistory = async (id = this._inventoryID) => {
+    public getInventoryExportWebHistory = async (id = this._inventoryID): Promise<void> => {
         this._isLoading = true;
         try {
             const response = await getInventoryWebInfoHistory(id);
@@ -295,5 +296,6 @@ export class InventoryStore {
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
         this._inventoryExportWeb = {} as InventoryWebInfo;
+        this._inventoryExportWebHistory = [] as InventoryExportWebHistory[];
     };
 }

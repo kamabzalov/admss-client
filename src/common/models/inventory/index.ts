@@ -273,3 +273,17 @@ export interface MediaLimitations {
     maxSize: number;
     maxUpload: number;
 }
+
+export interface InventoryExportWebHistory {
+    created: string;
+    id: number;
+    info: string;
+    inventoryuid: string;
+    listprice: string;
+    servicetype: string;
+    specialprice: string;
+    taskstatus: string;
+    tasktype: string;
+    taskuid: string;
+    useruid: string;
+}

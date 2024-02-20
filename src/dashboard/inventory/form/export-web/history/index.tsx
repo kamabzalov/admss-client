@@ -15,13 +15,13 @@ export const ExportWebHistory = observer((): ReactElement => {
             <div className='col-12'>
                 <DataTable
                     className='mt-6 export-web-history__table'
-                    value={(inventoryExportWebHistory as any) || []}
+                    value={inventoryExportWebHistory}
                     emptyMessage='No exports yet.'
                 >
-                    <Column sortable header='Date' />
-                    <Column sortable header='Service' />
-                    <Column sortable header='List price' />
-                    <Column sortable header='Status' />
+                    <Column sortable field='created' header='Date' />
+                    <Column sortable field='servicetype' header='Service' />
+                    <Column sortable field='listprice' header='List price' />
+                    <Column sortable field='taskstatus' header='Status' />
                 </DataTable>
             </div>
         </div>
