@@ -47,18 +47,13 @@
 .sign-in__password .sign__icon {
     position: absolute;
     right: 0.75em;
+    display: inline-flex;
+    align-items: center;
 }
 
-.sign-in__password .sign__icon--toggle {
-    right: 2em;
-    font-size: 1.1rem;
-    padding-top: 2px;
+.sign-in__password .sign__icon.adms-show,
+.sign-in__password .sign__icon.adms-hide {
     cursor: pointer;
-    transition: color 0.4s;
-}
-
-.sign-in .sign-in__password .sign__icon--toggle:hover {
-    color: var(--admss-app-medium-grey) !important;
 }
 
 .sign-in__password {
