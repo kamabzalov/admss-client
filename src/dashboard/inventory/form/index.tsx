@@ -123,7 +123,12 @@ export const InventoryForm = () => {
 
     return (
         <Suspense>
-            <div className='grid'>
+            <div className='grid relative'>
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={() => navigate("/dashboard/inventory")}
+                />
                 <div className='col-12'>
                     <div className='card inventory'>
                         <div className='card-header'>
