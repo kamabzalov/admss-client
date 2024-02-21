@@ -23,6 +23,44 @@
     height: 100%;
 }
 
+.p-button.close-button {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    padding: 20px;
+    right: 30px;
+    top: 30px;
+    border-radius: 50%;
+    color: var(--admss-app-main-blue);
+    background-color: transparent;
+    border-color: transparent;
+    transition: color 0.3s;
+}
+
+.close-button .p-button-icon {
+    font-size: 22px;
+}
+
+.close-button {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    padding: 20px;
+    right: 40px;
+    top: 40px;
+    border-radius: 50%;
+    color: var(--admss-app-primary);
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.p-button.close-button:hover,
+.p-button.close-button:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--admss-app-primary);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
