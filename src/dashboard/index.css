@@ -71,6 +71,10 @@
     color: var(--admss-app-primary);
 }
 
+.search-dialog {
+    width: 480px;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
