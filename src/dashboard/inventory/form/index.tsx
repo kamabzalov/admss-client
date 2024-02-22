@@ -21,6 +21,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 import { useLocation } from "react-router-dom";
+import { observer } from "mobx-react-lite";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -34,7 +35,7 @@ const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + curren
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 const STEP = "step";
 
-export const InventoryForm = () => {
+export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -53,6 +54,7 @@ export const InventoryForm = () => {
         saveInventory,
         getInventoryExportWeb,
         getInventoryExportWebHistory,
+        inventory,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -135,6 +137,17 @@ export const InventoryForm = () => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
+                            <div className='card-header-info'>
+                                Stock#{" "}
+                                <span className='card-header-info__data'>{inventory?.StockNo}</span>
+                                Make{" "}
+                                <span className='card-header-info__data'>{inventory?.Make}</span>
+                                Model{" "}
+                                <span className='card-header-info__data'>{inventory?.Model}</span>
+                                Year{" "}
+                                <span className='card-header-info__data'>{inventory?.Year}</span>
+                                VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
+                            </div>
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap'>
@@ -338,4 +351,4 @@ export const InventoryForm = () => {
             />
         </Suspense>
     );
-};
+});

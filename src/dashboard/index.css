@@ -12,11 +12,21 @@
 
 .card-header {
     margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 150px;
 }
 
 .card-content__title {
     margin-bottom: 30px;
     margin-top: 0;
+}
+
+.card-header-info__data {
+    font-weight: 700;
+    margin-left: 6px;
+    margin-right: 30px;
+    color: var(--admss-app-primary-main-green);
 }
 
 .p-paginator .p-dropdown .p-inputtext {
