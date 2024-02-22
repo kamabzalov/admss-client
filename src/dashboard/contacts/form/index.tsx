@@ -27,7 +27,7 @@ export const ContactForm = () => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number>(0);
     const store = useStore().contactStore;
     const { getContact, clearContact } = store;
     const navigate = useNavigate();
@@ -50,11 +50,7 @@ export const ContactForm = () => {
     useEffect(() => {
         ACCORDION_STEPS.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
+                return setAccordionActiveIndex(index);
             }
         });
     }, [stepActiveIndex]);
@@ -79,9 +75,10 @@ export const ContactForm = () => {
                                 <div className='p-0'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
+                                        onTabChange={(e) =>
+                                            setAccordionActiveIndex(Number(e.index))
+                                        }
                                         className='contact__accordion'
-                                        multiple
                                     >
                                         {contactSections.map((section) => (
                                             <AccordionTab
