@@ -3,7 +3,7 @@ import { DialogProps } from "primereact/dialog";
 import "./index.css";
 import { useEffect, useState } from "react";
 import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { SupportHistory, getSupportMessages } from "http/services/support.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
@@ -37,6 +37,15 @@ export const SupportHistoryDialog = ({
     const handleRowClick = (e: DataTableRowClickEvent) => {
         setExpandedRows([e.data]);
     };
+    interface TableColumnProps extends ColumnProps {
+        field: keyof SupportHistory;
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "username", header: "From" },
+        { field: "topic", header: "Theme" },
+        { field: "created", header: "Date" },
+    ];
 
     return (
         <DashboardDialog
@@ -52,10 +61,17 @@ export const SupportHistoryDialog = ({
                 onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                 onRowClick={handleRowClick}
                 rowHover
+                reorderableColumns
+                resizableColumns
             >
-                <Column header='From' field='username' />
-                <Column header='Theme' field='topic' />
-                <Column header='Date' field='created' />
+                {renderColumnsData.map(({ field, header }) => (
+                    <Column
+                        field={field}
+                        header={header}
+                        key={field}
+                        headerClassName='cursor-move'
+                    />
+                ))}
             </DataTable>
         </DashboardDialog>
     );

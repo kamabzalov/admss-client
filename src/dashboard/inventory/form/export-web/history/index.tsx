@@ -1,14 +1,26 @@
 import { observer } from "mobx-react-lite";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ReactElement } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { InventoryExportWebHistory } from "common/models/inventory";
 
 export const ExportWebHistory = observer((): ReactElement => {
     const store = useStore().inventoryStore;
 
     const { inventoryExportWebHistory } = store;
+
+    interface TableColumnProps extends ColumnProps {
+        field: keyof InventoryExportWebHistory;
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "created", header: "Date" },
+        { field: "servicetype", header: "Service" },
+        { field: "listprice", header: "List price" },
+        { field: "taskstatus", header: "Status" },
+    ];
 
     return (
         <div className='grid export-web-history row-gap-2'>
@@ -17,12 +29,17 @@ export const ExportWebHistory = observer((): ReactElement => {
                     className='mt-6 export-web-history__table'
                     value={inventoryExportWebHistory}
                     emptyMessage='No exports yet.'
+                    reorderableColumns
+                    resizableColumns
                 >
-                    
-                    <Column field='created' header='Date' />
-                    <Column field='servicetype' header='Service' />
-                    <Column field='listprice' header='List price' />
-                    <Column field='taskstatus' header='Status' />
+                    {renderColumnsData.map(({ field, header }) => (
+                        <Column
+                            field={field}
+                            header={header}
+                            key={field}
+                            headerClassName='cursor-move'
+                        />
+                    ))}
                 </DataTable>
             </div>
         </div>

@@ -14,7 +14,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { getInventoryList } from "http/services/inventory-service";
 import { Inventory } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
@@ -128,6 +128,20 @@ export default function Inventories(): ReactElement {
         setDialogVisible(false);
     };
 
+    interface TableColumnProps extends ColumnProps {
+        field: keyof Inventory | "Price";
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "StockNo", header: "StockNo" },
+        { field: "Make", header: "Make" },
+        { field: "Model", header: "Model" },
+        { field: "Year", header: "Year" },
+        { field: "ExteriorColor", header: "Color" },
+        { field: "mileage", header: "Miles" },
+        { field: "Price", header: "Price" },
+    ];
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -185,18 +199,22 @@ export default function Inventories(): ReactElement {
                                     onSort={sortData}
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    reorderableColumns
+                                    resizableColumns
                                     rowClassName={() => "hover:text-primary cursor-pointer"}
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
                                 >
-                                    <Column field='StockNo' header='StockNo' sortable></Column>
-                                    <Column field='Make' header='Make' sortable></Column>
-                                    <Column field='Model' header='Model' sortable></Column>
-                                    <Column field='Year' header='Year' sortable></Column>
-                                    <Column field='Color' header='Color' sortable></Column>
-                                    <Column field='mileage' header='Miles' sortable></Column>
-                                    <Column field='Price' header='Price' sortable></Column>
+                                    {renderColumnsData.map(({ field, header }) => (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                        />
+                                    ))}
                                 </DataTable>
                             </div>
                         </div>

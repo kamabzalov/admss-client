@@ -17,7 +17,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { LS_APP_USER } from "common/constants/localStorage";
@@ -86,6 +86,19 @@ export default function Contacts() {
             });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch]);
+    interface TableColumnProps extends ColumnProps {
+        field: keyof ContactUser;
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "userName", header: "Name" },
+        { field: "phone1", header: "Work Phone" },
+        { field: "phone2", header: "Home Phone" },
+        { field: "streetAddress", header: "Address" },
+        { field: "email1", header: "Email" },
+        { field: "created", header: "Created" },
+    ];
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -151,21 +164,22 @@ export default function Contacts() {
                                     onSort={sortData}
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    resizableColumns
+                                    reorderableColumns
                                     rowClassName={() => "hover:text-primary cursor-pointer"}
                                     onRowClick={({
                                         data: { contactuid },
                                     }: DataTableRowClickEvent) => navigate(contactuid)}
                                 >
-                                    <Column field='fullName' header='Name' sortable></Column>
-                                    <Column field='phone1' header='Work Phone' sortable></Column>
-                                    <Column field='phone2' header='Home Phone' sortable></Column>
-                                    <Column
-                                        field='streetAddress'
-                                        header='Address'
-                                        sortable
-                                    ></Column>
-                                    <Column field='email1' header='Email' sortable></Column>
-                                    <Column field='created' header='Created' sortable></Column>
+                                    {renderColumnsData.map(({ field, header }) => (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                        />
+                                    ))}
                                 </DataTable>
                             </div>
                         </div>
