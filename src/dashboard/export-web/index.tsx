@@ -6,7 +6,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { getExportToWebList } from "http/services/export-to-web.service";
@@ -57,6 +57,20 @@ export const ExportToWeb = () => {
         }
     }, [lazyState, authUser, globalSearch]);
 
+    interface TableColumnProps extends ColumnProps {
+        field: keyof ExportWebList | "media";
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "Make", header: "Make" },
+        { field: "Model", header: "Model" },
+        { field: "Year", header: "Year" },
+        { field: "VIN", header: "VIN" },
+        { field: "media", header: "Media" },
+        { field: "Status", header: "Status" },
+        { field: "lastexportdate", header: "Last Export Date" },
+    ];
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -100,20 +114,20 @@ export const ExportToWeb = () => {
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
+                                    reorderableColumns
+                                    resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column sortable field='Make' header='Make' />
-                                    <Column sortable field='Model' header='Model' />
-                                    <Column sortable field='Year' header='Year' />
-                                    <Column sortable field='VIN' header='VIN' />
-                                    <Column sortable field='Media' header='Media' />
-                                    <Column sortable field='Status' header='Status' />
-                                    <Column
-                                        sortable
-                                        field='lastexportdate'
-                                        header='Last Export Date'
-                                    />
+                                    {renderColumnsData.map(({ field, header }) => (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                        />
+                                    ))}
                                 </DataTable>
                             </div>
                         </div>

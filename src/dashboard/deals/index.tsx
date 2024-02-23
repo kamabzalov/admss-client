@@ -8,7 +8,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -65,6 +65,14 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch]);
 
+    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+        { field: "accountuid", header: "Account" },
+        { field: "contactinfo", header: "Customer" },
+        { field: "dealtype", header: "Type" },
+        { field: "created", header: "Date" },
+        { field: "inventoryinfo", header: "Info (Vehicle)" },
+    ];
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -118,18 +126,20 @@ export default function Deals() {
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
+                                    reorderableColumns
+                                    resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column field='accountuid' header='Account' sortable></Column>
-                                    <Column field='contactinfo' header='Customer' sortable></Column>
-                                    <Column field='dealtype' header='Type' sortable></Column>
-                                    <Column field='created' header='Date' sortable></Column>
-                                    <Column
-                                        field='inventoryinfo'
-                                        header='Info (Vehicle)'
-                                        sortable
-                                    ></Column>
+                                    {renderColumnsData.map(({ field, header }) => (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                        />
+                                    ))}
                                 </DataTable>
                             </div>
                         </div>

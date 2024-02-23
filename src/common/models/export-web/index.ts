@@ -29,4 +29,5 @@ export interface ExportWebList {
     options_info: string[];
     updated: string;
     useruid: string;
+    lastexportdate: string;
 }
