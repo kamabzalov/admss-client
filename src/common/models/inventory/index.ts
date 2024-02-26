@@ -287,3 +287,13 @@ export interface InventoryExportWebHistory {
     taskuid: string;
     useruid: string;
 }
+
+export interface InventoryPrintForm {
+    description: string;
+    index: number;
+    itemuid: string;
+    name: string;
+    state: string;
+    type: string;
+    version: string;
+}
