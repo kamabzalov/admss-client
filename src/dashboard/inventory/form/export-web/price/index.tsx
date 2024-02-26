@@ -18,10 +18,11 @@ export const ExportWebPrice = observer((): ReactElement => {
             ExtraPrice1,
             ExtraPrice2,
             ExtraPrice3,
+            DealerComments,
         },
         changeExportWeb,
     } = store;
-    const [checked, setChecked] = useState<boolean>(true);
+    const [checked, setChecked] = useState<boolean>(false);
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
@@ -112,6 +113,10 @@ export const ExportWebPrice = observer((): ReactElement => {
                 <InputTextarea
                     placeholder='Dealer comments on vehicle'
                     className='w-full export-web-price__text-area'
+                    value={DealerComments}
+                    onChange={({ target: { value } }) =>
+                        changeExportWeb({ key: "DealerComments", value })
+                    }
                 />
             </div>
         </div>
