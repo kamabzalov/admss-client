@@ -18,24 +18,31 @@ export const PrintForms = observer((): ReactElement => {
     const [selectedPrints, setSelectedPrints] = useState<InventoryPrintForm[] | null>(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
-    const handlePrintForm = (templateuid: string) => {
-        id &&
-            getInventoryPrintFormTemplate(id, templateuid).then((response: any) => {
+    const handlePrintForm = async (templateuid: string) => {
+        if (id) {
+            try {
+                const response = await getInventoryPrintFormTemplate(id, templateuid);
                 setIsButtonDisabled(true);
                 setTimeout(() => {
                     const url = new Blob([response], { type: "application/pdf" });
                     let link = document.createElement("a");
                     link.href = window.URL.createObjectURL(url);
-                    link.download = "PrintForm.pdf";
+                    link.download = `print_form_${templateuid}.pdf`;
                     link.click();
-                    setIsButtonDisabled(false);
-                }, 5000);
-            });
+                }, 3000);
+            } catch (error) {
+                //TODO: handle error
+            } finally {
+                setIsButtonDisabled(false);
+            }
+        }
     };
 
-    const handlePrintSelectedForms = () => {
-        if (id) {
-            selectedPrints?.map(({ itemuid }) => getInventoryPrintFormTemplate(id, itemuid));
+    const handlePrintSelectedForms = async () => {
+        if (selectedPrints) {
+            for (const { itemuid } of selectedPrints) {
+                await handlePrintForm(itemuid);
+            }
         }
     };
 
