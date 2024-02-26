@@ -6,6 +6,7 @@ import {
     InventoryMediaItemID,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
 } from "common/models/inventory";
 import {
     getInventoryInfo,
@@ -18,6 +19,7 @@ import {
     deleteMediaImage,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
+    getInventoryPrintForms,
     setInventoryExportWeb,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
@@ -34,8 +36,10 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
-    private _inventoryExportWebHistory: InventoryExportWebHistory[] = [];
+
+    private _exportWebActive: boolean = false;
+    private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
+    private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
@@ -44,6 +48,9 @@ export class InventoryStore {
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
+
+    private _printList: InventoryPrintForm[] = [];
+
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -61,19 +68,31 @@ export class InventoryStore {
         return this._inventoryExtData;
     }
     public get inventoryExportWeb() {
-        return this._inventoryExportWeb;
+        return this._exportWeb;
+    }
+    public get exportWebActive() {
+        return this._exportWebActive;
     }
     public get uploadFileImages() {
         return this._uploadFileImages;
     }
     public get inventoryExportWebHistory() {
-        return this._inventoryExportWebHistory;
+        return this._exportWebHistory;
     }
     public get images() {
         return this._images;
     }
+
+    public get printList() {
+        return this._printList;
+    }
+
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
     }
 
     public set isLoading(state: boolean) {
@@ -137,7 +156,7 @@ export class InventoryStore {
         try {
             const response = await getInventoryWebInfo(id);
             if (response) {
-                this._inventoryExportWeb = response;
+                this._exportWeb = response;
             }
         } catch (error) {
         } finally {
@@ -150,7 +169,7 @@ export class InventoryStore {
         try {
             const response = await getInventoryWebInfoHistory(id);
             if (response) {
-                this._inventoryExportWebHistory = response;
+                this._exportWebHistory = response;
             }
         } catch (error) {
         } finally {
@@ -203,15 +222,15 @@ export class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
-            const webResponse = await setInventoryExportWeb(
-                this._inventoryID,
-                this._inventoryExportWeb
-            );
+            if (!this.exportWebActive) {
+                return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
+            }
+            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK)
+                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
             );
         } catch (error) {
-            // TODO: add error handler
+            // TODO: add error handlers
             return undefined;
         }
     });
@@ -277,7 +296,21 @@ export class InventoryStore {
 
             this._images = result;
         } catch (error) {
-            // Handle or log the error
+            // TODO: add error handler
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public getPrintList = action(async (inventoryuid = this._inventoryID) => {
+        try {
+            this._isLoading = true;
+            const response = await getInventoryPrintForms(inventoryuid);
+            if (response) {
+                this._printList = response;
+            }
+        } catch (error) {
+            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -286,7 +319,6 @@ export class InventoryStore {
     public removeImage = action(async (imageuid: string): Promise<Status | undefined> => {
         try {
             this._isLoading = true;
-
             try {
                 await deleteMediaImage(imageuid);
                 await this.fetchImages();
@@ -312,7 +344,8 @@ export class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
-        this._inventoryExportWeb = {} as InventoryWebInfo;
-        this._inventoryExportWebHistory = [] as InventoryExportWebHistory[];
+        this._exportWeb = {} as InventoryWebInfo;
+        this._exportWebHistory = [] as InventoryExportWebHistory[];
+        this._printList = [] as InventoryPrintForm[];
     };
 }
