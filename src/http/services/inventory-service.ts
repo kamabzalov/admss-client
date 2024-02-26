@@ -12,10 +12,8 @@ import {
     CreateMediaItemRecordResponse,
     InventoryWebInfo,
     InventoryExportWebHistory,
-    InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
-import { writeFile } from "fs/promises";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
@@ -260,28 +258,18 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
     }
 };
 
-export const getInventoryPrintForms = async (inventoryuid: string) => {
+export const setInventoryExportWeb = async (
+    inventoryUid: string,
+    inventoryData: Partial<InventoryWebInfo>
+): Promise<InventorySetResponse | undefined> => {
     try {
-        const request = await authorizedUserApiInstance.get<InventoryPrintForm[]>(
-            `print/${inventoryuid}/listforms`
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${inventoryUid || 0}/webadd`,
+            inventoryData
         );
-        if (request.status === 200) {
-            return request.data;
-        }
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<any>(
-            `print/${inventoryuid}/${templateuid}/form`,
-            {
-                responseType: "blob",
-            }
-        );
-        if (request.status === 200) {
-            return request.data;
+
+        if (response.status === 200) {
+            return response.data;
         }
     } catch (error) {
         // TODO: add error handler

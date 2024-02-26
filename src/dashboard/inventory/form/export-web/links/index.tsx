@@ -6,12 +6,13 @@ import { useStore } from "store/hooks";
 
 export const ExportWebLinks = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryExportWeb } = store;
+    const { inventoryExportWeb, changeExportWeb } = store;
     return (
         <div className='grid export-web-links row-gap-2'>
             <InputTextarea
                 placeholder='VDP Link (Vehicle Detail Page)'
                 value={inventoryExportWeb.VDPLink}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "VDPLink", value })}
                 className='w-full export-web-links__text-area'
             />
 
@@ -20,11 +21,13 @@ export const ExportWebLinks = observer((): ReactElement => {
             <InputTextarea
                 placeholder='Video URL'
                 value={inventoryExportWeb.VideoURL}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "VideoURL", value })}
                 className='w-full export-web-links__text-area'
             />
             <InputTextarea
                 placeholder='Photo URL'
                 value={inventoryExportWeb.PhotoURL}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "PhotoURL", value })}
                 className='w-full export-web-links__text-area'
             />
         </div>
