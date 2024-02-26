@@ -15,7 +15,6 @@ import {
     InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
-import { writeFile } from "fs/promises";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
@@ -254,6 +253,24 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
         );
         if (request.status === 200) {
             return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setInventoryExportWeb = async (
+    inventoryUid: string,
+    inventoryData: Partial<InventoryWebInfo>
+): Promise<InventorySetResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${inventoryUid || 0}/webadd`,
+            inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
         }
     } catch (error) {
         // TODO: add error handler

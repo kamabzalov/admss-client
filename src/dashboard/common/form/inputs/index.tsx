@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
@@ -164,11 +164,40 @@ export const SearchInput = ({
     );
 };
 
-export const DateInput = ({ name, ...props }: CalendarProps): ReactElement => (
-    <div className='p-inputgroup flex-1 w-full date-input'>
-        <Calendar placeholder={name} {...props} className='date-input__calendar' />
-        <span className='p-inputgroup-addon'>
-            <i className='adms-calendar' />
-        </span>
-    </div>
-);
+interface DateInputProps extends CalendarProps {
+    date?: number;
+}
+
+export const DateInput = ({ date, name, value, ...props }: DateInputProps): ReactElement => {
+    const [innerDate, setInnerDate] = useState<Date>(new Date());
+
+    useEffect(() => {
+        if (!!date) {
+            const currentDate = new Date(Number(date));
+            setInnerDate(currentDate);
+        }
+    }, [date]);
+
+    const dateToNumber = (selectedDate: Date) => setInnerDate(selectedDate);
+    return (
+        <div
+            key={name}
+            className='flex align-items-center justify-content-between date-item relative'
+        >
+            <label htmlFor={name} className='date-item__label label-top'>
+                {name}
+            </label>
+            <div className='date-item__input flex justify-content-center'>
+                <Calendar
+                    inputId={name}
+                    value={innerDate}
+                    onChange={(e) => dateToNumber(e.value as Date)}
+                    {...props}
+                />
+                <div className='date-item__icon input-icon input-icon-right'>
+                    <i className='adms-calendar' />
+                </div>
+            </div>
+        </div>
+    );
+};
