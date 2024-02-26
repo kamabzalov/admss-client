@@ -21,6 +21,8 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 import { useLocation } from "react-router-dom";
+import { observer } from "mobx-react-lite";
+import { PrintForms } from "./print-forms";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -31,10 +33,11 @@ export const inventorySections = [
 
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
-const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 const STEP = "step";
 
-export const InventoryForm = () => {
+export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -53,6 +56,8 @@ export const InventoryForm = () => {
         saveInventory,
         getInventoryExportWeb,
         getInventoryExportWebHistory,
+        inventory,
+        getPrintList,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -97,9 +102,15 @@ export const InventoryForm = () => {
                 getInventoryExportWeb(id);
                 getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
+                stepActiveIndex === PRINT_ACTIVE_INDEX && getPrintList(id);
             }
         }
     }, [stepActiveIndex]);
+
+    const handleActivePrintForms = () => {
+        navigate(getUrl(PRINT_ACTIVE_INDEX));
+        setStepActiveIndex(PRINT_ACTIVE_INDEX);
+    };
 
     const handleSave = () => {
         saveInventory().then((res) => {
@@ -131,6 +142,17 @@ export const InventoryForm = () => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
+                            <div className='card-header-info'>
+                                Stock#{" "}
+                                <span className='card-header-info__data'>{inventory?.StockNo}</span>
+                                Make{" "}
+                                <span className='card-header-info__data'>{inventory?.Make}</span>
+                                Model{" "}
+                                <span className='card-header-info__data'>{inventory?.Model}</span>
+                                Year{" "}
+                                <span className='card-header-info__data'>{inventory?.Year}</span>
+                                VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
+                            </div>
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap'>
@@ -182,6 +204,18 @@ export const InventoryForm = () => {
                                     </Accordion>
                                     {id && (
                                         <Button
+                                            icon='icon adms-print'
+                                            className={`p-button gap-2 inventory__print-nav ${
+                                                stepActiveIndex === PRINT_ACTIVE_INDEX &&
+                                                "inventory__print-nav--active"
+                                            } w-full`}
+                                            onClick={handleActivePrintForms}
+                                        >
+                                            Print forms
+                                        </Button>
+                                    )}
+                                    {id && (
+                                        <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
@@ -221,6 +255,15 @@ export const InventoryForm = () => {
                                                     )}
                                                 </div>
                                             ))
+                                        )}
+
+                                        {stepActiveIndex === PRINT_ACTIVE_INDEX && (
+                                            <div className='inventory-form'>
+                                                <div className='inventory-form__title uppercase'>
+                                                    Print history
+                                                </div>
+                                                <PrintForms />
+                                            </div>
                                         )}
                                         {stepActiveIndex === DELETE_ACTIVE_INDEX && (
                                             <div className='inventory-form'>
@@ -335,4 +378,4 @@ export const InventoryForm = () => {
             />
         </Suspense>
     );
-};
+});

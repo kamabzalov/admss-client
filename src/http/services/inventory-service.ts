@@ -12,8 +12,10 @@ import {
     CreateMediaItemRecordResponse,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
+import { writeFile } from "fs/promises";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
@@ -249,6 +251,34 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<InventoryExportWebHistory[]>(
             `external/${inventoryuid}/history`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryPrintForms = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryPrintForm[]>(
+            `print/${inventoryuid}/listforms`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `print/${inventoryuid}/${templateuid}/form`,
+            {
+                responseType: "blob",
+            }
         );
         if (request.status === 200) {
             return request.data;
