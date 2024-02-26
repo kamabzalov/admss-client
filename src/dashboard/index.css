@@ -74,9 +74,6 @@
 .search-dialog {
     width: 480px;
 }
-.p-inputtext:enabled:focus {
-    box-shadow: none;
-}
 
 @media screen and (min-width: 992px) {
     .main {
