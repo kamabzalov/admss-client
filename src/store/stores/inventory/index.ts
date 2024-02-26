@@ -20,6 +20,7 @@ import {
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
+    setInventoryExportWeb,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -35,6 +36,8 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+
+    private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
@@ -67,6 +70,9 @@ export class InventoryStore {
     public get inventoryExportWeb() {
         return this._exportWeb;
     }
+    public get exportWebActive() {
+        return this._exportWebActive;
+    }
     public get uploadFileImages() {
         return this._uploadFileImages;
     }
@@ -83,6 +89,10 @@ export class InventoryStore {
 
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
     }
 
     public set isLoading(state: boolean) {
@@ -199,12 +209,28 @@ export class InventoryStore {
         }
     });
 
+    public changeExportWeb = action(
+        ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExportWeb } = inventoryStore;
+                (inventoryExportWeb as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
-            const response = await setInventory(this._inventoryID, this._inventory);
-            if (response?.status === Status.OK) return response.itemuid;
+            const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
+            if (!this.exportWebActive) {
+                return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
+            }
+            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
+            await Promise.all([inventoryResponse, webResponse]).then((response) =>
+                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
+            );
         } catch (error) {
-            // TODO: add error handler
+            // TODO: add error handlers
             return undefined;
         }
     });

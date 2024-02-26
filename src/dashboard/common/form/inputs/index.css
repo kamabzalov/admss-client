@@ -56,6 +56,10 @@
     border-radius: 0 5px 5px 0;
 }
 
+.date-item__input .p-inputtext {
+    border-radius: 5px 0 0 5px;
+}
+
 .label-top {
     position: absolute;
     top: 0;

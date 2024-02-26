@@ -6,22 +6,28 @@ import { useStore } from "store/hooks";
 
 export const ExportWebExtra = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryExportWeb } = store;
+    const { inventoryExportWeb, changeExportWeb, exportWebActive } = store;
     return (
         <div className='grid export-web-extra row-gap-2'>
             <InputTextarea
                 placeholder='Extra field 1'
                 value={inventoryExportWeb.ExtraField1}
+                disabled={!exportWebActive}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "ExtraField1", value })}
                 className='w-full export-web-extra__text-area'
             />
             <InputTextarea
                 placeholder='Extra field 2'
                 value={inventoryExportWeb.ExtraField2}
+                disabled={!exportWebActive}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "ExtraField2", value })}
                 className='w-full export-web-extra__text-area'
             />
             <InputTextarea
                 placeholder='Extra field 3'
                 value={inventoryExportWeb.ExtraField3}
+                disabled={!exportWebActive}
+                onChange={({ target: { value } }) => changeExportWeb({ key: "ExtraField3", value })}
                 className='w-full export-web-extra__text-area'
             />
         </div>
