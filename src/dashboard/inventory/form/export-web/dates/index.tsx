@@ -7,25 +7,44 @@ export const ExportWebDates = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
         inventoryExportWeb: { InStockDate, LastModifiedDate, LastExportDate },
+        exportWebActive,
+        changeExportWeb,
     } = store;
-
-    const stockDate = String(InStockDate);
-    const lastModifiedDate = String(LastModifiedDate);
-    const lastExportDate = String(LastExportDate);
 
     return (
         <div className='grid export-web-dates row-gap-2'>
             <div className='col-3'>
-                <DateInput value={stockDate} name='In Stock Date' />
+                <DateInput
+                    date={InStockDate}
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "InStockDate", value: Number(value) })
+                    }
+                    disabled={!exportWebActive}
+                    name='In Stock Date'
+                />
             </div>
 
             <hr className='form-line' />
 
             <div className='col-3'>
-                <DateInput value={lastModifiedDate} name='Last Modified Date' />
+                <DateInput
+                    date={LastModifiedDate}
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "LastModifiedDate", value: Number(value) })
+                    }
+                    disabled={!exportWebActive}
+                    name='Last Modified Date'
+                />
             </div>
             <div className='col-3'>
-                <DateInput value={lastExportDate} name='Last Export Date' />
+                <DateInput
+                    date={LastExportDate}
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "LastExportDate", value: Number(value) })
+                    }
+                    disabled={!exportWebActive}
+                    name='Last Export Date'
+                />
             </div>
         </div>
     );

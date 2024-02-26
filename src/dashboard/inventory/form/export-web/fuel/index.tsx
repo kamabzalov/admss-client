@@ -5,7 +5,7 @@ import { useStore } from "store/hooks";
 
 export const ExportWebFuel = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryExportWeb } = store;
+    const { inventoryExportWeb, changeExportWeb, exportWebActive } = store;
     return (
         <div className='grid export-web-fuel row-gap-2'>
             <div className='col-3'>
@@ -13,6 +13,10 @@ export const ExportWebFuel = observer((): ReactElement => {
                     <InputText
                         className='export-web-fuel__text-input w-full'
                         value={inventoryExportWeb.CityMPG}
+                        disabled={!exportWebActive}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "CityMPG", value })
+                        }
                     />
                     <label className='float-label'>City MPG</label>
                 </span>
@@ -22,6 +26,10 @@ export const ExportWebFuel = observer((): ReactElement => {
                     <InputText
                         className='export-web-fuel__text-input w-full'
                         value={inventoryExportWeb.HwyMPG}
+                        disabled={!exportWebActive}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "HwyMPG", value })
+                        }
                     />
                     <label className='float-label'>Hwy MPG</label>
                 </span>
