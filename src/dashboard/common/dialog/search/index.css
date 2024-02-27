@@ -1,0 +1,7 @@
+.search-dialog {
+    width: 480px;
+}
+.search-dialog__clear {
+    font-size: 14px;
+    line-height: 1.5;
+}

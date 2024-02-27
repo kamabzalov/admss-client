@@ -20,22 +20,29 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
-import { DashboardDialog } from "dashboard/common/dialog";
+import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
 
+const filterParams = (obj: Record<string, string>): Record<string, string> => {
+    return Object.fromEntries(
+        Object.entries(obj).filter(
+            ([_, value]) => typeof value === "string" && value.trim().length > 0
+        )
+    );
+};
+
 const createStringifySearchQuery = (obj: Record<string, string>): string => {
-    let searchQueryString = "";
-    if (Object.values(obj).every((value) => !value)) {
-        return searchQueryString;
+    const filteredObj = filterParams(obj);
+
+    if (Object.keys(filteredObj).length === 0) {
+        return "";
     }
-    Object.entries(obj).forEach(([key, value], index) => {
-        if (value.length > 0) {
-            searchQueryString += `${index > 0 ? "+" : ""}${value}.${key}`;
-        }
-    });
-    return searchQueryString;
+
+    return Object.entries(filteredObj)
+        .map(([key, value], index) => `${index > 0 ? "+" : ""}${value}.${key}`)
+        .join("");
 };
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
@@ -122,10 +129,36 @@ export default function Inventories(): ReactElement {
     };
 
     const handleAdvancedSearch = () => {
-        const params = createStringifySearchQuery(advancedSearch);
-        handleGetInventoryList({ ...lazyState, qry: params }, true);
+        const searchParams = createStringifySearchQuery(advancedSearch);
+        handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
 
         setDialogVisible(false);
+    };
+
+    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setButtonDisabled(true);
+        setAdvancedSearch((prev) => {
+            const updatedSearch = { ...prev };
+            delete updatedSearch[key];
+            return updatedSearch;
+        });
+
+        try {
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
+
+            const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            await handleGetInventoryList(params);
+        } finally {
+            setButtonDisabled(false);
+        }
     };
 
     interface TableColumnProps extends ColumnProps {
@@ -140,6 +173,25 @@ export default function Inventories(): ReactElement {
         { field: "ExteriorColor", header: "Color" },
         { field: "mileage", header: "Miles" },
         { field: "Price", header: "Price" },
+    ];
+
+    const searchFields: SearchField<AdvancedSearch>[] = [
+        {
+            key: "StockNo",
+            value: advancedSearch?.StockNo,
+        },
+        {
+            key: "Make",
+            value: advancedSearch?.Make,
+        },
+        {
+            key: "Model",
+            value: advancedSearch?.Model,
+        },
+        {
+            key: "VIN",
+            value: advancedSearch?.VIN,
+        },
     ];
 
     return (
@@ -177,7 +229,12 @@ export default function Inventories(): ReactElement {
                                     onClick={() => setDialogVisible(true)}
                                 />
                                 <span className='p-input-icon-right'>
-                                    <i className='pi pi-search' />
+                                    <i
+                                        className={`pi pi-${
+                                            !globalSearch ? "search" : "times cursor-pointer"
+                                        }`}
+                                        onClick={() => setGlobalSearch("")}
+                                    />
                                     <InputText
                                         value={globalSearch}
                                         onChange={(e) => setGlobalSearch(e.target.value)}
@@ -220,61 +277,18 @@ export default function Inventories(): ReactElement {
                         </div>
                     </div>
                 </div>
-                <DashboardDialog
-                    className='search-dialog'
-                    footer='Search'
-                    header='Advanced search'
+                <AdvancedSearchDialog<AdvancedSearch>
                     visible={dialogVisible}
                     buttonDisabled={buttonDisabled}
-                    action={handleAdvancedSearch}
                     onHide={() => {
                         setButtonDisabled(true);
                         setDialogVisible(false);
                     }}
-                >
-                    <div className='flex flex-column gap-4 pt-4'>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.StockNo}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("StockNo", target.value)
-                                }
-                            />
-                            <label className='float-label'>Stock#</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.Make}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("Make", target.value)
-                                }
-                            />
-                            <label className='float-label'>Make</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.Model}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("Model", target.value)
-                                }
-                            />
-                            <label className='float-label'>Model</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.VIN}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("VIN", target.value)
-                                }
-                            />
-                            <label className='float-label'>VIN</label>
-                        </span>
-                    </div>
-                </DashboardDialog>
+                    action={handleAdvancedSearch}
+                    onSearchClear={handleClearAdvancedSearchField}
+                    onInputChange={handleSetAdvancedSearch}
+                    fields={searchFields}
+                />
             </div>
         </div>
     );

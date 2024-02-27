@@ -1,7 +1,7 @@
 import { Dialog, DialogProps } from "primereact/dialog";
 import { Button } from "primereact/button";
 
-interface DashboardDialogProps extends DialogProps {
+export interface DashboardDialogProps extends DialogProps {
     action?: () => void;
     buttonDisabled?: boolean;
 }
