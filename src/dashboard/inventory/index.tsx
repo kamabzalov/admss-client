@@ -214,7 +214,12 @@ export default function Inventories(): ReactElement {
                                     onClick={() => setDialogVisible(true)}
                                 />
                                 <span className='p-input-icon-right'>
-                                    <i className='pi pi-search' />
+                                    <i
+                                        className={`pi pi-${
+                                            !globalSearch ? "search" : "times cursor-pointer"
+                                        }`}
+                                        onClick={() => setGlobalSearch("")}
+                                    />
                                     <InputText
                                         value={globalSearch}
                                         onChange={(e) => setGlobalSearch(e.target.value)}
