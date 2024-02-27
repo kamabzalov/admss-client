@@ -25,17 +25,24 @@ import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/searc
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
 
+const filterParams = (obj: Record<string, string>): Record<string, string> => {
+    return Object.fromEntries(
+        Object.entries(obj).filter(
+            ([_, value]) => typeof value === "string" && value.trim().length > 0
+        )
+    );
+};
+
 const createStringifySearchQuery = (obj: Record<string, string>): string => {
-    let searchQueryString = "";
-    if (Object.values(obj).every((value) => !value)) {
-        return searchQueryString;
+    const filteredObj = filterParams(obj);
+
+    if (Object.keys(filteredObj).length === 0) {
+        return "";
     }
-    Object.entries(obj).forEach(([key, value], index) => {
-        if (value.length > 0) {
-            searchQueryString += `${index > 0 ? "+" : ""}${value}.${key}`;
-        }
-    });
-    return searchQueryString;
+
+    return Object.entries(filteredObj)
+        .map(([key, value], index) => `${index > 0 ? "+" : ""}${value}.${key}`)
+        .join("");
 };
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
@@ -122,8 +129,8 @@ export default function Inventories(): ReactElement {
     };
 
     const handleAdvancedSearch = () => {
-        const params = createStringifySearchQuery(advancedSearch);
-        handleGetInventoryList({ ...lazyState, qry: params }, true);
+        const searchParams = createStringifySearchQuery(advancedSearch);
+        handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
 
         setDialogVisible(false);
     };
@@ -139,8 +146,16 @@ export default function Inventories(): ReactElement {
         try {
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
-            const params = createStringifySearchQuery(updatedSearch);
-            await handleGetInventoryList({ ...lazyState, qry: params });
+
+            const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            await handleGetInventoryList(params);
         } finally {
             setButtonDisabled(false);
         }
