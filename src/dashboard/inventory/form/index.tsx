@@ -143,20 +143,20 @@ export const InventoryForm = observer(() => {
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
                             <div className='card-header-info'>
-                                Stock#{" "}
+                                Stock#
                                 <span className='card-header-info__data'>{inventory?.StockNo}</span>
-                                Make{" "}
+                                Make
                                 <span className='card-header-info__data'>{inventory?.Make}</span>
-                                Model{" "}
+                                Model
                                 <span className='card-header-info__data'>{inventory?.Model}</span>
-                                Year{" "}
+                                Year
                                 <span className='card-header-info__data'>{inventory?.Year}</span>
                                 VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
                             </div>
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap'>
-                                <div className='p-0'>
+                                <div className='p-0 card-content__wrapper'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) =>
@@ -225,7 +225,7 @@ export const InventoryForm = observer(() => {
                                         </Button>
                                     )}
                                 </div>
-                                <div className='w-full flex flex-column p-0'>
+                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         {inventorySections.map((section) =>
                                             section.items.map((item: InventoryItem) => (

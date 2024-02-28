@@ -17,6 +17,17 @@
     gap: 150px;
 }
 
+.card-content__wrapper {
+    height: 40vh;
+    max-height: 704px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.card-content__wrapper::-webkit-scrollbar {
+    width: 2px;
+}
+
 .card-content__title {
     margin-bottom: 30px;
     margin-top: 0;

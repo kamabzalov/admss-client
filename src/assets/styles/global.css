@@ -60,6 +60,14 @@ body {
     margin-right: 20px !important;
 }
 
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--admss-app-medium-blue);
+}
+
 @media screen and (min-width: 992px) {
     .container {
         width: 824px;
