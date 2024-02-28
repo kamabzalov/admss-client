@@ -222,6 +222,8 @@ export interface Inventory {
     mileage: number;
     name: string;
     options_info?: InventoryOptionsInfo[];
+    FactoryCertified: number;
+    DealerCertified: number;
     status: string;
     updated: string;
     useruid: string;
