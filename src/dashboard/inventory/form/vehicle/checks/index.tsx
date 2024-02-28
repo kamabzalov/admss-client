@@ -3,11 +3,14 @@ import { ReactElement } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { InventoryExtData } from "common/models/inventory";
+import { Inventory, InventoryExtData } from "common/models/inventory";
 
 export const VehicleChecks = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
+        inventory: { FactoryCertified, DealerCertified },
+        changeInventoryExtData,
+        changeInventory,
         inventoryExtData: {
             chkAutocheckChecked,
             chkInspected,
@@ -23,11 +26,17 @@ export const VehicleChecks = observer((): ReactElement => {
             chkCustom8,
             chkCustom9,
         },
-        changeInventoryExtData,
     } = store;
 
-    const handleChange = (key: keyof InventoryExtData, value: number) => {
-        changeInventoryExtData({ key, value: !!value ? 0 : 1 });
+    const handleChange = (
+        key: keyof InventoryExtData | keyof Pick<Inventory, "DealerCertified" | "FactoryCertified">,
+        value: number
+    ) => {
+        if (key === "DealerCertified" || key === "FactoryCertified") {
+            changeInventory({ key, value: !!value ? 0 : 1 });
+        } else {
+            changeInventoryExtData({ key, value: !!value ? 0 : 1 });
+        }
     };
 
     return (
@@ -55,12 +64,32 @@ export const VehicleChecks = observer((): ReactElement => {
                 </div>
                 <div className='vehicle-checks__checkbox flex align-items-center'>
                     <Checkbox
+                        inputId='DealerCertified'
+                        onChange={() => handleChange("DealerCertified", DealerCertified)}
+                        checked={!!DealerCertified}
+                    />
+                    <label htmlFor='DealerCertified' className='ml-2'>
+                        Dealer Certified
+                    </label>
+                </div>
+                <div className='vehicle-checks__checkbox flex align-items-center'>
+                    <Checkbox
                         inputId='chkOil'
                         onChange={() => handleChange("chkOil", chkOil)}
                         checked={!!chkOil}
                     />
                     <label htmlFor='chkOil' className='ml-2'>
                         Oil and Filter inspected and changed
+                    </label>
+                </div>
+                <div className='vehicle-checks__checkbox flex align-items-center'>
+                    <Checkbox
+                        inputId='FactoryCertified'
+                        onChange={() => handleChange("FactoryCertified", FactoryCertified)}
+                        checked={!!FactoryCertified}
+                    />
+                    <label htmlFor='FactoryCertified' className='ml-2'>
+                        Factory Certified
                     </label>
                 </div>
             </div>
