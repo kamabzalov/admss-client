@@ -65,7 +65,7 @@ export const ExportToWeb = () => {
         { field: "Make", header: "Make" },
         { field: "Model", header: "Model" },
         { field: "Year", header: "Year" },
-        { field: "VIN", header: "VIN" },
+        { field: "StockNo", header: "StockNo" },
         { field: "media", header: "Media" },
         { field: "Status", header: "Status" },
         { field: "lastexportdate", header: "Last Export Date" },
