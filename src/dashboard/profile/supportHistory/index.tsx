@@ -55,6 +55,7 @@ export const SupportHistoryDialog = ({
             onHide={onHide}
         >
             <DataTable
+                showGridlines
                 value={supportHistoryData}
                 rowExpansionTemplate={rowExpansionTemplate}
                 expandedRows={expandedRows}

@@ -26,6 +26,7 @@ export const ExportWebHistory = observer((): ReactElement => {
         <div className='grid export-web-history row-gap-2'>
             <div className='col-12'>
                 <DataTable
+                    showGridlines
                     className='mt-6 export-web-history__table'
                     value={inventoryExportWebHistory}
                     emptyMessage='No exports yet.'
