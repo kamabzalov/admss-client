@@ -21,6 +21,7 @@
     --admss-app-light-green: #effff7;
     --admss-app-primary-main-green: #0db564;
     --admss-app-blue-text: #292a2e;
+    --admss-app-white: #ffffff;
     --admss-app-white-blue: #f9fbff;
     --admss-app-light-blue: #e5edfd;
     --admss-app-medium-blue: #afc6f3;
@@ -61,7 +62,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
