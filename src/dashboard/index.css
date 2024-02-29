@@ -86,6 +86,26 @@
     box-shadow: none;
 }
 
+.p-datatable .p-datatable-header {
+    border: none;
+    box-shadow: none;
+    background-color: var(--admss-app-white);
+    padding: 0;
+}
+
+.p-multiselect-panel .p-multiselect-header {
+    display: none;
+}
+
+.p-datatable-header .p-multiselect .p-multiselect-token {
+    background: var(--admss-app-primary-main-green);
+    color: var(--admss-app-white);
+}
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+    background-color: var(--admss-app-light-green);
+    color: var(--admss-app-blue-text);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
