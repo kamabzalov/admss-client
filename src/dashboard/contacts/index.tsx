@@ -153,6 +153,7 @@ export default function Contacts() {
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
+                                    showGridlines
                                     value={contacts}
                                     lazy
                                     paginator

@@ -117,6 +117,7 @@ export default function Deals() {
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
+                                    showGridlines
                                     value={deals}
                                     lazy
                                     paginator

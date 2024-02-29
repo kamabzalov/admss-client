@@ -273,6 +273,7 @@ export default function Inventories(): ReactElement {
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
+                                    showGridlines
                                     value={inventories}
                                     lazy
                                     paginator

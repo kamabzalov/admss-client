@@ -105,6 +105,7 @@ export const ExportToWeb = () => {
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
+                                    showGridlines
                                     value={exportsToWeb}
                                     lazy
                                     paginator

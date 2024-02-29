@@ -106,6 +106,41 @@
     color: var(--admss-app-blue-text);
 }
 
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td {
+    border-color: var(--admss-app-medium-blue);
+}
+.p-datatable .p-datatable-thead > tr > th {
+    border: 1px solid var(--admss-app-medium-blue);
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
+    border-top: none;
+    border-bottom: none;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:first-child {
+    border-left: none;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:last-child {
+    border-right: none;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr:first-child > td {
+    border-top: none;
+}
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td:first-child {
+    border-left: none;
+}
+
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td:last-child {
+    border-right: none;
+}
+
+.p-datatable.p-datatable-gridlines .p-paginator-bottom {
+    border: none;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
