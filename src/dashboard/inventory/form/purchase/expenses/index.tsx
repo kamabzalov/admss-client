@@ -45,6 +45,7 @@ export const PurchaseExpenses = (): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 purchase-expenses__table'
                         value={[]}
                         emptyMessage='No expenses yet.'

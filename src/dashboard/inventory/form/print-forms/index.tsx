@@ -64,6 +64,7 @@ export const PrintForms = observer((): ReactElement => {
         <div className='grid inventory-print row-gap-2'>
             <div className='col-12'>
                 <DataTable
+                    showGridlines
                     className='mt-6 inventory-print__table'
                     ref={ref}
                     value={printList}
