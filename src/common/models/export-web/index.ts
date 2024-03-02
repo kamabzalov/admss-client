@@ -30,4 +30,5 @@ export interface ExportWebList {
     updated: string;
     useruid: string;
     lastexportdate: string;
+    Price: number;
 }
