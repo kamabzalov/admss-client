@@ -6,11 +6,14 @@ import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { getExportToWebList } from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
+import { Checkbox } from "primereact/checkbox";
+import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -18,6 +21,8 @@ export const ExportToWeb = () => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
+    const navigate = useNavigate();
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
@@ -58,8 +63,19 @@ export const ExportToWeb = () => {
     }, [lazyState, authUser, globalSearch]);
 
     interface TableColumnProps extends ColumnProps {
-        field: keyof ExportWebList | "media";
+        field: keyof ExportWebList | "media" | "Price";
     }
+
+    const cellEditor = (options: ColumnEditorOptions) => {
+        return (
+            <InputText
+                type='text'
+                className='h-full m-0 py-0 px-2 w-full'
+                value={options.value}
+                onChange={(e) => options.editorCallback!(e.target.value)}
+            />
+        );
+    };
 
     const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
         { field: "Make", header: "Make" },
@@ -68,7 +84,16 @@ export const ExportToWeb = () => {
         { field: "StockNo", header: "StockNo" },
         { field: "media", header: "Media" },
         { field: "Status", header: "Status" },
+        { field: "ExteriorColor", header: "Color" },
+        { field: "mileage", header: "Mileage" },
         { field: "lastexportdate", header: "Last Export Date" },
+        { field: "Price", header: "Price" },
+    ];
+
+    const allowedEditableFields: Partial<keyof ExportWebList | "Price">[] = [
+        "ExteriorColor",
+        "mileage",
+        "Price",
     ];
 
     return (
@@ -120,12 +145,44 @@ export const ExportToWeb = () => {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
+                                    <Column
+                                        bodyStyle={{ textAlign: "center" }}
+                                        header={<Checkbox checked={false} />}
+                                        body={(options) => {
+                                            return (
+                                                <div className='flex gap-3'>
+                                                    <Checkbox checked={false} />
+                                                    <i
+                                                        className='icon adms-edit-item cursor-pointer export-web__icon'
+                                                        onClick={() => {
+                                                            navigate(
+                                                                `/dashboard/inventory/${options.itemuid}`
+                                                            );
+                                                        }}
+                                                    />
+                                                    <i className='pi pi-angle-down' />
+                                                </div>
+                                            );
+                                        }}
+                                    />
                                     {renderColumnsData.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
                                             key={field}
                                             sortable
+                                            editor={(data: ColumnEditorOptions) => {
+                                                const { field } = data;
+                                                if (
+                                                    allowedEditableFields.includes(
+                                                        field as keyof ExportWebList
+                                                    )
+                                                ) {
+                                                    return cellEditor(data);
+                                                } else {
+                                                    return data.value;
+                                                }
+                                            }}
                                             headerClassName='cursor-move'
                                         />
                                     ))}
