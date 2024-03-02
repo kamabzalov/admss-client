@@ -227,6 +227,7 @@ export interface Inventory {
     status: string;
     updated: string;
     useruid: string;
+    Price: number;
 }
 
 export interface TotalInventoryList extends BaseResponse {

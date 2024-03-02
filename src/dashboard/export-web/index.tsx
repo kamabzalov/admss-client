@@ -14,6 +14,7 @@ import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+import { setInventory } from "http/services/inventory-service";
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -63,8 +64,22 @@ export const ExportToWeb = () => {
     }, [lazyState, authUser, globalSearch]);
 
     interface TableColumnProps extends ColumnProps {
-        field: keyof ExportWebList | "media" | "Price";
+        field: keyof ExportWebList | "media";
     }
+
+    const handleEditedValueSet = (
+        key: "Enter" | unknown,
+        field: keyof ExportWebList,
+        value: string,
+        id: string
+    ) => {
+        if (key === "Enter") {
+            if (field === "Price") {
+                setInventory(id, { Price: Number(value) });
+            }
+            setInventory(id, { [field]: value });
+        }
+    };
 
     const cellEditor = (options: ColumnEditorOptions) => {
         return (
@@ -72,7 +87,15 @@ export const ExportToWeb = () => {
                 type='text'
                 className='h-full m-0 py-0 px-2 w-full'
                 value={options.value}
-                onChange={(e) => options.editorCallback!(e.target.value)}
+                onChange={(evt) => options.editorCallback!(evt.target.value)}
+                onKeyDown={(evt) =>
+                    handleEditedValueSet(
+                        evt.key,
+                        options.field as keyof ExportWebList,
+                        options.value,
+                        options.rowData.itemuid
+                    )
+                }
             />
         );
     };
@@ -90,7 +113,7 @@ export const ExportToWeb = () => {
         { field: "Price", header: "Price" },
     ];
 
-    const allowedEditableFields: Partial<keyof ExportWebList | "Price">[] = [
+    const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
         "Price",
