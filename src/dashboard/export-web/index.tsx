@@ -167,6 +167,7 @@ export const ExportToWeb = () => {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    className='overflow-x-hidden'
                                 >
                                     <Column
                                         bodyStyle={{ textAlign: "center" }}
