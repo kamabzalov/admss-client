@@ -11,7 +11,6 @@ import {
 } from "http/services/inventory-service";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { InputNumber } from "primereact/inputnumber";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 
 //TODO: add validation
@@ -161,11 +160,11 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber
-                        className='vehicle-general__number-input w-full'
+                    <InputText
+                        className='vehicle-general__text-input w-full'
                         required
                         value={inventory?.mileage}
-                        onChange={({ value }) =>
+                        onChange={({ target: { value } }) =>
                             value && changeInventory({ key: "mileage", value })
                         }
                     />
