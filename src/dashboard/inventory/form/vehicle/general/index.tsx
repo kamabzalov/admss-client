@@ -44,8 +44,6 @@ export const VehicleGeneral = observer((): ReactElement => {
         });
     }, []);
 
-    useEffect(() => {}, [inventoryAudit]);
-
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
             return (
