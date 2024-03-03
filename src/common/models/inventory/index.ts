@@ -196,12 +196,15 @@ export type InventoryOptionsInfo =
     | "Apple Car Play";
 
 export interface Inventory {
+    Age: number;
     BodyStyle: string;
     Category: string;
     Cylinders: string;
+    DealerCertified: number;
     DriveLine: string;
     Engine: string;
     ExteriorColor: string;
+    FactoryCertified: number;
     GroupClass: number;
     GroupClassName: string;
     InteriorColor: string;
@@ -209,6 +212,7 @@ export interface Inventory {
     Model: string;
     Notes: string;
     Options: number;
+    Price: number;
     Status: string;
     StockNo: string;
     Transmission: string;
@@ -217,17 +221,14 @@ export interface Inventory {
     VINimageUID: string;
     Year: string;
     created: string;
-    extdata?: InventoryExtData;
     itemuid: string;
-    mileage: number;
+    mileage: string;
     name: string;
+    options_codes?: unknown;
     options_info?: InventoryOptionsInfo[];
-    FactoryCertified: number;
-    DealerCertified: number;
-    status: string;
     updated: string;
     useruid: string;
-    Price: number;
+    extdata?: InventoryExtData;
 }
 
 export interface TotalInventoryList extends BaseResponse {
