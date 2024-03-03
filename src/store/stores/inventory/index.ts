@@ -177,6 +177,14 @@ export class InventoryStore {
         }
     };
 
+    public changeInventory = action(
+        ({ key, value }: { key: keyof Inventory; value: string | number }) => {
+            if (this._inventory && key !== "extdata" && key !== "options_info") {
+                (this._inventory as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
     public changeInventoryExtData = action(
         ({ key, value }: { key: keyof InventoryExtData; value: string | number }) => {
             const inventoryStore = this.rootStore.inventoryStore;

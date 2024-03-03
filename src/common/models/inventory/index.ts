@@ -197,7 +197,6 @@ export type InventoryOptionsInfo =
 
 export interface Inventory {
     Age: number;
-    Audit: Audit;
     BodyStyle: string;
     Category: string;
     Cylinders: string;
@@ -230,20 +229,6 @@ export interface Inventory {
     updated: string;
     useruid: string;
     extdata?: InventoryExtData;
-}
-
-interface Audit {
-    NeedsInspection: number;
-    NeedsOilChange: number;
-    Floorplanned: number;
-    KeysMissing: number;
-    TitleMissing: number;
-    NotPaid: number;
-    DataNeedsUpdate: number;
-    NeedsCleaning: number;
-    ReadyForSale: number;
-    Sold: number;
-    JustArrived: number;
 }
 
 export interface TotalInventoryList extends BaseResponse {
