@@ -12,13 +12,15 @@ import {
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
+import { Checkbox } from "primereact/checkbox";
+import { Audit } from "common/models/inventory";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory } = store;
+    const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -89,6 +91,13 @@ export const VehicleGeneral = observer((): ReactElement => {
             });
         }
     };
+
+    const renderedAuditKeys: (keyof Audit)[] = [
+        "DataNeedsUpdate",
+        "NeedsCleaning",
+        "ReadyForSale",
+        "JustArrived",
+    ];
 
     return (
         <div className='grid vehicle-general row-gap-2'>
@@ -198,6 +207,36 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className='w-full vehicle-general__dropdown'
                 />
             </div>
+
+            <div className='flex col-12'>
+                <h3 className='vehicle-general__title m-0 pr-3'>Audit</h3>
+                <hr className='vehicle-general__line flex-1' />
+            </div>
+
+            {Object.entries(inventoryAudit).map(([key, value]) => {
+                const typedKey = key as keyof Audit;
+
+                if (!renderedAuditKeys.includes(typedKey)) return null;
+
+                const inputLabel = typedKey.replace(/(?!^)([A-Z]|\d+)/g, " $1");
+
+                return (
+                    <div
+                        className='col-3 vehicle-options__checkbox flex align-items-center'
+                        key={key}
+                    >
+                        <Checkbox
+                            inputId={`audit-${key}`}
+                            name={`audit-${key}`}
+                            checked={!!value}
+                            onChange={() => changeInventoryAudit(typedKey)}
+                        />
+                        <label htmlFor={`audit-${key}`} className='ml-2'>
+                            {inputLabel}
+                        </label>
+                    </div>
+                );
+            })}
         </div>
     );
 });
