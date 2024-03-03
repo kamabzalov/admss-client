@@ -242,6 +242,7 @@ export class InventoryStore {
                 ...this.inventory,
                 extdata: this.inventoryExtData,
                 options_info: this.inventoryOptions,
+                Audit: this.inventoryAudit,
             };
             const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
             if (!this.exportWebActive) {
