@@ -1,4 +1,18 @@
+/* eslint-disable no-unused-vars */
 import { BaseResponse, Status } from "../base-response";
+
+export enum MediaType {
+    mtUnknown,
+    mtPhoto,
+    mtPhotoPreview,
+    mtVideo,
+    mtVideoPreview,
+    mtAudio,
+    mtPDFDocument,
+    mtJSONDocument,
+    mtBinaryData,
+    mtDocument,
+}
 
 export interface InventoryExtData {
     bgAsIs: number;
@@ -55,7 +69,7 @@ export interface InventoryExtData {
     fpReductionDate: number;
     fpReduxAmt: number;
     fpRemainBal: number;
-    inspDate: string;
+    inspDate: number;
     inspEmissions: number;
     inspNumber: string;
     inspSafety: number;
@@ -195,6 +209,20 @@ export type InventoryOptionsInfo =
     | "Android Auto"
     | "Apple Car Play";
 
+export interface Audit {
+    NeedsInspection: number;
+    NeedsOilChange: number;
+    Floorplanned: number;
+    KeysMissing: number;
+    TitleMissing: number;
+    NotPaid: number;
+    DataNeedsUpdate: number;
+    NeedsCleaning: number;
+    ReadyForSale: number;
+    Sold: number;
+    JustArrived: number;
+}
+
 export interface Inventory {
     Age: number;
     BodyStyle: string;
@@ -229,6 +257,7 @@ export interface Inventory {
     updated: string;
     useruid: string;
     extdata?: InventoryExtData;
+    Audit?: Audit;
 }
 
 export interface TotalInventoryList extends BaseResponse {
