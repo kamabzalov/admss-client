@@ -32,15 +32,10 @@ export const VehicleInspections = observer((): ReactElement => {
 
             <div className='col-3'>
                 <DateInput
-                    value={new Date(inspDate)}
-                    onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "inspDate",
-                                value: value.getTime(),
-                            });
-                        }
-                    }}
+                    date={inspDate}
+                    onChange={({ value }) =>
+                        value && changeInventoryExtData({ key: "inspDate", value: Number(value) })
+                    }
                     name='Date'
                 />
             </div>
@@ -61,15 +56,11 @@ export const VehicleInspections = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <DateInput
-                    value={new Date(inspStickerExp)}
-                    onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "inspStickerExp",
-                                value: value.getTime(),
-                            });
-                        }
-                    }}
+                    date={inspStickerExp}
+                    onChange={({ value }) =>
+                        value &&
+                        changeInventoryExtData({ key: "inspStickerExp", value: Number(value) })
+                    }
                     name='Sticker Exp. Date'
                 />
             </div>
