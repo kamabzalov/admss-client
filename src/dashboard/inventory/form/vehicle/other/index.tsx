@@ -7,20 +7,15 @@ import {
     ListData,
     getInventoryCategoryList,
     getInventoryGroupList,
-    getInventoryStatusList,
 } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 
 export const VehicleOther = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory } = store;
-    const [statusList, setStatusList] = useState<ListData[]>([]);
     const [groupClassList, setGroupClassList] = useState<ListData[]>([]);
     const [categoryList, setCategoryList] = useState<ListData[]>([]);
     useEffect(() => {
-        getInventoryStatusList().then((list) => {
-            list && setStatusList(list);
-        });
         getInventoryGroupList().then((list) => {
             list && setGroupClassList(list);
         });
@@ -30,19 +25,7 @@ export const VehicleOther = observer((): ReactElement => {
     }, []);
     return (
         <div className='grid vehicle-other row-gap-2'>
-            <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    options={statusList}
-                    value={inventory?.Status}
-                    onChange={({ value }) => changeInventory({ key: "Status", value })}
-                    placeholder='Status'
-                    className='w-full vehicle-other__dropdown'
-                />
-            </div>
-            <div className='col-3'>
+            <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
                     filter
@@ -54,7 +37,7 @@ export const VehicleOther = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     filter
                     options={groupClassList}
                     value={inventory?.GroupClass}
