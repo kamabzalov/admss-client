@@ -56,7 +56,6 @@ export const CurrencyInput = ({
     labelPosition = "left",
     ...props
 }: CurrencyInputProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div
             key={name}
@@ -67,13 +66,7 @@ export const CurrencyInput = ({
             </label>
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
-                <InputNumber
-                    {...props}
-                    minFractionDigits={2}
-                    locale='en-US'
-                    value={inputValue}
-                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
-                />
+                <InputNumber minFractionDigits={2} locale='en-US' value={value} {...props} />
             </div>
         </div>
     );
@@ -135,12 +128,10 @@ export const BorderedCheckbox = ({
 
 export const SearchInput = ({
     name,
-    value,
     height = "50px",
     title,
     ...props
 }: InputTextProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<string>(value || "");
     return (
         <div
             key={name}
@@ -150,11 +141,7 @@ export const SearchInput = ({
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <InputText
-                    {...props}
-                    value={inputValue}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-                />
+                <InputText {...props} />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
             <div className='search-input__icon input-icon input-icon-right'>
