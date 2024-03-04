@@ -44,14 +44,12 @@ export const PurchaseFloorplan = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     name='Reduction Date'
-                    value={new Date(fpReductionDate)}
+                    date={fpReductionDate}
                     onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "fpReductionDate",
-                                value: value.getTime(),
-                            });
-                        }
+                        changeInventoryExtData({
+                            key: "fpReductionDate",
+                            value: Number(value),
+                        });
                     }}
                 />
             </div>
@@ -73,14 +71,12 @@ export const PurchaseFloorplan = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     name='Pay Off By'
-                    value={new Date(fpPayoffBy)}
+                    date={fpPayoffBy}
                     onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "fpPayoffBy",
-                                value: value.getTime(),
-                            });
-                        }
+                        changeInventoryExtData({
+                            key: "fpPayoffBy",
+                            value: Number(value),
+                        });
                     }}
                 />
             </div>
