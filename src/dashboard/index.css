@@ -141,6 +141,16 @@
     border: none;
 }
 
+.p-float-label input.p-filled ~ label,
+.p-inputtext:enabled:focus + .float-label,
+.p-float-label .p-inputwrapper-filled ~ label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);

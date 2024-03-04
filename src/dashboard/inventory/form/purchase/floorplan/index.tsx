@@ -28,8 +28,11 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 <BorderedCheckbox
                     name='Floorplanned'
                     checked={!!fpIsFloorplanned}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "fpIsFloorplanned", value: !!value ? 0 : 1 })
+                    onChange={() =>
+                        changeInventoryExtData({
+                            key: "fpIsFloorplanned",
+                            value: !!fpIsFloorplanned ? 0 : 1,
+                        })
                     }
                 />
             </div>
@@ -37,8 +40,14 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 <SearchInput
                     name='Floor'
                     title='Floorplan Company'
-                    //TODO: Add search input API here
+                    //TODO:missed search company API
                     value={fpFloorplanCompany}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "fpFloorplanCompany",
+                            value,
+                        });
+                    }}
                 />
             </div>
             <div className='col-3'>
