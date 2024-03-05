@@ -17,6 +17,7 @@ import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
+import { useParams } from "react-router-dom";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -28,8 +29,16 @@ const limitations: MediaLimitations = {
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
-        store;
+    const { id } = useParams();
+    const {
+        getInventory,
+        saveInventoryImages,
+        uploadFileImages,
+        images,
+        isLoading,
+        removeImage,
+        fetchImages,
+    } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -39,10 +48,10 @@ export const ImagesMedia = observer((): ReactElement => {
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
         } else {
-            fetchImages();
+            id && getInventory(id).then(() => fetchImages());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchImages, images, checked]);
+    }, [fetchImages, checked, id]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = e.files;
@@ -266,14 +275,14 @@ export const ImagesMedia = observer((): ReactElement => {
                                 <div className='media-images__info image-info'>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
-                                            <i className='pi pi-th-large' />
+                                            <i className='icon adms-category' />
                                         </span>
                                         <span className='image-info__text--bold'>Exterior</span>
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
                                             <span className='image-info__icon'>
-                                                <i className='pi pi-comment' />
+                                                <i className='icon adms-comment' />
                                             </span>
                                         </span>
                                         <span className='image-info__text'>
@@ -282,7 +291,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
-                                            <i className='pi pi-calendar' />
+                                            <i className='icon adms-calendar' />
                                         </span>
                                         <span className='image-info__text'>
                                             10/11/2023 08:51:39
