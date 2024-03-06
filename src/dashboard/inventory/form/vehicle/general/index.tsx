@@ -1,10 +1,11 @@
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
@@ -23,6 +24,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
 
@@ -43,6 +45,21 @@ export const VehicleGeneral = observer((): ReactElement => {
             list && setInteriorList(list);
         });
     }, []);
+
+    const handleSelectMake = useCallback(() => {
+        const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
+        getAutoMakeModelList(makeSting).then((list) => {
+            if (list && Object.keys(list).length) {
+                setAutomakesModelList(list);
+            } else {
+                setAutomakesModelList([]);
+            }
+        });
+    }, [inventory.Make]);
+
+    useEffect(() => {
+        if (inventory.Make) handleSelectMake();
+    }, [handleSelectMake, inventory.Make]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -131,8 +148,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Make}
                     filter
                     required
-                    onChange={({ value }) => changeInventory({ key: "Make", value })}
                     options={[...automakesList, { name: inventory.Make }]}
+                    onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
@@ -147,7 +164,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Model}
                     filter
                     //TODO: add options
-                    options={[{ name: inventory?.Model }]}
+                    options={automakesModelList}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'

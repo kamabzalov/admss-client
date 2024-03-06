@@ -1,7 +1,7 @@
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
-import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
+import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { Calendar, CalendarProps } from "primereact/calendar";
@@ -74,12 +74,10 @@ export const CurrencyInput = ({
 
 export const PercentInput = ({
     name,
-    value,
     title,
     labelPosition = "left",
     ...props
 }: PercentInputProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div
             key={name}
@@ -92,14 +90,7 @@ export const PercentInput = ({
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>
-                <InputNumber
-                    {...props}
-                    inputId={name}
-                    minFractionDigits={2}
-                    name={name}
-                    value={inputValue}
-                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
-                />
+                <InputNumber inputId={name} minFractionDigits={2} name={name} {...props} />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
         </div>

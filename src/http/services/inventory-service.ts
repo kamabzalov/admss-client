@@ -40,7 +40,9 @@ export const getInventoryInfo = async (uid: string) => {
     }
 };
 
-export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T | undefined> => {
+export const fetchInventoryList = async <T>(
+    endpoint: EndpointType | string
+): Promise<T | undefined> => {
     try {
         const response: AxiosResponse<T> = await authorizedUserApiInstance.get(
             `inventory/list/constants/${endpoint}`
@@ -88,6 +90,8 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
     await fetchInventoryList<ListData[]>("status");
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
+export const getAutoMakeModelList = async (make: string): Promise<ListData[] | undefined> =>
+    await fetchInventoryList<ListData[]>(make);
 
 export const getInventoryDeleteReasonsList = async (
     useruid: string
@@ -289,6 +293,7 @@ export const getInventoryPrintForms = async (inventoryuid: string) => {
         // TODO: add error handler
     }
 };
+
 export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<any>(

@@ -6,6 +6,7 @@ import { Checkbox } from "primereact/checkbox";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InventoryExtData } from "common/models/inventory";
+import { STATES_LIST } from "common/constants/states";
 
 export const VehicleDisclosures = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -75,14 +76,13 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={damSalvageState}
                     filter
                     onChange={({ value }) =>
                         changeInventoryExtData({ key: "damSalvageState", value })
                     }
-                    //TODO: add options
-                    options={[{ name: damSalvageState }]}
+                    options={STATES_LIST}
                     placeholder='State'
                     className='w-full vehicle-disclosures__dropdown'
                 />
