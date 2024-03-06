@@ -319,3 +319,22 @@ export interface InventoryPrintForm {
     type: string;
     version: string;
 }
+
+export interface InventoryLocations {
+    created: string;
+    index: number;
+    locEmail1: string;
+    locEmail2: string;
+    locManager1: string;
+    locManager2: string;
+    locName: string;
+    locPhone1: string;
+    locPhone2: string;
+    locState: string;
+    locStreetAddress: string;
+    locWeb: string;
+    locZIP: string;
+    locationuid: string;
+    updated: string;
+    useruid: string;
+}

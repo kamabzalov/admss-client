@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { AxiosResponse } from "axios";
-import { BaseResponse } from "common/models/base-response";
+import { BaseResponse, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
@@ -13,6 +13,7 @@ import {
     InventoryWebInfo,
     InventoryExportWebHistory,
     InventoryPrintForm,
+    InventoryLocations,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -58,6 +59,11 @@ export type ListData = {
     id?: number;
     name: string;
 };
+
+export interface LocationsListData {
+    locations: InventoryLocations[];
+    status: Status;
+}
 
 export type MakesListData = ListData & { logo: string };
 export type OptionsListData = ListData & { name: InventoryOptionsInfo };
@@ -304,6 +310,19 @@ export const getInventoryPrintFormTemplate = async (inventoryuid: string, templa
         );
         if (request.status === 200) {
             return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryLocations = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<LocationsListData>(
+            `user/${useruid}/locations`
+        );
+        if (request.status === 200 && request.data.status === Status.OK) {
+            return request.data.locations;
         }
     } catch (error) {
         // TODO: add error handler
