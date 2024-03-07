@@ -105,6 +105,7 @@ export interface InventoryExtData {
     purPurchaseCity: string;
     purPurchaseDate: number;
     purPurchasePhone: string;
+    purPurchaseEmail: string;
     purPurchaseZipCode: string;
     purPurchasedFrom: string;
     purSoldByLot: number;
@@ -112,11 +113,15 @@ export interface InventoryExtData {
     titleHolderName: string;
     titleHolderPayoff: string;
     titleHolderPhone: string;
+    titleHolderZIP: string;
+    titleHolderState: string;
     titleIsTradeIn: number;
     titleNumber: string;
     titlePrevAddress: string;
     titlePrevName: string;
     titlePrevPhone: string;
+    titlePrevZIP: string;
+    titlePrevState: string;
     titleReceived: number;
     titleReceivedDate: number;
     titleState: string;
@@ -315,4 +320,23 @@ export interface InventoryPrintForm {
     state: string;
     type: string;
     version: string;
+}
+
+export interface InventoryLocations {
+    created: string;
+    index: number;
+    locEmail1: string;
+    locEmail2: string;
+    locManager1: string;
+    locManager2: string;
+    locName: string;
+    locPhone1: string;
+    locPhone2: string;
+    locState: string;
+    locStreetAddress: string;
+    locWeb: string;
+    locZIP: string;
+    locationuid: string;
+    updated: string;
+    useruid: string;
 }

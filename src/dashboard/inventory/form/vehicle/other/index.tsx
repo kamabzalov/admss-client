@@ -7,15 +7,25 @@ import {
     ListData,
     getInventoryCategoryList,
     getInventoryGroupList,
+    getInventoryLocations,
 } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { InventoryLocations } from "common/models/inventory";
 
 export const VehicleOther = observer((): ReactElement => {
+    const [user, setUser] = useState<AuthUser | null>(null);
     const store = useStore().inventoryStore;
     const { inventory, changeInventory } = store;
     const [groupClassList, setGroupClassList] = useState<ListData[]>([]);
     const [categoryList, setCategoryList] = useState<ListData[]>([]);
+    const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
+
     useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
         getInventoryGroupList().then((list) => {
             list && setGroupClassList(list);
         });
@@ -23,13 +33,23 @@ export const VehicleOther = observer((): ReactElement => {
             list && setCategoryList(list);
         });
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            getInventoryLocations(user.useruid).then((list) => {
+                list && setLocationList(list);
+            });
+        }
+    }, [user]);
+
     return (
         <div className='grid vehicle-other row-gap-2'>
             <div className='col-6'>
                 <Dropdown
-                    optionLabel='name'
+                    optionLabel='locName'
+                    optionValue='locationuid'
                     filter
-                    //TODO: add value, options, onChange
+                    options={locationList}
                     placeholder='Location name'
                     className='w-full vehicle-other__dropdown'
                 />
