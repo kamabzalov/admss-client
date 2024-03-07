@@ -16,15 +16,17 @@ export const PurchaseTitle = observer((): ReactElement => {
             titleHolderName,
             titleHolderPhone,
             titleHolderZIP,
+            titleHolderPayoff,
+            titleHolderState,
             titleIsTradeIn,
             titleNumber,
             titleState,
             titleStatus,
-            titleHolderPayoff,
             titlePrevAddress,
             titlePrevName,
             titlePrevPhone,
             titlePrevZIP,
+            titlePrevState,
             titleReceived,
             titleReceivedDate,
         },
@@ -176,6 +178,13 @@ export const PurchaseTitle = observer((): ReactElement => {
                     optionValue='id'
                     filter
                     className='w-full purchase-title__dropdown'
+                    value={titleHolderState}
+                    onChange={({ value }) => {
+                        changeInventoryExtData({
+                            key: "titleHolderState",
+                            value,
+                        });
+                    }}
                     options={STATES_LIST}
                 />
             </div>
@@ -235,6 +244,13 @@ export const PurchaseTitle = observer((): ReactElement => {
                     optionValue='id'
                     className='w-full purchase-title__dropdown'
                     options={STATES_LIST}
+                    value={titlePrevState}
+                    onChange={({ value }) => {
+                        changeInventoryExtData({
+                            key: "titlePrevState",
+                            value,
+                        });
+                    }}
                 />
             </div>
             <div className='col-3'>

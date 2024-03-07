@@ -87,7 +87,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             vendor: expenseVendor,
             comment: expenseNotes,
         };
-        setExpensesItem({ expenseuid: user?.useruid, expenseData }).then(() => getExpenses());
+        setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
     };
 
     return (

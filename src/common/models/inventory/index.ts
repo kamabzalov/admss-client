@@ -114,12 +114,14 @@ export interface InventoryExtData {
     titleHolderPayoff: string;
     titleHolderPhone: string;
     titleHolderZIP: string;
+    titleHolderState: string;
     titleIsTradeIn: number;
     titleNumber: string;
     titlePrevAddress: string;
     titlePrevName: string;
     titlePrevPhone: string;
     titlePrevZIP: string;
+    titlePrevState: string;
     titleReceived: number;
     titleReceivedDate: number;
     titleState: string;

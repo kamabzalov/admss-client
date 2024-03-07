@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput } from "dashboard/common/form/inputs";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -7,32 +7,60 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { useParams } from "react-router-dom";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { getAccountPaymentsList, setAccountPayment } from "http/services/accounts.service";
+import { AccountPayment } from "common/models/accounts";
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountPayment;
+}
+
+type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const store = useStore().inventoryStore;
+    const [user, setUser] = useState<AuthUser | null>(null);
     const {
         inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
         changeInventoryExtData,
         saveInventory,
         getInventoryPayments,
     } = store;
-    const { id } = useParams();
 
     useEffect(() => {
-        if (id) {
-            getInventoryPayments(id);
-        }
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-        { field: "Date", header: "Date" },
-        { field: "Type", header: "Type" },
-        { field: "Amount", header: "Amount" },
-        { field: "NotBillable", header: "Not Billable" },
-        { field: "Vendor", header: "Vendor" },
+    useEffect(() => {
+        if (user) {
+            getInventoryPayments(user.useruid);
+            getAccountPaymentsList(user.useruid);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    const renderColumnsData: TableColumnsList[] = [
+        { field: "ACCT_NUM", header: "Pack for this Vehicle" },
+        { field: "Status", header: "Default Expenses" },
+        { field: "Amount", header: "Paid" },
+        { field: "PTPDate", header: "Sales Tax Paid" },
     ];
+
+    const handleSavePayment = () => {
+        saveInventory();
+        setAccountPayment("0", {
+            payExpenses,
+            payPack,
+            payPaid,
+            paySalesTaxPaid,
+        });
+    };
+
     return (
         <>
             <div className='grid purchase-payments row-gap-2'>
@@ -94,7 +122,7 @@ export const PurchasePayments = observer((): ReactElement => {
                     />
                 </div>
 
-                <Button className='purchase-payments__button' onClick={saveInventory}>
+                <Button className='purchase-payments__button' onClick={handleSavePayment}>
                     Save
                 </Button>
             </div>
