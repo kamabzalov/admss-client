@@ -80,10 +80,11 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [getExpenses, user]);
 
     const handleExpenseSubmit = () => {
-        const expenseData: Partial<Expenses> = {
+        const expenseData: Partial<Expenses> & { inventoryuid: string } = {
+            inventoryuid: id ? id : "",
             operationdate: expenseDate,
             type: expenseType,
-            amount: expenseAmount,
+            amount: expenseAmount * 100,
             vendor: expenseVendor,
             comment: expenseNotes,
         };

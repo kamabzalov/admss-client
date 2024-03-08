@@ -12,6 +12,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { getAccountPaymentsList, setAccountPayment } from "http/services/accounts.service";
 import { AccountPayment } from "common/models/accounts";
+import { useParams } from "react-router-dom";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPayment;
@@ -20,12 +21,12 @@ interface TableColumnProps extends ColumnProps {
 type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 export const PurchasePayments = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().inventoryStore;
     const [user, setUser] = useState<AuthUser | null>(null);
     const {
         inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
         changeInventoryExtData,
-        saveInventory,
         getInventoryPayments,
     } = store;
 
@@ -52,12 +53,16 @@ export const PurchasePayments = observer((): ReactElement => {
     ];
 
     const handleSavePayment = () => {
-        saveInventory();
         setAccountPayment("0", {
+            inventoryuid: id,
             payExpenses,
-            payPack,
+            payPack: payPack * 100,
             payPaid,
             paySalesTaxPaid,
+        }).then(() => {
+            if (id) {
+                getAccountPaymentsList(id);
+            }
         });
     };
 
