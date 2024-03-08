@@ -38,7 +38,7 @@ export const getAccountPayment = async (itemuid: string): Promise<AccountPayment
 export const getAccountPaymentsList = async (itemuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<AccountPayment[]>(
-            `accounts/${itemuid}/listpayments`
+            `accounts/${itemuid}/payments`
         );
         if (request.status === 200) {
             return request.data;
