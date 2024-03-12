@@ -142,7 +142,7 @@ export const InventoryForm = observer(() => {
                 />
                 <div className='col-12'>
                     <div className='card inventory'>
-                        <div className='card-header'>
+                        <div className='card-header flex'>
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
@@ -159,7 +159,7 @@ export const InventoryForm = observer(() => {
                             </div>
                         </div>
                         <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap'>
+                            <div className='grid flex-nowrap inventory__card-content'>
                                 <div className='p-0 card-content__wrapper'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}

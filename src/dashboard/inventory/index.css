@@ -5,6 +5,10 @@
     margin-bottom: 45px;
 }
 
+.inventory__card-content {
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
 .inventory__accordion {
     border: none;
     width: 343px;
@@ -116,8 +120,6 @@
 .inventory-form {
     width: 100%;
     padding: 0 40px;
-    min-height: 705px;
-    border-right: 2px solid var(--admss-app-light-blue);
     border-left: 2px solid var(--admss-app-light-blue);
 }
 
