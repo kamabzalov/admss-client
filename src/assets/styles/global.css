@@ -77,12 +77,12 @@ body {
 
 @media screen and (min-width: 1400px) {
     .container {
-        width: 1260px;
+        width: 1250px;
     }
 }
 
 @media screen and (min-width: 1600px) {
     .container {
-        width: 1540px;
+        width: 1538px;
     }
 }
