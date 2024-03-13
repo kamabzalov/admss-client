@@ -56,6 +56,7 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
 };
 
 const columns: TableColumnsList[] = [
+    { field: "Make", header: "Make" },
     { field: "Model", header: "Model" },
     { field: "ExteriorColor", header: "Color" },
     { field: "mileage", header: "Miles" },
