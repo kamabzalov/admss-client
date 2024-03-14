@@ -93,10 +93,6 @@
     padding: 0;
 }
 
-.p-multiselect-panel .p-multiselect-header {
-    display: none;
-}
-
 .p-datatable-header .p-multiselect .p-multiselect-token {
     background: var(--admss-app-primary-main-green);
     color: var(--admss-app-white);
