@@ -138,7 +138,6 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: 25px 15px;
     padding-top: 50px;
     color: var(--admss-app-light-grey);
