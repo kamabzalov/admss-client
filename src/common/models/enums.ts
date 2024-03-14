@@ -12,3 +12,10 @@ export enum MediaType {
     mtBinaryData,
     mtDocument,
 }
+
+export enum ContentType {
+    ctGeneral,
+    ctInterior,
+    ctExterior,
+    ctDocument,
+}
