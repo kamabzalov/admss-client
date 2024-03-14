@@ -131,7 +131,8 @@ export class InventoryStore {
             if (response) {
                 const { extdata, options_info, Audit, ...inventory } = response;
                 this._inventoryID = response.itemuid;
-                this._inventory = inventory || ({} as Inventory);
+                this._inventory =
+                    { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
                 this._inventoryOptions = options_info || [];
 
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
