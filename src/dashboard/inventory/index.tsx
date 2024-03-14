@@ -51,9 +51,59 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
     }
 
     return Object.entries(filteredObj)
-        .map(([key, value], index) => `${index > 0 ? "+" : ""}${value}.${key}`)
+        .map(([key, value], index) => {
+            return `${index > 0 ? "+" : ""}${value}.${key}`;
+        })
         .join("");
 };
+
+interface FilterOptions {
+    label: string;
+    value: string;
+    column?: keyof Inventory;
+    bold?: boolean;
+    disabled?: boolean;
+}
+
+const filterOptions: FilterOptions[] = [
+    { label: "Status", value: "status", bold: true, disabled: true },
+    { label: "All", value: "all", column: "Status" },
+    { label: "Current (not sold)", column: "Status", value: "current" },
+    { label: "Sold", column: "Status", value: "sold" },
+    { label: "Age", value: "age", bold: true, disabled: true },
+    { label: "0 to 30 days", column: "Age", value: "0-30" },
+    { label: "31 to 60 days", column: "Age", value: "31-60" },
+    { label: "61 to 90 days", column: "Age", value: "61-90" },
+    { label: "90+ days", column: "Age", value: "over90" },
+    { label: "Body", value: "body", bold: true, disabled: true },
+    { label: "Trucks", column: "BodyStyle", value: "trucks" },
+    { label: "SUVs", column: "BodyStyle", value: "suv" },
+    { label: "Sedans", column: "BodyStyle", value: "sedans" },
+    { label: "Coupes", column: "BodyStyle", value: "coupes" },
+    { label: "Convertibles", column: "BodyStyle", value: "convertibles" },
+    { label: "Miles", value: "miles", bold: true, disabled: true },
+    { label: "0 to 30000", column: "mileage", value: "0-30000" },
+    { label: "30000 to 100000", column: "mileage", value: "30000-100000" },
+    { label: "over 100000", column: "mileage", value: "over100000" },
+    { label: "Audit", value: "audit", bold: true, disabled: true },
+    { label: "Data needs update", column: "Audit", value: "needsUpdatedata" },
+    { label: "Just arrived (today)", column: "Audit", value: "arrivedToday" },
+    { label: "Needs cleaning", column: "Audit", value: "needsCleaning" },
+    { label: "Ready for sale", column: "Audit", value: "readySale" },
+    { label: "Needs inspection", column: "Audit", value: "needsInspection" },
+    { label: "Needs oil changes", column: "Audit", value: "needsOil" },
+    { label: "Floorplanned", column: "Audit", value: "floorplanned" },
+    { label: "Keys missing", column: "Audit", value: "keysMissing" },
+    { label: "Title missing", column: "Audit", value: "titleMissing" },
+    { label: "Not paid", column: "Audit", value: "notPaid" },
+    // TODO: missed misc column
+    { label: "Misc", value: "misc", bold: true, disabled: true },
+    { label: "AWD", value: "awd" },
+    { label: "Manual Transmission", value: "manual" },
+    { label: "Diesel", value: "diesel" },
+    { label: "Fuel economy", value: "fuelEconomy" },
+    { label: "Electric", value: "electric" },
+];
 
 const columns: TableColumnsList[] = [
     { field: "Make", header: "Make" },
@@ -75,6 +125,10 @@ export default function Inventories(): ReactElement {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+    const [selectedFilter, setSelectedFilter] = useState<FilterOptions[]>([]);
+    const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
+        null
+    );
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
 
@@ -148,7 +202,7 @@ export default function Inventories(): ReactElement {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, authUser, globalSearch]);
 
-    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string) => {
+    const handleSetAdvancedSearch = (key: keyof Inventory, value: string) => {
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
@@ -163,7 +217,6 @@ export default function Inventories(): ReactElement {
     const handleAdvancedSearch = () => {
         const searchParams = createStringifySearchQuery(advancedSearch);
         handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
-
         setDialogVisible(false);
     };
 
@@ -212,19 +265,77 @@ export default function Inventories(): ReactElement {
         },
     ];
 
+    useEffect(() => {
+        if (selectedFilterOptions) {
+            let qry: string = "";
+            selectedFilterOptions.forEach((option, index) => {
+                const { column, value } = option;
+                if (value.includes("-")) {
+                    const [wordFrom, wordTo] = value.split("-");
+                    return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
+                }
+                qry += `${index > 0 ? "+" : ""}${value}.${column}`;
+            });
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...{
+                    qry,
+                },
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            handleGetInventoryList(params);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedFilterOptions]);
+
     const header = (
         <div className='grid datatable-controls'>
-            <div className='col-3'>
+            <div className='col-2'>
+                <MultiSelect
+                    optionValue='value'
+                    optionLabel='label'
+                    options={filterOptions}
+                    value={selectedFilter}
+                    onChange={({ value }: MultiSelectChangeEvent) => {
+                        const selectedOptions = filterOptions.filter((option) =>
+                            value.includes(option.value)
+                        );
+                        setSelectedFilterOptions(selectedOptions);
+                        setSelectedFilter(value);
+                    }}
+                    placeholder='Filter'
+                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                    display='chip'
+                    selectedItemsLabel='Clear Filter'
+                    pt={{
+                        header: {
+                            className: "inventory-filter__header",
+                        },
+                        wrapper: {
+                            className: "inventory-filter__wrapper",
+                        },
+                    }}
+                />
+            </div>
+            <div className='col-2'>
                 <MultiSelect
                     value={activeColumns}
                     options={columns}
                     optionLabel='header'
                     onChange={onColumnToggle}
-                    className='w-full pb-0 h-full flex align-items-center'
+                    showSelectAll={false}
+                    className='w-full pb-0 h-full flex align-items-center column-picker'
                     display='chip'
+                    pt={{
+                        header: {
+                            className: "column-picker__header",
+                        },
+                    }}
                 />
             </div>
-            <div className='col-3'>
+            <div className='col-2'>
                 <div className='contact-top-controls'>
                     <Button
                         className='contact-top-controls__button m-r-20px'
