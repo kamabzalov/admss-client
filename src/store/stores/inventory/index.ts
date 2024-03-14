@@ -1,5 +1,6 @@
 import { AccountPayment } from "common/models/accounts";
 import { Status } from "common/models/base-response";
+import { MediaType } from "common/models/enums";
 import {
     Inventory,
     InventoryOptionsInfo,
@@ -9,28 +10,41 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     Audit,
+    InventoryMediaPostData,
+    InventoryMedia,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
     getInventoryInfo,
-    getInventoryMediaItemList,
     setInventory,
-    createMediaItemRecord,
-    uploadInventoryMedia,
-    pairMediaWithInventoryItem,
-    getInventoryMediaItem,
-    deleteMediaImage,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
 } from "http/services/inventory-service";
+import {
+    getInventoryMediaItemList,
+    createMediaItemRecord,
+    uploadInventoryMedia,
+    setMediaItemData,
+    getInventoryMediaItem,
+    deleteMediaImage,
+} from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
-interface ImageItem {
+export interface ImageItem {
     src: string;
     itemuid: string;
+    mediauid?: string;
+    info?: Partial<InventoryMedia> & {
+        order?: number;
+    };
+}
+
+interface UploadImageItem {
+    file: File[];
+    data: Partial<InventoryMediaPostData>;
 }
 
 export class InventoryStore {
@@ -47,7 +61,7 @@ export class InventoryStore {
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileImages: File[] = [];
+    private _uploadFileImages: UploadImageItem = {} as UploadImageItem;
     private _images: ImageItem[] = [];
 
     private _inventoryVideoID: string[] = [];
@@ -117,7 +131,8 @@ export class InventoryStore {
             if (response) {
                 const { extdata, options_info, Audit, ...inventory } = response;
                 this._inventoryID = response.itemuid;
-                this._inventory = inventory || ({} as Inventory);
+                this._inventory =
+                    { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
                 this._inventoryOptions = options_info || [];
 
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
@@ -134,19 +149,24 @@ export class InventoryStore {
         try {
             const response = await getInventoryMediaItemList(this._inventoryID);
             if (response && response.length > 0) {
-                response.forEach(({ contenttype, mediauid, itemuid }) => {
+                response.forEach(({ type, mediauid, itemuid, ...info }) => {
                     if (mediauid) {
-                        switch (contenttype) {
-                            case 0:
+                        switch (type) {
+                            case MediaType.mtPhoto:
                                 this._inventoryImagesID.push({ itemuid, mediauid });
+                                this._images.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
                                 break;
-                            case 1:
+                            case MediaType.mtVideo:
                                 this._inventoryVideoID.push(mediauid);
                                 break;
-                            case 2:
+                            case MediaType.mtAudio:
                                 this._inventoryAudioID.push(mediauid);
                                 break;
-                            case 3:
+                            case MediaType.mtDocument:
                                 this._inventoryDocumentsID.push(mediauid);
                                 break;
                             default:
@@ -279,6 +299,7 @@ export class InventoryStore {
                 return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
             }
             const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
+
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
                 response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
             );
@@ -294,7 +315,7 @@ export class InventoryStore {
         try {
             this._isLoading = true;
             this._images = [];
-            const uploadPromises = this._uploadFileImages.map(async (file) => {
+            const uploadPromises = this._uploadFileImages.file.map(async (file) => {
                 const formData = new FormData();
                 formData.append("file", file);
 
@@ -306,10 +327,11 @@ export class InventoryStore {
                             formData
                         );
                         if (uploadMediaResponse?.status === Status.OK) {
-                            await pairMediaWithInventoryItem(
-                                this._inventoryID,
-                                uploadMediaResponse.itemuid
-                            );
+                            await setMediaItemData(this._inventoryID, {
+                                mediaitemuid: uploadMediaResponse.itemuid,
+                                contenttype: this._uploadFileImages.data.contenttype,
+                                notes: this._uploadFileImages.data.notes,
+                            });
                         }
                     }
                 } catch (error) {
@@ -318,7 +340,7 @@ export class InventoryStore {
             });
 
             await Promise.all(uploadPromises);
-            this._uploadFileImages = [];
+            this._uploadFileImages = {} as UploadImageItem;
             this.fetchImages();
 
             return Status.OK;
@@ -330,20 +352,42 @@ export class InventoryStore {
         }
     });
 
+    public changeInventoryMediaOrder = action(
+        (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]) => {
+            list.forEach(async ({ itemuid, order }) => {
+                const currentMedia = this._images.find((image) => image.itemuid === itemuid);
+                if (currentMedia?.mediauid && currentMedia?.info) {
+                    await setMediaItemData(this._inventoryID, {
+                        mediaitemuid: currentMedia?.mediauid,
+                        ...currentMedia.info,
+                        itemuid,
+                        order,
+                    });
+                }
+            });
+        }
+    );
+
     public fetchImages = action(async () => {
         try {
             this._isLoading = true;
             this._inventoryImagesID = [];
             await this.getInventoryMedia();
 
-            const result: ImageItem[] = [];
+            const result: ImageItem[] = [...this._images];
 
             await Promise.all(
-                this._inventoryImagesID.map(async ({ mediauid, itemuid }) => {
+                this._inventoryImagesID.map(async ({ mediauid, itemuid }, index: number) => {
                     if (mediauid && itemuid) {
-                        const response = await getInventoryMediaItem(mediauid);
-                        if (response) {
-                            result.push({ itemuid, src: response });
+                        const responseSrc = await getInventoryMediaItem(mediauid);
+
+                        if (responseSrc) {
+                            result[index] = {
+                                info: result[index].info,
+                                itemuid,
+                                mediauid,
+                                src: responseSrc,
+                            };
                         }
                     }
                 })
@@ -376,6 +420,7 @@ export class InventoryStore {
             this._isLoading = true;
             try {
                 await deleteMediaImage(imageuid);
+                this._images = [];
                 await this.fetchImages();
             } catch (error) {
                 // TODO: add error handler
@@ -390,7 +435,7 @@ export class InventoryStore {
         }
     });
 
-    public set uploadFileImages(files: File[]) {
+    public set uploadFileImages(files: UploadImageItem) {
         this._uploadFileImages = files;
     }
 
@@ -399,6 +444,7 @@ export class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
+        this._images = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
