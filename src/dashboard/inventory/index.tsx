@@ -96,6 +96,13 @@ const filterOptions: FilterOptions[] = [
     { label: "Keys missing", column: "Audit", value: "keysMissing" },
     { label: "Title missing", column: "Audit", value: "titleMissing" },
     { label: "Not paid", column: "Audit", value: "notPaid" },
+    // TODO: missed misc column
+    { label: "Misc", value: "misc", bold: true, disabled: true },
+    { label: "AWD", value: "awd" },
+    { label: "Manual Transmission", value: "manual" },
+    { label: "Diesel", value: "diesel" },
+    { label: "Fuel economy", value: "fuelEconomy" },
+    { label: "Electric", value: "electric" },
 ];
 
 const columns: TableColumnsList[] = [
