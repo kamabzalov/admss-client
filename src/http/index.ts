@@ -21,11 +21,29 @@ export const nonAuthorizedUserApiInstance = axios.create({
     baseURL: API_URL,
 });
 
-export function createApiDashboardInstance() {
+const handleErrorResponse = (error: any, navigate: any) => {
+    if (error.response && error.response.status === 401) {
+        localStorage.removeItem("useruid");
+        navigate("/");
+        return Promise.reject(error.response);
+    }
+};
+
+export function createApiDashboardInstance(navigate: any) {
     authorizedUserApiInstance = axios.create({
         baseURL: API_URL,
         headers: {
             common: { Authorization: `Bearer ${getToken()}` },
         },
     });
+    authorizedUserApiInstance.interceptors.response.use(
+        (response) => {
+            if (response.status === 200) {
+                return response;
+            } else {
+                return Promise.reject({ messages: response.statusText });
+            }
+        },
+        (error) => handleErrorResponse(error, navigate)
+    );
 }

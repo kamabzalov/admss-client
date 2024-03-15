@@ -5,7 +5,7 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "http/services/auth.service";
-import { createApiDashboardInstance } from "../http";
+import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 export default function Dashboard() {
@@ -14,7 +14,7 @@ export default function Dashboard() {
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
-            createApiDashboardInstance();
+            createApiDashboardInstance(navigate);
             setUser(authUser);
         } else {
             navigate("/");
