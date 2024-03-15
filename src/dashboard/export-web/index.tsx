@@ -15,6 +15,127 @@ import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { setInventory } from "http/services/inventory-service";
+import { Inventory } from "common/models/inventory";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof Inventory | MissedInventoryColumn;
+}
+
+type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
+
+type MissedInventoryColumn =
+    | "Location"
+    | "IsFloorplanned"
+    | "FloorplanCompany"
+    | "PurchasedFrom"
+    | "PurchaseAuctCo"
+    | "PurchaseBuyerName"
+    | "PurchaseDate"
+    | "PurchaseAmount"
+    | "LotNo"
+    | "SoldByLot"
+    | "KeysMissing"
+    | "KeysDuplicate"
+    | "KeysHasRemote"
+    | "KeyNumber"
+    | "Consignor"
+    | "Consign"
+    | "IsTradeIn"
+    | "TitleStatus"
+    | "TitleState"
+    | "TitleNumber"
+    | "TitleReceived"
+    | "TitleReceivedDate"
+    | "Paid"
+    | "SalesTaxPaid"
+    | "ODOMInExcess"
+    | "ODOMNotActual"
+    | "DAM_Salvage"
+    | "DAM_Salvage_State"
+    | "DAM_Flood"
+    | "DAM_25"
+    | "DAM_25_Parts"
+    | "DAM_Theft"
+    | "DAM_Theft_Parts"
+    | "DAM_Reconstructed"
+    | "Autocheck_Checked"
+    | "CHK_Oil"
+    | "CHK_Inspected"
+    | "INSP_Number"
+    | "INSP_Date"
+    | "INSP_Emissions"
+    | "INSP_Sticker_Exp"
+    | "In Stock Date"
+    | "City MPG"
+    | "Hwy MPG";
+
+const columns: TableColumnsList[] = [
+    { field: "VIN", header: "VIN", checked: true },
+    { field: "StockNo", header: "Stock#", checked: true },
+    { field: "Category", header: "Category", checked: false },
+    { field: "Year", header: "Year", checked: true },
+    { field: "Make", header: "Make", checked: true },
+    { field: "Model", header: "Model", checked: true },
+    { field: "mileage", header: "Mileage", checked: true },
+    { field: "Price", header: "Price", checked: true },
+    { field: "ExteriorColor", header: "Color", checked: false },
+    { field: "InteriorColor", header: "Interior Color", checked: false },
+    { field: "BodyStyle", header: "Body", checked: false },
+    { field: "Transmission", header: "Transmission", checked: false },
+    { field: "TypeOfFuel", header: "Fuel Type", checked: false },
+    { field: "DriveLine", header: "Drive Line", checked: false },
+    { field: "Cylinders", header: "Number of Cylinders", checked: false },
+    { field: "Engine", header: "Engine Descriptions", checked: false },
+    { field: "Status", header: "Status", checked: false },
+    { field: "GroupClass", header: "Group Class", checked: false },
+    { field: "Location", header: "Location", checked: false },
+    { field: "IsFloorplanned", header: "Floorplan Status", checked: false },
+    { field: "FloorplanCompany", header: "Floorplan Company", checked: false },
+    { field: "PurchasedFrom", header: "Purchased From", checked: false },
+    { field: "PurchaseAuctCo", header: "Purchase Auction Company", checked: false },
+    { field: "PurchaseBuyerName", header: "Purchase Buyer Name", checked: false },
+    { field: "PurchaseDate", header: "Purchase Date", checked: false },
+    { field: "PurchaseAmount", header: "Purchase Amount", checked: false },
+    { field: "LotNo", header: "Lot Number", checked: false },
+    { field: "SoldByLot", header: "Sold By Lot", checked: false },
+    { field: "KeysMissing", header: "Keys Missing", checked: false },
+    { field: "KeysDuplicate", header: "Duplicate Keys", checked: false },
+    { field: "KeysHasRemote", header: "Keys with Remote", checked: false },
+    { field: "KeyNumber", header: "Key Number", checked: false },
+    { field: "Consignor", header: "Consignor", checked: false },
+    { field: "Consign", header: "Consign Date", checked: false },
+    { field: "IsTradeIn", header: "Trade-In Status", checked: false },
+    { field: "TitleStatus", header: "Title Status", checked: false },
+    { field: "TitleState", header: "Title State", checked: false },
+    { field: "TitleNumber", header: "Title Number", checked: false },
+    { field: "TitleReceived", header: "Title Received", checked: false },
+    { field: "TitleReceivedDate", header: "Title Received Date", checked: false },
+    { field: "Paid", header: "Paid", checked: false },
+    { field: "SalesTaxPaid", header: "Sales Tax Paid", checked: false },
+    { field: "ODOMInExcess", header: "Odometer in Excess", checked: false },
+    { field: "ODOMNotActual", header: "Odometer Not Actual", checked: false },
+    { field: "DAM_Salvage", header: "Salvage Status", checked: false },
+    { field: "DAM_Salvage_State", header: "Salvage State", checked: false },
+    { field: "DAM_Flood", header: "Flood Status", checked: false },
+    { field: "DAM_25", header: "Damage Percentage", checked: false },
+    { field: "DAM_25_Parts", header: "Damaged Parts", checked: false },
+    { field: "DAM_Theft", header: "Theft Status", checked: false },
+    { field: "DAM_Theft_Parts", header: "Theft Parts", checked: false },
+    { field: "DAM_Reconstructed", header: "Reconstruction Status", checked: false },
+    { field: "Autocheck_Checked", header: "Autocheck Status", checked: false },
+    { field: "CHK_Oil", header: "Oil Check", checked: false },
+    { field: "CHK_Inspected", header: "State Inspection", checked: false },
+    { field: "FactoryCertified", header: "Factory Certified", checked: false },
+    { field: "DealerCertified", header: "Dealer Certified", checked: false },
+    { field: "INSP_Number", header: "Inspection Number", checked: false },
+    { field: "INSP_Date", header: "Inspection Date", checked: false },
+    { field: "INSP_Emissions", header: "Emissions Check", checked: false },
+    { field: "INSP_Sticker_Exp", header: "Sticker Expiration Date", checked: false },
+    { field: "In Stock Date", header: "In Stock Date", checked: false },
+    { field: "City MPG", header: "City MPG", checked: false },
+    { field: "Hwy MPG", header: "Highway MPG", checked: false },
+];
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -22,6 +143,7 @@ export const ExportToWeb = () => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
 
     const navigate = useNavigate();
 
@@ -63,9 +185,11 @@ export const ExportToWeb = () => {
         }
     }, [lazyState, authUser, globalSearch]);
 
-    interface TableColumnProps extends ColumnProps {
-        field: keyof ExportWebList | "media";
-    }
+    const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
+        const column: TableColumnsList = selectedOption;
+        column.checked = !column.checked;
+        setActiveColumns(value.filter((item: TableColumnsList) => item.checked));
+    };
 
     const handleEditedValueSet = (
         key: "Enter" | unknown,
@@ -100,19 +224,6 @@ export const ExportToWeb = () => {
         );
     };
 
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "Make", header: "Make" },
-        { field: "Model", header: "Model" },
-        { field: "Year", header: "Year" },
-        { field: "StockNo", header: "StockNo" },
-        { field: "media", header: "Media" },
-        { field: "Status", header: "Status" },
-        { field: "ExteriorColor", header: "Color" },
-        { field: "mileage", header: "Mileage" },
-        { field: "lastexportdate", header: "Last Export Date" },
-        { field: "Price", header: "Price" },
-    ];
-
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
@@ -128,7 +239,23 @@ export const ExportToWeb = () => {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-6'>
+                            <div className='col-2'>
+                                <MultiSelect
+                                    options={columns}
+                                    value={activeColumns.filter((column) => column.checked)}
+                                    optionLabel='header'
+                                    onChange={onColumnToggle}
+                                    showSelectAll={false}
+                                    className='w-full pb-0 h-full flex align-items-center column-picker'
+                                    display='chip'
+                                    pt={{
+                                        header: {
+                                            className: "column-picker__header",
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button m-r-20px px-6 uppercase'
@@ -189,7 +316,7 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {renderColumnsData.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
