@@ -93,7 +93,8 @@
     padding: 0;
 }
 
-.p-datatable-header .p-multiselect .p-multiselect-token {
+.p-datatable-header .p-multiselect .p-multiselect-token,
+.card-content .p-multiselect .p-multiselect-token {
     background: var(--admss-app-primary-main-green);
     color: var(--admss-app-white);
 }
