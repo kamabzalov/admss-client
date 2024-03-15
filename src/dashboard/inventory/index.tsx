@@ -60,7 +60,7 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
 interface FilterOptions {
     label: string;
     value: string;
-    column?: keyof Inventory;
+    column?: keyof Inventory | "Misc";
     bold?: boolean;
     disabled?: boolean;
 }
@@ -97,12 +97,12 @@ const filterOptions: FilterOptions[] = [
     { label: "Title missing", column: "Audit", value: "titleMissing" },
     { label: "Not paid", column: "Audit", value: "notPaid" },
     // TODO: missed misc column
-    { label: "Misc", value: "misc", bold: true, disabled: true },
-    { label: "AWD", value: "awd" },
-    { label: "Manual Transmission", value: "manual" },
-    { label: "Diesel", value: "diesel" },
-    { label: "Fuel economy", value: "fuelEconomy" },
-    { label: "Electric", value: "electric" },
+    { label: "Misc", column: "Misc", value: "misc", bold: true, disabled: true },
+    { label: "AWD", column: "Misc", value: "awd" },
+    { label: "Manual Transmission", column: "Misc", value: "manual" },
+    { label: "Diesel", column: "Misc", value: "diesel" },
+    { label: "Fuel economy", column: "Misc", value: "fuelEconomy" },
+    { label: "Electric", column: "Misc", value: "electric" },
 ];
 
 const columns: TableColumnsList[] = [
