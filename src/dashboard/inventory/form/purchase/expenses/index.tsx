@@ -11,6 +11,7 @@ import { ListData } from "http/services/inventory-service";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
 import {
+    deleteExpensesItem,
     getExpensesList,
     getExpensesListTypes,
     getExpensesListVendors,
@@ -89,6 +90,19 @@ export const PurchaseExpenses = observer((): ReactElement => {
             comment: expenseNotes,
         };
         setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
+    };
+
+    const deleteTemplate = ({ itemuid }: Expenses) => {
+        return (
+            <Button
+                type='button'
+                icon='icon adms-trash-can'
+                className='purchase-expenses__delete-button p-button-text'
+                onClick={() => {
+                    deleteExpensesItem(itemuid).then(() => getExpenses());
+                }}
+            />
+        );
     };
 
     return (
@@ -170,15 +184,34 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        pt={{
+                            wrapper: {
+                                className: "overflow-x-hidden",
+                            },
+                        }}
                     >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            body={() => {
+                                return (
+                                    <div className='flex gap-3 align-items-center'>
+                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
+                                        <i className='pi pi-angle-down' />
+                                    </div>
+                                );
+                            }}
+                        />
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
                                 key={field}
                                 headerClassName='cursor-move'
+                                className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                pt={{}}
                             />
                         ))}
+                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
                     </DataTable>
                 </div>
                 <div className='col-12 total-sum'>
