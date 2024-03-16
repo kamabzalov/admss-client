@@ -76,3 +76,16 @@ export const setExpensesItem = async ({ expenseuid, expenseData }: ExpensesData)
         // TODO: add error handler
     }
 };
+
+export const deleteExpensesItem = async (expenseuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<ExpensesSetResponse>(
+            `inventory/${expenseuid}/deleteexpense`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
