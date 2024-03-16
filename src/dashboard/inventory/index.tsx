@@ -232,7 +232,9 @@ export default function Inventories(): ReactElement {
         null
     );
 
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
+        columns.filter((column) => column.checked)
+    );
 
     const navigate = useNavigate();
 
@@ -422,7 +424,7 @@ export default function Inventories(): ReactElement {
             <div className='col-2'>
                 <MultiSelect
                     options={columns}
-                    value={activeColumns.filter((column) => column.checked)}
+                    value={activeColumns}
                     optionLabel='header'
                     onChange={onColumnToggle}
                     showSelectAll={false}
@@ -504,6 +506,11 @@ export default function Inventories(): ReactElement {
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
+                                    pt={{
+                                        wrapper: {
+                                            className: "overflow-x-hidden w-full",
+                                        },
+                                    }}
                                 >
                                     {activeColumns.map(({ field, header }) => (
                                         <Column
