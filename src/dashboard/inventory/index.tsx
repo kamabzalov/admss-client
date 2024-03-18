@@ -491,6 +491,8 @@ export default function Inventories(): ReactElement {
                                     value={inventories}
                                     lazy
                                     paginator
+                                    scrollable
+                                    scrollHeight='70vh'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={ROWS_PER_PAGE}

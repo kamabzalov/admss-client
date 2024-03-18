@@ -148,6 +148,49 @@
     font-size: 12px;
 }
 
+.p-datatable-wrapper::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-thumb {
+    border: 0.2em solid var(--admss-app-light-blue);
+    border-radius: 0.6em;
+    width: 6px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button {
+    background: var(--admss-app-light-blue);
+    display: block;
+    border-style: solid;
+    height: 8px;
+    width: 8px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:decrement {
+    border-width: 0 7px 7px 7px;
+    border-color: transparent transparent var(--admss-app-primary) transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:increment {
+    border-width: 7px 7px 0 7px;
+    border-color: var(--admss-app-primary) transparent transparent transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    border-width: 7px 7px 7px 0;
+    border-color: transparent var(--admss-app-primary) transparent transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:increment {
+    border-width: 7px 0 7px 7px;
+    border-color: transparent transparent transparent var(--admss-app-primary);
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-track {
+    background: var(--admss-app-light-blue);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
