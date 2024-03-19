@@ -4,7 +4,7 @@ import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ContactItem, ContactSection } from "../common";
+import { ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { GeneralInfoData } from "./general-info";

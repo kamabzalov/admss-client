@@ -1,9 +1,5 @@
-import {
-    BorderedCheckbox,
-    CurrencyInput,
-    DateInput,
-    SearchInput,
-} from "dashboard/common/form/inputs";
+import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
@@ -37,17 +33,18 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6'>
-                <SearchInput
-                    name='Floor'
-                    title='Floorplan Company'
-                    //TODO:missed search company API
+                <CompanySearch
+                    name='Floorplan Company'
                     value={fpFloorplanCompany}
-                    onChange={({ target: { value } }) => {
+                    onChange={({ value }) =>
+                        changeInventoryExtData({ key: "fpFloorplanCompany", value })
+                    }
+                    onRowClick={(companyName) =>
                         changeInventoryExtData({
                             key: "fpFloorplanCompany",
-                            value,
-                        });
-                    }}
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>

@@ -1,6 +1,7 @@
 import { STATES_LIST } from "common/constants/states";
 import { TITLE_STATUS_LIST } from "common/constants/title-status";
-import { DateInput, SearchInput } from "dashboard/common/form/inputs";
+import { DateInput } from "dashboard/common/form/inputs";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
@@ -126,11 +127,20 @@ export const PurchaseTitle = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <SearchInput
-                    title='Holder Name'
+                <CompanySearch
+                    name='Holder Name'
                     value={titleHolderName}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "titleHolderName", value })
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "titleHolderName",
+                            value,
+                        });
+                    }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "titleHolderName",
+                            value: companyName,
+                        })
                     }
                 />
             </div>
@@ -204,11 +214,20 @@ export const PurchaseTitle = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <SearchInput
-                    title='Previous Name'
+                <CompanySearch
+                    name='Previous Name'
                     value={titlePrevName}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "titlePrevName", value })
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "titlePrevName",
+                            value,
+                        });
+                    }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "titlePrevName",
+                            value: companyName,
+                        })
                     }
                 />
             </div>
