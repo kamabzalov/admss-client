@@ -1,4 +1,4 @@
-import { CurrencyInput, DateInput, SearchInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -7,6 +7,7 @@ import "./index.css";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 
 export const PurchaseConsign = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -29,6 +30,7 @@ export const PurchaseConsign = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+
     return (
         <div className='grid purchase-consign row-gap-2'>
             <div className='col-3 flex align-items-center'>
@@ -51,8 +53,8 @@ export const PurchaseConsign = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-6'>
-                <SearchInput
-                    name='Floor'
+                <CompanySearch
+                    name='Consignor'
                     value={csName}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -60,7 +62,12 @@ export const PurchaseConsign = observer((): ReactElement => {
                             value,
                         });
                     }}
-                    title='Consignor'
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "csName",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>

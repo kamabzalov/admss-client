@@ -26,7 +26,11 @@ import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
 
-export default function Contacts() {
+interface ContactsDataTableProps {
+    onRowClick?: (companyName: string) => void;
+}
+
+export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -99,6 +103,98 @@ export default function Contacts() {
         { field: "created", header: "Created" },
     ];
 
+    const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
+        if (onRowClick) {
+            onRowClick(companyName);
+        } else {
+            navigate(contactuid);
+        }
+    };
+
+    return (
+        <div className='card-content'>
+            <div className='grid datatable-controls'>
+                <div className='col-6'>
+                    <div className='contact-top-controls'>
+                        <Dropdown
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.value)}
+                            options={categories}
+                            optionLabel='name'
+                            editable
+                            className='m-r-20px'
+                            placeholder='Select Category'
+                        />
+                        <Button
+                            className='contact-top-controls__button m-r-20px'
+                            icon='pi pi-plus-circle'
+                            severity='success'
+                            type='button'
+                            onClick={() => navigate("create")}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='pi pi-print'
+                            onClick={printTableData}
+                        />
+                    </div>
+                </div>
+                <div className='col-6 text-right'>
+                    <Button
+                        className='contact-top-controls__button m-r-20px'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                    />
+                    <span className='p-input-icon-right'>
+                        <i className='pi pi-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                    </span>
+                </div>
+            </div>
+            <div className='grid'>
+                <div className='col-12'>
+                    <DataTable
+                        showGridlines
+                        value={contacts}
+                        lazy
+                        scrollable
+                        scrollHeight='70vh'
+                        paginator
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        rowsPerPageOptions={ROWS_PER_PAGE}
+                        totalRecords={totalRecords}
+                        onPage={pageChanged}
+                        onSort={sortData}
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
+                        resizableColumns
+                        reorderableColumns
+                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                        onRowClick={handleOnRowClick}
+                    >
+                        {renderColumnsData.map(({ field, header }) => (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                headerClassName='cursor-move'
+                            />
+                        ))}
+                    </DataTable>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function Contacts() {
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -106,85 +202,7 @@ export default function Contacts() {
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Contacts</h2>
                     </div>
-                    <div className='card-content'>
-                        <div className='grid datatable-controls'>
-                            <div className='col-6'>
-                                <div className='contact-top-controls'>
-                                    <Dropdown
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.value)}
-                                        options={categories}
-                                        optionLabel='name'
-                                        editable
-                                        className='m-r-20px'
-                                        placeholder='Select Category'
-                                    />
-                                    <Button
-                                        className='contact-top-controls__button m-r-20px'
-                                        icon='pi pi-plus-circle'
-                                        severity='success'
-                                        type='button'
-                                        onClick={() => navigate("create")}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
-                                    />
-                                </div>
-                            </div>
-                            <div className='col-6 text-right'>
-                                <Button
-                                    className='contact-top-controls__button m-r-20px'
-                                    label='Advanced search'
-                                    severity='success'
-                                    type='button'
-                                />
-                                <span className='p-input-icon-right'>
-                                    <i className='pi pi-search' />
-                                    <InputText
-                                        value={globalSearch}
-                                        onChange={(e) => setGlobalSearch(e.target.value)}
-                                    />
-                                </span>
-                            </div>
-                        </div>
-                        <div className='grid'>
-                            <div className='col-12'>
-                                <DataTable
-                                    showGridlines
-                                    value={contacts}
-                                    lazy
-                                    paginator
-                                    first={lazyState.first}
-                                    rows={lazyState.rows}
-                                    rowsPerPageOptions={ROWS_PER_PAGE}
-                                    totalRecords={totalRecords}
-                                    onPage={pageChanged}
-                                    onSort={sortData}
-                                    sortOrder={lazyState.sortOrder}
-                                    sortField={lazyState.sortField}
-                                    resizableColumns
-                                    reorderableColumns
-                                    rowClassName={() => "hover:text-primary cursor-pointer"}
-                                    onRowClick={({
-                                        data: { contactuid },
-                                    }: DataTableRowClickEvent) => navigate(contactuid)}
-                                >
-                                    {renderColumnsData.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                        />
-                                    ))}
-                                </DataTable>
-                            </div>
-                        </div>
-                    </div>
+                    <ContactsDataTable />
                 </div>
             </div>
         </div>

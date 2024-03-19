@@ -1,10 +1,10 @@
-import { ReactElement, useEffect, useState } from "react";
+import { LegacyRef, ReactElement, useEffect, useRef, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
-import { InputText, InputTextProps } from "primereact/inputtext";
 import { Calendar, CalendarProps } from "primereact/calendar";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -117,27 +117,60 @@ export const BorderedCheckbox = ({
     );
 };
 
+interface SearchInputProps extends DropdownProps {
+    onInputChange?: (value: string) => void;
+    onIconClick?: () => void;
+}
+
 export const SearchInput = ({
-    name,
     height = "50px",
     title,
+    onInputChange,
+    onIconClick,
     ...props
-}: InputTextProps): ReactElement => {
+}: SearchInputProps): ReactElement => {
+    const dropdownRef: LegacyRef<any> = useRef(null);
+
+    const handleOnInputChange = ({ target }: any) => {
+        const { value } = target as DropdownProps;
+        if (onInputChange && value) {
+            dropdownRef.current.show();
+            onInputChange(value);
+        } else {
+            dropdownRef.current.hide();
+        }
+    };
+
     return (
         <div
-            key={name}
+            key={props.name}
             style={{
                 height,
             }}
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <InputText {...props} />
+                <Dropdown
+                    ref={dropdownRef}
+                    onInput={handleOnInputChange}
+                    optionLabel='name'
+                    editable
+                    placeholder={title}
+                    {...props}
+                    pt={{
+                        trigger: {
+                            className: "hidden",
+                        },
+                    }}
+                />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
-            <div className='search-input__icon input-icon input-icon-right'>
-                <i className='adms-search' />
-            </div>
+            <button
+                className='search-input__icon input-icon input-icon-right'
+                onClick={onIconClick}
+            >
+                <i className='icon adms-table' />
+            </button>
         </div>
     );
 };

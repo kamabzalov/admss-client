@@ -3,7 +3,6 @@ import {
     CurrencyInput,
     DateInput,
     PercentInput,
-    SearchInput,
 } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
@@ -12,6 +11,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -40,8 +40,8 @@ export const PurchasePurchases = observer((): ReactElement => {
     return (
         <div className='grid purchase-purchases row-gap-2'>
             <div className='col-6'>
-                <SearchInput
-                    title='Purchased From (required)'
+                <CompanySearch
+                    name='Purchased From (required)'
                     value={purPurchasedFrom}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -49,6 +49,12 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value,
                         });
                     }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "purPurchasedFrom",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>
@@ -131,8 +137,8 @@ export const PurchasePurchases = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <SearchInput
-                    title='Auction Company'
+                <CompanySearch
+                    name='Auction Company'
                     value={purPurchaseAuctCo}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -140,11 +146,17 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value,
                         });
                     }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "purPurchaseAuctCo",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-6'>
-                <SearchInput
-                    title='Buyer Name'
+                <CompanySearch
+                    name='Buyer Name'
                     value={purPurchaseBuyerName}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -152,6 +164,12 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value,
                         });
                     }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "purPurchaseBuyerName",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>
