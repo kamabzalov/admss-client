@@ -23,3 +23,7 @@
     text-transform: uppercase;
     font-weight: 700;
 }
+
+.p-inputnumber .p-inputtext.p-inputnumber-input {
+    width: 100%;
+}

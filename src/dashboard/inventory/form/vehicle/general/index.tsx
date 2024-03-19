@@ -125,7 +125,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.VIN}
+                        value={inventory?.VIN || ""}
                         onChange={handleVINchange}
                     />
                     <label className='float-label'>VIN (required)</label>
@@ -136,7 +136,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.StockNo}
+                        value={inventory?.StockNo || ""}
                         onChange={({ target: { value } }) =>
                             changeInventory({ key: "StockNo", value })
                         }
@@ -208,7 +208,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={[...colorList, { name: inventory?.ExteriorColor }]}
+                    options={colorList}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -222,7 +222,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={[...interiorList, { name: inventory?.InteriorColor }]}
+                    options={interiorList}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
                 />
