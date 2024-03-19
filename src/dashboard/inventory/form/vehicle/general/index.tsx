@@ -148,7 +148,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Make}
                     filter
                     required
-                    options={[...automakesList, { name: inventory.Make }]}
+                    options={automakesList}
                     onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
