@@ -60,7 +60,7 @@ export const CompanySearch = ({ name, value, onRowClick, onChange }: CompanySear
                 }}
             />
             <Dialog
-                header={<div className='uppercase'>Inventory</div>}
+                header={<div className='uppercase'>Choose a Contact</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw" }}
                 maximizable
