@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
@@ -49,6 +49,7 @@ export const InventoryForm = observer(() => {
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
+    const stepsRef = useRef<HTMLDivElement>(null);
     const store = useStore().inventoryStore;
     const {
         getInventory,
@@ -71,6 +72,18 @@ export const InventoryForm = observer(() => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (stepsRef.current) {
+            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
+            if (activeStep) {
+                activeStep.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+            }
+        }
+    }, [stepActiveIndex, stepsRef.current]);
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
@@ -118,7 +131,6 @@ export const InventoryForm = observer(() => {
 
     const handleSave = () => {
         saveInventory().then((res) => {
-            //TODO: add actions after saving
             if (res && !id) {
                 navigate(`/dashboard/inventory`);
             }
@@ -160,7 +172,7 @@ export const InventoryForm = observer(() => {
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content'>
-                                <div className='p-0 card-content__wrapper'>
+                                <div className='p-0 card-content__wrapper' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
