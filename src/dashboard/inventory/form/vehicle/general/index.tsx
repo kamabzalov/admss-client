@@ -15,6 +15,7 @@ import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
 import { Audit } from "common/models/inventory";
+import { InputNumber } from "primereact/inputnumber";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
@@ -22,6 +23,8 @@ const VIN_VALID_LENGTH = 17;
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
+    const year = parseInt(inventory.Year, 10);
+    const mileage = parseInt(inventory.mileage, 10);
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -122,7 +125,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.VIN}
+                        value={inventory?.VIN || ""}
                         onChange={handleVINchange}
                     />
                     <label className='float-label'>VIN (required)</label>
@@ -133,7 +136,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.StockNo}
+                        value={inventory?.StockNo || ""}
                         onChange={({ target: { value } }) =>
                             changeInventory({ key: "StockNo", value })
                         }
@@ -163,7 +166,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionValue='name'
                     value={inventory?.Model}
                     filter
-                    //TODO: add options
                     options={automakesModelList}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
@@ -172,12 +174,13 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText
+                    <InputNumber
                         className='vehicle-general__text-input w-full'
                         required
-                        value={inventory?.Year}
-                        onChange={({ target: { value } }) =>
-                            changeInventory({ key: "Year", value })
+                        value={year || 0}
+                        useGrouping={false}
+                        onChange={({ value }) =>
+                            changeInventory({ key: "Year", value: String(value) })
                         }
                     />
                     <label className='float-label'>Year (required)</label>
@@ -186,12 +189,12 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText
+                    <InputNumber
                         className='vehicle-general__text-input w-full'
                         required
-                        value={inventory?.mileage}
-                        onChange={({ target: { value } }) =>
-                            value && changeInventory({ key: "mileage", value })
+                        value={mileage || 0}
+                        onChange={({ value }) =>
+                            value && changeInventory({ key: "mileage", value: String(value) })
                         }
                     />
                     <label className='float-label'>Mileage (required)</label>
@@ -205,7 +208,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={[...colorList, { name: inventory?.ExteriorColor }]}
+                    options={colorList}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -219,7 +222,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={[...interiorList, { name: inventory?.InteriorColor }]}
+                    options={interiorList}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
                 />
