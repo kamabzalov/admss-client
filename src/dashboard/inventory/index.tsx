@@ -508,11 +508,6 @@ export default function Inventories(): ReactElement {
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
-                                    pt={{
-                                        wrapper: {
-                                            className: "overflow-x-hidden w-full",
-                                        },
-                                    }}
                                 >
                                     {activeColumns.map(({ field, header }) => (
                                         <Column
