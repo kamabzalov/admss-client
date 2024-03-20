@@ -23,6 +23,7 @@ import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -246,10 +247,12 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
+        authUser && setUserSettings(authUser?.useruid, { page: event });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
+        authUser && setUserSettings(authUser?.useruid, { sort: event });
     };
 
     useEffect(() => {
@@ -259,6 +262,10 @@ export default function Inventories(): ReactElement {
             getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
             });
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response) {
+                }
+            });
         }
     }, []);
 
@@ -266,6 +273,7 @@ export default function Inventories(): ReactElement {
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
         setActiveColumns(value.filter((item: TableColumnsList) => item.checked));
+        authUser && setUserSettings(authUser.useruid, { activeColumns });
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
@@ -403,6 +411,10 @@ export default function Inventories(): ReactElement {
                         );
                         setSelectedFilterOptions(selectedOptions);
                         setSelectedFilter(value);
+                        authUser &&
+                            setUserSettings(authUser.useruid, {
+                                selectedFilterOptions: selectedOptions,
+                            });
                     }}
                     placeholder='Filter'
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
@@ -508,6 +520,27 @@ export default function Inventories(): ReactElement {
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
+                                    onColReorder={(event) => {
+                                        if (authUser && Array.isArray(event.columns)) {
+                                            const orderArray = event.columns?.map(
+                                                (column: any) => column.props.field
+                                            );
+                                            setUserSettings(authUser.useruid, {
+                                                columnOrder: orderArray,
+                                            });
+                                        }
+                                    }}
+                                    onColumnResizeEnd={(event) => {
+                                        if (authUser && event) {
+                                            const columnWidth = {
+                                                [event.column.props.field as string]:
+                                                    event.element.offsetWidth,
+                                            };
+                                            setUserSettings(authUser.useruid, {
+                                                columnWidth,
+                                            });
+                                        }
+                                    }}
                                 >
                                     {activeColumns.map(({ field, header }) => (
                                         <Column

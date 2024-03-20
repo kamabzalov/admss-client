@@ -14,3 +14,21 @@ export const getExtendedData = async (uid: string) => {
         // TODO: add error handler
     }
 };
+
+export const getUserSettings = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(`user/${uid}/profile`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setUserSettings = async (uid: string, settings: any) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(`user/${uid}/profile`, settings);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
