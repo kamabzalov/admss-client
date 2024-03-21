@@ -165,7 +165,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Model}
-                    filter
+                    filter={!!automakesModelList.length}
+                    editable={!automakesModelList.length}
                     options={automakesModelList}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
