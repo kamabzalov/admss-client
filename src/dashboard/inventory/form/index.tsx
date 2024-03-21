@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
-import { InventoryItem, InventorySection } from "../common";
+import { InventoryItem, InventorySection } from "../common/step-navigation";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";

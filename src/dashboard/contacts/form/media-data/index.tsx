@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common";
+import { Inventory } from "dashboard/inventory/common/step-navigation";
 import { lazy } from "react";
 
 const ContactsDocuments = lazy(() =>
