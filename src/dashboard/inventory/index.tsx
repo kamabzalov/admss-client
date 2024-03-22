@@ -232,6 +232,7 @@ export default function Inventories(): ReactElement {
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
+    const [serverSettings, setServerSettings] = useState<Record<string, any>>();
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
         columns.filter((column) => column.checked)
@@ -247,12 +248,12 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
-        authUser && setUserSettings(authUser?.useruid, { page: event });
+        authUser && changeSettings({ page: event });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
-        authUser && setUserSettings(authUser?.useruid, { sort: event });
+        authUser && changeSettings({ sort: event });
     };
 
     useEffect(() => {
@@ -262,19 +263,36 @@ export default function Inventories(): ReactElement {
             getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
             });
+        }
+    }, []);
+
+    useEffect(() => {
+        if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
-                if (response) {
+                if (response?.profile.length) {
+                    const settings = JSON.parse(response.profile);
+                    setServerSettings(settings);
+                    settings?.activeColumns && setActiveColumns(settings.activeColumns);
                 }
             });
         }
-    }, []);
+    }, [authUser]);
+
+    const changeSettings = (settings: any) => {
+        if (authUser) {
+            const newSettings = { ...serverSettings, ...settings };
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
 
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
         const newColumns = value.filter((item: TableColumnsList) => item.checked);
         setActiveColumns(newColumns);
-        authUser && setUserSettings(authUser.useruid, { activeColumns: newColumns });
+
+        changeSettings({ activeColumns: newColumns });
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
@@ -412,10 +430,10 @@ export default function Inventories(): ReactElement {
                         );
                         setSelectedFilterOptions(selectedOptions);
                         setSelectedFilter(value);
-                        authUser &&
-                            setUserSettings(authUser.useruid, {
-                                selectedFilterOptions: selectedOptions,
-                            });
+
+                        setServerSettings({
+                            selectedFilterOptions: selectedOptions,
+                        });
                     }}
                     placeholder='Filter'
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
@@ -526,32 +544,47 @@ export default function Inventories(): ReactElement {
                                             const orderArray = event.columns?.map(
                                                 (column: any) => column.props.field
                                             );
-                                            setUserSettings(authUser.useruid, {
+                                            changeSettings({
                                                 columnOrder: orderArray,
                                             });
                                         }
                                     }}
                                     onColumnResizeEnd={(event) => {
                                         if (authUser && event) {
-                                            const columnWidth = {
+                                            const newColumnWidth = {
                                                 [event.column.props.field as string]:
                                                     event.element.offsetWidth,
                                             };
-                                            setUserSettings(authUser.useruid, {
-                                                columnWidth,
+                                            changeSettings({
+                                                columnWidth: {
+                                                    ...serverSettings?.columnWidth,
+                                                    ...newColumnWidth,
+                                                },
                                             });
                                         }
                                     }}
                                 >
-                                    {activeColumns.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                        />
-                                    ))}
+                                    {activeColumns.map(({ field, header }) => {
+                                        return (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                headerClassName='cursor-move'
+                                                pt={{
+                                                    root: {
+                                                        style: {
+                                                            overflowX: "hidden",
+                                                            width: serverSettings?.columnWidth?.[
+                                                                field
+                                                            ],
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        );
+                                    })}
                                 </DataTable>
                             </div>
                         </div>
