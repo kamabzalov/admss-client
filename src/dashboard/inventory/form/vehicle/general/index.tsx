@@ -24,7 +24,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
     const year = parseInt(inventory.Year, 10);
-    const mileage = parseInt(inventory.mileage, 10);
+    const mileage = (inventory?.mileage && parseFloat(inventory.mileage.replace(/,/g, "."))) || 0;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -193,9 +193,14 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputNumber
                         className='vehicle-general__text-input w-full'
                         required
-                        value={mileage || 0}
+                        value={mileage}
+                        minFractionDigits={2}
                         onChange={({ value }) =>
-                            value && changeInventory({ key: "mileage", value: String(value) })
+                            value &&
+                            changeInventory({
+                                key: "mileage",
+                                value: String(value).replace(".", ","),
+                            })
                         }
                     />
                     <label className='float-label'>Mileage (required)</label>
