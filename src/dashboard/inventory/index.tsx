@@ -152,15 +152,15 @@ type MissedInventoryColumn =
     | "Hwy MPG";
 
 const columns: TableColumnsList[] = [
-    { field: "VIN", header: "VIN", checked: true },
     { field: "StockNo", header: "Stock#", checked: true },
-    { field: "Category", header: "Category", checked: false },
-    { field: "Year", header: "Year", checked: true },
     { field: "Make", header: "Make", checked: true },
     { field: "Model", header: "Model", checked: true },
+    { field: "Year", header: "Year", checked: true },
+    { field: "ExteriorColor", header: "Color", checked: true },
     { field: "mileage", header: "Mileage", checked: true },
     { field: "Price", header: "Price", checked: true },
-    { field: "ExteriorColor", header: "Color", checked: false },
+    { field: "VIN", header: "VIN", checked: true },
+    { field: "Category", header: "Category", checked: false },
     { field: "InteriorColor", header: "Interior Color", checked: false },
     { field: "BodyStyle", header: "Body", checked: false },
     { field: "Transmission", header: "Transmission", checked: false },
