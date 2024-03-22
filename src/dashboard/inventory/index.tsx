@@ -481,7 +481,6 @@ export default function Inventories(): ReactElement {
                     fields={searchFields}
                 />
             </div>
-            {serverSettings && <pre>{JSON.stringify(serverSettings, null, 2)}</pre>}
         </div>
     );
 }
