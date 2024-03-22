@@ -26,7 +26,9 @@ export const getUserSettings = async (uid: string) => {
 
 export const setUserSettings = async (uid: string, settings: any) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`user/${uid}/profile`, settings);
+        const request = await authorizedUserApiInstance.post<any>(`user/${uid}/profile`, {
+            profile: settings,
+        });
         return request.data;
     } catch (error) {
         // TODO: add error handler

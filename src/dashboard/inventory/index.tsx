@@ -272,8 +272,9 @@ export default function Inventories(): ReactElement {
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
-        setActiveColumns(value.filter((item: TableColumnsList) => item.checked));
-        authUser && setUserSettings(authUser.useruid, { activeColumns });
+        const newColumns = value.filter((item: TableColumnsList) => item.checked);
+        setActiveColumns(newColumns);
+        authUser && setUserSettings(authUser.useruid, { activeColumns: newColumns });
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
