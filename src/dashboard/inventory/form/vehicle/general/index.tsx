@@ -194,6 +194,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className='vehicle-general__text-input w-full'
                         required
                         value={mileage || 0}
+                        minFractionDigits={2}
                         onChange={({ value }) =>
                             value && changeInventory({ key: "mileage", value: String(value) })
                         }
