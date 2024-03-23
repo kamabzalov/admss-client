@@ -83,7 +83,6 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
-        // eslint-disable-next-line no-console
         changeSettings({ table: event });
     };
 
