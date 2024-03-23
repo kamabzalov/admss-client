@@ -20,4 +20,5 @@ export interface InventoryUserSettings {
     activeColumns?: ActiveColumn[];
     columnWidth?: ColumnWidth;
     selectedFilterOptions?: SelectedFilterOption[];
+    table?: DataTableState;
 }
