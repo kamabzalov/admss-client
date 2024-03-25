@@ -1,19 +1,25 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
     ItemTemplateOptions,
     FileUploadHeaderTemplateOptions,
+    FileUploadSelectEvent,
 } from "primereact/fileupload";
+
+import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
+import { useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -27,16 +33,104 @@ const limitations: MediaLimitations = {
 };
 
 export const VideoMedia = observer((): ReactElement => {
+    const store = useStore().inventoryStore;
+    const { id } = useParams();
+    const {
+        getInventory,
+        saveInventoryVideos,
+        uploadFileVideos,
+        videos,
+        isLoading,
+        removeMedia,
+        fetchVideos,
+        clearInventory,
+    } = store;
     const [checked, setChecked] = useState<boolean>(true);
+    const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+
+    useEffect(() => {
+        id && getInventory(id).then(() => fetchVideos());
+        if (videos.length) {
+            setVideoChecked(new Array(videos.length).fill(checked));
+        }
+        return () => {
+            clearInventory();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchVideos, checked, id]);
+
+    const handleCategorySelect = (e: DropdownChangeEvent) => {
+        store.uploadFileVideos = {
+            ...store.uploadFileVideos,
+            data: {
+                ...store.uploadFileVideos.data,
+                contenttype: e.target.value,
+            },
+        };
+    };
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileVideos = {
+            ...store.uploadFileVideos,
+            data: {
+                ...store.uploadFileVideos.data,
+                notes: e.target.value,
+            },
+        };
+    };
+
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {
+        store.uploadFileVideos = {
+            ...store.uploadFileVideos,
+            file: e.files,
+        };
+        setTotalCount(e.files.length);
+    };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
         setTotalCount(e.files.length);
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
+        const newFiles = {
+            file: uploadFileVideos.file.filter((item) => item.name !== file.name),
+            data: uploadFileVideos.data,
+        };
+        store.uploadFileVideos = newFiles;
+        setTotalCount(newFiles.file.length);
         callback();
+    };
+
+    const handleUploadFiles = () => {
+        saveInventoryVideos().then((res) => {
+            if (res) {
+                fileUploadRef.current?.clear();
+            }
+        });
+    };
+
+    const handleCheckedChange = (index?: number) => {
+        const updatedVideoChecked = [...videoChecked];
+
+        if (index === undefined && !checked) {
+            setChecked(true);
+            const allChecked = updatedVideoChecked.map(() => true);
+            setVideoChecked(allChecked);
+        } else if (index === undefined && checked) {
+            setChecked(false);
+            const allUnchecked = updatedVideoChecked.map(() => false);
+            setVideoChecked(allUnchecked);
+        } else if (index !== undefined) {
+            const updatedCheckboxState = [...updatedVideoChecked];
+            updatedCheckboxState[index] = !updatedCheckboxState[index];
+            setVideoChecked(updatedCheckboxState);
+        }
+    };
+
+    const handleDeleteImage = (mediauid: string) => {
+        removeMedia(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -162,17 +256,32 @@ export const VideoMedia = observer((): ReactElement => {
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
+                onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown className='media-input__dropdown' placeholder='Category' />
-                <InputText className='media-input__text' placeholder='Comment' />
+                <Dropdown
+                    className='media-input__dropdown'
+                    placeholder='Category'
+                    optionLabel={"name"}
+                    optionValue={"id"}
+                    options={CATEGORIES}
+                    value={uploadFileVideos?.data?.contenttype || 0}
+                    onChange={handleCategorySelect}
+                />
+                <InputText
+                    className='media-input__text'
+                    placeholder='Comment'
+                    value={uploadFileVideos?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
+                />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount}
+                    disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
+                    onClick={handleUploadFiles}
                 >
                     Save
                 </Button>
@@ -192,7 +301,66 @@ export const VideoMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-videos'>
-                <div className='w-full text-center'>No video files added yet.</div>
+                {videos.length ? (
+                    videos.map(({ itemuid, src }, index: number) => {
+                        return (
+                            <div key={itemuid} className='media-images__item'>
+                                {checked && (
+                                    <Checkbox
+                                        checked={videoChecked[index]}
+                                        onChange={() => handleCheckedChange(index)}
+                                        className='media-uploaded__checkbox'
+                                    />
+                                )}
+                                <Image
+                                    src={src}
+                                    alt='inventory-item'
+                                    width='75'
+                                    height='75'
+                                    pt={{
+                                        image: {
+                                            className: "media-images__image",
+                                        },
+                                    }}
+                                />
+                                <div className='media-images__info image-info'>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-th-large' />
+                                        </span>
+                                        <span className='image-info__text--bold'>Exterior</span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <span className='image-info__icon'>
+                                                <i className='pi pi-comment' />
+                                            </span>
+                                        </span>
+                                        <span className='image-info__text'>
+                                            Renewed colour and new tires
+                                        </span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-calendar' />
+                                        </span>
+                                        <span className='image-info__text'>
+                                            10/11/2023 08:51:39
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    className='media-images__close'
+                                    onClick={() => handleDeleteImage(itemuid)}
+                                >
+                                    <i className='pi pi-times' />
+                                </button>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className='w-full text-center'>No video files added yet.</div>
+                )}
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import { BaseResponse } from "common/models/base-response";
+import { MediaType } from "common/models/enums";
 import {
     InventoryMedia,
     CreateMediaItemRecordResponse,
@@ -57,11 +58,11 @@ export const getInventoryMediaInfo = async (mediauid: string) => {
     }
 };
 
-export const createMediaItemRecord = async () => {
+export const createMediaItemRecord = async (mediatype: MediaType) => {
     try {
         const response = await authorizedUserApiInstance.post<CreateMediaItemRecordResponse>(
             "media/0/meta",
-            { mediaType: 1 }
+            { mediatype }
         );
 
         if (response.status === 200) {
@@ -93,8 +94,9 @@ export const setMediaItemData = async (
     { mediaitemuid, notes, itemuid, order, contenttype, useruid }: Partial<InventoryMediaPostData>
 ) => {
     try {
+        const id = inventoryUid ? inventoryUid : 0;
         const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `inventory/${inventoryUid}/media`,
+            `inventory/${id}/media`,
             {
                 mediaitemuid,
                 useruid,

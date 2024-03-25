@@ -64,6 +64,11 @@ export class InventorySection implements Inventory {
         );
     }
 
+    public clearCount() {
+        InventorySection.itemIndex = 0;
+        InventorySection.instancesCount = 0;
+    }
+
     public getLength(): number {
         return this.items.length;
     }

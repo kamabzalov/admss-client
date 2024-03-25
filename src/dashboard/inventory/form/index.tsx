@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
-import { InventoryItem, InventorySection } from "../common";
+import { Inventory, InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,17 +24,6 @@ import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 
-export const inventorySections = [
-    InventoryVehicleData,
-    InventoryPurchaseData,
-    InventoryMediaData,
-    InventoryExportWebData,
-].map((sectionData) => new InventorySection(sectionData));
-
-const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
-const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
-const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
-const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 const STEP = "step";
 
 export const InventoryForm = observer(() => {
@@ -62,6 +51,11 @@ export const InventoryForm = observer(() => {
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+    const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
+    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
+    const [itemsMenuCount, setItemsMenuCount] = useState(0);
+    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -91,18 +85,30 @@ export const InventoryForm = observer(() => {
     };
 
     useEffect(() => {
-        if (id) {
-            getInventory(id);
-        } else {
-            clearInventory();
-        }
+        const inventorySections: Pick<Inventory, "label" | "items">[] = [
+            InventoryVehicleData,
+            InventoryPurchaseData,
+            InventoryExportWebData,
+        ];
+        id && inventorySections.splice(2, 0, InventoryMediaData);
+        const sections = inventorySections.map((sectionData) => new InventorySection(sectionData));
+        setInventorySections(sections);
+        setAccordionSteps(sections.map((item) => item.startIndex));
+        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        setItemsMenuCount(itemsMenuCount);
+        setPrintActiveIndex(itemsMenuCount + 1);
+        setDeleteActiveIndex(itemsMenuCount + 2);
+
+        id && getInventory(id);
+
         return () => {
+            sections.forEach((section) => section.clearCount());
             clearInventory();
         };
     }, [id, store]);
 
     useEffect(() => {
-        ACCORDION_STEPS.forEach((step, index) => {
+        accordionSteps.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
                 return setAccordionActiveIndex((prev) => {
                     const updatedArray = Array.isArray(prev) ? [...prev] : [0];
@@ -112,21 +118,21 @@ export const InventoryForm = observer(() => {
             }
         });
         if (
-            stepActiveIndex >= ACCORDION_STEPS[ACCORDION_STEPS.length - 1] &&
+            stepActiveIndex >= accordionSteps[accordionSteps.length - 1] &&
             !isInventoryWebExported
         ) {
             if (id) {
                 getInventoryExportWeb(id);
                 getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
-                stepActiveIndex === PRINT_ACTIVE_INDEX && getPrintList(id);
+                stepActiveIndex === printActiveIndex && getPrintList(id);
             }
         }
     }, [stepActiveIndex]);
 
     const handleActivePrintForms = () => {
-        navigate(getUrl(PRINT_ACTIVE_INDEX));
-        setStepActiveIndex(PRINT_ACTIVE_INDEX);
+        navigate(getUrl(printActiveIndex));
+        setStepActiveIndex(printActiveIndex);
     };
 
     const handleSave = () => {
@@ -221,7 +227,7 @@ export const InventoryForm = observer(() => {
                                         <Button
                                             icon='icon adms-print'
                                             className={`p-button gap-2 inventory__print-nav ${
-                                                stepActiveIndex === PRINT_ACTIVE_INDEX &&
+                                                stepActiveIndex === printActiveIndex &&
                                                 "inventory__print-nav--active"
                                             } w-full`}
                                             onClick={handleActivePrintForms}
@@ -234,7 +240,7 @@ export const InventoryForm = observer(() => {
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
-                                            onClick={() => setStepActiveIndex(DELETE_ACTIVE_INDEX)}
+                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
                                         >
                                             Delete inventory
                                         </Button>
@@ -272,7 +278,7 @@ export const InventoryForm = observer(() => {
                                             ))
                                         )}
 
-                                        {stepActiveIndex === PRINT_ACTIVE_INDEX && (
+                                        {stepActiveIndex === printActiveIndex && (
                                             <div className='inventory-form'>
                                                 <div className='inventory-form__title uppercase'>
                                                     Print history
@@ -280,7 +286,7 @@ export const InventoryForm = observer(() => {
                                                 <PrintForms />
                                             </div>
                                         )}
-                                        {stepActiveIndex === DELETE_ACTIVE_INDEX && (
+                                        {stepActiveIndex === deleteActiveIndex && (
                                             <div className='inventory-form'>
                                                 <div className='inventory-form__title inventory-form__title--danger uppercase'>
                                                     Delete inventory
@@ -353,9 +359,9 @@ export const InventoryForm = observer(() => {
                                             return newStep;
                                         })
                                     }
-                                    disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
+                                    disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex === DELETE_ACTIVE_INDEX
+                                        stepActiveIndex === deleteActiveIndex
                                             ? "secondary"
                                             : "success"
                                     }
@@ -364,7 +370,7 @@ export const InventoryForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                {stepActiveIndex === DELETE_ACTIVE_INDEX ? (
+                                {stepActiveIndex === deleteActiveIndex ? (
                                     <Button
                                         onClick={() => setConfirmActive(true)}
                                         className='p-button uppercase px-6 inventory__button inventory__button--danger'
