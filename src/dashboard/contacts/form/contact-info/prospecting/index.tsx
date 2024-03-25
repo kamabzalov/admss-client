@@ -13,7 +13,7 @@ import { getKeyValue } from "services/local-storage.service";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const { contact } = store;
+    const { contactExtData, changeContactExtData } = store;
     const [salesperson, setSalesperson] = useState<string>("");
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
 
@@ -70,7 +70,8 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-12'>
                 <InputTextarea
                     placeholder='Prospecting Notes'
-                    value={contact?.extdata?.Notes}
+                    value={contactExtData?.Notes}
+                    onChange={({ target: { value } }) => changeContactExtData("Notes", value)}
                     className='w-full contacts-prospecting__text-area'
                 />
             </div>

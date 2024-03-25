@@ -4,7 +4,7 @@ import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ContactItem, ContactSection } from "../common/step-navigation";
+import { ContactItem, ContactSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { GeneralInfoData } from "./general-info";
@@ -29,7 +29,7 @@ export const ContactForm = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact } = store;
+    const { getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
         if (id) {
@@ -184,7 +184,7 @@ export const ContactForm = () => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='uppercase px-6'>
                                     Save
                                 </Button>
                             </div>
