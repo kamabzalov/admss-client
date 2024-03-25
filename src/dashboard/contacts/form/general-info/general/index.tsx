@@ -21,7 +21,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact } = store;
+    const { contact, contactExtData, changeContact, changeContactExtData } = store;
 
     useEffect(() => {
         if (id) {
@@ -39,9 +39,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Title'
-                    value={contact.extdata?.Buyer_Salutation}
+                    value={contactExtData?.Buyer_Salutation}
                     options={titleList}
-                    onChange={({ target: { value } }) => {}}
+                    onChange={({ target: { value } }) => {
+                        changeContactExtData("Buyer_Salutation", value);
+                    }}
                     className='w-full general-info__dropdown'
                 />
             </div>
@@ -51,6 +53,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <InputText
                         className='general-info__text-input w-full'
                         value={contact?.firstName}
+                        onChange={({ target: { value } }) => changeContact("firstName", value)}
                     />
                     <label className='float-label'>First Name (required)</label>
                 </span>
@@ -61,6 +64,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <InputText
                         className='general-info__text-input w-full'
                         value={contact.lastName}
+                        onChange={({ target: { value } }) => changeContact("lastName", value)}
                     />
                     <label className='float-label'>Last Name (required)</label>
                 </span>
@@ -71,6 +75,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <InputText
                         className='general-info__text-input w-full'
                         value={contact.companyName}
+                        onChange={({ target: { value } }) => changeContact("companyName", value)}
                     />
                     <label className='float-label'>Business Name</label>
                 </span>
@@ -83,6 +88,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     value={contact.type}
                     filter
                     options={typeList}
+                    onChange={({ target: { value } }) => changeContact("type", value)}
                     placeholder='Type (required)'
                     className='w-full general-info__dropdown'
                 />
