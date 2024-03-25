@@ -1,18 +1,24 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
     ItemTemplateOptions,
     FileUploadHeaderTemplateOptions,
+    FileUploadSelectEvent,
 } from "primereact/fileupload";
+import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
+import { useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
+import { Checkbox } from "primereact/checkbox";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
@@ -23,15 +29,104 @@ const limitations: MediaLimitations = {
 };
 
 export const AudioMedia = observer((): ReactElement => {
+    const store = useStore().inventoryStore;
+    const { id } = useParams();
+    const {
+        getInventory,
+        saveInventoryAudios,
+        uploadFileAudios,
+        audios,
+        isLoading,
+        removeMedia,
+        fetchAudios,
+        clearInventory,
+    } = store;
+    const [checked, setChecked] = useState<boolean>(true);
+    const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+
+    useEffect(() => {
+        id && getInventory(id).then(() => fetchAudios());
+        if (audios.length) {
+            setAudioChecked(new Array(audios.length).fill(checked));
+        }
+        return () => {
+            clearInventory();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchAudios, checked, id]);
+
+    const handleCategorySelect = (e: DropdownChangeEvent) => {
+        store.uploadFileAudios = {
+            ...store.uploadFileAudios,
+            data: {
+                ...store.uploadFileAudios.data,
+                contenttype: e.target.value,
+            },
+        };
+    };
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileAudios = {
+            ...store.uploadFileAudios,
+            data: {
+                ...store.uploadFileAudios.data,
+                notes: e.target.value,
+            },
+        };
+    };
+
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {
+        store.uploadFileAudios = {
+            ...store.uploadFileAudios,
+            file: e.files,
+        };
+        setTotalCount(e.files.length);
+    };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
         setTotalCount(e.files.length);
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
+        const newFiles = {
+            file: uploadFileAudios.file.filter((item) => item.name !== file.name),
+            data: uploadFileAudios.data,
+        };
+        store.uploadFileAudios = newFiles;
+        setTotalCount(newFiles.file.length);
         callback();
+    };
+
+    const handleUploadFiles = () => {
+        saveInventoryAudios().then((res) => {
+            if (res) {
+                fileUploadRef.current?.clear();
+            }
+        });
+    };
+
+    const handleCheckedChange = (index?: number) => {
+        const updatedAudioChecked = [...audioChecked];
+
+        if (index === undefined && !checked) {
+            setChecked(true);
+            const allChecked = updatedAudioChecked.map(() => true);
+            setAudioChecked(allChecked);
+        } else if (index === undefined && checked) {
+            setChecked(false);
+            const allUnchecked = updatedAudioChecked.map(() => false);
+            setAudioChecked(allUnchecked);
+        } else if (index !== undefined) {
+            const updatedCheckboxState = [...updatedAudioChecked];
+            updatedCheckboxState[index] = !updatedCheckboxState[index];
+            setAudioChecked(updatedCheckboxState);
+        }
+    };
+
+    const handleDeleteImage = (mediauid: string) => {
+        removeMedia(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -143,22 +238,36 @@ export const AudioMedia = observer((): ReactElement => {
                 ref={fileUploadRef}
                 multiple
                 accept='audio/*'
-                maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
+                onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown className='media-input__dropdown' placeholder='Category' />
-                <InputText className='media-input__text' placeholder='Comment' />
+                <Dropdown
+                    className='media-input__dropdown'
+                    placeholder='Category'
+                    optionLabel={"name"}
+                    optionValue={"id"}
+                    options={CATEGORIES}
+                    value={uploadFileAudios?.data?.contenttype || 0}
+                    onChange={handleCategorySelect}
+                />
+                <InputText
+                    className='media-input__text'
+                    placeholder='Comment'
+                    value={uploadFileAudios?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
+                />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount}
+                    disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
+                    onClick={handleUploadFiles}
                 >
                     Save
                 </Button>
@@ -168,7 +277,66 @@ export const AudioMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-audios'>
-                <div className='w-full text-center'>No audio files added yet.</div>
+                {audios.length ? (
+                    audios.map(({ itemuid, src }, index: number) => {
+                        return (
+                            <div key={itemuid} className='media-images__item'>
+                                {checked && (
+                                    <Checkbox
+                                        checked={audioChecked[index]}
+                                        onChange={() => handleCheckedChange(index)}
+                                        className='media-uploaded__checkbox'
+                                    />
+                                )}
+                                <Image
+                                    src={src}
+                                    alt='inventory-item'
+                                    width='75'
+                                    height='75'
+                                    pt={{
+                                        image: {
+                                            className: "media-images__image",
+                                        },
+                                    }}
+                                />
+                                <div className='media-images__info image-info'>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-th-large' />
+                                        </span>
+                                        <span className='image-info__text--bold'>Exterior</span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <span className='image-info__icon'>
+                                                <i className='pi pi-comment' />
+                                            </span>
+                                        </span>
+                                        <span className='image-info__text'>
+                                            Renewed colour and new tires
+                                        </span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-calendar' />
+                                        </span>
+                                        <span className='image-info__text'>
+                                            10/11/2023 08:51:39
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    className='media-images__close'
+                                    onClick={() => handleDeleteImage(itemuid)}
+                                >
+                                    <i className='pi pi-times' />
+                                </button>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className='w-full text-center'>No audio files added yet.</div>
+                )}
             </div>
         </div>
     );

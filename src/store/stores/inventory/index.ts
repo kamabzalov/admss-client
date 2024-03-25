@@ -33,7 +33,7 @@ import {
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
-export interface ImageItem {
+export interface MediaItem {
     src: string;
     itemuid: string;
     mediauid?: string;
@@ -42,7 +42,7 @@ export interface ImageItem {
     };
 }
 
-interface UploadImageItem {
+interface UploadMediaItem {
     file: File[];
     data: Partial<InventoryMediaPostData>;
 }
@@ -61,11 +61,17 @@ export class InventoryStore {
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileImages: UploadImageItem = {} as UploadImageItem;
-    private _images: ImageItem[] = [];
+    private _uploadFileImages: UploadMediaItem = {} as UploadMediaItem;
+    private _images: MediaItem[] = [];
 
-    private _inventoryVideoID: string[] = [];
-    private _inventoryAudioID: string[] = [];
+    private _inventoryVideoID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileVideos: UploadMediaItem = {} as UploadMediaItem;
+    private _videos: MediaItem[] = [];
+
+    private _inventoryAudioID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileAudios: UploadMediaItem = {} as UploadMediaItem;
+    private _audios: MediaItem[] = [];
+
     private _inventoryDocumentsID: string[] = [];
 
     private _printList: InventoryPrintForm[] = [];
@@ -101,13 +107,25 @@ export class InventoryStore {
     public get uploadFileImages() {
         return this._uploadFileImages;
     }
-    public get inventoryExportWebHistory() {
-        return this._exportWebHistory;
-    }
     public get images() {
         return this._images;
     }
+    public get uploadFileVideos() {
+        return this._uploadFileVideos;
+    }
+    public get videos() {
+        return this._videos;
+    }
+    public get uploadFileAudios() {
+        return this._uploadFileAudios;
+    }
+    public get audios() {
+        return this._audios;
+    }
 
+    public get inventoryExportWebHistory() {
+        return this._exportWebHistory;
+    }
     public get printList() {
         return this._printList;
     }
@@ -161,10 +179,20 @@ export class InventoryStore {
                                 });
                                 break;
                             case MediaType.mtVideo:
-                                this._inventoryVideoID.push(mediauid);
+                                this._inventoryVideoID.push({ itemuid, mediauid });
+                                this._videos.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
                                 break;
                             case MediaType.mtAudio:
-                                this._inventoryAudioID.push(mediauid);
+                                this._audios.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
+                                this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
                                 this._inventoryDocumentsID.push(mediauid);
@@ -311,44 +339,89 @@ export class InventoryStore {
         }
     });
 
-    public saveInventoryImages = action(async (): Promise<Status | undefined> => {
-        try {
-            this._isLoading = true;
-            this._images = [];
-            const uploadPromises = this._uploadFileImages.file.map(async (file) => {
-                const formData = new FormData();
-                formData.append("file", file);
+    private saveInventoryMedia = action(
+        async (mediaType: MediaType): Promise<Status | undefined> => {
+            try {
+                this._isLoading = true;
+                const currentMt = new Map([
+                    [MediaType.mtPhoto, this._uploadFileImages],
+                    [MediaType.mtVideo, this._uploadFileVideos],
+                    [MediaType.mtAudio, this._uploadFileAudios],
+                ]);
+                const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
+                    async (file) => {
+                        const formData = new FormData();
+                        formData.append("file", file);
 
-                try {
-                    const createMediaResponse = await createMediaItemRecord();
-                    if (createMediaResponse?.status === Status.OK) {
-                        const uploadMediaResponse = await uploadInventoryMedia(
-                            createMediaResponse.itemUID,
-                            formData
-                        );
-                        if (uploadMediaResponse?.status === Status.OK) {
-                            await setMediaItemData(this._inventoryID, {
-                                mediaitemuid: uploadMediaResponse.itemuid,
-                                contenttype: this._uploadFileImages.data.contenttype,
-                                notes: this._uploadFileImages.data.notes,
-                            });
+                        try {
+                            const createMediaResponse = await createMediaItemRecord(mediaType);
+                            if (createMediaResponse?.status === Status.OK) {
+                                const uploadMediaResponse = await uploadInventoryMedia(
+                                    createMediaResponse.itemUID,
+                                    formData
+                                );
+                                if (uploadMediaResponse?.status === Status.OK) {
+                                    await setMediaItemData(this._inventoryID, {
+                                        mediaitemuid: uploadMediaResponse.itemuid,
+                                        contenttype: (currentMt.get(mediaType) as UploadMediaItem)
+                                            .data.contenttype,
+                                        notes: (currentMt.get(mediaType) as UploadMediaItem).data
+                                            .notes,
+                                    });
+                                }
+                            }
+                        } catch (error) {
+                            // TODO: add error handler
                         }
                     }
-                } catch (error) {
-                    // TODO: add error handler
-                }
-            });
+                );
 
-            await Promise.all(uploadPromises);
-            this._uploadFileImages = {} as UploadImageItem;
+                await Promise.all(uploadPromises);
+
+                return Status.OK;
+            } catch (error) {
+                // TODO: add error handler
+                return undefined;
+            } finally {
+                this._isLoading = false;
+            }
+        }
+    );
+
+    public saveInventoryImages = action(async (): Promise<Status | undefined> => {
+        try {
+            this._images = [];
+            await this.saveInventoryMedia(MediaType.mtPhoto);
+            this._uploadFileImages = {} as UploadMediaItem;
             this.fetchImages();
-
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
             return undefined;
-        } finally {
-            this._isLoading = false;
+        }
+    });
+    public saveInventoryVideos = action(async (): Promise<Status | undefined> => {
+        try {
+            this._videos = [];
+            await this.saveInventoryMedia(MediaType.mtVideo);
+            this._uploadFileVideos = {} as UploadMediaItem;
+            this.fetchImages();
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        }
+    });
+    public saveInventoryAudios = action(async (): Promise<Status | undefined> => {
+        try {
+            this._audios = [];
+            await this.saveInventoryMedia(MediaType.mtAudio);
+            this._uploadFileAudios = {} as UploadMediaItem;
+            this.fetchImages();
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
         }
     });
 
@@ -368,19 +441,21 @@ export class InventoryStore {
         }
     );
 
-    public fetchImages = action(async () => {
+    private async fetchMedia(
+        mediaType: MediaType,
+        mediaArray: MediaItem[],
+        inventoryMediaID: Partial<InventoryMediaItemID>[]
+    ) {
         try {
             this._isLoading = true;
-            this._inventoryImagesID = [];
             await this.getInventoryMedia();
 
-            const result: ImageItem[] = [...this._images];
+            const result: MediaItem[] = [...mediaArray];
 
             await Promise.all(
-                this._inventoryImagesID.map(async ({ mediauid, itemuid }, index: number) => {
+                inventoryMediaID.map(async ({ mediauid, itemuid }, index: number) => {
                     if (mediauid && itemuid) {
                         const responseSrc = await getInventoryMediaItem(mediauid);
-
                         if (responseSrc) {
                             result[index] = {
                                 info: result[index].info,
@@ -393,12 +468,36 @@ export class InventoryStore {
                 })
             );
 
-            this._images = result;
+            if (mediaType === MediaType.mtPhoto) {
+                this._images = result;
+            } else if (mediaType === MediaType.mtVideo) {
+                this._videos = result;
+            } else if (mediaType === MediaType.mtAudio) {
+                this._audios = result;
+            }
         } catch (error) {
             // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
+    }
+
+    public fetchImages = action(async () => {
+        this._images = [];
+        this._inventoryImagesID = [];
+        await this.fetchMedia(MediaType.mtPhoto, this._images, this._inventoryImagesID);
+    });
+
+    public fetchVideos = action(async () => {
+        this._videos = [];
+        this._inventoryVideoID = [];
+        await this.fetchMedia(MediaType.mtVideo, this._videos, this._inventoryVideoID);
+    });
+
+    public fetchAudios = action(async () => {
+        this._audios = [];
+        this._inventoryAudioID = [];
+        await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
     });
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
@@ -415,7 +514,7 @@ export class InventoryStore {
         }
     });
 
-    public removeImage = action(async (imageuid: string): Promise<Status | undefined> => {
+    public removeMedia = action(async (imageuid: string): Promise<Status | undefined> => {
         try {
             this._isLoading = true;
             try {
@@ -435,8 +534,16 @@ export class InventoryStore {
         }
     });
 
-    public set uploadFileImages(files: UploadImageItem) {
+    public set uploadFileImages(files: UploadMediaItem) {
         this._uploadFileImages = files;
+    }
+
+    public set uploadFileVideos(files: UploadMediaItem) {
+        this._uploadFileVideos = files;
+    }
+
+    public set uploadFileAudios(files: UploadMediaItem) {
+        this._uploadFileAudios = files;
     }
 
     public clearInventory = () => {
@@ -445,6 +552,10 @@ export class InventoryStore {
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
         this._images = [];
+        this._inventoryVideoID = [];
+        this._videos = [];
+        this._inventoryAudioID = [];
+        this._audios = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];

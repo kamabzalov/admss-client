@@ -19,7 +19,7 @@ import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
-import { ContentType } from "common/models/enums";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -28,13 +28,6 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
-
-const CATEGORIES = [
-    { name: "Interior", id: ContentType.ctInterior },
-    { name: "Exterior", id: ContentType.ctExterior },
-    { name: "Document", id: ContentType.ctDocument },
-    { name: "General", id: ContentType.ctGeneral },
-];
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -47,9 +40,10 @@ export const ImagesMedia = observer((): ReactElement => {
         uploadFileImages,
         images,
         isLoading,
-        removeImage,
+        removeMedia,
         fetchImages,
         changeInventoryMediaOrder,
+        clearInventory,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
@@ -57,11 +51,13 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
+        id && getInventory(id).then(() => fetchImages());
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
-        } else {
-            id && getInventory(id).then(() => fetchImages().then());
         }
+        return () => {
+            clearInventory();
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchImages, checked, id]);
 
@@ -134,7 +130,7 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeImage(mediauid);
+        removeMedia(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
