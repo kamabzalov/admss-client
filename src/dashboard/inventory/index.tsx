@@ -25,7 +25,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
-import { InventoryUserSettings } from "common/models/user";
+import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -67,7 +67,7 @@ export default function Inventories(): ReactElement {
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
-    const [serverSettings, setServerSettings] = useState<InventoryUserSettings>();
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
         columns.filter((column) => column.checked)
@@ -83,12 +83,12 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
-        changeSettings({ table: event });
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
-        changeSettings({ table: event });
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -121,8 +121,9 @@ export default function Inventories(): ReactElement {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const settings = JSON.parse(response.profile);
-                    setServerSettings(settings);
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { inventory: settings } = allSettings;
                     settings?.activeColumns && setActiveColumns(settings.activeColumns);
                     settings?.table &&
                         setLazyState({
@@ -143,9 +144,12 @@ export default function Inventories(): ReactElement {
         }
     }, [authUser]);
 
-    const changeSettings = (settings: any) => {
+    const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
-            const newSettings = { ...serverSettings, ...settings };
+            const newSettings = {
+                ...serverSettings,
+                inventory: { ...serverSettings?.inventory, ...settings },
+            } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
         }
@@ -156,7 +160,6 @@ export default function Inventories(): ReactElement {
         column.checked = !column.checked;
         const newColumns = value.filter((item: TableColumnsList) => item.checked);
         setActiveColumns(newColumns);
-
         changeSettings({ activeColumns: newColumns });
     };
 
@@ -424,7 +427,7 @@ export default function Inventories(): ReactElement {
                                             };
                                             changeSettings({
                                                 columnWidth: {
-                                                    ...serverSettings?.columnWidth,
+                                                    ...serverSettings?.inventory?.columnWidth,
                                                     ...newColumnWidth,
                                                 },
                                             });
@@ -450,9 +453,8 @@ export default function Inventories(): ReactElement {
                                                 pt={{
                                                     root: {
                                                         style: {
-                                                            width: serverSettings?.columnWidth?.[
-                                                                field
-                                                            ],
+                                                            width: serverSettings?.inventory
+                                                                ?.columnWidth?.[field],
                                                             overflow: "hidden",
                                                             textOverflow: "ellipsis",
                                                         },
