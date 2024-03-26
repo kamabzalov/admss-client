@@ -19,7 +19,6 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
-
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
@@ -68,7 +67,6 @@ export default function Inventories(): ReactElement {
         null
     );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
         columns.filter((column) => column.checked)
     );

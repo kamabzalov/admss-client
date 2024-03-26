@@ -25,7 +25,10 @@ export interface ContactsUserSettings extends UserSettings {
     selectedCategoriesOptions?: ContactType[];
 }
 
+export interface ExportWebUserSettings extends UserSettings {}
+
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
+    exportWeb: ExportWebUserSettings;
 }
