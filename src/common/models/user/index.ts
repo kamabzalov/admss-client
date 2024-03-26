@@ -1,24 +1,34 @@
+import { FilterOptions, TableColumnsList } from "dashboard/inventory/common/data-table";
 import { DataTableState } from "primereact/datatable";
-
-interface ActiveColumn {
-    field: string;
-    header: string;
-    checked: boolean;
-}
+import { ContactType } from "../contact";
 
 interface ColumnWidth {
     [key: string]: number;
 }
 
-interface SelectedFilterOption {
-    label: string;
+export interface TableState extends DataTableState {
+    page: number;
     column: string;
-    value: string;
 }
 
-export interface InventoryUserSettings {
-    activeColumns?: ActiveColumn[];
+interface UserSettings {
+    activeColumns?: TableColumnsList[] | any[];
     columnWidth?: ColumnWidth;
-    selectedFilterOptions?: SelectedFilterOption[];
-    table?: DataTableState;
+    table?: TableState;
+}
+
+export interface InventoryUserSettings extends UserSettings {
+    selectedFilterOptions?: FilterOptions[];
+}
+
+export interface ContactsUserSettings extends UserSettings {
+    selectedCategoriesOptions?: ContactType[];
+}
+
+export interface ExportWebUserSettings extends UserSettings {}
+
+export interface ServerUserSettings {
+    inventory: InventoryUserSettings;
+    contacts: ContactsUserSettings;
+    exportWeb: ExportWebUserSettings;
 }
