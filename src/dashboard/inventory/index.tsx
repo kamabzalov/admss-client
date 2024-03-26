@@ -321,14 +321,17 @@ export default function Inventories(): ReactElement {
                 />
             </div>
             <div className='col-2'>
-                <div className='contact-top-controls'>
+                <div className='inventory-top-controls'>
                     <Button
-                        className='contact-top-controls__button m-r-20px'
-                        icon='pi pi-plus-circle'
+                        className='inventory-top-controls__button m-r-20px new-inventory-button'
+                        icon='icon adms-add-item'
                         severity='success'
                         type='button'
+                        tooltip='Add new inventory'
                         onClick={() => navigate("create")}
-                    />
+                    >
+                        New
+                    </Button>
                     <Button
                         severity='success'
                         type='button'
@@ -339,7 +342,7 @@ export default function Inventories(): ReactElement {
             </div>
             <div className='col-6 text-right'>
                 <Button
-                    className='contact-top-controls__button m-r-20px'
+                    className='inventory-top-controls__button m-r-20px'
                     label='Advanced search'
                     severity='success'
                     type='button'
