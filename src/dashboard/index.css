@@ -197,6 +197,10 @@
     box-shadow: 0px 0px 4px var(--admss-app-blue-text);
 }
 
+.p-tooltip .p-tooltip-arrow {
+    display: none;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
