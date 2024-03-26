@@ -191,6 +191,12 @@
     background: var(--admss-app-light-blue);
 }
 
+.p-tooltip .p-tooltip-text {
+    background: var(--admss-app-white);
+    color: var(--admss-app-blue-text);
+    box-shadow: 0px 0px 4px var(--admss-app-blue-text);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
