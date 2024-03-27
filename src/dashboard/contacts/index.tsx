@@ -171,6 +171,13 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             editable
                             className='m-r-20px'
                             placeholder='Select Category'
+                            pt={{
+                                wrapper: {
+                                    style: {
+                                        maxHeight: "500px",
+                                    },
+                                },
+                            }}
                         />
                         <Button
                             className='contact-top-controls__button m-r-20px'

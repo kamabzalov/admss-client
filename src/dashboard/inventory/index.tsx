@@ -317,6 +317,12 @@ export default function Inventories(): ReactElement {
                         header: {
                             className: "column-picker__header",
                         },
+                        wrapper: {
+                            className: "column-picker__wrapper",
+                            style: {
+                                maxHeight: "500px",
+                            },
+                        },
                     }}
                 />
             </div>
