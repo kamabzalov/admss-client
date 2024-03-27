@@ -334,6 +334,8 @@ export const ExportToWeb = () => {
                                     value={exportsToWeb}
                                     lazy
                                     paginator
+                                    scrollable
+                                    scrollHeight='70vh'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={ROWS_PER_PAGE}
@@ -344,7 +346,6 @@ export const ExportToWeb = () => {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
-                                    className='overflow-x-hidden'
                                     onColReorder={(event) => {
                                         if (authUser && Array.isArray(event.columns)) {
                                             const orderArray = event.columns?.map(
@@ -384,13 +385,6 @@ export const ExportToWeb = () => {
                                                 },
                                             });
                                         }
-                                    }}
-                                    pt={{
-                                        table: {
-                                            style: {
-                                                tableLayout: "fixed",
-                                            },
-                                        },
                                     }}
                                 >
                                     <Column
