@@ -269,13 +269,6 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                                 });
                             }
                         }}
-                        pt={{
-                            table: {
-                                style: {
-                                    tableLayout: "fixed",
-                                },
-                            },
-                        }}
                     >
                         {activeColumns.map(({ field, header }) => (
                             <Column
