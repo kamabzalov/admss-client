@@ -14,6 +14,11 @@
     width: 343px;
 }
 
+.inventory-top-controls {
+    display: flex;
+    gap: 20px;
+}
+
 .inventory__accordion .p-accordion-header .p-accordion-header-link,
 .inventory__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
 .inventory__accordion
