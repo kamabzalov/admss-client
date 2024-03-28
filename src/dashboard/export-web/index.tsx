@@ -19,6 +19,7 @@ import { Inventory } from "common/models/inventory";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | MissedInventoryColumn;
@@ -227,6 +228,45 @@ export const ExportToWeb = () => {
         }
     }, [authUser]);
 
+    const printTableData = async (print: boolean = false) => {
+        const columns: string[] = activeColumns.map((column) => column.field);
+        const date = new Date();
+        const name = `export-web_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const params: QueryParams = {
+            ...(globalSearch && { qry: globalSearch }),
+        };
+
+        if (authUser) {
+            const data = await getExportToWebList(authUser.useruid, params);
+            const JSONreport = {
+                name,
+                type: "table",
+                data,
+                columns,
+                format: "",
+            };
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
+
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
+        }
+    };
+
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
@@ -308,14 +348,27 @@ export const ExportToWeb = () => {
                             <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button m-r-20px px-6 uppercase'
+                                        className='contact-top-controls__button px-6 uppercase'
                                         severity='success'
                                         type='button'
                                     >
                                         Export
                                     </Button>
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='pi pi-print'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        onClick={() => printTableData()}
+                                    />
                                 </div>
                             </div>
+
                             <div className='col-6 text-right'>
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
@@ -408,11 +461,11 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {activeColumns.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }, index) => (
                                         <Column
                                             field={field}
                                             header={header}
-                                            key={field}
+                                            key={`${field + index}`}
                                             sortable
                                             editor={(data: ColumnEditorOptions) => {
                                                 const { field } = data;

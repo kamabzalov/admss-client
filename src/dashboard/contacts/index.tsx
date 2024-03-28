@@ -11,8 +11,6 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
@@ -27,6 +25,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser;
@@ -34,6 +33,10 @@ interface TableColumnProps extends ColumnProps {
 
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
+}
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -57,10 +60,44 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
     const navigate = useNavigate();
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const printTableData = async (print: boolean = false) => {
+        const columns: string[] = renderColumnsData.map((column) => column.field);
+        const date = new Date();
+        const name = `contacts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        const params: QueryParams = {
+            ...(selectedCategory?.id && { param: selectedCategory.id }),
+            ...(globalSearch && { qry: globalSearch }),
+        };
+        if (authUser) {
+            const data = await getContacts(authUser.useruid, params);
+            const JSONreport = {
+                name,
+                type: "table",
+                data,
+                columns,
+                format: "",
+            };
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
+
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -169,7 +206,6 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             options={categories}
                             optionLabel='name'
                             editable
-                            className='m-r-20px'
                             placeholder='Select Category'
                             pt={{
                                 wrapper: {
@@ -180,7 +216,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             }}
                         />
                         <Button
-                            className='contact-top-controls__button m-r-20px'
+                            className='contact-top-controls__button'
                             icon='pi pi-plus-circle'
                             severity='success'
                             type='button'
@@ -189,8 +225,14 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         <Button
                             severity='success'
                             type='button'
-                            icon='pi pi-print'
-                            onClick={printTableData}
+                            icon='icon adms-print'
+                            onClick={() => printTableData(true)}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-blank'
+                            onClick={() => printTableData()}
                         />
                     </div>
                 </div>

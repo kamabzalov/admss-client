@@ -1,7 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import {
     DataTable,
     DataTablePageEvent,
@@ -25,6 +23,7 @@ import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/searc
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -53,6 +52,19 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
         .join("");
 };
 
+const createStringifyFilterQuery = (filterArray: FilterOptions[]): string => {
+    let qry: string = "";
+    filterArray.forEach((option, index) => {
+        const { column, value } = option;
+        if (value.includes("-")) {
+            const [wordFrom, wordTo] = value.split("-");
+            return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
+        }
+        qry += `${index > 0 ? "+" : ""}${value}.${column}`;
+    });
+    return qry;
+};
+
 export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -72,12 +84,6 @@ export default function Inventories(): ReactElement {
     );
 
     const navigate = useNavigate();
-
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
-    };
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
@@ -142,6 +148,58 @@ export default function Inventories(): ReactElement {
         }
     }, [authUser]);
 
+    const printTableData = async (print: boolean = false) => {
+        const columns: string[] = activeColumns.map((column) => column.field);
+        const date = new Date();
+        const name = `inventories_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
+        const params: QueryParams = {
+            qry,
+        };
+
+        if (authUser) {
+            const data = await getInventoryList(authUser.useruid, params);
+            const JSONreport = {
+                name,
+                type: "table",
+                data,
+                columns,
+                format: "",
+            };
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
+
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
+        }
+    };
+
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
             const newSettings = {
@@ -154,6 +212,7 @@ export default function Inventories(): ReactElement {
     };
 
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
+        setActiveColumns([]);
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
         const newColumns = value.filter((item: TableColumnsList) => item.checked);
@@ -243,16 +302,8 @@ export default function Inventories(): ReactElement {
 
     useEffect(() => {
         if (selectedFilterOptions) {
-            let qry: string = "";
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-            selectedFilterOptions.forEach((option, index) => {
-                const { column, value } = option;
-                if (value.includes("-")) {
-                    const [wordFrom, wordTo] = value.split("-");
-                    return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
-                }
-                qry += `${index > 0 ? "+" : ""}${value}.${column}`;
-            });
+            const qry = createStringifyFilterQuery(selectedFilterOptions);
             const params: QueryParams = {
                 ...(lazyState.sortOrder === 1 && { type: "asc" }),
                 ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -326,10 +377,10 @@ export default function Inventories(): ReactElement {
                     }}
                 />
             </div>
-            <div className='col-2'>
+            <div className='col-3'>
                 <div className='inventory-top-controls'>
                     <Button
-                        className='inventory-top-controls__button m-r-20px new-inventory-button'
+                        className='inventory-top-controls__button new-inventory-button'
                         icon='icon adms-add-item'
                         severity='success'
                         type='button'
@@ -342,11 +393,17 @@ export default function Inventories(): ReactElement {
                         severity='success'
                         type='button'
                         icon='pi pi-print'
-                        onClick={printTableData}
+                        onClick={() => printTableData(true)}
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-blank'
+                        onClick={() => printTableData()}
                     />
                 </div>
             </div>
-            <div className='col-6 text-right'>
+            <div className='col-5 text-right'>
                 <Button
                     className='inventory-top-controls__button m-r-20px'
                     label='Advanced search'
@@ -441,12 +498,12 @@ export default function Inventories(): ReactElement {
                                         }
                                     }}
                                 >
-                                    {activeColumns.map(({ field, header }) => {
+                                    {activeColumns.map(({ field, header }, index) => {
                                         return (
                                             <Column
                                                 field={field}
                                                 header={header}
-                                                key={field}
+                                                key={`${field + index}`}
                                                 sortable
                                                 reorderable
                                                 headerClassName='cursor-move'

@@ -5,6 +5,11 @@
     margin-bottom: 45px;
 }
 
+.contact-top-controls {
+    display: flex;
+    gap: 20px;
+}
+
 .contact__accordion {
     border: none;
     width: 343px;
