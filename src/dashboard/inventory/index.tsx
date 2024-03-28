@@ -377,7 +377,7 @@ export default function Inventories(): ReactElement {
                     }}
                 />
             </div>
-            <div className='col-2'>
+            <div className='col-3'>
                 <div className='inventory-top-controls'>
                     <Button
                         className='inventory-top-controls__button new-inventory-button'
@@ -403,7 +403,7 @@ export default function Inventories(): ReactElement {
                     />
                 </div>
             </div>
-            <div className='col-6 text-right'>
+            <div className='col-5 text-right'>
                 <Button
                     className='inventory-top-controls__button m-r-20px'
                     label='Advanced search'
