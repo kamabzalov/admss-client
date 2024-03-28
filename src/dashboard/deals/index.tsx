@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
@@ -13,6 +11,16 @@ import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Inventory } from "common/models/inventory";
+import { getContacts } from "http/services/contacts-service";
+import { getReportById, makeReports } from "http/services/reports.service";
+
+const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "accountuid", header: "Account" },
+    { field: "contactinfo", header: "Customer" },
+    { field: "dealtype", header: "Type" },
+    { field: "created", header: "Date" },
+    { field: "inventoryinfo", header: "Info (Vehicle)" },
+];
 
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
@@ -21,10 +29,43 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const printTableData = async (print: boolean = false) => {
+        const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
+        const date = new Date();
+        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        const params: QueryParams = {
+            ...(globalSearch && { qry: globalSearch }),
+        };
+        if (authUser) {
+            const data = await getContacts(authUser.useruid, params);
+            const JSONreport = {
+                name,
+                type: "table",
+                data,
+                columns,
+                format: "",
+            };
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
+
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -65,14 +106,6 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch]);
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-        { field: "accountuid", header: "Account" },
-        { field: "contactinfo", header: "Customer" },
-        { field: "dealtype", header: "Type" },
-        { field: "created", header: "Date" },
-        { field: "inventoryinfo", header: "Info (Vehicle)" },
-    ];
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -85,7 +118,7 @@ export default function Deals() {
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button m-r-20px'
+                                        className='contact-top-controls__button'
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
@@ -93,8 +126,14 @@ export default function Deals() {
                                     <Button
                                         severity='success'
                                         type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
+                                        icon='icon adms-print'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        onClick={() => printTableData()}
                                     />
                                 </div>
                             </div>
