@@ -22,6 +22,7 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -37,6 +38,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseVendor, setExpenseVendor] = useState<string>("");
     const [expenseNotes, setExpenseNotes] = useState<string>("");
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
+    const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
+    const [confirmActive, setConfirmActive] = useState<boolean>(false);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -92,6 +95,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
         setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
     };
 
+    const handleDeleteExpenses = () => {
+        currentExpenseUid && deleteExpensesItem(currentExpenseUid).then(() => getExpenses());
+    };
+
     const deleteTemplate = ({ itemuid }: Expenses) => {
         return (
             <Button
@@ -99,7 +106,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 icon='icon adms-trash-can'
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
-                    deleteExpensesItem(itemuid).then(() => getExpenses());
+                    setCurrentExpenseUid(itemuid);
+                    setConfirmActive(true);
                 }}
             />
         );
@@ -219,6 +227,17 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                bodyMessage='Do you really want to delete this expense? 
+                This process cannot be undone.'
+                confirmAction={handleDeleteExpenses}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='expenses-confirm-dialog'
+                onHide={() => setConfirmActive(false)}
+            />
         </>
     );
 });
