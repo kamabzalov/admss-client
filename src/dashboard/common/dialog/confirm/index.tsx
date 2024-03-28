@@ -6,6 +6,8 @@ import "./index.css";
 interface ConfirmModalProps extends ConfirmDialogProps {
     bodyMessage?: string;
     confirmAction?: () => void;
+    visible: boolean;
+    onHide: () => void;
 }
 
 export const ConfirmModal = ({
@@ -31,6 +33,7 @@ export const ConfirmModal = ({
                 detail: "You have accepted",
                 life: 3000,
             });
+        onHide();
     };
 
     const reject = () => {
@@ -41,6 +44,7 @@ export const ConfirmModal = ({
                 detail: "You have rejected",
                 life: 3000,
             });
+        onHide();
     };
 
     const showTemplate = () => {
@@ -65,8 +69,8 @@ export const ConfirmModal = ({
 
     return (
         <>
+            <ConfirmDialog {...props} visible={visible} onHide={onHide} />
             <Toast ref={toast} />
-            <ConfirmDialog />
         </>
     );
 };

@@ -45,3 +45,10 @@
 .purchase-expenses__delete-button .icon:hover {
     color: var(--admss-app-red);
 }
+
+.expenses-confirm-dialog .p-confirm-dialog-reject,
+.expenses-confirm-dialog .p-confirm-dialog-accept {
+    padding: 20px 33px;
+    height: 60px;
+    font-size: 20px;
+}
