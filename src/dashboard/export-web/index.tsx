@@ -146,12 +146,15 @@ export const ExportToWeb = () => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
-        columns.filter((column) => column.checked)
-    );
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeColumns]);
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
@@ -211,7 +214,15 @@ export const ExportToWeb = () => {
                     const allSettings: ServerUserSettings = JSON.parse(response.profile);
                     setServerSettings(allSettings);
                     const { exportWeb: settings } = allSettings;
-                    settings?.activeColumns && setActiveColumns(settings.activeColumns);
+                    if (settings?.activeColumns?.length) {
+                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                        const serverColumns = columns.filter((column) =>
+                            uniqueColumns.find((col) => col === column.field)
+                        );
+                        setActiveColumns(serverColumns);
+                    } else {
+                        setActiveColumns(columns.filter(({ checked }) => checked));
+                    }
                     settings?.table &&
                         setLazyState({
                             first: settings.table.first || initialDataTableQueries.first,
@@ -227,6 +238,29 @@ export const ExportToWeb = () => {
             });
         }
     }, [authUser]);
+
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={columns.length === activeColumns.length}
+                    onChange={() => {
+                        setActiveColumns(columns);
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    return setActiveColumns(columns.filter(({ checked }) => checked));
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
 
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = activeColumns.map((column) => column.field);
@@ -267,12 +301,8 @@ export const ExportToWeb = () => {
         }
     };
 
-    const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
-        const column: TableColumnsList = selectedOption;
-        column.checked = !column.checked;
-        const newColumns = value.filter((item: TableColumnsList) => item.checked);
-        setActiveColumns(newColumns);
-        changeSettings({ activeColumns: newColumns });
+    const onColumnToggle = ({ value }: MultiSelectChangeEvent) => {
+        return setActiveColumns(value);
     };
 
     const handleEditedValueSet = (
@@ -326,8 +356,9 @@ export const ExportToWeb = () => {
                             <div className='col-2'>
                                 <MultiSelect
                                     options={columns}
-                                    value={activeColumns.filter((column) => column.checked)}
+                                    value={activeColumns}
                                     optionLabel='header'
+                                    panelHeaderTemplate={dropdownHeaderPanel}
                                     onChange={onColumnToggle}
                                     showSelectAll={false}
                                     className='w-full pb-0 h-full flex align-items-center column-picker'
@@ -461,11 +492,11 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {activeColumns.map(({ field, header }, index) => (
+                                    {activeColumns.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
-                                            key={`${field + index}`}
+                                            key={field}
                                             sortable
                                             editor={(data: ColumnEditorOptions) => {
                                                 const { field } = data;
