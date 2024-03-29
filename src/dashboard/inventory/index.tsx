@@ -24,6 +24,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getReportById, makeReports } from "http/services/reports.service";
+import { Checkbox } from "primereact/checkbox";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -79,9 +80,7 @@ export default function Inventories(): ReactElement {
         null
     );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
-        columns.filter((column) => column.checked)
-    );
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
 
     const navigate = useNavigate();
 
@@ -106,6 +105,11 @@ export default function Inventories(): ReactElement {
     }, []);
 
     useEffect(() => {
+        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeColumns]);
+
+    useEffect(() => {
         const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
 
         const params: QueryParams = {
@@ -128,7 +132,15 @@ export default function Inventories(): ReactElement {
                     const allSettings: ServerUserSettings = JSON.parse(response.profile);
                     setServerSettings(allSettings);
                     const { inventory: settings } = allSettings;
-                    settings?.activeColumns && setActiveColumns(settings.activeColumns);
+                    if (settings?.activeColumns?.length) {
+                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                        const serverColumns = columns.filter((column) =>
+                            uniqueColumns.find((col) => col === column.field)
+                        );
+                        setActiveColumns(serverColumns);
+                    } else {
+                        setActiveColumns(columns.filter(({ checked }) => checked));
+                    }
                     settings?.table &&
                         setLazyState({
                             first: settings.table.first || initialDataTableQueries.first,
@@ -211,13 +223,8 @@ export default function Inventories(): ReactElement {
         }
     };
 
-    const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
-        setActiveColumns([]);
-        const column: TableColumnsList = selectedOption;
-        column.checked = !column.checked;
-        const newColumns = value.filter((item: TableColumnsList) => item.checked);
-        setActiveColumns(newColumns);
-        changeSettings({ activeColumns: newColumns });
+    const onColumnToggle = ({ value }: MultiSelectChangeEvent) => {
+        return setActiveColumns(value);
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
@@ -280,6 +287,29 @@ export default function Inventories(): ReactElement {
             setButtonDisabled(false);
         }
     };
+
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={columns.length === activeColumns.length}
+                    onChange={() => {
+                        setActiveColumns(columns);
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    return setActiveColumns(columns.filter(({ checked }) => checked));
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
@@ -362,6 +392,7 @@ export default function Inventories(): ReactElement {
                     optionLabel='header'
                     onChange={onColumnToggle}
                     showSelectAll={false}
+                    panelHeaderTemplate={dropdownHeaderPanel}
                     className='w-full pb-0 h-full flex align-items-center column-picker'
                     display='chip'
                     pt={{
@@ -457,7 +488,7 @@ export default function Inventories(): ReactElement {
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
-                                    onColReorder={(event) => {
+                                    onColReorder={(event: any) => {
                                         if (authUser && Array.isArray(event.columns)) {
                                             const orderArray = event.columns?.map(
                                                 (column: any) => column.props.field
@@ -472,7 +503,7 @@ export default function Inventories(): ReactElement {
                                                     );
                                                 })
                                                 .filter(
-                                                    (column): column is TableColumnsList =>
+                                                    (column: any): column is TableColumnsList =>
                                                         column !== null
                                                 );
 
@@ -498,12 +529,12 @@ export default function Inventories(): ReactElement {
                                         }
                                     }}
                                 >
-                                    {activeColumns.map(({ field, header }, index) => {
+                                    {activeColumns.map(({ field, header }) => {
                                         return (
                                             <Column
                                                 field={field}
                                                 header={header}
-                                                key={`${field + index}`}
+                                                key={field}
                                                 sortable
                                                 reorderable
                                                 headerClassName='cursor-move'
