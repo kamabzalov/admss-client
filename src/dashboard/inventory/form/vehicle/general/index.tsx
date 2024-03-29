@@ -1,7 +1,7 @@
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -10,11 +10,13 @@ import {
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
+
+import { useFormik } from "formik";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
-import { Audit } from "common/models/inventory";
+import { Audit, Inventory } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
 //TODO: add validation
@@ -94,7 +96,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const handleVINchange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    const handleVINchange = (value: string) => {
         changeInventory({ key: "VIN", value });
         if (value.length === VIN_VALID_LENGTH) {
             inventoryDecodeVIN(value).then((response) => {
@@ -119,17 +121,82 @@ export const VehicleGeneral = observer((): ReactElement => {
         "JustArrived",
     ];
 
+    const formik = useFormik({
+        initialValues: {
+            VIN: inventory?.VIN || "",
+            Make: inventory.Make,
+            Model: inventory.Model,
+            Year: String(year),
+            mileage: inventory.mileage,
+        } as Partial<Inventory>,
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors: any = {};
+
+            if (!data.VIN) {
+                errors.VIN = "Data is required.";
+            } else {
+                handleVINchange(data.VIN);
+            }
+
+            if (!data.Make) {
+                errors.Make = "Data is required.";
+            } else {
+                changeInventory({ key: "Make", value: data.Make });
+            }
+
+            if (!data.Model) {
+                errors.Model = "Data is required.";
+            } else {
+                changeInventory({ key: "Model", value: data.Model });
+            }
+
+            if (!data.Year) {
+                errors.Year = "Data is required.";
+            } else {
+                changeInventory({ key: "Year", value: String(data.Year) });
+            }
+
+            if (!data.mileage) {
+                errors.mileage = "Data is required.";
+            } else {
+                changeInventory({ key: "mileage", value: String(data.mileage).replace(".", ",") });
+            }
+
+            return errors;
+        },
+        validateOnChange: true,
+        onSubmit: () => {},
+    });
+
+    const isFormFieldInvalid = (name: keyof Inventory) => {
+        return !!formik.values[name];
+    };
+
+    const getFormErrorMessage = (name: keyof Inventory) => {
+        return isFormFieldInvalid(name) ? (
+            <small className='p-error absolute'>&nbsp;</small>
+        ) : (
+            <small className='p-error absolute'>{formik.errors[name]}</small>
+        );
+    };
+
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
                     <InputText
-                        className='vehicle-general__text-input w-full'
-                        value={inventory?.VIN || ""}
-                        onChange={handleVINchange}
+                        className={`vehicle-general__text-input w-full ${
+                            !isFormFieldInvalid("VIN") && "p-invalid"
+                        }`}
+                        value={formik.values.VIN}
+                        onChange={({ target: { value } }) => {
+                            formik.setFieldValue("VIN", value);
+                        }}
                     />
                     <label className='float-label'>VIN (required)</label>
                 </span>
+                {getFormErrorMessage("VIN")}
             </div>
 
             <div className='col-6'>
@@ -148,50 +215,59 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
-                    value={inventory?.Make}
+                    value={formik.values.Make}
                     filter
                     required
                     options={automakesList}
-                    onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
+                    onChange={({ value }) => formik.setFieldValue("Make", value)}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
-                    className='w-full vehicle-general__dropdown'
+                    className={`vehicle-general__dropdown w-full ${
+                        !isFormFieldInvalid("Make") && "p-invalid"
+                    }`}
                 />
+                {getFormErrorMessage("Make")}
             </div>
 
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
-                    value={inventory?.Model}
+                    value={formik.values.Model}
                     filter={!!automakesModelList.length}
                     editable={!automakesModelList.length}
                     options={automakesModelList}
-                    onChange={({ value }) => changeInventory({ key: "Model", value })}
+                    onChange={({ value }) => formik.setFieldValue("Model", value)}
                     placeholder='Model (required)'
-                    className='w-full vehicle-general__dropdown'
+                    className={`vehicle-general__dropdown w-full ${
+                        !isFormFieldInvalid("Model") && "p-invalid"
+                    }`}
                 />
+                {getFormErrorMessage("Model")}
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputNumber
-                        className='vehicle-general__text-input w-full'
+                        className={`vehicle-general__text-input w-full ${
+                            !isFormFieldInvalid("Year") && "p-invalid"
+                        }`}
                         required
                         value={year || 0}
                         useGrouping={false}
-                        onChange={({ value }) =>
-                            changeInventory({ key: "Year", value: String(value) })
-                        }
+                        onChange={({ value }) => formik.setFieldValue("Year", value)}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
+                {getFormErrorMessage("Year")}
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputNumber
-                        className='vehicle-general__text-input w-full'
+                        className={`vehicle-general__text-input w-full ${
+                            !isFormFieldInvalid("mileage") && "p-invalid"
+                        }`}
                         required
                         value={mileage}
                         minFractionDigits={2}
@@ -205,6 +281,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
+
+                {getFormErrorMessage("mileage")}
             </div>
             <div className='col-3'>
                 <Dropdown
