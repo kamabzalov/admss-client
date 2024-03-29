@@ -16,7 +16,13 @@ interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
 }
 
-export const CompanySearch = ({ name, value, onRowClick, onChange }: CompanySearchProps) => {
+export const CompanySearch = ({
+    name,
+    value,
+    onRowClick,
+    onChange,
+    ...props
+}: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<ContactUser[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -58,6 +64,7 @@ export const CompanySearch = ({ name, value, onRowClick, onChange }: CompanySear
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
+                {...props}
             />
             <Dialog
                 header={<div className='uppercase'>Choose a Contact</div>}

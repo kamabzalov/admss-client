@@ -175,15 +175,15 @@ export const VehicleGeneral = observer((): ReactElement => {
 
     const getFormErrorMessage = (name: keyof Inventory) => {
         return isFormFieldInvalid(name) ? (
-            <small className='p-error absolute'>&nbsp;</small>
+            <small className='p-error'>&nbsp;</small>
         ) : (
-            <small className='p-error absolute'>{formik.errors[name]}</small>
+            <small className='p-error'>{formik.errors[name]}</small>
         );
     };
 
     return (
         <div className='grid vehicle-general row-gap-2'>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
                         className={`vehicle-general__text-input w-full ${
@@ -211,7 +211,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <label className='float-label'>Stock#</label>
                 </span>
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
@@ -230,7 +230,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 {getFormErrorMessage("Make")}
             </div>
 
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
@@ -246,7 +246,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
                 {getFormErrorMessage("Model")}
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
                         className={`vehicle-general__text-input w-full ${
@@ -262,7 +262,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 {getFormErrorMessage("Year")}
             </div>
 
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
                         className={`vehicle-general__text-input w-full ${
