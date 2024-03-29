@@ -12,12 +12,13 @@ export interface TableState extends DataTableState {
 }
 
 interface UserSettings {
-    activeColumns?: TableColumnsList[] | any[];
+    activeColumns?: any[];
     columnWidth?: ColumnWidth;
     table?: TableState;
 }
 
 export interface InventoryUserSettings extends UserSettings {
+    activeColumns?: string[];
     selectedFilterOptions?: FilterOptions[];
 }
 

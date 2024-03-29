@@ -201,10 +201,6 @@
     display: none;
 }
 
-.column-picker__header.p-multiselect-header {
-    display: none;
-}
-
 .p-multiselect-panel .inventory-filter__header.p-multiselect-header {
     background-color: transparent;
     border-bottom: none;
@@ -219,11 +215,17 @@
     font-weight: 700;
     line-height: 1;
     flex-direction: column;
-    border-radius: 5px;
     height: 50px;
     width: 50px;
 }
 
 .new-inventory-button .icon {
     font-size: 20px;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
 }
