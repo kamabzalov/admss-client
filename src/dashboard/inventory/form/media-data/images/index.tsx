@@ -323,7 +323,7 @@ export const ImagesMedia = observer((): ReactElement => {
                             })),
                         }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
-                        draggableCancel='.media-uploaded__checkbox, .media-images__close'
+                        draggableCancel='.media-uploaded__checkbox, .media-images__close, .p-image'
                         rowHeight={20}
                     >
                         {images.map(({ itemuid, src, info }, index: number) => {
@@ -341,9 +341,17 @@ export const ImagesMedia = observer((): ReactElement => {
                                         alt='inventory-item'
                                         width='75'
                                         height='75'
+                                        preview
+                                        className='cursor-pointer'
                                         pt={{
                                             image: {
                                                 className: "media-images__image",
+                                            },
+                                            previewContainer: {
+                                                className: "media-images__preview-container",
+                                            },
+                                            preview: {
+                                                className: "media-images__preview",
                                             },
                                         }}
                                     />
