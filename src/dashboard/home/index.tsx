@@ -53,7 +53,10 @@ export default function Home() {
                                 </Link>
                             </div>
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
+                                <Link
+                                    to='deals/create'
+                                    className='common-tasks-menu__item cursor-pointer'
+                                >
                                     <div className='common-tasks-menu__icon new-deal'></div>
                                     New deal
                                 </Link>
