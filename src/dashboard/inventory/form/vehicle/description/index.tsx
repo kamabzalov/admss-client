@@ -1,3 +1,5 @@
+import { Inventory } from "common/models/inventory";
+import { useFormik } from "formik";
 import {
     ListData,
     getInventoryTransmissionTypesList,
@@ -36,6 +38,38 @@ export const VehicleDescription = observer((): ReactElement => {
             list && setEngineList(list);
         });
     }, []);
+
+    const formik = useFormik({
+        initialValues: {
+            TypeOfFuel: inventory.TypeOfFuel,
+        } as Partial<Inventory>,
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors: any = {};
+
+            if (!data.TypeOfFuel) {
+                errors.TypeOfFuel = "Data is required.";
+            } else {
+                changeInventory({ key: "TypeOfFuel", value: data.TypeOfFuel });
+            }
+
+            return errors;
+        },
+        validateOnChange: true,
+        onSubmit: () => {},
+    });
+
+    const isFormFieldInvalid = (name: keyof Inventory) => {
+        return !!formik.errors[name] && formik.touched[name];
+    };
+
+    const getFormErrorMessage = (name: keyof Inventory) => {
+        return isFormFieldInvalid(name) ? (
+            <small className='p-error'>&nbsp;</small>
+        ) : (
+            <small className='p-error'>{formik.errors[name]}</small>
+        );
+    };
     return (
         <div className='grid vehicle-description row-gap-2'>
             <div className='col-6'>
@@ -51,17 +85,20 @@ export const VehicleDescription = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <Dropdown
                     optionLabel='name'
                     optionValue='name'
                     filter
-                    value={inventory?.TypeOfFuel}
-                    onChange={({ value }) => changeInventory({ key: "TypeOfFuel", value })}
                     options={[...fuelList, { name: inventory?.TypeOfFuel }]}
+                    value={formik.values.TypeOfFuel}
+                    onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
                     placeholder='Type of Fuel (required)'
-                    className='w-full vehicle-description__dropdown'
+                    className={`vehicle-description__dropdown w-full ${
+                        !isFormFieldInvalid("TypeOfFuel") && "p-invalid"
+                    }`}
                 />
+                {getFormErrorMessage("TypeOfFuel")}
             </div>
             <div className='col-3'>
                 <Dropdown
