@@ -24,3 +24,11 @@
     font-weight: 700;
     font-size: 24px;
 }
+
+.inventory-print .p-datatable-thead tr th {
+    border: none;
+}
+
+.inventory-print .p-datatable .p-button {
+    height: 40px;
+}
