@@ -389,12 +389,14 @@ export const ExportToWeb = () => {
                                         severity='success'
                                         type='button'
                                         icon='pi pi-print'
+                                        tooltip='Print export to web form'
                                         onClick={() => printTableData(true)}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-blank'
+                                        tooltip='Download export to web form'
                                         onClick={() => printTableData()}
                                     />
                                 </div>

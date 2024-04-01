@@ -131,18 +131,21 @@ export default function Deals() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        tooltip='Add new deal'
                                         onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-print'
+                                        tooltip='Print deals form'
                                         onClick={() => printTableData(true)}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-blank'
+                                        tooltip='Download deals form'
                                         onClick={() => printTableData()}
                                     />
                                 </div>

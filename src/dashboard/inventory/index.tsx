@@ -424,12 +424,14 @@ export default function Inventories(): ReactElement {
                         severity='success'
                         type='button'
                         icon='pi pi-print'
+                        tooltip='Print inventory form'
                         onClick={() => printTableData(true)}
                     />
                     <Button
                         severity='success'
                         type='button'
                         icon='icon adms-blank'
+                        tooltip='Download inventory form'
                         onClick={() => printTableData()}
                     />
                 </div>
