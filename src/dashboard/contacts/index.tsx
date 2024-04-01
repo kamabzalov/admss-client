@@ -220,18 +220,21 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             icon='pi pi-plus-circle'
                             severity='success'
                             type='button'
+                            tooltip='Add new contact'
                             onClick={() => navigate("create")}
                         />
                         <Button
                             severity='success'
                             type='button'
                             icon='icon adms-print'
+                            tooltip='Print contacts form'
                             onClick={() => printTableData(true)}
                         />
                         <Button
                             severity='success'
                             type='button'
                             icon='icon adms-blank'
+                            tooltip='Download contacts form'
                             onClick={() => printTableData()}
                         />
                     </div>
