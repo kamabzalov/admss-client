@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable, DataTableSelectionMultipleChangeEvent } from "primereact/datatable";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 import { getInventoryPrintFormTemplate } from "http/services/inventory-service";
@@ -13,10 +13,16 @@ export const PrintForms = observer((): ReactElement => {
     const ref = useRef(null);
     const { id } = useParams();
     const store = useStore().inventoryStore;
-    const { printList } = store;
+    const { printList, getPrintList } = store;
 
     const [selectedPrints, setSelectedPrints] = useState<InventoryPrintForm[] | null>(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (id) {
+            getPrintList(id);
+        }
+    }, [getPrintList, id]);
 
     const handlePrintForm = async (templateuid: string, print: boolean = false) => {
         if (id) {

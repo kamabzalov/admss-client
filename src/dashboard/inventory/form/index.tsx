@@ -47,7 +47,6 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
-        getPrintList,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -125,7 +124,6 @@ export const InventoryForm = observer(() => {
                 getInventoryExportWeb(id);
                 getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
-                stepActiveIndex === printActiveIndex && getPrintList(id);
             }
         }
     }, [stepActiveIndex]);
