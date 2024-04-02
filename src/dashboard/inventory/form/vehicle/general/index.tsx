@@ -19,6 +19,8 @@ import { Checkbox } from "primereact/checkbox";
 import { Audit, Inventory } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
+import defaultMakesLogo from "assets/images/default-makes-logo.svg";
+
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 
@@ -72,7 +74,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <div className='flex align-items-center'>
                     <img
                         alt={option.name}
-                        src={option.logo}
+                        src={option?.logo || defaultMakesLogo}
                         className='mr-2 vehicle-general__dropdown-icon'
                     />
                     <div>{option.name}</div>
@@ -88,7 +90,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='flex align-items-center'>
                 <img
                     alt={option.name}
-                    src={option.logo}
+                    src={option?.logo || defaultMakesLogo}
                     className='mr-2 vehicle-general__dropdown-icon'
                 />
                 <div>{option.name}</div>
