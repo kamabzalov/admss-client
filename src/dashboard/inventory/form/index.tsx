@@ -34,7 +34,7 @@ export const InventoryForm = observer(() => {
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
@@ -67,6 +67,9 @@ export const InventoryForm = observer(() => {
     }, []);
 
     useEffect(() => {
+        accordionSteps.forEach((step, index) => {
+            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+        });
         if (stepsRef.current) {
             const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
             if (activeStep) {
@@ -107,15 +110,6 @@ export const InventoryForm = observer(() => {
     }, [id, store]);
 
     useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
-            }
-        });
         if (
             stepActiveIndex >= accordionSteps[accordionSteps.length - 1] &&
             !isInventoryWebExported
@@ -126,7 +120,7 @@ export const InventoryForm = observer(() => {
                 setIsInventoryWebExported(true);
             }
         }
-    }, [stepActiveIndex]);
+    }, [accordionSteps, stepActiveIndex]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
