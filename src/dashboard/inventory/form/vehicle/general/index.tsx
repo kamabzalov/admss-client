@@ -24,6 +24,7 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -153,11 +154,17 @@ export const VehicleGeneral = observer((): ReactElement => {
             } else {
                 changeInventory({ key: "Model", value: data.Model });
             }
-            if (!data.Year || Number(data.Year) < MIN_YEAR) {
-                errors.Year =
-                    Number(data.Year) < MIN_YEAR
-                        ? `Must be greater than ${MIN_YEAR}`
-                        : "Data is required.";
+            if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
+                switch (true) {
+                    case Number(data.Year) < MIN_YEAR:
+                        errors.Year = `Must be greater than ${MIN_YEAR}`;
+                        break;
+                    case Number(data.Year) > MAX_YEAR:
+                        errors.Year = `Must be less than ${MAX_YEAR}`;
+                        break;
+                    default:
+                        errors.Year = "Data is required.";
+                }
             } else {
                 changeInventory({ key: "Year", value: String(data.Year) });
             }
@@ -170,7 +177,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             return errors;
         },
-        onSubmit: () => { },
+        onSubmit: () => {},
     });
 
     return (
@@ -179,8 +186,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         {...formik.getFieldProps("VIN")}
-                        className={`vehicle-general__text-input w-full ${formik.touched.VIN && formik.errors.VIN && "p-invalid"
-                            }`}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
+                        }`}
                         value={formik.values.VIN}
                         onChange={({ target: { value } }) => {
                             formik.setFieldValue("VIN", value);
@@ -216,8 +224,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
-                    className={`vehicle-general__dropdown w-full ${formik.touched.Make && formik.errors.Make && "p-invalid"
-                        }`}
+                    className={`vehicle-general__dropdown w-full ${
+                        formik.touched.Make && formik.errors.Make && "p-invalid"
+                    }`}
                 />
                 <small className='p-error'>
                     {(formik.touched.Make && formik.errors.Make) || ""}
@@ -235,8 +244,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                     options={automakesModelList}
                     onChange={({ value }) => formik.setFieldValue("Model", value)}
                     placeholder='Model (required)'
-                    className={`vehicle-general__dropdown w-full ${formik.touched.Model && formik.errors.Model && "p-invalid"
-                        }`}
+                    className={`vehicle-general__dropdown w-full ${
+                        formik.touched.Model && formik.errors.Model && "p-invalid"
+                    }`}
                 />
                 <small className='p-error'>
                     {(formik.touched.Model && formik.errors.Model) || ""}
@@ -246,8 +256,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         {...formik.getFieldProps("Year")}
-                        className={`vehicle-general__text-input w-full ${formik.touched.Year && formik.errors.Year && "p-invalid"
-                            }`}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.Year && formik.errors.Year && "p-invalid"
+                        }`}
                         required
                         min={0}
                         value={year || MIN_YEAR}
@@ -265,8 +276,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         {...formik.getFieldProps("mileage")}
-                        className={`vehicle-general__text-input w-full ${formik.touched.mileage && formik.errors.mileage && "p-invalid"
-                            }`}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.mileage && formik.errors.mileage && "p-invalid"
+                        }`}
                         required
                         value={mileage}
                         minFractionDigits={2}
