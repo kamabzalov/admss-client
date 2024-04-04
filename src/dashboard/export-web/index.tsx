@@ -20,6 +20,7 @@ import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getReportById, makeReports } from "http/services/reports.service";
+import { ReportsColumn } from "common/models/reports";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | MissedInventoryColumn;
@@ -263,7 +264,10 @@ export const ExportToWeb = () => {
     );
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = activeColumns.map((column) => column.field);
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field,
+        }));
         const date = new Date();
         const name = `export-web_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
         const params: QueryParams = {
@@ -271,11 +275,23 @@ export const ExportToWeb = () => {
         };
 
         if (authUser) {
-            const data = await getExportToWebList(authUser.useruid, params);
+            const data = await getExportToWebList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    return response.map((item) => {
+                        const filteredItem: Record<string, any> = {};
+                        columns.forEach((column) => {
+                            if (item.hasOwnProperty(column.data)) {
+                                filteredItem[column.data] = item[column.data as keyof typeof item];
+                            }
+                        });
+                        return filteredItem;
+                    });
+                }
+            });
             const JSONreport = {
                 name,
-                type: "table",
-                data,
+                itemUID: "0",
+                data: data as Record<string, string>[],
                 columns,
                 format: "",
             };
@@ -285,7 +301,7 @@ export const ExportToWeb = () => {
                         const url = new Blob([response], { type: "application/pdf" });
                         let link = document.createElement("a");
                         link.href = window.URL.createObjectURL(url);
-                        link.download = "Report.pdf";
+                        link.download = `Report-${name}.pdf`;
                         link.click();
 
                         if (print) {

@@ -16,10 +16,10 @@ import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import { getContacts } from "http/services/contacts-service";
 import { makeReports, getReportById } from "http/services/reports.service";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
+import { ReportsColumn } from "common/models/reports";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountnumber", header: "Account" },
@@ -37,7 +37,10 @@ export default function Accounts() {
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
         const date = new Date();
         const name = `accounts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
@@ -45,11 +48,23 @@ export default function Accounts() {
             ...(globalSearch && { qry: globalSearch }),
         };
         if (authUser) {
-            const data = await getContacts(authUser.useruid, params);
+            const data = await getAccountsList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    return response.map((item) => {
+                        const filteredItem: Record<string, any> = {};
+                        columns.forEach((column) => {
+                            if (item.hasOwnProperty(column.data)) {
+                                filteredItem[column.data] = item[column.data as keyof typeof item];
+                            }
+                        });
+                        return filteredItem;
+                    });
+                }
+            });
             const JSONreport = {
                 name,
-                type: "table",
-                data,
+                itemUID: "0",
+                data: data as Record<string, string>[],
                 columns,
                 format: "",
             };
@@ -59,7 +74,7 @@ export default function Accounts() {
                         const url = new Blob([response], { type: "application/pdf" });
                         let link = document.createElement("a");
                         link.href = window.URL.createObjectURL(url);
-                        link.download = "Report.pdf";
+                        link.download = `Report-${name}.pdf`;
                         link.click();
 
                         if (print) {

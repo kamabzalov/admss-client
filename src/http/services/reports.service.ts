@@ -1,4 +1,5 @@
 import { QueryParams } from "common/models/query-params";
+import { ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportsList = async (uid: string, queryParams: QueryParams) => {
@@ -12,7 +13,7 @@ export const getReportsList = async (uid: string, queryParams: QueryParams) => {
     }
 };
 
-export const makeReports = async (uid: string | undefined, body?: any) => {
+export const makeReports = async (uid: string | undefined, body?: ReportsPostData) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`reports/${uid}/report`, body);
         return request.data;
