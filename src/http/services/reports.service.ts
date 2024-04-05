@@ -1,4 +1,5 @@
 import { QueryParams } from "common/models/query-params";
+import { ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportsList = async (uid: string, queryParams: QueryParams) => {
@@ -12,9 +13,27 @@ export const getReportsList = async (uid: string, queryParams: QueryParams) => {
     }
 };
 
-export const makeReports = async (uid: string | undefined, body?: any) => {
+export const makeReports = async (uid: string | undefined, body?: ReportsPostData) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`reports/${uid}/report`, body);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const makeShortReports = async (uid: string | undefined, body?: ReportsPostData) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `reports/${uid}/shortreport`,
+            body,
+            {
+                headers: {
+                    Accept: "application/pdf",
+                },
+                responseType: "blob",
+            }
+        );
         return request.data;
     } catch (error) {
         // TODO: add error handler

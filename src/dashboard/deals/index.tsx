@@ -16,10 +16,10 @@ import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Inventory } from "common/models/inventory";
-import { getContacts } from "http/services/contacts-service";
-import { getReportById, makeReports } from "http/services/reports.service";
+import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+import { ReportsColumn } from "common/models/reports";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -39,40 +39,46 @@ export default function Deals() {
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
         const date = new Date();
-        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const name = `deals_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
-        const params: QueryParams = {
-            ...(globalSearch && { qry: globalSearch }),
-        };
         if (authUser) {
-            const data = await getContacts(authUser.useruid, params);
+            const data = deals.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
             const JSONreport = {
                 name,
-                type: "table",
+                itemUID: "0",
                 data,
                 columns,
                 format: "",
             };
-            await makeReports(authUser.useruid, JSONreport).then((response) => {
-                setTimeout(() => {
-                    getReportById(response.taskuid).then((response) => {
-                        const url = new Blob([response], { type: "application/pdf" });
-                        let link = document.createElement("a");
-                        link.href = window.URL.createObjectURL(url);
-                        link.download = "Report.pdf";
-                        link.click();
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
 
-                        if (print) {
-                            window.open(
-                                link.href,
-                                "_blank",
-                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                            );
-                        }
-                    });
-                }, 5000);
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
             });
         }
     };

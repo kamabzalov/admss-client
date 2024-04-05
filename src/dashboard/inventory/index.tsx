@@ -23,8 +23,9 @@ import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/searc
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { getReportById, makeReports } from "http/services/reports.service";
+import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
+import { ReportsColumn } from "common/models/reports";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -175,53 +176,46 @@ export default function Inventories(): ReactElement {
     }, [authUser]);
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = activeColumns.map((column) => column.field);
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
         const date = new Date();
-        const name = `inventories_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        const params: QueryParams = {
-            qry,
-        };
+        const name = `inventory_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (authUser) {
-            const data = await getInventoryList(authUser.useruid, params);
+            const data = inventories.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
             const JSONreport = {
                 name,
-                type: "table",
+                itemUID: "0",
                 data,
                 columns,
                 format: "",
             };
-            await makeReports(authUser.useruid, JSONreport).then((response) => {
-                setTimeout(() => {
-                    getReportById(response.taskuid).then((response) => {
-                        const url = new Blob([response], { type: "application/pdf" });
-                        let link = document.createElement("a");
-                        link.href = window.URL.createObjectURL(url);
-                        link.download = "Report.pdf";
-                        link.click();
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
 
-                        if (print) {
-                            window.open(
-                                link.href,
-                                "_blank",
-                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                            );
-                        }
-                    });
-                }, 5000);
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
             });
         }
     };
