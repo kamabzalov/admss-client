@@ -22,6 +22,24 @@ export const makeReports = async (uid: string | undefined, body?: ReportsPostDat
     }
 };
 
+export const makeShortReports = async (uid: string | undefined, body?: ReportsPostData) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `reports/${uid}/shortreport`,
+            body,
+            {
+                headers: {
+                    Accept: "application/pdf",
+                },
+                responseType: "blob",
+            }
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
 export const getReportById = async (reportId: string) => {
     try {
         const request = await authorizedUserApiInstance.get<any>(`reports/${reportId}/report`, {

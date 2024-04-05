@@ -16,7 +16,7 @@ import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Inventory } from "common/models/inventory";
-import { getReportById, makeReports } from "http/services/reports.service";
+import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportsColumn } from "common/models/reports";
@@ -44,50 +44,41 @@ export default function Deals() {
             data: column.field as string,
         }));
         const date = new Date();
-        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-        const params: QueryParams = {
-            ...(globalSearch && { qry: globalSearch }),
-        };
+        const name = `deals_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (authUser) {
-            const data = await getDealsList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    return response.map((item) => {
-                        const filteredItem: Record<string, any> = {};
-                        columns.forEach((column) => {
-                            if (item.hasOwnProperty(column.data)) {
-                                filteredItem[column.data] = item[column.data as keyof typeof item];
-                            }
-                        });
-                        return filteredItem;
-                    });
-                }
+            const data = deals.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
             });
             const JSONreport = {
                 name,
                 itemUID: "0",
-                data: data as Record<string, string>[],
+                data,
                 columns,
                 format: "",
             };
-            await makeReports(authUser.useruid, JSONreport).then((response) => {
-                setTimeout(() => {
-                    getReportById(response.taskuid).then((response) => {
-                        const url = new Blob([response], { type: "application/pdf" });
-                        let link = document.createElement("a");
-                        link.href = window.URL.createObjectURL(url);
-                        link.download = `Report-${name}.pdf`;
-                        link.click();
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
 
-                        if (print) {
-                            window.open(
-                                link.href,
-                                "_blank",
-                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                            );
-                        }
-                    });
-                }, 5000);
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
             });
         }
     };
