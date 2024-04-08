@@ -47,6 +47,14 @@ interface UploadMediaItem {
     data: Partial<InventoryMediaPostData>;
 }
 
+const initialMediaItem: UploadMediaItem = {
+    file: [],
+    data: {
+        contenttype: MediaType.mtUnknown,
+        notes: "",
+    },
+};
+
 export class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
@@ -61,19 +69,19 @@ export class InventoryStore {
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileImages: UploadMediaItem = {} as UploadMediaItem;
+    private _uploadFileImages: UploadMediaItem = initialMediaItem;
     private _images: MediaItem[] = [];
 
     private _inventoryVideoID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileVideos: UploadMediaItem = {} as UploadMediaItem;
+    private _uploadFileVideos: UploadMediaItem = initialMediaItem;
     private _videos: MediaItem[] = [];
 
     private _inventoryAudioID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileAudios: UploadMediaItem = {} as UploadMediaItem;
+    private _uploadFileAudios: UploadMediaItem = initialMediaItem;
     private _audios: MediaItem[] = [];
 
     private _inventoryDocumentsID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileDocuments: UploadMediaItem = {} as UploadMediaItem;
+    private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
     private _documents: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
@@ -406,7 +414,7 @@ export class InventoryStore {
         try {
             this._images = [];
             await this.saveInventoryMedia(MediaType.mtPhoto);
-            this._uploadFileImages = {} as UploadMediaItem;
+            this._uploadFileImages = initialMediaItem;
             this.fetchImages();
             return Status.OK;
         } catch (error) {
@@ -418,7 +426,7 @@ export class InventoryStore {
         try {
             this._videos = [];
             await this.saveInventoryMedia(MediaType.mtVideo);
-            this._uploadFileVideos = {} as UploadMediaItem;
+            this._uploadFileVideos = initialMediaItem;
             this.fetchVideos();
             return Status.OK;
         } catch (error) {
@@ -430,7 +438,7 @@ export class InventoryStore {
         try {
             this._audios = [];
             await this.saveInventoryMedia(MediaType.mtAudio);
-            this._uploadFileAudios = {} as UploadMediaItem;
+            this._uploadFileAudios = initialMediaItem;
             this.fetchAudios();
             return Status.OK;
         } catch (error) {
@@ -443,7 +451,7 @@ export class InventoryStore {
         try {
             this._documents = [];
             await this.saveInventoryMedia(MediaType.mtDocument);
-            this._uploadFileDocuments = {} as UploadMediaItem;
+            this._uploadFileDocuments = initialMediaItem;
             this.fetchDocuments();
             return Status.OK;
         } catch (error) {

@@ -254,13 +254,13 @@ export const AudioMedia = observer((): ReactElement => {
                     optionLabel={"name"}
                     optionValue={"id"}
                     options={CATEGORIES}
-                    value={uploadFileAudios?.data?.contenttype || 0}
+                    value={uploadFileAudios?.data?.contenttype}
                     onChange={handleCategorySelect}
                 />
                 <InputText
                     className='media-input__text'
                     placeholder='Comment'
-                    value={uploadFileAudios?.data?.notes || ""}
+                    value={uploadFileAudios?.data?.notes}
                     onChange={handleCommentaryChange}
                 />
                 <Button
@@ -276,11 +276,11 @@ export const AudioMedia = observer((): ReactElement => {
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded audio files</h2>
                 <hr className='media-uploaded__line flex-1' />
             </div>
-            <div className='media-audios'>
+            <div className='media-audio'>
                 {audios.length ? (
                     audios.map(({ itemuid, src, info }, index: number) => {
                         return (
-                            <div key={itemuid} className='media-images__item'>
+                            <div key={itemuid} className='media-audio__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={audioChecked[index]}
@@ -295,16 +295,16 @@ export const AudioMedia = observer((): ReactElement => {
                                     height='75'
                                     pt={{
                                         image: {
-                                            className: "media-images__image",
+                                            className: "media-audio__image",
                                         },
                                     }}
                                 />
-                                <div className='media-images__info image-info'>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
+                                <div className='media-audio__info audio-info'>
+                                    <div className='audio-info__item'>
+                                        <span className='audio-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='image-info__text--bold'>
+                                        <span className='audio-info__text--bold'>
                                             {
                                                 CATEGORIES.find(
                                                     (category) => category.id === info?.contenttype
@@ -312,23 +312,23 @@ export const AudioMedia = observer((): ReactElement => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
-                                            <span className='image-info__icon'>
+                                    <div className='audio-info__item'>
+                                        <span className='audio-info__icon'>
+                                            <span className='audio-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='image-info__text'>{info?.notes}</span>
+                                        <span className='audio-info__text'>{info?.notes}</span>
                                     </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
+                                    <div className='audio-info__item'>
+                                        <span className='audio-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='image-info__text'>{info?.created}</span>
+                                        <span className='audio-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button
-                                    className='media-images__close'
+                                    className='media-audio__close'
                                     onClick={() => handleDeleteImage(itemuid)}
                                 >
                                     <i className='pi pi-times' />

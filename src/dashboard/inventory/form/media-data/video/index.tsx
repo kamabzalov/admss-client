@@ -129,7 +129,7 @@ export const VideoMedia = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (mediauid: string) => {
+    const handleDeleteVideo = (mediauid: string) => {
         removeMedia(mediauid);
     };
 
@@ -300,11 +300,11 @@ export const VideoMedia = observer((): ReactElement => {
                     Export to Web
                 </label>
             </div>
-            <div className='media-videos'>
+            <div className='media-video'>
                 {videos.length ? (
                     videos.map(({ itemuid, src, info }, index: number) => {
                         return (
-                            <div key={itemuid} className='media-images__item'>
+                            <div key={itemuid} className='media-video__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={videoChecked[index]}
@@ -319,16 +319,16 @@ export const VideoMedia = observer((): ReactElement => {
                                     height='75'
                                     pt={{
                                         image: {
-                                            className: "media-images__image",
+                                            className: "media-video__image",
                                         },
                                     }}
                                 />
-                                <div className='media-images__info image-info'>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
+                                <div className='media-video__info video-info'>
+                                    <div className='video-info__item'>
+                                        <span className='video-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='image-info__text--bold'>
+                                        <span className='video-info__text--bold'>
                                             {
                                                 CATEGORIES.find(
                                                     (category) => category.id === info?.contenttype
@@ -336,24 +336,24 @@ export const VideoMedia = observer((): ReactElement => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
-                                            <span className='image-info__icon'>
+                                    <div className='video-info__item'>
+                                        <span className='video-info__icon'>
+                                            <span className='video-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='image-info__text'>{info?.notes}</span>
+                                        <span className='video-info__text'>{info?.notes}</span>
                                     </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
+                                    <div className='video-info__item'>
+                                        <span className='video-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='image-info__text'>{info?.created}</span>
+                                        <span className='video-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button
-                                    className='media-images__close'
-                                    onClick={() => handleDeleteImage(itemuid)}
+                                    className='media-video__close'
+                                    onClick={() => handleDeleteVideo(itemuid)}
                                 >
                                     <i className='pi pi-times' />
                                 </button>
