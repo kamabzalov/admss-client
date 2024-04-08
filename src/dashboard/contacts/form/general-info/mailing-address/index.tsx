@@ -16,6 +16,9 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     <InputText
                         className='mailing-address-info__text-input w-full'
                         value={contact.streetAddress}
+                        onChange={({ target: { value } }) =>
+                            store.changeContact("streetAddress", value)
+                        }
                     />
                     <label className='float-label'>Street address</label>
                 </span>
@@ -27,6 +30,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     filter
                     placeholder='State'
                     value={contact?.state}
+                    onChange={({ target: { value } }) => store.changeContact("state", value)}
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
                 />
@@ -37,6 +41,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     <InputText
                         className='mailing-address-info__text-input w-full'
                         value={contact.city}
+                        onChange={({ target: { value } }) => store.changeContact("city", value)}
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -47,6 +52,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     <InputText
                         className='mailing-address-info__text-input w-full'
                         value={contact.ZIP}
+                        onChange={({ target: { value } }) => store.changeContact("ZIP", value)}
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>

@@ -17,6 +17,9 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                     <InputText
                         className='address-info__text-input w-full'
                         value={contact?.streetAddress}
+                        onChange={({ target: { value } }) =>
+                            store.changeContact("streetAddress", value)
+                        }
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
@@ -29,20 +32,29 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                     placeholder='State'
                     value={contact?.state}
                     options={STATES_LIST}
+                    onChange={({ target: { value } }) => store.changeContact("state", value)}
                     className='w-full address-info__dropdown'
                 />
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='address-info__text-input w-full' value={contact?.city} />
+                    <InputText
+                        className='address-info__text-input w-full'
+                        value={contact?.city}
+                        onChange={({ target: { value } }) => store.changeContact("city", value)}
+                    />
                     <label className='float-label'>City</label>
                 </span>
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='address-info__text-input w-full' value={contact?.ZIP} />
+                    <InputText
+                        className='address-info__text-input w-full'
+                        value={contact?.ZIP}
+                        onChange={({ target: { value } }) => store.changeContact("ZIP", value)}
+                    />
                     <label className='float-label'>Zip Code</label>
                 </span>
             </div>
