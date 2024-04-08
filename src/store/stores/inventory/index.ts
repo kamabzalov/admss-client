@@ -72,7 +72,9 @@ export class InventoryStore {
     private _uploadFileAudios: UploadMediaItem = {} as UploadMediaItem;
     private _audios: MediaItem[] = [];
 
-    private _inventoryDocumentsID: string[] = [];
+    private _inventoryDocumentsID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileDocuments: UploadMediaItem = {} as UploadMediaItem;
+    private _documents: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
 
@@ -121,6 +123,12 @@ export class InventoryStore {
     }
     public get audios() {
         return this._audios;
+    }
+    public get uploadFileDocuments() {
+        return this._uploadFileDocuments;
+    }
+    public get documents() {
+        return this._documents;
     }
 
     public get inventoryExportWebHistory() {
@@ -195,7 +203,11 @@ export class InventoryStore {
                                 this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
-                                this._inventoryDocumentsID.push(mediauid);
+                                this.documents.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
                                 break;
                             default:
                                 break;
@@ -347,6 +359,7 @@ export class InventoryStore {
                     [MediaType.mtPhoto, this._uploadFileImages],
                     [MediaType.mtVideo, this._uploadFileVideos],
                     [MediaType.mtAudio, this._uploadFileAudios],
+                    [MediaType.mtDocument, this._uploadFileDocuments],
                 ]);
                 const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
                     async (file) => {
@@ -367,6 +380,7 @@ export class InventoryStore {
                                             .data.contenttype,
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
+                                        type: mediaType,
                                     });
                                 }
                             }
@@ -405,7 +419,7 @@ export class InventoryStore {
             this._videos = [];
             await this.saveInventoryMedia(MediaType.mtVideo);
             this._uploadFileVideos = {} as UploadMediaItem;
-            this.fetchImages();
+            this.fetchVideos();
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
@@ -417,7 +431,20 @@ export class InventoryStore {
             this._audios = [];
             await this.saveInventoryMedia(MediaType.mtAudio);
             this._uploadFileAudios = {} as UploadMediaItem;
-            this.fetchImages();
+            this.fetchAudios();
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        }
+    });
+
+    public saveInventoryDocuments = action(async (): Promise<Status | undefined> => {
+        try {
+            this._documents = [];
+            await this.saveInventoryMedia(MediaType.mtDocument);
+            this._uploadFileDocuments = {} as UploadMediaItem;
+            this.fetchDocuments();
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
@@ -500,6 +527,12 @@ export class InventoryStore {
         await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
     });
 
+    public fetchDocuments = action(async () => {
+        this._documents = [];
+        this._inventoryDocumentsID = [];
+        await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
+    });
+
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
         try {
             this._isLoading = true;
@@ -546,6 +579,10 @@ export class InventoryStore {
         this._uploadFileAudios = files;
     }
 
+    public set uploadFileDocuments(files: UploadMediaItem) {
+        this._uploadFileDocuments = files;
+    }
+
     public clearInventory = () => {
         this._inventory = {} as Inventory;
         this._inventoryOptions = [];
@@ -556,6 +593,8 @@ export class InventoryStore {
         this._videos = [];
         this._inventoryAudioID = [];
         this._audios = [];
+        this._inventoryDocumentsID = [];
+        this._documents = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];

@@ -302,7 +302,7 @@ export const VideoMedia = observer((): ReactElement => {
             </div>
             <div className='media-videos'>
                 {videos.length ? (
-                    videos.map(({ itemuid, src }, index: number) => {
+                    videos.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-images__item'>
                                 {checked && (
@@ -328,7 +328,13 @@ export const VideoMedia = observer((): ReactElement => {
                                         <span className='image-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='image-info__text--bold'>Exterior</span>
+                                        <span className='image-info__text--bold'>
+                                            {
+                                                CATEGORIES.find(
+                                                    (category) => category.id === info?.contenttype
+                                                )?.name
+                                            }
+                                        </span>
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
@@ -336,17 +342,13 @@ export const VideoMedia = observer((): ReactElement => {
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='image-info__text'>
-                                            Renewed colour and new tires
-                                        </span>
+                                        <span className='image-info__text'>{info?.notes}</span>
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='image-info__text'>
-                                            10/11/2023 08:51:39
-                                        </span>
+                                        <span className='image-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button

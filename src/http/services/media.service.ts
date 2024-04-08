@@ -58,11 +58,11 @@ export const getInventoryMediaInfo = async (mediauid: string) => {
     }
 };
 
-export const createMediaItemRecord = async (mediatype: MediaType) => {
+export const createMediaItemRecord = async (mediaType: MediaType) => {
     try {
         const response = await authorizedUserApiInstance.post<CreateMediaItemRecordResponse>(
             "media/0/meta",
-            { mediatype }
+            { mediaType }
         );
 
         if (response.status === 200) {
@@ -91,7 +91,15 @@ export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: 
 
 export const setMediaItemData = async (
     inventoryUid: string,
-    { mediaitemuid, notes, itemuid, order, contenttype, useruid }: Partial<InventoryMediaPostData>
+    {
+        mediaitemuid,
+        notes,
+        itemuid,
+        order,
+        contenttype,
+        useruid,
+        type,
+    }: Partial<InventoryMediaPostData>
 ) => {
     try {
         const id = inventoryUid ? inventoryUid : 0;
@@ -104,6 +112,7 @@ export const setMediaItemData = async (
                 contenttype,
                 notes,
                 order,
+                type,
             }
         );
 
