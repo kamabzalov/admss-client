@@ -33,8 +33,10 @@ export const PrintForms = observer((): ReactElement => {
                     const url = new Blob([response], { type: "application/pdf" });
                     let link = document.createElement("a");
                     link.href = window.URL.createObjectURL(url);
-                    link.download = `print_form_${templateuid}.pdf`;
-                    link.click();
+                    if (!print) {
+                        link.download = `print_form_${templateuid}.pdf`;
+                        link.click();
+                    }
                     if (print) {
                         window.open(
                             link.href,
