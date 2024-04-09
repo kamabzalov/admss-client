@@ -130,7 +130,7 @@ export const VideoMedia = observer((): ReactElement => {
     };
 
     const handleDeleteVideo = (mediauid: string) => {
-        removeMedia(mediauid);
+        removeMedia(mediauid, fetchVideos);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {

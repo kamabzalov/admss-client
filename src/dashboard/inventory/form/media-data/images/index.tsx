@@ -130,7 +130,7 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeMedia(mediauid);
+        removeMedia(mediauid, fetchImages);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -323,7 +323,12 @@ export const ImagesMedia = observer((): ReactElement => {
                             })),
                         }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
-                        draggableCancel='.media-uploaded__checkbox, .media-images__close, .p-image'
+                        draggableCancel='
+                        .media-uploaded__checkbox,
+                        .media-images__close,
+                        .p-image,
+                        .p-image-mask,
+                        .media-images__preview'
                         rowHeight={20}
                     >
                         {images.map(({ itemuid, src, info }, index: number) => {

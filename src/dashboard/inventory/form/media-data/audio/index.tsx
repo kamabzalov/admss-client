@@ -125,8 +125,8 @@ export const AudioMedia = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (mediauid: string) => {
-        removeMedia(mediauid);
+    const handleDeleteAudio = (mediauid: string) => {
+        removeMedia(mediauid, fetchAudios);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -329,7 +329,7 @@ export const AudioMedia = observer((): ReactElement => {
                                 </div>
                                 <button
                                     className='media-audio__close'
-                                    onClick={() => handleDeleteImage(itemuid)}
+                                    onClick={() => handleDeleteAudio(itemuid)}
                                 >
                                     <i className='pi pi-times' />
                                 </button>

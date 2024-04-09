@@ -555,25 +555,26 @@ export class InventoryStore {
         }
     });
 
-    public removeMedia = action(async (imageuid: string): Promise<Status | undefined> => {
-        try {
-            this._isLoading = true;
+    public removeMedia = action(
+        async (imageuid: string, cb: () => void): Promise<Status | undefined> => {
             try {
-                await deleteMediaImage(imageuid);
-                this._images = [];
-                await this.fetchImages();
+                this._isLoading = true;
+                try {
+                    await deleteMediaImage(imageuid);
+                    await cb();
+                } catch (error) {
+                    // TODO: add error handler
+                }
+
+                return Status.OK;
             } catch (error) {
                 // TODO: add error handler
+                return undefined;
+            } finally {
+                this._isLoading = false;
             }
-
-            return Status.OK;
-        } catch (error) {
-            // TODO: add error handler
-            return undefined;
-        } finally {
-            this._isLoading = false;
         }
-    });
+    );
 
     public set uploadFileImages(files: UploadMediaItem) {
         this._uploadFileImages = files;

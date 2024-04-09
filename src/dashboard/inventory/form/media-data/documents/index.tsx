@@ -124,7 +124,7 @@ export const DocumentsMedia = observer((): ReactElement => {
     };
 
     const handleDeleteDocument = (mediauid: string) => {
-        removeMedia(mediauid);
+        removeMedia(mediauid, fetchDocuments);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
