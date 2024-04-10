@@ -179,6 +179,7 @@ export const AccountsForm = observer(() => {
                                         })
                                     }
                                     disabled={!stepActiveIndex}
+                                    severity={!stepActiveIndex ? "secondary" : "success"}
                                     className='uppercase px-6 account__button'
                                     outlined
                                 >
