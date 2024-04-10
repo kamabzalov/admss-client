@@ -165,6 +165,7 @@ export const ContactForm = () => {
                                         })
                                     }
                                     disabled={!stepActiveIndex}
+                                    severity={!stepActiveIndex ? "secondary" : "success"}
                                     className='uppercase px-6'
                                     outlined
                                 >

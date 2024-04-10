@@ -338,6 +338,7 @@ export const InventoryForm = observer(() => {
                                         })
                                     }
                                     disabled={!stepActiveIndex}
+                                    severity={!stepActiveIndex ? "secondary" : "success"}
                                     className='uppercase px-6 inventory__button'
                                     outlined
                                 >
