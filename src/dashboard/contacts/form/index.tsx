@@ -180,6 +180,11 @@ export const ContactForm = () => {
                                         })
                                     }
                                     disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
+                                    severity={
+                                        stepActiveIndex >= ITEMS_MENU_COUNT
+                                            ? "secondary"
+                                            : "success"
+                                    }
                                     className='uppercase px-6'
                                     outlined
                                 >

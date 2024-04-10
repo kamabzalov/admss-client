@@ -194,7 +194,9 @@ export const DealsForm = observer(() => {
                                         })
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
-                                    severity='success'
+                                    severity={
+                                        stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
+                                    }
                                     className='uppercase px-6 deal__button'
                                     outlined
                                 >

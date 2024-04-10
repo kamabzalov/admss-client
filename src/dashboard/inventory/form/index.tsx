@@ -354,7 +354,8 @@ export const InventoryForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex === deleteActiveIndex
+                                        stepActiveIndex === deleteActiveIndex ||
+                                        stepActiveIndex >= itemsMenuCount
                                             ? "secondary"
                                             : "success"
                                     }
