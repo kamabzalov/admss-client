@@ -212,42 +212,49 @@ export const VehicleGeneral = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-6 relative'>
-                <Dropdown
-                    {...formik.getFieldProps("Make")}
-                    optionLabel='name'
-                    optionValue='name'
-                    value={formik.values.Make}
-                    filter
-                    required
-                    options={automakesList}
-                    onChange={({ value }) => formik.setFieldValue("Make", value)}
-                    valueTemplate={selectedAutoMakesTemplate}
-                    itemTemplate={autoMakesOptionTemplate}
-                    placeholder='Make (required)'
-                    className={`vehicle-general__dropdown w-full ${
-                        formik.touched.Make && formik.errors.Make && "p-invalid"
-                    }`}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        {...formik.getFieldProps("Make")}
+                        optionLabel='name'
+                        optionValue='name'
+                        value={formik.values.Make}
+                        filter
+                        required
+                        options={automakesList}
+                        onChange={({ value }) => formik.setFieldValue("Make", value)}
+                        valueTemplate={selectedAutoMakesTemplate}
+                        itemTemplate={autoMakesOptionTemplate}
+                        placeholder='Make (required)'
+                        className={`vehicle-general__dropdown w-full ${
+                            formik.touched.Make && formik.errors.Make && "p-invalid"
+                        }`}
+                    />
+                    <label className='float-label'>Make (required)</label>
+                </span>
+
                 <small className='p-error'>
                     {(formik.touched.Make && formik.errors.Make) || ""}
                 </small>
             </div>
 
             <div className='col-6 relative'>
-                <Dropdown
-                    {...formik.getFieldProps("Model")}
-                    optionLabel='name'
-                    optionValue='name'
-                    value={formik.values.Model}
-                    filter={!!automakesModelList.length}
-                    editable={!automakesModelList.length}
-                    options={automakesModelList}
-                    onChange={({ value }) => formik.setFieldValue("Model", value)}
-                    placeholder='Model (required)'
-                    className={`vehicle-general__dropdown w-full ${
-                        formik.touched.Model && formik.errors.Model && "p-invalid"
-                    }`}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        {...formik.getFieldProps("Model")}
+                        optionLabel='name'
+                        optionValue='name'
+                        value={formik.values.Model}
+                        filter={!!automakesModelList.length}
+                        editable={!automakesModelList.length}
+                        options={automakesModelList}
+                        onChange={({ value }) => formik.setFieldValue("Model", value)}
+                        placeholder='Model (required)'
+                        className={`vehicle-general__dropdown w-full ${
+                            formik.touched.Model && formik.errors.Model && "p-invalid"
+                        }`}
+                    />
+                    <label className='float-label'>Model (required)</label>
+                </span>
                 <small className='p-error'>
                     {(formik.touched.Model && formik.errors.Model) || ""}
                 </small>
@@ -299,31 +306,37 @@ export const VehicleGeneral = observer((): ReactElement => {
                 </small>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    value={inventory?.ExteriorColor}
-                    filter
-                    required
-                    onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={colorList}
-                    placeholder='Color'
-                    className='w-full vehicle-general__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        value={inventory?.ExteriorColor}
+                        filter
+                        required
+                        onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
+                        options={colorList}
+                        placeholder='Color'
+                        className='w-full vehicle-general__dropdown'
+                    />
+                    <label className='float-label'>Color</label>
+                </span>
             </div>
 
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    value={inventory?.InteriorColor}
-                    filter
-                    required
-                    onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={interiorList}
-                    placeholder='Interior color'
-                    className='w-full vehicle-general__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        value={inventory?.InteriorColor}
+                        filter
+                        required
+                        onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
+                        options={interiorList}
+                        placeholder='Interior color'
+                        className='w-full vehicle-general__dropdown'
+                    />
+                    <label className='float-label'>Interior color</label>
+                </span>
             </div>
 
             <div className='flex col-12'>

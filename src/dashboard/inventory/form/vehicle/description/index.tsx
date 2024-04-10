@@ -73,71 +73,80 @@ export const VehicleDescription = observer((): ReactElement => {
     return (
         <div className='grid vehicle-description row-gap-2'>
             <div className='col-6'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    value={inventory?.Transmission}
-                    onChange={({ value }) => changeInventory({ key: "Transmission", value })}
-                    options={[...transmissionList, { name: inventory?.Transmission }]}
-                    placeholder='Transmission'
-                    className='w-full vehicle-description__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={inventory?.Transmission}
+                        onChange={({ value }) => changeInventory({ key: "Transmission", value })}
+                        options={transmissionList}
+                        className='w-full vehicle-description__dropdown'
+                    />
+                    <label className='float-label'>Transmission</label>
+                </span>
             </div>
 
             <div className='col-3 relative'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    options={[...fuelList, { name: inventory?.TypeOfFuel }]}
-                    value={formik.values.TypeOfFuel}
-                    onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
-                    placeholder='Type of Fuel (required)'
-                    className={`vehicle-description__dropdown w-full ${
-                        !isFormFieldInvalid("TypeOfFuel") && "p-invalid"
-                    }`}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        options={fuelList}
+                        value={formik.values.TypeOfFuel}
+                        onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
+                        className={`vehicle-description__dropdown w-full ${
+                            !isFormFieldInvalid("TypeOfFuel") && "p-invalid"
+                        }`}
+                    />
+                    <label className='float-label'>Type of Fuel (required)</label>
+                </span>
                 {getFormErrorMessage("TypeOfFuel")}
             </div>
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    value={inventory?.DriveLine}
-                    onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
-                    options={[...driveLineList, { name: inventory?.DriveLine }]}
-                    placeholder='Drive Line'
-                    className='w-full vehicle-description__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={inventory?.DriveLine}
+                        onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
+                        options={driveLineList}
+                        className='w-full vehicle-description__dropdown'
+                    />
+                    <label className='float-label'>Drive Line</label>
+                </span>
             </div>
 
             <div className='col-4'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    value={inventory?.Cylinders}
-                    onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
-                    options={[...cylindersList, { name: inventory?.Cylinders }]}
-                    placeholder='Cylinders'
-                    className='w-full vehicle-description__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={inventory?.Cylinders}
+                        onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
+                        options={cylindersList}
+                        className='w-full vehicle-description__dropdown'
+                    />
+                    <label className='float-label'>Cylinders</label>
+                </span>
             </div>
 
             <div className='col-8'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    value={inventory?.Engine}
-                    filter
-                    onChange={({ value }) => changeInventory({ key: "Engine", value })}
-                    //TODO: Remove name value from dropdown list
-                    options={[...engineList, { name: inventory?.Engine }]}
-                    placeholder='Engine description'
-                    className='w-full vehicle-description__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        value={inventory?.Engine}
+                        filter
+                        onChange={({ value }) => changeInventory({ key: "Engine", value })}
+                        options={engineList}
+                        className='w-full vehicle-description__dropdown'
+                    />
+                    <label className='float-label'>Engine description</label>
+                </span>
             </div>
         </div>
     );

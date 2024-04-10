@@ -120,11 +120,13 @@ export const PurchasePayments = observer((): ReactElement => {
                 </div>
 
                 <div className='col-12'>
-                    <InputTextarea
-                        className='purchase-payments__text-area'
-                        placeholder='Description'
-                        //TODO: missed payment description data
-                    />
+                    <span className='p-float-label'>
+                        <InputTextarea
+                            className='purchase-payments__text-area'
+                            //TODO: missed payment description data
+                        />
+                        <label className='float-label'>Description</label>
+                    </span>
                 </div>
 
                 <Button className='purchase-payments__button' onClick={handleSavePayment}>

@@ -20,14 +20,17 @@ export const VehicleInspections = observer((): ReactElement => {
     return (
         <div className='grid vehicle-inspections row-gap-2'>
             <div className='col-6'>
-                <InputText
-                    value={inspNumber}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "inspNumber", value })
-                    }
-                    placeholder='Inspection Number'
-                    className='w-full vehicle-inspections__dropdown'
-                />
+                <span className='p-float-label'>
+                    <InputText
+                        value={inspNumber}
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "inspNumber", value })
+                        }
+                        placeholder='Inspection Number'
+                        className='w-full vehicle-inspections__dropdown'
+                    />
+                    <label className='float-label'>Inspection Number</label>
+                </span>
             </div>
 
             <div className='col-3'>

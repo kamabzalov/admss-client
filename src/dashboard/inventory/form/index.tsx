@@ -328,7 +328,7 @@ export const InventoryForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-8 mr-3'>
                                 <Button
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {

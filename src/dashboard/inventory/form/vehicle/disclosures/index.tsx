@@ -74,18 +74,20 @@ export const VehicleDisclosures = observer((): ReactElement => {
             </div>
 
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='id'
-                    value={damSalvageState}
-                    filter
-                    onChange={({ value }) =>
-                        changeInventoryExtData({ key: "damSalvageState", value })
-                    }
-                    options={STATES_LIST}
-                    placeholder='State'
-                    className='w-full vehicle-disclosures__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        value={damSalvageState}
+                        filter
+                        onChange={({ value }) =>
+                            changeInventoryExtData({ key: "damSalvageState", value })
+                        }
+                        options={STATES_LIST}
+                        className='w-full vehicle-disclosures__dropdown'
+                    />
+                    <label className='float-label'>State</label>
+                </span>
             </div>
             <div className='col-3'>
                 <div className='vehicle-disclosures__checkbox flex'>
@@ -145,24 +147,28 @@ export const VehicleDisclosures = observer((): ReactElement => {
             </div>
 
             <div className='col-6'>
-                <InputTextarea
-                    placeholder='Parts Damaged'
-                    className='w-full vehicle-disclosures__text-area'
-                    value={dam25Parts}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "dam25Parts", value })
-                    }
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        className='w-full vehicle-disclosures__text-area'
+                        value={dam25Parts}
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "dam25Parts", value })
+                        }
+                    />
+                    <label className='float-label'>Parts Damaged</label>
+                </span>
             </div>
             <div className='col-6'>
-                <InputTextarea
-                    placeholder='Theft Parts Damaged '
-                    className='w-full vehicle-disclosures__text-area'
-                    value={damTheftParts}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "damTheftParts", value })
-                    }
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        className='w-full vehicle-disclosures__text-area'
+                        value={damTheftParts}
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "damTheftParts", value })
+                        }
+                    />
+                    <label className='float-label'>Theft Parts Damaged</label>
+                </span>
             </div>
         </div>
     );

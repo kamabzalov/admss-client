@@ -315,17 +315,19 @@ export const PurchasePurchases = observer((): ReactElement => {
                 />
             </div>
             <div className='col-12'>
-                <InputTextarea
-                    className='purchase-purchases__text-area'
-                    placeholder='Notes'
-                    value={purPurchaseCheckMemo}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseCheckMemo",
-                            value,
-                        });
-                    }}
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        className='purchase-purchases__text-area'
+                        value={purPurchaseCheckMemo}
+                        onChange={({ target: { value } }) => {
+                            changeInventoryExtData({
+                                key: "purPurchaseCheckMemo",
+                                value,
+                            });
+                        }}
+                    />
+                    <label className='float-label'>Notes</label>
+                </span>
             </div>
         </div>
     );
