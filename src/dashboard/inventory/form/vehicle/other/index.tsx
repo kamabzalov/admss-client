@@ -45,48 +45,62 @@ export const VehicleOther = observer((): ReactElement => {
     return (
         <div className='grid vehicle-other row-gap-2'>
             <div className='col-6'>
-                <Dropdown
-                    optionLabel='locName'
-                    optionValue='locationuid'
-                    filter
-                    options={locationList}
-                    placeholder='Location name'
-                    className='w-full vehicle-other__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='locName'
+                        optionValue='locationuid'
+                        filter
+                        options={locationList}
+                        placeholder='Location name'
+                        className='w-full vehicle-other__dropdown'
+                    />
+
+                    <label className='float-label'>Location name</label>
+                </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='id'
-                    filter
-                    options={groupClassList}
-                    value={inventory?.GroupClass}
-                    onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
-                    placeholder='Group class'
-                    className='w-full vehicle-other__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        filter
+                        options={groupClassList}
+                        value={inventory?.GroupClass}
+                        onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
+                        placeholder='Group class'
+                        className='w-full vehicle-other__dropdown'
+                    />
+                    <label className='float-label'>Group class</label>
+                </span>
             </div>
 
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    options={categoryList}
-                    value={inventory?.Category}
-                    onChange={({ value }) => changeInventory({ key: "Category", value })}
-                    placeholder='Category'
-                    className='w-full vehicle-other__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        options={categoryList}
+                        value={inventory?.Category}
+                        onChange={({ value }) => changeInventory({ key: "Category", value })}
+                        placeholder='Category'
+                        className='w-full vehicle-other__dropdown'
+                    />
+                    <label className='float-label'>Category</label>
+                </span>
             </div>
 
             <div className='col-12'>
-                <InputTextarea
-                    placeholder='Notes'
-                    value={inventory?.Notes}
-                    onChange={({ target: { value } }) => changeInventory({ key: "Notes", value })}
-                    className='w-full vehicle-other__text-area'
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        value={inventory?.Notes}
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "Notes", value })
+                        }
+                        className='w-full vehicle-other__text-area'
+                    />
+                    <label className='float-label'>Notes</label>
+                </span>
             </div>
         </div>
     );

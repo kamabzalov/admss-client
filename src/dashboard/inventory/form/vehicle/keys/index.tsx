@@ -41,14 +41,17 @@ export const VehicleKeys = observer((): ReactElement => {
             </div>
 
             <div className='col-6'>
-                <InputText
-                    placeholder='Key number/ Location'
-                    value={keyNumber}
-                    className='w-full vehicle-keys__dropdown'
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "keyNumber", value })
-                    }
-                />
+                <span className='p-float-label'>
+                    <InputText
+                        placeholder='Key number/ Location'
+                        value={keyNumber}
+                        className='w-full vehicle-keys__dropdown'
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "keyNumber", value })
+                        }
+                    />
+                    <label className='float-label'>Key number/ Location</label>
+                </span>
             </div>
         </div>
     );

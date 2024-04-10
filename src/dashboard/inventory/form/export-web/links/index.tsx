@@ -9,30 +9,51 @@ export const ExportWebLinks = observer((): ReactElement => {
     const { inventoryExportWeb, changeExportWeb, exportWebActive } = store;
     return (
         <div className='grid export-web-links row-gap-2'>
-            <InputTextarea
-                placeholder='VDP Link (Vehicle Detail Page)'
-                value={inventoryExportWeb.VDPLink}
-                disabled={!exportWebActive}
-                onChange={({ target: { value } }) => changeExportWeb({ key: "VDPLink", value })}
-                className='w-full export-web-links__text-area'
-            />
+            <div className='col-12'>
+                <span className='p-float-label'>
+                    <InputTextarea
+                        value={inventoryExportWeb.VDPLink}
+                        disabled={!exportWebActive}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "VDPLink", value })
+                        }
+                        className='w-full export-web-links__text-area'
+                    />
+
+                    <label className='float-label'>VDP Link</label>
+                </span>
+            </div>
 
             <hr className='form-line' />
 
-            <InputTextarea
-                placeholder='Video URL'
-                value={inventoryExportWeb.VideoURL}
-                disabled={!exportWebActive}
-                onChange={({ target: { value } }) => changeExportWeb({ key: "VideoURL", value })}
-                className='w-full export-web-links__text-area'
-            />
-            <InputTextarea
-                placeholder='Photo URL'
-                value={inventoryExportWeb.PhotoURL}
-                disabled={!exportWebActive}
-                onChange={({ target: { value } }) => changeExportWeb({ key: "PhotoURL", value })}
-                className='w-full export-web-links__text-area'
-            />
+            <div className='col-12'>
+                <span className='p-float-label'>
+                    <InputTextarea
+                        value={inventoryExportWeb.VideoURL}
+                        disabled={!exportWebActive}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "VideoURL", value })
+                        }
+                        className='w-full export-web-links__text-area'
+                    />
+
+                    <label className='float-label'>Video URL</label>
+                </span>
+            </div>
+            <div className='col-12'>
+                <span className='p-float-label'>
+                    <InputTextarea
+                        value={inventoryExportWeb.PhotoURL}
+                        disabled={!exportWebActive}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "PhotoURL", value })
+                        }
+                        className='w-full export-web-links__text-area'
+                    />
+
+                    <label className='float-label'>Photo URL</label>
+                </span>
+            </div>
         </div>
     );
 });

@@ -127,28 +127,34 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         />
                     </div>
                     <div className='col-6'>
-                        <Dropdown
-                            placeholder='Type'
-                            optionLabel='name'
-                            optionValue='id'
-                            filter
-                            options={expensesTypeList}
-                            value={expenseType}
-                            onChange={({ value }) => value && setExpenseType(Number(value))}
-                            className='w-full'
-                        />
+                        <span className='p-float-label'>
+                            <Dropdown
+                                optionLabel='name'
+                                optionValue='id'
+                                filter
+                                options={expensesTypeList}
+                                value={expenseType}
+                                onChange={({ value }) => value && setExpenseType(Number(value))}
+                                className='w-full'
+                            />
+
+                            <label className='float-label'>Type</label>
+                        </span>
                     </div>
                     <div className='col-12'>
-                        <Dropdown
-                            placeholder='Vendor'
-                            optionLabel='userName'
-                            optionValue='contactuid'
-                            filter
-                            options={expensesVendorList}
-                            value={expenseVendor}
-                            onChange={({ value }) => value && setExpenseVendor(String(value))}
-                            className='w-full'
-                        />
+                        <span className='p-float-label'>
+                            <Dropdown
+                                optionLabel='userName'
+                                optionValue='contactuid'
+                                filter
+                                options={expensesVendorList}
+                                value={expenseVendor}
+                                onChange={({ value }) => value && setExpenseVendor(String(value))}
+                                className='w-full'
+                            />
+
+                            <label className='float-label'>Vendor</label>
+                        </span>
                     </div>
                     <div className='col-6'>
                         <CurrencyInput
@@ -171,12 +177,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     </div>
                 </div>
                 <div className='col-6'>
-                    <InputTextarea
-                        className='purchase-expenses__text-area'
-                        placeholder='Notes'
-                        value={expenseNotes}
-                        onChange={({ target: { value } }) => setExpenseNotes(value)}
-                    />
+                    <span className='p-float-label'>
+                        <InputTextarea
+                            className='purchase-expenses__text-area'
+                            value={expenseNotes}
+                            onChange={({ target: { value } }) => setExpenseNotes(value)}
+                        />
+                        <label className='float-label'>Notes</label>
+                    </span>
                 </div>
 
                 <Button className='purchase-expenses__button' onClick={handleExpenseSubmit}>

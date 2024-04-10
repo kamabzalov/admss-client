@@ -55,28 +55,36 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    placeholder='Status'
-                    optionLabel='name'
-                    optionValue='id'
-                    filter
-                    className='w-full purchase-title__dropdown'
-                    value={titleStatus}
-                    options={TITLE_STATUS_LIST}
-                    onChange={({ value }) => changeInventoryExtData({ key: "titleStatus", value })}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        filter
+                        className='w-full purchase-title__dropdown'
+                        value={titleStatus}
+                        options={TITLE_STATUS_LIST}
+                        onChange={({ value }) =>
+                            changeInventoryExtData({ key: "titleStatus", value })
+                        }
+                    />
+                    <label className='float-label'>Status</label>
+                </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    placeholder='State'
-                    optionLabel='name'
-                    optionValue='id'
-                    filter
-                    className='w-full purchase-title__dropdown'
-                    value={titleState}
-                    options={STATES_LIST}
-                    onChange={({ value }) => changeInventoryExtData({ key: "titleState", value })}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        filter
+                        className='w-full purchase-title__dropdown'
+                        value={titleState}
+                        options={STATES_LIST}
+                        onChange={({ value }) =>
+                            changeInventoryExtData({ key: "titleState", value })
+                        }
+                    />
+                    <label className='float-label'>State</label>
+                </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -182,21 +190,23 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    placeholder='State'
-                    optionLabel='name'
-                    optionValue='id'
-                    filter
-                    className='w-full purchase-title__dropdown'
-                    value={titleHolderState}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "titleHolderState",
-                            value,
-                        });
-                    }}
-                    options={STATES_LIST}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        filter
+                        className='w-full purchase-title__dropdown'
+                        value={titleHolderState}
+                        onChange={({ value }) => {
+                            changeInventoryExtData({
+                                key: "titleHolderState",
+                                value,
+                            });
+                        }}
+                        options={STATES_LIST}
+                    />
+                    <label className='float-label'>Holder State</label>
+                </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -256,21 +266,24 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    placeholder='State'
-                    filter
-                    optionLabel='name'
-                    optionValue='id'
-                    className='w-full purchase-title__dropdown'
-                    options={STATES_LIST}
-                    value={titlePrevState}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "titlePrevState",
-                            value,
-                        });
-                    }}
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        placeholder='State'
+                        filter
+                        optionLabel='name'
+                        optionValue='id'
+                        className='w-full purchase-title__dropdown'
+                        options={STATES_LIST}
+                        value={titlePrevState}
+                        onChange={({ value }) => {
+                            changeInventoryExtData({
+                                key: "titlePrevState",
+                                value,
+                            });
+                        }}
+                    />
+                    <label className='float-label'>Previous State</label>
+                </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>

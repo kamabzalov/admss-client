@@ -152,6 +152,11 @@
 
 .inventory__button {
     font-weight: 600;
+    width: 245px;
+    font-size: 24px;
+    font-weight: 700;
+    justify-content: center;
+    height: 70px;
     transition: opacity 0.4s;
 }
 
