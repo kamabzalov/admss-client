@@ -50,8 +50,8 @@ export default function SignIn() {
                 } else {
                     toast.current?.show({
                         severity: "error",
-                        summary: response.error || "Error",
-                        detail: response?.message || String(response),
+                        summary: response.status || "Error",
+                        detail: response?.error || String(response),
                         sticky: true,
                     });
                 }
