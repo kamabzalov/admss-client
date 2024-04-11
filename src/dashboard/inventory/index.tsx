@@ -325,7 +325,10 @@ export default function Inventories(): ReactElement {
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
-                    checked={filterOptions.length === selectedFilter.length}
+                    checked={
+                        filterOptions.filter((option) => !option.disabled).length ===
+                        selectedFilter.length
+                    }
                     onChange={(e) => {
                         const isChecked = e.target.checked;
                         setSelectedFilter(
@@ -337,10 +340,6 @@ export default function Inventories(): ReactElement {
                         setSelectedFilterOptions(
                             selectedOptions.filter((option) => !option.disabled)
                         );
-                        changeSettings({
-                            ...serverSettings,
-                            selectedFilterOptions: selectedOptions,
-                        });
                     }}
                     className='dropdown-header__checkbox mr-2'
                 />
