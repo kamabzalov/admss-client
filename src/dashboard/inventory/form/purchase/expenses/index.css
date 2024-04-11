@@ -52,3 +52,9 @@
     height: 60px;
     font-size: 20px;
 }
+
+.expenses-confirm-dialog {
+    width: 455px;
+    height: 451px;
+    color: var(--admss-app-primary);
+}
