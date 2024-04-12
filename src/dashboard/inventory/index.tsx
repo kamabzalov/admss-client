@@ -206,8 +206,10 @@ export default function Inventories(): ReactElement {
                 const url = new Blob([response], { type: "application/pdf" });
                 let link = document.createElement("a");
                 link.href = window.URL.createObjectURL(url);
-                link.download = `Report-${name}.pdf`;
-                link.click();
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
 
                 if (print) {
                     window.open(
@@ -319,6 +321,46 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    const dropdownFilterHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={
+                        filterOptions.filter((option) => !option.disabled).length ===
+                        selectedFilter.length
+                    }
+                    onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        setSelectedFilter(
+                            isChecked
+                                ? filterOptions.map((option) => ({ value: option.value }))
+                                : []
+                        );
+                        const selectedOptions = isChecked ? filterOptions : [];
+                        setSelectedFilterOptions(
+                            selectedOptions.filter((option) => !option.disabled)
+                        );
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    setSelectedFilter([]);
+                    setSelectedFilterOptions([]);
+                    changeSettings({
+                        ...serverSettings,
+                        selectedFilterOptions: [],
+                    });
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -362,6 +404,7 @@ export default function Inventories(): ReactElement {
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
                     display='chip'
                     selectedItemsLabel='Clear Filter'
+                    panelHeaderTemplate={dropdownFilterHeaderPanel}
                     pt={{
                         header: {
                             className: "inventory-filter__header",
