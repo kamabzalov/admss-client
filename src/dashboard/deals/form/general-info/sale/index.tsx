@@ -87,7 +87,22 @@ export const DealGeneralSale = observer((): ReactElement => {
                 </span>
             </div>
 
-            <hr className='form-line' />
+            <div className='col-12 text-line'>
+                <h3 className='text-line__title m-0 pr-3'>Vehicle payments tracking</h3>
+                <hr className='text-line__line flex-1' />
+            </div>
+
+            <div className='col-3'>
+                <DateInput name='Warn Overdue After X Days' />
+            </div>
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <InputText className='deal-sale__text-input w-full' />
+                    <label className='float-label'>Account number</label>
+                </span>
+            </div>
+
+            <hr className='col-12 form-line' />
 
             <div className='col-6'>
                 <span className='p-float-label'>

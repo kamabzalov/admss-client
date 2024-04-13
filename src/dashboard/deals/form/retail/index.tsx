@@ -16,6 +16,9 @@ const DealRetailTag = lazy(() =>
 const DealRetailInsurance = lazy(() =>
     import("./insurance").then((module) => ({ default: module.DealRetailInsurance }))
 );
+const DealRetailCharges = lazy(() =>
+    import("./charges").then((module) => ({ default: module.DealRetailCharges }))
+);
 const DealRetailProducts = lazy(() =>
     import("./products").then((module) => ({ default: module.DealRetailProducts }))
 );
@@ -34,8 +37,9 @@ export const DealRetail: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "Trade 2", component: <DealRetailTradeSecond /> },
         { itemLabel: "Tag", component: <DealRetailTag /> },
         { itemLabel: "Insurance", component: <DealRetailInsurance /> },
-        { itemLabel: "Products", component: <DealRetailProducts /> },
+        { itemLabel: "Insurance Charges", component: <DealRetailCharges /> },
+        { itemLabel: "F&I products", component: <DealRetailProducts /> },
         { itemLabel: "Finances", component: <DealRetailFinances /> },
-        { itemLabel: "Pickup", component: <DealRetailPickup /> },
+        { itemLabel: "Pickup payments", component: <DealRetailPickup /> },
     ],
 };
