@@ -15,11 +15,11 @@ import { Column, ColumnProps } from "primereact/column";
 import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import { Inventory } from "common/models/inventory";
 import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportsColumn } from "common/models/reports";
+import { Deal } from "common/models/deals";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -30,7 +30,7 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 ];
 
 export default function Deals() {
-    const [deals, setDeals] = useState<Inventory[]>([]);
+    const [deals, setDeals] = useState<Deal[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
