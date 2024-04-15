@@ -1,3 +1,5 @@
+import { TypeList } from "..";
+
 export interface Deal {
     status: string;
     error: string;
@@ -14,9 +16,18 @@ export interface Deal {
     dealtype: number;
     saletype: number;
     dealstatus: number;
+    inventoryuinfo: string;
     inventorystatus: number;
     price: string;
+    name: string;
     extdata: DealExtData;
+}
+
+export interface DealType extends TypeList {
+    index: number;
+}
+export interface SaleType extends TypeList {
+    index: number;
 }
 
 export interface DealExtData {

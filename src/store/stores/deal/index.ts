@@ -1,6 +1,6 @@
 import { Deal, DealExtData } from "common/models/deals";
-import { getDealInfo } from "http/services/deals.service";
-import { makeAutoObservable } from "mobx";
+import { getDealInfo, setDeal } from "http/services/deals.service";
+import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
 interface DealItem extends Omit<Deal, "extdata"> {}
@@ -39,6 +39,7 @@ export class DealStore {
             if (response) {
                 const { extdata, ...deal } = response;
                 this._deal = deal;
+                this._dealID = extdata.dealUID;
                 this._dealExtData = extdata || ({} as DealExtData);
             }
         } catch (error) {
@@ -46,6 +47,24 @@ export class DealStore {
             this._isLoading = false;
         }
     };
+
+    public saveDeal = action(async (): Promise<string | undefined> => {
+        try {
+            this._isLoading = true;
+            const dealData: Deal = {
+                ...this._deal,
+                extdata: this._dealExtData,
+            };
+            const response = await setDeal(this._dealID, dealData);
+
+            return response?.status;
+        } catch (error) {
+            // TODO: add error handlers
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
 
     public clearDeal = () => {
         this._deal = {} as DealItem;

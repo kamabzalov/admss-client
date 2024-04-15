@@ -1,4 +1,4 @@
-import { LegacyRef, ReactElement, useEffect, useRef, useState } from "react";
+import { CSSProperties, LegacyRef, ReactElement, useEffect, useRef, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
@@ -10,6 +10,7 @@ type LabelPosition = "left" | "right" | "top";
 
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
+    style?: CSSProperties;
 }
 
 interface CurrencyInputProps extends InputNumberProps {
@@ -20,15 +21,16 @@ interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
 }
 
-export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElement => {
+export const DashboardRadio = ({ radioArray, style }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
 
     return (
-        <div className='flex flex-wrap gap-3 justify-content-between radio'>
+        <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
             {radioArray.map(({ name, title, value }) => (
                 <div
                     key={name}
                     className='flex align-items-center justify-content-between radio__item radio-item border-round'
+                    style={style}
                 >
                     <div className='radio-item__input flex align-items-center justify-content-center'>
                         <RadioButton

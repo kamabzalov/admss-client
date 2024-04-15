@@ -4,13 +4,21 @@ import "./index.css";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Checkbox } from "primereact/checkbox";
+import { useStore } from "store/hooks";
 
 export const DealGeneralOdometer = observer((): ReactElement => {
+    const store = useStore().dealStore;
+    const {
+        dealExtData: { OdometerReading, OdomDigits, OdomInExcess, OdomNotActual },
+    } = store;
     return (
         <div className='grid deal-general-odometer row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-odometer__text-input w-full' />
+                    <InputText
+                        className='deal-odometer__text-input w-full'
+                        value={OdometerReading}
+                    />
                     <label className='float-label'>Reading ar Time of Sale (r.)</label>
                 </span>
             </div>
@@ -19,6 +27,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='name'
+                        value={OdomDigits}
                         filter
                         required
                         className='w-full deal-odometer__dropdown'
@@ -32,7 +41,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         inputId='deal-odometer-reflects'
                         className='mt-1'
                         name='deal-odometer-reflects'
-                        checked={false}
+                        checked={!!OdomInExcess}
                     />
                     <label htmlFor='deal-odometer-reflects' className='ml-2'>
                         Odometer reflects the amount of mileage IN EXCESS of its mechanical limits
@@ -45,7 +54,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         inputId='deal-odometer-not-actual'
                         className='mt-1'
                         name='deal-odometer-not-actual'
-                        checked={false}
+                        checked={!!OdomNotActual}
                     />
                     <label htmlFor='deal-odometer-not-actual' className='ml-2'>
                         Odometer is NOT the actual mileage
