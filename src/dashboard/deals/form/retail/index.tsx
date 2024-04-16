@@ -28,6 +28,9 @@ const DealRetailFinances = lazy(() =>
 const DealRetailPickup = lazy(() =>
     import("./pickup").then((module) => ({ default: module.DealRetailPickup }))
 );
+const DealRetailContract = lazy(() =>
+    import("./contract").then((module) => ({ default: module.DealRetailContract }))
+);
 
 export const DealRetail: Pick<Inventory, "label" | "items"> = {
     label: "Retail (Cash)",
@@ -41,5 +44,6 @@ export const DealRetail: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "F&I products", component: <DealRetailProducts /> },
         { itemLabel: "Finances", component: <DealRetailFinances /> },
         { itemLabel: "Pickup payments", component: <DealRetailPickup /> },
+        { itemLabel: "Contract Printing", component: <DealRetailContract /> },
     ],
 };
