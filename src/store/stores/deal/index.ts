@@ -48,6 +48,22 @@ export class DealStore {
         }
     };
 
+    public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
+        if (this._deal && key !== "extdata") {
+            (this._deal as Record<typeof key, string | number>)[key] = value;
+        }
+    });
+
+    public changeDealExtData = action(
+        ({ key, value }: { key: keyof DealExtData; value: string | number }) => {
+            const dealStore = this.rootStore.dealStore;
+            if (dealStore) {
+                const { dealExtData } = dealStore;
+                (dealExtData as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
     public saveDeal = action(async (): Promise<string | undefined> => {
         try {
             this._isLoading = true;

@@ -12,6 +12,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
         deal: { dealtype, saletype, inventoryuinfo, name },
+        changeDeal,
     } = store;
 
     const [dealTypesList, setDealTypesList] = useState<DealType[]>([]);
@@ -63,6 +64,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         required
                         options={dealTypesList}
                         value={dealtype}
+                        onChange={(e) => changeDeal({ key: "dealtype", value: e.value })}
                         className='w-full deal-sale__dropdown'
                     />
                     <label className='float-label'>Type of Deal (required)</label>
@@ -89,6 +91,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         required
                         options={saleTypesList}
                         value={saletype}
+                        onChange={(e) => changeDeal({ key: "saletype", value: e.value })}
                         className='w-full deal-sale__dropdown'
                     />
                     <label className='float-label'>Sale type (required)</label>

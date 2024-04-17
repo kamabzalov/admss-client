@@ -23,7 +23,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { getDeal } = store;
+    const { getDeal, saveDeal } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -34,6 +34,9 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
 
     useEffect(() => {
+        accordionSteps.forEach((step, index) => {
+            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+        });
         if (stepsRef.current) {
             const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
             if (activeStep) {
@@ -208,7 +211,7 @@ export const DealsForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6 deal__button'>
+                                <Button onClick={saveDeal} className='uppercase px-6 deal__button'>
                                     Save
                                 </Button>
                             </div>

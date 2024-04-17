@@ -67,7 +67,7 @@ export const setDeal = async (
 ): Promise<BaseResponse | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `inventory/${dealuid || 0}/set`,
+            `deals/${dealuid || 0}/set`,
             dealData
         );
 
