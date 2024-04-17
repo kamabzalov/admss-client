@@ -10,6 +10,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
         dealExtData: { OdometerReading, OdomDigits, OdomInExcess, OdomNotActual },
+        changeDealExtData,
     } = store;
     return (
         <div className='grid deal-general-odometer row-gap-2'>
@@ -18,6 +19,9 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                     <InputText
                         className='deal-odometer__text-input w-full'
                         value={OdometerReading}
+                        onChange={(e) =>
+                            changeDealExtData({ key: "OdometerReading", value: e.target.value })
+                        }
                     />
                     <label className='float-label'>Reading ar Time of Sale (r.)</label>
                 </span>
@@ -42,6 +46,9 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         className='mt-1'
                         name='deal-odometer-reflects'
                         checked={!!OdomInExcess}
+                        onChange={() =>
+                            changeDealExtData({ key: "OdomInExcess", value: Number(!OdomInExcess) })
+                        }
                     />
                     <label htmlFor='deal-odometer-reflects' className='ml-2'>
                         Odometer reflects the amount of mileage IN EXCESS of its mechanical limits
@@ -55,6 +62,12 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         className='mt-1'
                         name='deal-odometer-not-actual'
                         checked={!!OdomNotActual}
+                        onChange={() =>
+                            changeDealExtData({
+                                key: "OdomNotActual",
+                                value: Number(!OdomNotActual),
+                            })
+                        }
                     />
                     <label htmlFor='deal-odometer-not-actual' className='ml-2'>
                         Odometer is NOT the actual mileage

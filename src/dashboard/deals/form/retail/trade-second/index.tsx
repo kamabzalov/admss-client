@@ -15,12 +15,38 @@ import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { useStore } from "store/hooks";
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
+const mileage = 0;
 
 export const DealRetailTradeSecond = observer((): ReactElement => {
-    const mileage = 0;
+    const store = useStore().dealStore;
+    const {
+        dealExtData: {
+            Trade2_VIN,
+            Trade2_Make,
+            Trade2_Model,
+            Trade2_Year,
+            Trade2_Mileage,
+            Trade2_Color,
+            Trade2_BodyStyle,
+            Trade2_Title_Num,
+            Trade2_StockNum,
+            Trade2_OdomInExcess,
+            Trade2_OdomNotActual,
+            Trade2_Allowance,
+            Trade2_Lien_Payoff,
+            Trade2_Lien_Payoff_Good_Through,
+            Trade2_Lien_Name,
+            Trade2_Lien_Address,
+            Trade2_Lien_Phone,
+            Trade2_Lien_Contact,
+            Trade2_Title_To,
+        },
+        changeDealExtData,
+    } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList] = useState<ListData[]>([]);
@@ -48,7 +74,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     <img
                         alt={option.name}
                         src={option?.logo || defaultMakesLogo}
-                        className='mr-2 deal-trade__dropdown-icon'
+                        className='mr-2 vehicle__dropdown-icon'
                     />
                     <div>{option.name}</div>
                 </div>
@@ -64,7 +90,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 <img
                     alt={option.name}
                     src={option?.logo || defaultMakesLogo}
-                    className='mr-2 deal-trade__dropdown-icon'
+                    className='mr-2 vehicle__dropdown-icon'
                 />
                 <div>{option.name}</div>
             </div>
@@ -73,11 +99,11 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
 
     const formik = useFormik({
         initialValues: {
-            VIN: "",
-            Make: "",
-            Model: "",
-            Year: String(""),
-            mileage: "",
+            VIN: Trade2_VIN || "",
+            Make: Trade2_Make || "",
+            Model: Trade2_Model || "",
+            Year: Trade2_Year || "",
+            mileage: Trade2_Mileage || "",
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -86,16 +112,19 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             if (!data.VIN) {
                 errors.VIN = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade2_VIN", value: data.VIN });
             }
 
             if (!data.Make) {
                 errors.Make = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade2_Make", value: data.Make });
             }
 
             if (!data.Model) {
                 errors.Model = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade2_Model", value: data.Model });
             }
             if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
                 switch (true) {
@@ -109,11 +138,13 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                         errors.Year = "Data is required.";
                 }
             } else {
+                changeDealExtData({ key: "Trade2_Year", value: data.Year });
             }
 
             if (!data.mileage) {
                 errors.mileage = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade2_Mileage", value: data.mileage });
             }
 
             return errors;
@@ -217,7 +248,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                         value={mileage}
                         minFractionDigits={2}
                         min={0}
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => formik.setFieldValue("mileage", value)}
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
@@ -231,8 +262,12 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='name'
+                        value={Trade2_Color}
                         filter
                         options={colorList}
+                        onChange={({ target: { value } }) =>
+                            changeDealExtData({ key: "Trade2_Color", value })
+                        }
                         className='w-full deal-trade__dropdown'
                     />
                     <label className='float-label'>Color</label>
@@ -242,8 +277,15 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
+                        //TODO: add options
                         optionLabel='name'
                         optionValue='name'
+                        value={Trade2_BodyStyle}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_BodyStyle", value });
+                        }}
+                        editable
+                        options={[{ name: Trade2_BodyStyle }]}
                         filter
                         className='w-full deal-trade__dropdown'
                     />
@@ -252,32 +294,69 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        value={Trade2_Title_Num}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_Title_Num", value });
+                        }}
+                        className='deal-trade__text-input w-full'
+                    />
                     <label className='float-label'>Title#</label>
                 </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        value={Trade2_StockNum}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_StockNum", value });
+                        }}
+                        className='deal-trade__text-input w-full'
+                    />
                     <label className='float-label'>Stock#</label>
                 </span>
             </div>
 
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                <Checkbox
+                    inputId='Trade2_OdomInExcess'
+                    name='Trade2_OdomInExcess'
+                    checked={!!Trade2_OdomInExcess}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Trade2_OdomInExcess",
+                            value: Number(!Trade2_OdomInExcess),
+                        })
+                    }
+                />
+                <label htmlFor='Trade2_OdomInExcess' className='ml-2'>
                     Disclosure IN EXCESS
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                <Checkbox
+                    inputId='Trade2_OdomNotActual'
+                    name='Trade2_OdomNotActual'
+                    checked={!!Trade2_OdomNotActual}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Trade2_OdomNotActual",
+                            value: Number(!Trade2_OdomNotActual),
+                        })
+                    }
+                />
+                <label htmlFor='Trade2_OdomNotActual' className='ml-2'>
                     Disclosure NOT ACTUAL
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                {/* TODO: Add checkbox for adding to inventory */}
+                <Checkbox
+                    inputId='Trade2_AddToInventory'
+                    name='Trade2_AddToInventory'
+                    checked={false}
+                />
+                <label htmlFor='Trade2_AddToInventory' className='ml-2'>
                     Add to inventory
                 </label>
             </div>
@@ -285,39 +364,106 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Allowance' />
+                <CurrencyInput
+                    value={Number(Trade2_Allowance)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade2_Allowance", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Allowance'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Payoff Amount' />
+                <CurrencyInput
+                    value={Number(Trade2_Lien_Payoff)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade2_Lien_Payoff", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Payoff Amount'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Payoff Amount' />
+                <CurrencyInput
+                    value={Number(Trade2_Lien_Payoff)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade2_Lien_Payoff", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Payoff Amount'
+                />
             </div>
             {/* TODO: Add calendar checkbox */}
             <div className='col-3'>
-                <DateInput name='PO Good Thru' />
+                <DateInput
+                    date={Trade2_Lien_Payoff_Good_Through}
+                    onChange={({ value }) =>
+                        value &&
+                        changeDealExtData({
+                            key: "Trade2_Lien_Payoff_Good_Through",
+                            value: Number(value),
+                        })
+                    }
+                    name='PO Good Thru'
+                />
             </div>
 
             <hr className='form-line' />
 
             <div className='col-6'>
-                <CompanySearch name='Lienholder Name' />
+                <CompanySearch
+                    name='Lienholder Name'
+                    value={Trade2_Lien_Name}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Trade2_Lien_Name", value })
+                    }
+                    onRowClick={(value) =>
+                        changeDealExtData({
+                            key: "Trade2_Lien_Name",
+                            value,
+                        })
+                    }
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        className='deal-trade__text-input w-full'
+                        value={Trade2_Lien_Address}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_Lien_Address", value });
+                        }}
+                    />
                     <label className='float-label'>Mailing address</label>
                 </span>
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        className='deal-trade__text-input w-full'
+                        value={Trade2_Lien_Phone}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_Lien_Phone", value });
+                        }}
+                    />
                     <label className='float-label'>Phone Number</label>
                 </span>
             </div>
             <div className='col-6'>
-                <CompanySearch name='Contact' />
+                <CompanySearch
+                    value={Trade2_Lien_Contact}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Trade2_Lien_Contact", value })
+                    }
+                    onRowClick={(value) =>
+                        changeDealExtData({
+                            key: "Trade2_Lien_Contact",
+                            value,
+                        })
+                    }
+                    name='Contact'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -325,6 +471,13 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
+                        //TODO: add options
+                        value={Trade2_Title_To}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade2_Title_To", value });
+                        }}
+                        editable
+                        options={[{ name: Trade2_Title_To }]}
                         className='w-full deal-trade__dropdown'
                     />
                     <label className='float-label'>Vehicle is Titled to</label>
