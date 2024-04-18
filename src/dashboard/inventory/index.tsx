@@ -302,10 +302,14 @@ export default function Inventories(): ReactElement {
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
-                    checked={columns.length === activeColumns.length}
                     onChange={() => {
-                        setActiveColumns(columns);
+                        if (columns.length === activeColumns.length) {
+                            setActiveColumns(columns.filter(({ checked }) => checked));
+                        } else {
+                            setActiveColumns(columns);
+                        }
                     }}
+                    checked={columns.length === activeColumns.length}
                     className='dropdown-header__checkbox mr-2'
                 />
                 Select All
