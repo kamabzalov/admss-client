@@ -5,14 +5,17 @@ import { useStore } from "store/hooks";
 
 export const ContactsWorkplace = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const { contact } = store;
+    const { contactExtData, changeContactExtData } = store;
     return (
         <div className='grid contacts-workplace row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact?.extdata?.Buyer_Emp_Company}
+                        value={contactExtData.Buyer_Emp_Company || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("Buyer_Emp_Company", value);
+                        }}
                     />
                     <label className='float-label'>Employer</label>
                 </span>
@@ -21,8 +24,12 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact?.extdata?.Buyer_Emp_Contact}
+                        value={contactExtData.Buyer_Emp_Contact || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("Buyer_Emp_Contact", value);
+                        }}
                     />
+
                     <label className='float-label'>Contact Name</label>
                 </span>
             </div>
@@ -31,7 +38,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        //TODO: missing Buyer_Emp_Email
+                        value={contactExtData.Buyer_Emp_Ext || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("Buyer_Emp_Ext", value);
+                        }}
                     />
                     <label className='float-label'>E-mail</label>
                 </span>
@@ -41,7 +51,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contact?.extdata?.Buyer_Emp_Phone}
+                        value={contactExtData.Buyer_Emp_Phone || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("Buyer_Emp_Phone", value);
+                        }}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>

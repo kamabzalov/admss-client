@@ -1,6 +1,6 @@
 import { BaseResponse, Status } from "../base-response";
 
-export interface ExtData {
+export interface ContactExtData {
     created: number;
     updated: number;
     useruid: string;
@@ -229,33 +229,39 @@ export interface ExtData {
     QBID: string;
 }
 export interface Contact {
-    created: string;
-    updated: string;
-    useruid: string;
-    contactuid: string;
-    userName: string;
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    city: string;
-    streetAddress: string;
-    state: string;
     ZIP: string;
-    phone1: string;
-    phone2: string;
+    city: string;
+    companyName: string;
+    contactuid: string;
+    created: string;
+    dl_number: string;
+    dluidback: string;
+    dluidfront: string;
+    dob: string;
     email1: string;
     email2: string;
     emails: string[];
-    phones: string[];
-    messagers: string[];
+    exp: string;
+    extdata?: ContactExtData;
+    firstName: string;
+    lastName: string;
     messager1: string;
     messager2: string;
-    companyName: string;
-    dluidfront: string;
-    dluidback: string;
+    messager3: string;
+    messager4: string;
+    messagers: string[];
+    middleName: string;
+    phone1: string;
+    phone2: string;
+    phones: string[];
+    sex: string;
+    state: string;
+    status: string;
+    streetAddress: string;
     type: number;
-    extdata: ExtData;
-    status: Status;
+    updated: string;
+    userName: string;
+    useruid: string;
 }
 
 export interface ContactsCategories {
