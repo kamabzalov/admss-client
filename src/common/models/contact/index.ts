@@ -242,7 +242,7 @@ export interface Contact {
     email2: string;
     emails: string[];
     exp: string;
-    extdata: ContactExtData;
+    extdata?: ContactExtData;
     firstName: string;
     lastName: string;
     messager1: string;

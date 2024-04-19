@@ -12,7 +12,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contactExtData.Buyer_Emp_Company}
+                        value={contactExtData.Buyer_Emp_Company || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_Emp_Company", value);
                         }}
@@ -24,7 +24,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contactExtData.Buyer_Emp_Contact}
+                        value={contactExtData.Buyer_Emp_Contact || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_Emp_Contact", value);
                         }}
@@ -38,7 +38,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contactExtData.Buyer_Emp_Ext}
+                        value={contactExtData.Buyer_Emp_Ext || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_Emp_Ext", value);
                         }}
@@ -51,7 +51,7 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        value={contactExtData.Buyer_Emp_Phone}
+                        value={contactExtData.Buyer_Emp_Phone || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_Emp_Phone", value);
                         }}

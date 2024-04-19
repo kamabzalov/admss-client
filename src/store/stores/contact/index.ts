@@ -1,12 +1,12 @@
 import { Status } from "common/models/base-response";
 import { Contact, ContactExtData } from "common/models/contact";
 import { getContactInfo, setContact } from "http/services/contacts-service";
-import { action, makeAutoObservable, observable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
 export class ContactStore {
     public rootStore: RootStore;
-    private _contact: Contact = observable({}) as Contact;
+    private _contact: Contact = {} as Contact;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactID: string = "";
     protected _isLoading = false;
@@ -47,10 +47,10 @@ export class ContactStore {
         try {
             const response = await getContactInfo(itemuid);
             if (response) {
-                const contact = response;
-                this._contactID = response.contactuid;
+                const { extdata, ...contact } = response as Contact;
+                this._contactID = contact.contactuid;
                 this._contact = contact || ({} as Contact);
-                this._contactExtData = contact.extdata || ({} as ContactExtData);
+                this._contactExtData = extdata || ({} as ContactExtData);
             }
         } catch (error) {
         } finally {

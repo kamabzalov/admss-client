@@ -39,7 +39,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Title'
-                    value={contactExtData.Buyer_Salutation}
+                    value={contactExtData.Buyer_Salutation || ""}
                     options={titleList}
                     onChange={({ target: { value } }) => {
                         changeContactExtData("Buyer_Salutation", value);
@@ -52,7 +52,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='general-info__text-input w-full'
-                        value={contact.firstName}
+                        value={contact.firstName || ""}
                         onChange={({ target: { value } }) => changeContact("firstName", value)}
                     />
                     <label className='float-label'>First Name (required)</label>
@@ -63,7 +63,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='general-info__text-input w-full'
-                        value={contact.lastName}
+                        value={contact.lastName || ""}
                         onChange={({ target: { value } }) => changeContact("lastName", value)}
                     />
                     <label className='float-label'>Last Name (required)</label>
@@ -74,7 +74,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='general-info__text-input w-full'
-                        value={contact.companyName}
+                        value={contact.companyName || ""}
                         onChange={({ target: { value } }) => changeContact("companyName", value)}
                     />
                     <label className='float-label'>Business Name</label>
@@ -85,7 +85,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 <Dropdown
                     optionLabel='name'
                     optionValue='id'
-                    value={contact.type}
+                    value={contact.type || ""}
                     filter
                     options={typeList}
                     onChange={({ target: { value } }) => changeContact("type", value)}

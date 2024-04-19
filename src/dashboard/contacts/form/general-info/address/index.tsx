@@ -16,7 +16,7 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.streetAddress}
+                        value={contact.streetAddress || ""}
                         onChange={({ target: { value } }) => changeContact("streetAddress", value)}
                     />
                     <label className='float-label'>Street Address</label>
@@ -28,7 +28,7 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                     optionValue='id'
                     filter
                     placeholder='State'
-                    value={contact.state}
+                    value={contact.state || ""}
                     options={STATES_LIST}
                     onChange={({ target: { value } }) => changeContact("state", value)}
                     className='w-full address-info__dropdown'
@@ -39,7 +39,7 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.city}
+                        value={contact.city || ""}
                         onChange={({ target: { value } }) => changeContact("city", value)}
                     />
                     <label className='float-label'>City</label>
@@ -50,7 +50,7 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.ZIP}
+                        value={contact.ZIP || ""}
                         onChange={({ target: { value } }) => changeContact("ZIP", value)}
                     />
                     <label className='float-label'>Zip Code</label>

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
-import { ReactElement } from "react";
+import { Fragment, ReactElement } from "react";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 
@@ -14,7 +14,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.email1}
+                        value={contact.email1 || ""}
                         onChange={({ target: { value } }) => {
                             changeContact("email1", value);
                         }}
@@ -32,7 +32,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.email2}
+                        value={contact.email2 || ""}
                         onChange={({ target: { value } }) => {
                             changeContact("email2", value);
                         }}
@@ -51,7 +51,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 contact.emails.map((email, index) => {
                     return (
                         index > 0 && (
-                            <>
+                            <Fragment key={index}>
                                 <div className='col-6'>
                                     <span className='p-float-label'>
                                         <InputText
@@ -78,7 +78,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                                         Add another email address
                                     </Button>
                                 </div>
-                            </>
+                            </Fragment>
                         )
                     );
                 })}
@@ -87,7 +87,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.phone1}
+                        value={contact.phone1 || ""}
                         onChange={({ target: { value } }) => {
                             changeContact("phone1", value);
                         }}
@@ -105,7 +105,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.phone2}
+                        value={contact.phone2 || ""}
                         onChange={({ target: { value } }) => {
                             changeContact("phone2", value);
                         }}
@@ -124,7 +124,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 contact.phones.map((phone, index) => {
                     return (
                         index > 0 && (
-                            <>
+                            <Fragment key={index}>
                                 <div className='col-6'>
                                     <span className='p-float-label'>
                                         <InputText
@@ -151,7 +151,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                                         Add another phone number
                                     </Button>
                                 </div>
-                            </>
+                            </Fragment>
                         )
                     );
                 })}
@@ -162,7 +162,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.messager1}
+                        value={contact.messager1 || ""}
                         onChange={(e) => changeContact("messager1", e.target.value)}
                     />
                     <label className='float-label'>Facebook</label>
@@ -172,7 +172,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.messager2}
+                        value={contact.messager2 || ""}
                         onChange={(e) => changeContact("messager2", e.target.value)}
                     />
                     <label className='float-label'>WhatsApp</label>
@@ -183,7 +183,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.messager3}
+                        value={contact.messager3 || ""}
                         onChange={(e) => changeContact("messager3", e.target.value)}
                     />
                     <label className='float-label'>Slack</label>
@@ -194,7 +194,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact.messager4}
+                        value={contact.messager4 || ""}
                         onChange={(e) => changeContact("messager4", e.target.value)}
                     />
                     <label className='float-label'>Skype</label>

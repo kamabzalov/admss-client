@@ -123,7 +123,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder="DL's State"
-                    value={contactExtData.Buyer_DL_State}
+                    value={contactExtData.Buyer_DL_State || ""}
                     options={STATES_LIST}
                     onChange={({ target: { value } }) =>
                         changeContactExtData("Buyer_DL_State", value)
@@ -136,7 +136,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='identification-info__text-input w-full'
-                        value={contactExtData.Buyer_Driver_License_Num}
+                        value={contactExtData.Buyer_Driver_License_Num || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_Driver_License_Num", value);
                         }}
@@ -148,7 +148,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3 mr-2'>
                 <DateInput
                     placeholder="DL's exp. date"
-                    value={contactExtData.Buyer_DL_Exp_Date}
+                    value={contactExtData.Buyer_DL_Exp_Date || ""}
                     onChange={({ target: { value } }) =>
                         changeContactExtData("Buyer_DL_Exp_Date", Date.parse(String(value)))
                     }
@@ -162,7 +162,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Sex'
-                    value={contactExtData.Buyer_Sex}
+                    value={contactExtData.Buyer_Sex || ""}
                     options={SexList}
                     onChange={({ target: { value } }) => changeContactExtData("Buyer_Sex", value)}
                     className='w-full identification-info__dropdown'
@@ -173,7 +173,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='identification-info__text-input w-full'
-                        value={contactExtData.Buyer_SS_Number}
+                        value={contactExtData.Buyer_SS_Number || ""}
                         onChange={({ target: { value } }) => {
                             changeContactExtData("Buyer_SS_Number", value);
                         }}
@@ -185,7 +185,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     placeholder='Date of Birth'
-                    value={contactExtData.Buyer_Date_Of_Birth}
+                    value={contactExtData.Buyer_Date_Of_Birth || ""}
                     onChange={({ target: { value } }) =>
                         changeContactExtData("Buyer_Date_Of_Birth", Date.parse(String(value)))
                     }
