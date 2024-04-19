@@ -29,7 +29,7 @@ export const ContactForm = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact } = store;
+    const { getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
         if (id) {
@@ -190,7 +190,7 @@ export const ContactForm = () => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='uppercase px-6'>
                                     Save
                                 </Button>
                             </div>
