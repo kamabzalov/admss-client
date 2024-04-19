@@ -1,20 +1,22 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
-    FileUploadUploadEvent,
-    ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
+import { DLSide } from "store/stores/contact";
+import { useParams } from "react-router-dom";
+import { Image } from "primereact/image";
 
 const SexList = [
     {
@@ -25,73 +27,80 @@ const SexList = [
     },
 ];
 
+enum DLSides {
+    FRONT = "front",
+    BACK = "back",
+}
+
 export const ContactsIdentificationInfo = observer((): ReactElement => {
+    const [sex, setSex] = useState<string>("");
+    const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData, setImagesDL, getImagesDL, removeImagesDL } =
-        store;
-    const fileUploadRef = useRef<FileUpload>(null);
+    const {
+        contact,
+        contactExtData,
+        changeContactExtData,
+        frontSideDL,
+        backSideDL,
+        getImagesDL,
+        removeImagesDL,
+        frontSideDLurl,
+        backSideDLurl,
+    } = store;
+    const fileUploadFrontRef = useRef<FileUpload>(null);
+    const fileUploadBackRef = useRef<FileUpload>(null);
 
     useEffect(() => {
         getImagesDL();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [contact]);
 
-    const onTemplateSelect = (e: FileUploadSelectEvent) => {};
-
-    const onTemplateUpload = (e: FileUploadUploadEvent) => {};
-
-    // eslint-disable-next-line no-unused-vars
-    const onTemplateRemove = (file: File, callback: Function) => {
-        removeImagesDL().then((res) => {
-            handleUploadFiles();
-        });
-        callback();
+    const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
+        if (side === DLSides.FRONT) {
+            store.frontSideDL = e.files[0];
+        }
+        if (side === DLSides.BACK) {
+            store.backSideDL = e.files[0];
+        }
     };
 
-    const handleUploadFiles = () => {
-        setImagesDL().then((res) => {
-            if (res) {
-                fileUploadRef.current?.clear();
-            }
-        });
+    const handleDeleteImage = (side: DLSide, isString: boolean = false) => {
+        if (side === DLSides.FRONT) {
+            fileUploadFrontRef.current?.clear();
+            store.frontSideDL = {} as File;
+        }
+        if (side === DLSides.BACK) {
+            fileUploadBackRef.current?.clear();
+            store.backSideDL = {} as File;
+        }
+        isString && removeImagesDL();
     };
 
-    const handleDeleteImage = () => {
-        removeImagesDL().then((res) => {
-            handleUploadFiles();
-        });
-    };
-
-    const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
-        const file = inFile as File;
+    const itemTemplate = (image: File | string, side: DLSide) => {
+        const isString = typeof image === "string";
+        const alt = isString ? "driven license" : image?.name;
+        const src = isString ? image : URL.createObjectURL(image);
         return (
-            <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__image'
-                    />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
-                </div>
+            <div className='flex align-items-center dl-presentation relative'>
+                <img alt={alt} src={src} role='presentation' className='dl-presentation__image' />
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={handleDeleteImage}
-                    className='p-button presentation__remove-button'
+                    onClick={() => handleDeleteImage(side, isString)}
+                    className='p-button dl-presentation__remove-button'
                 />
             </div>
         );
     };
 
-    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
+    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions, side: DLSide) => {
+        const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
         return (
-            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
+            <div
+                className={`col-6 ml-auto flex justify-content-center flex-wrap mb-3 dl-header ${
+                    size ? "dl-header__active" : ""
+                }`}
+            >
                 {chooseButton}
             </div>
         );
@@ -192,37 +201,55 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     className='identification-info__date-input w-full'
                 />
             </div>
-            <div className='flex col-12'>
-                <h3 className='identification__title m-0 pr-3'>Driver license's photos</h3>
-                <hr className='identification__line flex-1' />
-            </div>
+            {id && (
+                <>
+                    <div className='flex col-12'>
+                        <h3 className='identification__title m-0 pr-3'>Driver license's photos</h3>
+                        <hr className='identification__line flex-1' />
+                    </div>
 
-            <div className='col-6 identification-dl'>
-                <div className='identification-dl__title'>Frontside</div>
-                <FileUpload
-                    ref={fileUploadRef}
-                    accept='image/*'
-                    headerTemplate={chooseTemplate}
-                    onUpload={onTemplateUpload}
-                    itemTemplate={itemTemplate}
-                    emptyTemplate={emptyTemplate}
-                    onSelect={onTemplateSelect}
-                    progressBarTemplate={<></>}
-                    className='col-12'
-                />
-            </div>
-            <div className='col-6 identification-dl'>
-                <div className='identification-dl__title'>Backside</div>
-                <FileUpload
-                    ref={fileUploadRef}
-                    accept='image/*'
-                    headerTemplate={chooseTemplate}
-                    itemTemplate={itemTemplate}
-                    emptyTemplate={emptyTemplate}
-                    progressBarTemplate={<></>}
-                    className='col-12'
-                />
-            </div>
+                    <div
+                        className={`col-6 identification-dl ${
+                            frontSideDL.size ? "identification-dl__active" : ""
+                        }`}
+                    >
+                        <div className='identification-dl__title'>Frontside</div>
+                        {frontSideDLurl ? (
+                            itemTemplate(frontSideDLurl, DLSides.FRONT)
+                        ) : (
+                            <FileUpload
+                                ref={fileUploadFrontRef}
+                                accept='image/*'
+                                headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
+                                itemTemplate={(file) => itemTemplate(file as File, DLSides.FRONT)}
+                                emptyTemplate={emptyTemplate}
+                                onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
+                                progressBarTemplate={<></>}
+                            />
+                        )}
+                    </div>
+                    <div
+                        className={`col-6 identification-dl ${
+                            backSideDL.size ? "identification-dl__active" : ""
+                        }`}
+                    >
+                        <div className='identification-dl__title'>Backside</div>
+                        {backSideDLurl ? (
+                            itemTemplate(backSideDLurl, DLSides.BACK)
+                        ) : (
+                            <FileUpload
+                                ref={fileUploadBackRef}
+                                accept='image/*'
+                                headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
+                                itemTemplate={(file) => itemTemplate(file as File, DLSides.BACK)}
+                                emptyTemplate={emptyTemplate}
+                                onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
+                                progressBarTemplate={<></>}
+                            />
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 });

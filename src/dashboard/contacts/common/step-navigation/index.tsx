@@ -63,4 +63,9 @@ export class ContactSection implements Contact {
     public getLength(): number {
         return this.items.length;
     }
+
+    public clearCount() {
+        ContactSection.itemIndex = 0;
+        ContactSection.instancesCount = 0;
+    }
 }
