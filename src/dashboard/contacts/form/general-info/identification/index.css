@@ -24,7 +24,6 @@
 .identification-dl .p-fileupload {
     background: var(--admss-app-white-blue);
     border: dotted 1px var(--admss-app-medium-blue);
-    border-radius: 5px;
     display: flex;
     flex-direction: column-reverse;
 }
@@ -63,4 +62,56 @@
 .dl__line {
     border-top: 1px solid var(--admss-app-medium-blue);
     margin-top: 12px;
+}
+
+.identification-dl .p-fileupload-content {
+    padding: 0;
+}
+
+.identification-dl .dl-header.dl-header__active {
+    display: none !important;
+}
+
+.identification-dl .p-fileupload {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.identification-dl.identification-dl__active .p-button,
+.identification-dl .dl-presentation .p-button {
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: var(--admss-app-main-blue);
+}
+
+.identification-dl.identification-dl__active .p-button-icon {
+    font-size: 1.1rem;
+}
+
+.identification-dl.identification-dl__active .p-fileupload {
+    background: none;
+    border: none;
+}
+
+.identification-dl .p-fileupload-content .dl-presentation,
+.identification-dl .dl-presentation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 514px;
+    height: 282px;
+    padding: 0;
+}
+
+.dl-presentation__image {
+    width: 100%;
+    height: 100%;
+}
+
+.dl-presentation__remove-button {
+    position: absolute;
+    top: 0;
+    right: 0;
 }

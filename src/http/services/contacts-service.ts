@@ -96,3 +96,39 @@ export const setContact = async (
         // TODO: add error handler
     }
 };
+
+export const setContactDL = async (
+    contactuid: string,
+    { dluidback, dluidfront }: { dluidfront?: string; dluidback?: string }
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/dlicense`,
+            {
+                dluidfront,
+                dluidback,
+                contactuid,
+            }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const deleteContactDL = async (contactuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/deletedlicense`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
