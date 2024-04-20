@@ -47,6 +47,7 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
+        isFormValid,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -375,6 +376,7 @@ export const InventoryForm = observer(() => {
                                     <Button
                                         onClick={handleSave}
                                         className='uppercase px-6 inventory__button'
+                                        disabled={!isFormValid}
                                     >
                                         Save
                                     </Button>

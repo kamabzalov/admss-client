@@ -87,6 +87,7 @@ export class InventoryStore {
     private _printList: InventoryPrintForm[] = [];
 
     protected _isLoading = false;
+    protected _isFormValid = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -148,6 +149,10 @@ export class InventoryStore {
 
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public get isFormValid() {
+        return this._isFormValid;
     }
 
     public set exportWebActive(state: boolean) {
@@ -590,6 +595,10 @@ export class InventoryStore {
 
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
+    }
+
+    public set isFormValid(state: boolean) {
+        this._isFormValid = state;
     }
 
     public clearInventory = () => {

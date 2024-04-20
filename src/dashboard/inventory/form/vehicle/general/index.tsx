@@ -139,20 +139,14 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             if (!data.VIN) {
                 errors.VIN = "Data is required.";
-            } else {
-                handleVINchange(data.VIN);
             }
 
             if (!data.Make) {
                 errors.Make = "Data is required.";
-            } else {
-                changeInventory({ key: "Make", value: data.Make });
             }
 
             if (!data.Model) {
                 errors.Model = "Data is required.";
-            } else {
-                changeInventory({ key: "Model", value: data.Model });
             }
             if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
                 switch (true) {
@@ -165,20 +159,21 @@ export const VehicleGeneral = observer((): ReactElement => {
                     default:
                         errors.Year = "Data is required.";
                 }
-            } else {
-                changeInventory({ key: "Year", value: String(data.Year) });
             }
 
             if (!data.mileage) {
                 errors.mileage = "Data is required.";
-            } else {
-                changeInventory({ key: "mileage", value: String(data.mileage).replace(".", ",") });
             }
 
             return errors;
         },
         onSubmit: () => {},
     });
+
+    useEffect(() => {
+        const isValid = Object.keys(formik.errors).length === 0;
+        store.isFormValid = isValid;
+    }, [formik.errors, store]);
 
     return (
         <div className='grid vehicle-general row-gap-2'>
@@ -192,6 +187,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={formik.values.VIN}
                         onChange={({ target: { value } }) => {
                             formik.setFieldValue("VIN", value);
+                            handleVINchange(value);
                         }}
                     />
                     <label className='float-label'>VIN (required)</label>
@@ -221,7 +217,10 @@ export const VehicleGeneral = observer((): ReactElement => {
                         filter
                         required
                         options={automakesList}
-                        onChange={({ value }) => formik.setFieldValue("Make", value)}
+                        onChange={({ value }) => {
+                            formik.setFieldValue("Make", value);
+                            changeInventory({ key: "Make", value });
+                        }}
                         valueTemplate={selectedAutoMakesTemplate}
                         itemTemplate={autoMakesOptionTemplate}
                         placeholder='Make (required)'
@@ -247,7 +246,10 @@ export const VehicleGeneral = observer((): ReactElement => {
                         filter={!!automakesModelList.length}
                         editable={!automakesModelList.length}
                         options={automakesModelList}
-                        onChange={({ value }) => formik.setFieldValue("Model", value)}
+                        onChange={({ value }) => {
+                            formik.setFieldValue("Model", value);
+                            changeInventory({ key: "Model", value });
+                        }}
                         placeholder='Model (required)'
                         className={`vehicle-general__dropdown w-full ${
                             formik.touched.Model && formik.errors.Model && "p-invalid"
@@ -264,19 +266,20 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputNumber
                         {...formik.getFieldProps("Year")}
                         className={`vehicle-general__text-input w-full ${
-                            formik.touched.Year && formik.errors.Year && "p-invalid"
+                            formik.errors.Year && "p-invalid"
                         }`}
                         required
                         min={0}
                         value={year || MIN_YEAR}
                         useGrouping={false}
-                        onChange={({ value }) => formik.setFieldValue("Year", value)}
+                        onChange={({ value }) => {
+                            formik.setFieldValue("Year", value);
+                            changeInventory({ key: "Year", value: String(value) });
+                        }}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                <small className='p-error'>
-                    {(formik.touched.Year && formik.errors.Year) || ""}
-                </small>
+                <small className='p-error'>{formik.errors.Year || ""}</small>
             </div>
 
             <div className='col-3 relative'>
@@ -290,13 +293,13 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={mileage}
                         minFractionDigits={2}
                         min={0}
-                        onChange={({ value }) =>
-                            value &&
+                        onChange={({ value }) => {
+                            value && formik.setFieldValue("mileage", value);
                             changeInventory({
                                 key: "mileage",
                                 value: String(value).replace(".", ","),
-                            })
-                        }
+                            });
+                        }}
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
