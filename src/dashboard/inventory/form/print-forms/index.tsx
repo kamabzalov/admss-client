@@ -56,7 +56,7 @@ export const PrintForms = observer((): ReactElement => {
     const handlePrintSelectedForms = async () => {
         if (selectedPrints) {
             for (const { itemuid } of selectedPrints) {
-                await handlePrintForm(itemuid);
+                await handlePrintForm(itemuid, true);
             }
         }
     };
