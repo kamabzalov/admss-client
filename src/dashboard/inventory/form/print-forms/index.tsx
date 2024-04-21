@@ -24,6 +24,14 @@ export const PrintForms = observer((): ReactElement => {
         }
     }, [getPrintList, id]);
 
+    useEffect(() => {
+        if (!selectedPrints?.length) {
+            setIsButtonDisabled(true);
+        } else {
+            setIsButtonDisabled(false);
+        }
+    }, [selectedPrints]);
+
     const handlePrintForm = async (templateuid: string, print: boolean = false) => {
         if (id) {
             try {
@@ -107,6 +115,7 @@ export const PrintForms = observer((): ReactElement => {
                     <Button
                         className='p-button inventory-print__button'
                         onClick={() => handlePrintSelectedForms(true)}
+                        severity={isButtonDisabled ? "secondary" : "success"}
                         disabled={isButtonDisabled}
                     >
                         Print
@@ -115,6 +124,7 @@ export const PrintForms = observer((): ReactElement => {
                         className='p-button inventory-print__button'
                         onClick={() => handlePrintSelectedForms()}
                         disabled={isButtonDisabled}
+                        severity={isButtonDisabled ? "secondary" : "success"}
                     >
                         Download
                     </Button>
