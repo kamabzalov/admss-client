@@ -53,10 +53,10 @@ export const PrintForms = observer((): ReactElement => {
         }
     };
 
-    const handlePrintSelectedForms = async () => {
+    const handlePrintSelectedForms = async (print: boolean = false) => {
         if (selectedPrints) {
             for (const { itemuid } of selectedPrints) {
-                await handlePrintForm(itemuid, true);
+                await handlePrintForm(itemuid, print);
             }
         }
     };
@@ -103,16 +103,23 @@ export const PrintForms = observer((): ReactElement => {
                     <Column field='name' header='Form' />
                     <Column body={ActionButton} className='inventory-print__table-action' />
                 </DataTable>
-                <div className='mt-4'>
+                <div className='inventory-print__control'>
                     <Button
                         className='p-button inventory-print__button'
-                        onClick={handlePrintSelectedForms}
+                        onClick={() => handlePrintSelectedForms(true)}
                         disabled={isButtonDisabled}
                     >
-                        Print Selected
+                        Print
                     </Button>
                     <Button
-                        className='p-button inventory-print__button ml-4'
+                        className='p-button inventory-print__button'
+                        onClick={() => handlePrintSelectedForms()}
+                        disabled={isButtonDisabled}
+                    >
+                        Download
+                    </Button>
+                    <Button
+                        className='p-button inventory-print__button'
                         outlined
                         onClick={() => setSelectedPrints(null)}
                     >
