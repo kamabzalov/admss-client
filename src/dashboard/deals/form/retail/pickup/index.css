@@ -1,0 +1,31 @@
+.pickup-column {
+    padding: 0;
+}
+
+.pickup-header {
+    background: var(--admss-darkest-grey);
+    color: var(--admss-app-white);
+}
+
+.pickup-header,
+.pickup-item {
+    height: 60px;
+    display: flex;
+    padding-left: 30px;
+    align-items: center;
+}
+
+.pickup-item {
+    border-bottom: 1px solid var(--admss-app-light-grey);
+}
+
+.pickup-item:last-child {
+    border-bottom: none;
+}
+
+.pickup-amount {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+}

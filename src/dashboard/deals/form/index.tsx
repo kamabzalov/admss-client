@@ -10,7 +10,9 @@ import { ProgressBar } from "primereact/progressbar";
 
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { GeneralInfoData } from "./general-info";
+import { DealGeneralInfo } from "./general-info";
+import { DealRetail } from "./retail";
+import { useStore } from "store/hooks";
 
 const STEP = "step";
 
@@ -19,6 +21,9 @@ export const DealsForm = observer(() => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+
+    const store = useStore().dealStore;
+    const { getDeal, saveDeal } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -29,6 +34,9 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
 
     useEffect(() => {
+        accordionSteps.forEach((step, index) => {
+            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+        });
         if (stepsRef.current) {
             const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
             if (activeStep) {
@@ -46,13 +54,14 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        const dealsSections: Pick<Deals, "label" | "items">[] = [GeneralInfoData];
+        const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo, DealRetail];
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
 
+        id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
         };
@@ -202,7 +211,7 @@ export const DealsForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6 deal__button'>
+                                <Button onClick={saveDeal} className='uppercase px-6 deal__button'>
                                     Save
                                 </Button>
                             </div>
