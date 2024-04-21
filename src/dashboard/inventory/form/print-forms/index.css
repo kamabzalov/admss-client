@@ -20,15 +20,25 @@
     color: var(--admss-app-blue-text);
 }
 
-.inventory-print__button {
-    font-weight: 700;
-    font-size: 24px;
-}
-
 .inventory-print .p-datatable-thead tr th {
     border: none;
 }
 
 .inventory-print .p-datatable .p-button {
     height: 40px;
+}
+
+.inventory-print__control {
+    margin-top: 40px;
+    display: flex;
+    gap: 25px;
+}
+
+.inventory-print__button {
+    font-weight: 700;
+    font-size: 24px;
+    width: 245px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }

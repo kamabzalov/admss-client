@@ -24,6 +24,14 @@ export const PrintForms = observer((): ReactElement => {
         }
     }, [getPrintList, id]);
 
+    useEffect(() => {
+        if (!selectedPrints?.length) {
+            setIsButtonDisabled(true);
+        } else {
+            setIsButtonDisabled(false);
+        }
+    }, [selectedPrints]);
+
     const handlePrintForm = async (templateuid: string, print: boolean = false) => {
         if (id) {
             try {
@@ -53,10 +61,10 @@ export const PrintForms = observer((): ReactElement => {
         }
     };
 
-    const handlePrintSelectedForms = async () => {
+    const handlePrintSelectedForms = async (print: boolean = false) => {
         if (selectedPrints) {
             for (const { itemuid } of selectedPrints) {
-                await handlePrintForm(itemuid);
+                await handlePrintForm(itemuid, print);
             }
         }
     };
@@ -103,16 +111,25 @@ export const PrintForms = observer((): ReactElement => {
                     <Column field='name' header='Form' />
                     <Column body={ActionButton} className='inventory-print__table-action' />
                 </DataTable>
-                <div className='mt-4'>
+                <div className='inventory-print__control'>
                     <Button
                         className='p-button inventory-print__button'
-                        onClick={handlePrintSelectedForms}
+                        onClick={() => handlePrintSelectedForms(true)}
+                        severity={isButtonDisabled ? "secondary" : "success"}
                         disabled={isButtonDisabled}
                     >
-                        Print Selected
+                        Print
                     </Button>
                     <Button
-                        className='p-button inventory-print__button ml-4'
+                        className='p-button inventory-print__button'
+                        onClick={() => handlePrintSelectedForms()}
+                        disabled={isButtonDisabled}
+                        severity={isButtonDisabled ? "secondary" : "success"}
+                    >
+                        Download
+                    </Button>
+                    <Button
+                        className='p-button inventory-print__button'
                         outlined
                         onClick={() => setSelectedPrints(null)}
                     >
