@@ -171,15 +171,16 @@ export const DealsForm = observer(() => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/deals`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
+                                        });
+                                    }}
                                     className='uppercase px-6 deal__button'
                                     outlined
                                 >
