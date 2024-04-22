@@ -160,7 +160,7 @@ export const ContactForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
@@ -172,7 +172,7 @@ export const ContactForm = () => {
                                             return newStep;
                                         });
                                     }}
-                                    className='uppercase px-6'
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Back
@@ -189,12 +189,12 @@ export const ContactForm = () => {
                                     severity={
                                         stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
                                     }
-                                    className='uppercase px-6'
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={saveContact} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='form-nav__button'>
                                     Save
                                 </Button>
                             </div>

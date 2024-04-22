@@ -169,7 +169,7 @@ export const AccountsForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
@@ -181,7 +181,7 @@ export const AccountsForm = observer(() => {
                                             return newStep;
                                         });
                                     }}
-                                    className='uppercase px-6 account__button'
+                                    className='form-nav__button account__button'
                                     outlined
                                 >
                                     Back
@@ -198,14 +198,14 @@ export const AccountsForm = observer(() => {
                                     severity={
                                         stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
                                     }
-                                    className='uppercase px-6 account__button'
+                                    className='form-nav__button account__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
                                 <Button
                                     onClick={() => {}}
-                                    className='uppercase px-6 account__button'
+                                    className='form-nav__button account__button'
                                 >
                                     Save
                                 </Button>
