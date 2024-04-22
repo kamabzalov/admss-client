@@ -6,12 +6,12 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "primereact/progressbar";
 import { GeneralInfoData } from "./general-info";
 import { ContactInfoData } from "./contact-info";
 import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
+import { Loader } from "dashboard/common/loader";
 const STEP = "step";
 
 export const ContactForm = () => {
@@ -142,15 +142,7 @@ export const ContactForm = () => {
                                                         {item.itemLabel}
                                                     </div>
                                                     {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense
-                                                            fallback={
-                                                                <ProgressBar
-                                                                    mode='indeterminate'
-                                                                    style={{ height: "8px" }}
-                                                                    color='var(--admss-app-main-blue)'
-                                                                />
-                                                            }
-                                                        >
+                                                        <Suspense fallback={<Loader />}>
                                                             {item.component}
                                                         </Suspense>
                                                     )}
@@ -160,18 +152,19 @@ export const ContactForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/contacts`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
-                                    className='uppercase px-6'
+                                        });
+                                    }}
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Back
@@ -188,12 +181,12 @@ export const ContactForm = () => {
                                     severity={
                                         stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
                                     }
-                                    className='uppercase px-6'
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={saveContact} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='form-nav__button'>
                                     Save
                                 </Button>
                             </div>

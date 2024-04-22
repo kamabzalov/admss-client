@@ -10,7 +10,6 @@ import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
-import { ProgressBar } from "primereact/progressbar";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
@@ -23,6 +22,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
+import { Loader } from "dashboard/common/loader";
 
 const STEP = "step";
 
@@ -255,15 +255,7 @@ export const InventoryForm = observer(() => {
                                                         {item.itemLabel}
                                                     </div>
                                                     {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense
-                                                            fallback={
-                                                                <ProgressBar
-                                                                    mode='indeterminate'
-                                                                    style={{ height: "8px" }}
-                                                                    color='var(--admss-app-main-blue)'
-                                                                />
-                                                            }
-                                                        >
+                                                        <Suspense fallback={<Loader />}>
                                                             {item.component}
                                                         </Suspense>
                                                     )}
@@ -331,15 +323,16 @@ export const InventoryForm = observer(() => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-8 mr-3'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/inventory`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
+                                        });
+                                    }}
                                     className='uppercase px-6 inventory__button'
                                     outlined
                                 >

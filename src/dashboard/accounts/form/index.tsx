@@ -6,11 +6,10 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { Accounts, AccountsItem, AccountsSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "primereact/progressbar";
-
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { GeneralInfoData } from "./general-info";
+import { Loader } from "dashboard/common/loader";
 
 const STEP = "step";
 
@@ -151,15 +150,7 @@ export const AccountsForm = observer(() => {
                                                         {item.itemLabel}
                                                     </div>
                                                     {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense
-                                                            fallback={
-                                                                <ProgressBar
-                                                                    mode='indeterminate'
-                                                                    style={{ height: "8px" }}
-                                                                    color='var(--admss-app-main-blue)'
-                                                                />
-                                                            }
-                                                        >
+                                                        <Suspense fallback={<Loader />}>
                                                             {item.component}
                                                         </Suspense>
                                                     )}
@@ -169,18 +160,19 @@ export const AccountsForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/accounts`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
-                                    className='uppercase px-6 account__button'
+                                        });
+                                    }}
+                                    className='form-nav__button account__button'
                                     outlined
                                 >
                                     Back
@@ -197,14 +189,14 @@ export const AccountsForm = observer(() => {
                                     severity={
                                         stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
                                     }
-                                    className='uppercase px-6 account__button'
+                                    className='form-nav__button account__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
                                 <Button
                                     onClick={() => {}}
-                                    className='uppercase px-6 account__button'
+                                    className='form-nav__button account__button'
                                 >
                                     Save
                                 </Button>
