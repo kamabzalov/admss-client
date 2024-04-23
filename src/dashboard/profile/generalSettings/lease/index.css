@@ -1,48 +1,5 @@
-.lease-settings__row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 40px;
-}
-
-.lease-settings__row > * {
-    flex: 0 1 50%;
-}
-
-.lease-settings__row .p-inputnumber-input,
-.lease-settings__row .input-icon {
-    height: 50px;
-}
-
-.lease-settings__factor-label {
-    width: 112px;
-}
-
-.lease-settings__factor-input .p-inputnumber-input {
-    width: 116px;
-}
-
-.lease-settings-currency .currency-item__input .p-inputnumber-input {
-    width: 98px;
-}
-
-.lease-settings-currency .p-inputnumber-input {
-    width: 116px;
-}
-
-.lease-settings__mileage-label {
-    width: 81px;
-}
-
-.lease-settings__term-label {
-    width: 95px;
-}
-
-.lease-settings__mileage-label + .p-dropdown,
-.lease-settings__term-label + .p-dropdown {
-    flex: 1;
-}
-
-.lease-settings__payment-dropdown {
-    flex: 0 0 270px;
+.lease-settings-currency .currency-item__input .p-inputnumber-input,
+.lease-settings__dropdown.p-dropdown,
+.lease-settings .p-inputnumber {
+    width: 100%;
 }

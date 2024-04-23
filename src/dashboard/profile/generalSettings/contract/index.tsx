@@ -11,15 +11,20 @@ export const SettingsContract = ({ settings }: SettingsAccountProps) => {
     return (
         <div className='contract flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Contract Settings</div>
-            <div className='flex justify-content-between align-items-center'>
-                <div className='contract-percentage'>
+            <div className='grid'>
+                <div className='col-3'>
                     <PercentInput
                         className='contract-percentage__input'
                         title='Late fee percentage'
+                        labelPosition='top'
                     />
                 </div>
-
-                <Dropdown placeholder='Payment frequency' className='contract__dropdown' />
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <Dropdown className='contract__dropdown' />
+                        <label className='float-label'>Payment frequency</label>
+                    </span>
+                </div>
             </div>
         </div>
     );

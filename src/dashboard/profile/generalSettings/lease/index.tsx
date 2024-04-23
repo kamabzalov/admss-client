@@ -7,59 +7,48 @@ export const SettingsLease = () => {
     return (
         <div className='lease-settings flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Lease Settings</div>
-            <div className='lease-settings__row'>
-                <div className='flex align-items-center justify-content-between'>
-                    <label
-                        htmlFor='lease-settings__factor'
-                        className='lease-settings__factor-label'
-                    >
-                        Money factor
-                    </label>
-                    <InputNumber
-                        value={0}
-                        id='lease-settings__factor'
-                        className='lease-settings__factor-input'
-                    />
+            <div className='grid mt-2'>
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <InputNumber
+                            value={0}
+                            id='lease-settings__factor'
+                            className='lease-settings__factor-input'
+                        />
+                        <label
+                            htmlFor='lease-settings__factor'
+                            className='float-label lease-settings__factor-label'
+                        >
+                            Money factor
+                        </label>
+                    </span>
                 </div>
-                <div className='flex align-items-center justify-content-between'>
-                    <label
-                        htmlFor='lease-settings__mileage'
-                        className='lease-settings__mileage-label wrap'
-                    >
-                        Default mileage
-                    </label>
-                    <Dropdown
-                        placeholder='1500'
-                        id='lease-settings__mileage'
-                        className='lease-settings__mileage-dropdown'
-                    />
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <Dropdown className='lease-settings__dropdown' />
+                        <label className='float-label'> Default mileage</label>
+                    </span>
                 </div>
-            </div>
-            <div className='lease-settings__row'>
-                <div className='lease-settings-currency'>
+                <div className='col-3'>
                     <CurrencyInput
                         className='lease-settings-currency__input'
                         title='Overage amount'
+                        labelPosition='top'
                         value={0.15}
                     />
                 </div>
-
-                <div className='flex align-items-center justify-content-between'>
-                    <label htmlFor='lease-settings__term' className='lease-settings__term-label'>
-                        Term (months)
-                    </label>
-                    <Dropdown
-                        placeholder='6'
-                        id='lease-settings__term'
-                        className='lease-settings__term-dropdown'
-                    />
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <Dropdown id='lease-settings__term' className='lease-settings__dropdown' />
+                        <label className='float-label'>Term (months)</label>
+                    </span>
                 </div>
-            </div>
-            <div className='lease-settings__row'>
-                <Dropdown
-                    placeholder='Payment frequency'
-                    className='lease-settings__payment-dropdown'
-                />
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <Dropdown className='lease-settings__dropdown' />
+                        <label className='float-label'>Payment frequency</label>
+                    </span>
+                </div>
             </div>
         </div>
     );

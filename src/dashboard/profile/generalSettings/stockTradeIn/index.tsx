@@ -20,7 +20,7 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
     return (
         <div className='stock-trade-in flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Stock# for trade-in</div>
-            <div className='flex justify-content-between'>
+            <div className='flex'>
                 <div className='flex align-items-center stock-trade-in__input'>
                     <Checkbox inputId={settings} name={settings} value={settings} checked />
                     <label htmlFor={settings} className='ml-2'>
@@ -34,34 +34,44 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
                     </label>
                 </div>
             </div>
-            <div className='flex align-items-center justify-content-between'>
-                <span className='p-float-label'>
-                    <InputText className='stock-trade-in__input' />
-                    <label className='float-label'>Prefix</label>
-                </span>
-                <span className='p-float-label'>
-                    <InputText className='stock-trade-in__input' />
-                    <label className='float-label'>Suffix</label>
-                </span>
-            </div>
-            <DashboardRadio radioArray={radioSettings} />
-            <div className='flex'>
-                <label htmlFor={settings} className='ml-2'>
-                    Fixed digits
-                </label>
-                <div className='flex-1 ml-8'>
-                    <InputNumber
-                        value={value}
-                        max={10}
-                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
-                        className='w-full'
-                    />
-                    <Slider
-                        value={value}
-                        onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
-                        max={10}
-                        className='w-full'
-                    />
+
+            <hr className='form-line' />
+
+            <div className='grid'>
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <InputText className='stock-new__input' />
+                        <label className='float-label'>Prefix</label>
+                    </span>
+                </div>
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <InputText className='stock-new__input' />
+                        <label className='float-label'>Suffix</label>
+                    </span>
+                </div>
+                <div className='col-6'>
+                    <DashboardRadio radioArray={radioSettings} />
+                </div>
+
+                <div className='col-6 mt-3'>
+                    <span className='p-float-label'>
+                        <InputNumber
+                            value={value}
+                            max={10}
+                            onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
+                            className='w-full'
+                        />
+                        <Slider
+                            value={value}
+                            onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
+                            max={10}
+                            className='w-full'
+                        />
+                        <label htmlFor={settings} className='float-label'>
+                            Fixed digits
+                        </label>
+                    </span>
                 </div>
             </div>
         </div>

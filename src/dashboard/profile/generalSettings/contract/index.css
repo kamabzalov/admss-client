@@ -1,7 +1,4 @@
-.contract-percentage .percent-item__label {
-    width: 106px;
-}
-
+.contract-percentage .percent-item__label,
 .contract .contract__dropdown {
-    width: 250px;
+    width: 100%;
 }
