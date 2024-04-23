@@ -1,9 +1,4 @@
-.account-start-number__input,
-.account__input,
-.account__late-fee,
-.account-late-fee .currency-item__input .p-inputnumber-input,
-.account-grace__input,
-.account-grace__label,
-.account-percentage .percent-item__label {
+.settings-account__input,
+.settings-account .p-inputnumber-input {
     width: 100%;
 }

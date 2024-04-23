@@ -4,9 +4,9 @@ import { PercentInput } from "dashboard/common/form/inputs";
 
 export const SettingsTaxes = () => {
     return (
-        <>
-            <div className='text-lg pb-4 font-semibold taxes'>Taxes</div>
-            <div className='taxes__row grid'>
+        <div className='settings-form'>
+            <div className='settings-form__title'>Taxes</div>
+            <div className='grid'>
                 <div className='col-3'>
                     <Dropdown placeholder='State' className='taxes__dropdown' />
                 </div>
@@ -14,6 +14,6 @@ export const SettingsTaxes = () => {
                     <PercentInput />
                 </div>
             </div>
-        </>
+        </div>
     );
 };

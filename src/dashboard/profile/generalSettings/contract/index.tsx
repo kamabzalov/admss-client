@@ -9,19 +9,19 @@ interface SettingsAccountProps {
 
 export const SettingsContract = ({ settings }: SettingsAccountProps) => {
     return (
-        <div className='contract flex flex-column gap-4'>
-            <div className='text-lg font-semibold'>Contract Settings</div>
-            <div className='grid'>
+        <div className='settings-form'>
+            <div className='settings-form__title'>Contract Settings</div>
+            <div className='grid settings-contract'>
                 <div className='col-3'>
                     <PercentInput
-                        className='contract-percentage__input'
+                        className='settings-contract__input'
                         title='Late fee percentage'
                         labelPosition='top'
                     />
                 </div>
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <Dropdown className='contract__dropdown' />
+                        <Dropdown className='settings-contract__dropdown' />
                         <label className='float-label'>Payment frequency</label>
                     </span>
                 </div>

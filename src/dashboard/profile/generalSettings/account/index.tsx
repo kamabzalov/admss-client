@@ -13,17 +13,17 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
     const [valueDigits, setValueDigits] = useState<number>(2);
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='account flex flex-column gap-4'>
-            <div className='text-lg font-semibold'>Account Settings</div>
-            <div className='grid account-start-number mt-2'>
+        <div className='settings-form'>
+            <div className='settings-form__title'>Account Settings</div>
+            <div className='grid settings-account'>
                 <div className='col-3'>
                     <span className='p-float-label'>
                         <InputText
                             value={"0"}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {}}
-                            className='account-start-number__input'
+                            className='settings-account__input'
                         />
-                        <label className='account-start-number__label float-label'>
+                        <label className='settings-account__label float-label'>
                             Start number (starts from 0 by default)
                         </label>
                     </span>
@@ -50,13 +50,13 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                 <hr className='form-line' />
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <InputText className='account__input' />
+                        <InputText className='settings-account__input' />
                         <label className='float-label'>Prefix</label>
                     </span>
                 </div>
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <InputText className='account__input' />
+                        <InputText className='settings-account__input' />
                         <label className='float-label'>Suffix</label>
                     </span>
                 </div>
@@ -69,7 +69,7 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                 <div className='col-6 mt-3'>
                     <span className='p-float-label'>
                         <InputNumber
-                            className='account-grace__input'
+                            className='settings-account__input'
                             max={10}
                             value={value}
                             onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
@@ -87,7 +87,7 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                 </div>
                 <div className='col-3 mt-3'>
                     <PercentInput
-                        className='account-percentage__input'
+                        className='settings-account__input'
                         title='Late fee percentage'
                         labelPosition='top'
                     />

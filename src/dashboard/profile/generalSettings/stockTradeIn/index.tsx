@@ -18,26 +18,27 @@ interface SettingsStockTradeInProps {
 export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockTradeInProps) => {
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='stock-trade-in flex flex-column gap-4'>
-            <div className='text-lg font-semibold'>Stock# for trade-in</div>
-            <div className='flex'>
-                <div className='flex align-items-center stock-trade-in__input'>
-                    <Checkbox inputId={settings} name={settings} value={settings} checked />
-                    <label htmlFor={settings} className='ml-2'>
-                        Sequental
-                    </label>
-                </div>
-                <div className='flex align-items-center stock-trade-in__input'>
-                    <Checkbox inputId={settings} name={settings} value={settings} checked />
-                    <label htmlFor={settings} className='ml-2'>
-                        From sold vehicle
-                    </label>
-                </div>
-            </div>
-
-            <hr className='form-line' />
-
+        <div className='settings-form'>
+            <div className='settings-form__title'>Stock# for trade-in</div>
             <div className='grid'>
+                <div className='col-3'>
+                    <div className='flex align-items-center stock-trade-in__input'>
+                        <Checkbox inputId={settings} name={settings} value={settings} checked />
+                        <label htmlFor={settings} className='ml-2'>
+                            Sequental
+                        </label>
+                    </div>
+                </div>
+                <div className='col-3'>
+                    <div className='flex align-items-center stock-trade-in__input'>
+                        <Checkbox inputId={settings} name={settings} value={settings} checked />
+                        <label htmlFor={settings} className='ml-2'>
+                            From sold vehicle
+                        </label>
+                    </div>
+                </div>
+                <hr className='form-line' />
+
                 <div className='col-3'>
                     <span className='p-float-label'>
                         <InputText className='stock-new__input' />

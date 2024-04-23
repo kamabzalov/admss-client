@@ -61,7 +61,7 @@ export const GeneralSettings = (): ReactElement => {
     ];
 
     return (
-        <div className='grid relative'>
+        <div className='grid relative general-settings'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
