@@ -18,42 +18,52 @@ interface SettingsStockNewProps {
 export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewProps) => {
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='stock-new flex flex-column gap-4'>
-            <div className='text-lg font-semibold'>Stock# for new inventory</div>
-            <div className='flex align-items-center'>
-                <Checkbox inputId={settings} name={settings} value={settings} checked />
-                <label htmlFor={settings} className='ml-2'>
-                    Sequental
-                </label>
-            </div>
-            <div className='flex align-items-center justify-content-between'>
-                <span className='p-float-label'>
-                    <InputText className='stock-new__input' />
-                    <label className='float-label'>Prefix</label>
-                </span>
-                <span className='p-float-label'>
-                    <InputText className='stock-new__input' />
-                    <label className='float-label'>Suffix</label>
-                </span>
-            </div>
-            <DashboardRadio radioArray={radioSettings} />
-            <div className='flex'>
-                <label htmlFor={settings} className='ml-2'>
-                    Fixed digits
-                </label>
-                <div className='flex-1 ml-8'>
-                    <InputNumber
-                        value={value}
-                        max={10}
-                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
-                        className='w-full'
-                    />
-                    <Slider
-                        value={value}
-                        onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
-                        max={10}
-                        className='w-full'
-                    />
+        <div className='settings-form'>
+            <div className='settings-form__title'>Stock# for new inventory</div>
+            <div className='grid'>
+                <div className='col-3'>
+                    <Checkbox inputId={settings} name={settings} value={settings} checked />
+                    <label htmlFor={settings} className='ml-2'>
+                        Sequental
+                    </label>
+                </div>
+
+                <hr className='form-line' />
+
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <InputText className='stock-new__input' />
+                        <label className='float-label'>Prefix</label>
+                    </span>
+                </div>
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <InputText className='stock-new__input' />
+                        <label className='float-label'>Suffix</label>
+                    </span>
+                </div>
+                <div className='col-6'>
+                    <DashboardRadio radioArray={radioSettings} />
+                </div>
+
+                <div className='col-6 mt-3'>
+                    <span className='p-float-label'>
+                        <InputNumber
+                            value={value}
+                            max={10}
+                            onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
+                            className='w-full'
+                        />
+                        <Slider
+                            value={value}
+                            onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
+                            max={10}
+                            className='w-full'
+                        />
+                        <label htmlFor={settings} className='float-label'>
+                            Fixed digits
+                        </label>
+                    </span>
                 </div>
             </div>
         </div>

@@ -17,6 +17,7 @@ import { ContactForm } from "dashboard/contacts/form";
 import { ExportToWeb } from "dashboard/export-web";
 import { DealsForm } from "dashboard/deals/form";
 import { AccountsForm } from "dashboard/accounts/form";
+import { GeneralSettings } from "dashboard/profile/generalSettings";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -69,6 +70,10 @@ const router: RemixRouter = createBrowserRouter([
                             { path: "create", element: <AccountsForm /> },
                             { path: ":id", element: <AccountsForm /> },
                         ],
+                    },
+                    {
+                        path: "settings",
+                        element: <GeneralSettings />,
                     },
                     {
                         path: "reports",

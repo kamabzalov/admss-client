@@ -10,9 +10,9 @@ interface SettingsDealsProps {
 
 export const SettingsDeals = ({ settings }: SettingsDealsProps): JSX.Element => {
     return (
-        <>
-            <div className='text-lg pb-4 font-semibold'>Deals</div>
-            {settings && <DashboardRadio radioArray={settings} />}
-        </>
+        <div className='settings-form'>
+            <div className='settings-form__title'>Deals</div>
+            <div className='flex'>{settings && <DashboardRadio radioArray={settings} />}</div>
+        </div>
     );
 };
