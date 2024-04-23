@@ -213,11 +213,7 @@ export const DealsForm = observer(() => {
                                     Next
                                 </Button>
                                 <Button
-
                                     onClick={saveDeal}
-
-                                    onClick={() => {}}
-
                                     className='form-nav__button deal__button'
                                 >
                                     Save
