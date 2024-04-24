@@ -11,6 +11,7 @@ import { SettingsLease } from "./lease";
 import { ReactElement } from "react";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+import { SettingsInventoryGroups } from "./inventory-groups";
 
 interface TabItem {
     settingName: string;
@@ -55,6 +56,7 @@ export const GeneralSettings = (): ReactElement => {
                 />
             ),
         },
+        { settingName: "Inventory groups", component: <SettingsInventoryGroups /> },
         { settingName: "Account Settings", component: <SettingsAccount /> },
         { settingName: "Contract Settings", component: <SettingsContract /> },
         { settingName: "Lease Settings", component: <SettingsLease /> },
