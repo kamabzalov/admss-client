@@ -27,6 +27,7 @@ import { ContactsUserSettings, ServerUserSettings, TableState } from "common/mod
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
+import { Loader } from "dashboard/common/loader";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser;
@@ -265,83 +266,92 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             </div>
             <div className='grid'>
                 <div className='col-12'>
-                    <DataTable
-                        showGridlines
-                        value={contacts}
-                        lazy
-                        scrollable
-                        scrollHeight='70vh'
-                        paginator
-                        first={lazyState.first}
-                        rows={lazyState.rows}
-                        rowsPerPageOptions={ROWS_PER_PAGE}
-                        totalRecords={totalRecords}
-                        onPage={pageChanged}
-                        onSort={sortData}
-                        sortOrder={lazyState.sortOrder}
-                        sortField={lazyState.sortField}
-                        resizableColumns
-                        reorderableColumns
-                        rowClassName={() => "hover:text-primary cursor-pointer"}
-                        onRowClick={handleOnRowClick}
-                        onColReorder={(event) => {
-                            if (authUser && Array.isArray(event.columns)) {
-                                const orderArray = event.columns?.map(
-                                    (column: any) => column.props.field
-                                );
+                    {!contacts.length ? (
+                        <div className='dashboard-loader__wrapper'>
+                            <Loader />
+                        </div>
+                    ) : (
+                        <DataTable
+                            showGridlines
+                            value={contacts}
+                            lazy
+                            scrollable
+                            scrollHeight='70vh'
+                            paginator
+                            first={lazyState.first}
+                            rows={lazyState.rows}
+                            rowsPerPageOptions={ROWS_PER_PAGE}
+                            totalRecords={totalRecords}
+                            onPage={pageChanged}
+                            onSort={sortData}
+                            sortOrder={lazyState.sortOrder}
+                            sortField={lazyState.sortField}
+                            resizableColumns
+                            reorderableColumns
+                            rowClassName={() => "hover:text-primary cursor-pointer"}
+                            onRowClick={handleOnRowClick}
+                            onColReorder={(event) => {
+                                if (authUser && Array.isArray(event.columns)) {
+                                    const orderArray = event.columns?.map(
+                                        (column: any) => column.props.field
+                                    );
 
-                                const newActiveColumns = orderArray
-                                    .map((field: string) => {
-                                        return (
-                                            activeColumns.find(
-                                                (column) => column.field === field
-                                            ) || null
-                                        );
-                                    })
-                                    .filter(
-                                        (column): column is TableColumnProps => column !== null
-                                    ) as TableColumnProps[];
+                                    const newActiveColumns = orderArray
+                                        .map((field: string) => {
+                                            return (
+                                                activeColumns.find(
+                                                    (column) => column.field === field
+                                                ) || null
+                                            );
+                                        })
+                                        .filter(
+                                            (column): column is TableColumnProps => column !== null
+                                        ) as TableColumnProps[];
 
-                                setActiveColumns(newActiveColumns);
+                                    setActiveColumns(newActiveColumns);
 
-                                changeSettings({
-                                    activeColumns: newActiveColumns,
-                                });
-                            }
-                        }}
-                        onColumnResizeEnd={(event) => {
-                            if (authUser && event) {
-                                const newColumnWidth = {
-                                    [event.column.props.field as string]: event.element.offsetWidth,
-                                };
-                                changeSettings({
-                                    columnWidth: {
-                                        ...serverSettings?.contacts?.columnWidth,
-                                        ...newColumnWidth,
-                                    },
-                                });
-                            }
-                        }}
-                    >
-                        {activeColumns.map(({ field, header }) => (
-                            <Column
-                                field={field}
-                                header={header}
-                                key={field}
-                                sortable
-                                headerClassName='cursor-move'
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: serverSettings?.contacts?.columnWidth?.[field],
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
+                                    changeSettings({
+                                        activeColumns: newActiveColumns,
+                                    });
+                                }
+                            }}
+                            onColumnResizeEnd={(event) => {
+                                if (authUser && event) {
+                                    const newColumnWidth = {
+                                        [event.column.props.field as string]:
+                                            event.element.offsetWidth,
+                                    };
+                                    changeSettings({
+                                        columnWidth: {
+                                            ...serverSettings?.contacts?.columnWidth,
+                                            ...newColumnWidth,
                                         },
-                                    },
-                                }}
-                            />
-                        ))}
-                    </DataTable>
+                                    });
+                                }
+                            }}
+                        >
+                            {activeColumns.map(({ field, header }) => (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    sortable
+                                    headerClassName='cursor-move'
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: serverSettings?.contacts?.columnWidth?.[
+                                                    field
+                                                ],
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                            },
+                                        },
+                                    }}
+                                />
+                            ))}
+                        </DataTable>
+                    )}
                 </div>
             </div>
         </div>
