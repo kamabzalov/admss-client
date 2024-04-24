@@ -2,7 +2,6 @@ import { Column, ColumnProps } from "primereact/column";
 import "./index.css";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
