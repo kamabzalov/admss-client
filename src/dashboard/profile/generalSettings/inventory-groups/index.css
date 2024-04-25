@@ -26,6 +26,11 @@
     border-radius: 4px;
 }
 
+.settings-form .row-edit__button.p-button {
+    height: 50px;
+    border-radius: 0 5px 5px 0;
+}
+
 .settings-form__button.p-button {
     width: 245px;
     height: 54px;
