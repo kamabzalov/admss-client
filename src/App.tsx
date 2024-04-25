@@ -1,16 +1,15 @@
+import { Loader } from "dashboard/common/loader";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { store } from "store";
 import { StoreContext } from "store/context";
-import { useNavigate } from "react-router-dom";
-import { createApiDashboardInstance } from "http/index";
 
 export default function App() {
-    const navigate = useNavigate();
-
-    createApiDashboardInstance(navigate);
     return (
         <StoreContext.Provider value={store}>
-            <Outlet />
+            <Suspense fallback={<Loader overlay />}>
+                <Outlet />
+            </Suspense>
         </StoreContext.Provider>
     );
 }

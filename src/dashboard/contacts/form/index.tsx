@@ -6,12 +6,12 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "primereact/progressbar";
 import { GeneralInfoData } from "./general-info";
 import { ContactInfoData } from "./contact-info";
 import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
+import { Loader } from "dashboard/common/loader";
 const STEP = "step";
 
 export const ContactForm = () => {
@@ -142,15 +142,7 @@ export const ContactForm = () => {
                                                         {item.itemLabel}
                                                     </div>
                                                     {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense
-                                                            fallback={
-                                                                <ProgressBar
-                                                                    mode='indeterminate'
-                                                                    style={{ height: "8px" }}
-                                                                    color='var(--admss-app-main-blue)'
-                                                                />
-                                                            }
-                                                        >
+                                                        <Suspense fallback={<Loader />}>
                                                             {item.component}
                                                         </Suspense>
                                                     )}

@@ -19,6 +19,7 @@ import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Checkbox } from "primereact/checkbox";
 import { Image } from "primereact/image";
+import { Loader } from "dashboard/common/loader";
 
 const limitations: MediaLimitations = {
     formats: ["PDF"],
@@ -226,6 +227,7 @@ export const DocumentsMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
+            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
