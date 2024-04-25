@@ -35,9 +35,11 @@ export default function Accounts() {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
+        setIsLoading(true);
         const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
             name: column.header as string,
             data: column.field as string,
@@ -82,6 +84,7 @@ export default function Accounts() {
                 }
             });
         }
+        setIsLoading(false);
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -175,7 +178,7 @@ export default function Accounts() {
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
-                                {!accounts.length ? (
+                                {!accounts.length || isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>

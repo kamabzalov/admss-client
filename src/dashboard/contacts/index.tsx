@@ -60,9 +60,11 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
+        setIsLoading(true);
         const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
             name: column.header as string,
             data: column.field as string,
@@ -107,6 +109,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                 }
             });
         }
+        setIsLoading(false);
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -266,7 +269,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             </div>
             <div className='grid'>
                 <div className='col-12'>
-                    {!contacts.length ? (
+                    {!contacts.length || isLoading ? (
                         <div className='dashboard-loader__wrapper'>
                             <Loader overlay />
                         </div>
