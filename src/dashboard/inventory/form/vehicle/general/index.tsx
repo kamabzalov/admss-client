@@ -8,7 +8,9 @@ import {
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
+    getInventoryGroupList,
     getInventoryInteriorColorsList,
+    getInventoryLocations,
 } from "http/services/inventory-service";
 
 import { useFormik } from "formik";
@@ -16,10 +18,13 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
-import { Audit, Inventory } from "common/models/inventory";
+import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
+import { AuthUser } from "http/services/auth.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { getKeyValue } from "services/local-storage.service";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
@@ -32,12 +37,17 @@ export const VehicleGeneral = observer((): ReactElement => {
     const year = parseInt(inventory.Year, 10);
     const mileage = (inventory?.mileage && parseFloat(inventory.mileage.replace(/,/g, "."))) || 0;
 
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
+    const [groupClassList, setGroupClassList] = useState<ListData[]>([]);
+    const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
 
     useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
         getInventoryAutomakesList().then((list) => {
             if (list) {
                 const upperCasedList = list.map((item) => ({
@@ -53,7 +63,18 @@ export const VehicleGeneral = observer((): ReactElement => {
         getInventoryInteriorColorsList().then((list) => {
             list && setInteriorList(list);
         });
+        getInventoryGroupList().then((list) => {
+            list && setGroupClassList(list);
+        });
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            getInventoryLocations(user.useruid).then((list) => {
+                list && setLocationList(list);
+            });
+        }
+    }, [user]);
 
     const handleSelectMake = useCallback(() => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
@@ -177,6 +198,40 @@ export const VehicleGeneral = observer((): ReactElement => {
 
     return (
         <div className='grid vehicle-general row-gap-2'>
+            <div className='col-6'>
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='locName'
+                        optionValue='locationuid'
+                        filter
+                        options={locationList}
+                        placeholder='Location name'
+                        className='w-full vehicle-other__dropdown'
+                    />
+
+                    <label className='float-label'>Location name</label>
+                </span>
+            </div>
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
+                        filter
+                        options={groupClassList}
+                        value={inventory?.GroupClass}
+                        onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
+                        placeholder='Group class'
+                        className='w-full vehicle-other__dropdown'
+                    />
+                    <label className='float-label'>Group class</label>
+                </span>
+            </div>
+
+            <div className='col-12'>
+                <hr className='form-line' />
+            </div>
+
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
