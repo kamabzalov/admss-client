@@ -30,7 +30,7 @@ export default function Dashboard() {
                 <Sidebar />
                 <main className='main'>
                     <div className='container'>
-                        <Suspense fallback={<Loader />}>
+                        <Suspense fallback={<Loader overlay />}>
                             <Outlet />
                         </Suspense>
                     </div>

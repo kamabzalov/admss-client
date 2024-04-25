@@ -268,7 +268,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                 <div className='col-12'>
                     {!contacts.length ? (
                         <div className='dashboard-loader__wrapper'>
-                            <Loader />
+                            <Loader overlay />
                         </div>
                     ) : (
                         <DataTable

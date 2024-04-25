@@ -7,7 +7,7 @@ import { StoreContext } from "store/context";
 export default function App() {
     return (
         <StoreContext.Provider value={store}>
-            <Suspense fallback={<Loader />}>
+            <Suspense fallback={<Loader overlay />}>
                 <Outlet />
             </Suspense>
         </StoreContext.Provider>

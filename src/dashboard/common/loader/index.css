@@ -7,6 +7,16 @@
     align-items: center;
 }
 
+.loader-wrapper--overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+}
+
 .loader {
     width: 50px;
     aspect-ratio: 1;

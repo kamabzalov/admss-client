@@ -179,7 +179,7 @@ export default function Deals() {
                             <div className='col-12'>
                                 {!deals.length ? (
                                     <div className='dashboard-loader__wrapper'>
-                                        <Loader />
+                                        <Loader overlay />
                                     </div>
                                 ) : (
                                     <DataTable

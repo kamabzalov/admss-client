@@ -508,7 +508,7 @@ export default function Inventories(): ReactElement {
                             <div className='col-12'>
                                 {!activeColumns.length && !inventories.length ? (
                                     <div className='dashboard-loader__wrapper'>
-                                        <Loader />
+                                        <Loader overlay />
                                     </div>
                                 ) : (
                                     <DataTable

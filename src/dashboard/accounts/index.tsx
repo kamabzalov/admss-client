@@ -177,7 +177,7 @@ export default function Accounts() {
                             <div className='col-12'>
                                 {!accounts.length ? (
                                     <div className='dashboard-loader__wrapper'>
-                                        <Loader />
+                                        <Loader overlay />
                                     </div>
                                 ) : (
                                     <DataTable
