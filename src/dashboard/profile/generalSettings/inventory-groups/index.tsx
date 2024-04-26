@@ -154,7 +154,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         severity={
                                             inventorySettings[0].itemuid === item.itemuid
                                                 ? "secondary"
-                                                : "success"
+                                                : "danger"
                                         }
                                         onClick={() => {
                                             item.itemuid &&

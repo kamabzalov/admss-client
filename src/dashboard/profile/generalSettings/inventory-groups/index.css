@@ -41,6 +41,6 @@
     font-weight: 700;
 }
 
-.settings-inventory__delete.p-button {
+.settings-inventory__delete.p-button.p-button-danger {
     color: var(--admss-app-red);
 }
