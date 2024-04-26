@@ -2,11 +2,12 @@ import Sidebar from "./sidebar";
 import Header from "./header";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./index.css";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { Loader } from "./common/loader";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -29,7 +30,9 @@ export default function Dashboard() {
                 <Sidebar />
                 <main className='main'>
                     <div className='container'>
-                        <Outlet />
+                        <Suspense fallback={<Loader overlay />}>
+                            <Outlet />
+                        </Suspense>
                     </div>
                 </main>
             </>

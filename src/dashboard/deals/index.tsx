@@ -20,6 +20,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportsColumn } from "common/models/reports";
+import { Loader } from "dashboard/common/loader";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -35,10 +36,12 @@ export default function Deals() {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
+        setIsLoading(true);
         const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
             name: column.header as string,
             data: column.field as string,
@@ -83,6 +86,7 @@ export default function Deals() {
                 }
             });
         }
+        setIsLoading(false);
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -176,38 +180,44 @@ export default function Deals() {
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
-                                <DataTable
-                                    showGridlines
-                                    value={deals}
-                                    lazy
-                                    paginator
-                                    first={lazyState.first}
-                                    rows={lazyState.rows}
-                                    rowsPerPageOptions={ROWS_PER_PAGE}
-                                    totalRecords={totalRecords}
-                                    onPage={pageChanged}
-                                    onSort={sortData}
-                                    reorderableColumns
-                                    resizableColumns
-                                    sortOrder={lazyState.sortOrder}
-                                    sortField={lazyState.sortField}
-                                    rowClassName={() => "hover:text-primary cursor-pointer"}
-                                    onRowClick={({
-                                        data: { contactuid },
-                                    }: DataTableRowClickEvent) => {
-                                        navigate(contactuid);
-                                    }}
-                                >
-                                    {renderColumnsData.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                        />
-                                    ))}
-                                </DataTable>
+                                {!deals.length || isLoading ? (
+                                    <div className='dashboard-loader__wrapper'>
+                                        <Loader overlay />
+                                    </div>
+                                ) : (
+                                    <DataTable
+                                        showGridlines
+                                        value={deals}
+                                        lazy
+                                        paginator
+                                        first={lazyState.first}
+                                        rows={lazyState.rows}
+                                        rowsPerPageOptions={ROWS_PER_PAGE}
+                                        totalRecords={totalRecords}
+                                        onPage={pageChanged}
+                                        onSort={sortData}
+                                        reorderableColumns
+                                        resizableColumns
+                                        sortOrder={lazyState.sortOrder}
+                                        sortField={lazyState.sortField}
+                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        onRowClick={({
+                                            data: { contactuid },
+                                        }: DataTableRowClickEvent) => {
+                                            navigate(contactuid);
+                                        }}
+                                    >
+                                        {renderColumnsData.map(({ field, header }) => (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                headerClassName='cursor-move'
+                                            />
+                                        ))}
+                                    </DataTable>
+                                )}
                             </div>
                         </div>
                     </div>

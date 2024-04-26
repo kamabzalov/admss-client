@@ -50,6 +50,7 @@ export const getUserGroupList = async (uid: string) => {
         // TODO: add error handler
     }
 };
+
 export const getUserGroupActiveList = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<UserGroup[]>(

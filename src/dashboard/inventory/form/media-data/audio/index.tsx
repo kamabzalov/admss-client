@@ -19,6 +19,7 @@ import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { Checkbox } from "primereact/checkbox";
 import { CATEGORIES } from "common/constants/media-categories";
+import { Loader } from "dashboard/common/loader";
 
 const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
@@ -234,6 +235,7 @@ export const AudioMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
+            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
