@@ -24,7 +24,7 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { AuthUser } from "http/services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
-import { getUserGroupList } from "http/services/auth-user.service";
+import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 
 //TODO: add validation
@@ -71,7 +71,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             getInventoryLocations(user.useruid).then((list) => {
                 list && setLocationList(list);
             });
-            getUserGroupList(user.useruid).then((list) => {
+            getUserGroupActiveList(user.useruid).then((list) => {
                 list && setGroupClassList(list);
             });
         }

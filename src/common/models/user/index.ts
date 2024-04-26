@@ -40,4 +40,5 @@ export interface UserGroup {
     itemuid: string;
     updated: string;
     useruid: string;
+    enabled: 0 | 1;
 }
