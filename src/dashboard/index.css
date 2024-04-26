@@ -221,6 +221,24 @@
     text-transform: uppercase;
 }
 
+.row-edit {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+}
+
+.row-edit__input {
+    flex: 0 1 626px;
+    border-radius: 5px 0 0 5px;
+}
+
+.row-edit__button.p-button {
+    flex: 0 1 104px;
+    height: 50px;
+    border-radius: 0 5px 5px 0;
+}
+
 .dashboard-loader__wrapper {
     display: flex;
     flex-direction: column;
