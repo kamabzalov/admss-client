@@ -1,18 +1,18 @@
-.settings-form .p-datatable .p-datatable-tbody > tr.p-highlight {
-    background: var(--admss-app-light-green);
-    color: var(--admss-app-blue-text);
+.settings-inventory__header {
+    background: var(--admss-app-light-blue);
+    height: 60px;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
-.settings-form .p-datatable .p-datatable-thead > tr > th {
-    border: none;
-}
-
-.settings-form .p-datatable .p-datatable-tbody > tr.p-highlight .p-button {
-    background: var(--admss-app-white);
-}
-
-.settings-form .p-datatable .p-datatable-tbody > tr {
-    font-weight: 500;
+.settings-inventory__row {
+    border-bottom: 1px solid var(--admss-app-light-grey);
+    display: flex;
+    align-items: center;
+    margin-left: 2px;
+    padding-left: 0;
+    padding-bottom: 0px;
+    padding-top: 10px;
 }
 
 .settings-form .p-button {
@@ -39,4 +39,8 @@
     justify-content: center;
     font-size: 24px;
     font-weight: 700;
+}
+
+.settings-inventory__delete.p-button {
+    color: var(--admss-app-red);
 }

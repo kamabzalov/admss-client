@@ -1,8 +1,6 @@
-import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import "./index.css";
-import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
@@ -13,14 +11,11 @@ import {
     getUserGroupList,
 } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
+import { Checkbox } from "primereact/checkbox";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "description", header: "Group" },
-];
-
-export const SettingsInventoryGroups = () => {
+export const SettingsInventoryGroups = (): ReactElement => {
     const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
-    const [selectedInventory, setSelectedInventory] = useState<Partial<UserGroup>[] | null>(null);
+    const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -31,33 +26,6 @@ export const SettingsInventoryGroups = () => {
         }
     }, []);
 
-    const textEditor = (options: ColumnEditorOptions) => {
-        return (
-            <div className='flex row-edit'>
-                <InputText
-                    type='text'
-                    value={options.value}
-                    className='row-edit__input'
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        options.editorCallback!(e.target.value)
-                    }
-                />
-                <Button
-                    className='p-button row-edit__button'
-                    onClick={() => {
-                        const { rowData } = options;
-                        const newData = [...inventorySettings];
-                        newData.find((item) => item.itemuid === rowData.itemuid)!.description =
-                            options.value;
-                        setInventorySettings(newData);
-                    }}
-                >
-                    Save
-                </Button>
-            </div>
-        );
-    };
-
     return (
         <div className='settings-form'>
             <div className='settings-form__title'>Inventory groups</div>
@@ -66,76 +34,145 @@ export const SettingsInventoryGroups = () => {
                     className='settings-form__button'
                     outlined
                     onClick={() => {
-                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, "New group").then(() => {
-                            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
-                                list && setInventorySettings(list);
-                            });
+                        setEditedItem({
+                            description: "",
+                            itemuid: "new",
                         });
+                        setInventorySettings([
+                            ...inventorySettings,
+                            {
+                                description: "",
+                                itemuid: "new",
+                            },
+                        ]);
                     }}
                 >
                     New Group
                 </Button>
             </div>
-            <div className='grid settings-inventory'>
+            <div className='grid settings-inventory p-2'>
                 <div className='col-12'>
-                    <DataTable
-                        value={inventorySettings}
-                        selectionMode={"checkbox"}
-                        selection={selectedInventory!}
-                        editMode='row'
-                        onSelectionChange={(e) => setSelectedInventory(e.value)}
-                    >
-                        <Column selectionMode='multiple' headerStyle={{ width: "3rem" }}></Column>
-                        {renderColumnsData.map(({ field, header }) => (
-                            <Column
-                                field={field}
-                                bodyStyle={{ height: "30px" }}
-                                header={header}
-                                key={field}
-                                editor={(options) => textEditor(options)}
+                    <div className='settings-inventory__header grid'>
+                        <div className='col-1 flex justify-content-center align-items-center'>
+                            <Checkbox
+                                checked={inventorySettings.every((item) => item.enabled)}
+                                onChange={() => {
+                                    setInventorySettings(
+                                        inventorySettings.map((item) => {
+                                            return {
+                                                ...item,
+                                                enabled: 1,
+                                            };
+                                        })
+                                    );
+                                }}
                             />
-                        ))}
-                        <Column
-                            headerStyle={{ width: "6rem" }}
-                            header={"Actions"}
-                            rowEditor
-                            body={(rowData, options) => {
-                                return (
-                                    <div className='flex gap-3'>
-                                        <Button
-                                            className='p-button p-button-outlined'
-                                            severity={
-                                                options.rowEditor?.editing ? "secondary" : "success"
-                                            }
-                                            onClick={(event) => {
-                                                if (options.rowEditor?.editing) {
-                                                    return options.rowEditor?.onSaveClick!(event);
-                                                }
-                                                options.rowEditor?.onInitClick!(event);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            className='p-button p-button-outlined'
-                                            severity='secondary'
-                                            onClick={() => {
-                                                deleteUserGroupList(rowData.itemuid).then(() => {
+                        </div>
+                        <div className='col-9 flex align-items-center'>Group</div>
+                        <div className='col-2 flex align-items-center p-0 '>Actions</div>
+                    </div>
+                    <div className='settings-inventory__body grid'>
+                        {inventorySettings.map((item) => (
+                            <div key={item.itemuid} className='settings-inventory__row grid col-12'>
+                                <div className='col-1 flex justify-content-center align-items-center'>
+                                    <Checkbox
+                                        checked={!!item.enabled}
+                                        onClick={() => {
+                                            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                                                enabled: !item.enabled ? 1 : 0,
+                                                itemuid: item.itemuid,
+                                                description: item.description,
+                                            });
+                                        }}
+                                    />
+                                </div>
+                                <div className='col-9 flex align-items-center'>
+                                    {editedItem.itemuid === item.itemuid ? (
+                                        <div className='flex row-edit'>
+                                            <InputText
+                                                type='text'
+                                                value={editedItem.description}
+                                                className='row-edit__input'
+                                                onChange={(e) => {
+                                                    setEditedItem({
+                                                        ...editedItem,
+                                                        description: e.target.value,
+                                                    });
+                                                }}
+                                            />
+                                            <Button
+                                                className='p-button row-edit__button'
+                                                onClick={() => {
+                                                    addUserGroupList(
+                                                        getKeyValue(LS_APP_USER).useruid,
+                                                        {
+                                                            description: editedItem.description,
+                                                            itemuid:
+                                                                editedItem.itemuid === "new"
+                                                                    ? undefined
+                                                                    : editedItem.itemuid,
+                                                        }
+                                                    ).then(() => {
+                                                        getUserGroupList(
+                                                            getKeyValue(LS_APP_USER).useruid
+                                                        ).then((list) => {
+                                                            list && setInventorySettings(list);
+                                                            setEditedItem({});
+                                                        });
+                                                    });
+                                                }}
+                                            >
+                                                Save
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        item.description
+                                    )}
+                                </div>
+                                <div className='col-2 flex align-items-center column-gap-3'>
+                                    <Button
+                                        className='p-button'
+                                        outlined
+                                        disabled={inventorySettings[0].itemuid === item.itemuid}
+                                        severity={
+                                            inventorySettings[0].itemuid === item.itemuid
+                                                ? "secondary"
+                                                : "success"
+                                        }
+                                        onClick={() => {
+                                            editedItem.itemuid
+                                                ? setEditedItem({})
+                                                : setEditedItem(item);
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        className='p-button settings-inventory__delete'
+                                        outlined
+                                        disabled={inventorySettings[0].itemuid === item.itemuid}
+                                        severity={
+                                            inventorySettings[0].itemuid === item.itemuid
+                                                ? "secondary"
+                                                : "success"
+                                        }
+                                        onClick={() => {
+                                            item.itemuid &&
+                                                deleteUserGroupList(item.itemuid).then(() => {
                                                     getUserGroupList(
                                                         getKeyValue(LS_APP_USER).useruid
                                                     ).then((list) => {
                                                         list && setInventorySettings(list);
                                                     });
                                                 });
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </div>
-                                );
-                            }}
-                        />
-                    </DataTable>
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
