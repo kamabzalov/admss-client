@@ -8,12 +8,13 @@ import "./index.css";
 import { getInventoryPrintFormTemplate } from "http/services/inventory-service";
 import { useParams } from "react-router";
 import { InventoryPrintForm } from "common/models/inventory";
+import { Loader } from "dashboard/common/loader";
 
 export const PrintForms = observer((): ReactElement => {
     const ref = useRef(null);
     const { id } = useParams();
     const store = useStore().inventoryStore;
-    const { printList, getPrintList } = store;
+    const { printList, getPrintList, isLoading } = store;
 
     const [selectedPrints, setSelectedPrints] = useState<InventoryPrintForm[] | null>(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
@@ -35,6 +36,7 @@ export const PrintForms = observer((): ReactElement => {
     const handlePrintForm = async (templateuid: string, print: boolean = false) => {
         if (id) {
             try {
+                store.isLoading = true;
                 const response = await getInventoryPrintFormTemplate(id, templateuid);
                 setIsButtonDisabled(true);
                 setTimeout(() => {
@@ -56,6 +58,7 @@ export const PrintForms = observer((): ReactElement => {
             } catch (error) {
                 //TODO: handle error
             } finally {
+                store.isLoading = false;
                 setIsButtonDisabled(false);
             }
         }
@@ -94,6 +97,7 @@ export const PrintForms = observer((): ReactElement => {
 
     return (
         <div className='grid inventory-print row-gap-2'>
+            {isLoading && <Loader overlay />}
             <div className='col-12'>
                 <DataTable
                     className='mt-6 inventory-print__table'
