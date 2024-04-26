@@ -220,20 +220,16 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='description'
-                        optionValue='itemuid'
+                        optionValue='description'
                         filter
                         options={groupClassList}
-                        value={inventory?.GroupClass}
-                        onChange={({ value }) => {
-                            const index = groupClassList.findIndex(
-                                (item) => item.itemuid === value
-                            );
-                            changeInventory({ key: "GroupClass", value });
+                        value={inventory?.GroupClassName}
+                        onChange={({ value }) =>
                             changeInventory({
                                 key: "GroupClassName",
-                                value: groupClassList[index].description,
-                            });
-                        }}
+                                value,
+                            })
+                        }
                         placeholder='Group class'
                         className='w-full vehicle-general__dropdown'
                     />
