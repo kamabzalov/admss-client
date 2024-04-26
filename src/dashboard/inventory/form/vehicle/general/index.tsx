@@ -206,10 +206,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='locationuid'
                         filter
                         options={locationList}
-                        value={inventory?.locationuid}
+                        value={inventory.locationuid}
                         onChange={({ value }) => changeInventory({ key: "locationuid", value })}
                         placeholder='Location name'
-                        className='w-full vehicle-general__dropdown'
+                        className={`w-full vehicle-general__dropdown ${
+                            inventory.locationuid === "" && "p-inputwrapper-filled"
+                        }`}
                     />
                     <label className='float-label'>Location name</label>
                 </span>
@@ -222,7 +224,16 @@ export const VehicleGeneral = observer((): ReactElement => {
                         filter
                         options={groupClassList}
                         value={inventory?.GroupClass}
-                        onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
+                        onChange={({ value }) => {
+                            const index = groupClassList.findIndex(
+                                (item) => item.itemuid === value
+                            );
+                            changeInventory({ key: "GroupClass", value });
+                            changeInventory({
+                                key: "GroupClassName",
+                                value: groupClassList[index].description,
+                            });
+                        }}
                         placeholder='Group class'
                         className='w-full vehicle-general__dropdown'
                     />
