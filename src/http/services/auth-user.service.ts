@@ -1,6 +1,6 @@
 import { BaseResponse } from "common/models/base-response";
 import { authorizedUserApiInstance } from "../index";
-import { ServerUserSettings } from "common/models/user";
+import { ServerUserSettings, UserGroup } from "common/models/user";
 
 export interface ExtendedUserData extends BaseResponse {
     location: string;
@@ -36,6 +36,40 @@ export const setUserSettings = async (uid: string, settings: Partial<ServerUserS
         const request = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/profile`, {
             profile: JSON.stringify(settings),
         });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getUserGroupList = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<UserGroup[]>(`user/${uid}/grouplist`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const addUserGroupList = async (uid: string, description: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${uid}/grouplist`,
+            {
+                description,
+            }
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const deleteUserGroupList = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${itemuid}/deletegroup`
+        );
         return request.data;
     } catch (error) {
         // TODO: add error handler

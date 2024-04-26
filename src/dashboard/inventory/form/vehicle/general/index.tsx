@@ -8,7 +8,6 @@ import {
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
-    getInventoryGroupList,
     getInventoryInteriorColorsList,
     getInventoryLocations,
 } from "http/services/inventory-service";
@@ -25,6 +24,8 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { AuthUser } from "http/services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
+import { getUserGroupList } from "http/services/auth-user.service";
+import { UserGroup } from "common/models/user";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
@@ -42,7 +43,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
-    const [groupClassList, setGroupClassList] = useState<ListData[]>([]);
+    const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
 
     useEffect(() => {
@@ -63,15 +64,15 @@ export const VehicleGeneral = observer((): ReactElement => {
         getInventoryInteriorColorsList().then((list) => {
             list && setInteriorList(list);
         });
-        getInventoryGroupList().then((list) => {
-            list && setGroupClassList(list);
-        });
     }, []);
 
     useEffect(() => {
         if (user) {
             getInventoryLocations(user.useruid).then((list) => {
                 list && setLocationList(list);
+            });
+            getUserGroupList(user.useruid).then((list) => {
+                list && setGroupClassList(list);
             });
         }
     }, [user]);
@@ -205,24 +206,25 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='locationuid'
                         filter
                         options={locationList}
+                        value={inventory?.locationuid}
+                        onChange={({ value }) => changeInventory({ key: "locationuid", value })}
                         placeholder='Location name'
-                        className='w-full vehicle-other__dropdown'
+                        className='w-full vehicle-general__dropdown'
                     />
-
                     <label className='float-label'>Location name</label>
                 </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
+                        optionLabel='description'
+                        optionValue='itemuid'
                         filter
                         options={groupClassList}
                         value={inventory?.GroupClass}
                         onChange={({ value }) => changeInventory({ key: "GroupClass", value })}
                         placeholder='Group class'
-                        className='w-full vehicle-other__dropdown'
+                        className='w-full vehicle-general__dropdown'
                     />
                     <label className='float-label'>Group class</label>
                 </span>

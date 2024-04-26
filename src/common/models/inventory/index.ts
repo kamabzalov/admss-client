@@ -248,6 +248,7 @@ export interface Inventory {
     options_info?: InventoryOptionsInfo[];
     updated: string;
     useruid: string;
+    locationuid: string;
     extdata?: InventoryExtData;
     Audit?: Audit;
 }
