@@ -12,10 +12,12 @@ import {
 } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { Checkbox } from "primereact/checkbox";
+import { Loader } from "dashboard/common/loader";
 
 export const SettingsInventoryGroups = (): ReactElement => {
     const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -28,6 +30,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     return (
         <div className='settings-form'>
+            {isLoading && <Loader overlay />}
             <div className='settings-form__title'>Inventory groups</div>
             <div className='flex justify-content-end mb-4'>
                 <Button
@@ -57,6 +60,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                             <Checkbox
                                 checked={inventorySettings.every((item) => item.enabled)}
                                 onChange={() => {
+                                    setIsLoading(true);
                                     inventorySettings.forEach((item) => {
                                         if (item.enabled === 0) {
                                             addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
@@ -68,6 +72,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                     getKeyValue(LS_APP_USER).useruid
                                                 ).then((list) => {
                                                     list && setInventorySettings(list);
+                                                    setIsLoading(false);
                                                 });
                                             });
                                         }
@@ -85,6 +90,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                     <Checkbox
                                         checked={!!item.enabled}
                                         onClick={() => {
+                                            setIsLoading(true);
                                             addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
                                                 enabled: !item.enabled ? 1 : 0,
                                                 itemuid: item.itemuid,
@@ -94,6 +100,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                     getKeyValue(LS_APP_USER).useruid
                                                 ).then((list) => {
                                                     list && setInventorySettings(list);
+                                                    setIsLoading(false);
                                                 });
                                             });
                                         }}
@@ -116,6 +123,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                             <Button
                                                 className='p-button row-edit__button'
                                                 onClick={() => {
+                                                    setIsLoading(true);
                                                     addUserGroupList(
                                                         getKeyValue(LS_APP_USER).useruid,
                                                         {
@@ -131,6 +139,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                         ).then((list) => {
                                                             list && setInventorySettings(list);
                                                             setEditedItem({});
+                                                            setIsLoading(false);
                                                         });
                                                     });
                                                 }}
@@ -170,12 +179,14 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                 : "danger"
                                         }
                                         onClick={() => {
+                                            setIsLoading(true);
                                             item.itemuid &&
                                                 deleteUserGroupList(item.itemuid).then(() => {
                                                     getUserGroupList(
                                                         getKeyValue(LS_APP_USER).useruid
                                                     ).then((list) => {
                                                         list && setInventorySettings(list);
+                                                        setIsLoading(false);
                                                     });
                                                 });
                                         }}
