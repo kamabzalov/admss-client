@@ -20,6 +20,7 @@ import { InventoryMediaPostData, MediaLimitations } from "common/models/inventor
 import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
+import { Loader } from "dashboard/common/loader";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -248,6 +249,7 @@ export const ImagesMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
+            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple

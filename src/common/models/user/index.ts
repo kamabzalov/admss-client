@@ -33,3 +33,12 @@ export interface ServerUserSettings {
     contacts: ContactsUserSettings;
     exportWeb: ExportWebUserSettings;
 }
+
+export interface UserGroup {
+    created: string;
+    description: string;
+    itemuid: string;
+    updated: string;
+    useruid: string;
+    enabled: 0 | 1;
+}

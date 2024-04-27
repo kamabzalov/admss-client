@@ -17,6 +17,7 @@ import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
 import { Image } from "primereact/image";
+import { Loader } from "dashboard/common/loader";
 
 const SexList = [
     {
@@ -46,6 +47,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         removeImagesDL,
         frontSideDLurl,
         backSideDLurl,
+        isLoading,
     } = store;
     const fileUploadFrontRef = useRef<FileUpload>(null);
     const fileUploadBackRef = useRef<FileUpload>(null);
@@ -64,15 +66,11 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (side: DLSide, isString: boolean = false) => {
-        if (side === DLSides.FRONT) {
-            fileUploadFrontRef.current?.clear();
-            store.frontSideDL = {} as File;
-        }
-        if (side === DLSides.BACK) {
-            fileUploadBackRef.current?.clear();
-            store.backSideDL = {} as File;
-        }
+    const handleDeleteImage = (isString: boolean = false) => {
+        fileUploadFrontRef.current?.clear();
+        fileUploadBackRef.current?.clear();
+        store.frontSideDL = {} as File;
+        store.backSideDL = {} as File;
         isString && removeImagesDL();
     };
 
@@ -86,7 +84,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={() => handleDeleteImage(side, isString)}
+                    onClick={() => handleDeleteImage(isString)}
                     className='p-button dl-presentation__remove-button'
                 />
             </div>
@@ -214,7 +212,8 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Frontside</div>
-                        {frontSideDLurl ? (
+                        {isLoading && <Loader />}
+                        {frontSideDLurl && !isLoading ? (
                             itemTemplate(frontSideDLurl, DLSides.FRONT)
                         ) : (
                             <FileUpload
@@ -234,7 +233,8 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Backside</div>
-                        {backSideDLurl ? (
+                        {isLoading && <Loader />}
+                        {backSideDLurl && !isLoading ? (
                             itemTemplate(backSideDLurl, DLSides.BACK)
                         ) : (
                             <FileUpload

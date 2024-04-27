@@ -1,5 +1,3 @@
-import { DashboardDialog } from "dashboard/common/dialog";
-import { DialogProps } from "primereact/dialog";
 import { TabView, TabPanel } from "primereact/tabview";
 import "./index.css";
 import { SettingsDeals } from "./deals";
@@ -10,18 +8,18 @@ import { SettingsStockTradeIn } from "./stockTradeIn";
 import { SettingsAccount } from "./account";
 import { SettingsContract } from "./contract";
 import { SettingsLease } from "./lease";
+import { ReactElement } from "react";
+import { Button } from "primereact/button";
+import { useNavigate } from "react-router-dom";
+import { SettingsInventoryGroups } from "./inventory-groups";
 
 interface TabItem {
     settingName: string;
-    component: JSX.Element;
+    component: ReactElement;
 }
 
-export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
-    const handleSendSupportContact = (): void => {
-        onHide();
-        return;
-    };
-
+export const GeneralSettings = (): ReactElement => {
+    const navigate = useNavigate();
     const tabItems: TabItem[] = [
         {
             settingName: "Deals",
@@ -58,34 +56,38 @@ export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Ele
                 />
             ),
         },
+        { settingName: "Inventory groups", component: <SettingsInventoryGroups /> },
         { settingName: "Account Settings", component: <SettingsAccount /> },
         { settingName: "Contract Settings", component: <SettingsContract /> },
         { settingName: "Lease Settings", component: <SettingsLease /> },
     ];
 
     return (
-        <>
-            <DashboardDialog
-                className='dialog__general-settings general-settings'
-                footer='Save'
-                header='General settings'
-                visible={visible}
-                onHide={onHide}
-                action={handleSendSupportContact}
-            >
-                <TabView className='general-settings__tabs'>
-                    {tabItems.map(({ settingName, component }) => {
-                        return (
-                            <TabPanel
-                                header={settingName}
-                                children={component}
-                                key={settingName}
-                                className='general-settings__panel'
-                            />
-                        );
-                    })}
-                </TabView>
-            </DashboardDialog>
-        </>
+        <div className='grid relative general-settings'>
+            <Button
+                icon='pi pi-times'
+                className='p-button close-button'
+                onClick={() => navigate("/dashboard")}
+            />
+            <div className='col-12'>
+                <div className='card'>
+                    <div className='card-header flex'>
+                        <h2 className='card-header__title uppercase m-0'>General settings</h2>
+                    </div>
+                    <TabView className='general-settings__tabs'>
+                        {tabItems.map(({ settingName, component }) => {
+                            return (
+                                <TabPanel
+                                    header={settingName}
+                                    children={component}
+                                    key={settingName}
+                                    className='general-settings__panel'
+                                />
+                            );
+                        })}
+                    </TabView>
+                </div>
+            </div>
+        </div>
     );
 };

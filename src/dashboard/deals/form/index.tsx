@@ -6,13 +6,13 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { Deals, DealsItem, DealsSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "primereact/progressbar";
-
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
 import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
+
+import { Loader } from "dashboard/common/loader";
 
 const STEP = "step";
 
@@ -160,15 +160,7 @@ export const DealsForm = observer(() => {
                                                         {item.itemLabel}
                                                     </div>
                                                     {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense
-                                                            fallback={
-                                                                <ProgressBar
-                                                                    mode='indeterminate'
-                                                                    style={{ height: "8px" }}
-                                                                    color='var(--admss-app-main-blue)'
-                                                                />
-                                                            }
-                                                        >
+                                                        <Suspense fallback={<Loader />}>
                                                             {item.component}
                                                         </Suspense>
                                                     )}

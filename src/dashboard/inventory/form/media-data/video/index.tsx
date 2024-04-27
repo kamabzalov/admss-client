@@ -20,6 +20,7 @@ import { MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
+import { Loader } from "dashboard/common/loader";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -247,6 +248,7 @@ export const VideoMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
+            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
