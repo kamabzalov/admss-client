@@ -143,7 +143,7 @@ export default function Inventories(): ReactElement {
             top: lazyState.rows,
         };
 
-        handleGetInventoryList(params);
+        handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
