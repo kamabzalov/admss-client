@@ -236,6 +236,7 @@ export interface Inventory {
     Status: string;
     StockNo: string;
     Transmission: string;
+    Trim: string;
     TypeOfFuel: string;
     VIN: string;
     VINimageUID: string;
