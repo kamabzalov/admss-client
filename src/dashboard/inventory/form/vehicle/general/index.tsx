@@ -325,6 +325,19 @@ export const VehicleGeneral = observer((): ReactElement => {
                     {(formik.touched.Model && formik.errors.Model) || ""}
                 </small>
             </div>
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <InputText
+                        className='vehicle-general__text-input w-full'
+                        value={inventory?.Trim || ""}
+                        maxLength={16}
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "Trim", value })
+                        }
+                    />
+                    <label className='float-label'>Trim</label>
+                </span>
+            </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber

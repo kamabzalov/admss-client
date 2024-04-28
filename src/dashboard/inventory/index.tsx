@@ -59,7 +59,7 @@ const createStringifyFilterQuery = (filterArray: FilterOptions[]): string => {
     let qry: string = "";
     filterArray.forEach((option, index) => {
         const { column, value } = option;
-        if (value.includes("-")) {
+        if (value?.includes("-")) {
             const [wordFrom, wordTo] = value.split("-");
             return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
         }
