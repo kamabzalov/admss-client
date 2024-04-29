@@ -234,9 +234,11 @@
 .media .p-fileupload-row .presentation {
     justify-content: space-between;
     box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
-    border-radius: 5px;
+    border-radius: 5px 0px 0px 0px;
     font-size: 14px;
     padding: 0 4px;
+    width: 290px;
+    height: auto;
 }
 
 .presentation__video {
@@ -264,20 +266,22 @@
 }
 
 .video-choose .info-panel__panel {
-    min-width: 427px;
+    width: 427px;
 }
 
 .media-preview {
     width: 29px;
     height: 29px;
+    padding: 5px;
     display: inline-flex;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: 2px;
     align-items: center;
     background-color: var(--admss-app-primary-main-green);
 }
 
 .media-preview__icon {
     color: var(--admss-app-white-blue);
-    font-size: 18px;
+    width: 16px;
+    height: 13px;
 }
