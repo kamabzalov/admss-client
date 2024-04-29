@@ -22,6 +22,8 @@ import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 
+import playIcon from "assets/images/play.svg";
+
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
     codecs: "H.264, HEVC",
@@ -140,7 +142,11 @@ export const VideoMedia = observer((): ReactElement => {
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
                     <div className='media-preview'>
-                        <i className='icon adms-play-prev media-preview__icon' />
+                        <img
+                            alt={"video-preview-icon"}
+                            src={playIcon}
+                            className='media-preview__icon'
+                        />
                     </div>
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
@@ -250,13 +256,13 @@ export const VideoMedia = observer((): ReactElement => {
                 accept='video/*'
                 maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
-                headerTemplate={chooseTemplate}
+                headerTemplate={limitations.maxUpload > totalCount ? chooseTemplate : <div></div>}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
                 onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12'
+                className='col-12 video-upload'
             />
             <div className='col-12 mt-4 media-input'>
                 <Dropdown
