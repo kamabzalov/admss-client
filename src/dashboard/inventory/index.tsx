@@ -390,18 +390,22 @@ export default function Inventories(): ReactElement {
         {
             key: "StockNo",
             value: advancedSearch?.StockNo,
+            type: "text",
         },
         {
             key: "Make",
             value: advancedSearch?.Make,
+            type: "dropdown",
         },
         {
             key: "Model",
             value: advancedSearch?.Model,
+            type: "dropdown",
         },
         {
             key: "VIN",
             value: advancedSearch?.VIN,
+            type: "text",
         },
     ];
 
