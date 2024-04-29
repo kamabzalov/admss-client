@@ -248,6 +248,11 @@
     width: 100%;
 }
 
+.dropdown-icon {
+    height: 30px;
+    width: 30px;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
