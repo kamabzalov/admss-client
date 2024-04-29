@@ -266,3 +266,18 @@
 .video-choose .info-panel__panel {
     min-width: 427px;
 }
+
+.media-preview {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    justify-content: center;
+    border-radius: 4px;
+    align-items: center;
+    background-color: var(--admss-app-primary-main-green);
+}
+
+.media-preview__icon {
+    color: var(--admss-app-white-blue);
+    font-size: 18px;
+}
