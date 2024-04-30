@@ -3,8 +3,8 @@
 }
 
 .pickup-header {
-    background: var(--admss-darkest-grey);
-    color: var(--admss-app-white);
+    background: var(--admss-app-light-blue);
+    font-weight: 600;
 }
 
 .pickup-header,

@@ -11,6 +11,7 @@ type LabelPosition = "left" | "right" | "top";
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
+    onChange?: (value: string | number) => void;
 }
 
 interface CurrencyInputProps extends InputNumberProps {
@@ -21,8 +22,18 @@ interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
 }
 
-export const DashboardRadio = ({ radioArray, style }: DashboardRadioProps): ReactElement => {
+export const DashboardRadio = ({
+    radioArray,
+    style,
+    onChange,
+}: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
+
+    const handleRadioChange = (e: RadioButtonChangeEvent) => {
+        const value = e.value as string | number;
+        setRadioValue(value);
+        onChange && onChange(value);
+    };
 
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
@@ -37,7 +48,7 @@ export const DashboardRadio = ({ radioArray, style }: DashboardRadioProps): Reac
                             inputId={name}
                             name={name}
                             value={value}
-                            onChange={(e: RadioButtonChangeEvent) => setRadioValue(e.value)}
+                            onChange={handleRadioChange}
                             checked={radioValue === value}
                         />
                     </div>

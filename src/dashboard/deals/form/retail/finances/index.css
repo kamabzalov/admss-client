@@ -19,8 +19,9 @@
     border-top: 1px solid var(--admss-app-light-grey);
 }
 
-.finances-item--grey {
-    background-color: var(--admss-app-lightest-grey);
+.finances-item--sum {
+    background-color: var(--admss-app-light-blue);
+    border: none;
 }
 
 .finances-item .finances-item__label,

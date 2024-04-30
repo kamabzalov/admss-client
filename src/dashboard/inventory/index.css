@@ -138,13 +138,6 @@
     color: var(--admss-app-red);
 }
 
-.form-line {
-    width: 100%;
-    padding: 0;
-    border-top: var(--admss-app-light-grey);
-    margin: 28px 0;
-}
-
 .inventory__delete-nav {
     border-radius: 5px 0 0 5px;
     font-weight: 600;

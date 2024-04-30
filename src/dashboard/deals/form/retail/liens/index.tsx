@@ -86,17 +86,12 @@ export const DealRetailLiens = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        filter
+                    <InputText
                         value={First_Lien_City}
                         onChange={({ target: { value } }) => {
                             changeDealExtData({ key: "First_Lien_City", value });
                         }}
-                        options={[First_Lien_City]}
-                        editable
-                        className='w-full deal-liens__dropdown'
+                        className='w-full deal-liens__text'
                     />
                     <label className='float-label'>City</label>
                 </span>

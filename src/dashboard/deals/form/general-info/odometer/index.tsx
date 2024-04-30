@@ -29,9 +29,9 @@ export const DealGeneralOdometer = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
                         value={OdomDigits}
+                        onChange={(e) => changeDealExtData({ key: "OdomDigits", value: e.value })}
+                        options={[5, 6, 7, 8]}
                         filter
                         required
                         className='w-full deal-odometer__dropdown'

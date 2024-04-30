@@ -8,6 +8,8 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 
+const [MIN_LIMIT, MAX_LIMIT] = [0, 1000000];
+
 export const DealRetailInsurance = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
@@ -24,6 +26,9 @@ export const DealRetailInsurance = observer((): ReactElement => {
             Ins_Liab_Limit1,
             Ins_Liab_Limit2,
             Insurance_Notes,
+            Ins_Comp_Deduct,
+            Ins_Prop_Limit,
+            Ins_Col_Deduct,
         },
         changeDealExtData,
     } = store;
@@ -148,15 +153,25 @@ export const DealRetailInsurance = observer((): ReactElement => {
 
             <div className='col-3'>
                 <CurrencyInput
-                    // TODO: missed value
                     labelPosition='top'
+                    min={MIN_LIMIT}
+                    max={MAX_LIMIT}
+                    value={Ins_Comp_Deduct}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Ins_Comp_Deduct", value: Number(value) });
+                    }}
                     title='Coverage Comprehencive'
                 />
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    //TODO: missed value
                     labelPosition='top'
+                    min={MIN_LIMIT}
+                    max={MAX_LIMIT}
+                    value={Ins_Col_Deduct}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Ins_Col_Deduct", value: Number(value) });
+                    }}
                     title='Coverage Collision'
                 />
             </div>
@@ -164,6 +179,8 @@ export const DealRetailInsurance = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         value={Ins_Liab_Limit1}
+                        min={MIN_LIMIT}
+                        max={MAX_LIMIT}
                         onChange={({ value }) => {
                             changeDealExtData({ key: "Ins_Liab_Limit1", value: Number(value) });
                         }}
@@ -176,6 +193,8 @@ export const DealRetailInsurance = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         value={Ins_Liab_Limit2}
+                        min={MIN_LIMIT}
+                        max={MAX_LIMIT}
                         onChange={({ value }) => {
                             changeDealExtData({ key: "Ins_Liab_Limit2", value: Number(value) });
                         }}
@@ -186,8 +205,13 @@ export const DealRetailInsurance = observer((): ReactElement => {
             </div>
             <div className='col-2'>
                 <span className='p-float-label'>
-                    <InputText
-                        // TODO: missed value
+                    <InputNumber
+                        value={Ins_Prop_Limit}
+                        min={MIN_LIMIT}
+                        max={MAX_LIMIT}
+                        onChange={({ value }) => {
+                            changeDealExtData({ key: "Ins_Prop_Limit", value: Number(value) });
+                        }}
                         className='deal-insurance__text-input w-full'
                     />
                     <label className='float-label'>Liability Row</label>

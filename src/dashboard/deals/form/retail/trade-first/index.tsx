@@ -43,7 +43,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_Lien_Address,
             Trade1_Lien_Phone,
             Trade1_Lien_Contact,
-            Trade1_Title_To,
         },
         changeDealExtData,
     } = store;
@@ -464,24 +463,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     }
                     name='Contact'
                 />
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        filter
-                        //TODO: add options
-                        value={Trade1_Title_To}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Trade1_Title_To", value });
-                        }}
-                        editable
-                        options={[{ name: Trade1_Title_To }]}
-                        className='w-full deal-trade__dropdown'
-                    />
-                    <label className='float-label'>Vehicle is Titled to</label>
-                </span>
             </div>
         </div>
     );

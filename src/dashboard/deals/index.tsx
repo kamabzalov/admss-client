@@ -19,9 +19,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportsColumn } from "common/models/reports";
-
 import { Deal } from "common/models/deals";
-
 import { Loader } from "dashboard/common/loader";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [

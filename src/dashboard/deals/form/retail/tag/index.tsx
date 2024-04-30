@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import "./index.css";
 import { BorderedCheckbox, DashboardRadio, DateInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
@@ -16,6 +16,7 @@ const tagBottomRadio = [
 ];
 
 export const DealRetailTag = observer((): ReactElement => {
+    const [plateSelected, setPlateSelected] = useState<string | number>("");
     return (
         <div className='grid deal-retail-tag row-gap-2'>
             <div className='col-6'>
@@ -37,25 +38,43 @@ export const DealRetailTag = observer((): ReactElement => {
             <hr className='col-12 form-line' />
 
             <div className='col-3'>
-                <DashboardRadio radioArray={tagBottomRadio} style={{ width: `100%` }} />
+                <DashboardRadio
+                    radioArray={tagBottomRadio}
+                    style={{ width: `100%` }}
+                    onChange={(e) => {
+                        setPlateSelected(e);
+                    }}
+                />
             </div>
             <div className='col-3'>
                 <div className='grid'>
                     <div className='col-12'>
                         <span className='p-float-label'>
-                            <InputText className='deal-odometer__text-input w-full' value={""} />
+                            <InputText
+                                className='deal-odometer__text-input w-full'
+                                disabled={plateSelected !== "0"}
+                                value={""}
+                            />
                             <label className='float-label'>Plate#</label>
                         </span>
                     </div>
                     <div className='col-12'>
                         <span className='p-float-label'>
-                            <InputText className='deal-odometer__text-input w-full' value={""} />
+                            <InputText
+                                className='deal-odometer__text-input w-full'
+                                disabled={plateSelected !== "1"}
+                                value={""}
+                            />
                             <label className='float-label'>Plate#</label>
                         </span>
                     </div>
                     <div className='col-12'>
                         <span className='p-float-label'>
-                            <InputText className='deal-odometer__text-input w-full' value={""} />
+                            <InputText
+                                className='deal-odometer__text-input w-full'
+                                disabled={plateSelected !== "2"}
+                                value={""}
+                            />
                             <label className='float-label'>Plate#</label>
                         </span>
                     </div>

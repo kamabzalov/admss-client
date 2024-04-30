@@ -11,7 +11,6 @@ import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
 import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
-
 import { Loader } from "dashboard/common/loader";
 
 const STEP = "step";
