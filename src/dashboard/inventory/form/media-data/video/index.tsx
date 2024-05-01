@@ -142,11 +142,7 @@ export const VideoMedia = observer((): ReactElement => {
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
                     <div className='media-preview'>
-                        <img
-                            alt={"video-preview-icon"}
-                            src={playIcon}
-                            className='media-preview__icon'
-                        />
+                        <i className='icon adms-play-prev media-preview__icon' />
                     </div>
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}

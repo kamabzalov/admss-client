@@ -285,6 +285,6 @@
 }
 
 .media-preview__icon {
-    width: 13px;
-    height: 15px;
+    color: var(--admss-app-white);
+    font-size: 18px;
 }
