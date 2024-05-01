@@ -22,8 +22,6 @@ import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 
-import playIcon from "assets/images/play.svg";
-
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
     codecs: "H.264, HEVC",
