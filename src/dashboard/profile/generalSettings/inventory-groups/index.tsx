@@ -59,24 +59,26 @@ export const SettingsInventoryGroups = (): ReactElement => {
                         <div className='col-1 flex justify-content-center align-items-center'>
                             <Checkbox
                                 checked={inventorySettings.every((item) => item.enabled)}
-                                onChange={() => {
+                                onChange={({ checked }) => {
                                     setIsLoading(true);
-                                    inventorySettings.forEach((item) => {
-                                        if (item.enabled === 0) {
-                                            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-                                                enabled: 1,
-                                                itemuid: item.itemuid,
-                                                description: item.description,
-                                            }).then(() => {
-                                                getUserGroupList(
-                                                    getKeyValue(LS_APP_USER).useruid
-                                                ).then((list) => {
+                                    inventorySettings.forEach((item, index) => {
+                                        if (!index) return;
+                                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                                            enabled: checked ? 1 : 0,
+                                            itemuid: item.itemuid,
+                                            description: item.description,
+                                        }).then(() => {
+                                            getUserGroupList(getKeyValue(LS_APP_USER).useruid)
+                                                .then((list) => {
                                                     list && setInventorySettings(list);
                                                     setIsLoading(false);
+                                                })
+                                                .finally(() => {
+                                                    setIsLoading(false);
                                                 });
-                                            });
-                                        }
+                                        });
                                     });
+                                    setIsLoading(false);
                                 }}
                             />
                         </div>
@@ -89,7 +91,10 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                 <div className='col-1 flex justify-content-center align-items-center'>
                                     <Checkbox
                                         checked={!!item.enabled}
+                                        disabled={inventorySettings[0].itemuid === item.itemuid}
                                         onClick={() => {
+                                            if (inventorySettings[0].itemuid === item.itemuid)
+                                                return;
                                             setIsLoading(true);
                                             addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
                                                 enabled: !item.enabled ? 1 : 0,
