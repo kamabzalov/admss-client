@@ -233,7 +233,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         placeholder='Group class'
                         className='w-full vehicle-general__dropdown'
                     />
-                    <label className='float-label'>Group class</label>
+                    <label className='float-label'>Inventory group</label>
                 </span>
             </div>
 
