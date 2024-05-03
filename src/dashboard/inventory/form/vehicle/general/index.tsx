@@ -124,15 +124,40 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
-        if (vinInfo && inventory.GroupClassName !== "equipment" && allowOverwrite) {
-            changeInventory({ key: "Make", value: vinInfo.Make });
-            changeInventory({ key: "Model", value: vinInfo.Model });
-            changeInventory({ key: "Year", value: vinInfo.Year });
-            changeInventory({ key: "Transmission", value: vinInfo.Transmission });
-            changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel });
-            changeInventory({ key: "DriveLine", value: vinInfo.DriveLine });
-            changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
-            changeInventory({ key: "Engine", value: vinInfo.Engine });
+        if (vinInfo && inventory.GroupClassName !== "equipment") {
+            if (allowOverwrite) {
+                changeInventory({ key: "Make", value: vinInfo.Make });
+                changeInventory({ key: "Model", value: vinInfo.Model });
+                changeInventory({ key: "Year", value: vinInfo.Year });
+                changeInventory({ key: "Transmission", value: vinInfo.Transmission });
+                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel });
+                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine });
+                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
+                changeInventory({ key: "Engine", value: vinInfo.Engine });
+                changeInventory({ key: "StockNo", value: vinInfo.StockNo });
+            } else {
+                changeInventory({ key: "Make", value: inventory.Make || vinInfo.Make });
+                changeInventory({ key: "Model", value: inventory.Model || vinInfo.Model });
+                changeInventory({ key: "Year", value: inventory.Year || vinInfo.Year });
+                changeInventory({
+                    key: "Transmission",
+                    value: inventory.Transmission || vinInfo.Transmission,
+                });
+                changeInventory({
+                    key: "TypeOfFuel",
+                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel,
+                });
+                changeInventory({
+                    key: "DriveLine",
+                    value: inventory.DriveLine || vinInfo.DriveLine,
+                });
+                changeInventory({
+                    key: "Cylinders",
+                    value: inventory.Cylinders || vinInfo.Cylinders,
+                });
+                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine });
+                changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
+            }
         }
     };
 

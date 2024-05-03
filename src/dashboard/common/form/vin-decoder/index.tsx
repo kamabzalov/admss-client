@@ -8,7 +8,7 @@ interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
 }
 const MIN_VIN_LENGTH = 7;
-const VIN_VALID_LENGTH = 17;
+const MAX_VIN_LENGTH = 17;
 
 export const VINDecoder = ({
     value,
@@ -20,7 +20,7 @@ export const VINDecoder = ({
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
     const handleGetVinInfo = (vin: string) => {
-        if (vin.length === VIN_VALID_LENGTH) {
+        if (vin.length === MAX_VIN_LENGTH) {
             value &&
                 inventoryDecodeVIN(value).then((response) => {
                     if (response) {
@@ -35,8 +35,7 @@ export const VINDecoder = ({
     };
 
     useEffect(() => {
-        value &&
-            setButtonDisabled(value.length < MIN_VIN_LENGTH || value.length > VIN_VALID_LENGTH);
+        value && setButtonDisabled(value.length < MIN_VIN_LENGTH || value.length > MAX_VIN_LENGTH);
     }, [disabled, value, buttonDisabled]);
 
     return (
@@ -44,7 +43,7 @@ export const VINDecoder = ({
             <InputText
                 className={`vin-decoder__text-input`}
                 value={value}
-                maxLength={VIN_VALID_LENGTH}
+                maxLength={MAX_VIN_LENGTH}
                 onChange={handleInputChange}
                 {...props}
             />
