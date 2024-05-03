@@ -234,3 +234,16 @@
     align-items: center;
     padding: 1rem 1.5rem;
 }
+
+.inventory-form .p-datatable .p-datatable-thead > tr > th {
+    border: none;
+    padding: 10px;
+}
+
+.inventory-form .p-datatable .p-datatable-tbody > tr > td {
+    padding: 8px 10px;
+}
+
+.inventory-form .p-datatable .p-datatable-thead {
+    height: 44px;
+}

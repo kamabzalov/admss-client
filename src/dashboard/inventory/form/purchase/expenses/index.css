@@ -17,19 +17,26 @@
 .purchase-expenses__table.p-datatable .p-datatable-emptymessage {
     color: var(--admss-app-medium-grey);
 }
-.purchase-expenses__delete-button .icon {
+.purchase-expenses__delete-button .icon,
+.purchase-expenses__table-button .icon {
     transition: color 0.5s;
     border: none;
     background: transparent;
 }
 
-.purchase-expenses__delete-button.p-button-icon-only {
-    width: 30px;
-    height: 30px;
+.purchase-expenses__delete-button.p-button-icon-only,
+.purchase-expenses__table-button.p-button-icon-only {
+    width: 22px;
+    height: 22px;
+    font-size: 18px;
     border-radius: 50%;
     color: var(--admss-app-light-grey);
     border: none;
     background: transparent;
+}
+
+.purchase-expenses__table-button--success.p-button-icon-only {
+    color: var(--admss-app-green);
 }
 
 .purchase-expenses__delete-button.p-button:enabled:focus,
@@ -57,4 +64,14 @@
     width: 455px;
     height: 451px;
     color: var(--admss-app-primary);
+}
+
+.total-sum {
+    font-weight: 700;
+    gap: 20px;
+    font-size: 18px;
+}
+
+.total-sum__label {
+    color: var(--admss-app-main-blue);
 }
