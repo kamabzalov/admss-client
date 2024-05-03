@@ -27,3 +27,21 @@
 .p-inputnumber .p-inputtext.p-inputnumber-input {
     width: 100%;
 }
+
+.vehicle-general-overwrite {
+    display: flex;
+    align-items: center;
+}
+
+.vehicle-general-overwrite__label {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.vehicle-general-overwrite__icon {
+    margin-left: 6px;
+    padding-top: 2px;
+    font-size: 16px;
+    color: var(--admss-app-main-blue);
+}

@@ -15,7 +15,7 @@ import {
 import { useFormik } from "formik";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
+import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
 import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
@@ -26,9 +26,9 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
 import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
+import { VINDecoder } from "dashboard/common/form/vin-decoder";
 
 //TODO: add validation
-const VIN_VALID_LENGTH = 17;
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
@@ -45,6 +45,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
     const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -122,21 +123,41 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const handleVINchange = (value: string) => {
-        changeInventory({ key: "VIN", value });
-        if (value.length === VIN_VALID_LENGTH) {
-            inventoryDecodeVIN(value).then((response) => {
-                if (response) {
-                    changeInventory({ key: "Make", value: response.Make });
-                    changeInventory({ key: "Model", value: response.Model });
-                    changeInventory({ key: "Year", value: response.Year });
-                    changeInventory({ key: "Transmission", value: response.Transmission });
-                    changeInventory({ key: "TypeOfFuel", value: response.TypeOfFuel });
-                    changeInventory({ key: "DriveLine", value: response.DriveLine });
-                    changeInventory({ key: "Cylinders", value: response.Cylinders });
-                    changeInventory({ key: "Engine", value: response.Engine });
-                }
-            });
+    const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
+        if (vinInfo && inventory.GroupClassName !== "equipment") {
+            if (allowOverwrite) {
+                changeInventory({ key: "Make", value: vinInfo.Make });
+                changeInventory({ key: "Model", value: vinInfo.Model });
+                changeInventory({ key: "Year", value: vinInfo.Year });
+                changeInventory({ key: "Transmission", value: vinInfo.Transmission });
+                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel });
+                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine });
+                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
+                changeInventory({ key: "Engine", value: vinInfo.Engine });
+                changeInventory({ key: "StockNo", value: vinInfo.StockNo });
+            } else {
+                changeInventory({ key: "Make", value: inventory.Make || vinInfo.Make });
+                changeInventory({ key: "Model", value: inventory.Model || vinInfo.Model });
+                changeInventory({ key: "Year", value: inventory.Year || vinInfo.Year });
+                changeInventory({
+                    key: "Transmission",
+                    value: inventory.Transmission || vinInfo.Transmission,
+                });
+                changeInventory({
+                    key: "TypeOfFuel",
+                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel,
+                });
+                changeInventory({
+                    key: "DriveLine",
+                    value: inventory.DriveLine || vinInfo.DriveLine,
+                });
+                changeInventory({
+                    key: "Cylinders",
+                    value: inventory.Cylinders || vinInfo.Cylinders,
+                });
+                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine });
+                changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
+            }
         }
     };
 
@@ -241,21 +262,26 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <hr className='form-line' />
             </div>
 
-            <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...formik.getFieldProps("VIN")}
-                        className={`vehicle-general__text-input w-full ${
-                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
-                        }`}
-                        value={formik.values.VIN}
-                        onChange={({ target: { value } }) => {
-                            formik.setFieldValue("VIN", value);
-                            handleVINchange(value);
-                        }}
+            <div className='col-12'>
+                <div className='vehicle-general-overwrite pb-3'>
+                    <Checkbox
+                        checked={allowOverwrite}
+                        id='vehicle-general-overwrite'
+                        className='vehicle-general-overwrite__checkbox'
+                        onChange={() => setAllowOverwrite(!allowOverwrite)}
                     />
-                    <label className='float-label'>VIN (required)</label>
-                </span>
+                    <label className='pl-3 vehicle-general-overwrite__label'>Overwrite data</label>
+                    <i className='icon adms-help vehicle-general-overwrite__icon' />
+                </div>
+            </div>
+
+            <div className='col-6 relative'>
+                <VINDecoder
+                    value={formik.values.VIN}
+                    onChange={({ target: { value } }) => changeInventory({ key: "VIN", value })}
+                    onAction={handleVINchange}
+                    disabled={inventory.GroupClassName === "equipment"}
+                />
                 <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
             </div>
 
