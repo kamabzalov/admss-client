@@ -80,16 +80,14 @@ export const VehicleGeneral = observer((): ReactElement => {
 
     const handleSelectMake = useCallback(() => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
-        if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
-            getAutoMakeModelList(makeSting).then((list) => {
-                if (list && Object.keys(list).length) {
-                    setAutomakesModelList(list);
-                } else {
-                    setAutomakesModelList([]);
-                }
-            });
-        }
-    }, [automakesList, inventory.Make]);
+        getAutoMakeModelList(makeSting).then((list) => {
+            if (list && Object.keys(list).length) {
+                setAutomakesModelList(list);
+            } else {
+                setAutomakesModelList([]);
+            }
+        });
+    }, [inventory.Make]);
 
     useEffect(() => {
         if (inventory.Make) handleSelectMake();
@@ -316,7 +314,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         valueTemplate={selectedAutoMakesTemplate}
                         itemTemplate={autoMakesOptionTemplate}
                         placeholder='Make (required)'
-                        editable
                         className={`vehicle-general__dropdown w-full ${
                             formik.touched.Make && formik.errors.Make && "p-invalid"
                         }`}
@@ -337,7 +334,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='name'
                         value={formik.values.Model}
                         filter={!!automakesModelList.length}
-                        editable
+                        editable={!automakesModelList.length}
                         options={automakesModelList}
                         onChange={({ value }) => {
                             formik.setFieldValue("Model", value);
