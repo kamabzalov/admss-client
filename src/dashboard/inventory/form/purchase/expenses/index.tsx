@@ -3,7 +3,7 @@ import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
@@ -40,6 +40,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -113,6 +114,23 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 }}
             />
         );
+    };
+
+    const rowExpansionTemplate = (data: Expenses) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Row text: </div>
+                <div className='expanded-row__text'> </div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: Expenses) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     return (
@@ -202,6 +220,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
@@ -213,7 +234,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={() => {
+                            body={(options) => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
@@ -230,7 +251,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             tooltip='Edit'
                                             tooltipOptions={{ position: "mouse" }}
                                             className='purchase-expenses__table-button p-button-text'
-                                            onClick={() => {}}
+                                            onClick={() => handleRowExpansionClick(options)}
                                         />
                                     </div>
                                 );
