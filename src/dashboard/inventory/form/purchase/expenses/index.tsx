@@ -3,7 +3,7 @@ import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
@@ -40,6 +40,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -104,6 +105,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <Button
                 type='button'
                 icon='icon adms-trash-can'
+                tooltip='Delete'
+                tooltipOptions={{ position: "mouse" }}
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
                     setCurrentExpenseUid(itemuid);
@@ -111,6 +114,23 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 }}
             />
         );
+    };
+
+    const rowExpansionTemplate = (data: Expenses) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Notes: </div>
+                <div className='expanded-row__text'>{data.comment}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: Expenses) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     return (
@@ -194,43 +214,84 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
-                        showGridlines
                         className='mt-6 purchase-expenses__table'
                         value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
+                                style: {
+                                    height: "249px",
+                                },
                             },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={() => {
+                            body={(options) => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
-                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
-                                        <i className='pi pi-angle-down' />
+                                        <Button
+                                            type='button'
+                                            icon='icon adms-edit-item'
+                                            tooltip='Edit'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
+                                            onClick={() => {}}
+                                        />
+                                        <Button
+                                            type='button'
+                                            icon='pi pi-angle-down'
+                                            tooltip='Edit'
+                                            disabled={!options?.comment}
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className={`purchase-expenses__table-button p-button-text ${
+                                                expandedRows.some((item) => {
+                                                    return item === options;
+                                                }) && "table-button-active"
+                                            }`}
+                                            onClick={() => handleRowExpansionClick(options)}
+                                        />
                                     </div>
                                 );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "60px",
+                                    },
+                                },
                             }}
                         />
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
+                                alignHeader={"left"}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
-                                pt={{}}
                             />
                         ))}
-                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
+                        <Column
+                            body={deleteTemplate}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "20px",
+                                    },
+                                },
+                            }}
+                        ></Column>
                     </DataTable>
                 </div>
-                <div className='col-12 total-sum'>
+                <div className='col-12 total-sum flex justify-content-end '>
                     <span className='total-sum__label'>Total expenses:</span>
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>
