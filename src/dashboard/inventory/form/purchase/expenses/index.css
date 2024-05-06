@@ -91,4 +91,5 @@
 
 .table-button-active .p-button-icon {
     color: var(--admss-app-primary);
+    transform: rotate(180deg);
 }
