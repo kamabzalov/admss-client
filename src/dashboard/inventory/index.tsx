@@ -9,8 +9,8 @@ import {
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { getKeyValue } from "services/local-storage.service";
-import { getInventoryList } from "http/services/inventory-service";
-import { Inventory } from "common/models/inventory";
+import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
+import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
@@ -27,6 +27,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
+import { SplitButton } from "primereact/splitbutton";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -84,6 +85,10 @@ export default function Inventories(): ReactElement {
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [locations, setLocations] = useState<InventoryLocations[]>([]);
+    const [currentLocation, setCurrentLocation] = useState<InventoryLocations>(
+        {} as InventoryLocations
+    );
 
     const navigate = useNavigate();
 
@@ -104,6 +109,9 @@ export default function Inventories(): ReactElement {
             setUser(authUser);
             getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+            });
+            getInventoryLocations(authUser.useruid).then((response) => {
+                response && setLocations(response);
             });
         }
         setIsLoading(false);
@@ -526,6 +534,18 @@ export default function Inventories(): ReactElement {
                 <div className='card'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Inventory</h2>
+                        {locations.length > 0 && (
+                            <SplitButton
+                                label={currentLocation?.locName || "Select Location"}
+                                className='inventory-location'
+                                model={locations.map((location) => ({
+                                    label: location.locName,
+                                    command: () => setCurrentLocation(location),
+                                }))}
+                                rounded
+                                menuStyle={{ transform: "translateX(150px)" }}
+                            />
+                        )}
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
