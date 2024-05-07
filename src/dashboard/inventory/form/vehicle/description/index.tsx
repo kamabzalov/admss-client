@@ -103,6 +103,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         onChange={({ value }) => changeInventory({ key: "BodyStyle", value })}
                         options={bodyTypeList}
                         className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Body Type</label>
                 </span>
@@ -122,6 +123,7 @@ export const VehicleDescription = observer((): ReactElement => {
                             !isFormFieldInvalid("TypeOfFuel") &&
                             "p-invalid"
                         }`}
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
@@ -137,6 +139,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
                         options={driveLineList}
                         className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Drive Line</label>
                 </span>
@@ -152,6 +155,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
                         options={cylindersList}
                         className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Cylinders</label>
                 </span>
