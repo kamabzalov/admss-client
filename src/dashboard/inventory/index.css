@@ -266,17 +266,21 @@
     background: var(--admss-app-dark-blue);
     border: none;
     box-shadow: none;
+    cursor: default;
 }
 
 .inventory-location .p-button.p-button-icon-only {
-    width: 34px;
+    width: 29px;
+    border-left: 1px solid #292a2e33;
 }
 
 .inventory-location .p-button.p-button-icon-only:hover,
 .inventory-location .p-button.p-button-icon-only:focus,
 .inventory-location .p-button.p-button-icon-only:active {
-    background: var(--admss-app-darkest-blue);
+    background: var(--admss-app-dark-blue);
+    filter: brightness(0.8);
     border: none;
+    border-left: 1px solid #292a2e33;
     box-shadow: none;
 }
 
