@@ -536,7 +536,7 @@ export default function Inventories(): ReactElement {
                         <h2 className='card-header__title inventory__title uppercase m-0'>
                             Inventory
                         </h2>
-                        {locations.length > 0 && (
+                        {locations.length > 1 && (
                             <SplitButton
                                 label={currentLocation?.locName || "Select Location"}
                                 className='inventory-location'
