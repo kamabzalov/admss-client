@@ -20,9 +20,18 @@ import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
-import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import {
+    getUserGroupList,
+    getUserSettings,
+    setUserSettings,
+} from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
-import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import {
+    InventoryUserSettings,
+    ServerUserSettings,
+    TableState,
+    UserGroup,
+} from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
@@ -89,6 +98,8 @@ export default function Inventories(): ReactElement {
     const [currentLocation, setCurrentLocation] = useState<InventoryLocations>(
         {} as InventoryLocations
     );
+    const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
+    const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
 
     const navigate = useNavigate();
 
@@ -112,6 +123,9 @@ export default function Inventories(): ReactElement {
             });
             getInventoryLocations(authUser.useruid).then((response) => {
                 response && setLocations(response);
+            });
+            getUserGroupList(authUser.useruid).then((response) => {
+                response && setInventoryType(response);
             });
         }
         setIsLoading(false);
@@ -142,6 +156,21 @@ export default function Inventories(): ReactElement {
             qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
         if (Object.values(currentLocation).some((value) => value.trim().length)) {
             if (!!qry.length) qry += "+";
             qry += `${currentLocation.locationuid}.locationuid`;
@@ -160,7 +189,14 @@ export default function Inventories(): ReactElement {
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser, selectedFilterOptions, currentLocation]);
+    }, [
+        lazyState,
+        globalSearch,
+        authUser,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -192,6 +228,9 @@ export default function Inventories(): ReactElement {
                         });
                     if (settings?.selectedFilterOptions) {
                         setSelectedFilterOptions(settings.selectedFilterOptions);
+                    }
+                    if (settings?.selectedInventoryType) {
+                        setSelectedInventoryType(settings.selectedInventoryType);
                     }
                     if (settings?.currentLocation) {
                         const location = locations.find(
@@ -406,6 +445,49 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    const dropdownTypeHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={selectedInventoryType.length === inventoryType.length}
+                    onChange={() => {
+                        if (inventoryType.length !== selectedInventoryType.length) {
+                            setSelectedInventoryType(
+                                inventoryType.map(({ description }) => description)
+                            );
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: inventoryType.map(
+                                    ({ description }) => description
+                                ),
+                            });
+                        } else {
+                            setSelectedInventoryType([]);
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: [],
+                            });
+                        }
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    setSelectedInventoryType([]);
+                    changeSettings({
+                        ...serverSettings,
+                        selectedInventoryType: [],
+                    });
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -490,7 +572,38 @@ export default function Inventories(): ReactElement {
                     }}
                 />
             </div>
-            <div className='col-3'>
+            <div className='col-2'>
+                <MultiSelect
+                    optionValue='description'
+                    optionLabel='description'
+                    options={inventoryType}
+                    value={selectedInventoryType}
+                    onChange={({ value }: MultiSelectChangeEvent) => {
+                        setSelectedInventoryType(value);
+                        changeSettings({
+                            ...serverSettings,
+                            selectedInventoryType: value,
+                        });
+                    }}
+                    placeholder='Inventory Type'
+                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                    display='chip'
+                    selectedItemsLabel='Clear Filter'
+                    panelHeaderTemplate={dropdownTypeHeaderPanel}
+                    pt={{
+                        header: {
+                            className: "inventory-filter__header",
+                        },
+                        wrapper: {
+                            className: "inventory-filter__wrapper",
+                            style: {
+                                maxHeight: "500px",
+                            },
+                        },
+                    }}
+                />
+            </div>
+            <div className='col-2'>
                 <div className='inventory-top-controls'>
                     <Button
                         className='inventory-top-controls__button new-inventory-button'
@@ -518,7 +631,7 @@ export default function Inventories(): ReactElement {
                     />
                 </div>
             </div>
-            <div className='col-5 text-right'>
+            <div className='col-4 text-right'>
                 <Button
                     className='inventory-top-controls__button m-r-20px'
                     label='Advanced search'
