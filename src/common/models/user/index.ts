@@ -19,6 +19,7 @@ interface UserSettings {
 
 export interface InventoryUserSettings extends UserSettings {
     activeColumns?: string[];
+    currentLocation?: string;
     selectedFilterOptions?: FilterOptions[];
 }
 

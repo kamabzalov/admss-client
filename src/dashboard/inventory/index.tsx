@@ -142,6 +142,12 @@ export default function Inventories(): ReactElement {
             qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -154,7 +160,7 @@ export default function Inventories(): ReactElement {
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
+    }, [lazyState, globalSearch, authUser, selectedFilterOptions, currentLocation]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -187,11 +193,17 @@ export default function Inventories(): ReactElement {
                     if (settings?.selectedFilterOptions) {
                         setSelectedFilterOptions(settings.selectedFilterOptions);
                     }
+                    if (settings?.currentLocation) {
+                        const location = locations.find(
+                            (location) => location.locationuid === settings.currentLocation
+                        );
+                        // setCurrentLocation(location || ({} as InventoryLocations));
+                    }
                 }
             });
         }
         setIsLoading(false);
-    }, [authUser]);
+    }, [authUser, locations]);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -536,7 +548,7 @@ export default function Inventories(): ReactElement {
                         <h2 className='card-header__title inventory__title uppercase m-0'>
                             Inventory
                         </h2>
-                        {locations.length > 1 && (
+                        {locations.length > 0 && (
                             <SplitButton
                                 label={currentLocation?.locName || "Select Location"}
                                 className='inventory-location'
