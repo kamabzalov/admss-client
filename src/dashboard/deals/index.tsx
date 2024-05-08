@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
+import { Dropdown } from "primereact/dropdown";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -30,6 +31,35 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "inventoryinfo", header: "Info (Vehicle)" },
 ];
 
+interface DealsFilterOptions {
+    name: string;
+    index: number;
+}
+
+const DEALS_TYPE_LIST: DealsFilterOptions[] = [
+    { name: "All", index: 0 },
+    { name: "Buy Here Pay Here", index: 1 },
+    { name: "Lease Here Pay Here", index: 2 },
+    { name: "Cash", index: 3 },
+    { name: "Wholesale", index: 4 },
+    { name: "Dismantled", index: 5 },
+];
+
+const DEALS_OTHER_LIST: DealsFilterOptions[] = [
+    { name: "All incomplete", index: 0 },
+    { name: "Dead or Deleted", index: 1 },
+    { name: "Manager's review", index: 2 },
+];
+
+const DEALS_STATUS_LIST: DealsFilterOptions[] = [
+    { name: "All", index: 0 },
+    { name: "Recent deals", index: 1 },
+    { name: "Quotes", index: 2 },
+    { name: "Pending", index: 3 },
+    { name: "Sold, Not finalized", index: 4 },
+    { name: "Deals not yet sent to RFC", index: 5 },
+];
+
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -37,6 +67,9 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [dealType, setDealType] = useState<number>(DEALS_TYPE_LIST[0].index);
+    const [dealOther, setDealOther] = useState<number>(DEALS_OTHER_LIST[0].index);
+    const [dealStatus, setDealStatus] = useState<number>(DEALS_STATUS_LIST[0].index);
 
     const navigate = useNavigate();
 
@@ -130,13 +163,43 @@ export default function Deals() {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card deals'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Deals</h2>
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-6'>
+                            <div className='col-2'>
+                                <Dropdown
+                                    optionValue='index'
+                                    optionLabel='name'
+                                    value={dealType}
+                                    options={DEALS_TYPE_LIST}
+                                    className='deals__dropdown'
+                                    onChange={(e) => setDealType(e.value)}
+                                />
+                            </div>
+                            <div className='col-2'>
+                                <Dropdown
+                                    optionValue='index'
+                                    optionLabel='name'
+                                    value={dealOther}
+                                    options={DEALS_OTHER_LIST}
+                                    className='deals__dropdown'
+                                    onChange={(e) => setDealOther(e.value)}
+                                />
+                            </div>
+                            <div className='col-2'>
+                                <Dropdown
+                                    optionValue='index'
+                                    optionLabel='name'
+                                    value={dealStatus}
+                                    options={DEALS_STATUS_LIST}
+                                    className='deals__dropdown'
+                                    onChange={(e) => setDealStatus(e.value)}
+                                />
+                            </div>
+                            <div className='col-2'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button'
@@ -162,7 +225,7 @@ export default function Deals() {
                                     />
                                 </div>
                             </div>
-                            <div className='col-6 text-right'>
+                            <div className='col-4 text-right'>
                                 <Button
                                     className='contact-top-controls__button m-r-20px'
                                     label='Advanced search'
