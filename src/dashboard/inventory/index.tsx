@@ -157,7 +157,7 @@ export default function Inventories(): ReactElement {
                 qry += "+";
             selectedInventoryType.forEach(
                 (type, index) =>
-                    (qry += `${type}.GroupClassName${
+                    (qry += `${type}.GroupClass${
                         index !== selectedInventoryType.length - 1 ? "+" : ""
                     }`)
             );
