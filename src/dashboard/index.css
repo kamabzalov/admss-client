@@ -253,6 +253,10 @@
     width: 30px;
 }
 
+.p-menu .p-menuitem-link:not(.p-disabled):hover {
+    background: var(--admss-app-light-green);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
