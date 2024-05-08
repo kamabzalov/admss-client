@@ -1,9 +1,9 @@
 import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
@@ -40,6 +40,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [expandedRows, setExpandedRows] = useState<any[]>([]);
+    // const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -67,6 +69,28 @@ export const PurchaseExpenses = observer((): ReactElement => {
         setUser(authUser);
     }, []);
 
+    const handleCompareData = useMemo(() => {
+        const currentExpense = expensesList.find((item) => item.itemuid === currentExpenseUid);
+        if (currentExpense) {
+            const isDataChanged =
+                currentExpense.operationdate !== expenseDate ||
+                currentExpense.type !== expenseType ||
+                currentExpense.amount !== expenseAmount ||
+                currentExpense.vendor !== expenseVendor ||
+                currentExpense.comment !== expenseNotes;
+            return !isDataChanged;
+        }
+        return false;
+    }, [
+        currentExpenseUid,
+        expenseAmount,
+        expenseDate,
+        expenseNotes,
+        expenseType,
+        expenseVendor,
+        expensesList,
+    ]);
+
     useEffect(() => {
         getExpenses();
         if (user) {
@@ -83,7 +107,17 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
     }, [getExpenses, user]);
 
-    const handleExpenseSubmit = () => {
+    const handleClearExpense = () => {
+        setCurrentExpenseUid("");
+        setExpenseDate("");
+        setExpenseType(0);
+        setExpenseAmount(0);
+        setExpenseNotBillable(false);
+        setExpenseVendor("");
+        setExpenseNotes("");
+    };
+
+    const handleExpenseSubmit = (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
             operationdate: expenseDate,
@@ -92,7 +126,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
             vendor: expenseVendor,
             comment: expenseNotes,
         };
-        setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
+        if (currentExpenseUid) {
+            // expenseData.itemuid = currentExpenseUid;
+        }
+
+        setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
+            handleClearExpense();
+            getExpenses();
+        });
     };
 
     const handleDeleteExpenses = () => {
@@ -104,6 +145,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <Button
                 type='button'
                 icon='icon adms-trash-can'
+                tooltip='Delete'
+                tooltipOptions={{ position: "mouse" }}
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
                     setCurrentExpenseUid(itemuid);
@@ -111,6 +154,35 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 }}
             />
         );
+    };
+
+    const handleEditExpenses = ({ itemuid }: Expenses) => {
+        const expenseItem = expensesList.find((expense) => expense.itemuid === itemuid);
+        if (expenseItem) {
+            setExpenseDate(expenseItem.operationdate);
+            setExpenseType(expenseItem.type);
+            setExpenseAmount(expenseItem.amount / 100);
+            setExpenseVendor(expenseItem.vendor);
+            setExpenseNotes(expenseItem.comment);
+            setCurrentExpenseUid(itemuid);
+        }
+    };
+
+    const rowExpansionTemplate = (data: Expenses) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Notes: </div>
+                <div className='expanded-row__text'>{data.comment}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: Expenses) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     return (
@@ -135,7 +207,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesTypeList}
                                 value={expenseType}
                                 onChange={({ value }) => value && setExpenseType(Number(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Type</label>
@@ -150,7 +222,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesVendorList}
                                 value={expenseVendor}
                                 onChange={({ value }) => value && setExpenseVendor(String(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Vendor</label>
@@ -186,51 +258,107 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <label className='float-label'>Notes</label>
                     </span>
                 </div>
-
-                <Button className='purchase-expenses__button' onClick={handleExpenseSubmit}>
-                    Save
-                </Button>
+                <div className='purchase-expenses-controls'>
+                    {currentExpenseUid && (
+                        <Button
+                            className='purchase-expenses-controls__button'
+                            onClick={() => handleClearExpense()}
+                            outlined
+                        >
+                            Cancel
+                        </Button>
+                    )}
+                    <Button
+                        className='purchase-expenses-controls__button'
+                        disabled={handleCompareData}
+                        severity={handleCompareData ? "secondary" : "success"}
+                        onClick={() => handleExpenseSubmit(currentExpenseUid)}
+                    >
+                        {currentExpenseUid ? "Update" : "Save"}
+                    </Button>
+                </div>
             </div>
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
-                        showGridlines
                         className='mt-6 purchase-expenses__table'
                         value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
+                                style: {
+                                    height: "249px",
+                                },
                             },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={() => {
+                            body={(options) => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
-                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
-                                        <i className='pi pi-angle-down' />
+                                        <Button
+                                            type='button'
+                                            icon='icon adms-edit-item'
+                                            tooltip='Edit'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
+                                            onClick={() => handleEditExpenses(options)}
+                                        />
+                                        <Button
+                                            type='button'
+                                            icon='pi pi-angle-down'
+                                            tooltip='Show commentary'
+                                            disabled={!options?.comment}
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className={`purchase-expenses__table-button p-button-text ${
+                                                expandedRows.some((item) => {
+                                                    return item === options;
+                                                }) && "table-button-active"
+                                            }`}
+                                            onClick={() => handleRowExpansionClick(options)}
+                                        />
                                     </div>
                                 );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "60px",
+                                    },
+                                },
                             }}
                         />
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
+                                alignHeader={"left"}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
-                                pt={{}}
                             />
                         ))}
-                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
+                        <Column
+                            body={deleteTemplate}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "20px",
+                                    },
+                                },
+                            }}
+                        ></Column>
                     </DataTable>
                 </div>
-                <div className='col-12 total-sum'>
+                <div className='col-12 total-sum flex justify-content-end '>
                     <span className='total-sum__label'>Total expenses:</span>
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>
