@@ -21,6 +21,7 @@ export interface InventoryUserSettings extends UserSettings {
     activeColumns?: string[];
     currentLocation?: string;
     selectedFilterOptions?: FilterOptions[];
+    selectedInventoryType: string[];
 }
 
 export interface ContactsUserSettings extends UserSettings {
