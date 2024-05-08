@@ -236,7 +236,7 @@ export default function Inventories(): ReactElement {
                         const location = locations.find(
                             (location) => location.locationuid === settings.currentLocation
                         );
-                        // setCurrentLocation(location || ({} as InventoryLocations));
+                        setCurrentLocation(location || ({} as InventoryLocations));
                     }
                 }
             });
