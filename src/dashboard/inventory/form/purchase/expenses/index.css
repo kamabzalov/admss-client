@@ -3,11 +3,19 @@
     height: 210px;
 }
 
-.purchase-expenses__button {
-    padding: 0 80px;
-    font-size: 24px;
+.purchase-expenses-controls {
+    display: flex;
     margin-left: auto;
     margin-top: 10px;
+    gap: 20px;
+}
+
+.purchase-expenses-controls__button {
+    font-size: 24px;
+    width: 200px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .purchase-expenses__table.p-datatable .p-column-header-content {
@@ -92,4 +100,8 @@
 .table-button-active .p-button-icon {
     color: var(--admss-app-primary);
     transform: rotate(180deg);
+}
+
+.purchase-expenses__dropdown {
+    height: 50px;
 }

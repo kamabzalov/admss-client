@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -41,6 +41,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
+    // const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -68,6 +69,28 @@ export const PurchaseExpenses = observer((): ReactElement => {
         setUser(authUser);
     }, []);
 
+    const handleCompareData = useMemo(() => {
+        const currentExpense = expensesList.find((item) => item.itemuid === currentExpenseUid);
+        if (currentExpense) {
+            const isDataChanged =
+                currentExpense.operationdate !== expenseDate ||
+                currentExpense.type !== expenseType ||
+                currentExpense.amount !== expenseAmount ||
+                currentExpense.vendor !== expenseVendor ||
+                currentExpense.comment !== expenseNotes;
+            return !isDataChanged;
+        }
+        return false;
+    }, [
+        currentExpenseUid,
+        expenseAmount,
+        expenseDate,
+        expenseNotes,
+        expenseType,
+        expenseVendor,
+        expensesList,
+    ]);
+
     useEffect(() => {
         getExpenses();
         if (user) {
@@ -84,7 +107,17 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
     }, [getExpenses, user]);
 
-    const handleExpenseSubmit = () => {
+    const handleClearExpense = () => {
+        setCurrentExpenseUid("");
+        setExpenseDate("");
+        setExpenseType(0);
+        setExpenseAmount(0);
+        setExpenseNotBillable(false);
+        setExpenseVendor("");
+        setExpenseNotes("");
+    };
+
+    const handleExpenseSubmit = (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
             operationdate: expenseDate,
@@ -93,7 +126,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
             vendor: expenseVendor,
             comment: expenseNotes,
         };
-        setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
+        if (currentExpenseUid) {
+            // expenseData.itemuid = currentExpenseUid;
+        }
+
+        setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
+            handleClearExpense();
+            getExpenses();
+        });
     };
 
     const handleDeleteExpenses = () => {
@@ -114,6 +154,18 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 }}
             />
         );
+    };
+
+    const handleEditExpenses = ({ itemuid }: Expenses) => {
+        const expenseItem = expensesList.find((expense) => expense.itemuid === itemuid);
+        if (expenseItem) {
+            setExpenseDate(expenseItem.operationdate);
+            setExpenseType(expenseItem.type);
+            setExpenseAmount(expenseItem.amount / 100);
+            setExpenseVendor(expenseItem.vendor);
+            setExpenseNotes(expenseItem.comment);
+            setCurrentExpenseUid(itemuid);
+        }
     };
 
     const rowExpansionTemplate = (data: Expenses) => {
@@ -155,7 +207,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesTypeList}
                                 value={expenseType}
                                 onChange={({ value }) => value && setExpenseType(Number(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Type</label>
@@ -170,7 +222,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesVendorList}
                                 value={expenseVendor}
                                 onChange={({ value }) => value && setExpenseVendor(String(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Vendor</label>
@@ -206,10 +258,25 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <label className='float-label'>Notes</label>
                     </span>
                 </div>
-
-                <Button className='purchase-expenses__button' onClick={handleExpenseSubmit}>
-                    Save
-                </Button>
+                <div className='purchase-expenses-controls'>
+                    {currentExpenseUid && (
+                        <Button
+                            className='purchase-expenses-controls__button'
+                            onClick={() => handleClearExpense()}
+                            outlined
+                        >
+                            Cancel
+                        </Button>
+                    )}
+                    <Button
+                        className='purchase-expenses-controls__button'
+                        disabled={handleCompareData}
+                        severity={handleCompareData ? "secondary" : "success"}
+                        onClick={() => handleExpenseSubmit(currentExpenseUid)}
+                    >
+                        {currentExpenseUid ? "Update" : "Save"}
+                    </Button>
+                </div>
             </div>
             <div className='grid'>
                 <div className='col-12'>
@@ -243,12 +310,12 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             tooltip='Edit'
                                             tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
-                                            onClick={() => {}}
+                                            onClick={() => handleEditExpenses(options)}
                                         />
                                         <Button
                                             type='button'
                                             icon='pi pi-angle-down'
-                                            tooltip='Edit'
+                                            tooltip='Show commentary'
                                             disabled={!options?.comment}
                                             tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button p-button-text ${
