@@ -211,6 +211,34 @@
     left: 10px;
 }
 
+.form-line {
+    width: 98.5%;
+    padding: 0;
+    border-top: var(--admss-app-light-grey);
+    margin: 28px 0.5rem;
+}
+
+.text-line {
+    display: flex;
+}
+
+.text-line__line {
+    border: none;
+    border-top: 1px solid var(--admss-app-light-grey);
+    margin-top: 12px;
+}
+
+.text-line__title {
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.vehicle__dropdown-icon {
+    height: 30px;
+    width: 30px;
+}
+
 .form-nav__button {
     width: 245px;
     font-size: 24px;

@@ -1,7 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { ContactUser } from "common/models/contact";
+import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { QueryParams } from "common/models/query-params";
 import { AuthUser } from "http/services/auth.service";
 import { getContacts } from "http/services/contacts-service";
@@ -14,12 +14,14 @@ const FIELD: keyof ContactUser = "companyName";
 
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
+    contactCategory?: ContactTypeNameList | string;
 }
 
 export const CompanySearch = ({
     name,
     value,
     onRowClick,
+    contactCategory,
     onChange,
     ...props
 }: CompanySearchProps) => {
@@ -74,7 +76,10 @@ export const CompanySearch = ({
                 modal
                 onHide={() => setDialogVisible(false)}
             >
-                <ContactsDataTable onRowClick={handleOnRowClick} />
+                <ContactsDataTable
+                    onRowClick={handleOnRowClick}
+                    contactCategory={contactCategory}
+                />
             </Dialog>
         </>
     );

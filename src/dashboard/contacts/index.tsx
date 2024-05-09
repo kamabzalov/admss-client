@@ -22,7 +22,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
-import { ContactType, ContactUser } from "common/models/contact";
+import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { makeShortReports } from "http/services/reports.service";
@@ -35,6 +35,7 @@ interface TableColumnProps extends ColumnProps {
 
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
+    contactCategory?: ContactTypeNameList | string;
 }
 
 interface TableColumnProps extends ColumnProps {
@@ -50,7 +51,7 @@ const renderColumnsData: TableColumnProps[] = [
     { field: "created", header: "Created" },
 ];
 
-export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
+export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -128,6 +129,12 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             setUser(authUser);
             getContactsCategories().then((response) => {
                 if (response?.contact_types.length) {
+                    if (contactCategory) {
+                        const category = response?.contact_types.find(
+                            (item) => item.name === contactCategory
+                        );
+                        setSelectedCategory(category ?? null);
+                    }
                     setCategories(response?.contact_types);
                 }
             });
@@ -135,7 +142,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                 setTotalRecords(response?.total ?? 0);
             });
         }
-    }, []);
+    }, [contactCategory]);
 
     useEffect(() => {
         const params: QueryParams = {
@@ -210,6 +217,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         <Dropdown
                             value={selectedCategory}
                             onChange={(e) => {
+                                if (contactCategory) return;
                                 changeSettings({
                                     selectedCategoriesOptions: e.value,
                                 });
@@ -218,6 +226,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             options={categories}
                             optionLabel='name'
                             editable
+                            disabled={!!contactCategory}
                             placeholder='Select Category'
                             pt={{
                                 wrapper: {
@@ -227,6 +236,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                                 },
                             }}
                         />
+
                         <Button
                             className='contact-top-controls__button'
                             icon='pi pi-plus-circle'
