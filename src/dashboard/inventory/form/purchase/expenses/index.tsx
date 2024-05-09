@@ -41,7 +41,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
-    // const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -127,7 +127,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             comment: expenseNotes,
         };
         if (currentExpenseUid) {
-            // expenseData.itemuid = currentExpenseUid;
+            expenseData.itemuid = currentExpenseUid;
         }
 
         setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
