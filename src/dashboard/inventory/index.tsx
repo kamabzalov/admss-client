@@ -9,8 +9,8 @@ import {
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { getKeyValue } from "services/local-storage.service";
-import { getInventoryList } from "http/services/inventory-service";
-import { Inventory } from "common/models/inventory";
+import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
+import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
@@ -20,9 +20,18 @@ import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
-import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import {
+    getUserGroupList,
+    getUserSettings,
+    setUserSettings,
+} from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
-import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import {
+    InventoryUserSettings,
+    ServerUserSettings,
+    TableState,
+    UserGroup,
+} from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
@@ -33,6 +42,7 @@ import {
     isObjectEmpty,
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
+import { SplitButton } from "primereact/splitbutton";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -52,6 +62,12 @@ export default function Inventories(): ReactElement {
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [locations, setLocations] = useState<InventoryLocations[]>([]);
+    const [currentLocation, setCurrentLocation] = useState<InventoryLocations>(
+        {} as InventoryLocations
+    );
+    const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
+    const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
 
     const navigate = useNavigate();
 
@@ -72,6 +88,12 @@ export default function Inventories(): ReactElement {
             setUser(authUser);
             getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+            });
+            getInventoryLocations(authUser.useruid).then((response) => {
+                response && setLocations(response);
+            });
+            getUserGroupList(authUser.useruid).then((response) => {
+                response && setInventoryType(response);
             });
         }
         setIsLoading(false);
@@ -102,6 +124,27 @@ export default function Inventories(): ReactElement {
             qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -114,7 +157,14 @@ export default function Inventories(): ReactElement {
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
+    }, [
+        lazyState,
+        globalSearch,
+        authUser,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -147,11 +197,20 @@ export default function Inventories(): ReactElement {
                     if (settings?.selectedFilterOptions) {
                         setSelectedFilterOptions(settings.selectedFilterOptions);
                     }
+                    if (settings?.selectedInventoryType) {
+                        setSelectedInventoryType(settings.selectedInventoryType);
+                    }
+                    if (settings?.currentLocation) {
+                        const location = locations.find(
+                            (location) => location.locationuid === settings.currentLocation
+                        );
+                        setCurrentLocation(location || ({} as InventoryLocations));
+                    }
                 }
             });
         }
         setIsLoading(false);
-    }, [authUser]);
+    }, [authUser, locations]);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -354,6 +413,49 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    const dropdownTypeHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={selectedInventoryType.length === inventoryType.length}
+                    onChange={() => {
+                        if (inventoryType.length !== selectedInventoryType.length) {
+                            setSelectedInventoryType(
+                                inventoryType.map(({ description }) => description)
+                            );
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: inventoryType.map(
+                                    ({ description }) => description
+                                ),
+                            });
+                        } else {
+                            setSelectedInventoryType([]);
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: [],
+                            });
+                        }
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    setSelectedInventoryType([]);
+                    changeSettings({
+                        ...serverSettings,
+                        selectedInventoryType: [],
+                    });
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -438,7 +540,38 @@ export default function Inventories(): ReactElement {
                     }}
                 />
             </div>
-            <div className='col-3'>
+            <div className='col-2'>
+                <MultiSelect
+                    optionValue='description'
+                    optionLabel='description'
+                    options={inventoryType}
+                    value={selectedInventoryType}
+                    onChange={({ value }: MultiSelectChangeEvent) => {
+                        setSelectedInventoryType(value);
+                        changeSettings({
+                            ...serverSettings,
+                            selectedInventoryType: value,
+                        });
+                    }}
+                    placeholder='Inventory Type'
+                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                    display='chip'
+                    selectedItemsLabel='Clear Filter'
+                    panelHeaderTemplate={dropdownTypeHeaderPanel}
+                    pt={{
+                        header: {
+                            className: "inventory-filter__header",
+                        },
+                        wrapper: {
+                            className: "inventory-filter__wrapper",
+                            style: {
+                                maxHeight: "500px",
+                            },
+                        },
+                    }}
+                />
+            </div>
+            <div className='col-2'>
                 <div className='inventory-top-controls'>
                     <Button
                         className='inventory-top-controls__button new-inventory-button'
@@ -466,7 +599,7 @@ export default function Inventories(): ReactElement {
                     />
                 </div>
             </div>
-            <div className='col-5 text-right'>
+            <div className='col-4 text-right'>
                 <Button
                     className='inventory-top-controls__button m-r-20px'
                     label='Advanced search'
@@ -491,9 +624,28 @@ export default function Inventories(): ReactElement {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card inventory'>
                     <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Inventory</h2>
+                        <h2 className='card-header__title inventory__title uppercase m-0'>
+                            Inventory
+                        </h2>
+                        {locations.length > 0 && (
+                            <SplitButton
+                                label={currentLocation?.locName || "Select Location"}
+                                className='inventory-location'
+                                model={locations.map((location) => ({
+                                    label: location.locName,
+                                    command: () => setCurrentLocation(location),
+                                }))}
+                                rounded
+                                menuStyle={{ transform: "translateX(164px)" }}
+                                pt={{
+                                    menu: {
+                                        className: "inventory-location__menu",
+                                    },
+                                }}
+                            />
+                        )}
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
