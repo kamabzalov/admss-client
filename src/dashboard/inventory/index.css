@@ -240,19 +240,6 @@
     padding: 1rem 1.5rem;
 }
 
-
-.inventory-form .p-datatable .p-datatable-thead > tr > th {
-    border: none;
-    padding: 10px;
-}
-
-.inventory-form .p-datatable .p-datatable-tbody > tr > td {
-    padding: 8px 10px;
-}
-
-.inventory-form .p-datatable .p-datatable-thead {
-    height: 44px;
-=======
 .inventory-location {
     width: 200px;
 }
@@ -309,4 +296,17 @@
 
 .inventory-location__menu {
     width: 233px;
+}
+
+.inventory-form .p-datatable .p-datatable-thead > tr > th {
+    border: none;
+    padding: 10px;
+}
+
+.inventory-form .p-datatable .p-datatable-tbody > tr > td {
+    padding: 8px 10px;
+}
+
+.inventory-form .p-datatable .p-datatable-thead {
+    height: 44px;
 }
