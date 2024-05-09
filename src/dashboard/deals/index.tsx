@@ -23,6 +23,7 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
+import { Checkbox } from "primereact/checkbox";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -169,6 +170,33 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch, dealType, dealStatus, dealOther]);
 
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={dealOther.length === DEALS_OTHER_LIST.length}
+                    onChange={() => {
+                        if (dealOther.length !== DEALS_OTHER_LIST.length) {
+                            setDealOther(DEALS_OTHER_LIST.map(({ value }) => value));
+                        } else {
+                            setDealOther([]);
+                        }
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    setDealOther([]);
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -194,6 +222,7 @@ export default function Deals() {
                                     optionLabel='name'
                                     value={dealOther}
                                     options={DEALS_OTHER_LIST}
+                                    panelHeaderTemplate={dropdownHeaderPanel}
                                     className='deals__dropdown'
                                     onChange={(e) => setDealOther(e.value)}
                                 />
