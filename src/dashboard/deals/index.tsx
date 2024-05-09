@@ -22,6 +22,7 @@ import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { Dropdown } from "primereact/dropdown";
+import { MultiSelect } from "primereact/multiselect";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -33,31 +34,31 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 
 interface DealsFilterOptions {
     name: string;
-    index: number;
+    value: string;
 }
 
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
-    { name: "All", index: 0 },
-    { name: "Buy Here Pay Here", index: 1 },
-    { name: "Lease Here Pay Here", index: 2 },
-    { name: "Cash", index: 3 },
-    { name: "Wholesale", index: 4 },
-    { name: "Dismantled", index: 5 },
+    { name: "All", value: "" },
+    { name: "Buy Here Pay Here", value: "0.DealType" },
+    { name: "Lease Here Pay Here", value: "7.DealType" },
+    { name: "Cash", value: "1.DealType" },
+    { name: "Wholesale", value: "5.DealType" },
+    { name: "Dismantled", value: "6.DealType" },
 ];
 
 const DEALS_OTHER_LIST: DealsFilterOptions[] = [
-    { name: "All incomplete", index: 0 },
-    { name: "Dead or Deleted", index: 1 },
-    { name: "Manager's review", index: 2 },
+    { name: "All incomplete", value: "0.DealComplete" },
+    { name: "Dead or Deleted", value: "6.DealStatus" },
+    { name: "Manager's review", value: "1.managerReview" },
+    { name: "Deals not yet sent to RFC", value: "0.RFCSen" },
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
-    { name: "All", index: 0 },
-    { name: "Recent deals", index: 1 },
-    { name: "Quotes", index: 2 },
-    { name: "Pending", index: 3 },
-    { name: "Sold, Not finalized", index: 4 },
-    { name: "Deals not yet sent to RFC", index: 5 },
+    { name: "All", value: "" },
+    { name: "Recent deals", value: "0.30.Age" },
+    { name: "Quotes", value: "0.DealStatus" },
+    { name: "Pending", value: "1.DealStatus" },
+    { name: "Sold, Not finalized", value: "2.DealStatus" },
 ];
 
 export default function Deals() {
@@ -67,9 +68,9 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [dealType, setDealType] = useState<number>(DEALS_TYPE_LIST[0].index);
-    const [dealOther, setDealOther] = useState<number>(DEALS_OTHER_LIST[0].index);
-    const [dealStatus, setDealStatus] = useState<number>(DEALS_STATUS_LIST[0].index);
+    const [dealType, setDealType] = useState<string>(DEALS_TYPE_LIST[0].value);
+    const [dealOther, setDealOther] = useState<string[]>([DEALS_OTHER_LIST[0].value]);
+    const [dealStatus, setDealStatus] = useState<string>(DEALS_STATUS_LIST[0].value);
 
     const navigate = useNavigate();
 
@@ -149,6 +150,14 @@ export default function Deals() {
             skip: lazyState.first,
             top: lazyState.rows,
         };
+        let qry: string = "";
+        const selectedFilters: string = [dealType, dealStatus, ...dealOther]
+            .filter(Boolean)
+            .join("+");
+        if (selectedFilters.length) {
+            qry += selectedFilters;
+            params.qry = qry;
+        }
         if (authUser) {
             getDealsList(authUser.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
@@ -158,7 +167,7 @@ export default function Deals() {
                 }
             });
         }
-    }, [lazyState, authUser, globalSearch]);
+    }, [lazyState, authUser, globalSearch, dealType, dealStatus, dealOther]);
 
     return (
         <div className='grid'>
@@ -171,7 +180,7 @@ export default function Deals() {
                         <div className='grid datatable-controls'>
                             <div className='col-2'>
                                 <Dropdown
-                                    optionValue='index'
+                                    optionValue='value'
                                     optionLabel='name'
                                     value={dealType}
                                     options={DEALS_TYPE_LIST}
@@ -180,8 +189,8 @@ export default function Deals() {
                                 />
                             </div>
                             <div className='col-2'>
-                                <Dropdown
-                                    optionValue='index'
+                                <MultiSelect
+                                    optionValue='value'
                                     optionLabel='name'
                                     value={dealOther}
                                     options={DEALS_OTHER_LIST}
@@ -191,7 +200,7 @@ export default function Deals() {
                             </div>
                             <div className='col-2'>
                                 <Dropdown
-                                    optionValue='index'
+                                    optionValue='value'
                                     optionLabel='name'
                                     value={dealStatus}
                                     options={DEALS_STATUS_LIST}
@@ -243,7 +252,7 @@ export default function Deals() {
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
-                                {!deals.length || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>
