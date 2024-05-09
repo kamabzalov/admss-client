@@ -1,6 +1,6 @@
 import { authorizedUserApiInstance } from "http/index";
 
-interface VehicleDecodeInfo {
+export interface VehicleDecodeInfo {
     BodyStyle: string;
     Category: string;
     Cylinders: string;

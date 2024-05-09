@@ -4,6 +4,11 @@
     border-radius: 5px;
     display: flex;
     flex-direction: column-reverse;
+    justify-content: center;
+}
+
+.video-upload {
+    height: 343px;
 }
 
 .p-button.media__button {
@@ -223,12 +228,14 @@
 
 .media .p-fileupload-content > div:nth-child(2) {
     display: flex;
+    margin: 0 auto;
     flex-wrap: wrap;
-    gap: 10px;
+    width: 54%;
+    justify-content: space-between;
 }
 
 .media .p-fileupload-row {
-    width: 24%;
+    flex: 0 0 290px;
 }
 
 .media .p-fileupload-row .presentation {
@@ -265,4 +272,19 @@
 
 .video-choose .info-panel__panel {
     min-width: 427px;
+}
+
+.media-preview {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    justify-content: center;
+    border-radius: 4px;
+    align-items: center;
+    background-color: var(--admss-app-primary-main-green);
+}
+
+.media-preview__icon {
+    color: var(--admss-app-white);
+    font-size: 18px;
 }

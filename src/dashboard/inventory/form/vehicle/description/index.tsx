@@ -7,6 +7,7 @@ import {
     getInventoryDrivelineList,
     getInventoryCylindersList,
     getInventoryEngineList,
+    getInventoryBodyTypesList,
 } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
@@ -21,6 +22,8 @@ export const VehicleDescription = observer((): ReactElement => {
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
     const [cylindersList, setCylindersList] = useState<ListData[]>([]);
     const [engineList, setEngineList] = useState<ListData[]>([]);
+    const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
+
     useEffect(() => {
         getInventoryTransmissionTypesList().then((list) => {
             list && setTransmissionList(list);
@@ -36,6 +39,9 @@ export const VehicleDescription = observer((): ReactElement => {
         });
         getInventoryEngineList().then((list) => {
             list && setEngineList(list);
+        });
+        getInventoryBodyTypesList().then((list) => {
+            list && setBodyTypeList(list);
         });
     }, []);
 
@@ -87,6 +93,22 @@ export const VehicleDescription = observer((): ReactElement => {
                 </span>
             </div>
 
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={inventory?.BodyStyle}
+                        onChange={({ value }) => changeInventory({ key: "BodyStyle", value })}
+                        options={bodyTypeList}
+                        className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
+                    />
+                    <label className='float-label'>Body Type</label>
+                </span>
+            </div>
+
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
@@ -97,8 +119,11 @@ export const VehicleDescription = observer((): ReactElement => {
                         value={formik.values.TypeOfFuel}
                         onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
                         className={`vehicle-description__dropdown w-full ${
-                            !isFormFieldInvalid("TypeOfFuel") && "p-invalid"
+                            formik.touched.TypeOfFuel &&
+                            !isFormFieldInvalid("TypeOfFuel") &&
+                            "p-invalid"
                         }`}
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
@@ -114,12 +139,13 @@ export const VehicleDescription = observer((): ReactElement => {
                         onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
                         options={driveLineList}
                         className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Drive Line</label>
                 </span>
             </div>
 
-            <div className='col-4'>
+            <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
@@ -129,12 +155,13 @@ export const VehicleDescription = observer((): ReactElement => {
                         onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
                         options={cylindersList}
                         className='w-full vehicle-description__dropdown'
+                        panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Cylinders</label>
                 </span>
             </div>
 
-            <div className='col-8'>
+            <div className='col-6'>
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
