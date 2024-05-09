@@ -23,7 +23,6 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
-import { Checkbox } from "primereact/checkbox";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -39,7 +38,7 @@ interface DealsFilterOptions {
 }
 
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "" },
+    { name: "All", value: "all" },
     { name: "Buy Here Pay Here", value: "0.DealType" },
     { name: "Lease Here Pay Here", value: "7.DealType" },
     { name: "Cash", value: "1.DealType" },
@@ -55,7 +54,7 @@ const DEALS_OTHER_LIST: DealsFilterOptions[] = [
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "" },
+    { name: "All", value: "all" },
     { name: "Recent deals", value: "0.30.Age" },
     { name: "Quotes", value: "0.DealStatus" },
     { name: "Pending", value: "1.DealStatus" },
@@ -153,7 +152,7 @@ export default function Deals() {
         };
         let qry: string = "";
         const selectedFilters: string = [dealType, dealStatus, ...dealOther]
-            .filter(Boolean)
+            .filter((item) => item && item !== "all")
             .join("+");
         if (selectedFilters.length) {
             qry += selectedFilters;
@@ -170,33 +169,6 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch, dealType, dealStatus, dealOther]);
 
-    const dropdownHeaderPanel = (
-        <div className='dropdown-header flex pb-1'>
-            <label className='cursor-pointer dropdown-header__label'>
-                <Checkbox
-                    checked={dealOther.length === DEALS_OTHER_LIST.length}
-                    onChange={() => {
-                        if (dealOther.length !== DEALS_OTHER_LIST.length) {
-                            setDealOther(DEALS_OTHER_LIST.map(({ value }) => value));
-                        } else {
-                            setDealOther([]);
-                        }
-                    }}
-                    className='dropdown-header__checkbox mr-2'
-                />
-                Select All
-            </label>
-            <button
-                className='p-multiselect-close p-link'
-                onClick={() => {
-                    setDealOther([]);
-                }}
-            >
-                <i className='pi pi-times' />
-            </button>
-        </div>
-    );
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -207,35 +179,48 @@ export default function Deals() {
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
                             <div className='col-2'>
-                                <Dropdown
-                                    optionValue='value'
-                                    optionLabel='name'
-                                    value={dealType}
-                                    options={DEALS_TYPE_LIST}
-                                    className='deals__dropdown'
-                                    onChange={(e) => setDealType(e.value)}
-                                />
+                                <span className='p-float-label'>
+                                    <Dropdown
+                                        optionValue='value'
+                                        optionLabel='name'
+                                        value={dealType}
+                                        options={DEALS_TYPE_LIST}
+                                        placeholder='Type'
+                                        className='deals__dropdown'
+                                        onChange={(e) => setDealType(e.value)}
+                                    />
+                                    <label className='float-label'>Type</label>
+                                </span>
+                            </div>
+
+                            <div className='col-2'>
+                                <span className='p-float-label'>
+                                    <Dropdown
+                                        optionValue='value'
+                                        optionLabel='name'
+                                        value={dealStatus}
+                                        placeholder='Status'
+                                        options={DEALS_STATUS_LIST}
+                                        className='deals__dropdown'
+                                        onChange={(e) => setDealStatus(e.value)}
+                                    />
+                                    <label className='float-label'>Status</label>
+                                </span>
                             </div>
                             <div className='col-2'>
-                                <MultiSelect
-                                    optionValue='value'
-                                    optionLabel='name'
-                                    value={dealOther}
-                                    options={DEALS_OTHER_LIST}
-                                    panelHeaderTemplate={dropdownHeaderPanel}
-                                    className='deals__dropdown'
-                                    onChange={(e) => setDealOther(e.value)}
-                                />
-                            </div>
-                            <div className='col-2'>
-                                <Dropdown
-                                    optionValue='value'
-                                    optionLabel='name'
-                                    value={dealStatus}
-                                    options={DEALS_STATUS_LIST}
-                                    className='deals__dropdown'
-                                    onChange={(e) => setDealStatus(e.value)}
-                                />
+                                <span className='p-float-label'>
+                                    <MultiSelect
+                                        optionValue='value'
+                                        optionLabel='name'
+                                        value={dealOther}
+                                        options={DEALS_OTHER_LIST}
+                                        placeholder='Other'
+                                        panelHeaderTemplate={<></>}
+                                        className='deals__dropdown'
+                                        onChange={(e) => setDealOther(e.value)}
+                                    />
+                                    <label className='float-label'>Other</label>
+                                </span>
                             </div>
                             <div className='col-2'>
                                 <div className='contact-top-controls'>
