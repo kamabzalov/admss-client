@@ -3,6 +3,7 @@ export interface ExportWebList {
     Category: string;
     Cylinders: string;
     DealerCertified: number;
+    DealerComments: string;
     DriveLine: string;
     Engine: string;
     ExteriorColor: string;

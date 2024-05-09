@@ -1,4 +1,4 @@
-import { FilterOptions, TableColumnsList } from "dashboard/inventory/common/data-table";
+import { FilterOptions } from "dashboard/inventory/common/data-table";
 import { DataTableState } from "primereact/datatable";
 import { ContactType } from "../contact";
 
@@ -19,20 +19,21 @@ interface UserSettings {
 
 export interface InventoryUserSettings extends UserSettings {
     activeColumns?: string[];
-    currentLocation?: string;
     selectedFilterOptions?: FilterOptions[];
-    selectedInventoryType: string[];
 }
 
 export interface ContactsUserSettings extends UserSettings {
     selectedCategoriesOptions?: ContactType[];
 }
 
-export interface ExportWebUserSettings extends UserSettings {}
+export interface ExportWebUserSettings extends UserSettings {
+    selectedFilterOptions?: FilterOptions[] | any;
+}
 
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
+    selectedFilterOptions?: FilterOptions[];
     exportWeb: ExportWebUserSettings;
 }
 

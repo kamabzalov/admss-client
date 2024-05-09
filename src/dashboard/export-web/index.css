@@ -1,3 +1,73 @@
-.export-web__icon {
+.export-web__icon-button.p-button {
     color: var(--admss-app-primary-main-green);
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border: none;
+}
+.export-web__icon-button.p-button:last-child {
+    color: var(--admss-app-primary);
+}
+
+.export-web__icon-button.p-button:hover {
+    color: var(--admss-app-primary-main-green);
+    background: transparent;
+}
+
+.export-web-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.export-web-controls__button {
+    width: 160px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.export-web-controls__input {
+    width: 230px;
+    height: 100%;
+}
+
+.export-web-service {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+    max-width: 129px;
+}
+
+.row--selected {
+    background: var(--admss-app-light-green);
+}
+
+.export-web-service__input .p-inputnumber-input {
+    width: 94px;
+    height: 34px;
+}
+
+.export-web-table tr td:has(.row--selected) {
+    background: var(--admss-app-light-green);
+}
+
+.expanded-row {
+    width: 100%;
+    display: flex;
+    column-gap: 45px;
+}
+
+.expanded-row__label {
+    font-weight: 700;
+    flex: 0 1 20%;
+    text-align: right;
+}
+
+.expanded-row__text {
+    flex: 0 1 80%;
+    text-wrap: wrap;
 }
