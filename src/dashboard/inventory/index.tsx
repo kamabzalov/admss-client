@@ -35,48 +35,16 @@ import {
 import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
+import {
+    createStringifyFilterQuery,
+    createStringifySearchQuery,
+    filterParams,
+    isObjectEmpty,
+} from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
-
-const isObjectEmpty = (obj: Record<string, string>) =>
-    Object.values(obj).every((value) => !value.trim().length);
-
-const filterParams = (obj: Record<string, string>): Record<string, string> => {
-    return Object.fromEntries(
-        Object.entries(obj).filter(
-            ([_, value]) => typeof value === "string" && value.trim().length > 0
-        )
-    );
-};
-
-const createStringifySearchQuery = (obj: Record<string, string>): string => {
-    const filteredObj = filterParams(obj);
-
-    if (Object.keys(filteredObj).length === 0) {
-        return "";
-    }
-
-    return Object.entries(filteredObj)
-        .map(([key, value], index) => {
-            return `${index > 0 ? "+" : ""}${value}.${key}`;
-        })
-        .join("");
-};
-
-const createStringifyFilterQuery = (filterArray: FilterOptions[]): string => {
-    let qry: string = "";
-    filterArray.forEach((option, index) => {
-        const { column, value } = option;
-        if (value?.includes("-")) {
-            const [wordFrom, wordTo] = value.split("-");
-            return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
-        }
-        qry += `${index > 0 ? "+" : ""}${value}.${column}`;
-    });
-    return qry;
-};
 
 export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
