@@ -1,8 +1,11 @@
+import { ReportsColumn } from "../reports";
+
 export interface ExportWebList {
     BodyStyle: string;
     Category: string;
     Cylinders: string;
     DealerCertified: number;
+    DealerComments: string;
     DriveLine: string;
     Engine: string;
     ExteriorColor: string;
@@ -31,4 +34,9 @@ export interface ExportWebList {
     useruid: string;
     lastexportdate: string;
     Price: number;
+}
+
+export interface ExportWebPostData {
+    data: Record<string, unknown>[];
+    columns: ReportsColumn[];
 }

@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
@@ -9,137 +14,70 @@ import { InputText } from "primereact/inputtext";
 import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import { getExportToWebList } from "http/services/export-to-web.service";
+import {
+    addExportTask,
+    addExportTaskToSchedule,
+    getExportToWebList,
+} from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { setInventory } from "http/services/inventory-service";
-import { Inventory } from "common/models/inventory";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
+import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
+import { createStringifyFilterQuery } from "common/helpers";
+import { InputNumber } from "primereact/inputnumber";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof Inventory | MissedInventoryColumn;
+    field: keyof ExportWebList;
 }
 
 type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
-type MissedInventoryColumn =
-    | "Location"
-    | "IsFloorplanned"
-    | "FloorplanCompany"
-    | "PurchasedFrom"
-    | "PurchaseAuctCo"
-    | "PurchaseBuyerName"
-    | "PurchaseDate"
-    | "PurchaseAmount"
-    | "LotNo"
-    | "SoldByLot"
-    | "KeysMissing"
-    | "KeysDuplicate"
-    | "KeysHasRemote"
-    | "KeyNumber"
-    | "Consignor"
-    | "Consign"
-    | "IsTradeIn"
-    | "TitleStatus"
-    | "TitleState"
-    | "TitleNumber"
-    | "TitleReceived"
-    | "TitleReceivedDate"
-    | "Paid"
-    | "SalesTaxPaid"
-    | "ODOMInExcess"
-    | "ODOMNotActual"
-    | "DAM_Salvage"
-    | "DAM_Salvage_State"
-    | "DAM_Flood"
-    | "DAM_25"
-    | "DAM_25_Parts"
-    | "DAM_Theft"
-    | "DAM_Theft_Parts"
-    | "DAM_Reconstructed"
-    | "Autocheck_Checked"
-    | "CHK_Oil"
-    | "CHK_Inspected"
-    | "INSP_Number"
-    | "INSP_Date"
-    | "INSP_Emissions"
-    | "INSP_Sticker_Exp"
-    | "In Stock Date"
-    | "City MPG"
-    | "Hwy MPG";
-
 const columns: TableColumnsList[] = [
-    { field: "VIN", header: "VIN", checked: true },
     { field: "StockNo", header: "Stock#", checked: true },
-    { field: "Category", header: "Category", checked: false },
     { field: "Year", header: "Year", checked: true },
     { field: "Make", header: "Make", checked: true },
     { field: "Model", header: "Model", checked: true },
-    { field: "mileage", header: "Mileage", checked: true },
-    { field: "Price", header: "Price", checked: true },
-    { field: "ExteriorColor", header: "Color", checked: false },
-    { field: "InteriorColor", header: "Interior Color", checked: false },
-    { field: "BodyStyle", header: "Body", checked: false },
-    { field: "Transmission", header: "Transmission", checked: false },
-    { field: "TypeOfFuel", header: "Fuel Type", checked: false },
-    { field: "DriveLine", header: "Drive Line", checked: false },
-    { field: "Cylinders", header: "Number of Cylinders", checked: false },
-    { field: "Engine", header: "Engine Descriptions", checked: false },
+    { field: "VIN", header: "VIN", checked: false },
+    { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
-    { field: "GroupClass", header: "Group Class", checked: false },
-    { field: "Location", header: "Location", checked: false },
-    { field: "IsFloorplanned", header: "Floorplan Status", checked: false },
-    { field: "FloorplanCompany", header: "Floorplan Company", checked: false },
-    { field: "PurchasedFrom", header: "Purchased From", checked: false },
-    { field: "PurchaseAuctCo", header: "Purchase Auction Company", checked: false },
-    { field: "PurchaseBuyerName", header: "Purchase Buyer Name", checked: false },
-    { field: "PurchaseDate", header: "Purchase Date", checked: false },
-    { field: "PurchaseAmount", header: "Purchase Amount", checked: false },
-    { field: "LotNo", header: "Lot Number", checked: false },
-    { field: "SoldByLot", header: "Sold By Lot", checked: false },
-    { field: "KeysMissing", header: "Keys Missing", checked: false },
-    { field: "KeysDuplicate", header: "Duplicate Keys", checked: false },
-    { field: "KeysHasRemote", header: "Keys with Remote", checked: false },
-    { field: "KeyNumber", header: "Key Number", checked: false },
-    { field: "Consignor", header: "Consignor", checked: false },
-    { field: "Consign", header: "Consign Date", checked: false },
-    { field: "IsTradeIn", header: "Trade-In Status", checked: false },
-    { field: "TitleStatus", header: "Title Status", checked: false },
-    { field: "TitleState", header: "Title State", checked: false },
-    { field: "TitleNumber", header: "Title Number", checked: false },
-    { field: "TitleReceived", header: "Title Received", checked: false },
-    { field: "TitleReceivedDate", header: "Title Received Date", checked: false },
-    { field: "Paid", header: "Paid", checked: false },
-    { field: "SalesTaxPaid", header: "Sales Tax Paid", checked: false },
-    { field: "ODOMInExcess", header: "Odometer in Excess", checked: false },
-    { field: "ODOMNotActual", header: "Odometer Not Actual", checked: false },
-    { field: "DAM_Salvage", header: "Salvage Status", checked: false },
-    { field: "DAM_Salvage_State", header: "Salvage State", checked: false },
-    { field: "DAM_Flood", header: "Flood Status", checked: false },
-    { field: "DAM_25", header: "Damage Percentage", checked: false },
-    { field: "DAM_25_Parts", header: "Damaged Parts", checked: false },
-    { field: "DAM_Theft", header: "Theft Status", checked: false },
-    { field: "DAM_Theft_Parts", header: "Theft Parts", checked: false },
-    { field: "DAM_Reconstructed", header: "Reconstruction Status", checked: false },
-    { field: "Autocheck_Checked", header: "Autocheck Status", checked: false },
-    { field: "CHK_Oil", header: "Oil Check", checked: false },
-    { field: "CHK_Inspected", header: "State Inspection", checked: false },
-    { field: "FactoryCertified", header: "Factory Certified", checked: false },
-    { field: "DealerCertified", header: "Dealer Certified", checked: false },
-    { field: "INSP_Number", header: "Inspection Number", checked: false },
-    { field: "INSP_Date", header: "Inspection Date", checked: false },
-    { field: "INSP_Emissions", header: "Emissions Check", checked: false },
-    { field: "INSP_Sticker_Exp", header: "Sticker Expiration Date", checked: false },
-    { field: "In Stock Date", header: "In Stock Date", checked: false },
-    { field: "City MPG", header: "City MPG", checked: false },
-    { field: "Hwy MPG", header: "Highway MPG", checked: false },
+    { field: "Price", header: "Price", checked: false },
 ];
+
+const serviceColumns: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "cars.com", header: "CDC" },
+    { field: "carsforsale.com", header: "CFS" },
+    { field: "Equipmenttraider.com", header: "EQT" },
+    { field: "Commertialtrucktrader.com", header: "CTT" },
+];
+
+interface GroupedColumn {
+    label: string;
+    items: TableColumnsList[] | Pick<ColumnProps, "header" | "field">[];
+}
+
+const groupedColumns: GroupedColumn[] = [
+    {
+        label: "General",
+        items: columns,
+    },
+    {
+        label: "Services",
+        items: serviceColumns,
+    },
+];
+
+interface SelectionServices {
+    field?: string;
+    selected: boolean[];
+    price: number[];
+}
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -149,8 +87,126 @@ export const ExportToWeb = () => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+    const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
+        null
+    );
+    const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
+    const [selectedServices, setSelectedServices] = useState<SelectionServices[]>(
+        serviceColumns.map(({ field }) => ({ field, selected: [], price: [] }))
+    );
+    const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
     const navigate = useNavigate();
+
+    const rowExpansionTemplate = (data: ExportWebList) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Dealer comment: </div>
+                <div className='expanded-row__text'>{data.DealerComments || ""}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: ExportWebList) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
+    };
+
+    const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+
+        if (selectedItem) {
+            if (index === "all") {
+                return selectedItem.selected.every((item) => item);
+            } else {
+                return selectedItem.selected[index] || false;
+            }
+        }
+
+        return false;
+    };
+
+    const handleCheckboxChange = (field: string | "all", index: number | "all"): void => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+        if (field === "all" && index === "all") {
+            return setSelectedServices(
+                selectedServices.map((item) => ({
+                    ...item,
+                    selected: item.selected.map(() => selectedInventories.every((item) => !item)),
+                }))
+            );
+        }
+        if (field === "all" && index !== "all") {
+            selectedServices.forEach((item) => {
+                item.selected[index] = !selectedInventories[index];
+            });
+        }
+        if (selectedItem) {
+            if (index === "all") {
+                const isAllSelected = !selectedItem.selected.every((item) => item);
+                const allChecked = selectedItem.selected.map(() => isAllSelected);
+                selectedItem.selected = allChecked;
+            } else {
+                const currentState = selectedItem.selected[index];
+                selectedItem.selected[index] = !currentState;
+                const newSelectedInventories = [...selectedInventories];
+                newSelectedInventories[index] = !currentState;
+                if (selectedServices.some((item) => item.selected[index])) {
+                    newSelectedInventories[index] = true;
+                } else {
+                    newSelectedInventories[index] = false;
+                }
+
+                setSelectedInventories(newSelectedInventories);
+            }
+        }
+        setSelectedServices([...selectedServices]);
+    };
+
+    const handlePriceChange = (field: string, index: number, value: number) => {
+        const updatedServices = selectedServices.map((item) => {
+            if (item.field === field) {
+                return {
+                    ...item,
+                    price: [...item.price.slice(0, index), value, ...item.price.slice(index + 1)],
+                };
+            }
+            return item;
+        });
+        setSelectedServices(updatedServices);
+    };
+
+    const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            if (total) {
+                getExportToWebList(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                    if (response && !Array.isArray(response)) {
+                        setTotalRecords(response.total ?? 0);
+                    }
+                });
+            }
+            getExportToWebList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setExportsToWeb(response);
+                    setSelectedInventories(Array(response.length).fill(false));
+                    const price = response.map((item) => item.Price || 0);
+                    setSelectedServices(
+                        selectedServices.map((item) => ({
+                            ...item,
+                            selected: Array(response.length).fill(false),
+                            price,
+                        }))
+                    );
+                } else {
+                    setExportsToWeb([]);
+                }
+            });
+        }
+    };
 
     useEffect(() => {
         changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
@@ -178,30 +234,38 @@ export const ExportToWeb = () => {
     }, []);
 
     useEffect(() => {
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
             skip: lazyState.first,
             top: lazyState.rows,
         };
-        if (authUser) {
-            getExportToWebList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setExportsToWeb(response);
-                } else {
-                    setExportsToWeb([]);
-                }
-            });
-        }
-    }, [lazyState, authUser, globalSearch]);
+
+        handleGetExportWebList(params);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
-                exportWeb: { ...serverSettings?.exportWeb, ...settings },
+                inventory: { ...serverSettings?.inventory, ...settings },
             } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
@@ -347,6 +411,59 @@ export const ExportToWeb = () => {
         );
     };
 
+    const handleExport = (schedule?: boolean) => {
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field,
+        }));
+
+        const data = exportsToWeb
+            .map((item, index) => {
+                let filteredItem: Record<string, any> | null = {};
+                const reportService: { service: string; price: number }[] = [];
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        if (selectedInventories[index] && filteredItem) {
+                            filteredItem[column.data] = item[column.data as keyof typeof item];
+                            filteredItem["itemuid"] = item["itemuid"];
+                            selectedServices.forEach((serviceItem) => {
+                                if (
+                                    serviceItem.selected[index] &&
+                                    activeColumns.some(({ field }) => field === serviceItem.field)
+                                ) {
+                                    !reportService.some(
+                                        ({ service }) => service === serviceItem?.field
+                                    ) &&
+                                        reportService.push({
+                                            service: serviceItem?.field!,
+                                            price: serviceItem?.price[index],
+                                        });
+                                }
+                            });
+                        } else {
+                            filteredItem = null;
+                        }
+                    }
+                });
+                return reportService.length
+                    ? { ...filteredItem, services: reportService }
+                    : filteredItem;
+            })
+            .filter(Boolean);
+        const JSONreport = !!data.length && {
+            data,
+            columns,
+        };
+
+        if (JSONreport && authUser) {
+            if (schedule) {
+                addExportTaskToSchedule(authUser.useruid, JSONreport);
+            } else {
+                addExportTask(authUser?.useruid, JSONreport);
+            }
+        }
+    };
+
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
@@ -362,57 +479,86 @@ export const ExportToWeb = () => {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-2'>
-                                <MultiSelect
-                                    options={columns}
-                                    value={activeColumns}
-                                    optionLabel='header'
-                                    panelHeaderTemplate={dropdownHeaderPanel}
-                                    onChange={onColumnToggle}
-                                    showSelectAll={false}
-                                    className='w-full pb-0 h-full flex align-items-center column-picker'
-                                    display='chip'
-                                    pt={{
-                                        header: {
-                                            className: "column-picker__header",
-                                        },
-                                        wrapper: {
-                                            className: "column-picker__wrapper",
-                                            style: {
-                                                maxHeight: "500px",
-                                            },
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div className='col-4'>
-                                <div className='contact-top-controls'>
-                                    <Button
-                                        className='contact-top-controls__button px-6 uppercase'
-                                        severity='success'
-                                        type='button'
-                                    >
-                                        Export
-                                    </Button>
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        tooltip='Print export to web form'
-                                        onClick={() => printTableData(true)}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='icon adms-blank'
-                                        tooltip='Download export to web form'
-                                        onClick={() => printTableData()}
+                            <div className='col-12 export-web-controls'>
+                                <Button
+                                    className='export-web-controls__button px-6 uppercase'
+                                    severity='success'
+                                    type='button'
+                                    disabled={selectedInventories.filter(Boolean).length === 0}
+                                    onClick={() => handleExport()}
+                                >
+                                    Export now
+                                </Button>
+                                <Button
+                                    className='export-web-controls__button px-6 uppercase'
+                                    severity='success'
+                                    type='button'
+                                    disabled={selectedInventories.filter(Boolean).length === 0}
+                                    onClick={() => handleExport(true)}
+                                >
+                                    SCHEDULE
+                                </Button>
+                                <div className='export-web-controls__input'>
+                                    <TableFilter
+                                        filterOptions={filterOptions}
+                                        onFilterChange={(selectedFilter) => {
+                                            changeSettings({
+                                                ...serverSettings,
+                                                selectedFilterOptions: selectedFilter.filter(
+                                                    (option) => !option.disabled
+                                                ),
+                                            });
+                                        }}
+                                        onClearFilters={() => {
+                                            setSelectedFilter([]);
+                                            setSelectedFilterOptions([]);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                selectedFilterOptions: [],
+                                            });
+                                        }}
                                     />
                                 </div>
-                            </div>
-
-                            <div className='col-6 text-right'>
-                                <span className='p-input-icon-right'>
+                                <div className='export-web-controls__input'>
+                                    <MultiSelect
+                                        options={groupedColumns}
+                                        value={activeColumns}
+                                        optionGroupChildren='items'
+                                        optionLabel='header'
+                                        optionGroupLabel='label'
+                                        panelHeaderTemplate={dropdownHeaderPanel}
+                                        onChange={onColumnToggle}
+                                        showSelectAll={false}
+                                        className='w-full pb-0 h-full flex align-items-center column-picker'
+                                        display='chip'
+                                        pt={{
+                                            header: {
+                                                className: "column-picker__header",
+                                            },
+                                            wrapper: {
+                                                className: "column-picker__wrapper",
+                                                style: {
+                                                    maxHeight: "500px",
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <Button
+                                    severity='success'
+                                    type='button'
+                                    icon='icon adms-print'
+                                    tooltip='Print export to web form'
+                                    onClick={() => printTableData(true)}
+                                />
+                                <Button
+                                    severity='success'
+                                    type='button'
+                                    icon='icon adms-blank'
+                                    tooltip='Download export to web form'
+                                    onClick={() => printTableData()}
+                                />
+                                <span className='p-input-icon-right ml-auto'>
                                     <i className='pi pi-search' />
                                     <InputText
                                         value={globalSearch}
@@ -437,9 +583,15 @@ export const ExportToWeb = () => {
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
+                                    rowExpansionTemplate={rowExpansionTemplate}
+                                    expandedRows={expandedRows}
+                                    onRowToggle={(e: DataTableRowClickEvent) =>
+                                        setExpandedRows([e.data])
+                                    }
                                     reorderableColumns
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
+                                    className='export-web-table'
                                     sortField={lazyState.sortField}
                                     onColReorder={(event) => {
                                         if (authUser && Array.isArray(event.columns)) {
@@ -484,56 +636,189 @@ export const ExportToWeb = () => {
                                 >
                                     <Column
                                         bodyStyle={{ textAlign: "center" }}
-                                        header={<Checkbox checked={false} />}
+                                        header={
+                                            <Checkbox
+                                                checked={selectedInventories.every(
+                                                    (checkbox) => !!checkbox
+                                                )}
+                                                onClick={({ checked }) => {
+                                                    handleCheckboxChange("all", "all");
+                                                    setSelectedInventories(
+                                                        selectedInventories.map(() => {
+                                                            if (checked) {
+                                                                return true;
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })
+                                                    );
+                                                }}
+                                            />
+                                        }
                                         reorderable={false}
-                                        body={(options) => {
+                                        body={(options, { rowIndex }) => {
                                             return (
-                                                <div className='flex gap-3'>
-                                                    <Checkbox checked={false} />
-                                                    <i
-                                                        className='icon adms-edit-item cursor-pointer export-web__icon'
+                                                <div
+                                                    className={`flex gap-3 align-items-center  ${
+                                                        selectedInventories[rowIndex] &&
+                                                        "row--selected"
+                                                    }`}
+                                                >
+                                                    <Checkbox
+                                                        checked={selectedInventories[rowIndex]}
+                                                        onClick={() => {
+                                                            setSelectedInventories(
+                                                                selectedInventories.map(
+                                                                    (state, index) =>
+                                                                        index === rowIndex
+                                                                            ? !state
+                                                                            : state
+                                                                )
+                                                            );
+                                                            handleCheckboxChange("all", rowIndex);
+                                                        }}
+                                                    />
+
+                                                    <Button
+                                                        className='text export-web__icon-button'
+                                                        icon='icon adms-edit-item'
                                                         onClick={() => {
                                                             navigate(
                                                                 `/dashboard/inventory/${options.itemuid}`
                                                             );
                                                         }}
                                                     />
-                                                    <i className='pi pi-angle-down' />
+                                                    <Button
+                                                        className='text export-web__icon-button'
+                                                        icon='pi pi-angle-down'
+                                                        onClick={() =>
+                                                            handleRowExpansionClick(options)
+                                                        }
+                                                    />
                                                 </div>
                                             );
                                         }}
-                                    />
-                                    {activeColumns.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            editor={(data: ColumnEditorOptions) => {
-                                                const { field } = data;
-                                                if (
-                                                    allowedEditableFields.includes(
-                                                        field as keyof ExportWebList
-                                                    )
-                                                ) {
-                                                    return cellEditor(data);
-                                                } else {
-                                                    return data.value;
-                                                }
-                                            }}
-                                            headerClassName='cursor-move'
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: serverSettings?.exportWeb
-                                                            ?.columnWidth?.[field],
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
-                                                    },
+                                        pt={{
+                                            root: {
+                                                style: {
+                                                    width: "100px",
                                                 },
-                                            }}
-                                        />
-                                    ))}
+                                            },
+                                        }}
+                                    />
+                                    {activeColumns.map(({ field, header }) =>
+                                        serviceColumns.some(
+                                            (serviceColumn) => serviceColumn.field === field
+                                        ) ? (
+                                            <Column
+                                                field={field}
+                                                header={() => (
+                                                    <div className='flex gap-3'>
+                                                        <Checkbox
+                                                            checked={handleCheckboxCheck(
+                                                                field,
+                                                                "all"
+                                                            )}
+                                                            onClick={() =>
+                                                                handleCheckboxChange(field, "all")
+                                                            }
+                                                        />
+                                                        {header?.toString()}
+                                                    </div>
+                                                )}
+                                                headerTooltip={field}
+                                                body={({ Price }: ExportWebList, { rowIndex }) => {
+                                                    return (
+                                                        <div
+                                                            className={`export-web-service ${
+                                                                selectedInventories[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
+                                                            <Checkbox
+                                                                checked={handleCheckboxCheck(
+                                                                    field,
+                                                                    rowIndex
+                                                                )}
+                                                                onClick={() =>
+                                                                    handleCheckboxChange(
+                                                                        field,
+                                                                        rowIndex
+                                                                    )
+                                                                }
+                                                            />
+                                                            <InputNumber
+                                                                disabled={
+                                                                    !selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.selected[rowIndex]
+                                                                }
+                                                                value={
+                                                                    selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.price[rowIndex]
+                                                                }
+                                                                onChange={({ value }) =>
+                                                                    value &&
+                                                                    handlePriceChange(
+                                                                        field,
+                                                                        rowIndex,
+                                                                        value
+                                                                    )
+                                                                }
+                                                                className='export-web-service__input'
+                                                            />
+                                                        </div>
+                                                    );
+                                                }}
+                                                key={field}
+                                            />
+                                        ) : (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                body={(data, { rowIndex }) => {
+                                                    return (
+                                                        <div
+                                                            className={`${
+                                                                selectedInventories[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
+                                                            {data[field]}
+                                                        </div>
+                                                    );
+                                                }}
+                                                editor={(data: ColumnEditorOptions) => {
+                                                    const { field } = data;
+                                                    if (
+                                                        allowedEditableFields.includes(
+                                                            field as keyof ExportWebList
+                                                        )
+                                                    ) {
+                                                        return cellEditor(data);
+                                                    } else {
+                                                        return data.value;
+                                                    }
+                                                }}
+                                                headerClassName='cursor-move'
+                                                pt={{
+                                                    root: {
+                                                        style: {
+                                                            width: serverSettings?.exportWeb
+                                                                ?.columnWidth?.[field],
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        )
+                                    )}
                                 </DataTable>
                             </div>
                         </div>
