@@ -31,17 +31,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
-    const [expenseDate, setExpenseDate] = useState<string>("");
-    const [expenseType, setExpenseType] = useState<number>(0);
-    const [expenseAmount, setExpenseAmount] = useState<number>(0);
-    const [expenseNotBillable, setExpenseNotBillable] = useState<boolean>(false);
-    const [expenseVendor, setExpenseVendor] = useState<string>("");
-    const [expenseNotes, setExpenseNotes] = useState<string>("");
+    const [currentEditExpense, setCurrentEditExpense] = useState<Expenses | null>(null);
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
-    const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
-    const [expandedRows, setExpandedRows] = useState<any[]>([]);
-    // const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+    const [expandedRows, setExpandedRows] = useState<Record<string, any>[]>([]);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -70,26 +63,20 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, []);
 
     const handleCompareData = useMemo(() => {
-        const currentExpense = expensesList.find((item) => item.itemuid === currentExpenseUid);
+        const currentExpense = expensesList.find(
+            (item) => item.itemuid === currentEditExpense?.itemuid
+        );
         if (currentExpense) {
             const isDataChanged =
-                currentExpense.operationdate !== expenseDate ||
-                currentExpense.type !== expenseType ||
-                currentExpense.amount !== expenseAmount ||
-                currentExpense.vendor !== expenseVendor ||
-                currentExpense.comment !== expenseNotes;
+                currentExpense.operationdate !== currentEditExpense?.operationdate ||
+                currentExpense.type !== currentEditExpense?.type ||
+                currentExpense.amount !== currentEditExpense?.amount ||
+                currentExpense.vendor !== currentEditExpense?.vendor ||
+                currentExpense.comment !== currentEditExpense?.comment;
             return !isDataChanged;
         }
         return false;
-    }, [
-        currentExpenseUid,
-        expenseAmount,
-        expenseDate,
-        expenseNotes,
-        expenseType,
-        expenseVendor,
-        expensesList,
-    ]);
+    }, [expensesList, currentEditExpense]);
 
     useEffect(() => {
         getExpenses();
@@ -108,27 +95,18 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [getExpenses, user]);
 
     const handleClearExpense = () => {
-        setCurrentExpenseUid("");
-        setExpenseDate("");
-        setExpenseType(0);
-        setExpenseAmount(0);
-        setExpenseNotBillable(false);
-        setExpenseVendor("");
-        setExpenseNotes("");
+        setCurrentEditExpense(null);
     };
 
     const handleExpenseSubmit = (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
-            operationdate: expenseDate,
-            type: expenseType,
-            amount: expenseAmount * 100,
-            vendor: expenseVendor,
-            comment: expenseNotes,
+            operationdate: currentEditExpense?.operationdate || "",
+            type: currentEditExpense?.type || 0,
+            amount: (currentEditExpense?.amount && currentEditExpense?.amount * 100) || 0,
+            vendor: currentEditExpense?.vendor || "",
+            comment: currentEditExpense?.comment || "",
         };
-        if (currentExpenseUid) {
-            // expenseData.itemuid = currentExpenseUid;
-        }
 
         setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
             handleClearExpense();
@@ -137,10 +115,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
     };
 
     const handleDeleteExpenses = () => {
-        currentExpenseUid && deleteExpensesItem(currentExpenseUid).then(() => getExpenses());
+        currentEditExpense &&
+            deleteExpensesItem(currentEditExpense.itemuid).then(() => {
+                getExpenses();
+                handleClearExpense();
+            });
     };
 
-    const deleteTemplate = ({ itemuid }: Expenses) => {
+    const deleteTemplate = (expense: Expenses) => {
         return (
             <Button
                 type='button'
@@ -149,22 +131,16 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 tooltipOptions={{ showDelay: 300 }}
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
-                    setCurrentExpenseUid(itemuid);
+                    setCurrentEditExpense(expense);
                     setConfirmActive(true);
                 }}
             />
         );
     };
 
-    const handleEditExpenses = ({ itemuid }: Expenses) => {
-        const expenseItem = expensesList.find((expense) => expense.itemuid === itemuid);
-        if (expenseItem) {
-            setExpenseDate(expenseItem.operationdate);
-            setExpenseType(expenseItem.type);
-            setExpenseAmount(expenseItem.amount / 100);
-            setExpenseVendor(expenseItem.vendor);
-            setExpenseNotes(expenseItem.comment);
-            setCurrentExpenseUid(itemuid);
+    const handleEditExpenses = (expense: Expenses) => {
+        if (expense) {
+            setCurrentEditExpense({ ...expense, amount: expense.amount / 100 });
         }
     };
 
@@ -192,9 +168,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-6'>
                         <DateInput
                             name='Date'
-                            date={Date.parse(expenseDate)}
+                            date={Date.parse(currentEditExpense?.operationdate || "")}
                             onChange={({ value }) =>
-                                value && setExpenseDate(String(new Date(`${value}`)))
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({
+                                    ...currentEditExpense,
+                                    operationdate: String(new Date(`${value}`)),
+                                })
                             }
                         />
                     </div>
@@ -205,8 +186,12 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 optionValue='id'
                                 filter
                                 options={expensesTypeList}
-                                value={expenseType}
-                                onChange={({ value }) => value && setExpenseType(Number(value))}
+                                value={currentEditExpense?.type || 0}
+                                onChange={({ value }) =>
+                                    value &&
+                                    currentEditExpense &&
+                                    setCurrentEditExpense({ ...currentEditExpense, type: value })
+                                }
                                 className='w-full purchase-expenses__dropdown'
                             />
 
@@ -220,8 +205,12 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 optionValue='contactuid'
                                 filter
                                 options={expensesVendorList}
-                                value={expenseVendor}
-                                onChange={({ value }) => value && setExpenseVendor(String(value))}
+                                value={currentEditExpense?.vendor || ""}
+                                onChange={({ value }) =>
+                                    value &&
+                                    currentEditExpense &&
+                                    setCurrentEditExpense({ ...currentEditExpense, vendor: value })
+                                }
                                 className='w-full purchase-expenses__dropdown'
                             />
 
@@ -232,34 +221,34 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <CurrencyInput
                             labelPosition='top'
                             title='Amount'
-                            value={expenseAmount}
-                            onChange={({ value }) => {
-                                value && setExpenseAmount(value);
-                            }}
+                            value={currentEditExpense?.amount}
+                            onChange={({ value }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, amount: value })
+                            }
                         />
                     </div>
                     <div className='col-6'>
-                        <BorderedCheckbox
-                            checked={expenseNotBillable}
-                            name='Not Billable'
-                            onChange={() => {
-                                setExpenseNotBillable(!expenseNotBillable);
-                            }}
-                        />
+                        <BorderedCheckbox checked={false} name='Not Billable' />
                     </div>
                 </div>
                 <div className='col-6'>
                     <span className='p-float-label'>
                         <InputTextarea
                             className='purchase-expenses__text-area'
-                            value={expenseNotes}
-                            onChange={({ target: { value } }) => setExpenseNotes(value)}
+                            value={currentEditExpense?.comment || ""}
+                            onChange={({ target: { value } }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, comment: value })
+                            }
                         />
                         <label className='float-label'>Notes</label>
                     </span>
                 </div>
                 <div className='purchase-expenses-controls'>
-                    {currentExpenseUid && (
+                    {currentEditExpense && (
                         <Button
                             className='purchase-expenses-controls__button'
                             onClick={() => handleClearExpense()}
@@ -272,9 +261,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         className='purchase-expenses-controls__button'
                         disabled={handleCompareData}
                         severity={handleCompareData ? "secondary" : "success"}
-                        onClick={() => handleExpenseSubmit(currentExpenseUid)}
+                        onClick={() => handleExpenseSubmit(currentEditExpense?.itemuid)}
                     >
-                        {currentExpenseUid ? "Update" : "Save"}
+                        {currentEditExpense ? "Update" : "Save"}
                     </Button>
                 </div>
             </div>
