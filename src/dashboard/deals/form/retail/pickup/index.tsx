@@ -10,13 +10,15 @@ const arrayItem = Array.from({ length: 7 }, (_, i) => i + 1);
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
-    const [, setPayments] = useState([]);
+    const [, setPayments] = useState<any>();
     const [totalPayments, setTotalPayments] = useState(0);
 
     useEffect(() => {
         if (id) {
             getDealPayments(id).then((data) => setPayments(data));
-            getDealPaymentsTotal(id).then((data) => setTotalPayments(data));
+            getDealPaymentsTotal(id).then(
+                (data) => typeof data === "number" && setTotalPayments(data)
+            );
         }
         // eslint-disable-next-line
     }, []);

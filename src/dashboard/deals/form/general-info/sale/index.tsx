@@ -21,12 +21,12 @@ export const DealGeneralSale = observer((): ReactElement => {
             dealtype,
             dealstatus,
             saletype,
-            inventoryinfo,
             inventoryuid,
             datepurchase,
             dateeffective,
             inventorystatus,
             accountuid,
+            contactuid,
         },
         dealExtData,
         changeDeal,
@@ -57,11 +57,11 @@ export const DealGeneralSale = observer((): ReactElement => {
         <div className='grid deal-general-sale row-gap-2'>
             <div className='col-6'>
                 <CompanySearch
-                    value={inventoryuid}
-                    onChange={({ target: { value } }) => changeDeal({ key: "inventoryuid", value })}
+                    value={contactuid}
+                    onChange={({ target: { value } }) => changeDeal({ key: "contactuid", value })}
                     onRowClick={(value) =>
                         changeDeal({
-                            key: "inventoryuid",
+                            key: "contactuid",
                             value,
                         })
                     }
@@ -71,7 +71,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             <div className='col-6'>
                 <span className='p-float-label'>
                     <CompanySearch
-                        value={inventoryinfo}
+                        value={inventoryuid}
                         onChange={({ target: { value } }) =>
                             changeDeal({ key: "inventoryuid", value })
                         }
@@ -144,7 +144,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     name='First operated (req.)'
-                    date={Number(dateeffective)}
+                    value={dateeffective}
                     onChange={({ value }) =>
                         changeDeal({ key: "dateeffective", value: Number(value) })
                     }

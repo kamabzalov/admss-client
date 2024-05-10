@@ -18,6 +18,7 @@ export const DealRetailProducts = observer((): ReactElement => {
             Warranty_Term,
             Warranty_Deductible,
             Warranty_Notes,
+            Warranty_Price,
         },
         changeDeal,
         changeDealExtData,
@@ -40,7 +41,14 @@ export const DealRetailProducts = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Price' />
+                <CurrencyInput
+                    value={Warranty_Price}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Warranty_Price", value: Number(value) || 0 })
+                    }
+                    labelPosition='top'
+                    title='Price'
+                />
             </div>
             <div className='col-3'>
                 <CurrencyInput
@@ -112,7 +120,11 @@ export const DealRetailProducts = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={price.includes("$") ? Number(price.replace("$", "")) : Number(price)}
+                    value={
+                        typeof price === "string" && price.includes("$")
+                            ? Number(price.replace("$", ""))
+                            : Number(price)
+                    }
                     onChange={({ value }) => {
                         changeDeal({ key: "price", value: Number(value) || 0 });
                     }}

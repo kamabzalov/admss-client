@@ -44,6 +44,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             Trade2_Lien_Phone,
             Trade2_Lien_Contact,
         },
+        deal: { addToInventory },
+        changeDeal,
         changeDealExtData,
     } = store;
 
@@ -349,11 +351,16 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                {/* TODO: Add checkbox for adding to inventory */}
                 <Checkbox
                     inputId='Trade2_AddToInventory'
                     name='Trade2_AddToInventory'
-                    checked={false}
+                    checked={!!addToInventory}
+                    onChange={() =>
+                        changeDeal({
+                            key: "addToInventory",
+                            value: !addToInventory ? 1 : 0,
+                        })
+                    }
                 />
                 <label htmlFor='Trade2_AddToInventory' className='ml-2'>
                     Add to inventory

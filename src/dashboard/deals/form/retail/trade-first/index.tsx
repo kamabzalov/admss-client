@@ -44,6 +44,8 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_Lien_Phone,
             Trade1_Lien_Contact,
         },
+        deal: { addToInventory },
+        changeDeal,
         changeDealExtData,
     } = store;
 
@@ -155,7 +157,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         <div className='grid deal-retail-trade row-gap-2'>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    {/* TODO: Add DECODE button */}
                     <InputText
                         {...formik.getFieldProps("VIN")}
                         className={`deal-trade__text-input w-full ${
@@ -349,11 +350,16 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                {/* TODO: Add checkbox for adding to inventory */}
                 <Checkbox
                     inputId='Trade1_AddToInventory'
                     name='Trade1_AddToInventory'
-                    checked={false}
+                    checked={!!addToInventory}
+                    onChange={() =>
+                        changeDeal({
+                            key: "addToInventory",
+                            value: !addToInventory ? 1 : 0,
+                        })
+                    }
                 />
                 <label htmlFor='Trade1_AddToInventory' className='ml-2'>
                     Add to inventory
