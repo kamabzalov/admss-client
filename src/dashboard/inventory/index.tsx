@@ -35,12 +35,12 @@ import {
 import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
-import {
-    createStringifyFilterQuery,
-    createStringifySearchQuery,
-    filterParams,
-    isObjectEmpty,
-} from "common/helpers";
+// import {
+//     createStringifyFilterQuery,
+//     createStringifySearchQuery,
+//     filterParams,
+//     isObjectEmpty,
+// } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 
@@ -116,12 +116,12 @@ export default function Inventories(): ReactElement {
         if (globalSearch) {
             qry += globalSearch;
         } else {
-            qry += createStringifySearchQuery(advancedSearch);
+            // qry += createStringifySearchQuery(advancedSearch);
         }
 
         if (selectedFilterOptions) {
             if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
+            // qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
         if (selectedInventoryType.length) {
@@ -300,9 +300,9 @@ export default function Inventories(): ReactElement {
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = isObjectEmpty(newSearch);
+            // const isAnyValueEmpty = isObjectEmpty(newSearch);
 
-            setButtonDisabled(isAnyValueEmpty);
+            // setButtonDisabled(isAnyValueEmpty);
 
             return newSearch;
         });
@@ -311,8 +311,8 @@ export default function Inventories(): ReactElement {
 
     const handleAdvancedSearch = () => {
         setIsLoading(true);
-        const searchParams = createStringifySearchQuery(advancedSearch);
-        handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
+        //  const searchParams = createStringifySearchQuery(advancedSearch);
+        //  handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
         setDialogVisible(false);
         setIsLoading(false);
     };
@@ -331,11 +331,11 @@ export default function Inventories(): ReactElement {
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
-            const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+            // const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
             const params: QueryParams = {
                 ...(lazyState.sortOrder === 1 && { type: "asc" }),
                 ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                // ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
