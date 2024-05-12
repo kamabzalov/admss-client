@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode, useState } from "react";
-import { Button } from "primereact/button";
 import "./index.css";
+import { Button } from "primereact/button";
 
 interface InfoOverlayPanelProps {
     panelTitle?: string;
@@ -10,10 +10,7 @@ export const InfoOverlayPanel = ({ panelTitle, children }: InfoOverlayPanelProps
     const [panelShow, setPanelShow] = useState<boolean>(false);
     return (
         <div className='info-panel'>
-            <Button
-                className='limitation__button info-panel__button'
-                onClick={() => setPanelShow((prev) => !prev)}
-            >
+            <Button className='info-panel__button' onClick={() => setPanelShow((prev) => !prev)}>
                 <i className='icon adms-question-mark p-text-secondary p-overlay-badge info-panel__icon' />
             </Button>
             {panelShow && (

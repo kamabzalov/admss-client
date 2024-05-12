@@ -13,6 +13,7 @@ import {
 } from "http/services/deals.service";
 import { IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -70,7 +71,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <CompanySearch
+                    <InventorySearch
                         value={inventoryuid}
                         onChange={({ target: { value } }) =>
                             changeDeal({ key: "inventoryuid", value })
