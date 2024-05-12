@@ -44,7 +44,6 @@ import {
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 
-
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
 }
@@ -52,11 +51,6 @@ interface InventoriesProps {
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
 export default function Inventories({ onRowClick }: InventoriesProps): ReactElement {
-
-interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
-
-export default function Inventories(): ReactElement {
-
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
