@@ -31,7 +31,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
-    const [currentEditExpense, setCurrentEditExpense] = useState<Expenses | null>(null);
+    const [currentEditExpense, setCurrentEditExpense] = useState<Expenses>({} as Expenses);
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [expandedRows, setExpandedRows] = useState<Record<string, any>[]>([]);
@@ -95,7 +95,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [getExpenses, user]);
 
     const handleClearExpense = () => {
-        setCurrentEditExpense(null);
+        setCurrentEditExpense({} as Expenses);
     };
 
     const handleExpenseSubmit = (itemuid?: string) => {
@@ -248,7 +248,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     </span>
                 </div>
                 <div className='purchase-expenses-controls'>
-                    {currentEditExpense && (
+                    {currentEditExpense?.itemuid && (
                         <Button
                             className='purchase-expenses-controls__button'
                             onClick={() => handleClearExpense()}
@@ -263,7 +263,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         severity={handleCompareData ? "secondary" : "success"}
                         onClick={() => handleExpenseSubmit(currentEditExpense?.itemuid)}
                     >
-                        {currentEditExpense ? "Update" : "Save"}
+                        {currentEditExpense?.itemuid ? "Update" : "Save"}
                     </Button>
                 </div>
             </div>
