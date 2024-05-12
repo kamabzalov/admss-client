@@ -89,7 +89,6 @@
 
 .purchase-expenses__table .expanded-row {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
     padding-left: 82px;
 }
