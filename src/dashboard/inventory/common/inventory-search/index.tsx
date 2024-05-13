@@ -1,32 +1,30 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { QueryParams } from "common/models/query-params";
 import { AuthUser } from "http/services/auth.service";
-import { getContacts } from "http/services/contacts-service";
+import { getInventoryList } from "http/services/inventory-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
-import { ContactsDataTable } from "dashboard/contacts";
+import { Inventory } from "common/models/inventory";
+import Inventories from "dashboard/inventory";
 
-const FIELD: keyof ContactUser = "companyName";
+const FIELD: keyof Inventory = "name";
 
-interface CompanySearchProps extends DropdownProps {
-    onRowClick?: (companyName: string) => void;
-    contactCategory?: ContactTypeNameList | string;
+interface InventorySearchProps extends DropdownProps {
+    onRowClick?: (inventoryName: string) => void;
 }
 
-export const CompanySearch = ({
+export const InventorySearch = ({
     name,
     value,
     onRowClick,
-    contactCategory,
     onChange,
     ...props
-}: CompanySearchProps) => {
+}: InventorySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
-    const [options, setOptions] = useState<ContactUser[]>([]);
+    const [options, setOptions] = useState<Inventory[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
     useEffect(() => {
@@ -34,13 +32,13 @@ export const CompanySearch = ({
         setUser(authUser);
     }, []);
 
-    const handleCompanyInputChange = (searchValue: string): void => {
+    const handleInventoryInputChange = (searchValue: string): void => {
         const params: QueryParams = {
             qry: `${searchValue}.${FIELD}`,
         };
         user &&
-            getContacts(user.useruid, params).then((response) => {
-                if (response?.length) {
+            getInventoryList(user.useruid, params).then((response) => {
+                if (response instanceof Array && response?.length) {
                     setOptions(response);
                 } else {
                     setOptions([]);
@@ -48,8 +46,8 @@ export const CompanySearch = ({
             });
     };
 
-    const handleOnRowClick = (companyName: string) => {
-        onRowClick && onRowClick(companyName);
+    const handleOnRowClick = (inventoryName: string) => {
+        onRowClick && onRowClick(inventoryName);
         setDialogVisible(false);
     };
     return (
@@ -60,7 +58,7 @@ export const CompanySearch = ({
                 optionValue={FIELD}
                 optionLabel={FIELD}
                 options={options}
-                onInputChange={handleCompanyInputChange}
+                onInputChange={handleInventoryInputChange}
                 value={value}
                 onChange={onChange}
                 onIconClick={() => {
@@ -69,17 +67,14 @@ export const CompanySearch = ({
                 {...props}
             />
             <Dialog
-                header={<div className='uppercase'>Choose a Contact</div>}
+                header={<div className='uppercase'>Choose an Inventory</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw" }}
                 maximizable
                 modal
                 onHide={() => setDialogVisible(false)}
             >
-                <ContactsDataTable
-                    onRowClick={handleOnRowClick}
-                    contactCategory={contactCategory}
-                />
+                <Inventories onRowClick={handleOnRowClick} />
             </Dialog>
         </>
     );

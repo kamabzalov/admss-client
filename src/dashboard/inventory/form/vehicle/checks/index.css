@@ -12,9 +12,16 @@
 
 .vehicle-checks__bottom {
     max-height: 226px;
+    width: 100%;
+}
+
+.vehicle-checks__column {
+    display: flex;
+    width: 50%;
+    flex-direction: column;
+    row-gap: 25px;
 }
 
 .vehicle-checks__checkbox {
-    width: 50%;
     color: var(--admss-app-primary);
 }

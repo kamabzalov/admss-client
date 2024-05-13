@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { BaseResponse, Status } from "../base-response";
 
 export interface ContactExtData {
@@ -271,7 +272,7 @@ export interface ContactsCategories {
 
 export interface ContactType {
     id: number;
-    name: string;
+    name: ContactTypeNameList | string;
 }
 
 export interface ContactUser {
@@ -311,4 +312,17 @@ export interface SalespersonsList {
     updated: string;
     username: string;
     useruid: string;
+}
+
+export enum ContactTypeNameList {
+    DEFAULT = "Default",
+    BUYERS = "Buyers",
+    DEALERS = "Dealers",
+    INSURANCE_COMPANIES = "Insurance Companies",
+    INSURANCE_AGENTS = "Insurance Agents",
+    VENDORS = "Vendors",
+    LENDERS = "Lenders",
+    AUCTIONS = "Auctions",
+    CONSIGNORS = "Consignors",
+    GENERAL = "General",
 }

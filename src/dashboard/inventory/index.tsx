@@ -44,9 +44,13 @@ import {
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 
+interface InventoriesProps {
+    onRowClick?: (companyName: string) => void;
+}
+
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
-export default function Inventories(): ReactElement {
+export default function Inventories({ onRowClick }: InventoriesProps): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -621,6 +625,14 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    const handleOnRowClick = ({ data: { itemuid, name } }: DataTableRowClickEvent) => {
+        if (onRowClick) {
+            onRowClick(name);
+        } else {
+            navigate(itemuid);
+        }
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -674,9 +686,7 @@ export default function Inventories(): ReactElement {
                                         resizableColumns
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
-                                        onRowClick={({
-                                            data: { itemuid },
-                                        }: DataTableRowClickEvent) => navigate(itemuid)}
+                                        onRowClick={handleOnRowClick}
                                         onColReorder={(event: any) => {
                                             if (authUser && Array.isArray(event.columns)) {
                                                 const orderArray = event.columns?.map(
