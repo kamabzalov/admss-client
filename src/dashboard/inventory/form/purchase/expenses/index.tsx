@@ -40,7 +40,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         { field: "operationdate", header: "Date" },
         { field: "type_name", header: "Type" },
         { field: "amount_text", header: "Amount" },
-        { field: "NotBillable", header: "Not Billable" },
+        { field: "notbillable", header: "Not Billable" },
         { field: "vendor", header: "Vendor" },
     ];
 
@@ -72,7 +72,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 currentExpense.type !== currentEditExpense?.type ||
                 currentExpense.amount !== currentEditExpense?.amount ||
                 currentExpense.vendor !== currentEditExpense?.vendor ||
-                currentExpense.comment !== currentEditExpense?.comment;
+                currentExpense.comment !== currentEditExpense?.comment ||
+                currentExpense.notbillable !== currentEditExpense?.notbillable;
             return !isDataChanged;
         }
         return false;
@@ -106,6 +107,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             amount: (currentEditExpense?.amount && currentEditExpense?.amount * 100) || 0,
             vendor: currentEditExpense?.vendor || "",
             comment: currentEditExpense?.comment || "",
+            notbillable: currentEditExpense?.notbillable || 0,
         };
 
         setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
@@ -230,7 +232,16 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         />
                     </div>
                     <div className='col-6'>
-                        <BorderedCheckbox checked={false} name='Not Billable' />
+                        <BorderedCheckbox
+                            checked={!!currentEditExpense?.notbillable}
+                            onChange={() =>
+                                setCurrentEditExpense({
+                                    ...currentEditExpense,
+                                    notbillable: !currentEditExpense?.notbillable ? 1 : 0,
+                                })
+                            }
+                            name='Not Billable'
+                        />
                     </div>
                 </div>
                 <div className='col-6'>
@@ -330,16 +341,29 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        {renderColumnsData.map(({ field, header }) => (
-                            <Column
-                                field={field}
-                                header={header}
-                                alignHeader={"left"}
-                                key={field}
-                                headerClassName='cursor-move'
-                                className='max-w-16rem overflow-hidden text-overflow-ellipsis'
-                            />
-                        ))}
+                        {renderColumnsData.map(({ field, header }) =>
+                            field === "notbillable" ? (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    alignHeader={"left"}
+                                    body={(options) => <>{options[field] ? "Yes" : "No"}</>}
+                                    key={field}
+                                    headerClassName='cursor-move'
+                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                />
+                            ) : (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    alignHeader={"left"}
+                                    key={field}
+                                    headerClassName='cursor-move'
+                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                />
+                            )
+                        )}
+
                         <Column
                             body={deleteTemplate}
                             pt={{
@@ -349,7 +373,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                     },
                                 },
                             }}
-                        ></Column>
+                        />
                     </DataTable>
                 </div>
                 <div className='col-12 total-sum flex justify-content-end '>

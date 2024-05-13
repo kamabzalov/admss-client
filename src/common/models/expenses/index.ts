@@ -10,6 +10,7 @@ export interface Expenses {
     description: string;
     id: number;
     itemuid: string;
+    notbillable: 1 | 0;
     operationdate: string;
     ponumber: string;
     type: number;
