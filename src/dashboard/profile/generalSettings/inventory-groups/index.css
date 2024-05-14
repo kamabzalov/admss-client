@@ -44,3 +44,26 @@
 .settings-inventory__delete.p-button.p-button-danger {
     color: var(--admss-app-red);
 }
+
+.group-order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-form .group-order__button {
+    padding: 0;
+}
+
+.settings-form .group-order__button .pi {
+    font-size: 22px;
+}
+
+.group-order__button.p-button-icon-only,
+.group-order__button.p-button.p-button-success:enabled:focus {
+    font-size: 18px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
