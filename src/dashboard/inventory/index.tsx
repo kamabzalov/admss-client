@@ -112,66 +112,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     useEffect(() => {
         setIsLoading(true);
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-        }
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        if (selectedInventoryType.length) {
-            if (
-                globalSearch.length ||
-                Object.values(advancedSearch).length ||
-                selectedFilterOptions
-            )
-                qry += "+";
-            selectedInventoryType.forEach(
-                (type, index) =>
-                    (qry += `${type}.GroupClass${
-                        index !== selectedInventoryType.length - 1 ? "+" : ""
-                    }`)
-            );
-        }
-
-        if (Object.values(currentLocation).some((value) => value.trim().length)) {
-            if (!!qry.length) qry += "+";
-            qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
-        }
-
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
-
-        handleGetInventoryList(params, true);
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        lazyState,
-        globalSearch,
-        authUser,
-        selectedFilterOptions,
-        currentLocation,
-        selectedInventoryType,
-    ]);
-
-    useEffect(() => {
-        setIsLoading(true);
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
@@ -460,6 +400,66 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
+    useEffect(() => {
+        setIsLoading(true);
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        handleGetInventoryList(params, true);
+        setIsLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        lazyState,
+        globalSearch,
+        authUser,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
+
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -643,7 +643,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         </h2>
                         {locations.length > 0 && (
                             <SplitButton
-                                label={currentLocation?.locName || "Select Location"}
+                                label={currentLocation?.locName || "Any Location"}
                                 className='inventory-location'
                                 model={[
                                     {
