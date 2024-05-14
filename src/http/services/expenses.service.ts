@@ -65,9 +65,13 @@ export const getExpensesListVendors = async (useruid: string) => {
 
 export const setExpensesItem = async ({ expenseuid, expenseData }: ExpensesData) => {
     try {
+        const body = expenseData;
+        if (expenseuid && expenseuid !== "0") {
+            body.itemuid = expenseuid;
+        }
         const request = await authorizedUserApiInstance.post<ExpensesSetResponse>(
             `inventory/${expenseuid || 0}/expense`,
-            expenseData
+            body
         );
         if (request.status === 200) {
             return request.data;
