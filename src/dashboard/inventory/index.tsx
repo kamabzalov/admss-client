@@ -443,10 +443,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
             skip: lazyState.first,
             top: lazyState.rows,
         };
+
+        if (qry.length > 0) {
+            params.qry = qry;
+        }
 
         handleGetInventoryList(params, true);
         setIsLoading(false);
