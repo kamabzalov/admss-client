@@ -645,10 +645,22 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                             <SplitButton
                                 label={currentLocation?.locName || "Select Location"}
                                 className='inventory-location'
-                                model={locations.map((location) => ({
-                                    label: location.locName,
-                                    command: () => setCurrentLocation(location),
-                                }))}
+                                model={[
+                                    {
+                                        label: "Any Location",
+                                        command: () => {
+                                            setCurrentLocation({} as InventoryLocations);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: "",
+                                            });
+                                        },
+                                    },
+                                    ...locations.map((location) => ({
+                                        label: location.locName,
+                                        command: () => setCurrentLocation(location),
+                                    })),
+                                ]}
                                 rounded
                                 menuStyle={{ transform: "translateX(164px)" }}
                                 pt={{
