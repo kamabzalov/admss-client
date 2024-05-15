@@ -47,4 +47,5 @@ export interface UserGroup {
     useruid: string;
     enabled: 0 | 1;
     order: number;
+    isdefault: 0 | 1;
 }
