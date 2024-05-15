@@ -63,7 +63,7 @@ export const getUserGroupActiveList = async (uid: string) => {
 
 export const addUserGroupList = async (
     uid: string,
-    { description, enabled, itemuid }: Partial<UserGroup>
+    { description, enabled, itemuid, order, isdefault }: Partial<UserGroup>
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponse>(
@@ -72,6 +72,8 @@ export const addUserGroupList = async (
                 description,
                 enabled,
                 itemuid,
+                order,
+                isdefault,
             }
         );
         return request.data;

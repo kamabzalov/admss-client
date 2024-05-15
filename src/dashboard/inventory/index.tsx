@@ -115,7 +115,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    const allSettings: ServerUserSettings = response.profile
+                        ? JSON.parse(response.profile)
+                        : {};
                     setServerSettings(allSettings);
                     const { inventory: settings } = allSettings;
                     if (settings?.activeColumns?.length) {
