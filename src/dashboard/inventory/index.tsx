@@ -208,7 +208,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
-        setIsLoading(true);
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
