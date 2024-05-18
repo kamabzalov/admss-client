@@ -1,4 +1,6 @@
-import { TypeList } from "..";
+import { BaseResponse } from "common/models/base-response";
+import { PrintForm, TypeList } from "..";
+import { Status } from "../base-response";
 
 export interface Deal {
     accountInfo: string;
@@ -85,7 +87,7 @@ export interface DealExtData {
     Dismntl_Sold_Transmission_To: string;
     ERT_Submitted: number;
     Exchanged_Plate_Number: string;
-    Exchanged_Plates: number;
+    Exchanged_Plates: 0 | 1;
     First_Lien_Acct_Num: string;
     First_Lien_Address: string;
     First_Lien_City: string;
@@ -140,7 +142,7 @@ export interface DealExtData {
     Plate_Issue_Date: number;
     Plate_Issued: 0 | 1;
     Plate_Number: string;
-    Plate_Transferred: number;
+    Plate_Transferred: 0 | 1;
     Policy_Number: string;
     Purch_From_Address: string;
     Purch_From_City: string;
@@ -149,7 +151,7 @@ export interface DealExtData {
     Purch_From_State: string;
     Purch_From_Tax_ID: string;
     Purch_From_Zip_Code: string;
-    Replace_Plate: number;
+    Replace_Plate: 0 | 1;
     Replaced_Plate_Number: string;
     SaleID: string;
     Second_Lien_Acct_Num: string;
@@ -166,8 +168,8 @@ export interface DealExtData {
     TempTagNumber: string;
     Title_Issue_Date: number;
     Title_Number: string;
-    Title_Only: number;
-    Title_and_License: number;
+    Title_Only: 0 | 1;
+    Title_and_License: 0 | 1;
     Trade1_Allowance: string;
     Trade1_BodyStyle: string;
     Trade1_Color: string;
@@ -380,7 +382,24 @@ export interface DealFinance {
     deleted: number;
     index: number;
     itemUID: string;
-    status: string;
+    status: Status;
     updated: number;
     userUID: string;
+}
+
+export interface DealPrintForm extends PrintForm {}
+
+export type DealPrintFormResponse = BaseResponse & {
+    [key: string]: DealPrintForm[];
+};
+
+export interface DealPickupPayment {
+    amount: number;
+    created: string;
+    dealuid: string;
+    itemuid: string;
+    paid: number;
+    paydate: string;
+    updated: string;
+    useruid: string;
 }

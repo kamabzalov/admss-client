@@ -1,3 +1,4 @@
+import { PrintForm } from "..";
 import { BaseResponse, Status } from "../base-response";
 import { ContentType } from "../enums";
 
@@ -341,15 +342,7 @@ export interface InventoryExportWebHistory {
     useruid: string;
 }
 
-export interface InventoryPrintForm {
-    description: string;
-    index: number;
-    itemuid: string;
-    name: string;
-    state: string;
-    type: string;
-    version: string;
-}
+export interface InventoryPrintForm extends PrintForm {}
 
 export interface InventoryLocations {
     created: string;

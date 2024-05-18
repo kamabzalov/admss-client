@@ -63,3 +63,24 @@
     height: 50px;
     align-items: center;
 }
+
+.p-button.deal__print-nav {
+    background-color: transparent;
+    color: var(--admss-app-primary);
+    font-weight: 600;
+    border: none;
+}
+
+.p-button.deal__print-nav:focus,
+.p-button.deal__print-nav:active,
+.p-button.deal__print-nav:hover,
+.p-button.deal__print-nav--active {
+    outline: none;
+    box-shadow: none;
+    color: var(--admss-app-primary);
+    background-color: var(--admss-app-light-blue);
+}
+
+.p-button.deal__print-nav .p-button-icon {
+    color: var(--admss-app-green);
+}

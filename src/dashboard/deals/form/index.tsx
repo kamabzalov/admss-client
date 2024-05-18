@@ -12,6 +12,7 @@ import { DealGeneralInfo } from "./general-info";
 import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
+import { PrintDealForms } from "./print-forms";
 
 const STEP = "step";
 
@@ -31,6 +32,7 @@ export const DealsForm = observer(() => {
     const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
+    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -59,6 +61,7 @@ export const DealsForm = observer(() => {
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
+        setPrintActiveIndex(itemsMenuCount + 1);
 
         id && getDeal(id);
         return () => {
@@ -77,6 +80,11 @@ export const DealsForm = observer(() => {
             }
         });
     }, [stepActiveIndex]);
+
+    const handleActivePrintForms = () => {
+        navigate(getUrl(printActiveIndex));
+        setStepActiveIndex(printActiveIndex);
+    };
 
     return (
         <Suspense>
@@ -142,6 +150,18 @@ export const DealsForm = observer(() => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
+                                    {id && (
+                                        <Button
+                                            icon='icon adms-print'
+                                            className={`p-button gap-2 deal__print-nav ${
+                                                stepActiveIndex === printActiveIndex &&
+                                                "deal__print-nav--active"
+                                            } w-full`}
+                                            onClick={handleActivePrintForms}
+                                        >
+                                            Print forms
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
@@ -165,6 +185,14 @@ export const DealsForm = observer(() => {
                                                     )}
                                                 </div>
                                             ))
+                                        )}
+                                        {stepActiveIndex === printActiveIndex && (
+                                            <div className='deal-form'>
+                                                <div className='deal-form__title uppercase'>
+                                                    Print forms
+                                                </div>
+                                                <PrintDealForms />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
