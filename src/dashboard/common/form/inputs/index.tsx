@@ -239,7 +239,7 @@ export const DateInput = ({
                 <Calendar
                     inputId={name}
                     value={innerDate}
-                    disabled={!isChecked}
+                    disabled={checkbox && !isChecked}
                     className={`date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
                     onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}
