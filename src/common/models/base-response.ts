@@ -8,3 +8,8 @@ export enum Status {
 export interface BaseResponse {
     status: Status;
 }
+
+export interface BaseResponseError extends BaseResponse {
+    error?: string;
+    message?: string;
+}

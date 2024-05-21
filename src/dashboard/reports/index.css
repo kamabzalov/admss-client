@@ -1,0 +1,38 @@
+.reports .p-accordion-content {
+    border-left: none;
+    border-right: none;
+    padding-left: 3rem;
+}
+
+.reports-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.reports-header__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 50px;
+    gap: 10px;
+}
+
+.reports-header__search {
+    margin-left: auto;
+}
+
+.reports-header__search .p-inputtext {
+    width: 180px;
+    height: 50px;
+}
+
+.reports__list-item {
+    display: flex;
+    align-items: center;
+}
+
+.reports__list-item .reports-actions {
+    margin-left: auto;
+}
