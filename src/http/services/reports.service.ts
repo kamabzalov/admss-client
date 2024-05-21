@@ -1,4 +1,4 @@
-import { BaseResponse } from "common/models/base-response";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
@@ -10,7 +10,10 @@ export const getReportsList = async (uid: string, queryParams?: QueryParams) => 
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting reports list",
+        };
     }
 };
 
@@ -19,7 +22,10 @@ export const getReportCollection = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/collection`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting report collection",
+        };
     }
 };
 
@@ -28,7 +34,10 @@ export const getUserReportCollections = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/collections`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting user report collections",
+        };
     }
 };
 
@@ -37,7 +46,10 @@ export const getSpecificDocument = async (uid: string, documentId: string) => {
         const request = await authorizedUserApiInstance.get<any>(`reports/${uid}/${documentId}`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting document",
+        };
     }
 };
 
@@ -46,16 +58,24 @@ export const getReportTemplate = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<any>(`reports/${uid}/get`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting report template",
+        };
     }
 };
 
 export const getCommonReportsList = async () => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`reports/list`);
+        const request = await authorizedUserApiInstance.get<BaseResponse | BaseResponseError>(
+            `reports/list`
+        );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting common reports list",
+        };
     }
 };
 
@@ -66,7 +86,10 @@ export const getCommonReportsListByState = async (state: string, queryParams?: Q
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting reports list by state",
+        };
     }
 };
 
@@ -77,7 +100,10 @@ export const getTasksList = async (queryParams?: QueryParams) => {
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting tasks list",
+        };
     }
 };
 
@@ -88,7 +114,10 @@ export const getQueueList = async (queryParams?: QueryParams) => {
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting queue list",
+        };
     }
 };
 
@@ -100,7 +129,10 @@ export const makeReports = async (uid: string | undefined, body?: ReportsPostDat
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while making report",
+        };
     }
 };
 
@@ -118,7 +150,10 @@ export const makeShortReports = async (uid: string | undefined, body?: ReportsPo
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while making short report",
+        };
     }
 };
 
@@ -132,7 +167,10 @@ export const getReportById = async (reportId: string) => {
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting report",
+        };
     }
 };
 

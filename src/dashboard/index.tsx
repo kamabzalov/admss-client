@@ -8,6 +8,7 @@ import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Loader } from "./common/loader";
+import { ToastProvider } from "./common/toast";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Dashboard() {
 
     if (user) {
         return (
-            <>
+            <ToastProvider>
                 <Header user={user} />
                 <Sidebar />
                 <main className='main'>
@@ -35,7 +36,7 @@ export default function Dashboard() {
                         </Suspense>
                     </div>
                 </main>
-            </>
+            </ToastProvider>
         );
     }
     return null;

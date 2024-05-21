@@ -7,38 +7,41 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 const mockReportsGroup = [
     {
-        id: "1",
+        id: 1,
         name: "Favorites",
     },
     {
-        id: "2",
+        id: 2,
         name: "AR Reports",
     },
     {
-        id: "3",
+        id: 3,
         name: "BHPH Reports",
     },
     {
-        id: "4",
+        id: 4,
         name: "Custom Collections",
     },
     {
-        id: "5",
+        id: 5,
         name: "Custom Reports",
     },
     {
-        id: "6",
+        id: 6,
         name: "Inventory Reports",
     },
     {
-        id: "7",
+        id: 7,
         name: "Miscellaneous",
     },
     {
-        id: "8",
+        id: 8,
         name: "Sales Reports",
     },
 ];
@@ -54,6 +57,8 @@ export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
 
+    const toast = useToast();
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
@@ -61,11 +66,20 @@ export default function Reports(): ReactElement {
 
     useEffect(() => {
         if (user) {
-            setUser(user);
             getReportsList(user.useruid, { total: 1 }).then((response) => {});
-            getCommonReportsList().then((response) => {});
+            getCommonReportsList().then((response) => {
+                if (response.status === Status.ERROR && toast.current) {
+                    const { error } = response as BaseResponseError;
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
         }
-    }, [user]);
+    }, [toast, user]);
 
     const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
         return (
