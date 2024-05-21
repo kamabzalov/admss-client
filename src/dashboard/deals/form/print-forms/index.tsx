@@ -49,8 +49,7 @@ export const PrintDealForms = observer((): ReactElement => {
                     if (!print) {
                         link.download = `deal_print_form_${templateuid}.pdf`;
                         link.click();
-                    }
-                    if (print) {
+                    } else {
                         window.open(
                             link.href,
                             "_blank",

@@ -6,11 +6,14 @@ import { Checkbox } from "primereact/checkbox";
 import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().dealStore;
-    const { dealPickupPayments, getPickupPayments, changeDealPickupPayments } = store;
+    const toast = useToast();
+    const { dealPickupPayments, getPickupPayments, changeDealPickupPayments, dealErrorMessage } =
+        store;
     const [totalPayments, setTotalPayments] = useState(0);
 
     useEffect(() => {
@@ -22,6 +25,16 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (dealErrorMessage.length && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: dealErrorMessage,
+            });
+        }
+    }, [toast, dealErrorMessage]);
 
     return (
         <div className='grid deal-retail-pickup'>
