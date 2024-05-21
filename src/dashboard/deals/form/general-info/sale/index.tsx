@@ -14,9 +14,12 @@ import {
 import { IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
+import { BaseResponseError } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
+    const toast = useToast();
     const {
         deal: {
             dealtype,
@@ -41,18 +44,54 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     useEffect(() => {
         getDealTypes().then((res) => {
-            if (res) setDealTypesList(res);
+            const { error } = res as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                });
+            } else {
+                setDealTypesList(res as IndexedDealList[]);
+            }
         });
         getSaleTypes().then((res) => {
-            if (res) setSaleTypesList(res);
+            const { error } = res as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                });
+            } else {
+                setSaleTypesList(res as IndexedDealList[]);
+            }
         });
         getDealStatuses().then((res) => {
-            if (res) setDealStatusesList(res);
+            const { error } = res as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                });
+            } else {
+                setDealStatusesList(res as IndexedDealList[]);
+            }
         });
         getDealInventoryStatuses().then((res) => {
-            if (res) setInventoryStatusesList(res);
+            const { error } = res as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                });
+            } else {
+                setInventoryStatusesList(res as IndexedDealList[]);
+            }
         });
-    }, []);
+    }, [toast]);
 
     return (
         <div className='grid deal-general-sale row-gap-2'>

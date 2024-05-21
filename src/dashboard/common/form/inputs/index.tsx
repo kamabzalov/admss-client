@@ -11,6 +11,8 @@ type LabelPosition = "left" | "right" | "top";
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
+    disabled?: boolean;
+    initialValue?: string | number;
     onChange?: (value: string | number) => void;
 }
 
@@ -24,7 +26,9 @@ interface PercentInputProps extends InputNumberProps {
 
 export const DashboardRadio = ({
     radioArray,
+    initialValue,
     style,
+    disabled,
     onChange,
 }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
@@ -34,6 +38,10 @@ export const DashboardRadio = ({
         setRadioValue(value);
         onChange && onChange(value);
     };
+
+    useEffect(() => {
+        initialValue && setRadioValue(initialValue);
+    }, [initialValue]);
 
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
@@ -47,6 +55,7 @@ export const DashboardRadio = ({
                         <RadioButton
                             inputId={name}
                             name={name}
+                            disabled={disabled}
                             value={value}
                             onChange={handleRadioChange}
                             checked={radioValue === value}
@@ -190,10 +199,18 @@ export const SearchInput = ({
 
 interface DateInputProps extends CalendarProps {
     date?: number;
+    checkbox?: boolean;
 }
 
-export const DateInput = ({ date, name, value, ...props }: DateInputProps): ReactElement => {
+export const DateInput = ({
+    date,
+    name,
+    value,
+    checkbox,
+    ...props
+}: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
+    const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
         if (!!date) {
@@ -211,10 +228,19 @@ export const DateInput = ({ date, name, value, ...props }: DateInputProps): Reac
             <label htmlFor={name} className='date-item__label label-top'>
                 {name}
             </label>
-            <div className='date-item__input flex justify-content-center'>
+            <div className='date-item__input flex'>
+                {checkbox && (
+                    <Checkbox
+                        className='date-item__checkbox'
+                        checked={isChecked}
+                        onChange={() => setIsChecked(!isChecked)}
+                    />
+                )}
                 <Calendar
                     inputId={name}
                     value={innerDate}
+                    disabled={checkbox && !isChecked}
+                    className={`date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
                     onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}
                 />

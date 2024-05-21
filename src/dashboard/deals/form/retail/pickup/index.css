@@ -5,21 +5,24 @@
 .pickup-header {
     background: var(--admss-app-light-blue);
     font-weight: 600;
+    display: flex;
 }
 
-.pickup-header,
-.pickup-item {
+.pickup-row {
+    display: flex;
+    border-bottom: 1px solid var(--admss-app-light-grey);
+}
+
+.pickup-header__item,
+.pickup-row__item {
     height: 60px;
     display: flex;
     padding-left: 30px;
     align-items: center;
+    flex: 0 0 30%;
 }
 
-.pickup-item {
-    border-bottom: 1px solid var(--admss-app-light-grey);
-}
-
-.pickup-item:last-child {
+.pickup-row:last-child {
     border-bottom: none;
 }
 

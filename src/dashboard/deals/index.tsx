@@ -12,7 +12,7 @@ import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
-import { getDealsList } from "http/services/deals.service";
+import { TotalDealsList, getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { makeShortReports } from "http/services/reports.service";
@@ -23,6 +23,8 @@ import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
 import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
+import { BaseResponseError } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -50,7 +52,7 @@ const DEALS_OTHER_LIST: DealsFilterOptions[] = [
     { name: "All incomplete", value: "0.DealComplete" },
     { name: "Dead or Deleted", value: "6.DealStatus" },
     { name: "Manager's review", value: "1.managerReview" },
-    { name: "Deals not yet sent to RFC", value: "0.RFCSen" },
+    { name: "Deals not yet sent to RFC", value: "0.RFCSent" },
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
@@ -73,6 +75,7 @@ export default function Deals() {
     const [dealStatus, setDealStatus] = useState<string>(DEALS_STATUS_LIST[0].value);
 
     const navigate = useNavigate();
+    const toast = useToast();
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -136,10 +139,20 @@ export default function Deals() {
         if (authUser) {
             setUser(authUser);
             getDealsList(authUser.useruid, { total: 1 }).then((response) => {
-                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+                const { error } = response as BaseResponseError;
+                if (response && !error) {
+                    const { total } = response as TotalDealsList;
+                    setTotalRecords(total ?? 0);
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                    });
+                }
             });
         }
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         const params: QueryParams = {

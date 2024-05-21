@@ -3,19 +3,22 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
-import { getDealPayments, getDealPaymentsTotal } from "http/services/deals.service";
+import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
-
-const arrayItem = Array.from({ length: 7 }, (_, i) => i + 1);
+import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
-    const [, setPayments] = useState<any>();
+    const store = useStore().dealStore;
+    const toast = useToast();
+    const { dealPickupPayments, getPickupPayments, changeDealPickupPayments, dealErrorMessage } =
+        store;
     const [totalPayments, setTotalPayments] = useState(0);
 
     useEffect(() => {
         if (id) {
-            getDealPayments(id).then((data) => setPayments(data));
+            getPickupPayments(id);
             getDealPaymentsTotal(id).then(
                 (data) => typeof data === "number" && setTotalPayments(data)
             );
@@ -23,29 +26,63 @@ export const DealRetailPickup = observer((): ReactElement => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (dealErrorMessage.length && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: dealErrorMessage,
+            });
+        }
+    }, [toast, dealErrorMessage]);
+
     return (
-        <div className='grid deal-retail-pickup row-gap-2'>
-            <div className='col-4 pickup-column'>
-                <div className='pickup-header'>Date</div>
-                {arrayItem.map((item) => (
-                    <div key={item} className='pickup-item'>
-                        <DateInput />
-                    </div>
-                ))}
+        <div className='grid deal-retail-pickup'>
+            <div className='col-12 pickup-header'>
+                <div className='pickup-header__item'>Date</div>
+                <div className='pickup-header__item'>Amount</div>
+                <div className='pickup-header__item'>Paid</div>
             </div>
-            <div className='col-4 pickup-column'>
-                <div className='pickup-header'>Amount</div>
-                {arrayItem.map((item) => (
-                    <div key={item} className='pickup-item'>
-                        <CurrencyInput placeholder='0.00' />
-                    </div>
-                ))}
-            </div>
-            <div className='col-4 pickup-column'>
-                <div className='pickup-header'>Paid</div>
-                {arrayItem.map((item) => (
-                    <div key={item} className='pickup-item'>
-                        <Checkbox checked={false} />
+            <div className='pickup-body col-12'>
+                {dealPickupPayments.map((payment) => (
+                    <div key={payment.itemuid} className='pickup-row'>
+                        <div className='pickup-row__item'>
+                            <DateInput
+                                checkbox
+                                value={payment.paydate}
+                                onChange={() => {
+                                    changeDealPickupPayments(payment.itemuid, {
+                                        key: "paydate",
+                                        value: payment.paydate,
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className='pickup-row__item'>
+                            <div className='pickup-item'>
+                                <CurrencyInput
+                                    placeholder='0.00'
+                                    value={payment.amount}
+                                    onChange={({ value }) => {
+                                        changeDealPickupPayments(payment.itemuid, {
+                                            key: "amount",
+                                            value: Number(value),
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className='pickup-row__item'>
+                            <Checkbox
+                                checked={!!payment.paid}
+                                onChange={() =>
+                                    changeDealPickupPayments(payment.itemuid, {
+                                        key: "paid",
+                                        value: !payment.paid ? 1 : 0,
+                                    })
+                                }
+                            />
+                        </div>
                     </div>
                 ))}
             </div>

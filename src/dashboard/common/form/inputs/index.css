@@ -60,6 +60,35 @@
     border-radius: 5px 0 0 5px;
 }
 
+.date-item__input {
+    display: flex;
+    align-items: center;
+}
+
+.date-item__checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--admss-app-lightest-grey);
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--admss-app-light-grey);
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+}
+
+.date-item__input .date-item__icon {
+    height: 50px;
+}
+
+.date-item__calendar--checkbox {
+    width: 55%;
+}
+
+.date-item__calendar--checkbox .p-inputtext {
+    border-radius: 0px;
+}
+
 .label-top {
     position: absolute;
     top: 0;
