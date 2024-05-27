@@ -427,34 +427,17 @@ export const ExportToWeb = () => {
         const data = exportsToWeb
             .map((item, index) => {
                 let filteredItem: Record<string, any> | null = {};
-                const reportService: { service: string; price: number }[] = [];
                 columns.forEach((column) => {
                     if (item.hasOwnProperty(column.data)) {
                         if (selectedInventories[index] && filteredItem) {
                             filteredItem[column.data] = item[column.data as keyof typeof item];
                             filteredItem["itemuid"] = item["itemuid"];
-                            selectedServices.forEach((serviceItem) => {
-                                if (
-                                    serviceItem.selected[index] &&
-                                    activeColumns.some(({ field }) => field === serviceItem.field)
-                                ) {
-                                    !reportService.some(
-                                        ({ service }) => service === serviceItem?.field
-                                    ) &&
-                                        reportService.push({
-                                            service: serviceItem?.field!,
-                                            price: serviceItem?.price[index],
-                                        });
-                                }
-                            });
                         } else {
                             filteredItem = null;
                         }
                     }
                 });
-                return reportService.length
-                    ? { ...filteredItem, services: reportService }
-                    : filteredItem;
+                return filteredItem;
             })
             .filter(Boolean);
         const JSONreport = !!data.length && {
@@ -503,7 +486,7 @@ export const ExportToWeb = () => {
                                     disabled={selectedInventories.filter(Boolean).length === 0}
                                     onClick={() => handleExport(true)}
                                 >
-                                    SCHEDULE
+                                    Save to Schedule
                                 </Button>
                                 <div className='export-web-controls__input'>
                                     <TableFilter
