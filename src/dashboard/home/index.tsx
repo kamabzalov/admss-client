@@ -1,203 +1,131 @@
+import { useEffect, useRef, useState } from "react";
 import "./index.css";
-import { Calendar } from "primereact/calendar";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Tasks } from "dashboard/tasks";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
+import { Menu } from "primereact/menu";
+import { MenuItem } from "primereact/menuitem";
+import logo from "assets/images/logo.svg";
+import userCabinet from "assets/images/icons/header/user-cabinet.svg";
+import { AuthUser, logout } from "http/services/auth.service";
+import { useNavigate } from "react-router-dom";
+import { getExtendedData } from "http/services/auth-user.service";
+import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { SupportContactDialog } from "dashboard/profile/supportContact";
+import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
+import { UserProfileDialog } from "dashboard/profile/userProfile";
+import { useAuth } from "http/routes/ProtectedRoute";
 
-export default function Home() {
-    const [isSalesPerson, setIsSalesPerson] = useState<boolean>(false);
+export interface HeaderProps {
+    user: AuthUser;
+}
+
+export default function Header(props: HeaderProps) {
+    const authUser = useAuth();
+    const menuRight = useRef<Menu>(null);
+    const navigate = useNavigate();
+    const [dealerName, setDealerName] = useState<string>("");
+    const [location, setLocation] = useState<string>("");
+    const [supportContact, setSupportContact] = useState<boolean>(false);
+    const [supportHistory, setSupportHistory] = useState<boolean>(false);
+    const [userProfile, setUserProfile] = useState<boolean>(false);
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            setIsSalesPerson(!!authUser?.issalesperson);
-        }
+        getExtendedData(props.user.useruid).then((response) => {
+            if (response) {
+                setDealerName(response.dealerName);
+                setLocation(response.location);
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const [date] = useState(null);
 
-    return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Common tasks</h2>
+    const signOut = ({ useruid }: AuthUser) => {
+        logout(useruid).finally(() => {
+            localStorageClear(LS_APP_USER);
+            navigate("/");
+        });
+    };
+
+    const items: MenuItem[] = [
+        {
+            label: "My Profile",
+            command() {
+                setUserProfile(true);
+            },
+        },
+        { separator: true },
+        { label: "Change location" },
+        { label: "Users" },
+        { separator: true },
+        {
+            label: "Contact support",
+            command() {
+                setSupportContact(true);
+            },
+        },
+        {
+            label: "Support history",
+            command() {
+                setSupportHistory(true);
+            },
+        },
+        { label: "Help" },
+        { separator: true },
+        {
+            label: "Logout",
+            command() {
+                props.user && signOut(props.user);
+            },
+        },
+    ];
+
+    if (authUser && !authUser.issalesperson) {
+        items.splice(1, 0, {
+            label: "General Settings",
+            command() {
+                navigate("settings");
+            },
+        });
+    }
+
+    if (menuRight) {
+        return (
+            <header className='header'>
+                <div className='flex h-full align-items-center'>
+                    <div className='header__logo'>
+                        <img src={logo} alt='ADMSS' />
                     </div>
-                    <div className='card-content'>
-                        <div className='grid'>
-                            {isSalesPerson || (
-                                <>
-                                    <div className='col-12 md:col-6 lg:col-3'>
-                                        <Link
-                                            to='contacts/create'
-                                            className='common-tasks-menu__item new-contact cursor-pointer'
-                                        >
-                                            <div className='common-tasks-menu__icon new-contact'></div>
-                                            New Contact
-                                        </Link>
-                                    </div>
-                                    <div className='col-12 md:col-6 lg:col-3'>
-                                        <Link
-                                            to='contacts'
-                                            className='common-tasks-menu__item cursor-pointer'
-                                        >
-                                            <div className='common-tasks-menu__icon browse-all-contacts'></div>
-                                            Browse all contacts
-                                        </Link>
-                                    </div>
-                                </>
-                            )}
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link
-                                    to='inventory/create'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-inventory'></div>
-                                    New inventory
-                                </Link>
-                            </div>
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link
-                                    to='inventory'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon browser-all-inventory'></div>
-                                    Browse all inventory
-                                </Link>
-                            </div>
-                            {isSalesPerson || (
-                                <>
-                                    <div className='col-12 md:col-6 lg:col-3'>
-                                        <Link
-                                            to='deals/create'
-                                            className='common-tasks-menu__item cursor-pointer'
-                                        >
-                                            <div className='common-tasks-menu__icon new-deal'></div>
-                                            New deal
-                                        </Link>
-                                    </div>
-                                    <div className='col-12 md:col-6 lg:col-3'>
-                                        <Link
-                                            to='deals'
-                                            className='common-tasks-menu__item cursor-pointer'
-                                        >
-                                            <div className='common-tasks-menu__icon browse-all-deals'></div>
-                                            Browse all deals
-                                        </Link>
-                                    </div>
-                                </>
-                            )}
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <div className='common-tasks-menu__item cursor-pointer'>
-                                    <div className='common-tasks-menu__icon print-test-drive'></div>
-                                    Print (for test drive)
-                                </div>
-                            </div>
+                    <div className='grid m-0 head-container  justify-content-between'>
+                        <div className='header-dealer-info'>
+                            <p className='header-dealer-info__name font-bold'>{dealerName}</p>
+                            <span className='header-dealer-location'>{location}</span>
+                        </div>
+                        <div className='header-user-menu ml-auto'>
+                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
+                            <img
+                                className='header-user-menu__toggle'
+                                onClick={(event) => menuRight?.current?.toggle(event)}
+                                src={userCabinet}
+                                alt='User cabinet'
+                            />
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-content'>
-                        <div className='grid justify-content-between'>
-                            <div className='col-12 md:col-5'>
-                                <Tasks />
-                            </div>
-                            <div className='col-12 md:col-7 md:text-right'>
-                                <Calendar value={date} inline />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className='col-12 xl:col-4'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Recent messages</h2>
-                    </div>
-                    <div className='card-content'>
-                        <table className='table-message'>
-                            <thead>
-                                <tr>
-                                    <th>From</th>
-                                    <th>Theme</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className='success fw-600'>Support team</td>
-                                    <td className='success fw-600'>New inventory adding failure</td>
-                                    <td className='success fw-600'>04/26/2023 15:45:12</td>
-                                </tr>
-                                <tr>
-                                    <td>Support team</td>
-                                    <td>Empty tables</td>
-                                    <td>04/14/2023 15:45:12</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p className='text-right cursor-pointer underline messages-more'>
-                            See more...
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div className='col-12 xl:col-4'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Recently added contact</h2>
-                    </div>
-                    <div className='card-content'>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Name:</dt>
-                            <dd>Johnny Walker</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Phone:</dt>
-                            <dd>631-429-6822</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>E-mail:</dt>
-                            <dd>walkerjohnny@hotmail.com</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Date & time:</dt>
-                            <dd>26, April 2023</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div className='col-12 xl:col-4'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='uppercase m-0'>Printing</h2>
-                    </div>
-                    <div className='card-content'>
-                        <ul className='list-none pl-0 printing-menu'>
-                            <li className='printing-menu__item'>
-                                <i className='adms-email printing-menu__icon' />
-                                Mailings
-                            </li>
-                            <li className='printing-menu__item '>
-                                <i className='adms-blank printing-menu__icon' />
-                                Blank credit application
-                            </li>
-                            <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
-                                Print "Initial privacy notice"
-                            </li>
-                            <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
-                                Print deal forms
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+                <UserProfileDialog
+                    onHide={() => setUserProfile(false)}
+                    visible={userProfile}
+                    authUser={props.user}
+                />
+                <SupportContactDialog
+                    onHide={() => setSupportContact(false)}
+                    visible={supportContact}
+                />
+                <SupportHistoryDialog
+                    onHide={() => setSupportHistory(false)}
+                    useruid={props.user.useruid}
+                    visible={supportHistory}
+                />
+            </header>
+        );
+    }
+    return null;
 }
