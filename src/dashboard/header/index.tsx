@@ -12,12 +12,14 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
+import { useAuth } from "http/routes/ProtectedRoute";
 
 export interface HeaderProps {
     user: AuthUser;
 }
 
 export default function Header(props: HeaderProps) {
+    const authUser = useAuth();
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
@@ -50,12 +52,6 @@ export default function Header(props: HeaderProps) {
                 setUserProfile(true);
             },
         },
-        {
-            label: "General Settings",
-            command() {
-                navigate("settings");
-            },
-        },
         { separator: true },
         { label: "Change location" },
         { label: "Users" },
@@ -81,6 +77,16 @@ export default function Header(props: HeaderProps) {
             },
         },
     ];
+
+    if (authUser && !authUser.issalesperson) {
+        items.splice(1, 0, {
+            label: "General Settings",
+            command() {
+                navigate("settings");
+            },
+        });
+    }
+
     if (menuRight) {
         return (
             <header className='header'>
