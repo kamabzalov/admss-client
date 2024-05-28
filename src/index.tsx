@@ -17,6 +17,9 @@ import { InventoryForm } from "dashboard/inventory/form";
 import NotFound from "not-found";
 import SignIn from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
+import { GeneralSettings } from "dashboard/profile/generalSettings";
+import Reports from "dashboard/reports";
+import { ExportToWeb } from "dashboard/export-web";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -97,7 +100,7 @@ const AppRouter = (): ReactElement => {
                             path: "settings",
                             element: (
                                 <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <Outlet />
+                                    <GeneralSettings />
                                 </ProtectedRoute>
                             ),
                         },
@@ -105,7 +108,7 @@ const AppRouter = (): ReactElement => {
                             path: "reports",
                             element: (
                                 <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <Outlet />
+                                    <Reports />
                                 </ProtectedRoute>
                             ),
                         },
@@ -113,7 +116,7 @@ const AppRouter = (): ReactElement => {
                             path: "export-web",
                             element: (
                                 <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <Outlet />
+                                    <ExportToWeb />
                                 </ProtectedRoute>
                             ),
                         },
