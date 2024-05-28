@@ -21,28 +21,6 @@ export const getExportToWebList = async (useruid: string, queryParams?: QueryPar
     }
 };
 
-export const getScheduledTasks = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponse[]>(
-            `external/${useruid}/schedule`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const getExportTaskInfo = async (taskuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponse>(
-            `external/${taskuid}/exportinfo`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
 export const addExportTask = async (useruid: string, { data, columns }: ExportWebPostData) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponse>(
