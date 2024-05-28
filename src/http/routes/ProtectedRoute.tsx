@@ -47,7 +47,7 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps): ReactE
                 salesPerson: !!authUser.issalesperson,
             };
 
-            if (!allowedRoles.includes("salesPerson")) {
+            if (userRoles.salesPerson && !allowedRoles.includes("salesPerson")) {
                 return setHasRequiredRole(false);
             }
 
