@@ -44,7 +44,7 @@ interface DealsFilterGroup {
 }
 
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "all" },
+    { name: "All", value: "allTypes" },
     { name: "Buy Here Pay Here", value: "0.DealType" },
     { name: "Lease Here Pay Here", value: "7.DealType" },
     { name: "Cash", value: "1.DealType" },
@@ -60,7 +60,7 @@ const DEALS_OTHER_LIST: DealsFilterOptions[] = [
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "all" },
+    { name: "All", value: "allStatuses" },
     { name: "Recent deals", value: "0.30.Age" },
     { name: "Quotes", value: "0.DealStatus" },
     { name: "Pending", value: "1.DealStatus" },
@@ -175,7 +175,7 @@ export default function Deals() {
         };
         let qry: string = "";
         const selectedFilters: string = [...dealSelectedGroup, ...dealOther]
-            .filter((item) => item && item !== "all")
+            .filter((item) => item && item !== "allTypes" && item !== "allStatuses")
             .join("+");
         if (selectedFilters.length) {
             qry += selectedFilters;
@@ -213,7 +213,10 @@ export default function Deals() {
                                         panelHeaderTemplate={<></>}
                                         display='chip'
                                         className='deals__dropdown'
-                                        onChange={(e) => setDealSelectedGroup(e.value)}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            setDealSelectedGroup(e.value);
+                                        }}
                                         pt={{
                                             wrapper: {
                                                 style: {
