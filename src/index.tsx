@@ -17,9 +17,6 @@ import { InventoryForm } from "dashboard/inventory/form";
 import NotFound from "not-found";
 import SignIn from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
-import { GeneralSettings } from "dashboard/profile/generalSettings";
-import Reports from "dashboard/reports";
-import { ExportToWeb } from "dashboard/export-web";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -34,9 +31,7 @@ const AppRouter = (): ReactElement => {
                 {
                     path: "dashboard",
                     element: (
-                        <ProtectedRoute
-                            allowedRoles={["admin", "localAdmin", "manager", "salesPerson"]}
-                        >
+                        <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
                             <Dashboard />
                         </ProtectedRoute>
                     ),
@@ -45,9 +40,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "inventory",
                             element: (
-                                <ProtectedRoute
-                                    allowedRoles={["admin", "localAdmin", "manager", "salesPerson"]}
-                                >
+                                <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -60,7 +53,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "contacts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
+                                <ProtectedRoute allowedRoles={["admin"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -73,7 +66,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "deals",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
+                                <ProtectedRoute allowedRoles={["admin"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -86,7 +79,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "accounts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
+                                <ProtectedRoute allowedRoles={["admin"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -99,24 +92,24 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "settings",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <GeneralSettings />
+                                <ProtectedRoute allowedRoles={["admin"]}>
+                                    <Outlet />
                                 </ProtectedRoute>
                             ),
                         },
                         {
                             path: "reports",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <Reports />
+                                <ProtectedRoute allowedRoles={["admin"]}>
+                                    <Outlet />
                                 </ProtectedRoute>
                             ),
                         },
                         {
                             path: "export-web",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
-                                    <ExportToWeb />
+                                <ProtectedRoute allowedRoles={["admin"]}>
+                                    <Outlet />
                                 </ProtectedRoute>
                             ),
                         },
