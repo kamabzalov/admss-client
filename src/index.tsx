@@ -31,7 +31,9 @@ const AppRouter = (): ReactElement => {
                 {
                     path: "dashboard",
                     element: (
-                        <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
+                        <ProtectedRoute
+                            allowedRoles={["admin", "localAdmin", "manager", "salesPerson"]}
+                        >
                             <Dashboard />
                         </ProtectedRoute>
                     ),
@@ -40,7 +42,9 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "inventory",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
+                                <ProtectedRoute
+                                    allowedRoles={["admin", "localAdmin", "manager", "salesPerson"]}
+                                >
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -53,7 +57,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "contacts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -66,7 +70,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "deals",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -79,7 +83,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "accounts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -92,7 +96,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "settings",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -100,7 +104,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "reports",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -108,7 +112,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "export-web",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute allowedRoles={["admin", "localAdmin", "manager"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
