@@ -392,8 +392,10 @@ export const ExportToWeb = () => {
                                     type='button'
                                     disabled={selectedInventories.filter(Boolean).length === 0}
                                     onClick={() => handleExport(true)}
+                                    tooltip='Add to schedule'
                                 >
-                                    Save to Schedule
+                                    Add to
+                                    <i className='icon adms-calendar export-web-controls__button-icon' />
                                 </Button>
                                 <div className='export-web-controls__input'>
                                     <TableFilter

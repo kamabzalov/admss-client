@@ -30,6 +30,11 @@
     white-space: nowrap;
 }
 
+.export-web-controls__button-icon {
+    margin-left: 10px;
+    line-height: 1;
+}
+
 .export-web-controls__input {
     width: 230px;
     height: 100%;
