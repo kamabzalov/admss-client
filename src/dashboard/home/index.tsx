@@ -7,12 +7,13 @@ import { useAuth } from "http/routes/ProtectedRoute";
 
 export default function Home() {
     const authUser = useAuth();
+
     const [isSalesPerson, setIsSalesPerson] = useState(false);
 
     useEffect(() => {
         if (authUser) {
-            const { isadmin, issalesperson, ismanager, islocaladmin } = authUser;
-            [isadmin, islocaladmin, ismanager].some(Boolean) || setIsSalesPerson(!!issalesperson);
+            const { issalesperson, islocaladmin, ismanager, isadmin } = authUser;
+            [islocaladmin, ismanager, isadmin].some(Boolean) || setIsSalesPerson(!!issalesperson);
         }
     }, [authUser]);
     const [date] = useState(null);

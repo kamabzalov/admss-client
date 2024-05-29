@@ -32,8 +32,8 @@ export default function Header(props: HeaderProps) {
 
     useEffect(() => {
         if (authUser) {
-            const { isadmin, issalesperson, ismanager, islocaladmin } = authUser;
-            [isadmin, islocaladmin, ismanager].some(Boolean) || setIsSalesPerson(!!issalesperson);
+            const { issalesperson, islocaladmin, ismanager, isadmin } = authUser;
+            [islocaladmin, ismanager, isadmin].some(Boolean) || setIsSalesPerson(!!issalesperson);
         }
     }, [authUser]);
 

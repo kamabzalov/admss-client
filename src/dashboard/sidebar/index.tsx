@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./index.css";
 import { useState, useEffect } from "react";
 import { useAuth } from "http/routes/ProtectedRoute";
@@ -6,15 +6,14 @@ import { useAuth } from "http/routes/ProtectedRoute";
 export default function Sidebar() {
     const authUser = useAuth();
 
-    const location = useLocation();
     const [isSalesPerson, setIsSalesPerson] = useState(false);
 
     useEffect(() => {
         if (authUser) {
-            const { issalesperson, islocaladmin } = authUser;
-            [islocaladmin].some(Boolean) || setIsSalesPerson(!!issalesperson);
+            const { issalesperson, islocaladmin, ismanager, isadmin } = authUser;
+            [islocaladmin, ismanager, isadmin].some(Boolean) || setIsSalesPerson(!!issalesperson);
         }
-    }, [authUser, location]);
+    }, [authUser]);
 
     return (
         <aside className='sidebar hidden lg:block'>
