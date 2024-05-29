@@ -31,6 +31,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
 import { createStringifyFilterQuery } from "common/helpers";
+import { InputNumber } from "primereact/inputnumber";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -49,6 +50,13 @@ const columns: TableColumnsList[] = [
     { field: "Price", header: "Price", checked: false },
 ];
 
+const serviceColumns: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "cars.com", header: "CDC" },
+    { field: "carsforsale.com", header: "CFS" },
+    { field: "Equipmenttraider.com", header: "EQT" },
+    { field: "Commertialtrucktrader.com", header: "CTT" },
+];
+
 interface GroupedColumn {
     label: string;
     items: TableColumnsList[] | Pick<ColumnProps, "header" | "field">[];
@@ -59,7 +67,17 @@ const groupedColumns: GroupedColumn[] = [
         label: "General",
         items: columns,
     },
+    {
+        label: "Services",
+        items: serviceColumns,
+    },
 ];
+
+interface SelectionServices {
+    field?: string;
+    selected: boolean[];
+    price: number[];
+}
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -74,6 +92,9 @@ export const ExportToWeb = () => {
         null
     );
     const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
+    const [selectedServices, setSelectedServices] = useState<SelectionServices[]>(
+        serviceColumns.map(({ field }) => ({ field, selected: [], price: [] }))
+    );
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
     const navigate = useNavigate();
@@ -95,6 +116,70 @@ export const ExportToWeb = () => {
         setExpandedRows([...expandedRows, data]);
     };
 
+    const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+
+        if (selectedItem) {
+            if (index === "all") {
+                return selectedItem.selected.every((item) => item);
+            } else {
+                return selectedItem.selected[index] || false;
+            }
+        }
+
+        return false;
+    };
+
+    const handleCheckboxChange = (field: string | "all", index: number | "all"): void => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+        if (field === "all" && index === "all") {
+            return setSelectedServices(
+                selectedServices.map((item) => ({
+                    ...item,
+                    selected: item.selected.map(() => selectedInventories.every((item) => !item)),
+                }))
+            );
+        }
+        if (field === "all" && index !== "all") {
+            selectedServices.forEach((item) => {
+                item.selected[index] = !selectedInventories[index];
+            });
+        }
+        if (selectedItem) {
+            if (index === "all") {
+                const isAllSelected = !selectedItem.selected.every((item) => item);
+                const allChecked = selectedItem.selected.map(() => isAllSelected);
+                selectedItem.selected = allChecked;
+            } else {
+                const currentState = selectedItem.selected[index];
+                selectedItem.selected[index] = !currentState;
+                const newSelectedInventories = [...selectedInventories];
+                newSelectedInventories[index] = !currentState;
+                if (selectedServices.some((item) => item.selected[index])) {
+                    newSelectedInventories[index] = true;
+                } else {
+                    newSelectedInventories[index] = false;
+                }
+
+                setSelectedInventories(newSelectedInventories);
+            }
+        }
+        setSelectedServices([...selectedServices]);
+    };
+
+    const handlePriceChange = (field: string, index: number, value: number) => {
+        const updatedServices = selectedServices.map((item) => {
+            if (item.field === field) {
+                return {
+                    ...item,
+                    price: [...item.price.slice(0, index), value, ...item.price.slice(index + 1)],
+                };
+            }
+            return item;
+        });
+        setSelectedServices(updatedServices);
+    };
+
     const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
             if (total) {
@@ -108,6 +193,14 @@ export const ExportToWeb = () => {
                 if (Array.isArray(response)) {
                     setExportsToWeb(response);
                     setSelectedInventories(Array(response.length).fill(false));
+                    const price = response.map((item) => item.Price || 0);
+                    setSelectedServices(
+                        selectedServices.map((item) => ({
+                            ...item,
+                            selected: Array(response.length).fill(false),
+                            price,
+                        }))
+                    );
                 } else {
                     setExportsToWeb([]);
                 }
@@ -541,6 +634,7 @@ export const ExportToWeb = () => {
                                                     (checkbox) => !!checkbox
                                                 )}
                                                 onClick={({ checked }) => {
+                                                    handleCheckboxChange("all", "all");
                                                     setSelectedInventories(
                                                         selectedInventories.map(() => {
                                                             if (checked) {
@@ -573,6 +667,7 @@ export const ExportToWeb = () => {
                                                                             : state
                                                                 )
                                                             );
+                                                            handleCheckboxChange("all", rowIndex);
                                                         }}
                                                     />
 
@@ -603,49 +698,119 @@ export const ExportToWeb = () => {
                                             },
                                         }}
                                     />
-                                    {activeColumns.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            body={(data, { rowIndex }) => {
-                                                return (
-                                                    <div
-                                                        className={`${
-                                                            selectedInventories[rowIndex] &&
-                                                            "row--selected"
-                                                        }`}
-                                                    >
-                                                        {data[field]}
+                                    {activeColumns.map(({ field, header }) =>
+                                        serviceColumns.some(
+                                            (serviceColumn) => serviceColumn.field === field
+                                        ) ? (
+                                            <Column
+                                                field={field}
+                                                header={() => (
+                                                    <div className='flex gap-3'>
+                                                        <Checkbox
+                                                            checked={handleCheckboxCheck(
+                                                                field,
+                                                                "all"
+                                                            )}
+                                                            onClick={() =>
+                                                                handleCheckboxChange(field, "all")
+                                                            }
+                                                        />
+                                                        {header?.toString()}
                                                     </div>
-                                                );
-                                            }}
-                                            editor={(data: ColumnEditorOptions) => {
-                                                const { field } = data;
-                                                if (
-                                                    allowedEditableFields.includes(
-                                                        field as keyof ExportWebList
-                                                    )
-                                                ) {
-                                                    return cellEditor(data);
-                                                } else {
-                                                    return data.value;
-                                                }
-                                            }}
-                                            headerClassName='cursor-move'
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: serverSettings?.exportWeb
-                                                            ?.columnWidth?.[field],
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
+                                                )}
+                                                headerTooltip={field}
+                                                body={({ Price }: ExportWebList, { rowIndex }) => {
+                                                    return (
+                                                        <div
+                                                            className={`export-web-service ${
+                                                                selectedInventories[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
+                                                            <Checkbox
+                                                                checked={handleCheckboxCheck(
+                                                                    field,
+                                                                    rowIndex
+                                                                )}
+                                                                onClick={() =>
+                                                                    handleCheckboxChange(
+                                                                        field,
+                                                                        rowIndex
+                                                                    )
+                                                                }
+                                                            />
+                                                            <InputNumber
+                                                                disabled={
+                                                                    !selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.selected[rowIndex]
+                                                                }
+                                                                value={
+                                                                    selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.price[rowIndex]
+                                                                }
+                                                                onChange={({ value }) =>
+                                                                    value &&
+                                                                    handlePriceChange(
+                                                                        field,
+                                                                        rowIndex,
+                                                                        value
+                                                                    )
+                                                                }
+                                                                className='export-web-service__input'
+                                                            />
+                                                        </div>
+                                                    );
+                                                }}
+                                                key={field}
+                                            />
+                                        ) : (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                body={(data, { rowIndex }) => {
+                                                    return (
+                                                        <div
+                                                            className={`${
+                                                                selectedInventories[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
+                                                            {data[field]}
+                                                        </div>
+                                                    );
+                                                }}
+                                                editor={(data: ColumnEditorOptions) => {
+                                                    const { field } = data;
+                                                    if (
+                                                        allowedEditableFields.includes(
+                                                            field as keyof ExportWebList
+                                                        )
+                                                    ) {
+                                                        return cellEditor(data);
+                                                    } else {
+                                                        return data.value;
+                                                    }
+                                                }}
+                                                headerClassName='cursor-move'
+                                                pt={{
+                                                    root: {
+                                                        style: {
+                                                            width: serverSettings?.exportWeb
+                                                                ?.columnWidth?.[field],
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                        },
                                                     },
-                                                },
-                                            }}
-                                        />
-                                    ))}
+                                                }}
+                                            />
+                                        )
+                                    )}
                                 </DataTable>
                             </div>
                         </div>
