@@ -3,19 +3,16 @@ import { Calendar } from "primereact/calendar";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tasks } from "dashboard/tasks";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
+import { useAuth } from "http/routes/ProtectedRoute";
 
 export default function Home() {
-    const [isSalesPerson, setIsSalesPerson] = useState<boolean>(false);
-
+    const authUser = useAuth();
+    const [isSalesPerson, setIsSalesPerson] = useState(false);
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setIsSalesPerson(!!authUser?.issalesperson);
         }
-    }, []);
+    }, [authUser]);
     const [date] = useState(null);
 
     return (

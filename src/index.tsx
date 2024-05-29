@@ -17,6 +17,9 @@ import { InventoryForm } from "dashboard/inventory/form";
 import NotFound from "not-found";
 import SignIn from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
+import { GeneralSettings } from "dashboard/profile/generalSettings";
+import Reports from "dashboard/reports";
+import { ExportToWeb } from "dashboard/export-web";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -31,7 +34,7 @@ const AppRouter = (): ReactElement => {
                 {
                     path: "dashboard",
                     element: (
-                        <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
+                        <ProtectedRoute>
                             <Dashboard />
                         </ProtectedRoute>
                     ),
@@ -40,7 +43,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "inventory",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin", "salesPerson"]}>
+                                <ProtectedRoute>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -53,7 +56,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "contacts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -66,7 +69,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "deals",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -79,7 +82,7 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "accounts",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
                                     <Outlet />
                                 </ProtectedRoute>
                             ),
@@ -92,24 +95,24 @@ const AppRouter = (): ReactElement => {
                         {
                             path: "settings",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
-                                    <Outlet />
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <GeneralSettings />
                                 </ProtectedRoute>
                             ),
                         },
                         {
                             path: "reports",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
-                                    <Outlet />
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <Reports />
                                 </ProtectedRoute>
                             ),
                         },
                         {
                             path: "export-web",
                             element: (
-                                <ProtectedRoute allowedRoles={["admin"]}>
-                                    <Outlet />
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <ExportToWeb />
                                 </ProtectedRoute>
                             ),
                         },

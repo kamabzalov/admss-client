@@ -1,19 +1,16 @@
 import { Link } from "react-router-dom";
 import "./index.css";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { AuthUser } from "http/services/auth.service";
 import { useState, useEffect } from "react";
-import { getKeyValue } from "services/local-storage.service";
+import { useAuth } from "http/routes/ProtectedRoute";
 
 export default function Sidebar() {
-    const [isSalesPerson, setIsSalesPerson] = useState<boolean>(false);
-
+    const authUser = useAuth();
+    const [isSalesPerson, setIsSalesPerson] = useState(false);
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setIsSalesPerson(!!authUser?.issalesperson);
         }
-    }, []);
+    }, [authUser]);
     return (
         <aside className='sidebar hidden lg:block'>
             <ul className='sidebar-nav'>

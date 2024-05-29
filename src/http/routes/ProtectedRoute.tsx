@@ -12,7 +12,7 @@ interface UserRoles {
 }
 
 interface ProtectedRouteProps {
-    allowedRoles: (keyof UserRoles)[];
+    notAllowed?: (keyof UserRoles)[];
     children?: ReactNode;
 }
 
@@ -34,7 +34,7 @@ export const useAuth = (): AuthUser | null => {
     return authUser;
 };
 
-const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps): ReactElement => {
+const ProtectedRoute = ({ notAllowed, children }: ProtectedRouteProps): ReactElement => {
     const authUser = useAuth();
     const [hasRequiredRole, setHasRequiredRole] = useState<boolean>(true);
 
@@ -47,13 +47,15 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps): ReactE
                 salesPerson: !!authUser.issalesperson,
             };
 
-            setHasRequiredRole(
-                allowedRoles.some((role) => {
-                    return userRoles[role];
-                })
-            );
+            if (notAllowed) {
+                setHasRequiredRole(
+                    notAllowed.some((role) => {
+                        return !userRoles[role];
+                    })
+                );
+            }
         }
-    }, [allowedRoles, authUser]);
+    }, [notAllowed, authUser]);
 
     if (!authUser) {
         return <Navigate to='/' replace />;
