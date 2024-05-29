@@ -1,6 +1,6 @@
-import { BaseResponse } from "common/models/base-response";
+import { BaseResponse, Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "../index";
-import { ServerUserSettings, UserGroup } from "common/models/user";
+import { ServerUserSettings, UserGroup, UserPermissionsResponse } from "common/models/user";
 
 export interface ExtendedUserData extends BaseResponse {
     location: string;
@@ -90,5 +90,21 @@ export const deleteUserGroupList = async (itemuid: string) => {
         return request.data;
     } catch (error) {
         // TODO: add error handler
+    }
+};
+
+export const getUserPermissions = async (
+    uid: string
+): Promise<Partial<UserPermissionsResponse>> => {
+    try {
+        const request = await authorizedUserApiInstance.get<UserPermissionsResponse>(
+            `user/${uid}/permissions`
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting user permissions",
+        };
     }
 };

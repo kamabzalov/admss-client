@@ -1,5 +1,7 @@
 import { LS_APP_USER } from "./../common/constants/localStorage";
 export const setKey = (key: string, value: string) => {
+    // eslint-disable-next-line no-console
+    console.log(key);
     localStorage.setItem(key, value);
 };
 

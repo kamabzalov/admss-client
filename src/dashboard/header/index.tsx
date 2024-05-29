@@ -28,6 +28,15 @@ export default function Header(props: HeaderProps) {
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
 
+    const [isSalesPerson, setIsSalesPerson] = useState(false);
+
+    useEffect(() => {
+        if (authUser) {
+            const { isadmin, issalesperson, ismanager, islocaladmin } = authUser;
+            [isadmin, islocaladmin, ismanager].some(Boolean) || setIsSalesPerson(!!issalesperson);
+        }
+    }, [authUser]);
+
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
             if (response) {
@@ -78,7 +87,7 @@ export default function Header(props: HeaderProps) {
         },
     ];
 
-    if (authUser && !authUser.issalesperson) {
+    if (authUser && !isSalesPerson) {
         items.splice(1, 0, {
             label: "General Settings",
             command() {

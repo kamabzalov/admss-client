@@ -6,11 +6,17 @@ import { useAuth } from "http/routes/ProtectedRoute";
 export default function Sidebar() {
     const authUser = useAuth();
     const [isSalesPerson, setIsSalesPerson] = useState(false);
+
     useEffect(() => {
         if (authUser) {
-            setIsSalesPerson(!!authUser?.issalesperson);
+            const { isadmin, issalesperson, ismanager, islocaladmin } = authUser;
+            [isadmin, islocaladmin, ismanager].some(Boolean) || setIsSalesPerson(!!issalesperson);
         }
     }, [authUser]);
+
+    // eslint-disable-next-line no-console
+    console.log(isSalesPerson);
+
     return (
         <aside className='sidebar hidden lg:block'>
             <ul className='sidebar-nav'>
