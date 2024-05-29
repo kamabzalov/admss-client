@@ -14,9 +14,6 @@ export default function Sidebar() {
         }
     }, [authUser]);
 
-    // eslint-disable-next-line no-console
-    console.log(isSalesPerson);
-
     return (
         <aside className='sidebar hidden lg:block'>
             <ul className='sidebar-nav'>
