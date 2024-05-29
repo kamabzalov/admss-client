@@ -33,18 +33,25 @@ const updatePermissions = async (
 
         try {
             const permissions = await getUserPermissions(authUser.useruid);
-            const { uaSystemAdmin, uaLocationAdmin, uaManager, uaSalesPerson } = permissions;
+            const { uaSystemAdmin, uaClientAdmin, uaSalesPerson, uaManager } = permissions;
 
             const user: AuthUser = getKeyValue(LS_APP_USER);
-
-            user.islocaladmin = uaLocationAdmin || 0;
-            authUser.islocaladmin = uaLocationAdmin || 0;
-            user.isadmin = uaSystemAdmin || 0;
-            authUser.isadmin = uaSystemAdmin || 0;
-            user.ismanager = uaManager || 0;
-            authUser.ismanager = uaManager || 0;
-            user.issalesperson = uaSalesPerson || 0;
-            authUser.issalesperson = uaSalesPerson || 0;
+            if (typeof uaClientAdmin !== "undefined") {
+                user.islocaladmin = uaClientAdmin;
+                authUser.islocaladmin = uaClientAdmin;
+            }
+            if (typeof uaSystemAdmin !== "undefined") {
+                user.isadmin = uaSystemAdmin;
+                authUser.isadmin = uaSystemAdmin;
+            }
+            if (typeof uaManager !== "undefined") {
+                user.ismanager = uaManager;
+                authUser.ismanager = uaManager;
+            }
+            if (typeof uaSalesPerson !== "undefined") {
+                user.issalesperson = uaSalesPerson;
+                authUser.issalesperson = uaSalesPerson;
+            }
 
             localStorageClear(LS_APP_USER);
             setKey(LS_APP_USER, JSON.stringify(user));
