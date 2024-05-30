@@ -28,7 +28,7 @@ export default function Header(props: HeaderProps) {
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
 
-    const [isSalesPerson, setIsSalesPerson] = useState(false);
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;

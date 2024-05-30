@@ -7,7 +7,7 @@ import { useAuth } from "http/routes/ProtectedRoute";
 
 export default function Home() {
     const authUser = useAuth();
-    const [isSalesPerson, setIsSalesPerson] = useState(false);
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;

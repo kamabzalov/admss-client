@@ -21,7 +21,6 @@ interface ProtectedRouteProps {
 export const useAuth = (): AuthUser | null => {
     const [authUser, setAuthUser] = useState<AuthUser | null>(() => getKeyValue(LS_APP_USER));
     const location = useLocation();
-
     useEffect(() => {
         const handleStorageChange = () => {
             setAuthUser(getKeyValue(LS_APP_USER));
@@ -30,8 +29,7 @@ export const useAuth = (): AuthUser | null => {
         if (authUser) {
             getUserPermissions(authUser.useruid).then((response) => {
                 authUser.permissions = response as UserPermissionsResponse;
-
-                return authUser;
+                setAuthUser({ ...authUser, permissions: response as UserPermissionsResponse });
             });
         }
         window.addEventListener("storage", handleStorageChange);
@@ -41,6 +39,7 @@ export const useAuth = (): AuthUser | null => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
+
     return authUser;
 };
 
@@ -53,17 +52,15 @@ const ProtectedRoute = ({ notAllowed, children }: ProtectedRouteProps): ReactEle
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
             if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-                return setHasRequiredRole(false);
-            }
-            if (!!uaSalesPerson) setHasRequiredRole(true);
+                return setHasRequiredRole(true);
+            } else if (!!uaSalesPerson) setHasRequiredRole(false);
         }
-    }, [authUser, notAllowed, authUser?.permissions]);
+    }, [authUser]);
 
     if (!authUser) {
         return <Navigate to='/' replace />;
     }
-
-    if (!hasRequiredRole) {
+    if (!hasRequiredRole && notAllowed) {
         return <Navigate to='/dashboard' replace />;
     }
 
