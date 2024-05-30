@@ -70,6 +70,7 @@ const DEALS_STATUS_LIST: DealsFilterOptions[] = [
 const FILTER_GROUP_LIST: DealsFilterGroup[] = [
     { name: "Type (one of the list)", options: DEALS_TYPE_LIST },
     { name: "Status (one of the list)", options: DEALS_STATUS_LIST },
+    { name: "Other", options: DEALS_OTHER_LIST },
 ];
 
 export default function Deals() {
@@ -79,10 +80,7 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([
-        DEALS_TYPE_LIST[0].value,
-    ]);
-    const [dealOther, setDealOther] = useState<string[]>([DEALS_OTHER_LIST[0].value]);
+    const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
 
     const navigate = useNavigate();
     const toast = useToast();
@@ -174,7 +172,7 @@ export default function Deals() {
             top: lazyState.rows,
         };
         let qry: string = "";
-        const selectedFilters: string = [...dealSelectedGroup, ...dealOther]
+        const selectedFilters: string = [...dealSelectedGroup]
             .filter((item) => item && item !== "allTypes" && item !== "allStatuses")
             .join("+");
         if (selectedFilters.length) {
@@ -190,7 +188,7 @@ export default function Deals() {
                 }
             });
         }
-    }, [lazyState, authUser, globalSearch, dealSelectedGroup, dealOther]);
+    }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
     return (
         <div className='grid'>
@@ -229,22 +227,6 @@ export default function Deals() {
                                 </span>
                             </div>
 
-                            <div className='col-2'>
-                                <span className='p-float-label'>
-                                    <MultiSelect
-                                        optionValue='value'
-                                        optionLabel='name'
-                                        value={dealOther}
-                                        options={DEALS_OTHER_LIST}
-                                        placeholder='Other'
-                                        display='chip'
-                                        panelHeaderTemplate={<></>}
-                                        className='deals__dropdown'
-                                        onChange={(e) => setDealOther(e.value)}
-                                    />
-                                    <label className='float-label'>Other</label>
-                                </span>
-                            </div>
                             <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
