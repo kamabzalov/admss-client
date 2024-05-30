@@ -9,8 +9,6 @@ interface SidebarProps {
 export const Sidebar = ({ authUser }: SidebarProps) => {
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        // eslint-disable-next-line no-console
-        console.log(authUser);
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
