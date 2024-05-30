@@ -29,13 +29,16 @@ export default function Header(props: HeaderProps) {
     const [userProfile, setUserProfile] = useState<boolean>(false);
 
     const [isSalesPerson, setIsSalesPerson] = useState(false);
-
     useEffect(() => {
-        if (authUser) {
-            const { issalesperson, islocaladmin, ismanager, isadmin } = authUser;
-            [islocaladmin, ismanager, isadmin].some(Boolean) || setIsSalesPerson(!!issalesperson);
+        if (authUser && Object.keys(authUser.permissions).length) {
+            const { permissions } = authUser;
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setIsSalesPerson(false);
+            }
+            if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-    }, [authUser]);
+    }, [authUser, authUser?.permissions]);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
