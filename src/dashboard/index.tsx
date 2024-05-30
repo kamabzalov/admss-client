@@ -1,5 +1,5 @@
-import Sidebar from "./sidebar";
-import Header from "./header";
+import { Sidebar } from "./sidebar";
+import { Header } from "./header";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./index.css";
 import { Suspense, useEffect, useState } from "react";
@@ -9,35 +9,40 @@ import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Loader } from "./common/loader";
 import { ToastProvider } from "./common/toast";
+import { useAuth } from "http/routes/ProtectedRoute";
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
+
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
+        const storedUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (storedUser) {
             createApiDashboardInstance(navigate);
-            setUser(authUser);
+            setUser(storedUser);
         } else {
             navigate("/");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    if (user) {
-        return (
-            <ToastProvider>
-                <Header user={user} />
-                <Sidebar />
-                <main className='main'>
-                    <div className='container'>
-                        <Suspense fallback={<Loader overlay />}>
-                            <Outlet />
-                        </Suspense>
-                    </div>
-                </main>
-            </ToastProvider>
-        );
+    const authUser = useAuth();
+
+    if (!user || !authUser) {
+        return <Loader overlay />;
     }
-    return null;
+
+    return (
+        <ToastProvider>
+            <Header authUser={authUser} />
+            <Sidebar authUser={authUser} />
+            <main className='main'>
+                <div className='container'>
+                    <Suspense fallback={<Loader overlay />}>
+                        <Outlet />
+                    </Suspense>
+                </div>
+            </main>
+        </ToastProvider>
+    );
 }

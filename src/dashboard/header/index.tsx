@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -12,14 +12,12 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
-import { useAuth } from "http/routes/ProtectedRoute";
 
-export interface HeaderProps {
-    user: AuthUser;
+interface HeaderProps {
+    authUser: AuthUser;
 }
 
-export default function Header(props: HeaderProps) {
-    const authUser = useAuth();
+export const Header = ({ authUser }: HeaderProps): ReactElement => {
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
@@ -41,7 +39,7 @@ export default function Header(props: HeaderProps) {
     }, [authUser, authUser?.permissions]);
 
     useEffect(() => {
-        getExtendedData(props.user.useruid).then((response) => {
+        getExtendedData(authUser.useruid).then((response) => {
             if (response) {
                 setDealerName(response.dealerName);
                 setLocation(response.location);
@@ -85,7 +83,7 @@ export default function Header(props: HeaderProps) {
         {
             label: "Logout",
             command() {
-                props.user && signOut(props.user);
+                authUser && signOut(authUser);
             },
         },
     ];
@@ -125,7 +123,7 @@ export default function Header(props: HeaderProps) {
                 <UserProfileDialog
                     onHide={() => setUserProfile(false)}
                     visible={userProfile}
-                    authUser={props.user}
+                    authUser={authUser}
                 />
                 <SupportContactDialog
                     onHide={() => setSupportContact(false)}
@@ -133,11 +131,11 @@ export default function Header(props: HeaderProps) {
                 />
                 <SupportHistoryDialog
                     onHide={() => setSupportHistory(false)}
-                    useruid={props.user.useruid}
+                    useruid={authUser.useruid}
                     visible={supportHistory}
                 />
             </header>
         );
     }
-    return null;
-}
+    return <></>;
+};

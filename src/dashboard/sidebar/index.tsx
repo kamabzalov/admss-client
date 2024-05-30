@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
 import "./index.css";
 import { useState, useEffect } from "react";
-import { useAuth } from "http/routes/ProtectedRoute";
+import { AuthUser } from "http/services/auth.service";
+interface SidebarProps {
+    authUser: AuthUser;
+}
 
-export default function Sidebar() {
-    const authUser = useAuth();
+export const Sidebar = ({ authUser }: SidebarProps) => {
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
+        // eslint-disable-next-line no-console
+        console.log(authUser);
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
@@ -70,4 +74,4 @@ export default function Sidebar() {
             </ul>
         </aside>
     );
-}
+};
