@@ -21,14 +21,9 @@ import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
-import {
-    MultiSelect,
-    MultiSelectChangeEvent,
-    MultiSelectPanelHeaderTemplateEvent,
-} from "primereact/multiselect";
+import { MultiSelect } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
-import { Checkbox } from "primereact/checkbox";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -77,13 +72,6 @@ const FILTER_GROUP_LIST: DealsFilterGroup[] = [
     { name: "Status (one of the list)", options: DEALS_STATUS_LIST },
     { name: "Other", options: DEALS_OTHER_LIST },
 ];
-type TableColumnsList = Pick<ColumnProps, "header" | "field"> & { checked: boolean };
-
-export const columns: TableColumnsList[] = [
-    { field: "Vehicle", header: "Info (Vehicle)", checked: false },
-    { field: "StockNo", header: "Stock#", checked: false },
-    { field: "VIN", header: "VIN", checked: false },
-];
 
 export default function Deals() {
     const [deals, setDeals] = useState<Deal[]>([]);
@@ -93,7 +81,6 @@ export default function Deals() {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
 
     const navigate = useNavigate();
     const toast = useToast();
@@ -203,36 +190,6 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
-    const columnsDropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        onChange={() => {
-                            if (columns.length === activeColumns.length) {
-                                setActiveColumns(columns.filter(({ checked }) => checked));
-                            } else {
-                                setActiveColumns(columns);
-                            }
-                        }}
-                        checked={columns.length === activeColumns.length}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
-                        onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
-    };
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -269,34 +226,7 @@ export default function Deals() {
                                     <label className='float-label'>Filter</label>
                                 </span>
                             </div>
-                            <div className='col-2'>
-                                <MultiSelect
-                                    options={columns}
-                                    value={activeColumns}
-                                    optionLabel='header'
-                                    onChange={({
-                                        value,
-                                        stopPropagation,
-                                    }: MultiSelectChangeEvent) => {
-                                        stopPropagation();
-                                        setActiveColumns(value);
-                                    }}
-                                    panelHeaderTemplate={columnsDropdownHeaderPanel}
-                                    className='w-full pb-0 h-full flex align-items-center column-picker'
-                                    display='chip'
-                                    pt={{
-                                        header: {
-                                            className: "column-picker__header",
-                                        },
-                                        wrapper: {
-                                            className: "column-picker__wrapper",
-                                            style: {
-                                                maxHeight: "500px",
-                                            },
-                                        },
-                                    }}
-                                />
-                            </div>
+
                             <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
@@ -323,9 +253,9 @@ export default function Deals() {
                                     />
                                 </div>
                             </div>
-                            <div className='col-4 text-right flex flex-nowrap'>
+                            <div className='col-6 text-right flex flex-nowrap'>
                                 <Button
-                                    className='contact-top-controls__button m-r-20px'
+                                    className='contact-top-controls__button m-r-20px ml-auto'
                                     label='Advanced search'
                                     severity='success'
                                     type='button'
