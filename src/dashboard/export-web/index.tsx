@@ -276,14 +276,7 @@ export const ExportToWeb = () => {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
-                        }
-                    }
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
                     setServerSettings(allSettings);
                     const { exportWeb: settings } = allSettings;
                     if (settings?.activeColumns?.length) {
