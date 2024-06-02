@@ -94,17 +94,24 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
-                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
-            });
-            getInventoryLocations(authUser.useruid).then((response) => {
-                response && setLocations(response);
-            });
-            getUserGroupList(authUser.useruid).then((response) => {
-                response && setInventoryType(response);
-            });
+            Promise.all([
+                getInventoryList(authUser.useruid, { total: 1 }),
+                getInventoryLocations(authUser.useruid),
+                getUserGroupList(authUser.useruid),
+            ])
+                .then(([inventoryResponse, locationsResponse, userGroupsResponse]) => {
+                    if (inventoryResponse && !Array.isArray(inventoryResponse)) {
+                        setTotalRecords(inventoryResponse.total ?? 0);
+                    }
+                    if (locationsResponse) {
+                        setLocations(locationsResponse);
+                    }
+                    if (userGroupsResponse) {
+                        setInventoryType(userGroupsResponse);
+                    }
+                })
+                .finally(() => setIsLoading(false));
         }
-        setIsLoading(false);
     }, []);
 
     useEffect(() => {
@@ -115,51 +122,57 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     }, [activeColumns]);
 
     useEffect(() => {
-        setIsLoading(true);
-        if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile.length) {
-                    const allSettings: ServerUserSettings = response.profile
-                        ? JSON.parse(response.profile)
-                        : {};
-                    setServerSettings(allSettings);
-                    const { inventory: settings } = allSettings;
-                    if (settings?.activeColumns?.length) {
-                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
-                        const serverColumns = columns.filter((column) =>
-                            uniqueColumns.find((col) => col === column.field)
-                        );
-                        setActiveColumns(serverColumns);
-                    } else {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
+        if (authUser && locations.length > 0) {
+            setIsLoading(true);
+            getUserSettings(authUser.useruid)
+                .then((response) => {
+                    if (response?.profile.length) {
+                        let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                        if (response.profile) {
+                            try {
+                                allSettings = JSON.parse(response.profile);
+                            } catch (error) {
+                                allSettings = {} as ServerUserSettings;
+                            }
+                        }
+                        setServerSettings(allSettings);
+                        const { inventory: settings } = allSettings;
+                        if (settings?.activeColumns?.length) {
+                            const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                            const serverColumns = columns.filter((column) =>
+                                uniqueColumns.find((col) => col === column.field)
+                            );
+                            setActiveColumns(serverColumns);
+                        } else {
+                            setActiveColumns(columns.filter(({ checked }) => checked));
+                        }
+                        settings?.table &&
+                            setLazyState({
+                                first: settings.table.first || initialDataTableQueries.first,
+                                rows: settings.table.rows || initialDataTableQueries.rows,
+                                page: settings.table.page || initialDataTableQueries.page,
+                                column: settings.table.column || initialDataTableQueries.column,
+                                sortField:
+                                    settings.table.sortField || initialDataTableQueries.sortField,
+                                sortOrder:
+                                    settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                            });
+                        if (settings?.selectedFilterOptions) {
+                            setSelectedFilterOptions(settings.selectedFilterOptions);
+                        }
+                        if (settings?.selectedInventoryType) {
+                            setSelectedInventoryType(settings.selectedInventoryType);
+                        }
+                        if (settings?.currentLocation) {
+                            const location = locations.find(
+                                (location) => location.locationuid === settings.currentLocation
+                            );
+                            setCurrentLocation(location || ({} as InventoryLocations));
+                        }
                     }
-                    settings?.table &&
-                        setLazyState({
-                            first: settings.table.first || initialDataTableQueries.first,
-                            rows: settings.table.rows || initialDataTableQueries.rows,
-                            page: settings.table.page || initialDataTableQueries.page,
-                            column: settings.table.column || initialDataTableQueries.column,
-                            sortField:
-                                settings.table.sortField || initialDataTableQueries.sortField,
-                            sortOrder:
-                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                        });
-                    if (settings?.selectedFilterOptions) {
-                        setSelectedFilterOptions(settings.selectedFilterOptions);
-                    }
-                    if (settings?.selectedInventoryType) {
-                        setSelectedInventoryType(settings.selectedInventoryType);
-                    }
-                    if (settings?.currentLocation) {
-                        const location = locations.find(
-                            (location) => location.locationuid === settings.currentLocation
-                        );
-                        setCurrentLocation(location || ({} as InventoryLocations));
-                    }
-                }
-            });
+                })
+                .finally(() => setIsLoading(false));
         }
-        setIsLoading(false);
     }, [authUser, locations]);
 
     const printTableData = async (print: boolean = false) => {
@@ -258,6 +271,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     const handleAdvancedSearch = () => {
         setIsLoading(true);
         const searchParams = createStringifySearchQuery(advancedSearch);
+
         handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
         setDialogVisible(false);
         setIsLoading(false);
@@ -285,6 +299,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
+
             await handleGetInventoryList(params);
         } finally {
             setButtonDisabled(false);
@@ -411,67 +426,61 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     useEffect(() => {
-        setIsLoading(true);
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-        }
-        let qry: string = "";
+        const fetchData = async () => {
+            setIsLoading(true);
 
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
+            let qry: string = "";
 
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
+            if (globalSearch) {
+                qry += globalSearch;
+            } else {
+                qry += createStringifySearchQuery(advancedSearch);
+            }
 
-        if (selectedInventoryType.length) {
-            if (
-                globalSearch.length ||
-                Object.values(advancedSearch).length ||
-                selectedFilterOptions
-            )
-                qry += "+";
-            selectedInventoryType.forEach(
-                (type, index) =>
-                    (qry += `${type}.GroupClass${
-                        index !== selectedInventoryType.length - 1 ? "+" : ""
-                    }`)
-            );
-        }
+            if (selectedFilterOptions) {
+                if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+                qry += createStringifyFilterQuery(selectedFilterOptions);
+            }
 
-        if (Object.values(currentLocation).some((value) => value.trim().length)) {
-            if (!!qry.length) qry += "+";
-            qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
-        }
+            if (selectedInventoryType.length) {
+                if (
+                    globalSearch.length ||
+                    Object.values(advancedSearch).length ||
+                    selectedFilterOptions
+                )
+                    qry += "+";
+                selectedInventoryType.forEach(
+                    (type, index) =>
+                        (qry += `${type}.GroupClass${
+                            index !== selectedInventoryType.length - 1 ? "+" : ""
+                        }`)
+                );
+            }
 
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            skip: lazyState.first,
-            top: lazyState.rows,
+            if (Object.values(currentLocation).some((value) => value.trim().length)) {
+                if (!!qry.length) qry += "+";
+                qry += `${currentLocation.locationuid}.locationuid`;
+                changeSettings({ currentLocation: currentLocation.locationuid });
+            }
+
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(lazyState.sortField && { column: lazyState.sortField }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+
+            if (qry.length > 0) {
+                params.qry = qry;
+            }
+            await handleGetInventoryList(params, true);
+            setIsLoading(false);
         };
 
-        if (qry.length > 0) {
-            params.qry = qry;
-        }
-
-        handleGetInventoryList(params, true);
-        setIsLoading(false);
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        lazyState,
-        globalSearch,
-        authUser,
-        selectedFilterOptions,
-        currentLocation,
-        selectedInventoryType,
-    ]);
+    }, [lazyState, globalSearch, selectedFilterOptions, currentLocation, selectedInventoryType]);
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
