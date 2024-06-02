@@ -20,6 +20,10 @@ import { RootStore } from "store";
 
 interface DealItem extends Omit<Deal, "extdata"> {}
 
+interface DealPrintCollection {
+    [key: string]: DealPrintForm[];
+}
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -27,7 +31,7 @@ export class DealStore {
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
-    private _printList: DealPrintForm[] = [];
+    private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
     protected _isLoading = false;
 
@@ -178,10 +182,8 @@ export class DealStore {
             this._isLoading = true;
             const response = await getDealPrintForms(dealuid);
             if (response) {
-                this._printList = [];
-                Object.values(response).forEach((item) => {
-                    this._printList = [...this._printList, ...item];
-                });
+                const { error, status, ...printCollection } = response;
+                this._printList = printCollection;
             }
         } finally {
             this._isLoading = false;
@@ -209,7 +211,7 @@ export class DealStore {
         this._dealID = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinances = {} as DealFinance;
-        this._printList = [] as DealPrintForm[];
+        this._printList = {} as DealPrintCollection;
         this._dealPickupPayments = [] as DealPickupPayment[];
     };
 }

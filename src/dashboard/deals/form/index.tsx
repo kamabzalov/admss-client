@@ -72,8 +72,9 @@ export const DealsForm = observer(() => {
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
+                if (stepActiveIndex === printActiveIndex) return setAccordionActiveIndex([]);
                 return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
+                    const updatedArray = Array.isArray(prev) ? [...prev] : [];
                     updatedArray[index] = index;
                     return updatedArray;
                 });
