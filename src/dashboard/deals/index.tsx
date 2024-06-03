@@ -21,7 +21,6 @@ import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
-import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
@@ -39,8 +38,13 @@ interface DealsFilterOptions {
     value: string;
 }
 
+interface DealsFilterGroup {
+    name: string;
+    options: DealsFilterOptions[];
+}
+
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "all" },
+    { name: "All", value: "allTypes" },
     { name: "Buy Here Pay Here", value: "0.DealType" },
     { name: "Lease Here Pay Here", value: "7.DealType" },
     { name: "Cash", value: "1.DealType" },
@@ -56,11 +60,17 @@ const DEALS_OTHER_LIST: DealsFilterOptions[] = [
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
-    { name: "All", value: "all" },
+    { name: "All", value: "allStatuses" },
     { name: "Recent deals", value: "0.30.Age" },
     { name: "Quotes", value: "0.DealStatus" },
     { name: "Pending", value: "1.DealStatus" },
     { name: "Sold, Not finalized", value: "2.DealStatus" },
+];
+
+const FILTER_GROUP_LIST: DealsFilterGroup[] = [
+    { name: "Type (one of the list)", options: DEALS_TYPE_LIST },
+    { name: "Status (one of the list)", options: DEALS_STATUS_LIST },
+    { name: "Other", options: DEALS_OTHER_LIST },
 ];
 
 export default function Deals() {
@@ -70,9 +80,7 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [dealType, setDealType] = useState<string>(DEALS_TYPE_LIST[0].value);
-    const [dealOther, setDealOther] = useState<string[]>([DEALS_OTHER_LIST[0].value]);
-    const [dealStatus, setDealStatus] = useState<string>(DEALS_STATUS_LIST[0].value);
+    const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
 
     const navigate = useNavigate();
     const toast = useToast();
@@ -164,8 +172,8 @@ export default function Deals() {
             top: lazyState.rows,
         };
         let qry: string = "";
-        const selectedFilters: string = [dealType, dealStatus, ...dealOther]
-            .filter((item) => item && item !== "all")
+        const selectedFilters: string = [...dealSelectedGroup]
+            .filter((item) => item && item !== "allTypes" && item !== "allStatuses")
             .join("+");
         if (selectedFilters.length) {
             qry += selectedFilters;
@@ -180,7 +188,7 @@ export default function Deals() {
                 }
             });
         }
-    }, [lazyState, authUser, globalSearch, dealType, dealStatus, dealOther]);
+    }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
     return (
         <div className='grid'>
@@ -193,49 +201,33 @@ export default function Deals() {
                         <div className='grid datatable-controls'>
                             <div className='col-2'>
                                 <span className='p-float-label'>
-                                    <Dropdown
-                                        optionValue='value'
-                                        optionLabel='name'
-                                        value={dealType}
-                                        options={DEALS_TYPE_LIST}
-                                        placeholder='Type'
-                                        className='deals__dropdown'
-                                        onChange={(e) => setDealType(e.value)}
-                                    />
-                                    <label className='float-label'>Type</label>
-                                </span>
-                            </div>
-
-                            <div className='col-2'>
-                                <span className='p-float-label'>
-                                    <Dropdown
-                                        optionValue='value'
-                                        optionLabel='name'
-                                        value={dealStatus}
-                                        placeholder='Status'
-                                        options={DEALS_STATUS_LIST}
-                                        className='deals__dropdown'
-                                        onChange={(e) => setDealStatus(e.value)}
-                                    />
-                                    <label className='float-label'>Status</label>
-                                </span>
-                            </div>
-                            <div className='col-2'>
-                                <span className='p-float-label'>
                                     <MultiSelect
                                         optionValue='value'
                                         optionLabel='name'
-                                        value={dealOther}
-                                        options={DEALS_OTHER_LIST}
-                                        placeholder='Other'
+                                        value={dealSelectedGroup}
+                                        options={FILTER_GROUP_LIST}
+                                        optionGroupLabel='name'
+                                        optionGroupChildren='options'
                                         panelHeaderTemplate={<></>}
+                                        display='chip'
                                         className='deals__dropdown'
-                                        onChange={(e) => setDealOther(e.value)}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            setDealSelectedGroup(e.value);
+                                        }}
+                                        pt={{
+                                            wrapper: {
+                                                style: {
+                                                    maxHeight: "625px",
+                                                },
+                                            },
+                                        }}
                                     />
-                                    <label className='float-label'>Other</label>
+                                    <label className='float-label'>Filter</label>
                                 </span>
                             </div>
-                            <div className='col-2'>
+
+                            <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button'
@@ -261,9 +253,9 @@ export default function Deals() {
                                     />
                                 </div>
                             </div>
-                            <div className='col-4 text-right'>
+                            <div className='col-6 text-right flex flex-nowrap'>
                                 <Button
-                                    className='contact-top-controls__button m-r-20px'
+                                    className='contact-top-controls__button m-r-20px ml-auto'
                                     label='Advanced search'
                                     severity='success'
                                     type='button'
