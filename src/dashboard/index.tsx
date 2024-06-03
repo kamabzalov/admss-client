@@ -1,43 +1,55 @@
-import Sidebar from "./sidebar";
-import Header from "./header";
+import { Sidebar } from "./sidebar";
+import { Header } from "./header";
 import { Outlet, useNavigate } from "react-router-dom";
 import "./index.css";
-import { Suspense, useEffect, useState } from "react";
+import { ReactElement, Suspense, useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Loader } from "./common/loader";
 import { ToastProvider } from "./common/toast";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export default function Dashboard() {
+export const Dashboard = observer((): ReactElement => {
     const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
+
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
+        const storedUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (storedUser) {
             createApiDashboardInstance(navigate);
-            setUser(authUser);
+            setUser(storedUser);
         } else {
             navigate("/");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    if (user) {
-        return (
-            <ToastProvider>
-                <Header user={user} />
-                <Sidebar />
-                <main className='main'>
-                    <div className='container'>
-                        <Suspense fallback={<Loader overlay />}>
-                            <Outlet />
-                        </Suspense>
-                    </div>
-                </main>
-            </ToastProvider>
-        );
+    const store = useStore().userStore;
+    const { getPermissions, authUser } = store;
+
+    useEffect(() => {
+        if (user) getPermissions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    if (!user || !authUser) {
+        return <Loader overlay />;
     }
-    return null;
-}
+
+    return (
+        <ToastProvider>
+            <Header />
+            <Sidebar />
+            <main className='main'>
+                <div className='container'>
+                    <Suspense fallback={<Loader overlay />}>
+                        <Outlet />
+                    </Suspense>
+                </div>
+            </main>
+        </ToastProvider>
+    );
+});

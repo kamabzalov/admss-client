@@ -6,6 +6,7 @@ import {
     nonAuthorizedUserApiInstance,
 } from "../index";
 import { BaseResponse } from "common/models/base-response";
+import { UserPermissionsResponse } from "common/models/user";
 
 export interface AppError {
     status: "Error";
@@ -29,6 +30,7 @@ export interface AuthUser {
     token: string;
     username: string;
     useruid: string;
+    permissions: UserPermissionsResponse;
 }
 
 export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> => {
@@ -41,7 +43,6 @@ export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> =>
             // magic: MAGIC,
         })
         .then((response) => {
-            localStorage.setItem("useruid", JSON.stringify(response.data));
             return response.data;
         })
         .catch((err) => {
