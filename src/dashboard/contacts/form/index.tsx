@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useState } from "react";
+import { ReactElement, Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common/step-navigation";
@@ -12,9 +12,10 @@ import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
+import { observer } from "mobx-react-lite";
 const STEP = "step";
 
-export const ContactForm = () => {
+export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -26,7 +27,7 @@ export const ContactForm = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact, saveContact } = store;
+    const { contact, getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
@@ -75,13 +76,21 @@ export const ContactForm = () => {
                 <div className='col-12'>
                     <div className='card contact'>
                         <div className='card-header'>
-                            <h2 className='card-header__title uppercase m-0'>
+                            <h2 className='card-header__title uppercase m-0 pr-2'>
                                 {id ? "Edit" : "Create new"} contact
                             </h2>
+                            <div className='card-header-info'>
+                                Full Name
+                                <span className='card-header-info__data'>{contact?.userName}</span>
+                                Company name
+                                <span className='card-header-info__data'>
+                                    {contact?.companyName}
+                                </span>
+                            </div>
                         </div>
                         <div className='card-content contact__card'>
                             <div className='grid flex-nowrap'>
-                                <div className='p-0'>
+                                <div className='p-0 card-content__wrapper'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
@@ -196,4 +205,4 @@ export const ContactForm = () => {
             </div>
         </Suspense>
     );
-};
+});
