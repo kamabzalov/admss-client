@@ -84,9 +84,10 @@ export const DealsForm = observer(() => {
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
 
-        id ? getDeal(id) : clearDeal();
+        id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
+            clearDeal();
         };
     }, [id]);
 
