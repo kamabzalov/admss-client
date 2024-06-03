@@ -1,28 +1,28 @@
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { DataTable, DataTableSelectionMultipleChangeEvent } from "primereact/datatable";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 import { useParams } from "react-router";
 import { Loader } from "dashboard/common/loader";
 import { getDealPrintFormTemplate } from "http/services/deals.service";
 import { DealPrintForm } from "common/models/deals";
+import { Accordion, AccordionTab } from "primereact/accordion";
+import { Checkbox } from "primereact/checkbox";
 
 export const PrintDealForms = observer((): ReactElement => {
-    const ref = useRef(null);
     const { id } = useParams();
     const store = useStore().dealStore;
     const { printList, getPrintList, isLoading } = store;
 
-    const [selectedPrints, setSelectedPrints] = useState<DealPrintForm[] | null>(null);
+    const [selectedPrints, setSelectedPrints] = useState<any[] | null>(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
     useEffect(() => {
         if (id) {
             getPrintList(id);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getPrintList, id]);
 
     useEffect(() => {
@@ -56,13 +56,14 @@ export const PrintDealForms = observer((): ReactElement => {
                             "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
                         );
                     }
+
+                    store.isLoading = false;
                 }, 3000);
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error(error);
                 //TODO: handle error
             } finally {
-                store.isLoading = false;
                 setIsButtonDisabled(false);
             }
         }
@@ -76,25 +77,52 @@ export const PrintDealForms = observer((): ReactElement => {
         }
     };
 
-    const ActionButton = (rowData: DealPrintForm): ReactElement => {
+    const DealPrintItem = ({ item }: { item: DealPrintForm }): ReactElement => {
+        const isItemSelected = selectedPrints?.some(
+            (selectedItem) => selectedItem.itemuid === item.itemuid
+        );
         return (
-            <div className='flex gap-3'>
-                <Button
-                    className='p-button deal-print__action-button'
-                    outlined
-                    disabled={isButtonDisabled}
-                    onClick={() => handlePrintForm(rowData.itemuid, true)}
-                >
-                    Print
-                </Button>
-                <Button
-                    className='p-button deal-print__action-button'
-                    outlined
-                    disabled={isButtonDisabled}
-                    onClick={() => handlePrintForm(rowData.itemuid)}
-                >
-                    Download
-                </Button>
+            <div
+                className={`deal-print__list-item ${
+                    isItemSelected ? "deal-print__list-item--selected" : ""
+                }`}
+            >
+                <Checkbox
+                    className='deal-print__checkbox'
+                    checked={isItemSelected || false}
+                    onChange={() => {
+                        if (
+                            selectedPrints?.some(
+                                (selectedItem) => selectedItem.itemuid === item.itemuid
+                            )
+                        ) {
+                            setSelectedPrints(
+                                selectedPrints?.filter(
+                                    (selectedItem) => selectedItem.itemuid !== item.itemuid
+                                )
+                            );
+                        } else {
+                            setSelectedPrints([...(selectedPrints || []), item]);
+                        }
+                    }}
+                />
+                <p>{item.name}</p>
+                <div className='flex gap-3 ml-auto'>
+                    <Button
+                        className='p-button deal-print__action-button'
+                        outlined
+                        onClick={() => handlePrintForm(item.itemuid, true)}
+                    >
+                        Print
+                    </Button>
+                    <Button
+                        className='p-button deal-print__action-button'
+                        outlined
+                        onClick={() => handlePrintForm(item.itemuid)}
+                    >
+                        Download
+                    </Button>
+                </div>
             </div>
         );
     };
@@ -103,22 +131,35 @@ export const PrintDealForms = observer((): ReactElement => {
         <div className='grid deal-print row-gap-2'>
             {isLoading && <Loader overlay />}
             <div className='col-12'>
-                <DataTable
-                    className='mt-6 deal-print__table'
-                    ref={ref}
-                    value={printList}
-                    emptyMessage='No exports yet.'
-                    selectionMode={"checkbox"}
-                    selection={selectedPrints!}
-                    onSelectionChange={(
-                        event: DataTableSelectionMultipleChangeEvent<DealPrintForm[]>
-                    ) => setSelectedPrints(event.value)}
-                    dataKey='itemuid'
-                >
-                    <Column selectionMode='multiple' headerStyle={{ width: "3rem" }} />
-                    <Column field='name' header='Form' />
-                    <Column body={ActionButton} className='deal-print__table-action' />
-                </DataTable>
+                <div className='deal-print__header'>
+                    <Checkbox
+                        className='deal-print__checkbox'
+                        checked={selectedPrints?.length === Object.values(printList).flat().length}
+                        onChange={() => {
+                            if (selectedPrints?.length === Object.values(printList).flat().length) {
+                                setSelectedPrints([]);
+                            } else {
+                                setSelectedPrints(Object.values(printList).flat());
+                            }
+                        }}
+                    />
+                    Form
+                </div>
+                <Accordion multiple activeIndex={[0]} className='deal-print__accordion'>
+                    {Object.entries(printList).map(([group, prints]) => {
+                        return (
+                            <AccordionTab
+                                key={group}
+                                header={group}
+                                className='deal-print__accordion-tab'
+                            >
+                                {prints.map((print) => (
+                                    <DealPrintItem item={print} />
+                                ))}
+                            </AccordionTab>
+                        );
+                    })}
+                </Accordion>
                 <div className='deal-print__control'>
                     <Button
                         className='p-button deal-print__button'
