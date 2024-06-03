@@ -12,12 +12,12 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-interface HeaderProps {
-    authUser: AuthUser;
-}
-
-export const Header = ({ authUser }: HeaderProps): ReactElement => {
+export const Header = observer((): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
@@ -39,12 +39,14 @@ export const Header = ({ authUser }: HeaderProps): ReactElement => {
     }, [authUser, authUser?.permissions]);
 
     useEffect(() => {
-        getExtendedData(authUser.useruid).then((response) => {
-            if (response) {
-                setDealerName(response.dealerName);
-                setLocation(response.location);
-            }
-        });
+        if (authUser) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response) {
+                    setDealerName(response.dealerName);
+                    setLocation(response.location);
+                }
+            });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -120,22 +122,26 @@ export const Header = ({ authUser }: HeaderProps): ReactElement => {
                         </div>
                     </div>
                 </div>
-                <UserProfileDialog
-                    onHide={() => setUserProfile(false)}
-                    visible={userProfile}
-                    authUser={authUser}
-                />
-                <SupportContactDialog
-                    onHide={() => setSupportContact(false)}
-                    visible={supportContact}
-                />
-                <SupportHistoryDialog
-                    onHide={() => setSupportHistory(false)}
-                    useruid={authUser.useruid}
-                    visible={supportHistory}
-                />
+                {authUser && (
+                    <>
+                        <UserProfileDialog
+                            onHide={() => setUserProfile(false)}
+                            visible={userProfile}
+                            authUser={authUser}
+                        />
+                        <SupportContactDialog
+                            onHide={() => setSupportContact(false)}
+                            visible={supportContact}
+                        />
+                        <SupportHistoryDialog
+                            onHide={() => setSupportHistory(false)}
+                            useruid={authUser.useruid}
+                            visible={supportHistory}
+                        />
+                    </>
+                )}
             </header>
         );
     }
     return <></>;
-};
+});

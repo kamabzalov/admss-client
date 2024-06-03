@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import "./index.css";
-import { useState, useEffect } from "react";
-import { AuthUser } from "http/services/auth.service";
-interface SidebarProps {
-    authUser: AuthUser;
-}
+import { useState, useEffect, ReactElement } from "react";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const Sidebar = ({ authUser }: SidebarProps) => {
+export const Sidebar = observer((): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
@@ -72,4 +72,4 @@ export const Sidebar = ({ authUser }: SidebarProps) => {
             </ul>
         </aside>
     );
-};
+});
