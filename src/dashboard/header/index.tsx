@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -12,12 +12,12 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export interface HeaderProps {
-    user: AuthUser;
-}
-
-export default function Header(props: HeaderProps) {
+export const Header = observer((): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
@@ -26,13 +26,27 @@ export default function Header(props: HeaderProps) {
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
 
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        getExtendedData(props.user.useruid).then((response) => {
-            if (response) {
-                setDealerName(response.dealerName);
-                setLocation(response.location);
+        if (authUser && Object.keys(authUser.permissions).length) {
+            const { permissions } = authUser;
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setIsSalesPerson(false);
             }
-        });
+            if (!!uaSalesPerson) setIsSalesPerson(true);
+        }
+    }, [authUser, authUser?.permissions]);
+
+    useEffect(() => {
+        if (authUser) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response) {
+                    setDealerName(response.dealerName);
+                    setLocation(response.location);
+                }
+            });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -48,12 +62,6 @@ export default function Header(props: HeaderProps) {
             label: "My Profile",
             command() {
                 setUserProfile(true);
-            },
-        },
-        {
-            label: "General Settings",
-            command() {
-                navigate("settings");
             },
         },
         { separator: true },
@@ -77,10 +85,20 @@ export default function Header(props: HeaderProps) {
         {
             label: "Logout",
             command() {
-                props.user && signOut(props.user);
+                authUser && signOut(authUser);
             },
         },
     ];
+
+    if (authUser && !isSalesPerson) {
+        items.splice(1, 0, {
+            label: "General Settings",
+            command() {
+                navigate("settings");
+            },
+        });
+    }
+
     if (menuRight) {
         return (
             <header className='header'>
@@ -104,22 +122,26 @@ export default function Header(props: HeaderProps) {
                         </div>
                     </div>
                 </div>
-                <UserProfileDialog
-                    onHide={() => setUserProfile(false)}
-                    visible={userProfile}
-                    authUser={props.user}
-                />
-                <SupportContactDialog
-                    onHide={() => setSupportContact(false)}
-                    visible={supportContact}
-                />
-                <SupportHistoryDialog
-                    onHide={() => setSupportHistory(false)}
-                    useruid={props.user.useruid}
-                    visible={supportHistory}
-                />
+                {authUser && (
+                    <>
+                        <UserProfileDialog
+                            onHide={() => setUserProfile(false)}
+                            visible={userProfile}
+                            authUser={authUser}
+                        />
+                        <SupportContactDialog
+                            onHide={() => setSupportContact(false)}
+                            visible={supportContact}
+                        />
+                        <SupportHistoryDialog
+                            onHide={() => setSupportHistory(false)}
+                            useruid={authUser.useruid}
+                            visible={supportHistory}
+                        />
+                    </>
+                )}
             </header>
         );
     }
-    return null;
-}
+    return <></>;
+});

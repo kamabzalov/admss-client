@@ -1,10 +1,24 @@
 import "./index.css";
 import { Calendar } from "primereact/calendar";
-import { useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tasks } from "dashboard/tasks";
+import { useStore } from "store/hooks";
 
-export default function Home() {
+export const Home = (): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
+    useEffect(() => {
+        if (authUser && Object.keys(authUser.permissions).length) {
+            const { permissions } = authUser;
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setIsSalesPerson(false);
+            }
+            if (!!uaSalesPerson) setIsSalesPerson(true);
+        }
+    }, [authUser, authUser?.permissions]);
     const [date] = useState(null);
 
     return (
@@ -16,24 +30,28 @@ export default function Home() {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link
-                                    to='contacts/create'
-                                    className='common-tasks-menu__item new-contact cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-contact'></div>
-                                    New Contact
-                                </Link>
-                            </div>
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link
-                                    to='contacts'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon browse-all-contacts'></div>
-                                    Browse all contacts
-                                </Link>
-                            </div>
+                            {isSalesPerson || (
+                                <>
+                                    <div className='col-12 md:col-6 lg:col-3'>
+                                        <Link
+                                            to='contacts/create'
+                                            className='common-tasks-menu__item new-contact cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon new-contact'></div>
+                                            New Contact
+                                        </Link>
+                                    </div>
+                                    <div className='col-12 md:col-6 lg:col-3'>
+                                        <Link
+                                            to='contacts'
+                                            className='common-tasks-menu__item cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon browse-all-contacts'></div>
+                                            Browse all contacts
+                                        </Link>
+                                    </div>
+                                </>
+                            )}
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <Link
                                     to='inventory/create'
@@ -52,21 +70,28 @@ export default function Home() {
                                     Browse all inventory
                                 </Link>
                             </div>
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link
-                                    to='deals/create'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-deal'></div>
-                                    New deal
-                                </Link>
-                            </div>
-                            <div className='col-12 md:col-6 lg:col-3'>
-                                <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
-                                    <div className='common-tasks-menu__icon browse-all-deals'></div>
-                                    Browse all deals
-                                </Link>
-                            </div>
+                            {isSalesPerson || (
+                                <>
+                                    <div className='col-12 md:col-6 lg:col-3'>
+                                        <Link
+                                            to='deals/create'
+                                            className='common-tasks-menu__item cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon new-deal'></div>
+                                            New deal
+                                        </Link>
+                                    </div>
+                                    <div className='col-12 md:col-6 lg:col-3'>
+                                        <Link
+                                            to='deals'
+                                            className='common-tasks-menu__item cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon browse-all-deals'></div>
+                                            Browse all deals
+                                        </Link>
+                                    </div>
+                                </>
+                            )}
                             <div className='col-12 md:col-6 lg:col-3'>
                                 <div className='common-tasks-menu__item cursor-pointer'>
                                     <div className='common-tasks-menu__icon print-test-drive'></div>
@@ -178,4 +203,4 @@ export default function Home() {
             </div>
         </div>
     );
-}
+};
