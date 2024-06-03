@@ -19,9 +19,7 @@ import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 
 export const DealGeneralSale = observer((): ReactElement => {
-    const { values, errors, touched, setFieldValue, getFieldProps } = useFormikContext<
-        Deal & DealExtData
-    >();
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Deal & DealExtData>();
 
     const store = useStore().dealStore;
     const toast = useToast();
@@ -98,17 +96,15 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "contactuid", value });
                     }}
                     name='Buyer Name (required)'
-                    className={`${errors.contactuid && touched.contactuid && "p-invalid"}`}
+                    className={`${errors.contactuid && "p-invalid"}`}
                 />
-                <small className='p-error'>
-                    {touched.contactuid && errors.contactuid ? errors.contactuid : ""}
-                </small>
+                <small className='p-error'>{errors.contactuid}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InventorySearch
                         {...getFieldProps("inventoryuid")}
-                        className={`${errors.inventoryuid && touched.inventoryuid && "p-invalid"}`}
+                        className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
                             setFieldValue("inventoryuid", value);
                             changeDeal({ key: "inventoryuid", value });
@@ -121,9 +117,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     />
                     <label className='float-label'></label>
                 </span>
-                <small className='p-error'>
-                    {touched.inventoryuid && errors.inventoryuid ? errors.inventoryuid : ""}
-                </small>
+                <small className='p-error'>{errors.inventoryuid}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
@@ -139,15 +133,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                             setFieldValue("dealtype", e.value);
                             changeDeal({ key: "dealtype", value: e.value });
                         }}
-                        className={`w-full deal-sale__dropdown ${
-                            errors.dealtype && touched.dealtype && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
                     />
                     <label className='float-label'>Type of Deal (required)</label>
                 </span>
-                <small className='p-error'>
-                    {touched.dealtype && errors.dealtype ? errors.dealtype : ""}
-                </small>
+                <small className='p-error'>{errors.dealtype}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -163,15 +153,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                         options={dealStatusesList}
                         filter
                         required
-                        className={`w-full deal-sale__dropdown ${
-                            errors.dealstatus && touched.dealstatus && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale status (required)</label>
                 </span>
-                <small className='p-error'>
-                    {touched.dealstatus && errors.dealstatus ? errors.dealstatus : ""}
-                </small>
+                <small className='p-error'>{errors.dealstatus}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -187,20 +173,16 @@ export const DealGeneralSale = observer((): ReactElement => {
                             setFieldValue("saletype", e.value);
                             changeDeal({ key: "saletype", value: e.value });
                         }}
-                        className={`w-full deal-sale__dropdown ${
-                            errors.saletype && touched.saletype && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale type (required)</label>
                 </span>
-                <small className='p-error'>
-                    {touched.saletype && errors.saletype ? errors.saletype : ""}
-                </small>
+                <small className='p-error'>{errors.saletype}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("datepurchase")}
-                    className={`${errors.datepurchase && touched.datepurchase && "p-invalid"}`}
+                    className={`${errors.datepurchase && "p-invalid"}`}
                     name='Sale date (required)'
                     date={Number(values.datepurchase)}
                     onChange={({ value }) => {
@@ -208,14 +190,12 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "datepurchase", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>
-                    {touched.datepurchase && errors.datepurchase ? errors.datepurchase : ""}
-                </small>
+                <small className='p-error'>{errors.datepurchase}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("dateeffective")}
-                    className={`${errors.dateeffective && touched.dateeffective && "p-invalid"}`}
+                    className={`${errors.dateeffective && "p-invalid"}`}
                     name='First operated (req.)'
                     value={values.dateeffective}
                     onChange={({ value }) => {
@@ -223,9 +203,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "dateeffective", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>
-                    {touched.dateeffective && errors.dateeffective ? errors.dateeffective : ""}
-                </small>
+                <small className='p-error'>{errors.dateeffective}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -242,16 +220,12 @@ export const DealGeneralSale = observer((): ReactElement => {
                         filter
                         required
                         className={`w-full deal-sale__dropdown ${
-                            errors.inventorystatus && touched.inventorystatus && "p-invalid"
+                            errors.inventorystatus && "p-invalid"
                         }`}
                     />
                     <label className='float-label'>New or Used (req.)</label>
                 </span>
-                <small className='p-error'>
-                    {touched.inventorystatus && errors.inventorystatus
-                        ? errors.inventorystatus
-                        : ""}
-                </small>
+                <small className='p-error'>{errors.inventorystatus}</small>
             </div>
 
             <div className='col-12 text-line'>
@@ -299,22 +273,18 @@ export const DealGeneralSale = observer((): ReactElement => {
                         editable
                         filter
                         className={`w-full deal-sale__dropdown ${
-                            errors.HowFoundOut && touched.HowFoundOut && "p-invalid"
+                            errors.HowFoundOut && "p-invalid"
                         }`}
                     />
                     <label className='float-label'>How did you hear about us? (required)</label>
                 </span>
-                <small className='p-error'>
-                    {errors.HowFoundOut && touched.HowFoundOut ? errors.HowFoundOut : ""}
-                </small>
+                <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
                         {...getFieldProps("SaleID")}
-                        className={`deal-sale__text-input w-full ${
-                            errors.SaleID && touched.SaleID && "p-invalid"
-                        }`}
+                        className={`deal-sale__text-input w-full ${errors.SaleID && "p-invalid"}`}
                         value={values.SaleID}
                         onChange={(e) => {
                             setFieldValue("SaleID", e.target.value);
@@ -323,9 +293,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     />
                     <label className='float-label'>ROS SaleID (required)</label>
                 </span>
-                <small className='p-error'>
-                    {touched.SaleID && errors.SaleID ? errors.SaleID : ""}
-                </small>
+                <small className='p-error'>{errors.SaleID}</small>
             </div>
         </section>
     );

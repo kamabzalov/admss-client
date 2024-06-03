@@ -20,6 +20,10 @@ import { RootStore } from "store";
 
 interface DealItem extends Omit<Deal, "extdata"> {}
 
+interface DealPrintCollection {
+    [key: string]: DealPrintForm[];
+}
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -27,10 +31,10 @@ export class DealStore {
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
-    private _printList: DealPrintForm[] = [];
+    private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
-    protected _isFormValid = false;
     protected _isLoading = false;
+    protected _isFormChanged = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -64,8 +68,8 @@ export class DealStore {
         return this._isLoading;
     }
 
-    public get isFormValid() {
-        return this._isFormValid;
+    public get isFormChanged() {
+        return this._isFormChanged;
     }
 
     public set isLoading(state: boolean) {
@@ -87,6 +91,7 @@ export class DealStore {
                 this._dealErrorMessage = error!;
             }
         } finally {
+            this._isFormChanged = false;
             this._isLoading = false;
         }
     };
@@ -110,6 +115,7 @@ export class DealStore {
 
     public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
         if (this._deal && key !== "extdata") {
+            this._isFormChanged = true;
             (this._deal as Record<typeof key, string | number>)[key] = value;
         }
     });
@@ -118,6 +124,7 @@ export class DealStore {
         ({ key, value }: { key: keyof DealExtData; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore) {
+                this._isFormChanged = true;
                 const { dealExtData } = dealStore;
                 (dealExtData as Record<typeof key, string | number>)[key] = value;
             }
@@ -183,10 +190,8 @@ export class DealStore {
             this._isLoading = true;
             const response = await getDealPrintForms(dealuid);
             if (response) {
-                this._printList = [];
-                Object.values(response).forEach((item) => {
-                    this._printList = [...this._printList, ...item];
-                });
+                const { error, status, ...printCollection } = response;
+                this._printList = printCollection;
             }
         } finally {
             this._isLoading = false;
@@ -208,17 +213,13 @@ export class DealStore {
         }
     });
 
-    public set isFormValid(state: boolean) {
-        this._isFormValid = state;
-    }
-
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
         this._dealID = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinances = {} as DealFinance;
-        this._printList = [] as DealPrintForm[];
+        this._printList = {} as DealPrintCollection;
         this._dealPickupPayments = [] as DealPickupPayment[];
     };
 }

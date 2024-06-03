@@ -13,7 +13,7 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
-import { Form, Formik, FormikErrors, FormikProps } from "formik";
+import { Form, Formik, FormikProps } from "formik";
 import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
@@ -43,7 +43,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealExtData, getDeal, saveDeal, isFormValid } = store;
+    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -84,7 +84,7 @@ export const DealsForm = observer(() => {
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
 
-        id && getDeal(id);
+        id ? getDeal(id) : clearDeal();
         return () => {
             sections.forEach((section) => section.clearCount());
         };
@@ -93,8 +93,9 @@ export const DealsForm = observer(() => {
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
+                if (stepActiveIndex === printActiveIndex) return setAccordionActiveIndex([]);
                 return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
+                    const updatedArray = Array.isArray(prev) ? [...prev] : [];
                     updatedArray[index] = index;
                     return updatedArray;
                 });
@@ -108,15 +109,17 @@ export const DealsForm = observer(() => {
     };
 
     const handleSaveDealForm = () => {
-        if (!isFormValid) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Validation Error",
-                detail: "Please fill in all required fields.",
-            });
-        } else {
-            formikRef.current?.submitForm();
-        }
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
     };
 
     return (
@@ -202,23 +205,26 @@ export const DealsForm = observer(() => {
                                             innerRef={formikRef}
                                             initialValues={
                                                 {
-                                                    contactuid: deal.contactuid,
-                                                    inventoryuid: deal.inventoryuid,
+                                                    contactuid: deal.contactuid || "",
+                                                    inventoryuid: deal.inventoryuid || "",
                                                     dealtype: deal.dealtype,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase,
                                                     dateeffective: deal.dateeffective,
                                                     inventorystatus: deal.inventorystatus,
-                                                    accountuid: deal.accountuid,
-                                                    HowFoundOut: dealExtData?.HowFoundOut,
-                                                    SaleID: dealExtData?.SaleID,
-                                                    OdometerReading: dealExtData?.OdometerReading,
-                                                    OdomDigits: dealExtData?.OdomDigits,
+                                                    accountuid: deal.accountuid || "",
+                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
+                                                    SaleID: dealExtData?.SaleID || "",
+                                                    OdometerReading:
+                                                        dealExtData?.OdometerReading || "",
+                                                    OdomDigits: dealExtData?.OdomDigits || "",
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
                                             enableReinitialize
                                             validationSchema={DealFormSchema}
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
                                             onSubmit={() => {
                                                 saveDeal();
                                                 navigate(`/dashboard/deals`);
@@ -227,33 +233,6 @@ export const DealsForm = observer(() => {
                                                     summary: "Success",
                                                     detail: "Deal saved successfully",
                                                 });
-                                            }}
-                                            validate={(values) => {
-                                                const errors: FormikErrors<
-                                                    Partial<Deal> & Partial<DealExtData>
-                                                > = {};
-                                                try {
-                                                    DealFormSchema.validateSync(values, {
-                                                        abortEarly: false,
-                                                    });
-                                                } catch (err) {
-                                                    if (err instanceof Yup.ValidationError) {
-                                                        err.inner.forEach((validationError) => {
-                                                            if (validationError.path) {
-                                                                errors[
-                                                                    validationError.path as keyof (Partial<Deal> &
-                                                                        Partial<DealExtData>)
-                                                                ] = validationError.message;
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                                if (Object.keys(errors).length > 0) {
-                                                    store.isFormValid = false;
-                                                } else {
-                                                    store.isFormValid = true;
-                                                }
-                                                return errors;
                                             }}
                                         >
                                             <Form name='dealForm'>
@@ -328,6 +307,8 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
+                                    severity={isFormChanged ? "success" : "secondary"}
+                                    disabled={!isFormChanged}
                                 >
                                     Save
                                 </Button>
