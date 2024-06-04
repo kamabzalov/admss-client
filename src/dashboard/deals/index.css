@@ -84,3 +84,12 @@
 .p-button.deal__print-nav .p-button-icon {
     color: var(--admss-app-green);
 }
+
+.deal .p-dropdown {
+    height: 50px;
+    width: 100%;
+}
+
+.deal .p-inputtext {
+    width: 100%;
+}

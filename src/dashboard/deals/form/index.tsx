@@ -13,17 +13,37 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
+import { Form, Formik, FormikProps } from "formik";
+import { Deal, DealExtData } from "common/models/deals";
+import * as Yup from "yup";
+import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
+
+export const DealFormSchema = Yup.object().shape({
+    contactuid: Yup.string().required("Data is required."),
+    inventoryuid: Yup.string().required("Data is required."),
+    dealtype: Yup.string().required("Data is required."),
+    dealstatus: Yup.string().required("Data is required."),
+    saletype: Yup.string().required("Data is required."),
+    datepurchase: Yup.string().required("Data is required."),
+    dateeffective: Yup.string().required("Data is required."),
+    inventorystatus: Yup.string().required("Data is required."),
+    HowFoundOut: Yup.string().required("Data is required."),
+    SaleID: Yup.string().required("Data is required."),
+    OdometerReading: Yup.string().required("Data is required."),
+    OdomDigits: Yup.string().required("Data is required."),
+});
 
 export const DealsForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
+    const toast = useToast();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { getDeal, saveDeal } = store;
+    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -33,6 +53,7 @@ export const DealsForm = observer(() => {
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -66,6 +87,7 @@ export const DealsForm = observer(() => {
         id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
+            clearDeal();
         };
     }, [id]);
 
@@ -85,6 +107,20 @@ export const DealsForm = observer(() => {
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
+    };
+
+    const handleSaveDealForm = () => {
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
     };
 
     return (
@@ -166,35 +202,72 @@ export const DealsForm = observer(() => {
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
-                                        {dealsSections.map((section) =>
-                                            section.items.map((item: DealsItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block deal-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='deal-form__title uppercase'>
-                                                        {item.itemLabel}
+                                        <Formik
+                                            innerRef={formikRef}
+                                            initialValues={
+                                                {
+                                                    contactuid: deal.contactuid || "",
+                                                    inventoryuid: deal.inventoryuid || "",
+                                                    dealtype: deal.dealtype,
+                                                    dealstatus: deal.dealstatus,
+                                                    saletype: deal.saletype,
+                                                    datepurchase: deal.datepurchase,
+                                                    dateeffective: deal.dateeffective,
+                                                    inventorystatus: deal.inventorystatus,
+                                                    accountuid: deal.accountuid || "",
+                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
+                                                    SaleID: dealExtData?.SaleID || "",
+                                                    OdometerReading:
+                                                        dealExtData?.OdometerReading || "",
+                                                    OdomDigits: dealExtData?.OdomDigits || "",
+                                                } as Partial<Deal> & Partial<DealExtData>
+                                            }
+                                            enableReinitialize
+                                            validationSchema={DealFormSchema}
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
+                                            onSubmit={() => {
+                                                saveDeal();
+                                                navigate(`/dashboard/deals`);
+                                                toast.current?.show({
+                                                    severity: "success",
+                                                    summary: "Success",
+                                                    detail: "Deal saved successfully",
+                                                });
+                                            }}
+                                        >
+                                            <Form name='dealForm'>
+                                                {dealsSections.map((section) =>
+                                                    section.items.map((item: DealsItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block deal-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='deal-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                                {stepActiveIndex === printActiveIndex && (
+                                                    <div className='deal-form'>
+                                                        <div className='deal-form__title uppercase'>
+                                                            Print forms
+                                                        </div>
+                                                        <PrintDealForms />
                                                     </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
-                                        {stepActiveIndex === printActiveIndex && (
-                                            <div className='deal-form'>
-                                                <div className='deal-form__title uppercase'>
-                                                    Print forms
-                                                </div>
-                                                <PrintDealForms />
-                                            </div>
-                                        )}
+                                                )}
+                                            </Form>
+                                        </Formik>
                                     </div>
                                 </div>
                             </div>
@@ -233,8 +306,10 @@ export const DealsForm = observer(() => {
                                     Next
                                 </Button>
                                 <Button
-                                    onClick={saveDeal}
+                                    onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
+                                    severity={isFormChanged ? "success" : "secondary"}
+                                    disabled={!isFormChanged}
                                 >
                                     Save
                                 </Button>
