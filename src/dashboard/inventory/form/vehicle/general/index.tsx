@@ -137,6 +137,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
                 changeInventory({ key: "Engine", value: vinInfo.Engine });
                 changeInventory({ key: "StockNo", value: vinInfo.StockNo });
+                changeInventory({ key: "Trim", value: vinInfo.Trim });
+                changeInventory({ key: "BodyStyle", value: vinInfo.BodyStyle });
             } else {
                 changeInventory({ key: "Make", value: inventory.Make || vinInfo.Make });
                 changeInventory({ key: "Model", value: inventory.Model || vinInfo.Model });
@@ -159,6 +161,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                 });
                 changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine });
                 changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
+                changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
+                changeInventory({
+                    key: "BodyStyle",
+                    value: inventory.BodyStyle || vinInfo.BodyStyle,
+                });
             }
         }
     };

@@ -20,7 +20,7 @@ export const VINDecoder = ({
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
     const handleGetVinInfo = (vin: string) => {
-        if (vin.length === MAX_VIN_LENGTH) {
+        if (!buttonDisabled) {
             value &&
                 inventoryDecodeVIN(value).then((response) => {
                     if (response) {
