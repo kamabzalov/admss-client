@@ -95,14 +95,10 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         if (authUser) {
             setUser(authUser);
             Promise.all([
-                getInventoryList(authUser.useruid, { total: 1 }),
                 getInventoryLocations(authUser.useruid),
                 getUserGroupList(authUser.useruid),
             ])
-                .then(([inventoryResponse, locationsResponse, userGroupsResponse]) => {
-                    if (inventoryResponse && !Array.isArray(inventoryResponse)) {
-                        setTotalRecords(inventoryResponse.total ?? 0);
-                    }
+                .then(([locationsResponse, userGroupsResponse]) => {
                     if (locationsResponse) {
                         setLocations(locationsResponse);
                     }
