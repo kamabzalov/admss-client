@@ -10,21 +10,19 @@ import { useFormikContext } from "formik";
 
 export const DealGeneralOdometer = observer((): ReactElement => {
     const store = useStore().dealStore;
-    const { values, errors, touched, setFieldValue, getFieldProps } = useFormikContext<
-        Deal & DealExtData
-    >();
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Deal & DealExtData>();
     const {
         dealExtData: { OdomInExcess, OdomNotActual },
         changeDealExtData,
     } = store;
     return (
         <div className='grid deal-general-odometer row-gap-2'>
-            <div className='col-3 relative'>
+            <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
                         {...getFieldProps("OdometerReading")}
                         className={`'deal-odometer__text-input w-full' ${
-                            touched.OdometerReading && errors.OdometerReading ? "p-invalid" : ""
+                            errors.OdometerReading ? "p-invalid" : ""
                         }`}
                         value={values.OdometerReading}
                         onChange={(e) => {
@@ -33,14 +31,10 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         }}
                     />
                     <label className='float-label'>Reading at Time of Sale (r.)</label>
+                    <small className='p-error'>{errors.OdometerReading}</small>
                 </span>
-                <small className='p-error bottom-0'>
-                    {touched.OdometerReading && errors.OdometerReading
-                        ? errors.OdometerReading
-                        : ""}
-                </small>
             </div>
-            <div className='col-3 relative'>
+            <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
                         {...getFieldProps("OdomDigits")}
@@ -52,13 +46,13 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                         options={[5, 6, 7, 8]}
                         filter
                         required
-                        className='w-full deal-odometer__dropdown'
+                        className={`'w-full deal-odometer__dropdown' ${
+                            errors.OdomDigits ? "p-invalid" : ""
+                        }`}
                     />
                     <label className='float-label'>Number of Digits (req.)</label>
+                    <small className='p-error'>{errors.OdomDigits}</small>
                 </span>
-                <small className='p-error bottom-0'>
-                    {touched.OdomDigits && errors.OdomDigits ? errors.OdomDigits : ""}
-                </small>
             </div>
             <div className='col-3'>
                 <div className='deal-odometer__checkbox flex px-2'>
