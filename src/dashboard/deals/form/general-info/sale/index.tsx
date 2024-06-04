@@ -11,31 +11,19 @@ import {
     getDealTypes,
     getSaleTypes,
 } from "http/services/deals.service";
-import { IndexedDealList } from "common/models/deals";
+import { Deal, DealExtData, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
+import { useFormikContext } from "formik";
 
 export const DealGeneralSale = observer((): ReactElement => {
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Deal & DealExtData>();
+
     const store = useStore().dealStore;
     const toast = useToast();
-    const {
-        deal: {
-            dealtype,
-            dealstatus,
-            saletype,
-            inventoryuid,
-            datepurchase,
-            dateeffective,
-            inventorystatus,
-            accountuid,
-            contactuid,
-        },
-        dealExtData,
-        changeDeal,
-        changeDealExtData,
-    } = store;
+    const { deal, changeDeal, changeDealExtData } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
@@ -94,116 +82,150 @@ export const DealGeneralSale = observer((): ReactElement => {
     }, [toast]);
 
     return (
-        <div className='grid deal-general-sale row-gap-2'>
-            <div className='col-6'>
+        <section className='grid deal-general-sale row-gap-2'>
+            <div className='col-6 relative'>
                 <CompanySearch
-                    value={contactuid}
-                    onChange={({ target: { value } }) => changeDeal({ key: "contactuid", value })}
-                    onRowClick={(value) =>
-                        changeDeal({
-                            key: "contactuid",
-                            value,
-                        })
-                    }
+                    {...getFieldProps("contactuid")}
+                    value={values.contactuid}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("contactuid", value);
+                        changeDeal({ key: "contactuid", value });
+                    }}
+                    onRowClick={(value) => {
+                        setFieldValue("contactuid", value);
+                        changeDeal({ key: "contactuid", value });
+                    }}
                     name='Buyer Name (required)'
+                    className={`${errors.contactuid && "p-invalid"}`}
                 />
+                <small className='p-error'>{errors.contactuid}</small>
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InventorySearch
-                        value={inventoryuid}
-                        onChange={({ target: { value } }) =>
-                            changeDeal({ key: "inventoryuid", value })
-                        }
-                        onRowClick={(value) =>
-                            changeDeal({
-                                key: "inventoryuid",
-                                value,
-                            })
-                        }
+                        {...getFieldProps("inventoryuid")}
+                        className={`${errors.inventoryuid && "p-invalid"}`}
+                        onChange={({ target: { value } }) => {
+                            setFieldValue("inventoryuid", value);
+                            changeDeal({ key: "inventoryuid", value });
+                        }}
+                        onRowClick={(value) => {
+                            setFieldValue("inventoryuid", value);
+                            changeDeal({ key: "inventoryuid", value });
+                        }}
                         name='Vehicle (required)'
                     />
-
                     <label className='float-label'></label>
                 </span>
+                <small className='p-error'>{errors.inventoryuid}</small>
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
+                        {...getFieldProps("dealtype")}
                         optionLabel='name'
                         optionValue='id'
                         filter
                         required
                         options={dealTypesList}
-                        value={dealtype}
-                        onChange={(e) => changeDeal({ key: "dealtype", value: e.value })}
-                        className='w-full deal-sale__dropdown'
+                        value={values.dealtype}
+                        onChange={(e) => {
+                            setFieldValue("dealtype", e.value);
+                            changeDeal({ key: "dealtype", value: e.value });
+                        }}
+                        className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
                     />
                     <label className='float-label'>Type of Deal (required)</label>
                 </span>
+                <small className='p-error'>{errors.dealtype}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
+                        {...getFieldProps("dealstatus")}
                         optionLabel='name'
                         optionValue='id'
-                        value={dealstatus}
-                        onChange={(e) => changeDeal({ key: "dealstatus", value: e.value })}
+                        value={values.dealstatus}
+                        onChange={(e) => {
+                            setFieldValue("dealstatus", e.value);
+                            changeDeal({ key: "dealstatus", value: e.value });
+                        }}
                         options={dealStatusesList}
                         filter
                         required
-                        className='w-full deal-sale__dropdown'
+                        className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale status (required)</label>
                 </span>
+                <small className='p-error'>{errors.dealstatus}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
+                        {...getFieldProps("saletype")}
                         optionLabel='name'
                         optionValue='id'
                         filter
                         required
                         options={saleTypesList}
-                        value={saletype}
-                        onChange={(e) => changeDeal({ key: "saletype", value: e.value })}
-                        className='w-full deal-sale__dropdown'
+                        value={values.saletype}
+                        onChange={(e) => {
+                            setFieldValue("saletype", e.value);
+                            changeDeal({ key: "saletype", value: e.value });
+                        }}
+                        className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale type (required)</label>
                 </span>
+                <small className='p-error'>{errors.saletype}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <DateInput
+                    {...getFieldProps("datepurchase")}
+                    className={`${errors.datepurchase && "p-invalid"}`}
                     name='Sale date (required)'
-                    date={Number(datepurchase)}
-                    onChange={({ value }) =>
-                        changeDeal({ key: "datepurchase", value: Number(value) })
-                    }
+                    date={Number(values.datepurchase)}
+                    onChange={({ value }) => {
+                        setFieldValue("datepurchase", Number(value));
+                        changeDeal({ key: "datepurchase", value: Number(value) });
+                    }}
                 />
+                <small className='p-error'>{errors.datepurchase}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <DateInput
+                    {...getFieldProps("dateeffective")}
+                    className={`${errors.dateeffective && "p-invalid"}`}
                     name='First operated (req.)'
-                    value={dateeffective}
-                    onChange={({ value }) =>
-                        changeDeal({ key: "dateeffective", value: Number(value) })
-                    }
+                    value={values.dateeffective}
+                    onChange={({ value }) => {
+                        setFieldValue("dateeffective", Number(value));
+                        changeDeal({ key: "dateeffective", value: Number(value) });
+                    }}
                 />
+                <small className='p-error'>{errors.dateeffective}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
+                        {...getFieldProps("inventorystatus")}
                         optionLabel='name'
                         optionValue='id'
-                        value={inventorystatus}
+                        value={values.inventorystatus}
                         options={inventoryStatusesList}
-                        onChange={(e) => changeDeal({ key: "inventorystatus", value: e.value })}
+                        onChange={(e) => {
+                            setFieldValue("inventorystatus", e.value);
+                            changeDeal({ key: "inventorystatus", value: e.value });
+                        }}
                         filter
                         required
-                        className='w-full deal-sale__dropdown'
+                        className={`w-full deal-sale__dropdown ${
+                            errors.inventorystatus && "p-invalid"
+                        }`}
                     />
                     <label className='float-label'>New or Used (req.)</label>
                 </span>
+                <small className='p-error'>{errors.inventorystatus}</small>
             </div>
 
             <div className='col-12 text-line'>
@@ -212,14 +234,22 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
 
             <div className='col-3'>
-                <DateInput name='Warn Overdue After X Days' />
+                <DateInput
+                    name='Warn Overdue After X Days'
+                    date={deal.warnOverdueDays}
+                    onChange={({ value }) =>
+                        changeDeal({ key: "warnOverdueDays", value: Number(value) })
+                    }
+                />
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-sale__text-input w-full'
-                        value={accountuid}
+                        {...getFieldProps("accountuid")}
+                        className='w-full deal-sale__text-input'
+                        value={values.accountuid}
                         onChange={({ target: { value } }) => {
+                            setFieldValue("accountuid", value);
                             changeDeal({ key: "accountuid", value });
                         }}
                     />
@@ -229,33 +259,42 @@ export const DealGeneralSale = observer((): ReactElement => {
 
             <hr className='col-12 form-line' />
 
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        value={dealExtData.HowFoundOut}
-                        onChange={(e) => changeDealExtData({ key: "HowFoundOut", value: e.value })}
+                        {...getFieldProps("HowFoundOut")}
+                        required
+                        {...getFieldProps("HowFoundOut")}
+                        value={values.HowFoundOut}
+                        onChange={(e) => {
+                            setFieldValue("HowFoundOut", e.value);
+                            changeDealExtData({ key: "HowFoundOut", value: e.value });
+                        }}
                         editable
                         filter
-                        required
-                        className='w-full deal-sale__dropdown'
+                        className={`w-full deal-sale__dropdown ${
+                            errors.HowFoundOut && "p-invalid"
+                        }`}
                     />
                     <label className='float-label'>How did you hear about us? (required)</label>
                 </span>
+                <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-sale__text-input w-full'
-                        value={dealExtData.SaleID}
-                        onChange={(e) =>
-                            changeDealExtData({ key: "SaleID", value: e.target.value })
-                        }
+                        {...getFieldProps("SaleID")}
+                        className={`deal-sale__text-input w-full ${errors.SaleID && "p-invalid"}`}
+                        value={values.SaleID}
+                        onChange={(e) => {
+                            setFieldValue("SaleID", e.target.value);
+                            changeDealExtData({ key: "SaleID", value: e.target.value });
+                        }}
                     />
                     <label className='float-label'>ROS SaleID (required)</label>
                 </span>
+                <small className='p-error'>{errors.SaleID}</small>
             </div>
-        </div>
+        </section>
     );
 });

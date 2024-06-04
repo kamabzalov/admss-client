@@ -36,7 +36,7 @@ export interface VehicleDecodeInfo {
     mileage: number;
     options_codes: unknown;
     options_info: unknown;
-    trim: string;
+    Trim: string;
 }
 
 export const inventoryDecodeVIN = async (vin: string): Promise<VehicleDecodeInfo | undefined> => {
