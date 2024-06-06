@@ -154,7 +154,7 @@ export const PrintDealForms = observer((): ReactElement => {
                                 className='deal-print__accordion-tab'
                             >
                                 {prints.map((print) => (
-                                    <DealPrintItem item={print} />
+                                    <DealPrintItem key={print.itemuid} item={print} />
                                 ))}
                             </AccordionTab>
                         );
