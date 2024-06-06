@@ -154,7 +154,7 @@ export const PrintDealForms = observer((): ReactElement => {
                                 className='deal-print__accordion-tab'
                             >
                                 {prints.map((print) => (
-                                    <DealPrintItem item={print} />
+                                    <DealPrintItem key={print.itemuid} item={print} />
                                 ))}
                             </AccordionTab>
                         );
@@ -166,6 +166,7 @@ export const PrintDealForms = observer((): ReactElement => {
                         onClick={() => handlePrintSelectedForms(true)}
                         severity={isButtonDisabled ? "secondary" : "success"}
                         disabled={isButtonDisabled}
+                        type='button'
                     >
                         Print
                     </Button>
@@ -174,6 +175,7 @@ export const PrintDealForms = observer((): ReactElement => {
                         onClick={() => handlePrintSelectedForms()}
                         disabled={isButtonDisabled}
                         severity={isButtonDisabled ? "secondary" : "success"}
+                        type='button'
                     >
                         Download
                     </Button>
@@ -181,6 +183,7 @@ export const PrintDealForms = observer((): ReactElement => {
                         className='p-button deal-print__button'
                         outlined
                         onClick={() => setSelectedPrints(null)}
+                        type='button'
                     >
                         Clear all
                     </Button>
