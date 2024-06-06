@@ -26,15 +26,16 @@ import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import { Inventory as InventoryModel } from "common/models/inventory";
+import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
 
 type PartialInventory = Pick<
     InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClass" | "StockNo" | "TypeOfFuel"
->;
+    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
+> &
+    Pick<InventoryExtData, "purPurchasedFrom" | "purPurchaseDate">;
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
@@ -62,9 +63,11 @@ export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.objec
         })
         .required("Data is required."),
     locationuid: Yup.string().trim().required("Data is required."),
-    GroupClass: Yup.number().required("Data is required."),
+    GroupClassName: Yup.string().trim().required("Data is required."),
     StockNo: Yup.string().trim().required("Data is required."),
     TypeOfFuel: Yup.string().trim().required("Data is required."),
+    purPurchasedFrom: Yup.string().trim().required("Data is required."),
+    purPurchaseDate: Yup.number().required("Data is required."),
 });
 
 export const InventoryForm = observer(() => {
@@ -89,6 +92,7 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
+        inventoryExtData,
         isFormChanged,
     } = store;
     const navigate = useNavigate();
@@ -98,7 +102,7 @@ export const InventoryForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
-    const formikRef = useRef<FormikProps<InventoryModel>>(null);
+    const formikRef = useRef<FormikProps<PartialInventory>>(null);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -312,10 +316,16 @@ export const InventoryForm = observer(() => {
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
                                                     Year: inventory.Year || MIN_YEAR,
+                                                    TypeOfFuel: inventory?.TypeOfFuel || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid: inventory?.locationuid || "",
-                                                    GroupClass: inventory?.GroupClass || 0,
-                                                } as InventoryModel
+                                                    GroupClassName: inventory?.GroupClassName || "",
+                                                    purPurchasedFrom:
+                                                        inventoryExtData?.purPurchasedFrom || "",
+                                                    purPurchaseDate:
+                                                        inventoryExtData?.purPurchaseDate ||
+                                                        new Date().getMilliseconds(),
+                                                } as PartialInventory
                                             }
                                             enableReinitialize
                                             validateOnChange={false}
@@ -326,7 +336,7 @@ export const InventoryForm = observer(() => {
                                                 toast.current?.show({
                                                     severity: "success",
                                                     summary: "Success",
-                                                    detail: "Deal saved successfully",
+                                                    detail: "Inventory saved successfully",
                                                 });
                                             }}
                                         >

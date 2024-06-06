@@ -55,6 +55,13 @@ const initialMediaItem: UploadMediaItem = {
     },
 };
 
+const initialAuditState: Partial<Audit> = {
+    DataNeedsUpdate: 0,
+    NeedsCleaning: 0,
+    ReadyForSale: 0,
+    JustArrived: 0,
+};
+
 export class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
@@ -62,7 +69,7 @@ export class InventoryStore {
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryPayments: AccountPayment = {} as AccountPayment;
-    private _inventoryAudit: Audit = {} as Audit;
+    private _inventoryAudit: Audit = initialAuditState as Audit;
 
     private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
@@ -172,7 +179,7 @@ export class InventoryStore {
                 this._inventoryOptions = options_info || [];
 
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
-                this._inventoryAudit = Audit || ({} as Audit);
+                this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
         } finally {
@@ -613,6 +620,7 @@ export class InventoryStore {
 
     public clearInventory = () => {
         this._inventory = {} as Inventory;
+        this._inventoryAudit = initialAuditState as Audit;
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
