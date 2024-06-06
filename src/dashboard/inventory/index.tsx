@@ -470,7 +470,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, selectedFilterOptions, currentLocation, selectedInventoryType]);
+    }, [
+        serverSettings,
+        globalSearch,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {

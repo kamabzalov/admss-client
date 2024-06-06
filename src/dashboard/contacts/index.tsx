@@ -169,7 +169,14 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
                     setServerSettings(allSettings);
                     const { contacts: settings } = allSettings;
                     settings?.activeColumns &&
@@ -243,7 +250,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                             severity='success'
                             type='button'
                             tooltip='Add new contact'
-                            onClick={() => navigate("create")}
+                            onClick={() => navigate("/dashboard/contacts/create")}
                         />
                         <Button
                             severity='success'
