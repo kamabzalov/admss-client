@@ -12,11 +12,13 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { useFormik } from "formik";
-import { InventoryExtData } from "common/models/inventory";
+import { useFormikContext } from "formik";
+import { Inventory, InventoryExtData } from "common/models/inventory";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
+
+    const { values, errors, setFieldValue } = useFormikContext<Inventory & InventoryExtData>();
     const {
         inventoryExtData: {
             purLotNo,
@@ -33,63 +35,29 @@ export const PurchasePurchases = observer((): ReactElement => {
             purPurchasePhone,
             purPurchaseEmail,
             purPurchaseZipCode,
-            purPurchasedFrom,
             purSoldByLot,
             purPurchaseCheckMemo,
         },
         changeInventoryExtData,
     } = store;
 
-    const formik = useFormik({
-        initialValues: {
-            purPurchasedFrom,
-        } as Partial<InventoryExtData>,
-        enableReinitialize: true,
-        validate: (data) => {
-            let errors: any = {};
-
-            if (!data.purPurchasedFrom) {
-                errors.purPurchasedFrom = "Data is required.";
-            } else {
-                changeInventoryExtData({ key: "purPurchasedFrom", value: data.purPurchasedFrom });
-            }
-
-            return errors;
-        },
-        validateOnChange: true,
-        onSubmit: () => {},
-    });
-
-    const isFormFieldInvalid = (name: keyof InventoryExtData) => {
-        return !!formik.values[name];
-    };
-
-    const getFormErrorMessage = (name: keyof InventoryExtData) => {
-        return isFormFieldInvalid(name) ? (
-            <small className='p-error'>&nbsp;</small>
-        ) : (
-            <small className='p-error'>{formik.errors[name]}</small>
-        );
-    };
-
     return (
         <div className='grid purchase-purchases row-gap-2'>
             <div className='col-6 relative'>
                 <CompanySearch
                     name='Purchased From (required)'
-                    value={formik.values.purPurchasedFrom}
-                    onChange={({ target: { value } }) =>
-                        formik.setFieldValue("purPurchasedFrom", value)
-                    }
-                    onRowClick={(companyName) =>
+                    value={values.purPurchasedFrom}
+                    onChange={({ target: { value } }) => setFieldValue("purPurchasedFrom", value)}
+                    onRowClick={(companyName) => {
+                        setFieldValue("purPurchasedFrom", companyName);
                         changeInventoryExtData({
                             key: "purPurchasedFrom",
                             value: companyName,
-                        })
-                    }
-                    className={`${!isFormFieldInvalid("purPurchasedFrom") && "p-invalid"}`}
+                        });
+                    }}
+                    className={errors.purPurchasedFrom ? "p-invalid" : ""}
                 />
-                {getFormErrorMessage("purPurchasedFrom")}
+                <small className='p-error'>{errors.purPurchasedFrom}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -232,17 +200,20 @@ export const PurchasePurchases = observer((): ReactElement => {
                     }}
                 />
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <DateInput
                     name='Date (required)'
                     date={purPurchaseDate}
                     onChange={({ value }) => {
+                        setFieldValue("purPurchaseDate", value);
                         changeInventoryExtData({
                             key: "purPurchaseDate",
                             value: Number(value),
                         });
                     }}
+                    className={errors.purPurchaseDate ? "p-invalid" : ""}
                 />
+                <small className='p-error'>{errors.purPurchaseDate}</small>
             </div>
             <div className='col-3'>
                 <CurrencyInput

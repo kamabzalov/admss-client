@@ -199,7 +199,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='description'
-                        optionValue='itemuid'
+                        optionValue='description'
                         filter
                         options={groupClassList}
                         value={values?.GroupClassName}
@@ -217,7 +217,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>Inventory group (required)</label>
                 </span>
-                <small className='p-error'>{errors.GroupClass}</small>
+                <small className='p-error'>{errors.GroupClassName}</small>
             </div>
 
             <div className='col-12'>
@@ -254,7 +254,10 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='vehicle-general__text-input w-full'
+                        className={
+                            "vehicle-general__text-input w-full" +
+                            (errors.StockNo ? " p-invalid" : "")
+                        }
                         value={values.StockNo}
                         onChange={({ target: { value } }) => {
                             setFieldValue("StockNo", value);
