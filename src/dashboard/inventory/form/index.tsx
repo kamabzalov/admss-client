@@ -23,41 +23,14 @@ import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 import { Loader } from "dashboard/common/loader";
-import { Form, Formik, FormikProps } from "formik";
-import * as Yup from "yup";
-
-import { Inventory as InventoryModel } from "common/models/inventory";
-import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
-
-type PartialInventory = Pick<
-    InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClass" | "StockNo"
->;
-
-const MIN_YEAR = 1970;
-const MAX_YEAR = new Date().getFullYear();
-
-export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.object().shape({
-    VIN: Yup.string().trim().required("Data is required."),
-    Make: Yup.string().trim().required("Data is required."),
-    Model: Yup.string().trim().required("Data is required."),
-    Year: Yup.string()
-        .min(MIN_YEAR, `Must be greater than ${MIN_YEAR}`)
-        .max(MAX_YEAR, `Must be less than ${MAX_YEAR}`)
-        .required("Data is required."),
-    locationuid: Yup.string().trim().required("Data is required."),
-    GroupClass: Yup.number().required("Data is required."),
-    StockNo: Yup.string().trim().required("Data is required."),
-});
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
-    const toast = useToast();
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -83,9 +56,6 @@ export const InventoryForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
-    const formikRef = useRef<FormikProps<InventoryModel>>(null);
-
-    const year = parseInt(inventory.Year, 10);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -158,25 +128,19 @@ export const InventoryForm = observer(() => {
         setStepActiveIndex(printActiveIndex);
     };
 
+    const handleSave = () => {
+        saveInventory().then((res) => {
+            if (res && !id) {
+                navigate(`/dashboard/inventory`);
+            }
+        });
+    };
+
     const handleDeleteInventory = () => {
         id &&
             deleteInventory(id, { reason, comment }).then(
                 (response) => response && navigate("/dashboard/inventory")
             );
-    };
-
-    const handleSaveInventoryForm = () => {
-        formikRef.current?.validateForm().then((errors) => {
-            if (!Object.keys(errors).length) {
-                formikRef.current?.submitForm();
-            } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
-                });
-            }
-        });
     };
 
     return (
@@ -214,78 +178,43 @@ export const InventoryForm = observer(() => {
                                         className='inventory__accordion'
                                         multiple
                                     >
-                                        <Formik
-                                            innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema}
-                                            initialValues={
-                                                {
-                                                    VIN: inventory?.VIN || "",
-                                                    Make: inventory.Make,
-                                                    Model: inventory.Model,
-                                                    Year: String(year),
-                                                    StockNo: inventory?.StockNo || "",
-                                                    locationuid: inventory?.locationuid || "",
-                                                    GroupClass: inventory?.GroupClass || 0,
-                                                } as InventoryModel
-                                            }
-                                            enableReinitialize
-                                            validateOnChange={false}
-                                            validateOnBlur={false}
-                                            onSubmit={() => {
-                                                saveInventory();
-                                                navigate(`/dashboard/inventory`);
-                                                toast.current?.show({
-                                                    severity: "success",
-                                                    summary: "Success",
-                                                    detail: "Deal saved successfully",
-                                                });
-                                            }}
-                                        >
-                                            <Form name='inventoryForm'>
-                                                {inventorySections.map((section) => (
-                                                    <AccordionTab
-                                                        key={section.sectionId}
-                                                        header={section.label}
-                                                    >
-                                                        <Steps
-                                                            readOnly={false}
-                                                            activeIndex={
-                                                                stepActiveIndex - section.startIndex
-                                                            }
-                                                            onSelect={(e) => {
-                                                                setStepActiveIndex(
-                                                                    e.index + section.startIndex
+                                        {inventorySections.map((section) => (
+                                            <AccordionTab
+                                                key={section.sectionId}
+                                                header={section.label}
+                                            >
+                                                <Steps
+                                                    readOnly={false}
+                                                    activeIndex={
+                                                        stepActiveIndex - section.startIndex
+                                                    }
+                                                    onSelect={(e) => {
+                                                        setStepActiveIndex(
+                                                            e.index + section.startIndex
+                                                        );
+                                                    }}
+                                                    model={section.items.map(
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
                                                                 );
-                                                            }}
-                                                            model={section.items.map(
-                                                                ({ itemLabel, template }, idx) => ({
-                                                                    label: itemLabel,
-                                                                    template,
-                                                                    command: () => {
-                                                                        navigate(
-                                                                            getUrl(
-                                                                                section.startIndex +
-                                                                                    idx
-                                                                            )
-                                                                        );
-                                                                    },
-                                                                })
-                                                            )}
-                                                            className='vertical-step-menu'
-                                                            pt={{
-                                                                menu: {
-                                                                    className: "flex-column w-full",
-                                                                },
-                                                                step: {
-                                                                    className:
-                                                                        "border-circle inventory-step",
-                                                                },
-                                                            }}
-                                                        />
-                                                    </AccordionTab>
-                                                ))}
-                                            </Form>
-                                        </Formik>
+                                                            },
+                                                        })
+                                                    )}
+                                                    className='vertical-step-menu'
+                                                    pt={{
+                                                        menu: { className: "flex-column w-full" },
+                                                        step: {
+                                                            className:
+                                                                "border-circle inventory-step",
+                                                        },
+                                                    }}
+                                                />
+                                            </AccordionTab>
+                                        ))}
                                     </Accordion>
                                     {id && (
                                         <Button
@@ -438,9 +367,9 @@ export const InventoryForm = observer(() => {
                                     </Button>
                                 ) : (
                                     <Button
+                                        onClick={handleSave}
                                         className='uppercase px-6 inventory__button'
                                         disabled={!isFormValid}
-                                        onClick={handleSaveInventoryForm}
                                     >
                                         Save
                                     </Button>
