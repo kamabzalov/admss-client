@@ -85,9 +85,10 @@ export class InventoryStore {
     private _documents: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
+    private _formErrorIndex: number[] = [];
 
     protected _isLoading = false;
-    protected _isFormValid = false;
+    protected _isFormChanged = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -151,16 +152,12 @@ export class InventoryStore {
         return this._isLoading;
     }
 
-    public get isFormValid() {
-        return this._isFormValid;
+    public get isFormChanged() {
+        return this._isFormChanged;
     }
 
-    public set exportWebActive(state: boolean) {
-        this._exportWebActive = state;
-    }
-
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
+    public get formErrorIndex(): number[] {
+        return this._formErrorIndex;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -180,6 +177,7 @@ export class InventoryStore {
         } catch (error) {
         } finally {
             this._isLoading = false;
+            this._isFormChanged = false;
         }
     };
 
@@ -279,6 +277,7 @@ export class InventoryStore {
     public changeInventory = action(
         ({ key, value }: { key: keyof Inventory; value: string | number }) => {
             if (this._inventory && key !== "extdata" && key !== "options_info" && key !== "Audit") {
+                this._isFormChanged = true;
                 (this._inventory as Record<typeof key, string | number>)[key] = value;
             }
         }
@@ -288,6 +287,7 @@ export class InventoryStore {
         ({ key, value }: { key: keyof InventoryExtData; value: string | number }) => {
             const inventoryStore = this.rootStore.inventoryStore;
             if (inventoryStore) {
+                this._isFormChanged = true;
                 const { inventoryExtData } = inventoryStore;
                 (inventoryExtData as Record<typeof key, string | number>)[key] = value;
             }
@@ -297,6 +297,7 @@ export class InventoryStore {
     public changeInventoryOptions = action((optionName: InventoryOptionsInfo) => {
         const inventoryStore = this.rootStore.inventoryStore;
         if (inventoryStore) {
+            this._isFormChanged = true;
             const { inventoryOptions } = inventoryStore;
 
             if (inventoryOptions.includes(optionName)) {
@@ -312,6 +313,7 @@ export class InventoryStore {
         const inventoryStore = this.rootStore.inventoryStore;
         if (inventoryStore) {
             const { inventoryAudit } = inventoryStore;
+            this._isFormChanged = true;
             const newValue = !!inventoryAudit[key] ? 0 : 1;
             (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
         }
@@ -322,6 +324,7 @@ export class InventoryStore {
             const inventoryStore = this.rootStore.inventoryStore;
             if (inventoryStore) {
                 const { inventoryExportWeb } = inventoryStore;
+                this._isFormChanged = true;
                 (inventoryExportWeb as Record<typeof key, string | number>)[key] = value;
             }
         }
@@ -596,9 +599,16 @@ export class InventoryStore {
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
+    }
 
-    public set isFormValid(state: boolean) {
-        this._isFormValid = state;
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
+
+    public set formErrorIndex(state: number[]) {
+        this._formErrorIndex = state;
     }
 
     public clearInventory = () => {

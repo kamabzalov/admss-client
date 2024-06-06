@@ -250,7 +250,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                             severity='success'
                             type='button'
                             tooltip='Add new contact'
-                            onClick={() => navigate("create")}
+                            onClick={() => navigate("/dashboard/contacts/create")}
                         />
                         <Button
                             severity='success'

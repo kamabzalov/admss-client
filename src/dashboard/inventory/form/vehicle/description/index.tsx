@@ -1,5 +1,5 @@
 import { Inventory } from "common/models/inventory";
-import { useFormik } from "formik";
+import { useFormikContext } from "formik";
 import {
     ListData,
     getInventoryTransmissionTypesList,
@@ -16,7 +16,9 @@ import { useStore } from "store/hooks";
 
 export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory } = store;
+    const { inventory, changeInventory, formErrorIndex } = store;
+
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
@@ -45,37 +47,12 @@ export const VehicleDescription = observer((): ReactElement => {
         });
     }, []);
 
-    const formik = useFormik({
-        initialValues: {
-            TypeOfFuel: inventory.TypeOfFuel,
-        } as Partial<Inventory>,
-        enableReinitialize: true,
-        validate: (data) => {
-            let errors: any = {};
+    useEffect(() => {
+        if (errors.TypeOfFuel) {
+            store.formErrorIndex = [...formErrorIndex, 2];
+        }
+    }, [errors, formErrorIndex, store]);
 
-            if (!data.TypeOfFuel) {
-                errors.TypeOfFuel = "Data is required.";
-            } else {
-                changeInventory({ key: "TypeOfFuel", value: data.TypeOfFuel });
-            }
-
-            return errors;
-        },
-        validateOnChange: true,
-        onSubmit: () => {},
-    });
-
-    const isFormFieldInvalid = (name: keyof Inventory) => {
-        return !!formik.errors[name] && formik.touched[name];
-    };
-
-    const getFormErrorMessage = (name: keyof Inventory) => {
-        return isFormFieldInvalid(name) ? (
-            <small className='p-error'>&nbsp;</small>
-        ) : (
-            <small className='p-error'>{formik.errors[name]}</small>
-        );
-    };
     return (
         <div className='grid vehicle-description row-gap-2'>
             <div className='col-6'>
@@ -84,8 +61,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
-                        value={inventory?.Transmission}
-                        onChange={({ value }) => changeInventory({ key: "Transmission", value })}
+                        value={inventory.Transmission}
+                        onChange={({ value }) => {
+                            changeInventory({ key: "Transmission", value });
+                        }}
                         options={transmissionList}
                         className='w-full vehicle-description__dropdown'
                     />
@@ -99,8 +78,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
-                        value={inventory?.BodyStyle}
-                        onChange={({ value }) => changeInventory({ key: "BodyStyle", value })}
+                        value={values.BodyStyle}
+                        onChange={({ value }) => {
+                            changeInventory({ key: "BodyStyle", value });
+                        }}
                         options={bodyTypeList}
                         className='w-full vehicle-description__dropdown'
                         panelStyle={{ maxWidth: "250px" }}
@@ -112,22 +93,24 @@ export const VehicleDescription = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
+                        {...getFieldProps("TypeOfFuel")}
                         optionLabel='name'
                         optionValue='name'
                         filter
                         options={fuelList}
-                        value={formik.values.TypeOfFuel}
-                        onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
+                        value={values.TypeOfFuel}
+                        onChange={({ value }) => {
+                            setFieldValue("TypeOfFuel", value);
+                            changeInventory({ key: "TypeOfFuel", value });
+                        }}
                         className={`vehicle-description__dropdown w-full ${
-                            formik.touched.TypeOfFuel &&
-                            !isFormFieldInvalid("TypeOfFuel") &&
-                            "p-invalid"
+                            errors.TypeOfFuel ? "p-invalid" : ""
                         }`}
                         panelStyle={{ maxWidth: "250px" }}
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
-                {getFormErrorMessage("TypeOfFuel")}
+                <small className='p-error'>{errors.TypeOfFuel}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -135,8 +118,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
-                        value={inventory?.DriveLine}
-                        onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
+                        value={values.DriveLine}
+                        onChange={({ value }) => {
+                            changeInventory({ key: "DriveLine", value });
+                        }}
                         options={driveLineList}
                         className='w-full vehicle-description__dropdown'
                         panelStyle={{ maxWidth: "250px" }}
@@ -151,8 +136,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
-                        value={inventory?.Cylinders}
-                        onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
+                        value={values.Cylinders}
+                        onChange={({ value }) => {
+                            changeInventory({ key: "Cylinders", value });
+                        }}
                         options={cylindersList}
                         className='w-full vehicle-description__dropdown'
                         panelStyle={{ maxWidth: "250px" }}
@@ -166,9 +153,11 @@ export const VehicleDescription = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='name'
-                        value={inventory?.Engine}
+                        value={values.Engine}
                         filter
-                        onChange={({ value }) => changeInventory({ key: "Engine", value })}
+                        onChange={({ value }) => {
+                            changeInventory({ key: "Engine", value });
+                        }}
                         options={engineList}
                         className='w-full vehicle-description__dropdown'
                     />

@@ -46,7 +46,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "ModelCode", value })
                         }
-                        disabled={!exportWebActive}
                     />
                     <label className='float-label'>Model Code</label>
                 </span>
@@ -55,8 +54,7 @@ export const ExportWebPrice = observer((): ReactElement => {
                 <CurrencyInput
                     value={ListPrice}
                     labelPosition='top'
-                    title='List price (required)'
-                    disabled={!exportWebActive}
+                    title='List price'
                     onChange={({ value }) => value && changeExportWeb({ key: "ListPrice", value })}
                 />
             </div>
@@ -65,7 +63,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={SpecialPrice}
                     labelPosition='top'
                     title='Special price'
-                    disabled={!exportWebActive}
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "SpecialPrice", value })
                     }
@@ -76,7 +73,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={CostPrice}
                     labelPosition='top'
                     title='Cost price'
-                    disabled={!exportWebActive}
                     onChange={({ value }) => value && changeExportWeb({ key: "CostPrice", value })}
                 />
             </div>
@@ -85,7 +81,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={ExtraPrice1}
                     labelPosition='top'
                     title='Extra price 1'
-                    disabled={!exportWebActive}
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "ExtraPrice1", value })
                     }
@@ -96,7 +91,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={ExtraPrice2}
                     labelPosition='top'
                     title='Extra price 2'
-                    disabled={!exportWebActive}
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "ExtraPrice2", value })
                     }
@@ -107,7 +101,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={ExtraPrice3}
                     labelPosition='top'
                     title='Extra price 3'
-                    disabled={!exportWebActive}
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "ExtraPrice3", value })
                     }
@@ -121,7 +114,6 @@ export const ExportWebPrice = observer((): ReactElement => {
                     placeholder='Dealer comments on vehicle'
                     className='w-full export-web-price__text-area'
                     value={DealerComments}
-                    disabled={!exportWebActive}
                     onChange={({ target: { value } }) =>
                         changeExportWeb({ key: "DealerComments", value })
                     }

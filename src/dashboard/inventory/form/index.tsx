@@ -23,14 +23,56 @@ import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 import { Loader } from "dashboard/common/loader";
+import { Form, Formik, FormikProps } from "formik";
+import * as Yup from "yup";
+
+import { Inventory as InventoryModel } from "common/models/inventory";
+import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
+
+type PartialInventory = Pick<
+    InventoryModel,
+    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClass" | "StockNo" | "TypeOfFuel"
+>;
+
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
+
+export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.object().shape({
+    VIN: Yup.string().trim().required("Data is required."),
+    Make: Yup.string().trim().required("Data is required."),
+    Model: Yup.string().trim().required("Data is required."),
+    Year: Yup.string()
+        .test("is-valid-year", `Must be between ${MIN_YEAR} and ${MAX_YEAR}`, function (value) {
+            if (!value) {
+                return this.createError({ message: "Data is required." });
+            }
+            const year = Number(value);
+            if (isNaN(year)) {
+                return this.createError({ message: "Year must be a number." });
+            }
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        })
+        .required("Data is required."),
+    locationuid: Yup.string().trim().required("Data is required."),
+    GroupClass: Yup.number().required("Data is required."),
+    StockNo: Yup.string().trim().required("Data is required."),
+    TypeOfFuel: Yup.string().trim().required("Data is required."),
+});
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
+    const toast = useToast();
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -47,7 +89,7 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
-        isFormValid,
+        isFormChanged,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -56,6 +98,7 @@ export const InventoryForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const formikRef = useRef<FormikProps<InventoryModel>>(null);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -128,19 +171,25 @@ export const InventoryForm = observer(() => {
         setStepActiveIndex(printActiveIndex);
     };
 
-    const handleSave = () => {
-        saveInventory().then((res) => {
-            if (res && !id) {
-                navigate(`/dashboard/inventory`);
-            }
-        });
-    };
-
     const handleDeleteInventory = () => {
         id &&
             deleteInventory(id, { reason, comment }).then(
                 (response) => response && navigate("/dashboard/inventory")
             );
+    };
+
+    const handleSaveInventoryForm = () => {
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
     };
 
     return (
@@ -157,17 +206,28 @@ export const InventoryForm = observer(() => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
-                            <div className='card-header-info'>
-                                Stock#
-                                <span className='card-header-info__data'>{inventory?.StockNo}</span>
-                                Make
-                                <span className='card-header-info__data'>{inventory?.Make}</span>
-                                Model
-                                <span className='card-header-info__data'>{inventory?.Model}</span>
-                                Year
-                                <span className='card-header-info__data'>{inventory?.Year}</span>
-                                VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
-                            </div>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Stock#
+                                    <span className='card-header-info__data'>
+                                        {inventory?.StockNo}
+                                    </span>
+                                    Make
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Make}
+                                    </span>
+                                    Model
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Model}
+                                    </span>
+                                    Year
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Year}
+                                    </span>
+                                    VIN
+                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content'>
@@ -206,7 +266,9 @@ export const InventoryForm = observer(() => {
                                                     )}
                                                     className='vertical-step-menu'
                                                     pt={{
-                                                        menu: { className: "flex-column w-full" },
+                                                        menu: {
+                                                            className: "flex-column w-full",
+                                                        },
                                                         step: {
                                                             className:
                                                                 "border-circle inventory-step",
@@ -241,27 +303,57 @@ export const InventoryForm = observer(() => {
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
-                                        {inventorySections.map((section) =>
-                                            section.items.map((item: InventoryItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block inventory-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='inventory-form__title uppercase'>
-                                                        {item.itemLabel}
-                                                    </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
+                                        <Formik
+                                            innerRef={formikRef}
+                                            validationSchema={InventoryFormSchema}
+                                            initialValues={
+                                                {
+                                                    VIN: inventory?.VIN || "",
+                                                    Make: inventory.Make,
+                                                    Model: inventory.Model,
+                                                    Year: inventory.Year || MIN_YEAR,
+                                                    StockNo: inventory?.StockNo || "",
+                                                    locationuid: inventory?.locationuid || "",
+                                                    GroupClass: inventory?.GroupClass || 0,
+                                                } as InventoryModel
+                                            }
+                                            enableReinitialize
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
+                                            onSubmit={() => {
+                                                saveInventory();
+                                                navigate(`/dashboard/inventory`);
+                                                toast.current?.show({
+                                                    severity: "success",
+                                                    summary: "Success",
+                                                    detail: "Deal saved successfully",
+                                                });
+                                            }}
+                                        >
+                                            <Form name='inventoryForm' className='w-full'>
+                                                {inventorySections.map((section) =>
+                                                    section.items.map((item: InventoryItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block inventory-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='inventory-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </Form>
+                                        </Formik>
 
                                         {stepActiveIndex === printActiveIndex && (
                                             <div className='inventory-form'>
@@ -367,9 +459,10 @@ export const InventoryForm = observer(() => {
                                     </Button>
                                 ) : (
                                     <Button
-                                        onClick={handleSave}
                                         className='uppercase px-6 inventory__button'
-                                        disabled={!isFormValid}
+                                        onClick={handleSaveInventoryForm}
+                                        severity={isFormChanged ? "success" : "secondary"}
+                                        disabled={!isFormChanged}
                                     >
                                         Save
                                     </Button>
