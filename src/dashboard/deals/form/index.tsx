@@ -231,7 +231,7 @@ export const DealsForm = observer(() => {
                                                 });
                                             }}
                                         >
-                                            <Form name='dealForm'>
+                                            <Form name='dealForm' className='w-full'>
                                                 {dealsSections.map((section) =>
                                                     section.items.map((item: DealsItem) => (
                                                         <div

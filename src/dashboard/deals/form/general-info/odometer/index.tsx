@@ -30,7 +30,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                             changeDealExtData({ key: "OdometerReading", value: e.target.value });
                         }}
                     />
-                    <label className='float-label'>Reading at Time of Sale (r.)</label>
+                    <label className='float-label'>Reading at Time of Sale (required)</label>
                     <small className='p-error'>{errors.OdometerReading}</small>
                 </span>
             </div>
@@ -50,7 +50,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                             errors.OdomDigits ? "p-invalid" : ""
                         }`}
                     />
-                    <label className='float-label'>Number of Digits (req.)</label>
+                    <label className='float-label'>Number of Digits (required)</label>
                     <small className='p-error'>{errors.OdomDigits}</small>
                 </span>
             </div>
