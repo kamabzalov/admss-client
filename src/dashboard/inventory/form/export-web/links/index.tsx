@@ -6,14 +6,13 @@ import { useStore } from "store/hooks";
 
 export const ExportWebLinks = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryExportWeb, changeExportWeb, exportWebActive } = store;
+    const { inventoryExportWeb, changeExportWeb } = store;
     return (
         <div className='grid export-web-links row-gap-2'>
             <div className='col-12'>
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.VDPLink}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "VDPLink", value })
                         }
@@ -30,7 +29,6 @@ export const ExportWebLinks = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.VideoURL}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "VideoURL", value })
                         }
@@ -44,7 +42,6 @@ export const ExportWebLinks = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.PhotoURL}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "PhotoURL", value })
                         }

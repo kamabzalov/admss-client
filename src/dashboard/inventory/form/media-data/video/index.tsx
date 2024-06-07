@@ -44,7 +44,8 @@ export const VideoMedia = observer((): ReactElement => {
         isLoading,
         removeMedia,
         fetchVideos,
-        clearInventory,
+        clearMedia,
+        isFormChanged,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
@@ -52,12 +53,14 @@ export const VideoMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        id && getInventory(id).then(() => fetchVideos());
+        if (id) {
+            isFormChanged ? fetchVideos() : getInventory(id).then(() => fetchVideos());
+        }
         if (videos.length) {
             setVideoChecked(new Array(videos.length).fill(checked));
         }
         return () => {
-            clearInventory();
+            clearMedia();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchVideos, checked, id]);

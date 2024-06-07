@@ -44,7 +44,8 @@ export const ImagesMedia = observer((): ReactElement => {
         removeMedia,
         fetchImages,
         changeInventoryMediaOrder,
-        clearInventory,
+        clearMedia,
+        isFormChanged,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
@@ -52,12 +53,14 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        id && getInventory(id).then(() => fetchImages());
+        if (id) {
+            isFormChanged ? fetchImages() : getInventory(id).then(() => fetchImages());
+        }
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
         }
         return () => {
-            clearInventory();
+            clearMedia();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchImages, checked, id]);

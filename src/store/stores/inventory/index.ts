@@ -618,11 +618,7 @@ export class InventoryStore {
         this._formErrorIndex = state;
     }
 
-    public clearInventory = () => {
-        this._inventory = {} as Inventory;
-        this._inventoryAudit = initialAuditState as Audit;
-        this._inventoryOptions = [];
-        this._inventoryExtData = {} as InventoryExtData;
+    public clearMedia = () => {
         this._inventoryImagesID = [];
         this._images = [];
         this._inventoryVideoID = [];
@@ -631,8 +627,16 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
+    };
+
+    public clearInventory = () => {
+        this._inventory = {} as Inventory;
+        this._inventoryAudit = initialAuditState as Audit;
+        this._inventoryOptions = [];
+        this._inventoryExtData = {} as InventoryExtData;
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
+        this.clearMedia();
     };
 }

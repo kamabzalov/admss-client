@@ -39,8 +39,9 @@ export const AudioMedia = observer((): ReactElement => {
         audios,
         isLoading,
         removeMedia,
+        clearMedia,
         fetchAudios,
-        clearInventory,
+        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -48,12 +49,14 @@ export const AudioMedia = observer((): ReactElement => {
     const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        id && getInventory(id).then(() => fetchAudios());
+        if (id) {
+            isFormChanged ? fetchAudios() : getInventory(id).then(() => fetchAudios());
+        }
         if (audios.length) {
             setAudioChecked(new Array(audios.length).fill(checked));
         }
         return () => {
-            clearInventory();
+            clearMedia();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchAudios, checked, id]);

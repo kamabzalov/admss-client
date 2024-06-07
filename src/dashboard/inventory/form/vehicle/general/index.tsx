@@ -339,15 +339,17 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className={`vehicle-general__text-input w-full ${
                             errors.Year ? "p-invalid" : ""
                         }`}
-                        required
                         useGrouping={false}
-                        value={parseInt(values.Year)}
+                        value={parseInt(values.Year) || null}
                         onChange={({ value }) => {
+                            if (!value) {
+                                return changeInventory({ key: "Year", value: "" });
+                            }
                             setFieldValue("Year", value);
                             changeInventory({ key: "Year", value: String(value) });
                         }}
                     />
-                    <label className='float-label'>Year (required)</label>
+                    <label className='float-label'>Year</label>
                 </span>
                 <small className='p-error'>{errors.Year}</small>
             </div>
