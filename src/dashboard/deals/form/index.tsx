@@ -20,19 +20,32 @@ import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
 
-export const DealFormSchema = Yup.object().shape({
+type PartialDeal = Pick<
+    Deal,
+    | "contactuid"
+    | "inventoryuid"
+    | "dealtype"
+    | "dealstatus"
+    | "saletype"
+    | "datepurchase"
+    | "dateeffective"
+    | "inventorystatus"
+> &
+    Pick<DealExtData, "HowFoundOut" | "SaleID" | "OdometerReading" | "OdomDigits">;
+
+export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
     contactuid: Yup.string().required("Data is required."),
     inventoryuid: Yup.string().required("Data is required."),
-    dealtype: Yup.string().required("Data is required."),
-    dealstatus: Yup.string().required("Data is required."),
-    saletype: Yup.string().required("Data is required."),
+    dealtype: Yup.number().required("Data is required."),
+    dealstatus: Yup.number().required("Data is required."),
+    saletype: Yup.number().required("Data is required."),
     datepurchase: Yup.string().required("Data is required."),
     dateeffective: Yup.string().required("Data is required."),
-    inventorystatus: Yup.string().required("Data is required."),
+    inventorystatus: Yup.number().required("Data is required."),
     HowFoundOut: Yup.string().required("Data is required."),
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
-    OdomDigits: Yup.string().required("Data is required."),
+    OdomDigits: Yup.number().required("Data is required."),
 });
 
 export const DealsForm = observer(() => {
