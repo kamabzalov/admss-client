@@ -202,18 +202,15 @@ export const PurchasePurchases = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <DateInput
-                    name='Date (required)'
+                    name='Date'
                     date={purPurchaseDate}
                     onChange={({ value }) => {
-                        setFieldValue("purPurchaseDate", value);
                         changeInventoryExtData({
                             key: "purPurchaseDate",
                             value: Number(value),
                         });
                     }}
-                    className={errors.purPurchaseDate ? "p-invalid" : ""}
                 />
-                <small className='p-error'>{errors.purPurchaseDate}</small>
             </div>
             <div className='col-3'>
                 <CurrencyInput

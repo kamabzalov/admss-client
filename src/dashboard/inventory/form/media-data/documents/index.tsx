@@ -38,7 +38,8 @@ export const DocumentsMedia = observer((): ReactElement => {
         isLoading,
         removeMedia,
         fetchDocuments,
-        clearInventory,
+        clearMedia,
+        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -46,12 +47,14 @@ export const DocumentsMedia = observer((): ReactElement => {
     const [documentChecked, setDocumentChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        id && getInventory(id).then(() => fetchDocuments());
+        if (id) {
+            isFormChanged ? fetchDocuments() : getInventory(id).then(() => fetchDocuments());
+        }
         if (documents.length) {
             setDocumentChecked(new Array(documents.length).fill(checked));
         }
         return () => {
-            clearInventory();
+            clearMedia();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchDocuments, checked, id]);

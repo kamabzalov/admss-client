@@ -7,7 +7,6 @@ export const ExportWebDates = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
         inventoryExportWeb: { InStockDate, LastModifiedDate, LastExportDate },
-        exportWebActive,
         changeExportWeb,
     } = store;
 
@@ -19,7 +18,6 @@ export const ExportWebDates = observer((): ReactElement => {
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "InStockDate", value: Number(value) })
                     }
-                    disabled={!exportWebActive}
                     name='In Stock Date'
                 />
             </div>
@@ -32,7 +30,6 @@ export const ExportWebDates = observer((): ReactElement => {
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "LastModifiedDate", value: Number(value) })
                     }
-                    disabled={!exportWebActive}
                     name='Last Modified Date'
                 />
             </div>
@@ -42,7 +39,6 @@ export const ExportWebDates = observer((): ReactElement => {
                     onChange={({ value }) =>
                         value && changeExportWeb({ key: "LastExportDate", value: Number(value) })
                     }
-                    disabled={!exportWebActive}
                     name='Last Export Date'
                 />
             </div>

@@ -50,8 +50,11 @@ export const VehicleDescription = observer((): ReactElement => {
     useEffect(() => {
         if (errors.TypeOfFuel) {
             store.formErrorIndex = [...formErrorIndex, 2];
+        } else {
+            store.formErrorIndex = formErrorIndex.filter((index) => index !== 2);
         }
-    }, [errors, formErrorIndex, store]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [errors]);
 
     return (
         <div className='grid vehicle-description row-gap-2'>
