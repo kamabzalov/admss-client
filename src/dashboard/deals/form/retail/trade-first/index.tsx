@@ -1,35 +1,31 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
+    getInventoryBodyTypesList,
     getInventoryExteriorColorsList,
 } from "http/services/inventory-service";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { useFormik } from "formik";
+import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
-
-const MIN_YEAR = 1970;
-const MAX_YEAR = new Date().getFullYear();
-const mileage = 0;
+import { PartialDeal } from "dashboard/deals/form";
+import { VINDecoder } from "dashboard/common/form/vin-decoder";
+import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
         dealExtData: {
-            Trade1_VIN,
-            Trade1_Make,
-            Trade1_Model,
-            Trade1_Year,
-            Trade1_Mileage,
             Trade1_Color,
             Trade1_BodyStyle,
             Trade1_Title_Num,
@@ -40,18 +36,18 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_Lien_Payoff,
             Trade1_Lien_Payoff_Good_Through,
             Trade1_Lien_Name,
-            Trade1_Lien_Address,
-            Trade1_Lien_Phone,
             Trade1_Lien_Contact,
         },
         deal: { addToInventory },
         changeDeal,
         changeDealExtData,
     } = store;
+    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
-    const [automakesModelList] = useState<ListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
+    const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
@@ -63,10 +59,30 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 setAutomakesList(upperCasedList);
             }
         });
+        getInventoryBodyTypesList().then((list) => {
+            list && setBodyTypeList(list);
+        });
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
         });
     }, []);
+
+    const handleSelectMake = useCallback(() => {
+        const makeSting = values.Trade1_Make.toLowerCase().replaceAll(" ", "");
+        if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
+            getAutoMakeModelList(makeSting).then((list) => {
+                if (list && Object.keys(list).length) {
+                    setAutomakesModelList(list);
+                } else {
+                    setAutomakesModelList([]);
+                }
+            });
+        }
+    }, [automakesList, values.Trade1_Make]);
+
+    useEffect(() => {
+        if (values.Trade1_Make) handleSelectMake();
+    }, [handleSelectMake, values.Trade1_Make]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -98,164 +114,126 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         );
     };
 
-    const formik = useFormik({
-        initialValues: {
-            VIN: Trade1_VIN || "",
-            Make: Trade1_Make || "",
-            Model: Trade1_Model || "",
-            Year: Trade1_Year || "",
-            mileage: Trade1_Mileage || "",
-        },
-        enableReinitialize: true,
-        validate: (data) => {
-            let errors: any = {};
+    const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
+        if (vinInfo) {
+            changeDealExtData({ key: "Trade1_Make", value: vinInfo.Make });
+            changeDealExtData({ key: "Trade1_Model", value: vinInfo.Model });
+            changeDealExtData({ key: "Trade1_Year", value: vinInfo.Year });
 
-            if (!data.VIN) {
-                errors.VIN = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade1_VIN", value: data.VIN });
-            }
-
-            if (!data.Make) {
-                errors.Make = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade1_Make", value: data.Make });
-            }
-
-            if (!data.Model) {
-                errors.Model = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade1_Model", value: data.Model });
-            }
-            if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
-                switch (true) {
-                    case Number(data.Year) < MIN_YEAR:
-                        errors.Year = `Must be greater than ${MIN_YEAR}`;
-                        break;
-                    case Number(data.Year) > MAX_YEAR:
-                        errors.Year = `Must be less than ${MAX_YEAR}`;
-                        break;
-                    default:
-                        errors.Year = "Data is required.";
-                }
-            } else {
-                changeDealExtData({ key: "Trade1_Year", value: data.Year });
-            }
-
-            if (!data.mileage) {
-                errors.mileage = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade1_Mileage", value: data.mileage });
-            }
-
-            return errors;
-        },
-        onSubmit: () => {},
-    });
+            changeDealExtData({
+                key: "Trade1_StockNum",
+                value: vinInfo.StockNo,
+            });
+            changeDealExtData({
+                key: "Trade1_BodyStyle",
+                value: vinInfo.BodyStyle,
+            });
+        }
+    };
 
     return (
         <div className='grid deal-retail-trade row-gap-2'>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...formik.getFieldProps("VIN")}
-                        className={`deal-trade__text-input w-full ${
-                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
-                        }`}
-                        value={formik.values.VIN}
-                        onChange={({ target: { value } }) => {
-                            formik.setFieldValue("VIN", value);
-                        }}
-                    />
-                    <label className='float-label'>VIN (required)</label>
-                </span>
-                <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
+                <VINDecoder
+                    value={values.Trade1_VIN}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("Trade1_VIN", value);
+                        changeDealExtData({ key: "Trade1_VIN", value });
+                    }}
+                    onAction={handleVINchange}
+                    className={`${errors.Trade1_VIN ? "p-invalid" : ""}`}
+                />
+                <small className='p-error'>{errors.Trade1_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...formik.getFieldProps("Make")}
                         optionLabel='name'
                         optionValue='name'
-                        value={formik.values.Make}
+                        value={values.Trade1_Make}
                         filter
                         required
                         options={automakesList}
-                        onChange={({ value }) => formik.setFieldValue("Make", value)}
+                        onChange={({ value }) => {
+                            setFieldValue("Trade1_Make", value);
+                            changeDealExtData({ key: "Trade1_Make", value });
+                        }}
                         valueTemplate={selectedAutoMakesTemplate}
                         itemTemplate={autoMakesOptionTemplate}
                         className={`deal-trade__dropdown w-full ${
-                            formik.touched.Make && formik.errors.Make && "p-invalid"
+                            errors.Trade1_Make ? "p-invalid" : ""
                         }`}
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
 
-                <small className='p-error'>
-                    {(formik.touched.Make && formik.errors.Make) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade1_Make || ""}</small>
             </div>
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...formik.getFieldProps("Model")}
                         optionLabel='name'
                         optionValue='name'
-                        value={formik.values.Model}
+                        value={values.Trade1_Model}
                         filter={!!automakesModelList.length}
                         editable={!automakesModelList.length}
                         options={automakesModelList}
-                        onChange={({ value }) => formik.setFieldValue("Model", value)}
-                        className={`deal-trade__dropdown w-full ${
-                            formik.touched.Model && formik.errors.Model && "p-invalid"
-                        }`}
+                        onChange={({ value }) => {
+                            setFieldValue("Model", value);
+                            changeDealExtData({ key: "Trade1_Model", value });
+                        }}
+                        className={`deal-trade__dropdown w-full ${errors.Trade1_Model} ? "p-invalid" : ""}`}
                     />
                     <label className='float-label'>Model (required)</label>
                 </span>
-                <small className='p-error'>
-                    {(formik.touched.Model && formik.errors.Model) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade1_Model}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
-                        {...formik.getFieldProps("Year")}
                         className={`deal-trade__text-input w-full ${
-                            formik.touched.Year && formik.errors.Year && "p-invalid"
+                            errors.Trade1_Year ? "p-invalid" : ""
                         }`}
                         required
                         min={0}
-                        value={MIN_YEAR}
                         useGrouping={false}
-                        onChange={({ value }) => formik.setFieldValue("Year", value)}
+                        value={parseInt(values.Trade1_Year) || null}
+                        onChange={({ value }) => {
+                            if (!value) {
+                                return changeDealExtData({ key: "Trade1_Year", value: "" });
+                            }
+                            setFieldValue("Trade1_Year", value);
+                            changeDealExtData({ key: "Trade1_Year", value: String(value) });
+                        }}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                <small className='p-error'>
-                    {(formik.touched.Year && formik.errors.Year) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade1_Year}</small>
             </div>
 
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
-                        {...formik.getFieldProps("mileage")}
                         className={`deal-trade__text-input w-full ${
-                            formik.touched.mileage && formik.errors.mileage && "p-invalid"
+                            errors.Trade1_Mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={mileage}
-                        minFractionDigits={2}
+                        value={parseFloat(values?.Trade1_Mileage) || 0}
+                        useGrouping={false}
                         min={0}
-                        onChange={({ value }) => formik.setFieldValue("mileage", value)}
+                        onChange={({ value }) => {
+                            setFieldValue("Trade1_Mileage", value);
+                            changeDealExtData({
+                                key: "Trade1_Mileage",
+                                value: value ? String(value) : "0",
+                            });
+                        }}
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
 
-                <small className='p-error'>
-                    {(formik.touched.mileage && formik.errors.mileage) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade1_Mileage || ""}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -277,7 +255,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        //TODO: add options
                         optionLabel='name'
                         optionValue='name'
                         value={Trade1_BodyStyle}
@@ -285,7 +262,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             changeDealExtData({ key: "Trade1_BodyStyle", value });
                         }}
                         editable
-                        options={[{ name: Trade1_BodyStyle }]}
+                        options={bodyTypeList}
                         filter
                         className='w-full deal-trade__dropdown'
                     />
@@ -398,10 +375,10 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     title='Payoff Amount'
                 />
             </div>
-            {/* TODO: Add calendar checkbox */}
             <div className='col-3'>
                 <DateInput
                     date={Trade1_Lien_Payoff_Good_Through}
+                    checkbox
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({
@@ -430,30 +407,38 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-trade__text-input w-full'
-                        value={Trade1_Lien_Address}
+                        className={`'deal-trade__text-input w-full' ${
+                            errors.Trade1_Lien_Address ? "p-invalid" : ""
+                        }`}
+                        value={values.Trade1_Lien_Address}
                         onChange={({ target: { value } }) => {
+                            setFieldValue("Trade1_Lien_Address", value);
                             changeDealExtData({ key: "Trade1_Lien_Address", value });
                         }}
                     />
                     <label className='float-label'>Mailing address</label>
                 </span>
+                <small className='p-error'>{errors.Trade1_Lien_Address}</small>
             </div>
 
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-trade__text-input w-full'
-                        value={Trade1_Lien_Phone}
+                        className={`'deal-trade__text-input w-full' ${
+                            errors.Trade1_Lien_Phone ? "p-invalid" : ""
+                        }`}
+                        value={values.Trade1_Lien_Phone}
                         onChange={({ target: { value } }) => {
+                            setFieldValue("Trade1_Lien_Phone", value);
                             changeDealExtData({ key: "Trade1_Lien_Phone", value });
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>
+                <small className='p-error'>{errors.Trade1_Lien_Phone}</small>
             </div>
             <div className='col-6'>
                 <CompanySearch

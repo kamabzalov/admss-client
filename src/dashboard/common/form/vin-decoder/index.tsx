@@ -6,20 +6,22 @@ import "./index.css";
 
 interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
+    buttonClassName?: string;
 }
-const MIN_VIN_LENGTH = 7;
-const MAX_VIN_LENGTH = 17;
+export const MIN_VIN_LENGTH = 7;
+export const MAX_VIN_LENGTH = 17;
 
 export const VINDecoder = ({
     value,
     onAction,
     onChange,
     disabled,
+    buttonClassName,
     ...props
 }: VINDecoderProps): ReactElement => {
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
-    const handleGetVinInfo = (vin: string) => {
+    const handleGetVinInfo = () => {
         if (!buttonDisabled) {
             value &&
                 inventoryDecodeVIN(value).then((response) => {
@@ -41,19 +43,20 @@ export const VINDecoder = ({
     return (
         <span className='p-float-label vin-decoder'>
             <InputText
-                className={`vin-decoder__text-input`}
+                {...props}
+                className={`vin-decoder__text-input ${props.className}`}
                 value={value}
                 maxLength={MAX_VIN_LENGTH}
                 onChange={handleInputChange}
-                {...props}
             />
             <Button
-                className='vin-decoder__decode-button'
+                className={`vin-decoder__decode-button ${buttonClassName}`}
                 severity={
                     (value && value.length < MIN_VIN_LENGTH) || disabled ? "secondary" : "success"
                 }
                 disabled={buttonDisabled || disabled}
-                onClick={() => value && handleGetVinInfo(value)}
+                type='button'
+                onClick={() => value && handleGetVinInfo()}
             >
                 Decode
             </Button>

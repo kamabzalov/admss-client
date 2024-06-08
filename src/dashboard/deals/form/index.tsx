@@ -17,6 +17,7 @@ import { Form, Formik, FormikProps } from "formik";
 import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
+import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 
 const STEP = "step";
 
@@ -33,7 +34,25 @@ export type PartialDeal = Pick<
 > &
     Pick<
         DealExtData,
-        "HowFoundOut" | "SaleID" | "OdometerReading" | "OdomDigits" | "First_Lien_Phone_Num"
+        | "HowFoundOut"
+        | "SaleID"
+        | "OdometerReading"
+        | "OdomDigits"
+        | "First_Lien_Phone_Num"
+        | "Trade1_Make"
+        | "Trade1_Model"
+        | "Trade1_VIN"
+        | "Trade1_Year"
+        | "Trade1_Mileage"
+        | "Trade1_Lien_Address"
+        | "Trade1_Lien_Phone"
+        | "Trade2_Make"
+        | "Trade2_Model"
+        | "Trade2_VIN"
+        | "Trade2_Year"
+        | "Trade2_Mileage"
+        | "Trade2_Lien_Address"
+        | "Trade2_Lien_Phone"
     >;
 
 export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
@@ -50,6 +69,32 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
     First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+    Trade1_Make: Yup.string().required("Data is required."),
+    Trade1_Model: Yup.string().required("Data is required."),
+    Trade1_VIN: Yup.string()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
+    Trade1_Year: Yup.string().required("Data is required."),
+    Trade1_Mileage: Yup.string().required("Data is required."),
+    Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
+    Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+    Trade2_Make: Yup.string().required("Data is required."),
+    Trade2_Model: Yup.string().required("Data is required."),
+    Trade2_VIN: Yup.string()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
+    Trade2_Year: Yup.string().required("Data is required."),
+    Trade2_Mileage: Yup.string().required("Data is required."),
+    Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
+    Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -237,6 +282,26 @@ export const DealsForm = observer(() => {
                                                     OdomDigits: dealExtData?.OdomDigits || "",
                                                     First_Lien_Phone_Num:
                                                         dealExtData?.First_Lien_Phone_Num || "",
+                                                    Trade1_Make: dealExtData?.Trade1_Make || "",
+                                                    Trade1_Model: dealExtData?.Trade1_Model || "",
+                                                    Trade1_VIN: dealExtData?.Trade1_VIN || "",
+                                                    Trade1_Year: dealExtData?.Trade1_Year || "",
+                                                    Trade1_Mileage:
+                                                        dealExtData?.Trade1_Mileage || "",
+                                                    Trade1_Lien_Address:
+                                                        dealExtData?.Trade1_Lien_Address || "",
+                                                    Trade1_Lien_Phone:
+                                                        dealExtData?.Trade1_Lien_Phone || "",
+                                                    Trade2_Make: dealExtData?.Trade2_Make || "",
+                                                    Trade2_Model: dealExtData?.Trade2_Model || "",
+                                                    Trade2_VIN: dealExtData?.Trade2_VIN || "",
+                                                    Trade2_Year: dealExtData?.Trade2_Year || "",
+                                                    Trade2_Mileage:
+                                                        dealExtData?.Trade2_Mileage || "",
+                                                    Trade2_Lien_Address:
+                                                        dealExtData?.Trade2_Lien_Address || "",
+                                                    Trade2_Lien_Phone:
+                                                        dealExtData?.Trade2_Lien_Phone || "",
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
                                             enableReinitialize
