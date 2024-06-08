@@ -20,7 +20,7 @@ import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
 
-type PartialDeal = Pick<
+export type PartialDeal = Pick<
     Deal,
     | "contactuid"
     | "inventoryuid"
@@ -31,7 +31,10 @@ type PartialDeal = Pick<
     | "dateeffective"
     | "inventorystatus"
 > &
-    Pick<DealExtData, "HowFoundOut" | "SaleID" | "OdometerReading" | "OdomDigits">;
+    Pick<
+        DealExtData,
+        "HowFoundOut" | "SaleID" | "OdometerReading" | "OdomDigits" | "First_Lien_Phone_Num"
+    >;
 
 export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
     contactuid: Yup.string().required("Data is required."),
@@ -46,6 +49,10 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
+    First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
 });
 
 export const DealsForm = observer(() => {
@@ -219,15 +226,17 @@ export const DealsForm = observer(() => {
                                                     dealtype: deal.dealtype,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
-                                                    datepurchase: deal.datepurchase,
-                                                    dateeffective: deal.dateeffective,
-                                                    inventorystatus: deal.inventorystatus,
+                                                    datepurchase: deal.datepurchase || "",
+                                                    dateeffective: deal.dateeffective || "",
+                                                    inventorystatus: deal.inventorystatus || "",
                                                     accountuid: deal.accountuid || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
                                                     SaleID: dealExtData?.SaleID || "",
                                                     OdometerReading:
                                                         dealExtData?.OdometerReading || "",
                                                     OdomDigits: dealExtData?.OdomDigits || "",
+                                                    First_Lien_Phone_Num:
+                                                        dealExtData?.First_Lien_Phone_Num || "",
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
                                             enableReinitialize

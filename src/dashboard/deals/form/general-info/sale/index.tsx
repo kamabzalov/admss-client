@@ -9,25 +9,31 @@ import {
     getDealInventoryStatuses,
     getDealStatuses,
     getDealTypes,
+    getHowToKnowList,
     getSaleTypes,
 } from "http/services/deals.service";
-import { Deal, DealExtData, IndexedDealList } from "common/models/deals";
+import { HowToKnowListResponse, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
+import { PartialDeal } from "../..";
 
 export const DealGeneralSale = observer((): ReactElement => {
-    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Deal & DealExtData>();
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
 
     const store = useStore().dealStore;
+    const userStore = useStore().userStore;
     const toast = useToast();
+
+    const { authUser } = userStore;
     const { deal, changeDeal, changeDealExtData } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
+    const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnowListResponse>[]>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
 
     useEffect(() => {
@@ -80,6 +86,14 @@ export const DealGeneralSale = observer((): ReactElement => {
             }
         });
     }, [toast]);
+
+    useEffect(() => {
+        if (authUser?.useruid) {
+            getHowToKnowList(authUser?.useruid).then((res) => {
+                if (Array.isArray(res) && res.length) setHowToKnowList(res as any);
+            });
+        }
+    }, [authUser, toast]);
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
@@ -247,7 +261,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     <InputText
                         {...getFieldProps("accountuid")}
                         className='w-full deal-sale__text-input'
-                        value={values.accountuid}
+                        value={deal.accountuid}
                         onChange={({ target: { value } }) => {
                             setFieldValue("accountuid", value);
                             changeDeal({ key: "accountuid", value });
@@ -264,7 +278,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                     <Dropdown
                         {...getFieldProps("HowFoundOut")}
                         required
-                        {...getFieldProps("HowFoundOut")}
+                        optionLabel='description'
+                        optionValue='itemuid'
+                        options={howToKnowList}
                         value={values.HowFoundOut}
                         onChange={(e) => {
                             setFieldValue("HowFoundOut", e.value);
