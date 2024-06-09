@@ -286,12 +286,6 @@ export const InventoryForm = observer(() => {
                                                     }}
                                                     model={section.items.map(
                                                         ({ itemLabel, template }, idx) => {
-                                                            // eslint-disable-next-line no-console
-                                                            console.log(
-                                                                itemLabel,
-                                                                errorSections,
-                                                                errorSections.includes(itemLabel)
-                                                            );
                                                             return {
                                                                 label: itemLabel,
                                                                 template,
