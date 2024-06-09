@@ -285,6 +285,14 @@
     background: var(--admss-app-light-green);
 }
 
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-invalid
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    border-color: var(--admss-app-red);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);

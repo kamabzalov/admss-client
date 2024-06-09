@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common";
+import { AccordionItems, Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
 const ExportWebPrice = lazy(() =>
@@ -23,11 +23,11 @@ const ExportWebHistory = lazy(() =>
 export const InventoryExportWebData: Pick<Inventory, "label" | "items"> = {
     label: "Export to WEB",
     items: [
-        { itemLabel: "Price and comments", component: <ExportWebPrice /> },
-        { itemLabel: "Dates", component: <ExportWebDates /> },
-        { itemLabel: "Links", component: <ExportWebLinks /> },
-        { itemLabel: "Fuel Economy", component: <ExportWebFuel /> },
-        { itemLabel: "Extra data", component: <ExportWebExtra /> },
-        { itemLabel: "History", component: <ExportWebHistory /> },
+        { itemLabel: AccordionItems.PRICE, component: <ExportWebPrice /> },
+        { itemLabel: AccordionItems.DATES, component: <ExportWebDates /> },
+        { itemLabel: AccordionItems.LINKS, component: <ExportWebLinks /> },
+        { itemLabel: AccordionItems.FUEL, component: <ExportWebFuel /> },
+        { itemLabel: AccordionItems.EXTRA, component: <ExportWebExtra /> },
+        { itemLabel: AccordionItems.HISTORY, component: <ExportWebHistory /> },
     ],
 };

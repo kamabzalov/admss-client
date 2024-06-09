@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
-import { Inventory, InventoryItem, InventorySection } from "../common";
+import { AccordionItems, Inventory, InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -36,6 +36,20 @@ type PartialInventory = Pick<
     "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
 > &
     Pick<InventoryExtData, "purPurchasedFrom">;
+
+const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
+    [AccordionItems.GENERAL]: [
+        "VIN",
+        "Make",
+        "Model",
+        "Year",
+        "locationuid",
+        "GroupClassName",
+        "StockNo",
+    ],
+    [AccordionItems.DESCRIPTION]: ["TypeOfFuel"],
+    [AccordionItems.PURCHASES]: ["purPurchasedFrom"],
+};
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
@@ -99,6 +113,7 @@ export const InventoryForm = observer(() => {
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<PartialInventory>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
+    const [errorSections, setErrorSections] = useState<string[]>([]);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -184,6 +199,21 @@ export const InventoryForm = observer(() => {
                 formikRef.current?.submitForm();
             } else {
                 setValidateOnMount(true);
+
+                const sectionsWithErrors = Object.keys(errors);
+                const currentSectionsWithErrors: string[] = [];
+                Object.entries(tabFields).forEach(([key, value]) => {
+                    value.forEach((field) => {
+                        if (
+                            sectionsWithErrors.includes(field) &&
+                            !currentSectionsWithErrors.includes(key)
+                        ) {
+                            currentSectionsWithErrors.push(key);
+                        }
+                    });
+                });
+                setErrorSections(currentSectionsWithErrors);
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
@@ -255,15 +285,32 @@ export const InventoryForm = observer(() => {
                                                         );
                                                     }}
                                                     model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
-                                                                );
-                                                            },
-                                                        })
+                                                        ({ itemLabel, template }, idx) => {
+                                                            // eslint-disable-next-line no-console
+                                                            console.log(
+                                                                itemLabel,
+                                                                errorSections,
+                                                                errorSections.includes(itemLabel)
+                                                            );
+                                                            return {
+                                                                label: itemLabel,
+                                                                template,
+                                                                command: () => {
+                                                                    navigate(
+                                                                        getUrl(
+                                                                            section.startIndex + idx
+                                                                        )
+                                                                    );
+                                                                },
+                                                                className: `${
+                                                                    errorSections.includes(
+                                                                        itemLabel
+                                                                    )
+                                                                        ? "section-invalid"
+                                                                        : ""
+                                                                }`,
+                                                            };
+                                                        }
                                                     )}
                                                     className='vertical-step-menu'
                                                     pt={{

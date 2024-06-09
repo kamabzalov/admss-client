@@ -1,10 +1,38 @@
+/* eslint-disable no-unused-vars */
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
+export enum AccordionItems {
+    GENERAL = "General",
+    DESCRIPTION = "Description",
+    OPTIONS = "Options",
+    CHECKS = "Checks",
+    INSPECTIONS = "Inspections",
+    KEYS = "Keys",
+    DISCLOSURES = "Disclosures",
+    OTHER = "Other",
+    FLOORPLAN = "Floorplan",
+    CONSIGN = "Consign",
+    TITLE = "Title",
+    PURCHASES = "Purchases",
+    EXPENSES = "Expenses",
+    PAYMENTS = "Payments",
+    PRICE = "Price and comments",
+    DATES = "Dates",
+    LINKS = "Links",
+    FUEL = "Fuel Economy",
+    EXTRA = "Extra data",
+    HISTORY = "History",
+    IMAGES = "Images",
+    VIDEO = "Video",
+    AUDIO = "Audio",
+    DOCUMENTS = "Documents",
+}
+
 export interface InventoryItem extends MenuItem {
-    itemLabel: string;
+    itemLabel: AccordionItems | string;
     itemIndex?: number;
     component?: ReactElement;
 }

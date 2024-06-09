@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common";
+import { AccordionItems, Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
 const PurchaseFloorplan = lazy(() =>
@@ -23,11 +23,11 @@ const PurchasePayments = lazy(() =>
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",
     items: [
-        { itemLabel: "Floorplan", component: <PurchaseFloorplan /> },
-        { itemLabel: "Consign", component: <PurchaseConsign /> },
-        { itemLabel: "Title", component: <PurchaseTitle /> },
-        { itemLabel: "Purchases", component: <PurchasePurchases /> },
-        { itemLabel: "Expenses", component: <PurchaseExpenses /> },
-        { itemLabel: "Payments", component: <PurchasePayments /> },
+        { itemLabel: AccordionItems.FLOORPLAN, component: <PurchaseFloorplan /> },
+        { itemLabel: AccordionItems.CONSIGN, component: <PurchaseConsign /> },
+        { itemLabel: AccordionItems.TITLE, component: <PurchaseTitle /> },
+        { itemLabel: AccordionItems.PURCHASES, component: <PurchasePurchases /> },
+        { itemLabel: AccordionItems.EXPENSES, component: <PurchaseExpenses /> },
+        { itemLabel: AccordionItems.PAYMENTS, component: <PurchasePayments /> },
     ],
 };
