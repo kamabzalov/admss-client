@@ -93,3 +93,21 @@
 .deal .p-inputtext {
     width: 100%;
 }
+
+.trade-overwrite {
+    display: flex;
+    align-items: center;
+}
+
+.trade-overwrite__label {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.trade-overwrite__icon {
+    margin-left: 6px;
+    padding-top: 2px;
+    font-size: 16px;
+    color: var(--admss-app-main-blue);
+}

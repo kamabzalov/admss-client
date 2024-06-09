@@ -48,6 +48,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
@@ -116,23 +117,43 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
 
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo) {
-            changeDealExtData({ key: "Trade2_Make", value: vinInfo.Make });
-            changeDealExtData({ key: "Trade2_Model", value: vinInfo.Model });
-            changeDealExtData({ key: "Trade2_Year", value: vinInfo.Year });
+            if (allowOverwrite) {
+                changeDealExtData({ key: "Trade2_Make", value: vinInfo.Make });
+                changeDealExtData({ key: "Trade2_Model", value: vinInfo.Model });
+                changeDealExtData({ key: "Trade2_Year", value: vinInfo.Year });
 
-            changeDealExtData({
-                key: "Trade2_StockNum",
-                value: vinInfo.StockNo,
-            });
-            changeDealExtData({
-                key: "Trade2_BodyStyle",
-                value: vinInfo.BodyStyle,
-            });
+                changeDealExtData({
+                    key: "Trade2_StockNum",
+                    value: vinInfo.StockNo,
+                });
+                changeDealExtData({
+                    key: "Trade2_BodyStyle",
+                    value: vinInfo.BodyStyle,
+                });
+            } else {
+                setFieldValue("Trade2_Make", values.Trade2_Make || vinInfo.Make);
+                setFieldValue("Trade2_Model", values.Trade2_Model || vinInfo.Model);
+                setFieldValue("Trade2_Year", values.Trade2_Year || vinInfo.Year);
+                setFieldValue("Trade2_StockNum", Trade2_StockNum || vinInfo.StockNo);
+                setFieldValue("Trade2_BodyStyle", Trade2_BodyStyle || vinInfo.BodyStyle);
+            }
         }
     };
 
     return (
         <div className='grid deal-retail-trade row-gap-2'>
+            <div className='col-12'>
+                <div className='trade-overwrite pb-3'>
+                    <Checkbox
+                        checked={allowOverwrite}
+                        id='trade-overwrite'
+                        className='trade-overwrite__checkbox'
+                        onChange={() => setAllowOverwrite(!allowOverwrite)}
+                    />
+                    <label className='pl-3 trade-overwrite__label'>Overwrite data</label>
+                    <i className='icon adms-help trade-overwrite__icon' />
+                </div>
+            </div>
             <div className='col-6 relative'>
                 <VINDecoder
                     value={values.Trade2_VIN}
