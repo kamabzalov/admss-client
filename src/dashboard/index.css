@@ -293,8 +293,17 @@
     border-color: var(--admss-app-red);
 }
 
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-valid
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    background-color: var(--admss-app-green);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
     }
+}
 }

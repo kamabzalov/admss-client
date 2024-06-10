@@ -285,26 +285,20 @@ export const InventoryForm = observer(() => {
                                                         );
                                                     }}
                                                     model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => {
-                                                            return {
-                                                                label: itemLabel,
-                                                                template,
-                                                                command: () => {
-                                                                    navigate(
-                                                                        getUrl(
-                                                                            section.startIndex + idx
-                                                                        )
-                                                                    );
-                                                                },
-                                                                className: `${
-                                                                    errorSections.includes(
-                                                                        itemLabel
-                                                                    )
-                                                                        ? "section-invalid"
-                                                                        : ""
-                                                                }`,
-                                                            };
-                                                        }
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
+                                                                );
+                                                            },
+                                                            className: errorSections.length
+                                                                ? errorSections.includes(itemLabel)
+                                                                    ? "section-invalid"
+                                                                    : "section-valid"
+                                                                : "",
+                                                        })
                                                     )}
                                                     className='vertical-step-menu'
                                                     pt={{
