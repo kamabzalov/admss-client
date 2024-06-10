@@ -7,6 +7,8 @@ import { Dropdown } from "primereact/dropdown";
 import { STATES_LIST } from "common/constants/states";
 import { DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
+import { useFormikContext } from "formik";
+import { PartialDeal } from "dashboard/deals/form";
 
 export const DealRetailLiens = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -14,7 +16,6 @@ export const DealRetailLiens = observer((): ReactElement => {
         changeDealExtData,
         dealExtData: {
             First_Lien_Name,
-            First_Lien_Phone_Num,
             First_Lien_Address,
             First_Lien_State,
             First_Lien_City,
@@ -24,6 +25,8 @@ export const DealRetailLiens = observer((): ReactElement => {
             First_Lien_Lienholder_ID,
         },
     } = store;
+
+    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
     return (
         <div className='grid deal-retail-liens row-gap-2'>
             <div className='col-6'>
@@ -41,17 +44,21 @@ export const DealRetailLiens = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-liens__text-input w-full'
-                        value={First_Lien_Phone_Num}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "First_Lien_Phone_Num", value })
-                        }
+                        className={`'deal-liens__text-input w-full' ${
+                            errors.First_Lien_Phone_Num ? "p-invalid" : ""
+                        }`}
+                        value={values.First_Lien_Phone_Num}
+                        onChange={({ target: { value } }) => {
+                            setFieldValue("First_Lien_Phone_Num", value);
+                            changeDealExtData({ key: "First_Lien_Phone_Num", value });
+                        }}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>
+                <small className='p-error'>{errors.First_Lien_Phone_Num}</small>
             </div>
 
             <hr className='form-line' />
@@ -71,7 +78,7 @@ export const DealRetailLiens = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
+                        optionLabel='id'
                         optionValue='id'
                         options={STATES_LIST}
                         value={First_Lien_State}

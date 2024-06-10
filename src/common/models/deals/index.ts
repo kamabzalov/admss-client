@@ -403,3 +403,11 @@ export interface DealPickupPayment {
     updated: string;
     useruid: string;
 }
+
+export interface HowToKnow {
+    created: string;
+    updated: string;
+    itemuid: string;
+    useruid: string;
+    description: string;
+}

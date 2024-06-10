@@ -285,6 +285,10 @@
     background: var(--admss-app-light-green);
 }
 
+.p-dropdown-panel.p-component {
+    max-width: 250px;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
