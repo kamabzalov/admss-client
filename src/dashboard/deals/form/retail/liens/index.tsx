@@ -8,7 +8,7 @@ import { STATES_LIST } from "common/constants/states";
 import { DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
-import { PartialDeal } from "../..";
+import { PartialDeal } from "dashboard/deals/form";
 
 export const DealRetailLiens = observer((): ReactElement => {
     const store = useStore().dealStore;

@@ -18,7 +18,7 @@ import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
-import { PartialDeal } from "../..";
+import { PartialDeal } from "dashboard/deals/form";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
