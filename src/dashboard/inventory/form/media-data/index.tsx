@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common";
+import { AccordionItems, Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 const MediaDataImages = lazy(() =>
     import("./images").then((module) => ({ default: module.ImagesMedia }))
@@ -16,9 +16,9 @@ const MediaDataDocuments = lazy(() =>
 export const InventoryMediaData: Pick<Inventory, "label" | "items"> = {
     label: "Media data",
     items: [
-        { itemLabel: "Images", component: <MediaDataImages /> },
-        { itemLabel: "Video", component: <MediaDataVideo /> },
-        { itemLabel: "Audio", component: <MediaDataAudio /> },
-        { itemLabel: "Documents", component: <MediaDataDocuments /> },
+        { itemLabel: AccordionItems.IMAGES, component: <MediaDataImages /> },
+        { itemLabel: AccordionItems.VIDEO, component: <MediaDataVideo /> },
+        { itemLabel: AccordionItems.AUDIO, component: <MediaDataAudio /> },
+        { itemLabel: AccordionItems.DOCUMENTS, component: <MediaDataDocuments /> },
     ],
 };

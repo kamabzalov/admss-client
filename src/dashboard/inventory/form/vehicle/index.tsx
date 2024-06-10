@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common";
+import { AccordionItems, Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
 const VehicleGeneral = lazy(() =>
@@ -29,13 +29,13 @@ const VehicleOptions = lazy(() =>
 export const InventoryVehicleData: Pick<Inventory, "label" | "items"> = {
     label: "Vehicle",
     items: [
-        { itemLabel: "General", component: <VehicleGeneral /> },
-        { itemLabel: "Description", component: <VehicleDescription /> },
-        { itemLabel: "Options", component: <VehicleOptions /> },
-        { itemLabel: "Checks", component: <VehicleChecks /> },
-        { itemLabel: "Inspections", component: <VehicleInspections /> },
-        { itemLabel: "Keys", component: <VehicleKeys /> },
-        { itemLabel: "Disclosures", component: <VehicleDisclosures /> },
-        { itemLabel: "Other", component: <VehicleOther /> },
+        { itemLabel: AccordionItems.GENERAL, component: <VehicleGeneral /> },
+        { itemLabel: AccordionItems.DESCRIPTION, component: <VehicleDescription /> },
+        { itemLabel: AccordionItems.OPTIONS, component: <VehicleOptions /> },
+        { itemLabel: AccordionItems.CHECKS, component: <VehicleChecks /> },
+        { itemLabel: AccordionItems.INSPECTIONS, component: <VehicleInspections /> },
+        { itemLabel: AccordionItems.KEYS, component: <VehicleKeys /> },
+        { itemLabel: AccordionItems.DISCLOSURES, component: <VehicleDisclosures /> },
+        { itemLabel: AccordionItems.OTHER, component: <VehicleOther /> },
     ],
 };
