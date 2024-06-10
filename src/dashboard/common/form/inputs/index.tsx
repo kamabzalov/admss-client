@@ -190,6 +190,7 @@ export const SearchInput = ({
             <button
                 className='search-input__icon input-icon input-icon-right'
                 onClick={onIconClick}
+                type='button'
             >
                 <i className='icon adms-table' />
             </button>

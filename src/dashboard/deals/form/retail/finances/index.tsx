@@ -69,7 +69,8 @@ export const DealRetailFinances = observer((): ReactElement => {
                 <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Taxable amount</span>
                     <span className='finances-item__amount'>
-                        ${dealFinances.TaxableAmount || "0.00"}
+                        <span>$</span>
+                        {dealFinances.TaxableAmount || "0.00"}
                     </span>
                 </div>
 
@@ -93,8 +94,8 @@ export const DealRetailFinances = observer((): ReactElement => {
                 <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Subtotal</span>
                     <span className='finances-item__amount'>
-                        {" "}
-                        ${dealFinances.SubTotal || "0.00"}
+                        <span>$</span>
+                        {dealFinances.SubTotal || "0.00"}
                     </span>
                 </div>
 
@@ -203,20 +204,22 @@ export const DealRetailFinances = observer((): ReactElement => {
                 <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Total Price</span>
                     <span className='finances-item__amount'>
-                        ${dealFinances.TotalPrice || "0.00"}
+                        <span>$</span>
+                        {dealFinances.TotalPrice?.replace("$", "") || "0.00"}
                     </span>
                 </div>
 
                 <div className='finances-item'>
                     <label className='finances-item__label'>Trade in Pay-Off Amount</label>
-                    <span className='finances-item__amount'>
-                        ${dealFinances.TradeInPayoff || "0.00"}
+                    <span className='finances-item__amount finances-item__amount--bold'>
+                        <span>$</span>
+                        {dealFinances.TradeInPayoff || "0.00"}
                     </span>
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Net Trade Allowance</label>
-                    <span className='finances-item__amount'>
-                        ${dealFinances.NetTradeAllowance || "0.00"}
+                    <span className='finances-item__amount finances-item__amount--bold'>
+                        <span>$</span> {dealFinances.NetTradeAllowance || "0.00"}
                     </span>
                 </div>
                 <div className='finances-item'>
@@ -229,15 +232,17 @@ export const DealRetailFinances = observer((): ReactElement => {
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Total Down Payment</label>
-                    <span className='finances-item__amount'>
-                        ${dealFinances.TotalDown || "0.00"}
+                    <span className='finances-item__amount finances-item__amount--bold'>
+                        <span>$</span>
+                        {dealFinances.TotalDown || "0.00"}
                     </span>
                 </div>
 
                 <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Amount Financed</span>
-                    <span className='finances-item__amount'>
-                        ${dealFinances.BalanceDue || "0.00"}
+                    <span className='finances-item__amount finances-item__amount--bold'>
+                        <span>$</span>
+                        {dealFinances.BalanceDue || "0.00"}
                     </span>
                 </div>
             </div>

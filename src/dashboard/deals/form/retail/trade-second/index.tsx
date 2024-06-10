@@ -1,35 +1,31 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
+    getInventoryBodyTypesList,
     getInventoryExteriorColorsList,
 } from "http/services/inventory-service";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { useFormik } from "formik";
+import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
-
-const MIN_YEAR = 1970;
-const MAX_YEAR = new Date().getFullYear();
-const mileage = 0;
+import { PartialDeal } from "dashboard/deals/form";
+import { VINDecoder } from "dashboard/common/form/vin-decoder";
+import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 
 export const DealRetailTradeSecond = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
         dealExtData: {
-            Trade2_VIN,
-            Trade2_Make,
-            Trade2_Model,
-            Trade2_Year,
-            Trade2_Mileage,
             Trade2_Color,
             Trade2_BodyStyle,
             Trade2_Title_Num,
@@ -40,18 +36,19 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             Trade2_Lien_Payoff,
             Trade2_Lien_Payoff_Good_Through,
             Trade2_Lien_Name,
-            Trade2_Lien_Address,
-            Trade2_Lien_Phone,
             Trade2_Lien_Contact,
         },
         deal: { addToInventory },
         changeDeal,
         changeDealExtData,
     } = store;
+    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
-    const [automakesModelList] = useState<ListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
+    const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
@@ -63,10 +60,30 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 setAutomakesList(upperCasedList);
             }
         });
+        getInventoryBodyTypesList().then((list) => {
+            list && setBodyTypeList(list);
+        });
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
         });
     }, []);
+
+    const handleSelectMake = useCallback(() => {
+        const makeSting = values.Trade2_Make.toLowerCase().replaceAll(" ", "");
+        if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
+            getAutoMakeModelList(makeSting).then((list) => {
+                if (list && Object.keys(list).length) {
+                    setAutomakesModelList(list);
+                } else {
+                    setAutomakesModelList([]);
+                }
+            });
+        }
+    }, [automakesList, values.Trade2_Make]);
+
+    useEffect(() => {
+        if (values.Trade2_Make) handleSelectMake();
+    }, [handleSelectMake, values.Trade2_Make]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -98,165 +115,146 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
         );
     };
 
-    const formik = useFormik({
-        initialValues: {
-            VIN: Trade2_VIN || "",
-            Make: Trade2_Make || "",
-            Model: Trade2_Model || "",
-            Year: Trade2_Year || "",
-            mileage: Trade2_Mileage || "",
-        },
-        enableReinitialize: true,
-        validate: (data) => {
-            let errors: any = {};
+    const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
+        if (vinInfo) {
+            if (allowOverwrite) {
+                changeDealExtData({ key: "Trade2_Make", value: vinInfo.Make });
+                changeDealExtData({ key: "Trade2_Model", value: vinInfo.Model });
+                changeDealExtData({ key: "Trade2_Year", value: vinInfo.Year });
 
-            if (!data.VIN) {
-                errors.VIN = "Data is required.";
+                changeDealExtData({
+                    key: "Trade2_StockNum",
+                    value: vinInfo.StockNo,
+                });
+                changeDealExtData({
+                    key: "Trade2_BodyStyle",
+                    value: vinInfo.BodyStyle,
+                });
             } else {
-                changeDealExtData({ key: "Trade2_VIN", value: data.VIN });
+                setFieldValue("Trade2_Make", values.Trade2_Make || vinInfo.Make);
+                setFieldValue("Trade2_Model", values.Trade2_Model || vinInfo.Model);
+                setFieldValue("Trade2_Year", values.Trade2_Year || vinInfo.Year);
+                setFieldValue("Trade2_StockNum", Trade2_StockNum || vinInfo.StockNo);
+                setFieldValue("Trade2_BodyStyle", Trade2_BodyStyle || vinInfo.BodyStyle);
             }
-
-            if (!data.Make) {
-                errors.Make = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade2_Make", value: data.Make });
-            }
-
-            if (!data.Model) {
-                errors.Model = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade2_Model", value: data.Model });
-            }
-            if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
-                switch (true) {
-                    case Number(data.Year) < MIN_YEAR:
-                        errors.Year = `Must be greater than ${MIN_YEAR}`;
-                        break;
-                    case Number(data.Year) > MAX_YEAR:
-                        errors.Year = `Must be less than ${MAX_YEAR}`;
-                        break;
-                    default:
-                        errors.Year = "Data is required.";
-                }
-            } else {
-                changeDealExtData({ key: "Trade2_Year", value: data.Year });
-            }
-
-            if (!data.mileage) {
-                errors.mileage = "Data is required.";
-            } else {
-                changeDealExtData({ key: "Trade2_Mileage", value: data.mileage });
-            }
-
-            return errors;
-        },
-        onSubmit: () => {},
-    });
+        }
+    };
 
     return (
         <div className='grid deal-retail-trade row-gap-2'>
-            <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    {/* TODO: Add DECODE button */}
-                    <InputText
-                        {...formik.getFieldProps("VIN")}
-                        className={`deal-trade__text-input w-full ${
-                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
-                        }`}
-                        value={formik.values.VIN}
-                        onChange={({ target: { value } }) => {
-                            formik.setFieldValue("VIN", value);
-                        }}
+            <div className='col-12'>
+                <div className='trade-overwrite pb-3'>
+                    <Checkbox
+                        checked={allowOverwrite}
+                        id='trade-overwrite'
+                        className='trade-overwrite__checkbox'
+                        onChange={() => setAllowOverwrite(!allowOverwrite)}
                     />
-                    <label className='float-label'>VIN (required)</label>
-                </span>
-                <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
+                    <label className='pl-3 trade-overwrite__label'>Overwrite data</label>
+                    <i className='icon adms-help trade-overwrite__icon' />
+                </div>
+            </div>
+            <div className='col-6 relative'>
+                <VINDecoder
+                    value={values.Trade2_VIN}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("Trade2_VIN", value);
+                        changeDealExtData({ key: "Trade2_VIN", value });
+                    }}
+                    onAction={handleVINchange}
+                    className={`${errors.Trade2_VIN ? "p-invalid" : ""}`}
+                />
+                <small className='p-error'>{errors.Trade2_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...formik.getFieldProps("Make")}
                         optionLabel='name'
                         optionValue='name'
-                        value={formik.values.Make}
+                        value={values.Trade2_Make}
                         filter
                         required
                         options={automakesList}
-                        onChange={({ value }) => formik.setFieldValue("Make", value)}
+                        onChange={({ value }) => {
+                            setFieldValue("Trade2_Make", value);
+                            changeDealExtData({ key: "Trade2_Make", value });
+                        }}
                         valueTemplate={selectedAutoMakesTemplate}
                         itemTemplate={autoMakesOptionTemplate}
                         className={`deal-trade__dropdown w-full ${
-                            formik.touched.Make && formik.errors.Make && "p-invalid"
+                            errors.Trade2_Make ? "p-invalid" : ""
                         }`}
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
 
-                <small className='p-error'>
-                    {(formik.touched.Make && formik.errors.Make) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade2_Make || ""}</small>
             </div>
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...formik.getFieldProps("Model")}
                         optionLabel='name'
                         optionValue='name'
-                        value={formik.values.Model}
+                        value={values.Trade2_Model}
                         filter={!!automakesModelList.length}
                         editable={!automakesModelList.length}
                         options={automakesModelList}
-                        onChange={({ value }) => formik.setFieldValue("Model", value)}
-                        className={`deal-trade__dropdown w-full ${
-                            formik.touched.Model && formik.errors.Model && "p-invalid"
-                        }`}
+                        onChange={({ value }) => {
+                            setFieldValue("Model", value);
+                            changeDealExtData({ key: "Trade2_Model", value });
+                        }}
+                        className={`deal-trade__dropdown w-full ${errors.Trade2_Model} ? "p-invalid" : ""}`}
                     />
                     <label className='float-label'>Model (required)</label>
                 </span>
-                <small className='p-error'>
-                    {(formik.touched.Model && formik.errors.Model) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade2_Model}</small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
-                        {...formik.getFieldProps("Year")}
                         className={`deal-trade__text-input w-full ${
-                            formik.touched.Year && formik.errors.Year && "p-invalid"
+                            errors.Trade2_Year ? "p-invalid" : ""
                         }`}
                         required
                         min={0}
-                        value={MIN_YEAR}
                         useGrouping={false}
-                        onChange={({ value }) => formik.setFieldValue("Year", value)}
+                        value={parseInt(values.Trade2_Year) || null}
+                        onChange={({ value }) => {
+                            if (!value) {
+                                return changeDealExtData({ key: "Trade2_Year", value: "" });
+                            }
+                            setFieldValue("Trade2_Year", value);
+                            changeDealExtData({ key: "Trade2_Year", value: String(value) });
+                        }}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                <small className='p-error'>
-                    {(formik.touched.Year && formik.errors.Year) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade2_Year}</small>
             </div>
 
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
-                        {...formik.getFieldProps("mileage")}
                         className={`deal-trade__text-input w-full ${
-                            formik.touched.mileage && formik.errors.mileage && "p-invalid"
+                            errors.Trade2_Mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={mileage}
-                        minFractionDigits={2}
+                        value={parseFloat(values?.Trade2_Mileage) || 0}
+                        useGrouping={false}
                         min={0}
-                        onChange={({ value }) => formik.setFieldValue("mileage", value)}
+                        onChange={({ value }) => {
+                            setFieldValue("Trade2_Mileage", value);
+                            changeDealExtData({
+                                key: "Trade2_Mileage",
+                                value: value ? String(value) : "0",
+                            });
+                        }}
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
 
-                <small className='p-error'>
-                    {(formik.touched.mileage && formik.errors.mileage) || ""}
-                </small>
+                <small className='p-error'>{errors.Trade2_Mileage || ""}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -278,7 +276,6 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        //TODO: add options
                         optionLabel='name'
                         optionValue='name'
                         value={Trade2_BodyStyle}
@@ -286,7 +283,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                             changeDealExtData({ key: "Trade2_BodyStyle", value });
                         }}
                         editable
-                        options={[{ name: Trade2_BodyStyle }]}
+                        options={bodyTypeList}
                         filter
                         className='w-full deal-trade__dropdown'
                     />
@@ -399,10 +396,10 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     title='Payoff Amount'
                 />
             </div>
-            {/* TODO: Add calendar checkbox */}
             <div className='col-3'>
                 <DateInput
                     date={Trade2_Lien_Payoff_Good_Through}
+                    checkbox
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({
@@ -431,30 +428,38 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-trade__text-input w-full'
-                        value={Trade2_Lien_Address}
+                        className={`'deal-trade__text-input w-full' ${
+                            errors.Trade2_Lien_Address ? "p-invalid" : ""
+                        }`}
+                        value={values.Trade2_Lien_Address}
                         onChange={({ target: { value } }) => {
+                            setFieldValue("Trade2_Lien_Address", value);
                             changeDealExtData({ key: "Trade2_Lien_Address", value });
                         }}
                     />
                     <label className='float-label'>Mailing address</label>
                 </span>
+                <small className='p-error'>{errors.Trade2_Lien_Address}</small>
             </div>
 
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='deal-trade__text-input w-full'
-                        value={Trade2_Lien_Phone}
+                        className={`'deal-trade__text-input w-full' ${
+                            errors.Trade2_Lien_Phone ? "p-invalid" : ""
+                        }`}
+                        value={values.Trade2_Lien_Phone}
                         onChange={({ target: { value } }) => {
+                            setFieldValue("Trade2_Lien_Phone", value);
                             changeDealExtData({ key: "Trade2_Lien_Phone", value });
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>
+                <small className='p-error'>{errors.Trade2_Lien_Phone}</small>
             </div>
             <div className='col-6'>
                 <CompanySearch
