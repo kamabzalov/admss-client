@@ -12,7 +12,7 @@ import {
     getHowToKnowList,
     getSaleTypes,
 } from "http/services/deals.service";
-import { HowToKnowListResponse, IndexedDealList } from "common/models/deals";
+import { HowToKnow, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { BaseResponseError } from "common/models/base-response";
@@ -33,7 +33,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
-    const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnowListResponse>[]>([]);
+    const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
 
     useEffect(() => {
@@ -90,7 +90,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     useEffect(() => {
         if (authUser?.useruid) {
             getHowToKnowList(authUser?.useruid).then((res) => {
-                if (Array.isArray(res) && res.length) setHowToKnowList(res as any);
+                if (Array.isArray(res) && res.length) setHowToKnowList(res);
             });
         }
     }, [authUser, toast]);

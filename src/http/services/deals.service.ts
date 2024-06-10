@@ -6,7 +6,7 @@ import {
     DealFinance,
     DealPickupPayment,
     DealPrintFormResponse,
-    HowToKnowListResponse,
+    HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
 
@@ -287,12 +287,11 @@ export const getDealPrintFormTemplate = async (dealuid: string, templateuid: str
 
 export const getHowToKnowList = async (itemuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<HowToKnowListResponse>(
+        const request = await authorizedUserApiInstance.get<HowToKnow[]>(
             `user/${itemuid}/howtoknow`
         );
-        if (request.data.status === Status.OK || request.status === 200) {
-            const { status, ...dataWithoutStatus } = request.data;
-            return dataWithoutStatus;
+        if (request.status === 200) {
+            return request.data;
         } else {
             throw new Error("Error while getting how to know list");
         }

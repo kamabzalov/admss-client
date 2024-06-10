@@ -404,7 +404,7 @@ export interface DealPickupPayment {
     useruid: string;
 }
 
-export interface HowToKnowListResponse extends BaseResponseError {
+export interface HowToKnow {
     created: string;
     updated: string;
     itemuid: string;
