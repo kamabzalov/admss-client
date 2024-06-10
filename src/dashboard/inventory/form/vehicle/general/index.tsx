@@ -126,11 +126,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Make", value: vinInfo.Make });
                 changeInventory({ key: "Model", value: vinInfo.Model });
                 changeInventory({ key: "Year", value: vinInfo.Year });
-                changeInventory({ key: "Transmission", value: vinInfo.Transmission });
-                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel });
-                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine });
-                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
-                changeInventory({ key: "Engine", value: vinInfo.Engine });
+                changeInventory({ key: "Transmission", value: vinInfo.Transmission_id });
+                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel_id });
+                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine_id });
+                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders_id });
+                changeInventory({ key: "Engine", value: vinInfo.Engine_id });
                 changeInventory({ key: "StockNo", value: vinInfo.StockNo });
                 changeInventory({ key: "Trim", value: vinInfo.Trim });
                 changeInventory({ key: "BodyStyle", value: vinInfo.BodyStyle });
@@ -140,21 +140,21 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Year", value: inventory.Year || vinInfo.Year });
                 changeInventory({
                     key: "Transmission",
-                    value: inventory.Transmission || vinInfo.Transmission,
+                    value: inventory.Transmission || vinInfo.Transmission_id,
                 });
                 changeInventory({
                     key: "TypeOfFuel",
-                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel,
+                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel_id,
                 });
                 changeInventory({
                     key: "DriveLine",
-                    value: inventory.DriveLine || vinInfo.DriveLine,
+                    value: inventory.DriveLine || vinInfo.DriveLine_id,
                 });
                 changeInventory({
                     key: "Cylinders",
-                    value: inventory.Cylinders || vinInfo.Cylinders,
+                    value: inventory.Cylinders || vinInfo.Cylinders_id,
                 });
-                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine });
+                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine_id });
                 changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
                 changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
                 changeInventory({

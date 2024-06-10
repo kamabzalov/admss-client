@@ -18,7 +18,7 @@ export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, formErrorIndex } = store;
 
-    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
+    const { errors, setFieldValue } = useFormikContext<Inventory>();
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
@@ -62,7 +62,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         value={inventory.Transmission}
                         onChange={({ value }) => {
@@ -79,7 +79,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         value={inventory.BodyStyle}
                         onChange={({ value }) => {
@@ -96,12 +96,11 @@ export const VehicleDescription = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...getFieldProps("TypeOfFuel")}
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         options={fuelList}
-                        value={values.TypeOfFuel}
+                        value={inventory.TypeOfFuel}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel", value);
                             changeInventory({ key: "TypeOfFuel", value });
@@ -119,7 +118,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         value={inventory.DriveLine}
                         onChange={({ value }) => {
@@ -137,7 +136,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         value={inventory.Cylinders}
                         onChange={({ value }) => {
@@ -155,7 +154,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         value={inventory.Engine}
                         filter
                         onChange={({ value }) => {
