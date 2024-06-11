@@ -30,7 +30,7 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof ContactUser | "fullName";
+    field: keyof ContactUser;
 }
 
 interface ContactsDataTableProps {
@@ -38,8 +38,12 @@ interface ContactsDataTableProps {
     contactCategory?: ContactTypeNameList | string;
 }
 
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
+}
+
 const renderColumnsData: TableColumnProps[] = [
-    { field: "fullName", header: "Name" },
+    { field: "userName", header: "Name" },
     { field: "phone1", header: "Work Phone" },
     { field: "phone2", header: "Home Phone" },
     { field: "streetAddress", header: "Address" },
@@ -212,10 +216,6 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         }
     };
 
-    const renderFullName = (rowData: ContactUser) => {
-        return `${rowData.firstName} ${rowData.lastName}`;
-    };
-
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -357,7 +357,6 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                                     key={field}
                                     sortable
                                     headerClassName='cursor-move'
-                                    body={field === "fullName" ? renderFullName : undefined}
                                     pt={{
                                         root: {
                                             style: {
