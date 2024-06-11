@@ -3,7 +3,6 @@ import { ReactElement, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
@@ -142,25 +141,20 @@ export const ContactsDocuments = observer((): ReactElement => {
                 emptyTemplate={emptyTemplate}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12'
+                className='col-12 mb-4'
             />
-            <div className='col-12 mt-4 media-input'>
-                <Dropdown
-                    className='media-input__dropdown'
-                    value={""}
-                    onChange={() => {}}
-                    placeholder='Category'
-                />
+            <div className='col-9 media-input'>
                 <InputText
-                    className='media-input__text'
-                    value={""}
+                    className='media-input__text w-full'
                     onChange={() => {}}
                     placeholder='Comment'
                 />
+            </div>
+            <div className='col-3'>
                 <Button
                     severity={totalCount ? "success" : "secondary"}
                     disabled={!totalCount}
-                    className='p-button media-input__button'
+                    className='p-button media-input__button w-full'
                 >
                     Save
                 </Button>

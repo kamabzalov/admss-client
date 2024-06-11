@@ -1,10 +1,22 @@
+/* eslint-disable no-unused-vars */
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
+export enum ContactAccordionItems {
+    GENERAL = "General",
+    ADDRESS = "Address",
+    MAILING_ADDRESS = "Mailing address",
+    IDENTIFICATION = "Identification",
+    CONTACTS = "Contacts",
+    COMPANY = "Company/Workplace",
+    PROSPECTING = "Prospecting and notes",
+    DOCUMENTS = "Documents",
+}
+
 export interface ContactItem extends MenuItem {
-    itemLabel: string;
+    itemLabel: ContactAccordionItems;
     itemIndex?: number;
     component?: ReactElement;
 }

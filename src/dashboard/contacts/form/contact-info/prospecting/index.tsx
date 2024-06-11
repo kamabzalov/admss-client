@@ -15,6 +15,7 @@ export const ContactsProspecting = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
+    const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -25,80 +26,101 @@ export const ContactsProspecting = observer((): ReactElement => {
         }
     }, []);
 
+    useEffect(() => {
+        setAnotherVehicle(!!contactExtData.PROSPECT2_ID?.length);
+    }, [contactExtData.PROSPECT2_ID]);
+
     return (
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
-                <Dropdown
-                    optionLabel='username'
-                    optionValue='useruid'
-                    filter
-                    value={contactExtData.SALESMAN_ID}
-                    options={salespersonsList}
-                    onChange={({ target: { value } }) => changeContactExtData("SALESMAN_ID", value)}
-                    placeholder='Attending Salesman'
-                    className='w-full contacts-prospecting__dropdown'
-                />
-            </div>
-
-            <div className='col-6'>
-                <DateInput
-                    placeholder='Contact till...'
-                    date={contactExtData.created}
-                    onChange={() => changeContactExtData("created", "")}
-                    disabled
-                    className='contacts-prospecting__date-input w-full'
-                />
-            </div>
-
-            <div className='col-6'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    value={contactExtData.PROSPECT1_ID}
-                    onChange={({ target: { value } }) =>
-                        changeContactExtData("PROSPECT1_ID", value)
-                    }
-                    placeholder='Choose a Vehicle'
-                    className='w-full contacts-prospecting__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='username'
+                        optionValue='useruid'
+                        filter
+                        value={contactExtData.SALESMAN_ID}
+                        options={salespersonsList}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("SALESMAN_ID", value)
+                        }
+                        placeholder='Attending Salesman'
+                        className='w-full contacts-prospecting__dropdown'
+                    />
+                    <label className='float-label'>Attending Salesman</label>
+                </span>
             </div>
             <div className='col-6'>
-                <Button className='w-full'>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another Vehicle
-                </Button>
+                <span className='p-float-label'>
+                    <DateInput
+                        placeholder='Contact till...'
+                        date={contactExtData.created}
+                        onChange={() => changeContactExtData("created", "")}
+                        className='contacts-prospecting__date-input w-full'
+                    />
+                    <label className='float-label'>Contact till</label>
+                </span>
             </div>
             <div className='col-6'>
-                <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
-                    filter
-                    value={contactExtData.PROSPECT2_ID}
-                    onChange={({ target: { value } }) =>
-                        changeContactExtData("PROSPECT2_ID", value)
-                    }
-                    placeholder='Choose a Vehicle'
-                    className='w-full contacts-prospecting__dropdown'
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={contactExtData.PROSPECT1_ID}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("PROSPECT1_ID", value)
+                        }
+                        placeholder='Choose a Vehicle'
+                        className='w-full contacts-prospecting__dropdown'
+                    />
+                    <label className='float-label'>Choose a Vehicle</label>
+                </span>
             </div>
-            <div className='col-6'>
-                <Button className='w-full'>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another Vehicle
-                </Button>
-            </div>
-
+            {anotherVehicle ? (
+                <div className='col-6'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            optionLabel='name'
+                            optionValue='name'
+                            filter
+                            value={contactExtData.PROSPECT2_ID}
+                            onChange={({ target: { value } }) =>
+                                changeContactExtData("PROSPECT2_ID", value)
+                            }
+                            placeholder='Choose a Vehicle'
+                            className='w-full contacts-prospecting__dropdown'
+                        />
+                        <label className='float-label'>Choose a Vehicle</label>
+                    </span>
+                </div>
+            ) : (
+                <div className='col-6'>
+                    <Button
+                        type='button'
+                        className='contacts__button w-full'
+                        outlined
+                        onClick={() => setAnotherVehicle(true)}
+                    >
+                        <i className='pi pi-plus mr-2 text-xs pt-1' />
+                        Add another Vehicle
+                    </Button>
+                </div>
+            )}
             <div className='col-12'>
-                <InputTextarea
-                    placeholder='Prospecting Notes'
-                    value={contactExtData.Notes}
-                    onChange={({ target: { value } }) => changeContactExtData("Notes", value)}
-                    className='w-full contacts-prospecting__text-area'
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        placeholder='Prospecting Notes'
+                        value={contactExtData.Notes}
+                        onChange={({ target: { value } }) => changeContactExtData("Notes", value)}
+                        className='w-full contacts-prospecting__text-area'
+                    />
+                    <label className='float-label'>Prospecting Notes</label>
+                </span>
             </div>
             <div className='col-12 flex justify-content-end '>
-                <Button className='px-4'>Schedule Call Back</Button>
+                <Button type='button' className='px-4 font-bold' outlined>
+                    Schedule Call Back
+                </Button>
             </div>
         </div>
     );

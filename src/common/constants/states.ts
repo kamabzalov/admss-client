@@ -1,4 +1,4 @@
-export const STATES_LIST = [
+const STATES = [
     {
         id: "AL",
         name: "Alabama",
@@ -236,3 +236,8 @@ export const STATES_LIST = [
         name: "Wyoming",
     },
 ];
+
+export const STATES_LIST = STATES.map((state) => ({
+    ...state,
+    label: `[${state.id}] ${state.name}`,
+}));
