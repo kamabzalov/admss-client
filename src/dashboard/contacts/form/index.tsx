@@ -293,8 +293,6 @@ export const ContactForm = observer((): ReactElement => {
                                 <Button
                                     className='form-nav__button'
                                     onClick={handleSaveContactForm}
-                                    // severity={isFormChanged ? "success" : "secondary"}
-                                    // disabled={!isFormChanged}
                                 >
                                     Save
                                 </Button>
