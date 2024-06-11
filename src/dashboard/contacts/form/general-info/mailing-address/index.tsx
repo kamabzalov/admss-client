@@ -25,7 +25,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <Dropdown
-                    optionLabel='name'
+                    optionLabel='label'
                     optionValue='id'
                     filter
                     placeholder='State'

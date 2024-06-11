@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { ReactElement, Suspense, useEffect, useState } from "react";
+import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ContactItem, ContactSection } from "../common/step-navigation";
+import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
 import { GeneralInfoData } from "./general-info";
 import { ContactInfoData } from "./contact-info";
@@ -13,12 +13,38 @@ import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
+import { Form, Formik, FormikProps } from "formik";
+import { Contact } from "common/models/contact";
+import * as Yup from "yup";
+import { useToast } from "dashboard/common/toast";
 const STEP = "step";
+
+type PartialContact = Pick<Contact, "firstName" | "lastName" | "type" | "companyName">;
+
+const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
+    [ContactAccordionItems.GENERAL]: ["firstName", "lastName", "type", "companyName"],
+};
+
+export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
+
+export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
+    firstName: Yup.string().trim().required("Data is required."),
+    lastName: Yup.string().trim().required("Data is required."),
+    type: Yup.number().required("Data is required."),
+    companyName: Yup.string()
+        .trim()
+        .when("type", ([type]) => {
+            return REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
+                ? Yup.string().trim().required("Data is required.")
+                : Yup.string().trim();
+        }),
+});
 
 export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+    const toast = useToast();
 
     const [contactSections, setContactSections] = useState<ContactSection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
@@ -29,6 +55,9 @@ export const ContactForm = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact, getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
+    const formikRef = useRef<FormikProps<PartialContact>>(null);
+    const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
+    const [errorSections, setErrorSections] = useState<string[]>([]);
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
         if (id) {
@@ -65,6 +94,36 @@ export const ContactForm = observer((): ReactElement => {
         });
     }, [stepActiveIndex]);
 
+    const handleSaveContactForm = () => {
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                setValidateOnMount(true);
+
+                const sectionsWithErrors = Object.keys(errors);
+                const currentSectionsWithErrors: string[] = [];
+                Object.entries(tabFields).forEach(([key, value]) => {
+                    value.forEach((field) => {
+                        if (
+                            sectionsWithErrors.includes(field) &&
+                            !currentSectionsWithErrors.includes(key)
+                        ) {
+                            currentSectionsWithErrors.push(key);
+                        }
+                    });
+                });
+                setErrorSections(currentSectionsWithErrors);
+
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
+    };
+
     return (
         <Suspense>
             <div className='grid relative'>
@@ -81,7 +140,9 @@ export const ContactForm = observer((): ReactElement => {
                             </h2>
                             <div className='card-header-info'>
                                 Full Name
-                                <span className='card-header-info__data'>{`${contact?.firstName || ""} ${contact?.lastName || ""}`}</span>
+                                <span className='card-header-info__data'>{`${
+                                    contact!.firstName || ""
+                                } ${contact?.lastName || ""}`}</span>
                                 Company name
                                 <span className='card-header-info__data'>
                                     {contact?.companyName}
@@ -112,6 +173,11 @@ export const ContactForm = observer((): ReactElement => {
                                                                     getUrl(section.startIndex + idx)
                                                                 );
                                                             },
+                                                            className: errorSections.length
+                                                                ? errorSections.includes(itemLabel)
+                                                                    ? "section-invalid"
+                                                                    : "section-valid"
+                                                                : "",
                                                         })
                                                     )}
                                                     readOnly={false}
@@ -137,27 +203,56 @@ export const ContactForm = observer((): ReactElement => {
                                 </div>
                                 <div className='w-full flex flex-column p-0'>
                                     <div className='flex flex-grow-1'>
-                                        {contactSections.map((section) =>
-                                            section.items.map((item: ContactItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block inventory-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='contact-form__title uppercase'>
-                                                        {item.itemLabel}
-                                                    </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
+                                        <Formik
+                                            innerRef={formikRef}
+                                            validationSchema={ContactFormSchema}
+                                            initialValues={
+                                                {
+                                                    firstName: contact?.firstName || "",
+                                                    lastName: contact?.lastName || "",
+                                                    type: contact?.type || "",
+                                                    companyName: contact?.companyName || "",
+                                                } as PartialContact
+                                            }
+                                            enableReinitialize
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
+                                            validateOnMount={validateOnMount}
+                                            onSubmit={() => {
+                                                setValidateOnMount(false);
+                                                saveContact();
+                                                navigate(`/dashboard/contacts`);
+                                                toast.current?.show({
+                                                    severity: "success",
+                                                    summary: "Success",
+                                                    detail: "Contact saved successfully",
+                                                });
+                                            }}
+                                        >
+                                            <Form name='contactForm' className='w-full'>
+                                                {contactSections.map((section) =>
+                                                    section.items.map((item: ContactItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block contact-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='contact-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </Form>
+                                        </Formik>
                                     </div>
                                 </div>
                             </div>
@@ -195,7 +290,12 @@ export const ContactForm = observer((): ReactElement => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={saveContact} className='form-nav__button'>
+                                <Button
+                                    className='form-nav__button'
+                                    onClick={handleSaveContactForm}
+                                    // severity={isFormChanged ? "success" : "secondary"}
+                                    // disabled={!isFormChanged}
+                                >
                                     Save
                                 </Button>
                             </div>

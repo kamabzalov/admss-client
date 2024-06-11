@@ -1,3 +1,4 @@
+import { ContactAccordionItems } from "dashboard/contacts/common/step-navigation";
 import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
@@ -17,9 +18,9 @@ const ContactsIdentification = lazy(() =>
 export const GeneralInfoData: Pick<Inventory, "label" | "items"> = {
     label: "General information",
     items: [
-        { itemLabel: "General", component: <ContactsGeneral /> },
-        { itemLabel: "Address", component: <ContactsGeneralAddress /> },
-        { itemLabel: "Mailing address", component: <ContactsMailingAddress /> },
-        { itemLabel: "Identification", component: <ContactsIdentification /> },
+        { itemLabel: ContactAccordionItems.GENERAL, component: <ContactsGeneral /> },
+        { itemLabel: ContactAccordionItems.ADDRESS, component: <ContactsGeneralAddress /> },
+        { itemLabel: ContactAccordionItems.MAILING_ADDRESS, component: <ContactsMailingAddress /> },
+        { itemLabel: ContactAccordionItems.IDENTIFICATION, component: <ContactsIdentification /> },
     ],
 };
