@@ -26,13 +26,6 @@ export const ConfirmModal = ({
 
     const accept = () => {
         confirmAction && confirmAction();
-        toast.current &&
-            toast.current.show({
-                severity: "info",
-                summary: "Confirmed",
-                detail: "You have accepted",
-                life: 3000,
-            });
         onHide();
     };
 

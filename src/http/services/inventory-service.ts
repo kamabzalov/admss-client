@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import { AxiosResponse } from "axios";
+import { AxiosResponse, isAxiosError } from "axios";
 import { BaseResponse, Status } from "common/models/base-response";
 import {
     Inventory,
@@ -136,11 +136,16 @@ export const deleteInventory = async (inventoryuid: string, data: Record<string,
             `inventory/${inventoryuid}/delete`,
             data
         );
-        if (response.status === 200) {
+        if (response.data.status === Status.OK) {
             return response.data;
         }
     } catch (error) {
-        // TODO add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
     }
 };
 

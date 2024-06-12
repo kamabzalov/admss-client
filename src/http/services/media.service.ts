@@ -1,4 +1,5 @@
-import { BaseResponse } from "common/models/base-response";
+import { isAxiosError } from "axios";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
 import {
     InventoryMedia,
@@ -103,7 +104,7 @@ export const setMediaItemData = async (
 ) => {
     try {
         const id = inventoryUid ? inventoryUid : 0;
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `inventory/${id}/media`,
             {
                 mediaitemuid,
@@ -116,11 +117,16 @@ export const setMediaItemData = async (
             }
         );
 
-        if (response.status === 200) {
+        if (response.data.status === Status.OK) {
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
     }
 };
 
@@ -153,6 +159,11 @@ export const deleteMediaImage = async (itemuid: string) => {
             return response.data;
         }
     } catch (error) {
-        // TODO add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
     }
 };
