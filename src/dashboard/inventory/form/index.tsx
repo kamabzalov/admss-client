@@ -28,6 +28,7 @@ import * as Yup from "yup";
 
 import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
+import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 
 const STEP = "step";
 
@@ -55,7 +56,11 @@ const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
 export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = Yup.object().shape({
-    VIN: Yup.string().trim().required("Data is required."),
+    VIN: Yup.string()
+        .trim()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
     Make: Yup.string().trim().required("Data is required."),
     Model: Yup.string().trim().required("Data is required."),
     Year: Yup.string().test(
