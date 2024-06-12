@@ -97,7 +97,7 @@ export const VehicleDescription = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='id'
+                        optionValue='name'
                         filter
                         options={fuelList}
                         value={inventory.TypeOfFuel}
