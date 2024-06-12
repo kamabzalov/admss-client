@@ -1,5 +1,5 @@
 import { AccountPayment } from "common/models/accounts";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
 import {
     Inventory,
@@ -94,8 +94,9 @@ export class InventoryStore {
     private _printList: InventoryPrintForm[] = [];
     private _formErrorIndex: number[] = [];
 
-    protected _isLoading = false;
-    protected _isFormChanged = false;
+    protected _isLoading: boolean = false;
+    protected _isFormChanged: boolean = false;
+    protected _formErrorMessage: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -165,6 +166,10 @@ export class InventoryStore {
 
     public get formErrorIndex(): number[] {
         return this._formErrorIndex;
+    }
+
+    public get formErrorMessage() {
+        return this._formErrorMessage;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -404,11 +409,18 @@ export class InventoryStore {
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
                                         type: mediaType,
+                                    }).then((response) => {
+                                        if (response?.status === Status.ERROR) {
+                                            const { error } = response as BaseResponseError;
+                                            this._formErrorMessage =
+                                                error || "Failed to upload file";
+                                        }
                                     });
                                 }
                             }
-                        } catch (error) {
-                            // TODO: add error handler
+                        } finally {
+                            this._isLoading = false;
+                            this._formErrorMessage = "";
                         }
                     }
                 );
@@ -574,16 +586,16 @@ export class InventoryStore {
         async (imageuid: string, cb: () => void): Promise<Status | undefined> => {
             try {
                 this._isLoading = true;
-                try {
-                    await deleteMediaImage(imageuid);
-                    await cb();
-                } catch (error) {
-                    // TODO: add error handler
-                }
+                await deleteMediaImage(imageuid).then((response) => {
+                    if (response?.status === Status.ERROR) {
+                        const { error } = response as BaseResponseError;
+                        this._formErrorMessage = error || "Failed to delete media";
+                    }
+                });
+                await cb();
 
                 return Status.OK;
             } catch (error) {
-                // TODO: add error handler
                 return undefined;
             } finally {
                 this._isLoading = false;
@@ -618,6 +630,10 @@ export class InventoryStore {
         this._formErrorIndex = state;
     }
 
+    public set formErrorMessage(state: string) {
+        this._formErrorMessage = state;
+    }
+
     public clearMedia = () => {
         this._inventoryImagesID = [];
         this._images = [];
@@ -637,6 +653,7 @@ export class InventoryStore {
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
+        this._formErrorMessage = "";
         this.clearMedia();
     };
 }

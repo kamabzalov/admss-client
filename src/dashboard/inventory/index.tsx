@@ -703,7 +703,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12'>
-                                {(!activeColumns.length && !inventories.length) || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>

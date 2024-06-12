@@ -30,7 +30,7 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof ContactUser;
+    field: keyof ContactUser | "fullName";
 }
 
 interface ContactsDataTableProps {
@@ -38,12 +38,8 @@ interface ContactsDataTableProps {
     contactCategory?: ContactTypeNameList | string;
 }
 
-interface TableColumnProps extends ColumnProps {
-    field: keyof ContactUser;
-}
-
 const renderColumnsData: TableColumnProps[] = [
-    { field: "userName", header: "Name" },
+    { field: "fullName", header: "Name" },
     { field: "phone1", header: "Work Phone" },
     { field: "phone2", header: "Home Phone" },
     { field: "streetAddress", header: "Address" },
@@ -208,11 +204,26 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         }
     };
 
-    const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({
+        data: { contactuid, firstName, lastName },
+    }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(companyName);
+            onRowClick(`${firstName} ${lastName}`);
         } else {
             navigate(contactuid);
+        }
+    };
+
+    const renderFullName = (rowData: ContactUser) => {
+        return `${rowData.firstName} ${rowData.lastName}`;
+    };
+
+    const handleCreateContact = () => {
+        const CREATE_LINK = "/dashboard/contacts/create";
+        if (onRowClick) {
+            window.open(CREATE_LINK, "_blank");
+        } else {
+            navigate(CREATE_LINK);
         }
     };
 
@@ -250,7 +261,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                             severity='success'
                             type='button'
                             tooltip='Add new contact'
-                            onClick={() => navigate("/dashboard/contacts/create")}
+                            onClick={handleCreateContact}
                         />
                         <Button
                             severity='success'
@@ -357,6 +368,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                                     key={field}
                                     sortable
                                     headerClassName='cursor-move'
+                                    body={field === "fullName" ? renderFullName : undefined}
                                     pt={{
                                         root: {
                                             style: {

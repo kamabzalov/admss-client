@@ -26,6 +26,8 @@ const handleErrorResponse = (error: any, navigate: any) => {
         localStorage.removeItem("useruid");
         navigate("/");
         return Promise.reject(error.response);
+    } else {
+        return Promise.reject(error);
     }
 };
 

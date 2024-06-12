@@ -28,6 +28,8 @@ import * as Yup from "yup";
 
 import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
+import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 const STEP = "step";
 
@@ -55,7 +57,11 @@ const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
 export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = Yup.object().shape({
-    VIN: Yup.string().trim().required("Data is required."),
+    VIN: Yup.string()
+        .trim()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
     Make: Yup.string().trim().required("Data is required."),
     Model: Yup.string().trim().required("Data is required."),
     Year: Yup.string().test(
@@ -188,9 +194,18 @@ export const InventoryForm = observer(() => {
 
     const handleDeleteInventory = () => {
         id &&
-            deleteInventory(id, { reason, comment }).then(
-                (response) => response && navigate("/dashboard/inventory")
-            );
+            deleteInventory(id, { reason, comment }).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    const { error } = response as BaseResponseError;
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error || "Error while deleting inventory",
+                    });
+                } else {
+                    navigate("/dashboard/inventory");
+                }
+            });
     };
 
     const handleSaveInventoryForm = () => {
@@ -350,7 +365,7 @@ export const InventoryForm = observer(() => {
                                                     Year: inventory.Year,
                                                     TypeOfFuel: inventory?.TypeOfFuel || "",
                                                     StockNo: inventory?.StockNo || "",
-                                                    locationuid: inventory?.locationuid || "",
+                                                    locationuid: inventory?.locationuid || " ",
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                     purPurchasedFrom:
                                                         inventoryExtData?.purPurchasedFrom || "",
@@ -393,64 +408,64 @@ export const InventoryForm = observer(() => {
                                                         </div>
                                                     ))
                                                 )}
+
+                                                {stepActiveIndex === printActiveIndex && (
+                                                    <div className='inventory-form'>
+                                                        <div className='inventory-form__title uppercase'>
+                                                            Print history
+                                                        </div>
+                                                        <PrintForms />
+                                                    </div>
+                                                )}
+                                                {stepActiveIndex === deleteActiveIndex && (
+                                                    <div className='inventory-form'>
+                                                        <div className='inventory-form__title inventory-form__title--danger uppercase'>
+                                                            Delete inventory
+                                                        </div>
+                                                        <div className='grid'>
+                                                            <div className='col-6'>
+                                                                <Dropdown
+                                                                    optionLabel='name'
+                                                                    optionValue='name'
+                                                                    value={reason}
+                                                                    required
+                                                                    filter
+                                                                    onChange={({ value }) => {
+                                                                        setReason(value);
+                                                                    }}
+                                                                    options={deleteReasonsList}
+                                                                    placeholder='Reason'
+                                                                    className='w-full vehicle-general__dropdown'
+                                                                />
+                                                            </div>
+                                                            <div className='col-12'>
+                                                                <span className='p-float-label'>
+                                                                    <InputTextarea
+                                                                        className='w-full'
+                                                                        value={comment}
+                                                                        pt={{
+                                                                            root: {
+                                                                                style: {
+                                                                                    height: "110px",
+                                                                                },
+                                                                            },
+                                                                        }}
+                                                                        onChange={({
+                                                                            target: { value },
+                                                                        }) => {
+                                                                            setComment(value);
+                                                                        }}
+                                                                    />
+                                                                    <label className='float-label'>
+                                                                        Comment
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </Form>
                                         </Formik>
-
-                                        {stepActiveIndex === printActiveIndex && (
-                                            <div className='inventory-form'>
-                                                <div className='inventory-form__title uppercase'>
-                                                    Print history
-                                                </div>
-                                                <PrintForms />
-                                            </div>
-                                        )}
-                                        {stepActiveIndex === deleteActiveIndex && (
-                                            <div className='inventory-form'>
-                                                <div className='inventory-form__title inventory-form__title--danger uppercase'>
-                                                    Delete inventory
-                                                </div>
-                                                <div className='grid'>
-                                                    <div className='col-6'>
-                                                        <Dropdown
-                                                            optionLabel='name'
-                                                            optionValue='name'
-                                                            value={reason}
-                                                            required
-                                                            filter
-                                                            onChange={({ value }) => {
-                                                                setReason(value);
-                                                            }}
-                                                            options={deleteReasonsList}
-                                                            placeholder='Reason'
-                                                            className='w-full vehicle-general__dropdown'
-                                                        />
-                                                    </div>
-                                                    <div className='col-12'>
-                                                        <span className='p-float-label'>
-                                                            <InputTextarea
-                                                                className='w-full'
-                                                                value={comment}
-                                                                pt={{
-                                                                    root: {
-                                                                        style: {
-                                                                            height: "110px",
-                                                                        },
-                                                                    },
-                                                                }}
-                                                                onChange={({
-                                                                    target: { value },
-                                                                }) => {
-                                                                    setComment(value);
-                                                                }}
-                                                            />
-                                                            <label className='float-label'>
-                                                                Comment
-                                                            </label>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
