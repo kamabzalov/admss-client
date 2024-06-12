@@ -133,6 +133,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Make", value: vinInfo.Make });
                 changeInventory({ key: "Model", value: vinInfo.Model });
                 changeInventory({ key: "Year", value: vinInfo.Year });
+                changeInventory({ key: "GroupClassName", value: vinInfo.GroupClassName });
                 changeInventory({ key: "Transmission", value: vinInfo.Transmission_id });
                 changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel_id });
                 changeInventory({ key: "DriveLine", value: vinInfo.DriveLine_id });
@@ -148,6 +149,10 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Make", value: inventory.Make || vinInfo.Make });
                 changeInventory({ key: "Model", value: inventory.Model || vinInfo.Model });
                 changeInventory({ key: "Year", value: inventory.Year || vinInfo.Year });
+                changeInventory({
+                    key: "GroupClassName",
+                    value: inventory.GroupClassName || vinInfo.GroupClassName,
+                });
                 changeInventory({
                     key: "Transmission",
                     value: inventory.Transmission || vinInfo.Transmission_id,
