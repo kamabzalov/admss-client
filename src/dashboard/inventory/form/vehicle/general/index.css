@@ -34,14 +34,25 @@
 }
 
 .vehicle-general-overwrite__label {
+    padding-top: 2px;
     font-size: 18px;
     font-weight: 500;
     line-height: 1;
+    cursor: pointer;
 }
 
-.vehicle-general-overwrite__icon {
-    margin-left: 6px;
-    padding-top: 2px;
-    font-size: 16px;
+.vehicle-general-overwrite__icon.p-button.p-button-icon-only {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin-left: 2px;
+    border-radius: 50%;
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.vehicle-general-overwrite__icon .p-button-icon {
+    padding-top: 4px;
+    font-size: 14px;
     color: var(--admss-app-main-blue);
 }

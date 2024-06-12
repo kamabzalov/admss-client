@@ -34,7 +34,6 @@ enum DLSides {
 }
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
-    const [sex, setSex] = useState<string>("");
     const { id } = useParams();
     const store = useStore().contactStore;
     const {
@@ -126,8 +125,8 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         <div className='grid address-info row-gap-2'>
             <div className='col-3'>
                 <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
+                    optionLabel='label'
+                    optionValue='id'
                     filter
                     placeholder="DL's State"
                     value={contactExtData.Buyer_DL_State || ""}

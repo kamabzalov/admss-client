@@ -27,6 +27,13 @@ import { getKeyValue } from "services/local-storage.service";
 import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
+import { Button } from "primereact/button";
+
+const EQUIPMENT = "equipment";
+
+const parseMileage = (mileage: string): number => {
+    return parseFloat(mileage.replace(/,/g, ""));
+};
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -121,46 +128,58 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
-        if (vinInfo && inventory.GroupClassName !== "equipment") {
+        if (vinInfo && inventory.GroupClassName !== EQUIPMENT) {
             if (allowOverwrite) {
                 changeInventory({ key: "Make", value: vinInfo.Make });
                 changeInventory({ key: "Model", value: vinInfo.Model });
                 changeInventory({ key: "Year", value: vinInfo.Year });
-                changeInventory({ key: "Transmission", value: vinInfo.Transmission });
-                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel });
-                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine });
-                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders });
-                changeInventory({ key: "Engine", value: vinInfo.Engine });
+                changeInventory({ key: "Transmission", value: vinInfo.Transmission_id });
+                changeInventory({ key: "TypeOfFuel", value: vinInfo.TypeOfFuel_id });
+                changeInventory({ key: "DriveLine", value: vinInfo.DriveLine_id });
+                changeInventory({ key: "Cylinders", value: vinInfo.Cylinders_id });
+                changeInventory({ key: "Engine", value: vinInfo.Engine_id });
                 changeInventory({ key: "StockNo", value: vinInfo.StockNo });
                 changeInventory({ key: "Trim", value: vinInfo.Trim });
                 changeInventory({ key: "BodyStyle", value: vinInfo.BodyStyle });
+                changeInventory({ key: "InteriorColor", value: vinInfo.InteriorColor });
+                changeInventory({ key: "ExteriorColor", value: vinInfo.ExteriorColor });
+                changeInventory({ key: "mileage", value: vinInfo.mileage });
             } else {
                 changeInventory({ key: "Make", value: inventory.Make || vinInfo.Make });
                 changeInventory({ key: "Model", value: inventory.Model || vinInfo.Model });
                 changeInventory({ key: "Year", value: inventory.Year || vinInfo.Year });
                 changeInventory({
                     key: "Transmission",
-                    value: inventory.Transmission || vinInfo.Transmission,
+                    value: inventory.Transmission || vinInfo.Transmission_id,
                 });
                 changeInventory({
                     key: "TypeOfFuel",
-                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel,
+                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel_id,
                 });
                 changeInventory({
                     key: "DriveLine",
-                    value: inventory.DriveLine || vinInfo.DriveLine,
+                    value: inventory.DriveLine || vinInfo.DriveLine_id,
                 });
                 changeInventory({
                     key: "Cylinders",
-                    value: inventory.Cylinders || vinInfo.Cylinders,
+                    value: inventory.Cylinders || vinInfo.Cylinders_id,
                 });
-                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine });
+                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine_id });
                 changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
                 changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
                 changeInventory({
                     key: "BodyStyle",
                     value: inventory.BodyStyle || vinInfo.BodyStyle,
                 });
+                changeInventory({
+                    key: "InteriorColor",
+                    value: inventory.InteriorColor || vinInfo.InteriorColor,
+                });
+                changeInventory({
+                    key: "ExteriorColor",
+                    value: inventory.ExteriorColor || vinInfo.ExteriorColor,
+                });
+                changeInventory({ key: "mileage", value: inventory.mileage || vinInfo.mileage });
             }
         }
     };
@@ -223,33 +242,63 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='col-12'>
                 <hr className='form-line' />
             </div>
-
-            <div className='col-12'>
-                <div className='vehicle-general-overwrite pb-3'>
-                    <Checkbox
-                        checked={allowOverwrite}
-                        id='vehicle-general-overwrite'
-                        className='vehicle-general-overwrite__checkbox'
-                        onChange={() => setAllowOverwrite(!allowOverwrite)}
-                    />
-                    <label className='pl-3 vehicle-general-overwrite__label'>Overwrite data</label>
-                    <i className='icon adms-help vehicle-general-overwrite__icon' />
+            {inventory.GroupClassName === EQUIPMENT ? (
+                <div className='col-6 relative'>
+                    <span className='p-float-label'>
+                        <InputText
+                            value={values.VIN}
+                            onChange={({ target: { value } }) => {
+                                setFieldValue("VIN", value);
+                                changeInventory({ key: "VIN", value });
+                            }}
+                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
+                        />
+                        <label className='float-label'>VIN (required)</label>
+                    </span>
+                    <small className='p-error'>{errors.VIN}</small>
                 </div>
-            </div>
+            ) : (
+                <>
+                    <div className='col-12'>
+                        <div className='vehicle-general-overwrite pb-3'>
+                            <Checkbox
+                                checked={allowOverwrite}
+                                inputId='vehicle-general-overwrite'
+                                className='vehicle-general-overwrite__checkbox'
+                                onChange={() => setAllowOverwrite(!allowOverwrite)}
+                            />
+                            <label
+                                htmlFor='vehicle-general-overwrite'
+                                className='pl-3 vehicle-general-overwrite__label'
+                            >
+                                Overwrite data
+                            </label>
+                            <Button
+                                text
+                                tooltip='Data received from the VIN decoder service will overwrite user-entered data.'
+                                icon='icon adms-help'
+                                type='button'
+                                severity='info'
+                                className='vehicle-general-overwrite__icon transparent'
+                            />
+                        </div>
+                    </div>
 
-            <div className='col-6 relative'>
-                <VINDecoder
-                    value={values.VIN}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("VIN", value);
-                        changeInventory({ key: "VIN", value });
-                    }}
-                    onAction={handleVINchange}
-                    disabled={inventory.GroupClassName === "equipment"}
-                    className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
-                />
-                <small className='p-error'>{errors.VIN}</small>
-            </div>
+                    <div className='col-6 relative'>
+                        <VINDecoder
+                            value={values.VIN}
+                            onChange={({ target: { value } }) => {
+                                setFieldValue("VIN", value);
+                                changeInventory({ key: "VIN", value });
+                            }}
+                            onAction={handleVINchange}
+                            disabled={inventory.GroupClassName === "equipment"}
+                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
+                        />
+                        <small className='p-error'>{errors.VIN}</small>
+                    </div>
+                </>
+            )}
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
@@ -362,7 +411,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             errors.mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={parseFloat(inventory?.mileage) || 0}
+                        value={parseMileage(inventory?.mileage || "0")}
                         useGrouping={false}
                         min={0}
                         onChange={({ value }) => {
