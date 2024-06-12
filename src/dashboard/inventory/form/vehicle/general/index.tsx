@@ -281,7 +281,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                                 severity='info'
                                 className='vehicle-general-overwrite__icon transparent'
                             />
-                            {/* <i className='icon adms-help vehicle-general-overwrite__icon' /> */}
                         </div>
                     </div>
 
