@@ -1,10 +1,10 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { ContactTypeNameList, ContactUser } from "common/models/contact";
+import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { QueryParams } from "common/models/query-params";
 import { AuthUser } from "http/services/auth.service";
-import { getContacts } from "http/services/contacts-service";
+import { getContacts, getContactsTypeList } from "http/services/contacts-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
@@ -28,15 +28,27 @@ export const CompanySearch = ({
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<ContactUser[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [currentCategory, setCurrentCategory] = useState<number>();
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
+        if (contactCategory) {
+            getContactsTypeList("0").then((response) => {
+                if (response) {
+                    const types = response as ContactType[];
+                    const category = types?.find((item) => item.name === contactCategory)?.id;
+                    setCurrentCategory(category);
+                }
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleCompanyInputChange = (searchValue: string): void => {
         const params: QueryParams = {
             qry: `${searchValue}.${FIELD}`,
+            param: currentCategory,
         };
         user &&
             getContacts(user.useruid, params).then((response) => {
