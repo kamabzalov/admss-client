@@ -47,6 +47,7 @@ import {
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
+import { useStore } from "store/hooks";
 
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
@@ -76,6 +77,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     );
     const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
     const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
+    const store = useStore().inventoryStore;
 
     const navigate = useNavigate();
 
@@ -157,12 +159,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                 (location) => location.locationuid === settings.currentLocation
                             );
                             setCurrentLocation(location || ({} as InventoryLocations));
+                            store.currentLocation = location?.locationuid || "";
                         }
                     }
                 })
                 .finally(() => setIsLoading(false));
         }
-    }, [authUser, locations]);
+    }, [authUser, locations, store]);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -687,6 +690,8 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                                 ...serverSettings,
                                                 currentLocation: location.locationuid,
                                             });
+
+                                            store.currentLocation = location.locationuid;
                                         },
                                     })),
                                 ]}

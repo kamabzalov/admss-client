@@ -135,9 +135,6 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                     }
                 }
             });
-            getContactsAmount(authUser.useruid, { total: 1 }).then((response) => {
-                setTotalRecords(response?.total ?? 0);
-            });
         }
     }, [contactCategory]);
 
@@ -152,6 +149,12 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
             top: lazyState.rows,
         };
         if (authUser) {
+            if (!selectedCategory && contactCategory) {
+                return;
+            }
+            getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                setTotalRecords(response?.total ?? 0);
+            });
             getContacts(authUser.useruid, params).then((response) => {
                 if (response?.length) {
                     setUserContacts(response);
@@ -160,7 +163,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                 }
             });
         }
-    }, [selectedCategory, lazyState, authUser, globalSearch]);
+    }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
     useEffect(() => {
         if (authUser) {

@@ -368,7 +368,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
 
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade2_Allowance)}
+                    value={Number(Trade2_Allowance) || 0}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Trade2_Allowance", value: value || 0 });
                     }}
@@ -378,7 +378,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade2_Lien_Payoff)}
+                    value={Number(Trade2_Lien_Payoff) || 0}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Trade2_Lien_Payoff", value: value || 0 });
                     }}
@@ -388,7 +388,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade2_Lien_Payoff)}
+                    value={Number(Trade2_Lien_Payoff) || 0}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Trade2_Lien_Payoff", value: value || 0 });
                     }}

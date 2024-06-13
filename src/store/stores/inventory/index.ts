@@ -93,6 +93,7 @@ export class InventoryStore {
 
     private _printList: InventoryPrintForm[] = [];
     private _formErrorIndex: number[] = [];
+    private _currentLocation: string = "";
 
     protected _isLoading: boolean = false;
     protected _isFormChanged: boolean = false;
@@ -170,6 +171,10 @@ export class InventoryStore {
 
     public get formErrorMessage() {
         return this._formErrorMessage;
+    }
+
+    public get currentLocation() {
+        return this._currentLocation;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -632,6 +637,10 @@ export class InventoryStore {
 
     public set formErrorMessage(state: string) {
         this._formErrorMessage = state;
+    }
+
+    public set currentLocation(state: string) {
+        this._currentLocation = state;
     }
 
     public clearMedia = () => {

@@ -4,7 +4,7 @@ import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { Deals, DealsItem, DealsSection } from "../common";
+import { AccordionDealItems, Deals, DealsItem, DealsSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
@@ -55,6 +55,43 @@ export type PartialDeal = Pick<
         | "Trade2_Lien_Phone"
     >;
 
+const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
+    [AccordionDealItems.SALE]: [
+        "contactuid",
+        "inventoryuid",
+        "dealtype",
+        "dealstatus",
+        "saletype",
+        "datepurchase",
+        "dateeffective",
+        "inventorystatus",
+        "HowFoundOut",
+        "SaleID",
+    ],
+    [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.FIRST_TRADE]: [
+        "Trade1_Make",
+        "Trade1_Model",
+        "Trade1_VIN",
+        "Trade1_Year",
+        "Trade1_Mileage",
+        "Trade1_Lien_Address",
+        "Trade1_Lien_Phone",
+    ],
+    [AccordionDealItems.SECOND_TRADE]: [
+        "Trade2_Make",
+        "Trade2_Model",
+        "Trade2_VIN",
+        "Trade2_Year",
+        "Trade2_Mileage",
+        "Trade2_Lien_Address",
+        "Trade2_Lien_Phone",
+    ],
+};
+
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
+
 export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
     contactuid: Yup.string().required("Data is required."),
     inventoryuid: Yup.string().required("Data is required."),
@@ -78,7 +115,20 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
         .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
         .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
         .required("Data is required."),
-    Trade1_Year: Yup.string().required("Data is required."),
+    Trade1_Year: Yup.string().test(
+        "is-valid-year",
+        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+        function (value) {
+            const year = Number(value);
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        }
+    ),
     Trade1_Mileage: Yup.string().required("Data is required."),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
@@ -91,7 +141,20 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
         .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
         .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
         .required("Data is required."),
-    Trade2_Year: Yup.string().required("Data is required."),
+    Trade2_Year: Yup.string().test(
+        "is-valid-year",
+        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+        function (value) {
+            const year = Number(value);
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        }
+    ),
     Trade2_Mileage: Yup.string().required("Data is required."),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
@@ -99,6 +162,8 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
         excludeEmptyString: false,
     }),
 });
+
+const DATE_NOW = new Date().toISOString();
 
 export const DealsForm = observer(() => {
     const { id } = useParams();
@@ -119,6 +184,7 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
+    const [errorSections, setErrorSections] = useState<string[]>([]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -174,6 +240,19 @@ export const DealsForm = observer(() => {
             if (!Object.keys(errors).length) {
                 formikRef.current?.submitForm();
             } else {
+                const sectionsWithErrors = Object.keys(errors);
+                const currentSectionsWithErrors: string[] = [];
+                Object.entries(tabFields).forEach(([key, value]) => {
+                    value.forEach((field) => {
+                        if (
+                            sectionsWithErrors.includes(field) &&
+                            !currentSectionsWithErrors.includes(key)
+                        ) {
+                            currentSectionsWithErrors.push(key);
+                        }
+                    });
+                });
+                setErrorSections(currentSectionsWithErrors);
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
@@ -234,6 +313,11 @@ export const DealsForm = observer(() => {
                                                                     getUrl(section.startIndex + idx)
                                                                 );
                                                             },
+                                                            className: errorSections.length
+                                                                ? errorSections.includes(itemLabel)
+                                                                    ? "section-invalid"
+                                                                    : "section-valid"
+                                                                : "",
                                                         })
                                                     )}
                                                     className='vertical-step-menu'
@@ -271,8 +355,8 @@ export const DealsForm = observer(() => {
                                                     dealtype: deal.dealtype,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
-                                                    datepurchase: deal.datepurchase || "",
-                                                    dateeffective: deal.dateeffective || "",
+                                                    datepurchase: deal.datepurchase || DATE_NOW,
+                                                    dateeffective: deal.dateeffective || DATE_NOW,
                                                     inventorystatus: deal.inventorystatus || "",
                                                     accountuid: deal.accountuid || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
