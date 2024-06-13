@@ -1,3 +1,4 @@
+import { AccordionDealItems } from "dashboard/deals/common";
 import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
@@ -35,15 +36,15 @@ const DealRetailContract = lazy(() =>
 export const DealRetail: Pick<Inventory, "label" | "items"> = {
     label: "Retail (Cash)",
     items: [
-        { itemLabel: "Liens", component: <DealRetailLiens /> },
-        { itemLabel: "Trade 1", component: <DealRetailTradeFirst /> },
-        { itemLabel: "Trade 2", component: <DealRetailTradeSecond /> },
-        { itemLabel: "Tag", component: <DealRetailTag /> },
-        { itemLabel: "Insurance", component: <DealRetailInsurance /> },
-        { itemLabel: "Insurance Charges", component: <DealRetailCharges /> },
-        { itemLabel: "F&I products", component: <DealRetailProducts /> },
-        { itemLabel: "Finances", component: <DealRetailFinances /> },
-        { itemLabel: "Pickup payments", component: <DealRetailPickup /> },
-        { itemLabel: "Contract Printing", component: <DealRetailContract /> },
+        { itemLabel: AccordionDealItems.LIENS, component: <DealRetailLiens /> },
+        { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTradeFirst /> },
+        { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTradeSecond /> },
+        { itemLabel: AccordionDealItems.TAG, component: <DealRetailTag /> },
+        { itemLabel: AccordionDealItems.INSURANCE, component: <DealRetailInsurance /> },
+        { itemLabel: AccordionDealItems.CHARGES, component: <DealRetailCharges /> },
+        { itemLabel: AccordionDealItems.PRODUCTS, component: <DealRetailProducts /> },
+        { itemLabel: AccordionDealItems.FINANCES, component: <DealRetailFinances /> },
+        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
+        { itemLabel: AccordionDealItems.CONTRACT, component: <DealRetailContract /> },
     ],
 };

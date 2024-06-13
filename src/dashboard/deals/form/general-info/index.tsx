@@ -1,3 +1,4 @@
+import { AccordionDealItems } from "dashboard/deals/common";
 import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
@@ -14,8 +15,8 @@ const DealsSeller = lazy(() =>
 export const DealGeneralInfo: Pick<Inventory, "label" | "items"> = {
     label: "General information",
     items: [
-        { itemLabel: "Sale", component: <DealsSale /> },
-        { itemLabel: "Odometer", component: <DealsOdometer /> },
-        { itemLabel: "Seller", component: <DealsSeller /> },
+        { itemLabel: AccordionDealItems.SALE, component: <DealsSale /> },
+        { itemLabel: AccordionDealItems.ODOMETER, component: <DealsOdometer /> },
+        { itemLabel: AccordionDealItems.SELLER, component: <DealsSeller /> },
     ],
 };

@@ -109,6 +109,7 @@ export const InventoryForm = observer(() => {
         inventory,
         inventoryExtData,
         isFormChanged,
+        currentLocation,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -365,7 +366,10 @@ export const InventoryForm = observer(() => {
                                                     Year: inventory.Year,
                                                     TypeOfFuel: inventory?.TypeOfFuel || "",
                                                     StockNo: inventory?.StockNo || "",
-                                                    locationuid: inventory?.locationuid || " ",
+                                                    locationuid:
+                                                        inventory?.locationuid ||
+                                                        currentLocation ||
+                                                        " ",
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                     purPurchasedFrom:
                                                         inventoryExtData?.purPurchasedFrom || "",

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
@@ -15,6 +16,22 @@ export interface Deals {
     sectionId: number;
     startIndex: number;
     getLength: () => number;
+}
+
+export enum AccordionDealItems {
+    SALE = "Sale",
+    ODOMETER = "Odometer",
+    SELLER = "Seller",
+    LIENS = "Liens",
+    FIRST_TRADE = "Trade 1",
+    SECOND_TRADE = "Trade 2",
+    TAG = "Tag",
+    INSURANCE = "Insurance",
+    CHARGES = "Insurance Charges",
+    PRODUCTS = "F&I products",
+    FINANCES = "Finances",
+    PICKUP = "Pickup payments",
+    CONTRACT = "Contract Printing",
 }
 
 export class DealsSection implements Deals {
