@@ -10,7 +10,7 @@ import { DropdownProps } from "primereact/dropdown";
 import { Inventory } from "common/models/inventory";
 import Inventories from "dashboard/inventory";
 
-const FIELD: keyof Inventory = "name";
+const FIELD: keyof Inventory = "Make";
 
 interface InventorySearchProps extends DropdownProps {
     onRowClick?: (inventoryName: string) => void;
