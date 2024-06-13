@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { BaseResponse, Status } from "../base-response";
+import { BaseResponse, BaseResponseError } from "../base-response";
 
 export interface ContactExtData {
     created: number;
@@ -231,10 +231,14 @@ export interface ContactExtData {
 }
 export interface Contact {
     ZIP: string;
+    businessName: string;
+    businessSite: string;
     city: string;
     companyName: string;
     contactuid: string;
     created: string;
+    dl_expiration: string;
+    dl_issuedate: string;
     dl_number: string;
     dluidback: string;
     dluidfront: string;
@@ -246,6 +250,12 @@ export interface Contact {
     extdata?: ContactExtData;
     firstName: string;
     lastName: string;
+    mailCity: string;
+    mailEmail: string;
+    mailPhone: string;
+    mailState: string;
+    mailStreetAddress: string;
+    mailZIP: string;
     messager1: string;
     messager2: string;
     messager3: string;
@@ -265,8 +275,7 @@ export interface Contact {
     useruid: string;
 }
 
-export interface ContactsCategories {
-    status: Status;
+export interface ContactsCategories extends BaseResponseError {
     contact_types: ContactType[];
 }
 

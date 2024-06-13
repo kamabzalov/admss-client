@@ -14,15 +14,21 @@ import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
 import { Form, Formik, FormikProps } from "formik";
-import { Contact } from "common/models/contact";
+import { Contact, ContactExtData } from "common/models/contact";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 const STEP = "step";
 
-type PartialContact = Pick<Contact, "firstName" | "lastName" | "type" | "companyName">;
+export type PartialContact = Pick<
+    Contact,
+    "firstName" | "lastName" | "type" | "companyName" | "email1" | "email2" | "phone1" | "phone2"
+> &
+    Pick<ContactExtData, "Buyer_Emp_Ext" | "Buyer_Emp_Phone">;
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
     [ContactAccordionItems.GENERAL]: ["firstName", "lastName", "type", "companyName"],
+    [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
+    [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
@@ -31,6 +37,16 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     firstName: Yup.string().trim().required("Data is required."),
     lastName: Yup.string().trim().required("Data is required."),
     type: Yup.number().required("Data is required."),
+    email1: Yup.string().email("Invalid email address."),
+    email2: Yup.string().email("Invalid email address."),
+    phone1: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Invalid phone number.",
+        excludeEmptyString: false,
+    }),
+    phone2: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Invalid phone number.",
+        excludeEmptyString: false,
+    }),
     companyName: Yup.string()
         .trim()
         .when("type", ([type]) => {
@@ -38,6 +54,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
                 ? Yup.string().trim().required("Data is required.")
                 : Yup.string().trim();
         }),
+    Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
+    Buyer_Emp_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Invalid phone number.",
+        excludeEmptyString: false,
+    }),
 });
 
 export const ContactForm = observer((): ReactElement => {
@@ -53,7 +74,7 @@ export const ContactForm = observer((): ReactElement => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { contact, getContact, clearContact, saveContact } = store;
+    const { contact, contactExtData, getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
@@ -212,6 +233,14 @@ export const ContactForm = observer((): ReactElement => {
                                                     lastName: contact?.lastName || "",
                                                     type: contact?.type || "",
                                                     companyName: contact?.companyName || "",
+                                                    email1: contact?.email1 || "",
+                                                    email2: contact?.email2 || "",
+                                                    phone1: contact?.phone1 || "",
+                                                    phone2: contact?.phone2 || "",
+                                                    Buyer_Emp_Ext:
+                                                        contactExtData.Buyer_Emp_Ext || "",
+                                                    Buyer_Emp_Phone:
+                                                        contactExtData.Buyer_Emp_Phone || "",
                                                 } as PartialContact
                                             }
                                             enableReinitialize

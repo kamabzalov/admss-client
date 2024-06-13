@@ -26,7 +26,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     useEffect(() => {
         if (id) {
             getContactsTypeList(id).then((response) => {
-                response && setTypeList(response);
+                if (response) {
+                    const types = response as ContactType[];
+                    setTypeList(types);
+                }
             });
         }
     }, [id]);

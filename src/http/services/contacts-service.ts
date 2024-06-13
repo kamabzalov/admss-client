@@ -8,17 +8,7 @@ import {
     TotalUsers,
 } from "common/models/contact";
 import { BaseResponse, Status } from "common/models/base-response";
-
-export const getContactsCategories = async () => {
-    try {
-        const request = await authorizedUserApiInstance.get<ContactsCategories>(
-            `contacts/0/listtypes`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
+import { isAxiosError } from "axios";
 
 export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
@@ -53,7 +43,7 @@ export const getContactInfo = async (uid: string) => {
     }
 };
 
-export const getContactsTypeList = async (uid: string) => {
+export const getContactsTypeList = async (uid: string | "0") => {
     try {
         const request = await authorizedUserApiInstance.get<ContactsCategories>(
             `contacts/${uid}/listtypes`
@@ -62,7 +52,12 @@ export const getContactsTypeList = async (uid: string) => {
             return request.data.contact_types;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on get contacts type list",
+            };
+        }
     }
 };
 

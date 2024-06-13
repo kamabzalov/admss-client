@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
     getContacts,
     getContactsAmount,
-    getContactsCategories,
+    getContactsTypeList,
 } from "http/services/contacts-service";
 import { AuthUser } from "http/services/auth.service";
 import {
@@ -123,15 +123,16 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getContactsCategories().then((response) => {
-                if (response?.contact_types.length) {
-                    if (contactCategory) {
-                        const category = response?.contact_types.find(
-                            (item) => item.name === contactCategory
-                        );
-                        setSelectedCategory(category ?? null);
+            getContactsTypeList("0").then((response) => {
+                if (response) {
+                    const types = response as ContactType[];
+                    if (types?.length) {
+                        if (contactCategory) {
+                            const category = types?.find((item) => item.name === contactCategory);
+                            setSelectedCategory(category ?? null);
+                        }
+                        setCategories(types);
                     }
-                    setCategories(response?.contact_types);
                 }
             });
             getContactsAmount(authUser.useruid, { total: 1 }).then((response) => {
@@ -204,9 +205,11 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         }
     };
 
-    const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({
+        data: { contactuid, firstName, lastName },
+    }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(companyName);
+            onRowClick(`${firstName} ${lastName}`);
         } else {
             navigate(contactuid);
         }
@@ -214,6 +217,15 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
 
     const renderFullName = (rowData: ContactUser) => {
         return `${rowData.firstName} ${rowData.lastName}`;
+    };
+
+    const handleCreateContact = () => {
+        const CREATE_LINK = "/dashboard/contacts/create";
+        if (onRowClick) {
+            window.open(CREATE_LINK, "_blank");
+        } else {
+            navigate(CREATE_LINK);
+        }
     };
 
     return (
@@ -250,7 +262,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                             severity='success'
                             type='button'
                             tooltip='Add new contact'
-                            onClick={() => navigate("/dashboard/contacts/create")}
+                            onClick={handleCreateContact}
                         />
                         <Button
                             severity='success'
@@ -286,7 +298,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
             </div>
             <div className='grid'>
                 <div className='col-12'>
-                    {!contacts.length || isLoading ? (
+                    {isLoading ? (
                         <div className='dashboard-loader__wrapper'>
                             <Loader overlay />
                         </div>
