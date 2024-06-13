@@ -651,9 +651,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
-    const handleOnRowClick = ({ data: { itemuid, name } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data: { itemuid, Make } }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(name);
+            onRowClick(Make);
         } else {
             navigate(itemuid);
         }
