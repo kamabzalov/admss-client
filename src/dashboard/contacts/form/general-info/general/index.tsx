@@ -28,11 +28,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
     useEffect(() => {
-        if (id) {
-            getContactsTypeList(id).then((response) => {
-                response && setTypeList(response);
-            });
-        }
+        getContactsTypeList(id || "0").then((response) => {
+            if (response) {
+                const types = response as ContactType[];
+                setTypeList(types);
+            }
+        });
     }, [id]);
 
     return (
@@ -93,8 +94,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='general-info__text-input w-full'
-                        value={contact.companyName || ""}
-                        onChange={({ target: { value } }) => changeContact("companyName", value)}
+                        value={contact.businessName || ""}
+                        onChange={({ target: { value } }) => changeContact("businessName", value)}
                     />
                     <label className='float-label'>Business Name</label>
                 </span>
