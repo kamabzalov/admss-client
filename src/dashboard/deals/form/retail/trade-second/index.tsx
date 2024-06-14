@@ -27,6 +27,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
     const {
         dealExtData: {
             Trade2_Color,
+            Trade2_Mileage,
+            Trade2_Year,
             Trade2_BodyStyle,
             Trade2_Title_Num,
             Trade2_StockNum,
@@ -121,7 +123,6 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 changeDealExtData({ key: "Trade2_Make", value: vinInfo.Make });
                 changeDealExtData({ key: "Trade2_Model", value: vinInfo.Model });
                 changeDealExtData({ key: "Trade2_Year", value: vinInfo.Year });
-
                 changeDealExtData({
                     key: "Trade2_StockNum",
                     value: vinInfo.StockNo,
@@ -130,12 +131,40 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     key: "Trade2_BodyStyle",
                     value: vinInfo.BodyStyle,
                 });
+                changeDealExtData({
+                    key: "Trade2_Color",
+                    value: vinInfo.ExteriorColor,
+                });
+                changeDealExtData({ key: "Trade2_Mileage", value: vinInfo.mileage });
             } else {
-                setFieldValue("Trade2_Make", values.Trade2_Make || vinInfo.Make);
-                setFieldValue("Trade2_Model", values.Trade2_Model || vinInfo.Model);
-                setFieldValue("Trade2_Year", values.Trade2_Year || vinInfo.Year);
-                setFieldValue("Trade2_StockNum", Trade2_StockNum || vinInfo.StockNo);
-                setFieldValue("Trade2_BodyStyle", Trade2_BodyStyle || vinInfo.BodyStyle);
+                changeDealExtData({
+                    key: "Trade2_Make",
+                    value: values.Trade2_Make || vinInfo.Make,
+                });
+                changeDealExtData({
+                    key: "Trade2_Model",
+                    value: values.Trade2_Model || vinInfo.Model,
+                });
+                changeDealExtData({
+                    key: "Trade2_Year",
+                    value: values.Trade2_Year || vinInfo.Year,
+                });
+                changeDealExtData({
+                    key: "Trade2_StockNum",
+                    value: Trade2_StockNum || vinInfo.StockNo,
+                });
+                changeDealExtData({
+                    key: "Trade2_BodyStyle",
+                    value: Trade2_BodyStyle || vinInfo.BodyStyle,
+                });
+                changeDealExtData({
+                    key: "Trade2_Color",
+                    value: Trade2_Color || vinInfo.ExteriorColor,
+                });
+                changeDealExtData({
+                    key: "Trade2_Mileage",
+                    value: Trade2_Mileage || vinInfo.mileage,
+                });
             }
         }
     };
@@ -219,7 +248,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                         required
                         min={0}
                         useGrouping={false}
-                        value={parseInt(values.Trade2_Year) || null}
+                        value={parseInt(Trade2_Year) || null}
                         onChange={({ value }) => {
                             if (!value) {
                                 return changeDealExtData({ key: "Trade2_Year", value: "" });
