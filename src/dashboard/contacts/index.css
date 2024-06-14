@@ -50,3 +50,38 @@
     font-size: 20px;
     font-weight: 700;
 }
+
+.contacts__button.p-button-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--admss-app-light-green);
+    color: var(--admss-app-dark-green);
+    width: 100%;
+    font-weight: 700;
+}
+
+.contact-social {
+    display: flex;
+    align-items: center;
+}
+
+.contact-social__input {
+    height: 50px;
+    border-radius: 5px 0 0 5px;
+}
+
+.contact-social__icon {
+    flex: 0 0 50px;
+    font-size: 24px;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--admss-app-medium-grey);
+    background-color: var(--admss-app-lightest-grey);
+    border-radius: 0 5px 5px 0;
+    border: 1px solid var(--admss-app-light-grey);
+    border-left: none;
+}
