@@ -548,7 +548,20 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     optionLabel='header'
                     onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                         stopPropagation();
-                        setActiveColumns(value);
+                        const sortedValue = value.sort(
+                            (a: TableColumnsList, b: TableColumnsList) => {
+                                const firstIndex = columns.findIndex(
+                                    (col) => col.field === a.field
+                                );
+                                const secondIndex = columns.findIndex(
+                                    (col) => col.field === b.field
+                                );
+                                return firstIndex - secondIndex;
+                            }
+                        );
+
+                        setActiveColumns(sortedValue);
+
                         changeSettings({
                             activeColumns: value.map(({ field }: { field: string }) => field),
                         });
