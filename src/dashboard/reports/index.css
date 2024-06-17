@@ -36,3 +36,14 @@
 .reports__list-item .reports-actions {
     margin-left: auto;
 }
+
+.new-collection.p-panel .p-panel-content {
+    border: none;
+    background-color: var(--admss-app-lightest-grey);
+}
+
+.new-collection__multiselect {
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+}
