@@ -1,6 +1,5 @@
 import { LS_APP_USER } from "common/constants/localStorage";
 import { UserPermissionsResponse } from "common/models/user";
-import { getUserPermissions } from "http/services/auth-user.service";
 import { AuthUser } from "http/services/auth.service";
 import { makeAutoObservable } from "mobx";
 import { getKeyValue } from "services/local-storage.service";
@@ -19,11 +18,9 @@ export class UserStore {
         return this._storedUser;
     }
 
-    public getPermissions = async () => {
-        try {
-            const authUser = getKeyValue(LS_APP_USER);
-            const response = await getUserPermissions(authUser.useruid);
-            this._storedUser!.permissions = response as UserPermissionsResponse;
-        } catch (error) {}
-    };
+    public set userPermissions(permissions: UserPermissionsResponse) {
+        if (this._storedUser) {
+            this._storedUser = { ...this._storedUser, permissions };
+        }
+    }
 }

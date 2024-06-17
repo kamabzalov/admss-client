@@ -28,12 +28,7 @@ export const Dashboard = observer((): ReactElement => {
     }, []);
 
     const store = useStore().userStore;
-    const { getPermissions, authUser } = store;
-
-    useEffect(() => {
-        if (user) getPermissions();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    const { authUser } = store;
 
     if (!user || !authUser) {
         return <Loader overlay />;
