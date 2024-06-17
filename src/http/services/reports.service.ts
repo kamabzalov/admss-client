@@ -1,14 +1,28 @@
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { ReportsPostData } from "common/models/reports";
+import {
+    ReportCollectionContent,
+    ReportCollectionResponse,
+    ReportsListResponse,
+    ReportsPostData,
+} from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportsList = async (uid: string, queryParams?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/list`, {
-            params: queryParams,
-        });
-        return request.data;
+        const request = await authorizedUserApiInstance.get<ReportsListResponse>(
+            `reports/${uid}/list`,
+            {
+                params: queryParams,
+            }
+        );
+        if (request.data.status === Status.ERROR) {
+            return {
+                status: Status.ERROR,
+                error: request.data.error,
+            };
+        }
+        return request.data.documents;
     } catch (error) {
         return {
             status: Status.ERROR,
@@ -31,8 +45,10 @@ export const getReportCollection = async (uid: string) => {
 
 export const getUserReportCollections = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/collections`);
-        return request.data;
+        const request = await authorizedUserApiInstance.get<ReportCollectionResponse>(
+            `reports/${uid}/collections`
+        );
+        return request.data.collections;
     } catch (error) {
         return {
             status: Status.ERROR,
@@ -174,9 +190,38 @@ export const getReportById = async (reportId: string) => {
     }
 };
 
+export const createReportCollection = async (useruid: string, name: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${useruid}/collection`,
+            { name }
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while creating report collection",
+        };
+    }
+};
+
 export const printDocumentByUser = async (userId: string | undefined) => {
     const request = await authorizedUserApiInstance
         .get<any>(`print/${userId}/${userId}`)
         .then((response) => response.data);
     return request;
+};
+
+export const getUserReportCollectionsContent = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | ReportCollectionContent[]
+        >(`reports/${uid}/collectionscontent `);
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting user report collections content",
+        };
+    }
 };
