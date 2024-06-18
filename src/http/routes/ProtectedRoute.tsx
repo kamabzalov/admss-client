@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { ReactElement, ReactNode, useEffect, useState, Suspense } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
@@ -7,6 +7,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { UserPermissionsResponse } from "common/models/user";
 import { Loader } from "dashboard/common/loader";
+import { createApiDashboardInstance } from "http/index";
 
 interface UserRoles {
     admin: boolean;
@@ -22,12 +23,14 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps): ReactElement => {
     const store = useStore().userStore;
+    const navigate = useNavigate();
     const [hasRequiredRole, setHasRequiredRole] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const authUser = getKeyValue(LS_APP_USER);
     useEffect(() => {
         if (authUser) {
+            createApiDashboardInstance(navigate);
             getUserPermissions(authUser.useruid).then((response) => {
                 setIsLoading(false);
                 if (!response) return setHasRequiredRole(false);
@@ -41,7 +44,8 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
         } else {
             setIsLoading(false);
         }
-    }, [authUser, store]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     if (isLoading) {
         return <Loader overlay />;
