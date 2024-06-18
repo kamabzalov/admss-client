@@ -54,6 +54,7 @@ export const Header = observer((): ReactElement => {
         logout(useruid).finally(() => {
             localStorageClear(LS_APP_USER);
             navigate("/");
+            window.location.reload();
         });
     };
 
