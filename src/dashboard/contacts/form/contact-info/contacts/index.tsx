@@ -47,8 +47,8 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         }`}
                         value={values.email1 || ""}
                         onBlur={handleBlur}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("email1", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("email1", value);
                             changeContact("email1", value);
                             setFieldTouched("email1", true, true);
                         }}
@@ -66,11 +66,11 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             }`}
                             onBlur={handleBlur}
                             value={values.email2 || ""}
-                            onChange={({ target: { value } }) => {
+                            onChange={async ({ target: { value } }) => {
                                 if (!value?.length) setAnotherEmail(false);
-                                setFieldTouched("email2", true, true);
-                                setFieldValue("email2", value);
+                                await setFieldValue("email2", value);
                                 changeContact("email2", value);
+                                setFieldTouched("email2", true, true);
                             }}
                         />
                         <label className='float-label'>E-mail address</label>
@@ -99,10 +99,10 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         }`}
                         onBlur={handleBlur}
                         value={values.phone1 || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldTouched("phone1", true, true);
-                            setFieldValue("phone1", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("phone1", value);
                             changeContact("phone1", value);
+                            setFieldTouched("phone1", true, true);
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
@@ -118,11 +118,11 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             }`}
                             value={values.phone2 || ""}
                             onBlur={handleBlur}
-                            onChange={({ target: { value } }) => {
+                            onChange={async ({ target: { value } }) => {
                                 if (!value?.length) setAnotherPhone(false);
-                                setFieldTouched("phone2", true, true);
-                                setFieldValue("phone2", value);
+                                await setFieldValue("phone2", value);
                                 changeContact("phone2", value);
+                                setFieldTouched("phone2", true, true);
                             }}
                         />
                         <label className='float-label'>Phone Number</label>

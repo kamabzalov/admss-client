@@ -46,10 +46,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                         }`}
                         onBlur={handleBlur}
                         value={values.Buyer_Emp_Ext || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Buyer_Emp_Ext", value);
-                            setFieldTouched("Buyer_Emp_Ext", true, true);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Buyer_Emp_Ext", value);
                             changeContactExtData("Buyer_Emp_Ext", value);
+                            setFieldTouched("Buyer_Emp_Ext", true, true);
                         }}
                     />
                     <label className='float-label'>E-mail</label>
@@ -65,10 +65,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                         }`}
                         onBlur={handleBlur}
                         value={values.Buyer_Emp_Phone || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Buyer_Emp_Phone", value);
-                            setFieldTouched("Buyer_Emp_Phone", true, true);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Buyer_Emp_Phone", value);
                             changeContactExtData("Buyer_Emp_Phone", value);
+                            setFieldTouched("Buyer_Emp_Phone", true, true);
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
