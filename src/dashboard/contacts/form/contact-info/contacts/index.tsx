@@ -27,7 +27,8 @@ const SocialInput = (props: SocialInputProps): ReactElement => {
 export const ContactsSocialInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact, changeContact } = store;
-    const { values, errors, setFieldValue } = useFormikContext<Contact>();
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+        useFormikContext<Contact>();
     const [anotherEmail, setAnotherEmail] = useState<boolean>(false);
     const [anotherPhone, setAnotherPhone] = useState<boolean>(false);
 
@@ -45,9 +46,11 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             errors.email1 ? "p-invalid" : ""
                         }`}
                         value={values.email1 || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("email1", value);
+                        onBlur={handleBlur}
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("email1", value);
                             changeContact("email1", value);
+                            setFieldTouched("email1", true, true);
                         }}
                     />
                     <label className='float-label'>E-mail address</label>
@@ -61,11 +64,13 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             className={`contacts-social__text-input w-full ${
                                 errors.email2 ? "p-invalid" : ""
                             }`}
+                            onBlur={handleBlur}
                             value={values.email2 || ""}
-                            onChange={({ target: { value } }) => {
+                            onChange={async ({ target: { value } }) => {
                                 if (!value?.length) setAnotherEmail(false);
-                                setFieldValue("email2", value);
+                                await setFieldValue("email2", value);
                                 changeContact("email2", value);
+                                setFieldTouched("email2", true, true);
                             }}
                         />
                         <label className='float-label'>E-mail address</label>
@@ -92,10 +97,12 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         className={`contacts-social__text-input w-full ${
                             errors.phone1 ? "p-invalid" : ""
                         }`}
+                        onBlur={handleBlur}
                         value={values.phone1 || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("phone1", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("phone1", value);
                             changeContact("phone1", value);
+                            setFieldTouched("phone1", true, true);
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
@@ -110,10 +117,12 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                                 errors.phone2 ? "p-invalid" : ""
                             }`}
                             value={values.phone2 || ""}
-                            onChange={({ target: { value } }) => {
+                            onBlur={handleBlur}
+                            onChange={async ({ target: { value } }) => {
                                 if (!value?.length) setAnotherPhone(false);
-                                setFieldValue("phone2", value);
+                                await setFieldValue("phone2", value);
                                 changeContact("phone2", value);
+                                setFieldTouched("phone2", true, true);
                             }}
                         />
                         <label className='float-label'>Phone Number</label>

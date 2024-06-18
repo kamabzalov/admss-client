@@ -8,7 +8,8 @@ import { ContactExtData } from "common/models/contact";
 export const ContactsWorkplace = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
-    const { values, errors, setFieldValue } = useFormikContext<ContactExtData>();
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+        useFormikContext<ContactExtData>();
     return (
         <div className='grid contacts-workplace row-gap-2'>
             <div className='col-6'>
@@ -43,10 +44,12 @@ export const ContactsWorkplace = observer((): ReactElement => {
                         className={`contacts-workplace__text-input w-full ${
                             errors.Buyer_Emp_Ext ? "p-invalid" : ""
                         }`}
+                        onBlur={handleBlur}
                         value={values.Buyer_Emp_Ext || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Buyer_Emp_Ext", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Buyer_Emp_Ext", value);
                             changeContactExtData("Buyer_Emp_Ext", value);
+                            setFieldTouched("Buyer_Emp_Ext", true, true);
                         }}
                     />
                     <label className='float-label'>E-mail</label>
@@ -58,12 +61,14 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className={`contacts-workplace__text-input w-full ${
-                            errors.Buyer_Emp_Ext ? "p-invalid" : ""
+                            errors.Buyer_Emp_Phone ? "p-invalid" : ""
                         }`}
+                        onBlur={handleBlur}
                         value={values.Buyer_Emp_Phone || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Buyer_Emp_Phone", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Buyer_Emp_Phone", value);
                             changeContactExtData("Buyer_Emp_Phone", value);
+                            setFieldTouched("Buyer_Emp_Phone", true, true);
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
