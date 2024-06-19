@@ -3,102 +3,114 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { AuthUser } from "http/services/auth.service";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
-import { Dropdown } from "primereact/dropdown";
+import { observer } from "mobx-react-lite";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getKeyValue } from "services/local-storage.service";
+import { useStore } from "store/hooks";
 
-interface DeleteFormProps {
+interface DeleteFormProps extends DropdownProps {
     isDeleteConfirm: boolean;
+    attemptedSubmit?: boolean;
 }
 
-export const DeleteForm = ({ isDeleteConfirm }: DeleteFormProps): ReactElement => {
-    const toast = useToast();
-    const navigate = useNavigate();
-    const { id } = useParams();
+export const DeleteForm = observer(
+    ({ isDeleteConfirm, attemptedSubmit }: DeleteFormProps): ReactElement => {
+        const toast = useToast();
+        const navigate = useNavigate();
+        const { id } = useParams();
+        const store = useStore().inventoryStore;
 
-    const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
-    const [reason, setReason] = useState<string>("");
-    const [comment, setComment] = useState<string>("");
+        const { deleteReason } = store;
 
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            getInventoryDeleteReasonsList(authUser.useruid).then((res) => {
-                Array.isArray(res) && setDeleteReasonsList(res);
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+        const [comment, setComment] = useState<string>("");
 
-    const handleDeleteInventory = () => {
-        if (id && reason) {
-            deleteInventory(id, { reason, comment }).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    const { error } = response as BaseResponseError;
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error || "Error while deleting inventory",
-                    });
-                } else {
-                    navigate("/dashboard/inventory");
-                }
-            });
-        }
-    };
+        useEffect(() => {
+            const authUser: AuthUser = getKeyValue(LS_APP_USER);
+            if (authUser) {
+                getInventoryDeleteReasonsList(authUser.useruid).then((res) => {
+                    Array.isArray(res) && setDeleteReasonsList(res);
+                });
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, []);
 
-    useEffect(() => {
-        if (isDeleteConfirm) {
-            handleDeleteInventory();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isDeleteConfirm]);
+        const handleDeleteInventory = () => {
+            if (id && deleteReason) {
+                deleteInventory(id, { reason: deleteReason, comment }).then((response) => {
+                    if (response?.status === Status.ERROR) {
+                        const { error } = response as BaseResponseError;
+                        toast.current?.show({
+                            severity: "error",
+                            summary: "Error",
+                            detail: error || "Error while deleting inventory",
+                        });
+                    } else {
+                        navigate("/dashboard/inventory");
+                    }
+                });
+            }
+        };
 
-    return (
-        <div className='inventory-form'>
-            <div className='inventory-form__title inventory-form__title--danger uppercase'>
-                Delete inventory
-            </div>
-            <div className='grid'>
-                <div className='col-6'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='name'
-                            value={reason}
-                            required
-                            filter
-                            onChange={({ value }) => {
-                                setReason(value);
-                            }}
-                            options={deleteReasonsList}
-                            className='w-full vehicle-general__dropdown'
-                        />
-                        <label className='float-label'>Reason (required)</label>
-                    </span>
+        useEffect(() => {
+            if (isDeleteConfirm) {
+                handleDeleteInventory();
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [isDeleteConfirm]);
+
+        return (
+            <div className='inventory-form'>
+                <div className='inventory-form__title inventory-form__title--danger uppercase'>
+                    Delete inventory
                 </div>
-                <div className='col-12'>
-                    <span className='p-float-label'>
-                        <InputTextarea
-                            className='w-full'
-                            value={comment}
-                            pt={{
-                                root: {
-                                    style: {
-                                        height: "110px",
+                <div className='grid'>
+                    <div className='col-6 relative'>
+                        <span className='p-float-label'>
+                            <Dropdown
+                                optionLabel='name'
+                                optionValue='name'
+                                value={deleteReason}
+                                required
+                                filter
+                                onChange={({ value }) => {
+                                    store.deleteReason = value;
+                                }}
+                                options={deleteReasonsList}
+                                className={`w-full vehicle-general__dropdown ${
+                                    attemptedSubmit && !deleteReason ? "p-invalid" : ""
+                                }`}
+                            />
+                            <label className='float-label'>Reason (required)</label>
+                        </span>
+                        {attemptedSubmit && !deleteReason && (
+                            <small className='p-error'>Data is required</small>
+                        )}
+                    </div>
+                    <div className='col-12'>
+                        <span className='p-float-label'>
+                            <InputTextarea
+                                className='w-full'
+                                value={comment}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            height: "110px",
+                                        },
                                     },
-                                },
-                            }}
-                            onChange={({ target: { value } }) => {
-                                setComment(value);
-                            }}
-                        />
-                        <label className='float-label'>Comment</label>
-                    </span>
+                                }}
+                                onChange={({ target: { value } }) => {
+                                    setComment(value);
+                                }}
+                            />
+                            <label className='float-label'>Comment</label>
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+);

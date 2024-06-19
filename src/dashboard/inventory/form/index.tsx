@@ -104,6 +104,7 @@ export const InventoryForm = observer(() => {
         inventoryExtData,
         isFormChanged,
         currentLocation,
+        deleteReason,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -114,6 +115,7 @@ export const InventoryForm = observer(() => {
     const formikRef = useRef<FormikProps<PartialInventory>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -389,7 +391,10 @@ export const InventoryForm = observer(() => {
                                                     </div>
                                                 )}
                                                 {stepActiveIndex === deleteActiveIndex && (
-                                                    <DeleteForm isDeleteConfirm={isDeleteConfirm} />
+                                                    <DeleteForm
+                                                        attemptedSubmit={attemptedSubmit}
+                                                        isDeleteConfirm={isDeleteConfirm}
+                                                    />
                                                 )}
                                             </Form>
                                         </Formik>
@@ -435,7 +440,11 @@ export const InventoryForm = observer(() => {
                                 </Button>
                                 {stepActiveIndex === deleteActiveIndex ? (
                                     <Button
-                                        onClick={() => setConfirmActive(true)}
+                                        onClick={() =>
+                                            deleteReason.length
+                                                ? setConfirmActive(true)
+                                                : setAttemptedSubmit(true)
+                                        }
                                         className='p-button uppercase px-6 inventory__button inventory__button--danger'
                                     >
                                         Delete
