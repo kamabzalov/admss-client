@@ -6,14 +6,13 @@ import { useStore } from "store/hooks";
 
 export const ExportWebExtra = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryExportWeb, changeExportWeb, exportWebActive } = store;
+    const { inventoryExportWeb, changeExportWeb } = store;
     return (
         <div className='grid export-web-extra row-gap-2'>
             <div className='col-12'>
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.ExtraField1}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "ExtraField1", value })
                         }
@@ -27,7 +26,6 @@ export const ExportWebExtra = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.ExtraField2}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "ExtraField2", value })
                         }
@@ -41,7 +39,6 @@ export const ExportWebExtra = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputTextarea
                         value={inventoryExportWeb.ExtraField3}
-                        disabled={!exportWebActive}
                         onChange={({ target: { value } }) =>
                             changeExportWeb({ key: "ExtraField3", value })
                         }
