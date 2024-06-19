@@ -372,12 +372,8 @@ export class InventoryStore {
                 options_info: this.inventoryOptions,
                 Audit: this.inventoryAudit,
             };
-            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
-            if (!this.exportWebActive) {
-                return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
-            }
             const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
-
+            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
                 response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
             );
