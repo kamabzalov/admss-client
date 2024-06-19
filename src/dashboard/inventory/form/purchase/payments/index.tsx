@@ -129,7 +129,11 @@ export const PurchasePayments = observer((): ReactElement => {
                     </span>
                 </div>
 
-                <Button className='purchase-payments__button' onClick={handleSavePayment}>
+                <Button
+                    className='purchase-payments__button'
+                    type='button'
+                    onClick={handleSavePayment}
+                >
                     Save
                 </Button>
             </div>
