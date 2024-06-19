@@ -270,6 +270,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     )}
                     <Button
                         className='purchase-expenses-controls__button'
+                        type='button'
                         disabled={handleCompareData}
                         severity={handleCompareData ? "secondary" : "success"}
                         onClick={() => handleExpenseSubmit(currentEditExpense?.itemuid)}
