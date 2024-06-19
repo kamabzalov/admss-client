@@ -11,13 +11,7 @@ import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
-import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
 import { InventoryExportWebData } from "./export-web";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
@@ -29,7 +23,7 @@ import * as Yup from "yup";
 import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { DeleteForm } from "./delete-form";
 
 const STEP = "step";
 
@@ -96,8 +90,8 @@ export const InventoryForm = observer(() => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
-    const [reason, setReason] = useState<string>("");
-    const [comment, setComment] = useState<string>("");
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
+
     const stepsRef = useRef<HTMLDivElement>(null);
     const store = useStore().inventoryStore;
     const {
@@ -112,7 +106,6 @@ export const InventoryForm = observer(() => {
         currentLocation,
     } = store;
     const navigate = useNavigate();
-    const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
@@ -121,16 +114,6 @@ export const InventoryForm = observer(() => {
     const formikRef = useRef<FormikProps<PartialInventory>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            getInventoryDeleteReasonsList(authUser.useruid).then((res) => {
-                Array.isArray(res) && setDeleteReasonsList(res);
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -191,22 +174,6 @@ export const InventoryForm = observer(() => {
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
-    };
-
-    const handleDeleteInventory = () => {
-        id &&
-            deleteInventory(id, { reason, comment }).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    const { error } = response as BaseResponseError;
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error || "Error while deleting inventory",
-                    });
-                } else {
-                    navigate("/dashboard/inventory");
-                }
-            });
     };
 
     const handleSaveInventoryForm = () => {
@@ -422,51 +389,7 @@ export const InventoryForm = observer(() => {
                                                     </div>
                                                 )}
                                                 {stepActiveIndex === deleteActiveIndex && (
-                                                    <div className='inventory-form'>
-                                                        <div className='inventory-form__title inventory-form__title--danger uppercase'>
-                                                            Delete inventory
-                                                        </div>
-                                                        <div className='grid'>
-                                                            <div className='col-6'>
-                                                                <Dropdown
-                                                                    optionLabel='name'
-                                                                    optionValue='name'
-                                                                    value={reason}
-                                                                    required
-                                                                    filter
-                                                                    onChange={({ value }) => {
-                                                                        setReason(value);
-                                                                    }}
-                                                                    options={deleteReasonsList}
-                                                                    placeholder='Reason'
-                                                                    className='w-full vehicle-general__dropdown'
-                                                                />
-                                                            </div>
-                                                            <div className='col-12'>
-                                                                <span className='p-float-label'>
-                                                                    <InputTextarea
-                                                                        className='w-full'
-                                                                        value={comment}
-                                                                        pt={{
-                                                                            root: {
-                                                                                style: {
-                                                                                    height: "110px",
-                                                                                },
-                                                                            },
-                                                                        }}
-                                                                        onChange={({
-                                                                            target: { value },
-                                                                        }) => {
-                                                                            setComment(value);
-                                                                        }}
-                                                                    />
-                                                                    <label className='float-label'>
-                                                                        Comment
-                                                                    </label>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <DeleteForm isDeleteConfirm={isDeleteConfirm} />
                                                 )}
                                             </Form>
                                         </Formik>
@@ -536,7 +459,7 @@ export const InventoryForm = observer(() => {
                 visible={confirmActive}
                 bodyMessage='Do you really want to delete this inventory? 
                 This process cannot be undone.'
-                confirmAction={handleDeleteInventory}
+                confirmAction={() => setIsDeleteConfirm(true)}
                 onHide={() => setConfirmActive(false)}
             />
         </Suspense>
