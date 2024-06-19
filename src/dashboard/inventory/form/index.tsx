@@ -11,6 +11,7 @@ import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { checkStockNoAvailability } from "http/services/inventory-service";
 import { InventoryExportWebData } from "./export-web";
 
 import { useLocation } from "react-router-dom";
@@ -20,10 +21,15 @@ import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
+import {
+    InventoryExtData,
+    Inventory as InventoryModel,
+    InventoryStockNumber,
+} from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
+import { Status } from "common/models/base-response";
 
 const STEP = "step";
 
@@ -74,7 +80,17 @@ export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = 
     ),
     locationuid: Yup.string().trim().required("Data is required."),
     GroupClassName: Yup.string().trim().required("Data is required."),
-    StockNo: Yup.string().trim().required("Data is required."),
+    StockNo: Yup.string()
+        .trim()
+        .test("is-stockno-available", "Stock number is already in use", async function (value) {
+            if (!value) return true;
+            const res = await checkStockNoAvailability(value);
+            if (res && res.status === Status.OK) {
+                const { exists } = res as InventoryStockNumber;
+                return !exists;
+            }
+            return false;
+        }),
     TypeOfFuel: Yup.string().trim().required("Data is required."),
     purPurchasedFrom: Yup.string().trim().required("Data is required."),
 });
@@ -474,3 +490,4 @@ export const InventoryForm = observer(() => {
         </Suspense>
     );
 });
+
