@@ -1,5 +1,5 @@
 import { PrintForm } from "..";
-import { BaseResponse, Status } from "../base-response";
+import { BaseResponse, BaseResponseError, Status } from "../base-response";
 import { ContentType } from "../enums";
 
 export interface InventoryExtData {
@@ -362,3 +362,10 @@ export interface InventoryLocations {
     updated: string;
     useruid: string;
 }
+
+export interface InventoryStockNumber {
+    exists: 0 | 1;
+    status: Status;
+    stockno: string;
+}
+

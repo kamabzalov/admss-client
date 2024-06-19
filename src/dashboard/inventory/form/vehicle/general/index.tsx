@@ -38,7 +38,8 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
-    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
+    const { values, errors, setFieldValue, getFieldProps, validateField, handleBlur } =
+        useFormikContext<Inventory>();
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -312,13 +313,20 @@ export const VehicleGeneral = observer((): ReactElement => {
                             "vehicle-general__text-input w-full" +
                             (errors.StockNo ? " p-invalid" : "")
                         }
+                        name='StockNo'
                         value={values.StockNo}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("StockNo", value);
+                        onBlur={async (e) => {
+                            handleBlur(e);
+                            const { value } = e.target;
+                            await setFieldValue("StockNo", value);
+                            await validateField("StockNo");
+                        }}
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("StockNo", value);
                             changeInventory({ key: "StockNo", value });
                         }}
                     />
-                    <label className='float-label'>Stock# (required)</label>
+                    <label className='float-label'>Stock#</label>
                 </span>
                 <small className='p-error'>{errors.StockNo}</small>
             </div>
@@ -496,3 +504,4 @@ export const VehicleGeneral = observer((): ReactElement => {
         </div>
     );
 });
+
