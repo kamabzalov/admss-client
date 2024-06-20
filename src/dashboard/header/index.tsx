@@ -61,6 +61,12 @@ export const Header = observer((): ReactElement => {
                     }
                 });
             }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (authUser && currentLocation) {
             getExtendedData(authUser.useruid).then((response) => {
                 if (response) {
                     const currentLocationName = response.locations.find(
