@@ -172,6 +172,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
+            width: serverSettings?.inventory?.columnWidth?.[column.field as string],
         }));
         const date = new Date();
         const name = `inventory_${
