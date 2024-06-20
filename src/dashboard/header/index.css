@@ -18,12 +18,13 @@
 }
 
 .header-dealer-info__name {
-    font-size: 1rem;
+    font-size: 28px;
     margin: 0;
 }
 
 .header-dealer-location {
-    font-size: .66rem;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .header-user-menu {
@@ -31,7 +32,10 @@
 }
 
 .header-dealer-info {
-    margin-left: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-left: 120px;
 }
 
 .header-user-menu__toggle {
@@ -53,14 +57,3 @@
     cursor: pointer;
 }
 
-@media screen and (min-width: 1400px) {
-    .header-dealer-location {
-        font-size: .77rem;
-    }
-}
-
-@media screen and (min-width: 1920px) {
-    .header-dealer-location {
-        font-size: .77rem;
-    }
-}
