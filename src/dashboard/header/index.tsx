@@ -6,7 +6,6 @@ import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useNavigate } from "react-router-dom";
-import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
@@ -14,17 +13,24 @@ import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { getExtendedData, getUserSettings } from "http/services/auth-user.service";
+import { ServerUserSettings } from "common/models/user";
+import { Loader } from "dashboard/common/loader";
+
+const DEFAULT_LOCATION = "Default";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
+    const inventoryStore = useStore().inventoryStore;
     const { authUser } = store;
+    const { currentLocation } = inventoryStore;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
-    const [dealerName, setDealerName] = useState<string>("");
-    const [location, setLocation] = useState<string>("");
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
+    const [location, setLocation] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
@@ -40,15 +46,40 @@ export const Header = observer((): ReactElement => {
 
     useEffect(() => {
         if (authUser) {
-            getExtendedData(authUser.useruid).then((response) => {
-                if (response) {
-                    setDealerName(response.dealerName);
-                    setLocation(response.location);
-                }
-            });
+            if (!currentLocation) {
+                getUserSettings(authUser.useruid).then((response) => {
+                    if (response?.profile.length) {
+                        if (response.profile) {
+                            try {
+                                const parsedSettings = JSON.parse(
+                                    response.profile
+                                ) as ServerUserSettings;
+                                inventoryStore.currentLocation =
+                                    parsedSettings.inventory.currentLocation || DEFAULT_LOCATION;
+                            } catch (error) {
+                                inventoryStore.currentLocation = DEFAULT_LOCATION;
+                            }
+                        }
+                    }
+                });
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (authUser && currentLocation) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response) {
+                    const currentLocationName = response.locations.find(
+                        (location) => location.locationuid === currentLocation
+                    );
+                    setLocation(currentLocationName?.locName || null);
+                }
+                setIsLoading(false);
+            });
+        }
+    }, [authUser, currentLocation]);
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
@@ -106,20 +137,33 @@ export const Header = observer((): ReactElement => {
                     <div className='header__logo'>
                         <img src={logo} alt='ADMSS' />
                     </div>
-                    <div className='grid m-0 head-container  justify-content-between'>
-                        <div className='header-dealer-info'>
-                            <p className='header-dealer-info__name font-bold'>{dealerName}</p>
-                            <span className='header-dealer-location'>{location}</span>
-                        </div>
-                        <div className='header-user-menu ml-auto'>
-                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
-                            <img
-                                className='header-user-menu__toggle'
-                                onClick={(event) => menuRight?.current?.toggle(event)}
-                                src={userCabinet}
-                                alt='User cabinet'
-                            />
-                        </div>
+                    <div className='grid m-0 head-container justify-content-between'>
+                        {isLoading ? (
+                            <Loader overlay />
+                        ) : (
+                            <>
+                                <div className='header-dealer-info'>
+                                    <p className='header-dealer-info__name font-bold'>
+                                        {authUser?.loginname}
+                                    </p>
+                                    <span className='header-dealer-location'>{location}</span>
+                                </div>
+                                <div className='header-user-menu ml-auto'>
+                                    <Menu
+                                        model={items}
+                                        popup
+                                        ref={menuRight}
+                                        popupAlignment='right'
+                                    />
+                                    <img
+                                        className='header-user-menu__toggle'
+                                        onClick={(event) => menuRight?.current?.toggle(event)}
+                                        src={userCabinet}
+                                        alt='User cabinet'
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
                 {authUser && (

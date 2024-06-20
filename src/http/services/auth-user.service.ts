@@ -1,9 +1,10 @@
 import { BaseResponse, Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "../index";
 import { ServerUserSettings, UserGroup, UserPermissionsResponse } from "common/models/user";
+import { InventoryLocations } from "common/models/inventory";
 
 export interface ExtendedUserData extends BaseResponse {
-    location: string;
+    locations: InventoryLocations[];
     dealerName: string;
 }
 
