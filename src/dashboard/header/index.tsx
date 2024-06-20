@@ -15,6 +15,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData, getUserSettings } from "http/services/auth-user.service";
 import { ServerUserSettings } from "common/models/user";
+import { Loader } from "dashboard/common/loader";
 
 const DEFAULT_LOCATION = "Default";
 
@@ -29,6 +30,7 @@ export const Header = observer((): ReactElement => {
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
     const [location, setLocation] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
@@ -74,10 +76,10 @@ export const Header = observer((): ReactElement => {
                     );
                     setLocation(currentLocationName?.locName || null);
                 }
+                setIsLoading(false);
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentLocation]);
+    }, [authUser, currentLocation]);
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
@@ -136,21 +138,32 @@ export const Header = observer((): ReactElement => {
                         <img src={logo} alt='ADMSS' />
                     </div>
                     <div className='grid m-0 head-container justify-content-between'>
-                        <div className='header-dealer-info'>
-                            <p className='header-dealer-info__name font-bold'>
-                                {authUser?.loginname}
-                            </p>
-                            <span className='header-dealer-location'>{location}</span>
-                        </div>
-                        <div className='header-user-menu ml-auto'>
-                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
-                            <img
-                                className='header-user-menu__toggle'
-                                onClick={(event) => menuRight?.current?.toggle(event)}
-                                src={userCabinet}
-                                alt='User cabinet'
-                            />
-                        </div>
+                        {isLoading ? (
+                            <Loader overlay />
+                        ) : (
+                            <>
+                                <div className='header-dealer-info'>
+                                    <p className='header-dealer-info__name font-bold'>
+                                        {authUser?.loginname}
+                                    </p>
+                                    <span className='header-dealer-location'>{location}</span>
+                                </div>
+                                <div className='header-user-menu ml-auto'>
+                                    <Menu
+                                        model={items}
+                                        popup
+                                        ref={menuRight}
+                                        popupAlignment='right'
+                                    />
+                                    <img
+                                        className='header-user-menu__toggle'
+                                        onClick={(event) => menuRight?.current?.toggle(event)}
+                                        src={userCabinet}
+                                        alt='User cabinet'
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
                 {authUser && (

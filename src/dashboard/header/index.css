@@ -29,6 +29,8 @@
 
 .header-user-menu {
     margin-right: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .header-dealer-info {
