@@ -88,7 +88,13 @@ export const CurrencyInput = ({
             </label>
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
-                <InputNumber minFractionDigits={2} locale='en-US' value={value} {...props} />
+                <InputNumber
+                    minFractionDigits={2}
+                    min={0}
+                    locale='en-US'
+                    value={value}
+                    {...props}
+                />
             </div>
         </div>
     );
@@ -112,7 +118,7 @@ export const PercentInput = ({
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>
-                <InputNumber inputId={name} minFractionDigits={2} name={name} {...props} />
+                <InputNumber inputId={name} min={0} minFractionDigits={2} name={name} {...props} />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
         </div>
