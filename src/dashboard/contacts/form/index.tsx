@@ -36,7 +36,7 @@ export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
     firstName: Yup.string().trim().required("Data is required."),
     lastName: Yup.string().trim().required("Data is required."),
-    type: Yup.number().required("Data is required."),
+    type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
     phone1: Yup.string().matches(/^[\d]{10,13}$/, {
@@ -231,7 +231,7 @@ export const ContactForm = observer((): ReactElement => {
                                                 {
                                                     firstName: contact?.firstName || "",
                                                     lastName: contact?.lastName || "",
-                                                    type: contact?.type || "",
+                                                    type: contact?.type || 0,
                                                     companyName: contact?.companyName || "",
                                                     email1: contact?.email1 || "",
                                                     email2: contact?.email2 || "",
@@ -333,3 +333,4 @@ export const ContactForm = observer((): ReactElement => {
         </Suspense>
     );
 });
+

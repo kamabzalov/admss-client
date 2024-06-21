@@ -7,7 +7,7 @@ import {
     SalespersonsList,
     TotalUsers,
 } from "common/models/contact";
-import { BaseResponse, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { isAxiosError } from "axios";
 
 export const getContacts = async (uid: string, queryParams?: QueryParams) => {
@@ -127,3 +127,27 @@ export const deleteContactDL = async (contactuid: string) => {
         // TODO: add error handler
     }
 };
+
+export const getContactsProspectList = async (contactuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<unknown[] | BaseResponseError>(
+            `contacts/${contactuid}/listprospect`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error: Error | BaseResponseError | unknown) {
+        const errorMessage = "Error while getting contacts prospect list";
+        if (error instanceof Error) {
+            return {
+                status: Status.ERROR,
+                error: error.message || errorMessage,
+            };
+        }
+        return {
+            status: Status.ERROR,
+            error: error || errorMessage,
+        };
+    }
+};
+
