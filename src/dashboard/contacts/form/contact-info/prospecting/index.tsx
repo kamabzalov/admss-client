@@ -6,16 +6,19 @@ import { DateInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
-import { getContactsSalesmanList } from "http/services/contacts-service";
+import { getContactsProspectList, getContactsSalesmanList } from "http/services/contacts-service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
+import { useParams } from "react-router-dom";
 
 export const ContactsProspecting = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
+    const [prospectList, setProspectList] = useState<any>([]);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -23,8 +26,12 @@ export const ContactsProspecting = observer((): ReactElement => {
             getContactsSalesmanList(authUser.useruid).then((response) => {
                 response && setSalespersonsList(response);
             });
+            id &&
+                getContactsProspectList(id).then((response) => {
+                    setProspectList(response);
+                });
         }
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         setAnotherVehicle(!!contactExtData.PROSPECT2_ID?.length);
@@ -63,13 +70,15 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-6'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
+                        optionLabel='notes'
+                        optionValue='notes'
+                        options={prospectList}
                         filter
+                        editable
                         value={contactExtData.PROSPECT1_ID}
-                        onChange={({ target: { value } }) =>
-                            changeContactExtData("PROSPECT1_ID", value)
-                        }
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("PROSPECT1_ID", value);
+                        }}
                         placeholder='Choose a Vehicle'
                         className='w-full contacts-prospecting__dropdown'
                     />
@@ -80,13 +89,15 @@ export const ContactsProspecting = observer((): ReactElement => {
                 <div className='col-6'>
                     <span className='p-float-label'>
                         <Dropdown
-                            optionLabel='name'
-                            optionValue='name'
+                            optionLabel='notes'
+                            optionValue='notes'
+                            options={prospectList}
                             filter
+                            editable
                             value={contactExtData.PROSPECT2_ID}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("PROSPECT2_ID", value)
-                            }
+                            onChange={({ target: { value } }) => {
+                                changeContactExtData("PROSPECT2_ID", value);
+                            }}
                             placeholder='Choose a Vehicle'
                             className='w-full contacts-prospecting__dropdown'
                         />
@@ -125,3 +136,4 @@ export const ContactsProspecting = observer((): ReactElement => {
         </div>
     );
 });
+

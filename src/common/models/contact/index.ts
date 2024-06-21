@@ -229,6 +229,18 @@ export interface ContactExtData {
     ID_Verify_Memo: string;
     QBID: string;
 }
+
+export interface ContactProspect {
+    index: number;
+    created: string;
+    updated: string;
+    itemuid: string;
+    useruid: string;
+    contactuid: string;
+    inventoryuid: string;
+    notes: string;
+}
+
 export interface Contact {
     ZIP: string;
     businessName: string;
@@ -265,6 +277,7 @@ export interface Contact {
     phone1: string;
     phone2: string;
     phones: string[];
+    prospect: ContactProspect[];
     sex: string;
     state: string;
     status: string;
@@ -335,3 +348,4 @@ export enum ContactTypeNameList {
     CONSIGNORS = "Consignors",
     GENERAL = "General",
 }
+

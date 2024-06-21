@@ -34,8 +34,11 @@ export const ContactsSocialInfo = observer((): ReactElement => {
 
     useEffect(() => {
         setAnotherEmail(!!contact.email2?.length);
+    }, [contact.email2?.length]);
+
+    useEffect(() => {
         setAnotherPhone(!!contact.phone2?.length);
-    }, [contact.email2, contact.phone2]);
+    }, [contact.phone2?.length]);
 
     return (
         <div className='grid contacts-social row-gap-2'>
@@ -178,3 +181,4 @@ export const ContactsSocialInfo = observer((): ReactElement => {
         </div>
     );
 });
+
