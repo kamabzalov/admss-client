@@ -1,5 +1,3 @@
-import { BaseResponseError } from "../base-response";
-
 export interface ReportsColumn {
     name: string;
     data: string;
@@ -12,19 +10,23 @@ export interface ReportsPostData {
     columns?: ReportsColumn[];
 }
 
-export interface ReportCollection {
+export interface ReportDocument {
+    accessed: string;
+    count: number;
     created: string;
-    description: string;
+    documentUID: string;
     index: number;
-    itemuid: string;
+    isfavorite: 0 | 1;
+    itemUID: string;
     name: string;
     updated: string;
 }
 
-export interface ReportCollectionContent {
+export interface ReportCollection {
     accessed: string;
     created: string;
     description: string;
+    documents: ReportDocument[];
     index: number;
     isfavorite: 0 | 1;
     itemUID: string;
@@ -33,20 +35,3 @@ export interface ReportCollectionContent {
     userUID: string;
 }
 
-export interface ReportCollectionResponse extends BaseResponseError {
-    collections: ReportCollection[];
-}
-
-export interface ReportDocument {
-    description: string;
-    index: number;
-    itemuid: string;
-    name: string;
-    state: string;
-    type: string;
-    version: string;
-}
-
-export interface ReportsListResponse extends BaseResponseError {
-    documents: ReportDocument[];
-}
