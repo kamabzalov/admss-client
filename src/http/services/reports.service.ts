@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { ReportCollection, ReportsPostData } from "common/models/reports";
@@ -32,10 +33,12 @@ export const getReportTemplate = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<any>(`reports/${uid}/get`);
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting report template",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report template",
+            };
+        }
     }
 };
 
