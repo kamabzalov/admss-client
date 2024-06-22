@@ -1,35 +1,8 @@
+import { isAxiosError } from "axios";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import {
-    ReportCollectionContent,
-    ReportCollectionResponse,
-    ReportsListResponse,
-    ReportsPostData,
-} from "common/models/reports";
+import { ReportCollection, ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
-
-export const getReportsList = async (uid: string, queryParams?: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<ReportsListResponse>(
-            `reports/${uid}/list`,
-            {
-                params: queryParams,
-            }
-        );
-        if (request.data.status === Status.ERROR) {
-            return {
-                status: Status.ERROR,
-                error: request.data.error,
-            };
-        }
-        return request.data.documents;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting reports list",
-        };
-    }
-};
 
 export const getReportCollection = async (uid: string) => {
     try {
@@ -39,20 +12,6 @@ export const getReportCollection = async (uid: string) => {
         return {
             status: Status.ERROR,
             error: "Error while getting report collection",
-        };
-    }
-};
-
-export const getUserReportCollections = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<ReportCollectionResponse>(
-            `reports/${uid}/collections`
-        );
-        return request.data.collections;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting user report collections",
         };
     }
 };
@@ -74,10 +33,12 @@ export const getReportTemplate = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<any>(`reports/${uid}/get`);
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting report template",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report template",
+            };
+        }
     }
 };
 
@@ -214,9 +175,9 @@ export const printDocumentByUser = async (userId: string | undefined) => {
 
 export const getUserReportCollectionsContent = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<
-            BaseResponseError | ReportCollectionContent[]
-        >(`reports/${uid}/collectionscontent `);
+        const request = await authorizedUserApiInstance.get<BaseResponseError | ReportCollection>(
+            `reports/${uid}/collectionscontent `
+        );
         return request.data;
     } catch (error) {
         return {
@@ -225,3 +186,4 @@ export const getUserReportCollectionsContent = async (uid: string) => {
         };
     }
 };
+
