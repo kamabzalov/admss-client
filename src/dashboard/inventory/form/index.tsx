@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
@@ -56,44 +56,49 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
-export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = Yup.object().shape({
-    VIN: Yup.string()
-        .trim()
-        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
-        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
-        .required("Data is required."),
-    Make: Yup.string().trim().required("Data is required."),
-    Model: Yup.string().trim().required("Data is required."),
-    Year: Yup.string().test(
-        "is-valid-year",
-        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-        function (value) {
-            const year = Number(value);
-            if (year < MIN_YEAR) {
-                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+export const InventoryFormSchema = ({
+    initialStockNo,
+}: {
+    initialStockNo?: string;
+}): Yup.ObjectSchema<Partial<PartialInventory>> =>
+    Yup.object().shape({
+        VIN: Yup.string()
+            .trim()
+            .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+            .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+            .required("Data is required."),
+        Make: Yup.string().trim().required("Data is required."),
+        Model: Yup.string().trim().required("Data is required."),
+        Year: Yup.string().test(
+            "is-valid-year",
+            `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+            function (value) {
+                const year = Number(value);
+                if (year < MIN_YEAR) {
+                    return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+                }
+                if (year > MAX_YEAR) {
+                    return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+                }
+                return true;
             }
-            if (year > MAX_YEAR) {
-                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
-            }
-            return true;
-        }
-    ),
-    locationuid: Yup.string().trim().required("Data is required."),
-    GroupClassName: Yup.string().trim().required("Data is required."),
-    StockNo: Yup.string()
-        .trim()
-        .test("is-stockno-available", "Stock number is already in use", async function (value) {
-            if (!value) return true;
-            const res = await checkStockNoAvailability(value);
-            if (res && res.status === Status.OK) {
-                const { exists } = res as InventoryStockNumber;
-                return !exists;
-            }
-            return false;
-        }),
-    TypeOfFuel: Yup.string().trim().required("Data is required."),
-    purPurchasedFrom: Yup.string().trim().required("Data is required."),
-});
+        ),
+        locationuid: Yup.string().trim().required("Data is required."),
+        GroupClassName: Yup.string().trim().required("Data is required."),
+        StockNo: Yup.string()
+            .trim()
+            .test("is-stockno-available", "Stock number is already in use", async function (value) {
+                if (!value || initialStockNo === value) return true;
+                const res = await checkStockNoAvailability(value);
+                if (res && res.status === Status.OK) {
+                    const { exists } = res as InventoryStockNumber;
+                    return !exists;
+                }
+                return false;
+            }),
+        TypeOfFuel: Yup.string().trim().required("Data is required."),
+        purPurchasedFrom: Yup.string().trim().required("Data is required."),
+    });
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
@@ -132,6 +137,13 @@ export const InventoryForm = observer(() => {
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+
+    const initialStockNo = useMemo(() => {
+        if (inventory) {
+            return inventory?.StockNo;
+        }
+        return "";
+    }, [inventory]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -342,7 +354,9 @@ export const InventoryForm = observer(() => {
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema}
+                                            validationSchema={InventoryFormSchema({
+                                                initialStockNo,
+                                            })}
                                             initialValues={
                                                 {
                                                     VIN: inventory?.VIN || "",
