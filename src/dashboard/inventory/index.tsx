@@ -744,6 +744,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                         sortField={lazyState.sortField}
                                         reorderableColumns
                                         resizableColumns
+                                        columnResizeMode='expand'
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onRowClick={handleOnRowClick}
