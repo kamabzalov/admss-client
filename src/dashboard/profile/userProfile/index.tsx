@@ -38,7 +38,7 @@ export const UserProfileDialog = ({
         >
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__label'>User name</div>
-                <div className='profile-row__value'>{user.loginname}</div>
+                <div className='profile-row__value'>{authUser.loginname}</div>
             </div>
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__label'>Company name</div>

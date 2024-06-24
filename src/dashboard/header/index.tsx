@@ -108,7 +108,7 @@ export const Header = observer((): ReactElement => {
                             <p className='header-dealer-info__name font-bold'>
                                 {authUser?.loginname}
                             </p>
-                            <span className='header-dealer-location'></span>
+                            <span className='header-dealer-location'>{authUser?.locationname}</span>
                         </div>
                         <div className='header-user-menu ml-auto'>
                             <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
