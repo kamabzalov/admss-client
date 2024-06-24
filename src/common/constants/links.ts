@@ -1,1 +1,1 @@
-export const HELP_PAGE = "https://app.admss.com/";
+export const HELP_PAGE = "https://www.admss.com/";
