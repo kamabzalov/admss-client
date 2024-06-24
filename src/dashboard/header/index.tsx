@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -24,11 +24,16 @@ export const Header = observer((): ReactElement => {
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response && response.locations && response.locations.length > 1) {
+                    setShowChangeLocation(true);
+                }
+            });
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
             if (Object.values(otherPermissions).some((permission) => permission === 1)) {
@@ -45,65 +50,51 @@ export const Header = observer((): ReactElement => {
         });
     };
 
-    useEffect(() => {
-        const items: MenuItem[] = [
-            {
-                label: "My Profile",
-                command() {
-                    setUserProfile(true);
+    const menuItems = useMemo(
+        () =>
+            [
+                {
+                    label: "My Profile",
+                    command() {
+                        setUserProfile(true);
+                    },
                 },
-            },
-            { separator: true },
-            { label: "Users" },
-            { separator: true },
-            {
-                label: "Contact support",
-                command() {
-                    setSupportContact(true);
+                !isSalesPerson
+                    ? { label: "General Settings", command: () => navigate("settings") }
+                    : null,
+                { separator: true },
+                showChangeLocation ? { label: "Change Location" } : null,
+                { label: "Users" },
+                { separator: true },
+                {
+                    label: "Contact support",
+                    command() {
+                        setSupportContact(true);
+                    },
                 },
-            },
-            {
-                label: "Support history",
-                command() {
-                    setSupportHistory(true);
+                {
+                    label: "Support history",
+                    command() {
+                        setSupportHistory(true);
+                    },
                 },
-            },
-            {
-                label: "Help",
-                command() {
-                    window.open(HELP_PAGE, "_blank");
+                {
+                    label: "Help",
+                    command() {
+                        window.open(HELP_PAGE, "_blank");
+                    },
                 },
-            },
-            { separator: true },
-            {
-                label: "Logout",
-                command() {
-                    authUser && signOut(authUser);
+                { separator: true },
+                {
+                    label: "Logout",
+                    command() {
+                        authUser && signOut(authUser);
+                    },
                 },
-            },
-        ];
-        if (authUser && !isSalesPerson) {
-            items.splice(1, 0, {
-                label: "General Settings",
-                command() {
-                    navigate("settings");
-                },
-            });
-        }
-
-        if (authUser) {
-            getExtendedData(authUser.useruid).then((response) => {
-                if (response && response.locations && response.locations.length > 1) {
-                    items.splice(3, 0, {
-                        label: "Change location",
-                    });
-                }
-            });
-        }
-
-        setMenuItems(items);
+            ].filter(Boolean) as MenuItem[],
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authUser, isSalesPerson]);
+        [authUser, isSalesPerson, showChangeLocation]
+    );
 
     if (menuRight) {
         return (
@@ -153,4 +144,3 @@ export const Header = observer((): ReactElement => {
     }
     return <></>;
 });
-
