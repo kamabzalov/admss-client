@@ -832,4 +832,3 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 }
-
