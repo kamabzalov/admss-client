@@ -16,19 +16,14 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
-import { ReportCollection } from "common/models/reports";
-
-interface Report {
-    id: string;
-    name: string;
-}
+import { ReportCollection, ReportDocument } from "common/models/reports";
 
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
-    const [selectedReports, setSelectedReports] = useState<Report[]>([]);
+    const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
 
     const toast = useToast();
 
@@ -163,18 +158,20 @@ export default function Reports(): ReactElement {
     };
 
     // eslint-disable-next-line
-    const handleReportGroupSelect = (items: Report[]) => {
+    const handleReportGroupSelect = (items: ReportDocument[]) => {
         const allItemsSelected = items.every((item) =>
-            selectedReports.some((selected) => selected.id === item.id)
+            selectedReports.some((selected) => selected.itemUID === item.itemUID)
         );
 
         if (allItemsSelected) {
             setSelectedReports(
-                selectedReports.filter((report) => !items.some((item) => item.id === report.id))
+                selectedReports.filter(
+                    (report) => !items.some((item) => item.itemUID === report.itemUID)
+                )
             );
         } else {
             const newSelectedReports = items.filter(
-                (item) => !selectedReports.some((selected) => selected.id === item.id)
+                (item) => !selectedReports.some((selected) => selected.itemUID === item.itemUID)
             );
             setSelectedReports([...selectedReports, ...newSelectedReports]);
         }
@@ -182,7 +179,10 @@ export default function Reports(): ReactElement {
 
     const handleCreateCollection = () => {
         if (collectionName) {
-            createReportCollection(user!.useruid, collectionName).then((response) => {
+            createReportCollection(user!.useruid, {
+                name: collectionName,
+                documents: selectedReports,
+            }).then((response) => {
                 const { error } = response as BaseResponseError;
                 if (error && toast.current) {
                     toast.current.show({
@@ -230,7 +230,6 @@ export default function Reports(): ReactElement {
                                             <MultiSelect
                                                 filter
                                                 optionLabel='name'
-                                                optionValue='name'
                                                 options={collections.filter(
                                                     (collection) => collection.documents
                                                 )}
