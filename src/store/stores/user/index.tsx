@@ -18,9 +18,22 @@ export class UserStore {
         return this._storedUser;
     }
 
+    public set storedUser(user: AuthUser | null) {
+        if (user) {
+            const { permissions, ...restUserData } = user;
+            this._storedUser = {
+                ...restUserData,
+                permissions: this._storedUser?.permissions || ({} as UserPermissionsResponse),
+            };
+        } else {
+            this._storedUser = null;
+        }
+    }
+
     public set userPermissions(permissions: UserPermissionsResponse) {
         if (this._storedUser) {
             this._storedUser = { ...this._storedUser, permissions };
         }
     }
 }
+

@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -13,28 +13,27 @@ import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { getExtendedData, getUserSettings } from "http/services/auth-user.service";
-import { ServerUserSettings } from "common/models/user";
-import { Loader } from "dashboard/common/loader";
-
-const DEFAULT_LOCATION = "Default";
+import { getExtendedData } from "http/services/auth-user.service";
+import { HELP_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
-    const inventoryStore = useStore().inventoryStore;
     const { authUser } = store;
-    const { currentLocation } = inventoryStore;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
-    const [location, setLocation] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response && response.locations && response.locations.length > 1) {
+                    setShowChangeLocation(true);
+                }
+            });
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
             if (Object.values(otherPermissions).some((permission) => permission === 1)) {
@@ -44,43 +43,6 @@ export const Header = observer((): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
 
-    useEffect(() => {
-        if (authUser) {
-            if (!currentLocation) {
-                getUserSettings(authUser.useruid).then((response) => {
-                    if (response?.profile.length) {
-                        if (response.profile) {
-                            try {
-                                const parsedSettings = JSON.parse(
-                                    response.profile
-                                ) as ServerUserSettings;
-                                inventoryStore.currentLocation =
-                                    parsedSettings.inventory.currentLocation || DEFAULT_LOCATION;
-                            } catch (error) {
-                                inventoryStore.currentLocation = DEFAULT_LOCATION;
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        if (authUser && currentLocation) {
-            getExtendedData(authUser.useruid).then((response) => {
-                if (response) {
-                    const currentLocationName = response.locations.find(
-                        (location) => location.locationuid === currentLocation
-                    );
-                    setLocation(currentLocationName?.locName || null);
-                }
-                setIsLoading(false);
-            });
-        }
-    }, [authUser, currentLocation]);
-
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
             localStorageClear(LS_APP_USER);
@@ -88,47 +50,51 @@ export const Header = observer((): ReactElement => {
         });
     };
 
-    const items: MenuItem[] = [
-        {
-            label: "My Profile",
-            command() {
-                setUserProfile(true);
-            },
-        },
-        { separator: true },
-        { label: "Change location" },
-        { label: "Users" },
-        { separator: true },
-        {
-            label: "Contact support",
-            command() {
-                setSupportContact(true);
-            },
-        },
-        {
-            label: "Support history",
-            command() {
-                setSupportHistory(true);
-            },
-        },
-        { label: "Help" },
-        { separator: true },
-        {
-            label: "Logout",
-            command() {
-                authUser && signOut(authUser);
-            },
-        },
-    ];
-
-    if (authUser && !isSalesPerson) {
-        items.splice(1, 0, {
-            label: "General Settings",
-            command() {
-                navigate("settings");
-            },
-        });
-    }
+    const menuItems = useMemo(
+        () =>
+            [
+                {
+                    label: "My Profile",
+                    command() {
+                        setUserProfile(true);
+                    },
+                },
+                !isSalesPerson
+                    ? { label: "General Settings", command: () => navigate("settings") }
+                    : null,
+                { separator: true },
+                showChangeLocation ? { label: "Change Location" } : null,
+                { label: "Users" },
+                { separator: true },
+                {
+                    label: "Contact support",
+                    command() {
+                        setSupportContact(true);
+                    },
+                },
+                {
+                    label: "Support history",
+                    command() {
+                        setSupportHistory(true);
+                    },
+                },
+                {
+                    label: "Help",
+                    command() {
+                        window.open(HELP_PAGE, "_blank");
+                    },
+                },
+                { separator: true },
+                {
+                    label: "Logout",
+                    command() {
+                        authUser && signOut(authUser);
+                    },
+                },
+            ].filter(Boolean) as MenuItem[],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [authUser, isSalesPerson, showChangeLocation]
+    );
 
     if (menuRight) {
         return (
@@ -138,32 +104,21 @@ export const Header = observer((): ReactElement => {
                         <img src={logo} alt='ADMSS' />
                     </div>
                     <div className='grid m-0 head-container justify-content-between'>
-                        {isLoading ? (
-                            <Loader overlay />
-                        ) : (
-                            <>
-                                <div className='header-dealer-info'>
-                                    <p className='header-dealer-info__name font-bold'>
-                                        {authUser?.loginname}
-                                    </p>
-                                    <span className='header-dealer-location'>{location}</span>
-                                </div>
-                                <div className='header-user-menu ml-auto'>
-                                    <Menu
-                                        model={items}
-                                        popup
-                                        ref={menuRight}
-                                        popupAlignment='right'
-                                    />
-                                    <img
-                                        className='header-user-menu__toggle'
-                                        onClick={(event) => menuRight?.current?.toggle(event)}
-                                        src={userCabinet}
-                                        alt='User cabinet'
-                                    />
-                                </div>
-                            </>
-                        )}
+                        <div className='header-dealer-info'>
+                            <p className='header-dealer-info__name font-bold'>
+                                {authUser?.loginname}
+                            </p>
+                            <span className='header-dealer-location'></span>
+                        </div>
+                        <div className='header-user-menu ml-auto'>
+                            <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
+                            <img
+                                className='header-user-menu__toggle'
+                                onClick={(event) => menuRight?.current?.toggle(event)}
+                                src={userCabinet}
+                                alt='User cabinet'
+                            />
+                        </div>
                     </div>
                 </div>
                 {authUser && (

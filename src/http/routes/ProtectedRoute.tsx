@@ -8,6 +8,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { UserPermissionsResponse } from "common/models/user";
 import { Loader } from "dashboard/common/loader";
 import { createApiDashboardInstance } from "http/index";
+import { AuthUser } from "http/services/auth.service";
 
 interface UserRoles {
     admin: boolean;
@@ -30,6 +31,7 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
     const authUser = getKeyValue(LS_APP_USER);
     useEffect(() => {
         if (authUser) {
+            store.storedUser = authUser as AuthUser;
             createApiDashboardInstance(navigate);
             getUserPermissions(authUser.useruid).then((response) => {
                 setIsLoading(false);
@@ -64,3 +66,4 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
 });
 
 export default ProtectedRoute;
+
