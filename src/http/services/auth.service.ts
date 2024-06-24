@@ -23,6 +23,8 @@ export interface AuthUser {
     issalesperson: 0 | 1;
     lastname: string;
     loginname: string;
+    locationname: string;
+    locationuid: string;
     modified: string;
     sessionuid: string;
     started: string;
