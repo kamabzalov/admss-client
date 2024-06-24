@@ -681,7 +681,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         <h2 className='card-header__title inventory__title uppercase m-0'>
                             Inventory
                         </h2>
-                        {locations.length > 0 && (
+                        {locations.length > 1 && (
                             <SplitButton
                                 label={currentLocation?.locName || "Any Location"}
                                 className='inventory-location'
@@ -832,3 +832,4 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 }
+

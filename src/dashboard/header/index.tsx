@@ -16,6 +16,7 @@ import { observer } from "mobx-react-lite";
 import { getExtendedData, getUserSettings } from "http/services/auth-user.service";
 import { ServerUserSettings } from "common/models/user";
 import { Loader } from "dashboard/common/loader";
+import { HELP_PAGE } from "common/constants/links";
 
 const DEFAULT_LOCATION = "Default";
 
@@ -70,7 +71,7 @@ export const Header = observer((): ReactElement => {
     useEffect(() => {
         if (authUser && currentLocation) {
             getExtendedData(authUser.useruid).then((response) => {
-                if (response) {
+                if (response && response.locations) {
                     const currentLocationName = response.locations.find(
                         (location) => location.locationuid === currentLocation
                     );
@@ -111,7 +112,12 @@ export const Header = observer((): ReactElement => {
                 setSupportHistory(true);
             },
         },
-        { label: "Help" },
+        {
+            label: "Help",
+            command() {
+                window.open(HELP_PAGE, "_blank");
+            },
+        },
         { separator: true },
         {
             label: "Logout",
@@ -189,3 +195,4 @@ export const Header = observer((): ReactElement => {
     }
     return <></>;
 });
+
