@@ -157,26 +157,6 @@ export default function Reports(): ReactElement {
         );
     };
 
-    // eslint-disable-next-line
-    const handleReportGroupSelect = (items: ReportDocument[]) => {
-        const allItemsSelected = items.every((item) =>
-            selectedReports.some((selected) => selected.itemUID === item.itemUID)
-        );
-
-        if (allItemsSelected) {
-            setSelectedReports(
-                selectedReports.filter(
-                    (report) => !items.some((item) => item.itemUID === report.itemUID)
-                )
-            );
-        } else {
-            const newSelectedReports = items.filter(
-                (item) => !selectedReports.some((selected) => selected.itemUID === item.itemUID)
-            );
-            setSelectedReports([...selectedReports, ...newSelectedReports]);
-        }
-    };
-
     const handleCreateCollection = () => {
         if (collectionName) {
             createReportCollection(user!.useruid, {
