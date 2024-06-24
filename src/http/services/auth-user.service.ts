@@ -1,111 +1,61 @@
-import { BaseResponse, Status } from "common/models/base-response";
-import { authorizedUserApiInstance } from "../index";
-import { ServerUserSettings, UserGroup, UserPermissionsResponse } from "common/models/user";
-import { InventoryLocations } from "common/models/inventory";
+import { LoginForm } from "sign/sign-in";
+import {
+    APPLICATION,
+    authorizedUserApiInstance,
+    // MAGIC,
+    nonAuthorizedUserApiInstance,
+} from "../index";
+import { BaseResponse } from "common/models/base-response";
+import { UserPermissionsResponse } from "common/models/user";
 
-export interface ExtendedUserData extends BaseResponse {
-    locations: InventoryLocations[];
-    dealerName: string;
+export interface AppError {
+    status: "Error";
+    error?: string;
+    message?: string;
 }
 
-export interface UserSettings extends BaseResponse {
-    created: string;
-    profile: string;
-    updated: string;
+export interface AuthUser {
+    companyname: string;
+    firstname: string;
+    isadmin: 0 | 1;
+    islocaladmin: 0 | 1;
+    ismanager: 0 | 1;
+    issalesperson: 0 | 1;
+    lastname: string;
+    loginname: string;
+    modified: string;
+    sessionuid: string;
+    started: string;
+    status: "OK";
+    token: string;
+    username: string;
+    useruid: string;
+    permissions: UserPermissionsResponse;
 }
 
-export const getExtendedData = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<ExtendedUserData>(`user/${uid}/info`);
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const getUserSettings = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserSettings>(`user/${uid}/profile`);
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const setUserSettings = async (uid: string, settings: Partial<ServerUserSettings>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/profile`, {
-            profile: JSON.stringify(settings),
+export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> => {
+    const response = await nonAuthorizedUserApiInstance
+        .post<AuthUser | AppError>("user", {
+            user: signData.username,
+            secret: signData.password,
+            rememberme: signData.rememberme,
+            application: APPLICATION,
+            // magic: MAGIC,
+        })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((err) => {
+            return err?.response?.data || err.message;
         });
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
+    return response;
 };
 
-export const getUserGroupList = async (uid: string) => {
+export const logout = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<UserGroup[]>(`user/${uid}/grouplist`);
-        return request.data;
+        const response = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/logout`);
+        return response.data;
     } catch (error) {
         // TODO: add error handler
-    }
-};
-export const getUserGroupActiveList = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserGroup[]>(
-            `user/${uid}/grouplistactive`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const addUserGroupList = async (
-    uid: string,
-    { description, enabled, itemuid, order, isdefault }: Partial<UserGroup>
-) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${uid}/grouplist`,
-            {
-                description,
-                enabled,
-                itemuid,
-                order,
-                isdefault,
-            }
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const deleteUserGroupList = async (itemuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${itemuid}/deletegroup`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const getUserPermissions = async (
-    uid: string
-): Promise<Partial<UserPermissionsResponse>> => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserPermissionsResponse>(
-            `user/${uid}/permissions`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting user permissions",
-        };
     }
 };
