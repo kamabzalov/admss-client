@@ -315,6 +315,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }
                         name='StockNo'
                         value={values.StockNo}
+                        disabled={Boolean(inventory.itemuid)}
                         onBlur={async (e) => {
                             handleBlur(e);
                             const { value } = e.target;
@@ -322,6 +323,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             await validateField("StockNo");
                         }}
                         onChange={async ({ target: { value } }) => {
+                            if (Boolean(inventory.itemuid)) return;
                             await setFieldValue("StockNo", value);
                             changeInventory({ key: "StockNo", value });
                         }}
