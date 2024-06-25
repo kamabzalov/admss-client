@@ -315,7 +315,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }
                         name='StockNo'
                         value={values.StockNo}
-                        disabled={Boolean(inventory.itemuid)}
+                        disabled={!!inventory.itemuid}
                         onBlur={async (e) => {
                             handleBlur(e);
                             const { value } = e.target;
