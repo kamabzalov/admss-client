@@ -33,13 +33,16 @@ const AppRouter = (): ReactElement => {
                 { path: "", element: <SignIn /> },
                 {
                     path: "dashboard",
-                    element: (
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    ),
+                    element: <Dashboard />,
                     children: [
-                        { path: "", element: <Home /> },
+                        {
+                            path: "",
+                            element: (
+                                <ProtectedRoute>
+                                    <Home />
+                                </ProtectedRoute>
+                            ),
+                        },
                         {
                             path: "inventory",
                             element: (
