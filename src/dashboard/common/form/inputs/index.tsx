@@ -92,7 +92,7 @@ export const CurrencyInput = ({
                     minFractionDigits={2}
                     min={0}
                     locale='en-US'
-                    value={value}
+                    value={value || 0}
                     {...props}
                 />
             </div>
