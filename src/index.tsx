@@ -131,3 +131,4 @@ const AppRouter = (): ReactElement => {
 };
 
 root.render(<AppRouter />);
+
