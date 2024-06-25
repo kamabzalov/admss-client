@@ -219,12 +219,38 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
-            const newSettings = {
-                ...serverSettings,
-                inventory: { ...serverSettings?.inventory, ...settings },
-            } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
+            if (settings.activeColumns) {
+                const filteredSettings = serverSettings?.inventory.columnWidth
+                    ? Object.entries(serverSettings.inventory.columnWidth)
+                          .filter(([column]) =>
+                              settings.activeColumns?.some((col) => col === column)
+                          )
+                          .reduce((obj, [key, value]) => {
+                              return {
+                                  ...obj,
+                                  [key]: value,
+                              };
+                          }, {} as { [key: string]: number })
+                    : {};
+                const updatedSettings = {
+                    ...serverSettings,
+                    inventory: {
+                        ...serverSettings?.inventory,
+                        ...settings,
+                        columnWidth: filteredSettings,
+                    },
+                } as ServerUserSettings;
+
+                setServerSettings(updatedSettings);
+                setUserSettings(authUser.useruid, updatedSettings);
+            } else {
+                const newSettings = {
+                    ...serverSettings,
+                    inventory: { ...serverSettings?.inventory, ...settings },
+                } as ServerUserSettings;
+                setServerSettings(newSettings);
+                setUserSettings(authUser.useruid, newSettings);
+            }
         }
     };
 
@@ -744,6 +770,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                         sortField={lazyState.sortField}
                                         reorderableColumns
                                         resizableColumns
+                                        columnResizeMode='expand'
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onRowClick={handleOnRowClick}
