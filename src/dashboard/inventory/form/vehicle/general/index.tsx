@@ -323,7 +323,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             await validateField("StockNo");
                         }}
                         onChange={async ({ target: { value } }) => {
-                            if (Boolean(inventory.itemuid)) return;
+                            if ((inventory.itemuid)) return;
                             await setFieldValue("StockNo", value);
                             changeInventory({ key: "StockNo", value });
                         }}
