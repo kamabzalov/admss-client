@@ -30,6 +30,11 @@
     white-space: nowrap;
 }
 
+.export-web-controls__button-icon {
+    margin-left: 10px;
+    line-height: 1;
+}
+
 .export-web-controls__input {
     width: 230px;
     height: 100%;
@@ -70,4 +75,29 @@
 .expanded-row__text {
     flex: 0 1 80%;
     text-wrap: wrap;
+}
+
+.export-web .p-tabview .p-tabview-nav {
+    margin: 0 1.25rem;
+    border-color: var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    font-weight: 700;
+    color: var(----admss-app-primary);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight.export-web__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border: none;
+    border-bottom: 1px solid var(--admss-app-main-blue);
+}
+
+.p-tabview
+    .p-tabview-nav
+    li.export-web__header:not(.p-highlight):not(.p-disabled):hover
+    .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-color: transparent;
+    border-bottom-color: var(--admss-app-light-grey);
 }
