@@ -5,7 +5,8 @@ import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
 import { store } from "store";
 import { getExportHistoryList } from "http/services/export-to-web.service";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { Checkbox } from "primereact/checkbox";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof HistoryList;
@@ -130,7 +131,8 @@ export const ExportHistory = (): ReactElement => {
     const userStore = store.userStore;
     const { authUser } = userStore;
     const [historyList] = useState<HistoryList[]>(historyData);
-    const [activeHistoryColumns] = useState<HistoryColumnsList[]>(historyColumns);
+    const [activeHistoryColumns, setActiveHistoryColumns] =
+        useState<HistoryColumnsList[]>(historyColumns);
 
     useEffect(() => {
         if (authUser) {
@@ -140,6 +142,29 @@ export const ExportHistory = (): ReactElement => {
         }
     }, [authUser]);
 
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={historyColumns.length === activeHistoryColumns.length}
+                    onChange={() => {
+                        setActiveHistoryColumns(historyColumns);
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    return setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     return (
         <div className='card-content history'>
             <div className='grid datatable-controls'>
@@ -147,7 +172,27 @@ export const ExportHistory = (): ReactElement => {
                     <div className='export-web-controls__input'>
                         <MultiSelect
                             showSelectAll={false}
+                            value={activeHistoryColumns}
+                            optionLabel='header'
+                            options={historyColumns}
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+                                const sortedValue = value.sort(
+                                    (a: HistoryColumnsList, b: HistoryColumnsList) => {
+                                        const firstIndex = historyColumns.findIndex(
+                                            (col) => col.field === a.field
+                                        );
+                                        const secondIndex = historyColumns.findIndex(
+                                            (col) => col.field === b.field
+                                        );
+                                        return firstIndex - secondIndex;
+                                    }
+                                );
+
+                                setActiveHistoryColumns(sortedValue);
+                            }}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
+                            panelHeaderTemplate={dropdownHeaderPanel}
                             display='chip'
                             pt={{
                                 header: {
@@ -213,3 +258,4 @@ export const ExportHistory = (): ReactElement => {
         </div>
     );
 };
+
