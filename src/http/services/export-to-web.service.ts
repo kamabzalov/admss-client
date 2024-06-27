@@ -68,7 +68,7 @@ export const getExportScheduleList = async (useruid: string) => {
 export const getExportHistoryList = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<ExportWebList[]>(
-            `external/${useruid}/listtasks`
+            `/api/v1/external/${useruid}/listhistor`
         );
         return request.data;
     } catch (error) {
