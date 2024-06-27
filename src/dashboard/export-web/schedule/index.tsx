@@ -6,7 +6,8 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { store } from "store";
 import { getExportScheduleList } from "http/services/export-to-web.service";
 import "./index.css";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { Checkbox } from "primereact/checkbox";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ScheduleList;
@@ -131,7 +132,8 @@ export const ExportSchedule = (): ReactElement => {
     const userStore = store.userStore;
     const { authUser } = userStore;
     const [scheduleList] = useState<ScheduleList[]>(scheduleData);
-    const [activeScheduleColumns] = useState<ScheduleColumnsList[]>(scheduleColumns);
+    const [activeScheduleColumns, setActiveScheduleColumns] =
+        useState<ScheduleColumnsList[]>(scheduleColumns);
 
     useEffect(() => {
         if (authUser) {
@@ -141,6 +143,31 @@ export const ExportSchedule = (): ReactElement => {
         }
     }, [authUser]);
 
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={scheduleColumns.length === activeScheduleColumns.length}
+                    onChange={() => {
+                        setActiveScheduleColumns(scheduleColumns);
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    return setActiveScheduleColumns(
+                        scheduleColumns.filter(({ checked }) => checked)
+                    );
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
     return (
         <div className='card-content schedule'>
             <div className='grid datatable-controls'>
@@ -148,7 +175,27 @@ export const ExportSchedule = (): ReactElement => {
                     <div className='export-web-controls__input'>
                         <MultiSelect
                             showSelectAll={false}
+                            value={activeScheduleColumns}
+                            optionLabel='header'
+                            options={scheduleColumns}
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+                                const sortedValue = value.sort(
+                                    (a: ScheduleColumnsList, b: ScheduleColumnsList) => {
+                                        const firstIndex = scheduleColumns.findIndex(
+                                            (col) => col.field === a.field
+                                        );
+                                        const secondIndex = scheduleColumns.findIndex(
+                                            (col) => col.field === b.field
+                                        );
+                                        return firstIndex - secondIndex;
+                                    }
+                                );
+
+                                setActiveScheduleColumns(sortedValue);
+                            }}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
+                            panelHeaderTemplate={dropdownHeaderPanel}
                             display='chip'
                             pt={{
                                 header: {
@@ -247,3 +294,4 @@ export const ExportSchedule = (): ReactElement => {
         </div>
     );
 };
+
