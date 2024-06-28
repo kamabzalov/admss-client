@@ -38,6 +38,8 @@ export interface ServerUserSettings {
     contacts: ContactsUserSettings;
     selectedFilterOptions?: FilterOptions[];
     exportWeb: ExportWebUserSettings;
+    exportSchedule: ExportWebUserSettings;
+    exportHistory: ExportWebUserSettings;
 }
 
 export interface UserGroup {

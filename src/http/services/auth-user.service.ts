@@ -33,6 +33,8 @@ export const getUserSettings = async (uid: string) => {
 };
 
 export const setUserSettings = async (uid: string, settings: Partial<ServerUserSettings>) => {
+    // eslint-disable-next-line no-console
+    console.log(settings);
     try {
         const request = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/profile`, {
             profile: JSON.stringify(settings),

@@ -1,5 +1,4 @@
 import { ReactElement, useEffect, useState } from "react";
-import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import {
     DataTable,
@@ -7,12 +6,10 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { getExportToWebList } from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
@@ -26,6 +23,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
 import { createStringifyFilterQuery } from "common/helpers";
+import { store } from "store";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -58,7 +56,8 @@ const groupedColumns: GroupedColumn[] = [
 
 export const ExportWeb = (): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
-    const [authUser, setUser] = useState<AuthUser | null>(null);
+    const userStore = store.userStore;
+    const { authUser } = userStore;
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
@@ -110,11 +109,6 @@ export const ExportWeb = (): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeColumns]);
-
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
         changeSettings({ table: event as TableState });
@@ -124,44 +118,6 @@ export const ExportWeb = (): ReactElement => {
         setLazyState(event);
         changeSettings({ table: event as TableState });
     };
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            setUser(authUser);
-            getExportToWebList(authUser.useruid, { total: 1 }).then((response) => {
-                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
-            });
-        }
-    }, []);
-
-    useEffect(() => {
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-        }
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
-
-        handleGetExportWebList(params);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
         if (authUser) {
@@ -213,13 +169,49 @@ export const ExportWeb = (): ReactElement => {
         }
     }, [authUser]);
 
+    useEffect(() => {
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        handleGetExportWebList(params, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [globalSearch, selectedFilterOptions, lazyState, authUser]);
+
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
                     checked={columns.length === activeColumns.length}
                     onChange={() => {
-                        setActiveColumns(columns);
+                        if (columns.length === activeColumns.length) {
+                            setActiveColumns(columns.filter(({ checked }) => checked));
+                            changeSettings({ activeColumns: [] });
+                        } else {
+                            setActiveColumns(columns);
+                            changeSettings({
+                                activeColumns: columns.map(({ field }) => field),
+                            });
+                        }
                     }}
                     className='dropdown-header__checkbox mr-2'
                 />
@@ -228,6 +220,7 @@ export const ExportWeb = (): ReactElement => {
             <button
                 className='p-multiselect-close p-link'
                 onClick={() => {
+                    changeSettings({ activeColumns: [] });
                     return setActiveColumns(columns.filter(({ checked }) => checked));
                 }}
             >
@@ -281,10 +274,6 @@ export const ExportWeb = (): ReactElement => {
                 }
             });
         }
-    };
-
-    const onColumnToggle = ({ value }: MultiSelectChangeEvent) => {
-        return setActiveColumns(value);
     };
 
     const handleEditedValueSet = (
@@ -389,19 +378,19 @@ export const ExportWeb = (): ReactElement => {
                             filterOptions={filterOptions}
                             onFilterChange={(selectedFilter) => {
                                 changeSettings({
-                                    ...serverSettings,
                                     selectedFilterOptions: selectedFilter.filter(
                                         (option) => !option.disabled
                                     ),
                                 });
+                                setSelectedFilter(selectedFilter);
                             }}
                             onClearFilters={() => {
                                 setSelectedFilter([]);
                                 setSelectedFilterOptions([]);
                                 changeSettings({
-                                    ...serverSettings,
                                     selectedFilterOptions: [],
                                 });
+                                setSelectedFilter(filterOptions);
                             }}
                         />
                     </div>
@@ -413,7 +402,28 @@ export const ExportWeb = (): ReactElement => {
                             optionLabel='header'
                             optionGroupLabel='label'
                             panelHeaderTemplate={dropdownHeaderPanel}
-                            onChange={onColumnToggle}
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+                                const sortedValue = value.sort(
+                                    (a: TableColumnsList, b: TableColumnsList) => {
+                                        const firstIndex = columns.findIndex(
+                                            (col) => col.field === a.field
+                                        );
+                                        const secondIndex = columns.findIndex(
+                                            (col) => col.field === b.field
+                                        );
+                                        return firstIndex - secondIndex;
+                                    }
+                                );
+
+                                setActiveColumns(sortedValue);
+
+                                changeSettings({
+                                    activeColumns: value.map(
+                                        ({ field }: { field: string }) => field
+                                    ),
+                                });
+                            }}
                             showSelectAll={false}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
                             display='chip'
@@ -621,4 +631,3 @@ export const ExportWeb = (): ReactElement => {
         </div>
     );
 };
-

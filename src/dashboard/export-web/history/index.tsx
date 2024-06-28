@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -10,6 +10,8 @@ import { Checkbox } from "primereact/checkbox";
 import { ExportWebHistoryList } from "common/models/export-web";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -33,6 +35,7 @@ export const ExportHistory = (): ReactElement => {
         useState<HistoryColumnsList[]>(historyColumns);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const handleGetExportHistoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
@@ -53,12 +56,81 @@ export const ExportHistory = (): ReactElement => {
         }
     };
 
+    const pageChanged = (event: DataTablePageEvent) => {
+        setLazyState(event);
+        changeSettings({ table: event as TableState });
+    };
+
+    const sortData = (event: DataTableSortEvent) => {
+        setLazyState(event);
+        changeSettings({ table: event as TableState });
+    };
+
+    const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                exportHistory: { ...serverSettings?.exportHistory, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
     useEffect(() => {
         if (authUser) {
-            handleGetExportHistoryList(lazyState, true);
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
+                    setServerSettings(allSettings);
+                    const { exportHistory: settings } = allSettings;
+                    if (settings?.activeColumns?.length) {
+                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                        const serverColumns = historyColumns.filter((column) =>
+                            uniqueColumns.find((col) => col === column.field)
+                        );
+                        setActiveHistoryColumns(serverColumns);
+                    } else {
+                        setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
+                    }
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                }
+            });
         }
+    }, [authUser]);
+
+    useEffect(() => {
+        let qry: string = "";
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        handleGetExportHistoryList(params, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authUser, lazyState]);
+    }, [lazyState, authUser]);
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
@@ -66,7 +138,17 @@ export const ExportHistory = (): ReactElement => {
                 <Checkbox
                     checked={historyColumns.length === activeHistoryColumns.length}
                     onChange={() => {
-                        setActiveHistoryColumns(historyColumns);
+                        if (historyColumns.length === activeHistoryColumns.length) {
+                            setActiveHistoryColumns(
+                                historyColumns.filter(({ checked }) => checked)
+                            );
+                            changeSettings({ activeColumns: [] });
+                        } else {
+                            setActiveHistoryColumns(historyColumns);
+                            changeSettings({
+                                activeColumns: historyColumns.map(({ field }) => field),
+                            });
+                        }
                     }}
                     className='dropdown-header__checkbox mr-2'
                 />
@@ -75,6 +157,7 @@ export const ExportHistory = (): ReactElement => {
             <button
                 className='p-multiselect-close p-link'
                 onClick={() => {
+                    changeSettings({ activeColumns: [] });
                     return setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
                 }}
             >
@@ -106,7 +189,11 @@ export const ExportHistory = (): ReactElement => {
                                         return firstIndex - secondIndex;
                                     }
                                 );
-
+                                changeSettings({
+                                    activeColumns: value.map(
+                                        ({ field }: { field: string }) => field
+                                    ),
+                                });
                                 setActiveHistoryColumns(sortedValue);
                             }}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
@@ -155,8 +242,8 @@ export const ExportHistory = (): ReactElement => {
                         first={lazyState.first}
                         rows={lazyState.rows}
                         totalRecords={totalRecords}
-                        onPage={(event) => setLazyState(event)}
-                        onSort={(event) => setLazyState(event)}
+                        onPage={pageChanged}
+                        onSort={sortData}
                         sortOrder={lazyState.sortOrder}
                         sortField={lazyState.sortField}
                     >
@@ -164,6 +251,7 @@ export const ExportHistory = (): ReactElement => {
                             return (
                                 <Column
                                     field={field}
+                                    key={field}
                                     sortable
                                     header={header}
                                     reorderable={false}

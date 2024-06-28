@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -11,6 +11,8 @@ import { Checkbox } from "primereact/checkbox";
 import { ExportWebScheduleList } from "common/models/export-web";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { QueryParams } from "common/models/query-params";
+import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -35,6 +37,7 @@ export const ExportSchedule = (): ReactElement => {
         useState<ScheduleColumnsList[]>(scheduleColumns);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const handleGetExportScheduleList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
@@ -57,12 +60,81 @@ export const ExportSchedule = (): ReactElement => {
         }
     };
 
+    const pageChanged = (event: DataTablePageEvent) => {
+        setLazyState(event);
+        changeSettings({ table: event as TableState });
+    };
+
+    const sortData = (event: DataTableSortEvent) => {
+        setLazyState(event);
+        changeSettings({ table: event as TableState });
+    };
+
+    const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                exportSchedule: { ...serverSettings?.exportSchedule, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
     useEffect(() => {
         if (authUser) {
-            handleGetExportScheduleList(lazyState, true);
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
+                    setServerSettings(allSettings);
+                    const { exportSchedule: settings } = allSettings;
+                    if (settings?.activeColumns?.length) {
+                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                        const serverColumns = scheduleColumns.filter((column) =>
+                            uniqueColumns.find((col) => col === column.field)
+                        );
+                        setActiveScheduleColumns(serverColumns);
+                    } else {
+                        setActiveScheduleColumns(scheduleColumns.filter(({ checked }) => checked));
+                    }
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                }
+            });
         }
+    }, [authUser]);
+
+    useEffect(() => {
+        let qry: string = "";
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        handleGetExportScheduleList(params, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authUser, lazyState]);
+    }, [lazyState, authUser]);
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
@@ -70,7 +142,17 @@ export const ExportSchedule = (): ReactElement => {
                 <Checkbox
                     checked={scheduleColumns.length === activeScheduleColumns.length}
                     onChange={() => {
-                        setActiveScheduleColumns(scheduleColumns);
+                        if (scheduleColumns.length === activeScheduleColumns.length) {
+                            setActiveScheduleColumns(
+                                scheduleColumns.filter(({ checked }) => checked)
+                            );
+                            changeSettings({ activeColumns: [] });
+                        } else {
+                            setActiveScheduleColumns(scheduleColumns);
+                            changeSettings({
+                                activeColumns: scheduleColumns.map(({ field }) => field),
+                            });
+                        }
                     }}
                     className='dropdown-header__checkbox mr-2'
                 />
@@ -79,6 +161,7 @@ export const ExportSchedule = (): ReactElement => {
             <button
                 className='p-multiselect-close p-link'
                 onClick={() => {
+                    changeSettings({ activeColumns: [] });
                     return setActiveScheduleColumns(
                         scheduleColumns.filter(({ checked }) => checked)
                     );
@@ -112,7 +195,11 @@ export const ExportSchedule = (): ReactElement => {
                                         return firstIndex - secondIndex;
                                     }
                                 );
-
+                                changeSettings({
+                                    activeColumns: value.map(
+                                        ({ field }: { field: string }) => field
+                                    ),
+                                });
                                 setActiveScheduleColumns(sortedValue);
                             }}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
@@ -161,8 +248,8 @@ export const ExportSchedule = (): ReactElement => {
                         first={lazyState.first}
                         rows={lazyState.rows}
                         totalRecords={totalRecords}
-                        onPage={(event) => setLazyState(event)}
-                        onSort={(event) => setLazyState(event)}
+                        onPage={pageChanged}
+                        onSort={sortData}
                         sortOrder={lazyState.sortOrder}
                         sortField={lazyState.sortField}
                     >
@@ -170,6 +257,7 @@ export const ExportSchedule = (): ReactElement => {
                             return (
                                 <Column
                                     field={field}
+                                    key={field}
                                     sortable
                                     header={header}
                                     reorderable={false}
