@@ -1,4 +1,3 @@
-import { ExportWebHistory } from "./../../../dashboard/inventory/form/export-web/history/index";
 import { ReportsColumn } from "../reports";
 
 export interface ExportWebList {

@@ -8,6 +8,8 @@ import { getExportHistoryList } from "http/services/export-to-web.service";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
 import { ExportWebHistoryList } from "common/models/export-web";
+import { QueryParams } from "common/models/query-params";
+import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -29,14 +31,34 @@ export const ExportHistory = (): ReactElement => {
     const [historyList, setHistoryList] = useState<ExportWebHistoryList[]>([]);
     const [activeHistoryColumns, setActiveHistoryColumns] =
         useState<HistoryColumnsList[]>(historyColumns);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
+    const handleGetExportHistoryList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            if (total) {
+                getExportHistoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                    if (response && !Array.isArray(response)) {
+                        setTotalRecords(response.total ?? 0);
+                    }
+                });
+            }
+            getExportHistoryList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setHistoryList(response);
+                } else {
+                    setHistoryList([]);
+                }
+            });
+        }
+    };
 
     useEffect(() => {
         if (authUser) {
-            getExportHistoryList(authUser.useruid).then((response) => {
-                response && setHistoryList(response);
-            });
+            handleGetExportHistoryList(lazyState, true);
         }
-    }, [authUser]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authUser, lazyState]);
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
@@ -129,11 +151,18 @@ export const ExportHistory = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         className='export-web-table'
+                        paginator
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        totalRecords={totalRecords}
+                        onPage={(event) => setLazyState(event)}
+                        onSort={(event) => setLazyState(event)}
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
                     >
                         {activeHistoryColumns.map(({ field, header }) => {
                             return (
                                 <Column
-                                    bodyStyle={{ textAlign: "center" }}
                                     field={field}
                                     sortable
                                     header={header}
@@ -154,4 +183,3 @@ export const ExportHistory = (): ReactElement => {
         </div>
     );
 };
-

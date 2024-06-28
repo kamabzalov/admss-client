@@ -9,6 +9,8 @@ import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
 import { ExportWebScheduleList } from "common/models/export-web";
+import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+import { QueryParams } from "common/models/query-params";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -31,14 +33,36 @@ export const ExportSchedule = (): ReactElement => {
     const [scheduleList, setScheduleList] = useState<ExportWebScheduleList[]>([]);
     const [activeScheduleColumns, setActiveScheduleColumns] =
         useState<ScheduleColumnsList[]>(scheduleColumns);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
+    const handleGetExportScheduleList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            if (total) {
+                getExportScheduleList(authUser.useruid, { ...params, total: 1 }).then(
+                    (response) => {
+                        if (response && !Array.isArray(response)) {
+                            setTotalRecords(response.total ?? 0);
+                        }
+                    }
+                );
+            }
+            getExportScheduleList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setScheduleList(response);
+                } else {
+                    setScheduleList([]);
+                }
+            });
+        }
+    };
 
     useEffect(() => {
         if (authUser) {
-            getExportScheduleList(authUser.useruid).then((response) => {
-                response && setScheduleList(response);
-            });
+            handleGetExportScheduleList(lazyState, true);
         }
-    }, [authUser]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authUser, lazyState]);
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
@@ -133,11 +157,18 @@ export const ExportSchedule = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         className='export-web-table'
+                        paginator
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        totalRecords={totalRecords}
+                        onPage={(event) => setLazyState(event)}
+                        onSort={(event) => setLazyState(event)}
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
                     >
                         {activeScheduleColumns.map(({ field, header }) => {
                             return (
                                 <Column
-                                    bodyStyle={{ textAlign: "center" }}
                                     field={field}
                                     sortable
                                     header={header}
@@ -191,4 +222,3 @@ export const ExportSchedule = (): ReactElement => {
         </div>
     );
 };
-

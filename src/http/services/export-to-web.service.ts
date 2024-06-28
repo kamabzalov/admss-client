@@ -59,22 +59,22 @@ export const addExportTaskToSchedule = async (
     }
 };
 
-export const getExportScheduleList = async (useruid: string) => {
+export const getExportScheduleList = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<ExportWebScheduleList[]>(
-            `external/${useruid}/schedule`
-        );
+        const request = await authorizedUserApiInstance.get<
+            ExportWebScheduleList[] | TotalExportToWebList
+        >(`external/${useruid}/schedule`, { params });
         return request.data;
     } catch (error) {
         // TODO: add error handler
     }
 };
 
-export const getExportHistoryList = async (useruid: string) => {
+export const getExportHistoryList = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<ExportWebHistoryList[]>(
-            `external/${useruid}/listhistory`
-        );
+        const request = await authorizedUserApiInstance.get<
+            ExportWebHistoryList[] | TotalExportToWebList
+        >(`external/${useruid}/listhistory`, { params });
         return request.data;
     } catch (error) {
         // TODO: add error handler
@@ -122,4 +122,3 @@ export const exportTaskScheduleContinue = async (taskuid: string) => {
         };
     }
 };
-
