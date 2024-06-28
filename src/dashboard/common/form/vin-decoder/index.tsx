@@ -8,7 +8,7 @@ interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
     buttonClassName?: string;
 }
-export const MIN_VIN_LENGTH = 7;
+export const MIN_VIN_LENGTH = 1;
 export const MAX_VIN_LENGTH = 17;
 
 export const VINDecoder = ({
@@ -50,6 +50,8 @@ export const VINDecoder = ({
                 className={`vin-decoder__text-input ${props.className}`}
                 value={value}
                 onChange={handleInputChange}
+                minLength={1}
+                maxLength={17}
             />
             <Button
                 className={`vin-decoder__decode-button ${buttonClassName}`}
