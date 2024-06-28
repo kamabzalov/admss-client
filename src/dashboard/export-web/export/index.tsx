@@ -167,7 +167,7 @@ export const ExportWeb = (): ReactElement => {
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
-                inventory: { ...serverSettings?.inventory, ...settings },
+                exportWeb: { ...serverSettings?.exportWeb, ...settings },
             } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);

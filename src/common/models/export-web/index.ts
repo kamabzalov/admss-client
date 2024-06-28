@@ -1,3 +1,4 @@
+import { ExportWebHistory } from "./../../../dashboard/inventory/form/export-web/history/index";
 import { ReportsColumn } from "../reports";
 
 export interface ExportWebList {
@@ -34,6 +35,34 @@ export interface ExportWebList {
     useruid: string;
     lastexportdate: string;
     Price: number;
+}
+
+export interface ExportWebHistoryList {
+    created: string;
+    filepath: string;
+    id: number;
+    info: string;
+    itemuid: string;
+    md5: string;
+    taskstatus: string;
+    tasktype: string;
+    taskuid: string;
+    updated: string;
+    useruid: string;
+}
+
+export interface ExportWebScheduleList {
+    created: string;
+    datapath: string;
+    id: number;
+    lasttatus: string;
+    lasttrun: string;
+    nextrun: string;
+    paused: number;
+    tasktype: string;
+    taskuid: string;
+    updated: string;
+    useruid: string;
 }
 
 export interface ExportWebPostData {

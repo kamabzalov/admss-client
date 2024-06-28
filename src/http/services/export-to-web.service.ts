@@ -1,7 +1,12 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
-import { ExportWebList, ExportWebPostData } from "common/models/export-web";
+import {
+    ExportWebHistoryList,
+    ExportWebList,
+    ExportWebPostData,
+    ExportWebScheduleList,
+} from "common/models/export-web";
 
 export interface TotalExportToWebList extends BaseResponse {
     total: number;
@@ -56,7 +61,7 @@ export const addExportTaskToSchedule = async (
 
 export const getExportScheduleList = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<ExportWebList[]>(
+        const request = await authorizedUserApiInstance.get<ExportWebScheduleList[]>(
             `external/${useruid}/schedule`
         );
         return request.data;
@@ -67,7 +72,7 @@ export const getExportScheduleList = async (useruid: string) => {
 
 export const getExportHistoryList = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<ExportWebList[]>(
+        const request = await authorizedUserApiInstance.get<ExportWebHistoryList[]>(
             `external/${useruid}/listhistory`
         );
         return request.data;
