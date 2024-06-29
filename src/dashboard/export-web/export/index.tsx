@@ -200,6 +200,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                             sortOrder:
                                 settings.table.sortOrder || initialDataTableQueries.sortOrder,
                         });
+                    if (settings?.selectedFilterOptions) {
+                        setSelectedFilterOptions(settings.selectedFilterOptions);
+                    }
                 }
                 setSettingsLoaded(true);
             });
