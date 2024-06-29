@@ -42,6 +42,7 @@ export interface ExportWebHistoryList {
     id: number;
     info: string;
     itemuid: string;
+    lastrun: string;
     md5: string;
     taskstatus: string;
     tasktype: string;
@@ -53,6 +54,7 @@ export interface ExportWebHistoryList {
 export interface ExportWebScheduleList {
     created: string;
     datapath: string;
+    info: string;
     id: number;
     lasttatus: string;
     lasttrun: string;

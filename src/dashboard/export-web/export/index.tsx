@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import {
     DataTable,
+    DataTableColReorderEvent,
+    DataTableColumnResizeEndEvent,
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
@@ -9,25 +12,47 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
-import { getExportToWebList } from "http/services/export-to-web.service";
+import {
+    addExportTask,
+    addExportTaskToSchedule,
+    getExportToWebList,
+} from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
-import { setInventory } from "http/services/inventory-service";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import {
+    MultiSelect,
+    MultiSelectChangeEvent,
+    MultiSelectPanelHeaderTemplateEvent,
+} from "primereact/multiselect";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
-import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
+import { FilterOptions, filterOptions } from "dashboard/common/filter";
 import { createStringifyFilterQuery } from "common/helpers";
 import { store } from "store";
+import { Status } from "common/models/base-response";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
 }
+
+enum ExportToWebStatus {
+    ALL = "allValues",
+    SELECTED = "allSelected",
+    UNSELECTED = "allUnselected",
+}
+
+const exportWebFilterOptions: FilterOptions[] = [
+    { label: "Export To Web", value: "exportToWeb", bold: true, disabled: true },
+    { label: "All", value: ExportToWebStatus.ALL },
+    { label: "Selected", value: ExportToWebStatus.SELECTED },
+    { label: "Unselected", value: ExportToWebStatus.UNSELECTED },
+    ...filterOptions,
+];
 
 type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
@@ -40,6 +65,7 @@ const columns: TableColumnsList[] = [
     { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
     { field: "Price", header: "Price", checked: false },
+    { field: "lastexportdate", header: "Last Export Date", checked: false },
 ];
 
 interface GroupedColumn {
@@ -54,7 +80,11 @@ const groupedColumns: GroupedColumn[] = [
     },
 ];
 
-export const ExportWeb = (): ReactElement => {
+interface ExportWebProps {
+    countCb: (selected: number) => void;
+}
+
+export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const userStore = store.userStore;
     const { authUser } = userStore;
@@ -63,14 +93,19 @@ export const ExportWeb = (): ReactElement => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const [, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+    const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
     const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
+    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        countCb(selectedInventories.filter((item) => item).length);
+    }, [selectedInventories, countCb]);
 
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
@@ -89,23 +124,23 @@ export const ExportWeb = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
+    const handleGetExportWebList = async (params: QueryParams) => {
         if (authUser) {
-            if (total) {
-                getExportToWebList(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    if (response && !Array.isArray(response)) {
-                        setTotalRecords(response.total ?? 0);
-                    }
-                });
+            const [totalResponse, dataResponse] = await Promise.all([
+                getExportToWebList(authUser.useruid, { ...params, total: 1 }),
+                getExportToWebList(authUser.useruid, params),
+            ]);
+
+            if (totalResponse && !Array.isArray(totalResponse)) {
+                setTotalRecords(totalResponse.total ?? 0);
             }
-            getExportToWebList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setExportsToWeb(response);
-                    setSelectedInventories(Array(response.length).fill(false));
-                } else {
-                    setExportsToWeb([]);
-                }
-            });
+
+            if (Array.isArray(dataResponse)) {
+                setExportsToWeb(dataResponse);
+                setSelectedInventories(Array(dataResponse.length).fill(false));
+            } else {
+                setExportsToWeb([]);
+            }
         }
     };
 
@@ -125,8 +160,9 @@ export const ExportWeb = (): ReactElement => {
                 ...serverSettings,
                 exportWeb: { ...serverSettings?.exportWeb, ...settings },
             } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
+            setUserSettings(authUser.useruid, newSettings).then((response) => {
+                if (response?.status === Status.OK) setServerSettings(newSettings);
+            });
         }
     };
 
@@ -165,11 +201,13 @@ export const ExportWeb = (): ReactElement => {
                                 settings.table.sortOrder || initialDataTableQueries.sortOrder,
                         });
                 }
+                setSettingsLoaded(true);
             });
         }
     }, [authUser]);
 
     useEffect(() => {
+        if (!settingsLoaded) return;
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
         }
@@ -193,26 +231,28 @@ export const ExportWeb = (): ReactElement => {
             top: lazyState.rows,
         };
 
-        handleGetExportWebList(params, true);
+        handleGetExportWebList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [globalSearch, selectedFilterOptions, lazyState, authUser]);
+    }, [globalSearch, lazyState, selectedFilterOptions, settingsLoaded]);
+
+    const handleCheckboxChange = () => {
+        if (columns.length === activeColumns.length) {
+            setActiveColumns(columns.filter(({ checked }) => checked));
+            changeSettings({ activeColumns: [] });
+        } else {
+            setActiveColumns(columns);
+            changeSettings({
+                activeColumns: columns.map(({ field }) => field),
+            });
+        }
+    };
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
                     checked={columns.length === activeColumns.length}
-                    onChange={() => {
-                        if (columns.length === activeColumns.length) {
-                            setActiveColumns(columns.filter(({ checked }) => checked));
-                            changeSettings({ activeColumns: [] });
-                        } else {
-                            setActiveColumns(columns);
-                            changeSettings({
-                                activeColumns: columns.map(({ field }) => field),
-                            });
-                        }
-                    }}
+                    onChange={handleCheckboxChange}
                     className='dropdown-header__checkbox mr-2'
                 />
                 Select All
@@ -228,6 +268,50 @@ export const ExportWeb = (): ReactElement => {
             </button>
         </div>
     );
+
+    const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        checked={
+                            exportWebFilterOptions.filter((option) => !option.disabled).length ===
+                            selectedFilter.length
+                        }
+                        onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            setSelectedFilter(
+                                isChecked
+                                    ? exportWebFilterOptions.map((option) => ({
+                                          value: option.value,
+                                      }))
+                                    : []
+                            );
+                            const selectedOptions = isChecked ? exportWebFilterOptions : [];
+                            setSelectedFilterOptions(
+                                selectedOptions.filter((option) => !option.disabled)
+                            );
+                        }}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={(e) => {
+                        setSelectedFilter([]);
+                        setSelectedFilterOptions([]);
+                        changeSettings({
+                            selectedFilterOptions: [],
+                        });
+                        evt.onCloseClick(e);
+                    }}
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
 
     const printTableData = async (print: boolean = false) => {
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
@@ -276,78 +360,97 @@ export const ExportWeb = (): ReactElement => {
         }
     };
 
-    const handleEditedValueSet = (
-        key: "Enter" | unknown,
-        field: keyof ExportWebList,
-        value: string,
-        id: string
-    ) => {
-        if (key === "Enter") {
-            if (field === "Price") {
-                setInventory(id, { Price: Number(value) });
+    const handleExport = (schedule?: boolean) => {
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field,
+        }));
+        const data = exportsToWeb
+            .map((item, index) => {
+                let filteredItem: Record<string, any> | null = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        if (selectedInventories[index] && filteredItem) {
+                            filteredItem[column.data] = item[column.data as keyof typeof item];
+                            filteredItem["itemuid"] = item["itemuid"];
+                        } else {
+                            filteredItem = null;
+                        }
+                    }
+                });
+                return filteredItem;
+            })
+            .filter(Boolean);
+        const JSONreport = !!data.length && {
+            data,
+            columns,
+        };
+        if (JSONreport && authUser) {
+            if (schedule) {
+                addExportTaskToSchedule(authUser.useruid, JSONreport);
+            } else {
+                addExportTask(authUser?.useruid, JSONreport);
             }
-            setInventory(id, { [field]: value });
         }
     };
 
-    const cellEditor = (options: ColumnEditorOptions) => {
-        return (
-            <InputText
-                type='text'
-                className='h-full m-0 py-0 px-2 w-full'
-                value={options.value}
-                onChange={(evt) => options.editorCallback!(evt.target.value)}
-                onKeyDown={(evt) =>
-                    handleEditedValueSet(
-                        evt.key,
-                        options.field as keyof ExportWebList,
-                        options.value,
-                        options.rowData.itemuid
-                    )
-                }
-            />
+    const handleColumnReorder = (event: DataTableColReorderEvent) => {
+        if (authUser && Array.isArray(event.columns)) {
+            const orderArray = event.columns?.map((column: any) => column.props.field);
+
+            const newActiveColumns = orderArray
+                .map((field: string) => {
+                    return activeColumns.find((column) => column.field === field) || null;
+                })
+                .filter((column): column is TableColumnsList => column !== null);
+
+            setActiveColumns(newActiveColumns);
+
+            changeSettings({
+                activeColumns: newActiveColumns,
+            });
+        }
+    };
+
+    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
+        if (event.column.props.field) {
+            const newColumnWidth = {
+                [event.column.props.field as string]: event.element.offsetWidth,
+            };
+            changeSettings({
+                columnWidth: {
+                    ...serverSettings?.exportWeb?.columnWidth,
+                    ...newColumnWidth,
+                },
+            });
+        }
+    };
+
+    const handleChangeColumn = ({ value, stopPropagation }: MultiSelectChangeEvent) => {
+        stopPropagation();
+        const sortedValue = value.sort((a: TableColumnsList, b: TableColumnsList) => {
+            const firstIndex = columns.findIndex((col) => col.field === a.field);
+            const secondIndex = columns.findIndex((col) => col.field === b.field);
+            return firstIndex - secondIndex;
+        });
+
+        setActiveColumns(sortedValue);
+
+        changeSettings({
+            activeColumns: value.map(({ field }: { field: string }) => field),
+        });
+    };
+
+    const handleChangeFilter = ({ value }: MultiSelectChangeEvent) => {
+        const selectedOptions = exportWebFilterOptions.filter((option) =>
+            value.includes(option.value)
         );
-    };
+        setSelectedFilterOptions(selectedOptions);
 
-    const handleExport = (schedule?: boolean) => {
-        //   const columns: ReportsColumn[] = activeColumns.map((column) => ({
-        //       name: column.header as string,
-        //       data: column.field,
-        //   }));
-        //   const data = exportsToWeb
-        //       .map((item, index) => {
-        //           let filteredItem: Record<string, any> | null = {};
-        //           columns.forEach((column) => {
-        //               if (item.hasOwnProperty(column.data)) {
-        //                   if (selectedInventories[index] && filteredItem) {
-        //                       filteredItem[column.data] = item[column.data as keyof typeof item];
-        //                       filteredItem["itemuid"] = item["itemuid"];
-        //                   } else {
-        //                       filteredItem = null;
-        //                   }
-        //               }
-        //           });
-        //           return filteredItem;
-        //       })
-        //       .filter(Boolean);
-        //   const JSONreport = !!data.length && {
-        //       data,
-        //       columns,
-        //   };
-        //   if (JSONreport && authUser) {
-        //       if (schedule) {
-        //           addExportTaskToSchedule(authUser.useruid, JSONreport);
-        //       } else {
-        //           addExportTask(authUser?.useruid, JSONreport);
-        //       }
-        //   }
+        changeSettings({
+            selectedFilterOptions: selectedOptions,
+        });
     };
-
-    const allowedEditableFields: Partial<keyof ExportWebList>[] = [
-        "ExteriorColor",
-        "mileage",
-        "Price",
-    ];
 
     return (
         <div className='card-content'>
@@ -374,23 +477,27 @@ export const ExportWeb = (): ReactElement => {
                         <i className='icon adms-calendar export-web-controls__button-icon' />
                     </Button>
                     <div className='export-web-controls__input'>
-                        <TableFilter
-                            filterOptions={filterOptions}
-                            onFilterChange={(selectedFilter) => {
-                                changeSettings({
-                                    selectedFilterOptions: selectedFilter.filter(
-                                        (option) => !option.disabled
-                                    ),
-                                });
-                                setSelectedFilter(selectedFilter);
-                            }}
-                            onClearFilters={() => {
-                                setSelectedFilter([]);
-                                setSelectedFilterOptions([]);
-                                changeSettings({
-                                    selectedFilterOptions: [],
-                                });
-                                setSelectedFilter(filterOptions);
+                        <MultiSelect
+                            optionValue='value'
+                            optionLabel='label'
+                            options={exportWebFilterOptions}
+                            value={selectedFilter}
+                            onChange={handleChangeFilter}
+                            placeholder='Filter'
+                            className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                            display='chip'
+                            selectedItemsLabel='Clear Filter'
+                            panelHeaderTemplate={dropdownFilterHeaderPanel}
+                            pt={{
+                                header: {
+                                    className: "inventory-filter__header",
+                                },
+                                wrapper: {
+                                    className: "inventory-filter__wrapper",
+                                    style: {
+                                        maxHeight: "500px",
+                                    },
+                                },
                             }}
                         />
                     </div>
@@ -402,28 +509,7 @@ export const ExportWeb = (): ReactElement => {
                             optionLabel='header'
                             optionGroupLabel='label'
                             panelHeaderTemplate={dropdownHeaderPanel}
-                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                                stopPropagation();
-                                const sortedValue = value.sort(
-                                    (a: TableColumnsList, b: TableColumnsList) => {
-                                        const firstIndex = columns.findIndex(
-                                            (col) => col.field === a.field
-                                        );
-                                        const secondIndex = columns.findIndex(
-                                            (col) => col.field === b.field
-                                        );
-                                        return firstIndex - secondIndex;
-                                    }
-                                );
-
-                                setActiveColumns(sortedValue);
-
-                                changeSettings({
-                                    activeColumns: value.map(
-                                        ({ field }: { field: string }) => field
-                                    ),
-                                });
-                            }}
+                            onChange={handleChangeColumn}
                             showSelectAll={false}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
                             display='chip'
@@ -487,44 +573,8 @@ export const ExportWeb = (): ReactElement => {
                         sortOrder={lazyState.sortOrder}
                         className='export-web-table'
                         sortField={lazyState.sortField}
-                        onColReorder={(event) => {
-                            if (authUser && Array.isArray(event.columns)) {
-                                const orderArray = event.columns?.map(
-                                    (column: any) => column.props.field
-                                );
-
-                                const newActiveColumns = orderArray
-                                    .map((field: string) => {
-                                        return (
-                                            activeColumns.find(
-                                                (column) => column.field === field
-                                            ) || null
-                                        );
-                                    })
-                                    .filter(
-                                        (column): column is TableColumnsList => column !== null
-                                    );
-
-                                setActiveColumns(newActiveColumns);
-
-                                changeSettings({
-                                    activeColumns: newActiveColumns,
-                                });
-                            }
-                        }}
-                        onColumnResizeEnd={(event) => {
-                            if (authUser && event) {
-                                const newColumnWidth = {
-                                    [event.column.props.field as string]: event.element.offsetWidth,
-                                };
-                                changeSettings({
-                                    columnWidth: {
-                                        ...serverSettings?.exportWeb?.columnWidth,
-                                        ...newColumnWidth,
-                                    },
-                                });
-                            }
-                        }}
+                        onColReorder={handleColumnReorder}
+                        onColumnResizeEnd={handleColumnResize}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
@@ -533,18 +583,13 @@ export const ExportWeb = (): ReactElement => {
                                     checked={selectedInventories.every((checkbox) => !!checkbox)}
                                     onClick={({ checked }) => {
                                         setSelectedInventories(
-                                            selectedInventories.map(() => {
-                                                if (checked) {
-                                                    return true;
-                                                } else {
-                                                    return false;
-                                                }
-                                            })
+                                            selectedInventories.map(() => !!checked)
                                         );
                                     }}
                                 />
                             }
                             reorderable={false}
+                            resizeable={false}
                             body={(options, { rowIndex }) => {
                                 return (
                                     <div
@@ -602,16 +647,6 @@ export const ExportWeb = (): ReactElement => {
                                             {data[field]}
                                         </div>
                                     );
-                                }}
-                                editor={(data: ColumnEditorOptions) => {
-                                    const { field } = data;
-                                    if (
-                                        allowedEditableFields.includes(field as keyof ExportWebList)
-                                    ) {
-                                        return cellEditor(data);
-                                    } else {
-                                        return data.value;
-                                    }
                                 }}
                                 headerClassName='cursor-move'
                                 pt={{

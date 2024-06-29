@@ -1,5 +1,11 @@
 import { ReactElement, useEffect, useState } from "react";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTableColReorderEvent,
+    DataTableColumnResizeEndEvent,
+    DataTablePageEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -26,6 +32,7 @@ const scheduleColumns: ScheduleColumnsList[] = [
     { field: "lasttatus", header: "Status", checked: true },
     { field: "created", header: "Created", checked: true },
     { field: "tasktype", header: "Type", checked: true },
+    { field: "info", header: "Info", checked: true },
     { field: "lasttrun", header: "Last Run", checked: true },
     { field: "nextrun", header: "Next Run", checked: true },
 ];
@@ -138,7 +145,7 @@ export const ExportSchedule = (): ReactElement => {
             handleGetExportScheduleList(params);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [serverSettings]);
+    }, [lazyState, settingsLoaded]);
 
     const handleCheckboxChange = () => {
         if (scheduleColumns.length === activeScheduleColumns.length) {
@@ -175,6 +182,38 @@ export const ExportSchedule = (): ReactElement => {
             </button>
         </div>
     );
+
+    const handleColumnReorder = (event: DataTableColReorderEvent) => {
+        if (authUser && Array.isArray(event.columns)) {
+            const orderArray = event.columns?.map((column: any) => column.props.field);
+
+            const newActiveColumns = orderArray
+                .map((field: string) => {
+                    return activeScheduleColumns.find((column) => column.field === field) || null;
+                })
+                .filter((column): column is ScheduleColumnsList => column !== null);
+
+            setActiveScheduleColumns(newActiveColumns);
+
+            changeSettings({
+                activeColumns: newActiveColumns,
+            });
+        }
+    };
+
+    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
+        if (event.column.props.field) {
+            const newColumnWidth = {
+                [event.column.props.field as string]: event.element.offsetWidth,
+            };
+            changeSettings({
+                columnWidth: {
+                    ...serverSettings?.exportSchedule?.columnWidth,
+                    ...newColumnWidth,
+                },
+            });
+        }
+    };
 
     return (
         <div className='card-content schedule'>
@@ -256,6 +295,8 @@ export const ExportSchedule = (): ReactElement => {
                         onSort={sortData}
                         sortOrder={lazyState.sortOrder}
                         sortField={lazyState.sortField}
+                        onColReorder={handleColumnReorder}
+                        onColumnResizeEnd={handleColumnResize}
                     >
                         {activeScheduleColumns.map(({ field, header }) => {
                             return (
@@ -278,6 +319,7 @@ export const ExportSchedule = (): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
+                            resizeable={false}
                             body={() => {
                                 return (
                                     <div className='schedule-control'>
