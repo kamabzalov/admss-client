@@ -49,21 +49,20 @@ export const ExportSchedule = (): ReactElement => {
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
     const handleGetExportScheduleList = async (params: QueryParams) => {
-        if (authUser) {
-            const [totalResponse, dataResponse] = await Promise.all([
-                getExportScheduleList(authUser.useruid, { ...params, total: 1 }),
-                getExportScheduleList(authUser.useruid, params),
-            ]);
+        if (!authUser) return;
+        const [totalResponse, dataResponse] = await Promise.all([
+            getExportScheduleList(authUser.useruid, { ...params, total: 1 }),
+            getExportScheduleList(authUser.useruid, params),
+        ]);
 
-            if (totalResponse && !Array.isArray(totalResponse)) {
-                setTotalRecords(totalResponse.total ?? 0);
-            }
+        if (totalResponse && !Array.isArray(totalResponse)) {
+            setTotalRecords(totalResponse.total ?? 0);
+        }
 
-            if (Array.isArray(dataResponse)) {
-                setScheduleList(dataResponse);
-            } else {
-                setScheduleList([]);
-            }
+        if (Array.isArray(dataResponse)) {
+            setScheduleList(dataResponse);
+        } else {
+            setScheduleList([]);
         }
     };
 
@@ -78,55 +77,51 @@ export const ExportSchedule = (): ReactElement => {
     };
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
-        if (authUser) {
-            const newSettings = {
-                ...serverSettings,
-                exportSchedule: { ...serverSettings?.exportSchedule, ...settings },
-            } as ServerUserSettings;
-            setUserSettings(authUser.useruid, newSettings).then((response) => {
-                if (response?.status === Status.OK) setServerSettings(newSettings);
-            });
-        }
+        if (!authUser) return;
+        const newSettings = {
+            ...serverSettings,
+            exportSchedule: { ...serverSettings?.exportSchedule, ...settings },
+        } as ServerUserSettings;
+        setUserSettings(authUser.useruid, newSettings).then((response) => {
+            if (response?.status === Status.OK) setServerSettings(newSettings);
+        });
     };
 
     useEffect(() => {
-        if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
-                        }
+        if (!authUser) return;
+        getUserSettings(authUser.useruid).then((response) => {
+            if (response?.profile.length) {
+                let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                if (response.profile) {
+                    try {
+                        allSettings = JSON.parse(response.profile);
+                    } catch (error) {
+                        allSettings = {} as ServerUserSettings;
                     }
-                    setServerSettings(allSettings);
-                    const { exportSchedule: settings } = allSettings;
-                    if (settings?.activeColumns?.length) {
-                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
-                        const serverColumns = scheduleColumns.filter((column) =>
-                            uniqueColumns.find((col) => col === column.field)
-                        );
-                        setActiveScheduleColumns(serverColumns);
-                    } else {
-                        setActiveScheduleColumns(scheduleColumns.filter(({ checked }) => checked));
-                    }
-                    settings?.table &&
-                        setLazyState({
-                            first: settings.table.first || initialDataTableQueries.first,
-                            rows: settings.table.rows || initialDataTableQueries.rows,
-                            page: settings.table.page || initialDataTableQueries.page,
-                            column: settings.table.column || initialDataTableQueries.column,
-                            sortField:
-                                settings.table.sortField || initialDataTableQueries.sortField,
-                            sortOrder:
-                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                        });
                 }
-                setSettingsLoaded(true);
-            });
-        }
+                setServerSettings(allSettings);
+                const { exportSchedule: settings } = allSettings;
+                if (settings?.activeColumns?.length) {
+                    const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                    const serverColumns = scheduleColumns.filter((column) =>
+                        uniqueColumns.find((col) => col === column.field)
+                    );
+                    setActiveScheduleColumns(serverColumns);
+                } else {
+                    setActiveScheduleColumns(scheduleColumns.filter(({ checked }) => checked));
+                }
+                settings?.table &&
+                    setLazyState({
+                        first: settings.table.first || initialDataTableQueries.first,
+                        rows: settings.table.rows || initialDataTableQueries.rows,
+                        page: settings.table.page || initialDataTableQueries.page,
+                        column: settings.table.column || initialDataTableQueries.column,
+                        sortField: settings.table.sortField || initialDataTableQueries.sortField,
+                        sortOrder: settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                    });
+            }
+            setSettingsLoaded(true);
+        });
     }, [authUser]);
 
     useEffect(() => {

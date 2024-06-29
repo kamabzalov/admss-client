@@ -8,6 +8,7 @@ import {
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
+    DataTableValue,
 } from "primereact/datatable";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
@@ -98,7 +99,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         null
     );
     const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
-    const [expandedRows, setExpandedRows] = useState<any[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
     const navigate = useNavigate();
@@ -125,22 +126,21 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const handleGetExportWebList = async (params: QueryParams) => {
-        if (authUser) {
-            const [totalResponse, dataResponse] = await Promise.all([
-                getExportToWebList(authUser.useruid, { ...params, total: 1 }),
-                getExportToWebList(authUser.useruid, params),
-            ]);
+        if (!authUser) return;
+        const [totalResponse, dataResponse] = await Promise.all([
+            getExportToWebList(authUser.useruid, { ...params, total: 1 }),
+            getExportToWebList(authUser.useruid, params),
+        ]);
 
-            if (totalResponse && !Array.isArray(totalResponse)) {
-                setTotalRecords(totalResponse.total ?? 0);
-            }
+        if (totalResponse && !Array.isArray(totalResponse)) {
+            setTotalRecords(totalResponse.total ?? 0);
+        }
 
-            if (Array.isArray(dataResponse)) {
-                setExportsToWeb(dataResponse);
-                setSelectedInventories(Array(dataResponse.length).fill(false));
-            } else {
-                setExportsToWeb([]);
-            }
+        if (Array.isArray(dataResponse)) {
+            setExportsToWeb(dataResponse);
+            setSelectedInventories(Array(dataResponse.length).fill(false));
+        } else {
+            setExportsToWeb([]);
         }
     };
 
@@ -155,58 +155,54 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
-        if (authUser) {
-            const newSettings = {
-                ...serverSettings,
-                exportWeb: { ...serverSettings?.exportWeb, ...settings },
-            } as ServerUserSettings;
-            setUserSettings(authUser.useruid, newSettings).then((response) => {
-                if (response?.status === Status.OK) setServerSettings(newSettings);
-            });
-        }
+        if (!authUser) return;
+        const newSettings = {
+            ...serverSettings,
+            exportWeb: { ...serverSettings?.exportWeb, ...settings },
+        } as ServerUserSettings;
+        setUserSettings(authUser.useruid, newSettings).then((response) => {
+            if (response?.status === Status.OK) setServerSettings(newSettings);
+        });
     };
 
     useEffect(() => {
-        if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
-                        }
-                    }
-                    setServerSettings(allSettings);
-                    const { exportWeb: settings } = allSettings;
-                    if (settings?.activeColumns?.length) {
-                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
-                        const serverColumns = columns.filter((column) =>
-                            uniqueColumns.find((col) => col === column.field)
-                        );
-                        setActiveColumns(serverColumns);
-                    } else {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
-                    }
-                    settings?.table &&
-                        setLazyState({
-                            first: settings.table.first || initialDataTableQueries.first,
-                            rows: settings.table.rows || initialDataTableQueries.rows,
-                            page: settings.table.page || initialDataTableQueries.page,
-                            column: settings.table.column || initialDataTableQueries.column,
-                            sortField:
-                                settings.table.sortField || initialDataTableQueries.sortField,
-                            sortOrder:
-                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                        });
-                    if (settings?.selectedFilterOptions) {
-                        setSelectedFilterOptions(settings.selectedFilterOptions);
+        if (!authUser) return;
+        getUserSettings(authUser.useruid).then((response) => {
+            if (response?.profile.length) {
+                let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                if (response.profile) {
+                    try {
+                        allSettings = JSON.parse(response.profile);
+                    } catch (error) {
+                        allSettings = {} as ServerUserSettings;
                     }
                 }
-                setSettingsLoaded(true);
-            });
-        }
+                setServerSettings(allSettings);
+                const { exportWeb: settings } = allSettings;
+                if (settings?.activeColumns?.length) {
+                    const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                    const serverColumns = columns.filter((column) =>
+                        uniqueColumns.find((col) => col === column.field)
+                    );
+                    setActiveColumns(serverColumns);
+                } else {
+                    setActiveColumns(columns.filter(({ checked }) => checked));
+                }
+                settings?.table &&
+                    setLazyState({
+                        first: settings.table.first || initialDataTableQueries.first,
+                        rows: settings.table.rows || initialDataTableQueries.rows,
+                        page: settings.table.page || initialDataTableQueries.page,
+                        column: settings.table.column || initialDataTableQueries.column,
+                        sortField: settings.table.sortField || initialDataTableQueries.sortField,
+                        sortOrder: settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                    });
+                if (settings?.selectedFilterOptions) {
+                    setSelectedFilterOptions(settings.selectedFilterOptions);
+                }
+            }
+            setSettingsLoaded(true);
+        });
     }, [authUser]);
 
     useEffect(() => {
