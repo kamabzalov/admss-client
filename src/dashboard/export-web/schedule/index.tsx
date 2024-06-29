@@ -13,6 +13,7 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { QueryParams } from "common/models/query-params";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { Status } from "common/models/base-response";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -38,25 +39,24 @@ export const ExportSchedule = (): ReactElement => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
-    const handleGetExportScheduleList = async (params: QueryParams, total?: boolean) => {
+    const handleGetExportScheduleList = async (params: QueryParams) => {
         if (authUser) {
-            if (total) {
-                getExportScheduleList(authUser.useruid, { ...params, total: 1 }).then(
-                    (response) => {
-                        if (response && !Array.isArray(response)) {
-                            setTotalRecords(response.total ?? 0);
-                        }
-                    }
-                );
+            const [totalResponse, dataResponse] = await Promise.all([
+                getExportScheduleList(authUser.useruid, { ...params, total: 1 }),
+                getExportScheduleList(authUser.useruid, params),
+            ]);
+
+            if (totalResponse && !Array.isArray(totalResponse)) {
+                setTotalRecords(totalResponse.total ?? 0);
             }
-            getExportScheduleList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setScheduleList(response);
-                } else {
-                    setScheduleList([]);
-                }
-            });
+
+            if (Array.isArray(dataResponse)) {
+                setScheduleList(dataResponse);
+            } else {
+                setScheduleList([]);
+            }
         }
     };
 
@@ -76,8 +76,9 @@ export const ExportSchedule = (): ReactElement => {
                 ...serverSettings,
                 exportSchedule: { ...serverSettings?.exportSchedule, ...settings },
             } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
+            setUserSettings(authUser.useruid, newSettings).then((response) => {
+                if (response?.status === Status.OK) setServerSettings(newSettings);
+            });
         }
     };
 
@@ -116,44 +117,47 @@ export const ExportSchedule = (): ReactElement => {
                                 settings.table.sortOrder || initialDataTableQueries.sortOrder,
                         });
                 }
+                setSettingsLoaded(true);
             });
         }
     }, [authUser]);
 
     useEffect(() => {
-        let qry: string = "";
+        if (settingsLoaded) {
+            let qry: string = "";
 
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(lazyState.sortField && { column: lazyState.sortField }),
+                qry,
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
 
-        handleGetExportScheduleList(params, true);
+            handleGetExportScheduleList(params);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, authUser]);
+    }, [serverSettings]);
+
+    const handleCheckboxChange = () => {
+        if (scheduleColumns.length === activeScheduleColumns.length) {
+            setActiveScheduleColumns(scheduleColumns.filter(({ checked }) => checked));
+            changeSettings({ activeColumns: [] });
+        } else {
+            setActiveScheduleColumns(scheduleColumns);
+            changeSettings({
+                activeColumns: scheduleColumns.map(({ field }) => field),
+            });
+        }
+    };
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
                     checked={scheduleColumns.length === activeScheduleColumns.length}
-                    onChange={() => {
-                        if (scheduleColumns.length === activeScheduleColumns.length) {
-                            setActiveScheduleColumns(
-                                scheduleColumns.filter(({ checked }) => checked)
-                            );
-                            changeSettings({ activeColumns: [] });
-                        } else {
-                            setActiveScheduleColumns(scheduleColumns);
-                            changeSettings({
-                                activeColumns: scheduleColumns.map(({ field }) => field),
-                            });
-                        }
-                    }}
+                    onChange={handleCheckboxChange}
                     className='dropdown-header__checkbox mr-2'
                 />
                 Select All

@@ -12,6 +12,7 @@ import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { Status } from "common/models/base-response";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -36,23 +37,24 @@ export const ExportHistory = (): ReactElement => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
-    const handleGetExportHistoryList = async (params: QueryParams, total?: boolean) => {
+    const handleGetExportHistoryList = async (params: QueryParams) => {
         if (authUser) {
-            if (total) {
-                getExportHistoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    if (response && !Array.isArray(response)) {
-                        setTotalRecords(response.total ?? 0);
-                    }
-                });
+            const [totalResponse, dataResponse] = await Promise.all([
+                getExportHistoryList(authUser.useruid, { ...params, total: 1 }),
+                getExportHistoryList(authUser.useruid, params),
+            ]);
+
+            if (totalResponse && !Array.isArray(totalResponse)) {
+                setTotalRecords(totalResponse.total ?? 0);
             }
-            getExportHistoryList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setHistoryList(response);
-                } else {
-                    setHistoryList([]);
-                }
-            });
+
+            if (Array.isArray(dataResponse)) {
+                setHistoryList(dataResponse);
+            } else {
+                setHistoryList([]);
+            }
         }
     };
 
@@ -72,8 +74,9 @@ export const ExportHistory = (): ReactElement => {
                 ...serverSettings,
                 exportHistory: { ...serverSettings?.exportHistory, ...settings },
             } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
+            setUserSettings(authUser.useruid, newSettings).then((response) => {
+                if (response?.status === Status.OK) setServerSettings(newSettings);
+            });
         }
     };
 
@@ -112,11 +115,13 @@ export const ExportHistory = (): ReactElement => {
                                 settings.table.sortOrder || initialDataTableQueries.sortOrder,
                         });
                 }
+                setSettingsLoaded(true);
             });
         }
     }, [authUser]);
 
     useEffect(() => {
+        if (!settingsLoaded) return;
         let qry: string = "";
 
         const params: QueryParams = {
@@ -128,28 +133,28 @@ export const ExportHistory = (): ReactElement => {
             top: lazyState.rows,
         };
 
-        handleGetExportHistoryList(params, true);
+        handleGetExportHistoryList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, authUser]);
+
+    const handleCheckboxChange = () => {
+        if (historyColumns.length === activeHistoryColumns.length) {
+            setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
+            changeSettings({ activeColumns: [] });
+        } else {
+            setActiveHistoryColumns(historyColumns);
+            changeSettings({
+                activeColumns: historyColumns.map(({ field }) => field),
+            });
+        }
+    };
 
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
                     checked={historyColumns.length === activeHistoryColumns.length}
-                    onChange={() => {
-                        if (historyColumns.length === activeHistoryColumns.length) {
-                            setActiveHistoryColumns(
-                                historyColumns.filter(({ checked }) => checked)
-                            );
-                            changeSettings({ activeColumns: [] });
-                        } else {
-                            setActiveHistoryColumns(historyColumns);
-                            changeSettings({
-                                activeColumns: historyColumns.map(({ field }) => field),
-                            });
-                        }
-                    }}
+                    onChange={handleCheckboxChange}
                     className='dropdown-header__checkbox mr-2'
                 />
                 Select All
