@@ -151,6 +151,11 @@ export const ExportHistory = (): ReactElement => {
         }
     };
 
+    const handleDropdownHeaderColumnToggle = () => {
+        changeSettings({ activeColumns: [] });
+        return setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
+    };
+
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
@@ -163,10 +168,7 @@ export const ExportHistory = (): ReactElement => {
             </label>
             <button
                 className='p-multiselect-close p-link'
-                onClick={() => {
-                    changeSettings({ activeColumns: [] });
-                    return setActiveHistoryColumns(historyColumns.filter(({ checked }) => checked));
-                }}
+                onClick={handleDropdownHeaderColumnToggle}
             >
                 <i className='pi pi-times' />
             </button>
@@ -205,6 +207,19 @@ export const ExportHistory = (): ReactElement => {
         }
     };
 
+    const handleColumnToggle = ({ value, stopPropagation }: MultiSelectChangeEvent) => {
+        stopPropagation();
+        const sortedValue = value.sort((a: HistoryColumnsList, b: HistoryColumnsList) => {
+            const firstIndex = historyColumns.findIndex((col) => col.field === a.field);
+            const secondIndex = historyColumns.findIndex((col) => col.field === b.field);
+            return firstIndex - secondIndex;
+        });
+        changeSettings({
+            activeColumns: value.map(({ field }: { field: string }) => field),
+        });
+        setActiveHistoryColumns(sortedValue);
+    };
+
     return (
         <div className='card-content history'>
             <div className='grid datatable-controls'>
@@ -215,26 +230,7 @@ export const ExportHistory = (): ReactElement => {
                             value={activeHistoryColumns}
                             optionLabel='header'
                             options={historyColumns}
-                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                                stopPropagation();
-                                const sortedValue = value.sort(
-                                    (a: HistoryColumnsList, b: HistoryColumnsList) => {
-                                        const firstIndex = historyColumns.findIndex(
-                                            (col) => col.field === a.field
-                                        );
-                                        const secondIndex = historyColumns.findIndex(
-                                            (col) => col.field === b.field
-                                        );
-                                        return firstIndex - secondIndex;
-                                    }
-                                );
-                                changeSettings({
-                                    activeColumns: value.map(
-                                        ({ field }: { field: string }) => field
-                                    ),
-                                });
-                                setActiveHistoryColumns(sortedValue);
-                            }}
+                            onChange={handleColumnToggle}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
                             panelHeaderTemplate={dropdownHeaderPanel}
                             display='chip'
@@ -299,7 +295,11 @@ export const ExportHistory = (): ReactElement => {
                                     pt={{
                                         root: {
                                             style: {
-                                                width: "100px",
+                                                width: serverSettings?.exportHistory?.columnWidth?.[
+                                                    field
+                                                ],
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
                                             },
                                         },
                                     }}

@@ -154,6 +154,11 @@ export const ExportSchedule = (): ReactElement => {
         }
     };
 
+    const handleDropdownHeaderColumnToggle = () => {
+        changeSettings({ activeColumns: [] });
+        return setActiveScheduleColumns(scheduleColumns.filter(({ checked }) => checked));
+    };
+
     const dropdownHeaderPanel = (
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
@@ -166,12 +171,7 @@ export const ExportSchedule = (): ReactElement => {
             </label>
             <button
                 className='p-multiselect-close p-link'
-                onClick={() => {
-                    changeSettings({ activeColumns: [] });
-                    return setActiveScheduleColumns(
-                        scheduleColumns.filter(({ checked }) => checked)
-                    );
-                }}
+                onClick={handleDropdownHeaderColumnToggle}
             >
                 <i className='pi pi-times' />
             </button>
@@ -210,6 +210,19 @@ export const ExportSchedule = (): ReactElement => {
         }
     };
 
+    const handleColumnToggle = ({ value, stopPropagation }: MultiSelectChangeEvent) => {
+        stopPropagation();
+        const sortedValue = value.sort((a: ScheduleColumnsList, b: ScheduleColumnsList) => {
+            const firstIndex = scheduleColumns.findIndex((col) => col.field === a.field);
+            const secondIndex = scheduleColumns.findIndex((col) => col.field === b.field);
+            return firstIndex - secondIndex;
+        });
+        changeSettings({
+            activeColumns: value.map(({ field }: { field: string }) => field),
+        });
+        setActiveScheduleColumns(sortedValue);
+    };
+
     return (
         <div className='card-content schedule'>
             <div className='grid datatable-controls'>
@@ -220,26 +233,7 @@ export const ExportSchedule = (): ReactElement => {
                             value={activeScheduleColumns}
                             optionLabel='header'
                             options={scheduleColumns}
-                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                                stopPropagation();
-                                const sortedValue = value.sort(
-                                    (a: ScheduleColumnsList, b: ScheduleColumnsList) => {
-                                        const firstIndex = scheduleColumns.findIndex(
-                                            (col) => col.field === a.field
-                                        );
-                                        const secondIndex = scheduleColumns.findIndex(
-                                            (col) => col.field === b.field
-                                        );
-                                        return firstIndex - secondIndex;
-                                    }
-                                );
-                                changeSettings({
-                                    activeColumns: value.map(
-                                        ({ field }: { field: string }) => field
-                                    ),
-                                });
-                                setActiveScheduleColumns(sortedValue);
-                            }}
+                            onChange={handleColumnToggle}
                             className='w-full pb-0 h-full flex align-items-center column-picker'
                             panelHeaderTemplate={dropdownHeaderPanel}
                             display='chip'
@@ -304,7 +298,10 @@ export const ExportSchedule = (): ReactElement => {
                                     pt={{
                                         root: {
                                             style: {
-                                                width: "100px",
+                                                width: serverSettings?.exportSchedule
+                                                    ?.columnWidth?.[field],
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
                                             },
                                         },
                                     }}

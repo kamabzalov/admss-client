@@ -77,9 +77,13 @@
     text-wrap: wrap;
 }
 
+.export-web .card-header {
+    align-items: stretch;
+}
+
 .export-web .p-tabview .p-tabview-nav {
     margin: 0 1.25rem;
-    border-color: var(--admss-app-light-grey);
+    border-bottom: 2px solid var(--admss-app-light-grey);
 }
 
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
@@ -87,10 +91,14 @@
     color: var(----admss-app-primary);
 }
 
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    border: none;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
 .p-tabview .p-tabview-nav li.p-highlight.export-web__header .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
-    border: none;
-    border-bottom: 1px solid var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
 }
 
 .p-tabview
