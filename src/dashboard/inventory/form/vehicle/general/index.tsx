@@ -38,8 +38,15 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
-    const { values, errors, setFieldValue, getFieldProps, validateField, handleBlur } =
-        useFormikContext<Inventory>();
+    const {
+        values,
+        errors,
+        setFieldValue,
+        getFieldProps,
+        validateField,
+        handleBlur,
+        setFieldTouched,
+    } = useFormikContext<Inventory>();
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -314,18 +321,17 @@ export const VehicleGeneral = observer((): ReactElement => {
                             (errors.StockNo ? " p-invalid" : "")
                         }
                         name='StockNo'
+                        minLength={1}
+                        maxLength={20}
                         value={values.StockNo}
-                        disabled={!!inventory.itemuid}
                         onBlur={async (e) => {
                             handleBlur(e);
-                            const { value } = e.target;
-                            await setFieldValue("StockNo", value);
-                            await validateField("StockNo");
                         }}
                         onChange={async ({ target: { value } }) => {
-                            if ((inventory.itemuid)) return;
                             await setFieldValue("StockNo", value);
+                            await setFieldTouched("StockNo", true, true);
                             changeInventory({ key: "StockNo", value });
+                            await validateField("StockNo");
                         }}
                     />
                     <label className='float-label'>Stock#</label>
@@ -506,4 +512,3 @@ export const VehicleGeneral = observer((): ReactElement => {
         </div>
     );
 });
-

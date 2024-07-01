@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
@@ -94,7 +94,18 @@ export const InventoryForm = observer(() => {
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-    const InventoryFormSchema = (): Yup.ObjectSchema<Partial<PartialInventory>> =>
+    const initialStockNo = useMemo(() => {
+        if (inventory) {
+            return inventory?.StockNo;
+        }
+        return "";
+    }, [inventory]);
+
+    const InventoryFormSchema = ({
+        initialStockNo,
+    }: {
+        initialStockNo?: string;
+    }): Yup.ObjectSchema<Partial<PartialInventory>> =>
         Yup.object().shape({
             VIN: Yup.string()
                 .trim()
@@ -125,7 +136,7 @@ export const InventoryForm = observer(() => {
                     "is-stockno-available",
                     "Stock number is already in use",
                     async function (value) {
-                        if (!value || id) return true;
+                        if (!value || initialStockNo === value) return true;
                         const res = await checkStockNoAvailability(value);
                         if (res && res.status === Status.OK) {
                             const { exists } = res as InventoryStockNumber;
@@ -347,7 +358,9 @@ export const InventoryForm = observer(() => {
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema}
+                                            validationSchema={InventoryFormSchema({
+                                                initialStockNo,
+                                            })}
                                             initialValues={
                                                 {
                                                     VIN: inventory?.VIN || "",
@@ -495,4 +508,3 @@ export const InventoryForm = observer(() => {
         </Suspense>
     );
 });
-
