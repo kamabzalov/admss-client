@@ -321,8 +321,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                             (errors.StockNo ? " p-invalid" : "")
                         }
                         name='StockNo'
-                        minLength={1}
-                        maxLength={20}
                         value={values.StockNo}
                         onBlur={async (e) => {
                             handleBlur(e);

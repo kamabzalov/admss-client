@@ -132,11 +132,14 @@ export const InventoryForm = observer(() => {
             GroupClassName: Yup.string().trim().required("Data is required."),
             StockNo: Yup.string()
                 .trim()
+                .min(1, "Stock number must be at least 1 character")
+                .max(20, "Stock number must be at most 20 characters")
                 .test(
                     "is-stockno-available",
                     "Stock number is already in use",
                     async function (value) {
-                        if (!value || initialStockNo === value) return true;
+                        if (!value) return true;
+                        if (initialStockNo === value) return true;
                         const res = await checkStockNoAvailability(value);
                         if (res && res.status === Status.OK) {
                             const { exists } = res as InventoryStockNumber;
