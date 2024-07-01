@@ -41,8 +41,7 @@ export const Header = observer((): ReactElement => {
             }
             if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [authUser, authUser?.permissions]);
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {

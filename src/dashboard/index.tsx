@@ -36,16 +36,15 @@ export const Dashboard = observer((): ReactElement => {
 
     return (
         <ToastProvider>
-            <Suspense fallback={<Loader overlay />}>
-                <Header />
-                <Sidebar />
-                <main className='main'>
-                    <div className='container'>
+            <Header />
+            <Sidebar />
+            <main className='main'>
+                <div className='container'>
+                    <Suspense fallback={<Loader overlay />}>
                         <Outlet />
-                    </div>
-                </main>
-            </Suspense>
+                    </Suspense>
+                </div>
+            </main>
         </ToastProvider>
     );
 });
-

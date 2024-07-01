@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     DataTable,
@@ -49,8 +49,6 @@ import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 
-const DATA_FIELD = "data-field";
-
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
 }
@@ -79,28 +77,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     );
     const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
     const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
-    const dataTableRef = useRef<DataTable<Inventory[]>>(null);
-    const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (dataTableRef.current) {
-            const table = dataTableRef.current.getTable();
-            const columns = table.querySelectorAll("th");
-            const columnWidths = Array.from(columns).map((column) => {
-                const field = column!
-                    .querySelector(`span[${DATA_FIELD}]`)
-                    ?.getAttribute(DATA_FIELD);
-                return {
-                    field: field!,
-                    width: column.offsetWidth,
-                };
-            });
-            setColumnWidths(columnWidths);
-        }
-    }, [inventories, activeColumns]);
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
@@ -193,7 +172,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
-            width: columnWidths.find((item) => item.field === column.field)?.width || 0,
+            width: serverSettings?.inventory?.columnWidth?.[column.field as string],
         }));
         const date = new Date();
         const name = `inventory_${
@@ -240,41 +219,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
-            if (settings.activeColumns) {
-                const filteredSettings = serverSettings?.inventory.columnWidth
-                    ? Object.entries(serverSettings.inventory.columnWidth)
-                          .filter(([column]) =>
-                              settings.activeColumns?.some((col) => col === column)
-                          )
-                          .reduce(
-                              (obj, [key, value]) => {
-                                  return {
-                                      ...obj,
-                                      [key]: value,
-                                  };
-                              },
-                              {} as { [key: string]: number }
-                          )
-                    : {};
-                const updatedSettings = {
-                    ...serverSettings,
-                    inventory: {
-                        ...serverSettings?.inventory,
-                        ...settings,
-                        columnWidth: filteredSettings,
-                    },
-                } as ServerUserSettings;
-
-                setServerSettings(updatedSettings);
-                setUserSettings(authUser.useruid, updatedSettings);
-            } else {
-                const newSettings = {
-                    ...serverSettings,
-                    inventory: { ...serverSettings?.inventory, ...settings },
-                } as ServerUserSettings;
-                setServerSettings(newSettings);
-                setUserSettings(authUser.useruid, newSettings);
-            }
+            const newSettings = {
+                ...serverSettings,
+                inventory: { ...serverSettings?.inventory, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
         }
     };
 
@@ -723,10 +673,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         }
     };
 
-    const columnHeader = (title: string, field: string) => {
-        return <span data-field={field}>{title}</span>;
-    };
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -782,7 +728,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                     </div>
                                 ) : (
                                     <DataTable
-                                        ref={dataTableRef}
                                         showGridlines
                                         value={inventories}
                                         lazy
@@ -847,9 +792,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                             return (
                                                 <Column
                                                     field={field}
-                                                    header={() =>
-                                                        columnHeader(header as string, field)
-                                                    }
+                                                    header={header}
                                                     key={field}
                                                     sortable
                                                     reorderable
