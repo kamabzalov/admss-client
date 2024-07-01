@@ -113,23 +113,20 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     useEffect(() => {
-        setIsLoading(true);
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
             Promise.all([
                 getInventoryLocations(authUser.useruid),
                 getUserGroupList(authUser.useruid),
-            ])
-                .then(([locationsResponse, userGroupsResponse]) => {
-                    if (locationsResponse) {
-                        setLocations(locationsResponse);
-                    }
-                    if (userGroupsResponse) {
-                        setInventoryType(userGroupsResponse);
-                    }
-                })
-                .finally(() => setIsLoading(false));
+            ]).then(([locationsResponse, userGroupsResponse]) => {
+                if (locationsResponse) {
+                    setLocations(locationsResponse);
+                }
+                if (userGroupsResponse) {
+                    setInventoryType(userGroupsResponse);
+                }
+            });
         }
     }, []);
 
@@ -280,7 +277,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
-            setIsLoading(true);
             if (total) {
                 getInventoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
                     response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
@@ -468,7 +464,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     useEffect(() => {
-        setIsLoading(true);
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
         }
@@ -518,7 +513,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         }
 
         handleGetInventoryList(params, true);
-        setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         serverSettings,
