@@ -36,6 +36,36 @@ export interface ExportWebList {
     Price: number;
 }
 
+export interface ExportWebHistoryList {
+    created: string;
+    filepath: string;
+    id: number;
+    info: string;
+    itemuid: string;
+    lastrun: string;
+    md5: string;
+    taskstatus: string;
+    tasktype: string;
+    taskuid: string;
+    updated: string;
+    useruid: string;
+}
+
+export interface ExportWebScheduleList {
+    created: string;
+    datapath: string;
+    info: string;
+    id: number;
+    lasttatus: string;
+    lasttrun: string;
+    nextrun: string;
+    paused: number;
+    tasktype: string;
+    taskuid: string;
+    updated: string;
+    useruid: string;
+}
+
 export interface ExportWebPostData {
     data: Record<string, unknown>[];
     columns: ReportsColumn[];

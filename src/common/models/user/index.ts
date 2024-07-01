@@ -36,8 +36,9 @@ export interface ExportWebUserSettings extends UserSettings {
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
-    selectedFilterOptions?: FilterOptions[];
     exportWeb: ExportWebUserSettings;
+    exportSchedule: ExportWebUserSettings;
+    exportHistory: ExportWebUserSettings;
 }
 
 export interface UserGroup {
