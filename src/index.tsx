@@ -125,11 +125,9 @@ const AppRouter = (): ReactElement => {
         },
     ];
 
-
     const router: RemixRouter = createBrowserRouter(routes);
 
     return <RouterProvider router={router} />;
 };
 
 root.render(<AppRouter />);
-
