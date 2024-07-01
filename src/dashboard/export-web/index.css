@@ -30,6 +30,11 @@
     white-space: nowrap;
 }
 
+.export-web-controls__button-icon {
+    margin-left: 10px;
+    line-height: 1;
+}
+
 .export-web-controls__input {
     width: 230px;
     height: 100%;
@@ -71,3 +76,48 @@
     flex: 0 1 80%;
     text-wrap: wrap;
 }
+
+.export-web .card-header {
+    align-items: stretch;
+}
+
+.export-web .p-tabview .p-tabview-nav {
+    margin: 0 1.25rem;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    font-weight: 700;
+    color: var(----admss-app-primary);
+}
+
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    border: none;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight.export-web__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.p-tabview
+    .p-tabview-nav
+    li.export-web__header:not(.p-highlight):not(.p-disabled):hover
+    .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-color: transparent;
+    border-bottom-color: var(--admss-app-light-grey);
+}
+
+.export-web__header-count {
+    font-weight: 400;
+    margin-left: 10px;
+    font-size: 20px;
+    color: var(--admss-app-light-grey);
+}
+
+.export-web__header-count--active {
+    color: var(--admss-app-main-blue);
+}
+

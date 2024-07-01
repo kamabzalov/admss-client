@@ -413,7 +413,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         setSelectedFilter([]);
                         setSelectedFilterOptions([]);
                         changeSettings({
-                            ...serverSettings,
                             selectedFilterOptions: [],
                         });
                         evt.onCloseClick(e);
@@ -437,7 +436,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                     inventoryType.map(({ description }) => description)
                                 );
                                 changeSettings({
-                                    ...serverSettings,
                                     selectedInventoryType: inventoryType.map(
                                         ({ description }) => description
                                     ),
@@ -445,7 +443,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                             } else {
                                 setSelectedInventoryType([]);
                                 changeSettings({
-                                    ...serverSettings,
                                     selectedInventoryType: [],
                                 });
                             }
@@ -459,7 +456,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     onClick={(e) => {
                         setSelectedInventoryType([]);
                         changeSettings({
-                            ...serverSettings,
                             selectedInventoryType: [],
                         });
                         onCloseClick(e);
@@ -570,7 +566,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         setSelectedFilterOptions(selectedOptions);
 
                         changeSettings({
-                            ...serverSettings,
                             selectedFilterOptions: selectedOptions,
                         });
                     }}
@@ -643,7 +638,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         stopPropagation();
                         setSelectedInventoryType(value);
                         changeSettings({
-                            ...serverSettings,
                             selectedInventoryType: value,
                         });
                     }}
@@ -745,7 +739,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                         command: () => {
                                             setCurrentLocation({} as InventoryLocations);
                                             changeSettings({
-                                                ...serverSettings,
                                                 currentLocation: "",
                                             });
                                         },
@@ -755,7 +748,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                         command: () => {
                                             setCurrentLocation(location);
                                             changeSettings({
-                                                ...serverSettings,
                                                 currentLocation: location.locationuid,
                                             });
 
