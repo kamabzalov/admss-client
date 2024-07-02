@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
@@ -30,6 +30,7 @@ import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
 import { Status } from "common/models/base-response";
+import { debounce } from "common/helpers";
 
 const STEP = "step";
 
@@ -94,8 +95,33 @@ export const InventoryForm = observer(() => {
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
-    const InventoryFormSchema = (): Yup.ObjectSchema<Partial<PartialInventory>> =>
-        Yup.object().shape({
+    const initialStockNo = useMemo(() => {
+        if (inventory) {
+            return inventory?.StockNo;
+        }
+        return "";
+    }, [inventory]);
+
+    const InventoryFormSchema = ({
+        initialStockNo,
+    }: {
+        initialStockNo?: string;
+    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
+        const debouncedCheckStockNoAvailability = debounce(
+            async (value: string, resolve: (exists: boolean) => void) => {
+                if (!value || initialStockNo === value) {
+                    resolve(true);
+                } else {
+                    const res = (await checkStockNoAvailability(
+                        value
+                    )) as unknown as InventoryStockNumber;
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                }
+            },
+            500
+        );
+
+        return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
                 .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
@@ -121,22 +147,17 @@ export const InventoryForm = observer(() => {
             GroupClassName: Yup.string().trim().required("Data is required."),
             StockNo: Yup.string()
                 .trim()
-                .test(
-                    "is-stockno-available",
-                    "Stock number is already in use",
-                    async function (value) {
-                        if (!value || id) return true;
-                        const res = await checkStockNoAvailability(value);
-                        if (res && res.status === Status.OK) {
-                            const { exists } = res as InventoryStockNumber;
-                            return !exists;
-                        }
-                        return false;
-                    }
-                ),
+                .min(1, "Stock number must be at least 1 character")
+                .max(20, "Stock number must be at most 20 characters")
+                .test("is-stockno-available", "Stock number is already in use", function (value) {
+                    return new Promise((resolve) => {
+                        debouncedCheckStockNoAvailability(value || "", resolve);
+                    });
+                }),
             TypeOfFuel: Yup.string().trim().required("Data is required."),
             purPurchasedFrom: Yup.string().trim().required("Data is required."),
         });
+    };
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -347,7 +368,9 @@ export const InventoryForm = observer(() => {
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema}
+                                            validationSchema={InventoryFormSchema({
+                                                initialStockNo,
+                                            })}
                                             initialValues={
                                                 {
                                                     VIN: inventory?.VIN || "",
@@ -495,4 +518,3 @@ export const InventoryForm = observer(() => {
         </Suspense>
     );
 });
-

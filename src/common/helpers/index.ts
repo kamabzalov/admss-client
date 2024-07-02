@@ -37,3 +37,25 @@ export const createStringifyFilterQuery = (filterArray: FilterOptions[]): string
     });
     return qry;
 };
+
+export function debounce<T extends (...args: any[]) => any>(
+    callee: T,
+    timeoutMs: number
+): (...args: Parameters<T>) => void {
+    let lastCall: number | null = null;
+    let lastCallTimer: NodeJS.Timeout | null = null;
+
+    return function perform(...args: Parameters<T>): void {
+        if (lastCall !== null && Date.now() - lastCall <= timeoutMs) {
+            if (lastCallTimer) {
+                clearTimeout(lastCallTimer);
+            }
+        }
+
+        lastCall = Date.now();
+
+        lastCallTimer = setTimeout(() => {
+            callee(...args);
+        }, timeoutMs);
+    };
+}
