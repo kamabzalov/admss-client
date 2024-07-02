@@ -186,7 +186,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     }, [authUser, locations, store]);
 
     const printTableData = async (print: boolean = false) => {
-        setIsLoading(true);
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
@@ -232,7 +231,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                 }
             });
         }
-        setIsLoading(false);
     };
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
