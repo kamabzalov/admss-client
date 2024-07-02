@@ -38,15 +38,8 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
-    const {
-        values,
-        errors,
-        setFieldValue,
-        getFieldProps,
-        validateField,
-        handleBlur,
-        setFieldTouched,
-    } = useFormikContext<Inventory>();
+    const { values, errors, setFieldValue, getFieldProps, validateField, setFieldTouched } =
+        useFormikContext<Inventory>();
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -322,9 +315,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }
                         name='StockNo'
                         value={values.StockNo}
-                        onBlur={async (e) => {
-                            handleBlur(e);
-                        }}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("StockNo", value);
                             await setFieldTouched("StockNo", true, true);

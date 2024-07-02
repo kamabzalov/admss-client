@@ -30,6 +30,7 @@ import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
 import { Status } from "common/models/base-response";
+import { debounce } from "common/helpers";
 
 const STEP = "step";
 
@@ -105,8 +106,22 @@ export const InventoryForm = observer(() => {
         initialStockNo,
     }: {
         initialStockNo?: string;
-    }): Yup.ObjectSchema<Partial<PartialInventory>> =>
-        Yup.object().shape({
+    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
+        const debouncedCheckStockNoAvailability = debounce(
+            async (value: string, resolve: (exists: boolean) => void) => {
+                if (!value || initialStockNo === value) {
+                    resolve(true);
+                } else {
+                    const res = (await checkStockNoAvailability(
+                        value
+                    )) as unknown as InventoryStockNumber;
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                }
+            },
+            500
+        );
+
+        return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
                 .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
@@ -134,23 +149,15 @@ export const InventoryForm = observer(() => {
                 .trim()
                 .min(1, "Stock number must be at least 1 character")
                 .max(20, "Stock number must be at most 20 characters")
-                .test(
-                    "is-stockno-available",
-                    "Stock number is already in use",
-                    async function (value) {
-                        if (!value) return true;
-                        if (initialStockNo === value) return true;
-                        const res = await checkStockNoAvailability(value);
-                        if (res && res.status === Status.OK) {
-                            const { exists } = res as InventoryStockNumber;
-                            return !exists;
-                        }
-                        return false;
-                    }
-                ),
+                .test("is-stockno-available", "Stock number is already in use", function (value) {
+                    return new Promise((resolve) => {
+                        debouncedCheckStockNoAvailability(value || "", resolve);
+                    });
+                }),
             TypeOfFuel: Yup.string().trim().required("Data is required."),
             purPurchasedFrom: Yup.string().trim().required("Data is required."),
         });
+    };
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
