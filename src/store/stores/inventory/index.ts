@@ -352,7 +352,7 @@ export class InventoryStore {
         }
     );
 
-    public saveInventory = action(async (): Promise<string | undefined> => {
+    public saveInventory = action(async (inventoryuid: string): Promise<string | undefined> => {
         try {
             this._isLoading = true;
             const inventoryData: Inventory = {
@@ -372,10 +372,10 @@ export class InventoryStore {
                 options_info: this.inventoryOptions,
                 Audit: this.inventoryAudit,
             };
-            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
-            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
+            const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
+            const inventoryResponse = await setInventory(inventoryuid, inventoryData);
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
+                response.every((item) => item?.status === Status.OK) ? inventoryuid : undefined
             );
         } catch (error) {
             // TODO: add error handlers
