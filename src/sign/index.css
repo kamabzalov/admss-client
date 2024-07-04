@@ -114,3 +114,14 @@
         width: 545px;
     }
 }
+.sign-in__input {
+    position: relative;
+}
+
+.sign-in__input small {
+    position: absolute;
+    bottom: -1rem; 
+    left: 0;
+    font-size: 0.75rem;
+    color: #dc3545; 
+}

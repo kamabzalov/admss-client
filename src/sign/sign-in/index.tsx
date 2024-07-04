@@ -96,12 +96,13 @@ export default function SignIn() {
                             <span className='w-full p-float-label sign-in__password'>
                                 <InputText
                                     placeholder='Password'
-                                    className='sign__input'
+                                    className={`sign__input ${formik.errors.password ? "p-invalid" : ""}`}
                                     id='password'
                                     type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
                                     value={formik.values.password}
                                 />
+
                                 <i
                                     className={`adms-${currentPassIcon(
                                         !!formik.values.password
@@ -115,7 +116,11 @@ export default function SignIn() {
                             </span>
                             {formik.errors.password ? (
                                 <small className='p-error'>{formik.errors.password}</small>
-                            ) : null}
+                            ) : (
+                                formik.values.password.trim() === "" && (
+                                    <small className='p-error'>Password is requared</small>
+                                )
+                            )}
                         </div>
 
                         <div className='flex justify-content-between user-help'>
