@@ -69,3 +69,20 @@ export const getUserReportCollectionsContent = async (uid: string) => {
         };
     }
 };
+
+export const getUserFavoriteReportList = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | ReportCollection>(
+            `reports/${uid}/favorites `
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while getting user favorite report list",
+            };
+        }
+    }
+};

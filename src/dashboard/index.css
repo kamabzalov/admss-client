@@ -306,6 +306,22 @@
     background-color: var(--admss-app-green);
 }
 
+.hr {
+    display: flex;
+}
+
+.hr__line {
+    border: none;
+    border-top: 1px solid var(--admss-app-light-grey);
+    margin-top: 12px;
+}
+
+.hr__title {
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);

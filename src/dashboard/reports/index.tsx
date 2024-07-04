@@ -3,6 +3,7 @@ import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
     getReportTemplate,
+    getUserFavoriteReportList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
@@ -17,8 +18,10 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportDocument } from "common/models/reports";
+import { useNavigate } from "react-router-dom";
 
 export default function Reports(): ReactElement {
+    const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
@@ -53,6 +56,7 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
+            getUserFavoriteReportList(user.useruid);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
@@ -141,7 +145,9 @@ export default function Reports(): ReactElement {
                 >
                     New collection
                 </Button>
-                <Button className='reports-header__button'>Custom Report</Button>
+                <Button className='reports-header__button' onClick={() => navigate("create")}>
+                    Custom Report
+                </Button>
                 <span className='p-input-icon-right reports-header__search'>
                     <i
                         className={`pi pi-${!reportSearch ? "search" : "times cursor-pointer"}`}
