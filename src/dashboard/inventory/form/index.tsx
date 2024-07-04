@@ -394,7 +394,7 @@ export const InventoryForm = observer(() => {
                                             validateOnMount={validateOnMount}
                                             onSubmit={() => {
                                                 setValidateOnMount(false);
-                                                saveInventory();
+                                                saveInventory(id);
                                                 navigate(`/dashboard/inventory`);
                                                 toast.current?.show({
                                                     severity: "success",

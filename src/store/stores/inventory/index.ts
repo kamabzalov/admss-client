@@ -352,38 +352,40 @@ export class InventoryStore {
         }
     );
 
-    public saveInventory = action(async (): Promise<string | undefined> => {
-        try {
-            this._isLoading = true;
-            const inventoryData: Inventory = {
-                ...this.inventory,
-                extdata: {
-                    ...this.inventoryExtData,
-                    fpReduxAmt: this.inventoryExtData?.fpReduxAmt * 100,
-                    fpRemainBal: this.inventoryExtData?.fpRemainBal * 100,
-                    csFee: this.inventoryExtData?.csFee * 100,
-                    csReserveAmt: this.inventoryExtData?.csReserveAmt * 100,
-                    csEarlyRemoval: this.inventoryExtData?.csEarlyRemoval * 100,
-                    csListingFee: this.inventoryExtData?.csListingFee * 100,
-                    csOwnerAskingPrice: this.inventoryExtData?.csOwnerAskingPrice * 100,
-                    purPurchaseBuyerComm: this.inventoryExtData?.purPurchaseBuyerComm * 100,
-                    purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
-                },
-                options_info: this.inventoryOptions,
-                Audit: this.inventoryAudit,
-            };
-            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
-            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
-            await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
-            );
-        } catch (error) {
-            // TODO: add error handlers
-            return undefined;
-        } finally {
-            this._isLoading = false;
+    public saveInventory = action(
+        async (inventoryuid: string = "0"): Promise<string | undefined> => {
+            try {
+                this._isLoading = true;
+                const inventoryData: Inventory = {
+                    ...this.inventory,
+                    extdata: {
+                        ...this.inventoryExtData,
+                        fpReduxAmt: this.inventoryExtData?.fpReduxAmt * 100,
+                        fpRemainBal: this.inventoryExtData?.fpRemainBal * 100,
+                        csFee: this.inventoryExtData?.csFee * 100,
+                        csReserveAmt: this.inventoryExtData?.csReserveAmt * 100,
+                        csEarlyRemoval: this.inventoryExtData?.csEarlyRemoval * 100,
+                        csListingFee: this.inventoryExtData?.csListingFee * 100,
+                        csOwnerAskingPrice: this.inventoryExtData?.csOwnerAskingPrice * 100,
+                        purPurchaseBuyerComm: this.inventoryExtData?.purPurchaseBuyerComm * 100,
+                        purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
+                    },
+                    options_info: this.inventoryOptions,
+                    Audit: this.inventoryAudit,
+                };
+                const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
+                const inventoryResponse = await setInventory(inventoryuid, inventoryData);
+                await Promise.all([inventoryResponse, webResponse]).then((response) =>
+                    response.every((item) => item?.status === Status.OK) ? inventoryuid : undefined
+                );
+            } catch (error) {
+                // TODO: add error handlers
+                return undefined;
+            } finally {
+                this._isLoading = false;
+            }
         }
-    });
+    );
 
     private saveInventoryMedia = action(
         async (mediaType: MediaType): Promise<Status | undefined> => {
