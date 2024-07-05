@@ -35,7 +35,10 @@ export const ReportForm = (): ReactElement => {
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
             if (Array.isArray(response)) {
-                setCollections(response);
+                const collectionsWithoutFavorite = response.filter(
+                    (collection: ReportCollection) => collection.description !== "Favorites"
+                );
+                setCollections(collectionsWithoutFavorite);
             } else {
                 setCollections([]);
             }

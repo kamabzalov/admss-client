@@ -48,7 +48,10 @@ export default function Reports(): ReactElement {
                 });
             }
             if (Array.isArray(response)) {
-                setCollections(response);
+                const collectionsWithoutFavorite = response.filter(
+                    (collection: ReportCollection) => collection.description !== "Favorites"
+                );
+                setCollections(collectionsWithoutFavorite);
             } else {
                 setCollections([]);
             }
