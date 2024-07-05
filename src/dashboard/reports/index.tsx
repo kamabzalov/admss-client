@@ -3,6 +3,7 @@ import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
     getReportTemplate,
+    getUserFavoriteReportList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
@@ -17,11 +18,14 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportDocument } from "common/models/reports";
+import { useNavigate } from "react-router-dom";
 
 export default function Reports(): ReactElement {
+    const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
 
@@ -44,7 +48,10 @@ export default function Reports(): ReactElement {
                 });
             }
             if (Array.isArray(response)) {
-                setCollections(response);
+                const collectionsWithoutFavorite = response.filter(
+                    (collection: ReportCollection) => collection.description !== "Favorites"
+                );
+                setCollections(collectionsWithoutFavorite);
             } else {
                 setCollections([]);
             }
@@ -53,6 +60,11 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
+            getUserFavoriteReportList(user.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
@@ -141,7 +153,9 @@ export default function Reports(): ReactElement {
                 >
                     New collection
                 </Button>
-                <Button className='reports-header__button'>Custom Report</Button>
+                <Button className='reports-header__button' onClick={() => navigate("create")}>
+                    Custom Report
+                </Button>
                 <span className='p-input-icon-right reports-header__search'>
                     <i
                         className={`pi pi-${!reportSearch ? "search" : "times cursor-pointer"}`}
@@ -243,7 +257,7 @@ export default function Reports(): ReactElement {
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
                                     {collections &&
-                                        collections.map(
+                                        [...favoriteCollections, ...collections].map(
                                             ({ itemUID, name, documents }: ReportCollection) => (
                                                 <AccordionTab
                                                     key={itemUID}
@@ -281,5 +295,4 @@ export default function Reports(): ReactElement {
         </div>
     );
 }
-
 
