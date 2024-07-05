@@ -328,7 +328,7 @@ export const ReportForm = (): ReactElement => {
                                         </div>
                                     </div>
 
-                                    <div className='flex col-12'>
+                                    <div className='hr col-12'>
                                         <h3 className='hr__title m-0 pr-3'>Report options</h3>
                                         <hr className='hr__line flex-1' />
                                     </div>
@@ -352,7 +352,7 @@ export const ReportForm = (): ReactElement => {
                                         </label>
                                     </div>
 
-                                    <div className='flex col-12'>
+                                    <div className='hr col-12'>
                                         <h3 className='hr__title m-0 pr-3'>Report parameters</h3>
                                         <hr className='hr__line flex-1' />
                                     </div>
