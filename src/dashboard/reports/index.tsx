@@ -25,6 +25,7 @@ export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
 
@@ -56,7 +57,11 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
-            getUserFavoriteReportList(user.useruid);
+            getUserFavoriteReportList(user.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
@@ -249,7 +254,7 @@ export default function Reports(): ReactElement {
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
                                     {collections &&
-                                        collections.map(
+                                        [...favoriteCollections, ...collections].map(
                                             ({ itemUID, name, documents }: ReportCollection) => (
                                                 <AccordionTab
                                                     key={itemUID}
@@ -287,5 +292,4 @@ export default function Reports(): ReactElement {
         </div>
     );
 }
-
 
