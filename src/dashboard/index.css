@@ -306,17 +306,17 @@
     background-color: var(--admss-app-green);
 }
 
-.hr {
+.splitter {
     display: flex;
 }
 
-.hr__line {
+.splitter-line {
     border: none;
     border-top: 1px solid var(--admss-app-light-grey);
     margin-top: 12px;
 }
 
-.hr__title {
+.splitter-text {
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 700;
