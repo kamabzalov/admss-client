@@ -330,7 +330,7 @@ export const ReportForm = (): ReactElement => {
 
                                     <div className='splitter col-12'>
                                         <h3 className='splitter-title m-0 pr-3'>Report options</h3>
-                                        <hr className='splitter-line' />
+                                        <hr className='splitter-line flex-1' />
                                     </div>
 
                                     <div className='col-3'>
