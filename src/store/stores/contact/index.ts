@@ -109,7 +109,7 @@ export class ContactStore {
         this._contactExtData[key] = value as never;
     });
 
-    private setImagesDL = async (): Promise<any> => {
+    private setImagesDL = async (contactuid: string): Promise<any> => {
         this._isLoading = true;
         try {
             [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
@@ -124,7 +124,7 @@ export class ContactStore {
                             formData
                         );
                         if (uploadMediaResponse?.status === Status.OK) {
-                            await setContactDL(this._contactID, {
+                            await setContactDL(contactuid, {
                                 [!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
                             });
                         }
@@ -162,7 +162,7 @@ export class ContactStore {
 
             const [contactDataResponse, imagesResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
-                this.setImagesDL(),
+                this.setImagesDL(this._contactID),
             ]);
 
             if (
@@ -214,4 +214,3 @@ export class ContactStore {
         this._contactExtData = {} as ContactExtData;
     };
 }
-

@@ -16,7 +16,6 @@ import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
-import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 
 const SexList = [
@@ -211,8 +210,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Frontside</div>
-                        {isLoading && <Loader />}
-                        {frontSideDLurl && !isLoading ? (
+                        {frontSideDLurl && isLoading ? (
+                            <Loader />
+                        ) : frontSideDLurl ? (
                             itemTemplate(frontSideDLurl, DLSides.FRONT)
                         ) : (
                             <FileUpload
@@ -232,8 +232,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Backside</div>
-                        {isLoading && <Loader />}
-                        {backSideDLurl && !isLoading ? (
+                        {backSideDLurl && isLoading ? (
+                            <Loader />
+                        ) : backSideDLurl ? (
                             itemTemplate(backSideDLurl, DLSides.BACK)
                         ) : (
                             <FileUpload
