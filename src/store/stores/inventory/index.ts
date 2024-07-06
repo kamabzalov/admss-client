@@ -100,6 +100,8 @@ export class InventoryStore {
     protected _isFormChanged: boolean = false;
     protected _formErrorMessage: string = "";
 
+    private _cachedInventory: Inventory = {} as Inventory;
+
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
@@ -187,14 +189,23 @@ export class InventoryStore {
         try {
             const response = await getInventoryInfo(itemuid);
             if (response) {
-                const { extdata, options_info, Audit, ...inventory } = response;
                 this._inventoryID = response.itemuid;
-                this._inventory =
-                    { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
-                this._inventoryOptions = options_info || [];
+                if (response.itemuid === this._cachedInventory.itemuid) {
+                    const { extdata, options_info, Audit, ...inventory } = this._cachedInventory;
+                    this._inventory = inventory || ({} as Inventory);
+                    this._inventoryOptions = options_info || [];
+                    this._inventoryExtData = extdata || ({} as InventoryExtData);
+                    this._inventoryAudit = Audit || (initialAuditState as Audit);
+                } else {
+                    const { extdata, options_info, Audit, ...inventory } = response;
+                    this._inventory =
+                        { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
 
-                this._inventoryExtData = extdata || ({} as InventoryExtData);
-                this._inventoryAudit = Audit || (initialAuditState as Audit);
+                    this._inventoryOptions = options_info || [];
+
+                    this._inventoryExtData = extdata || ({} as InventoryExtData);
+                    this._inventoryAudit = Audit || (initialAuditState as Audit);
+                }
             }
         } catch (error) {
         } finally {
@@ -662,6 +673,12 @@ export class InventoryStore {
     };
 
     public clearInventory = () => {
+        this._cachedInventory = {
+            options_info: this._inventoryOptions,
+            Audit: this._inventoryAudit,
+            extdata: this._inventoryExtData,
+            ...this._inventory,
+        };
         this._inventory = {} as Inventory;
         this._inventoryAudit = initialAuditState as Audit;
         this._inventoryOptions = [];
