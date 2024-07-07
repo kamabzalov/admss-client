@@ -78,6 +78,7 @@ export const InventoryForm = observer(() => {
         saveInventory,
         getInventoryExportWeb,
         getInventoryExportWebHistory,
+        getCachedInventory,
         inventory,
         inventoryExtData,
         isFormChanged,
@@ -194,7 +195,11 @@ export const InventoryForm = observer(() => {
         setPrintActiveIndex(itemsMenuCount + 1);
         setDeleteActiveIndex(itemsMenuCount + 2);
 
-        id && getInventory(id);
+        if (id) {
+            getInventory(id);
+        } else {
+            getCachedInventory();
+        }
 
         return () => {
             sections.forEach((section) => section.clearCount());

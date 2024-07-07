@@ -223,12 +223,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
     };
 
     const handleCreateContact = () => {
-        const CREATE_LINK = "/dashboard/contacts/create";
-        if (onRowClick) {
-            window.open(CREATE_LINK, "_blank");
-        } else {
-            navigate(CREATE_LINK);
-        }
+        navigate("/dashboard/contacts/create");
     };
 
     return (
