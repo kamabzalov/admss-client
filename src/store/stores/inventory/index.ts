@@ -191,11 +191,7 @@ export class InventoryStore {
             if (response) {
                 this._inventoryID = response.itemuid;
                 if (response.itemuid === this._cachedInventory.itemuid) {
-                    const { extdata, options_info, Audit, ...inventory } = this._cachedInventory;
-                    this._inventory = inventory || ({} as Inventory);
-                    this._inventoryOptions = options_info || [];
-                    this._inventoryExtData = extdata || ({} as InventoryExtData);
-                    this._inventoryAudit = Audit || (initialAuditState as Audit);
+                    this.getCachedInventory();
                 } else {
                     const { extdata, options_info, Audit, ...inventory } = response;
                     this._inventory =
@@ -212,6 +208,14 @@ export class InventoryStore {
             this._isLoading = false;
             this._isFormChanged = false;
         }
+    };
+
+    public getCachedInventory = () => {
+        const { extdata, options_info, Audit, ...inventory } = this._cachedInventory;
+        this._inventory = inventory || ({} as Inventory);
+        this._inventoryOptions = options_info || [];
+        this._inventoryExtData = extdata || ({} as InventoryExtData);
+        this._inventoryAudit = Audit || (initialAuditState as Audit);
     };
 
     private getInventoryMedia = async (): Promise<Status> => {
