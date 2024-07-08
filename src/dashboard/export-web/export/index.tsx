@@ -67,6 +67,7 @@ const columns: TableColumnsList[] = [
     { field: "Status", header: "Status", checked: false },
     { field: "Price", header: "Price", checked: false },
     { field: "lastexportdate", header: "Last Export Date", checked: false },
+    { field: "mediacount", header: "Media (qty)", checked: false },
 ];
 
 interface GroupedColumn {
