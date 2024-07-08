@@ -33,6 +33,7 @@ export interface ExportWebList {
     updated: string;
     useruid: string;
     lastexportdate: string;
+    mediacount: number;
     Price: number;
 }
 
