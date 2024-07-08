@@ -211,7 +211,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     >
                         <div className='identification-dl__title'>Frontside</div>
                         {frontSideDLurl && isLoading ? (
-                            <Loader />
+                            <Loader size='large' />
                         ) : frontSideDLurl ? (
                             itemTemplate(frontSideDLurl, DLSides.FRONT)
                         ) : (
@@ -233,7 +233,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     >
                         <div className='identification-dl__title'>Backside</div>
                         {backSideDLurl && isLoading ? (
-                            <Loader />
+                            <Loader size='large' />
                         ) : backSideDLurl ? (
                             itemTemplate(backSideDLurl, DLSides.BACK)
                         ) : (
