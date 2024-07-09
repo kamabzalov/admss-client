@@ -41,9 +41,9 @@ export const SettingsInventoryGroups = (): ReactElement => {
     }, []);
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
-        if (currentItem && authUser) {
+        if (currentItem) {
             const order = direction === "up" ? --currentItem.order : ++currentItem.order;
-            addUserGroupList(authUser.useruid, {
+            addUserGroupList(authUser!.useruid, {
                 ...currentItem,
                 order,
             }).then(handleGetUserGroupList);
@@ -114,13 +114,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
     const handleCheckAllGroups = ({ checked }: CheckboxChangeEvent) => {
         setIsLoading(true);
         inventorySettings.forEach((item, index) => {
-            if (!index || !authUser) return;
-            addUserGroupList(authUser.useruid, {
+            if (!index) return;
+            addUserGroupList(authUser!.useruid, {
                 enabled: checked ? 1 : 0,
                 itemuid: item.itemuid,
                 description: item.description,
             }).then(() => {
-                getUserGroupList(authUser.useruid)
+                getUserGroupList(authUser!.useruid)
                     .then((list) => {
                         list && setInventorySettings(list);
                         setIsLoading(false);
