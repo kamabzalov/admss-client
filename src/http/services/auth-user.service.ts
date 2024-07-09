@@ -2,6 +2,7 @@ import { BaseResponse, Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "../index";
 import { ServerUserSettings, UserGroup, UserPermissionsResponse } from "common/models/user";
 import { InventoryLocations } from "common/models/inventory";
+import { isAxiosError } from "axios";
 
 export interface ExtendedUserData extends BaseResponse {
     locations: InventoryLocations[];
@@ -79,7 +80,12 @@ export const addUserGroupList = async (
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while creating user inventory group",
+            };
+        }
     }
 };
 

@@ -13,8 +13,14 @@ import {
 import { UserGroup } from "common/models/user";
 import { Checkbox } from "primereact/checkbox";
 import { Loader } from "dashboard/common/loader";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { useToast } from "dashboard/common/toast";
+
+const NEW_ITEM = "new";
 
 export const SettingsInventoryGroups = (): ReactElement => {
+    const toast = useToast();
     const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -45,16 +51,81 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     const handleSetGroupDefault = (item: UserGroup) => {
         if (item) {
-            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-                ...item,
-                isdefault: !!item.isdefault ? 0 : 1,
-            }).then(() => {
+            setIsLoading(true);
+
+            if (!item.enabled) {
+                return setIsLoading(false);
+            }
+
+            const updatedSettings = inventorySettings.map((group) => {
+                return group.itemuid === item.itemuid
+                    ? { ...group, isdefault: 1 }
+                    : { ...group, isdefault: 0 };
+            });
+
+            Promise.all(
+                updatedSettings.map((group) =>
+                    addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                        ...group,
+                        isdefault: group.isdefault ? 1 : 0,
+                    })
+                )
+            ).then(() => {
                 getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
                     list && setInventorySettings(list);
                     setIsLoading(false);
                 });
             });
         }
+    };
+
+    const handleSaveGroup = () => {
+        setIsLoading(true);
+        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+            description: editedItem.description,
+            itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
+        }).then((response) => {
+            if (response?.status === Status.ERROR) {
+                const { error, status } = response as BaseResponseError;
+                toast.current?.show({
+                    severity: "error",
+                    summary: status,
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+                return setIsLoading(false);
+            }
+            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                list && setInventorySettings(list);
+                setEditedItem({});
+                setIsLoading(false);
+            });
+        });
+    };
+
+    const handleToggleGroupVisible = (item: UserGroup) => {
+        setIsLoading(true);
+        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+            enabled: !item.enabled ? 1 : 0,
+            itemuid: item.itemuid,
+            description: item.description,
+        }).then(() => {
+            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                list && setInventorySettings(list);
+                setIsLoading(false);
+            });
+        });
+    };
+
+    const handleDeleteGroup = (item: UserGroup) => {
+        setIsLoading(true);
+        item.itemuid &&
+            deleteUserGroupList(item.itemuid).then(() => {
+                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                    list && setInventorySettings(list);
+                    setIsLoading(false);
+                });
+            });
     };
 
     return (
@@ -68,13 +139,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
                     onClick={() => {
                         setEditedItem({
                             description: "",
-                            itemuid: "new",
+                            itemuid: NEW_ITEM,
                         });
                         setInventorySettings([
                             ...inventorySettings,
                             {
                                 description: "",
-                                itemuid: "new",
+                                itemuid: NEW_ITEM,
                             },
                         ]);
                     }}
@@ -127,7 +198,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         tooltip='Move up'
                                         className='p-button-text group-order__button'
                                         onClick={() => handleMoveItem(item as UserGroup, "up")}
-                                        disabled={index === 0}
+                                        disabled={index === 0 || item.itemuid === NEW_ITEM}
                                     />
                                     <Button
                                         icon='pi pi-arrow-circle-down'
@@ -137,31 +208,17 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         tooltip='Move down'
                                         className='p-button-text group-order__button'
                                         onClick={() => handleMoveItem(item as UserGroup, "down")}
-                                        disabled={index === inventorySettings.length - 1}
+                                        disabled={
+                                            index === inventorySettings.length - 1 ||
+                                            item.itemuid === NEW_ITEM
+                                        }
                                     />
                                 </div>
                                 <div className='col-1 flex justify-content-center align-items-center'>
                                     <Checkbox
                                         checked={!!item.enabled}
                                         tooltip='Select visible inventory groups'
-                                        disabled={inventorySettings[0].itemuid === item.itemuid}
-                                        onClick={() => {
-                                            if (inventorySettings[0].itemuid === item.itemuid)
-                                                return;
-                                            setIsLoading(true);
-                                            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-                                                enabled: !item.enabled ? 1 : 0,
-                                                itemuid: item.itemuid,
-                                                description: item.description,
-                                            }).then(() => {
-                                                getUserGroupList(
-                                                    getKeyValue(LS_APP_USER).useruid
-                                                ).then((list) => {
-                                                    list && setInventorySettings(list);
-                                                    setIsLoading(false);
-                                                });
-                                            });
-                                        }}
+                                        onClick={() => handleToggleGroupVisible(item as UserGroup)}
                                     />
                                 </div>
                                 <div className='col-7 flex align-items-center'>
@@ -180,27 +237,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                             />
                                             <Button
                                                 className='p-button row-edit__button'
-                                                onClick={() => {
-                                                    setIsLoading(true);
-                                                    addUserGroupList(
-                                                        getKeyValue(LS_APP_USER).useruid,
-                                                        {
-                                                            description: editedItem.description,
-                                                            itemuid:
-                                                                editedItem.itemuid === "new"
-                                                                    ? undefined
-                                                                    : editedItem.itemuid,
-                                                        }
-                                                    ).then(() => {
-                                                        getUserGroupList(
-                                                            getKeyValue(LS_APP_USER).useruid
-                                                        ).then((list) => {
-                                                            list && setInventorySettings(list);
-                                                            setEditedItem({});
-                                                            setIsLoading(false);
-                                                        });
-                                                    });
-                                                }}
+                                                onClick={handleSaveGroup}
                                             >
                                                 Save
                                             </Button>
@@ -213,7 +250,9 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                     <Button
                                         className='p-button'
                                         icon={`pi pi-star${!!item.isdefault ? "-fill" : ""}`}
+                                        tooltip='Make default'
                                         outlined
+                                        disabled={!item.enabled}
                                         severity={!item.isdefault ? "secondary" : "success"}
                                         onClick={() => handleSetGroupDefault(item as UserGroup)}
                                     />
@@ -225,26 +264,21 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                 ? setEditedItem({})
                                                 : setEditedItem(item);
                                         }}
+                                        disabled={!item.useruid}
+                                        severity={!item.useruid ? "secondary" : "success"}
                                     >
                                         Edit
                                     </Button>
                                     <Button
                                         className='p-button settings-inventory__delete'
                                         outlined
-                                        disabled={!!item.isdefault}
-                                        severity={!!item.isdefault ? "secondary" : "danger"}
-                                        onClick={() => {
-                                            setIsLoading(true);
-                                            item.itemuid &&
-                                                deleteUserGroupList(item.itemuid).then(() => {
-                                                    getUserGroupList(
-                                                        getKeyValue(LS_APP_USER).useruid
-                                                    ).then((list) => {
-                                                        list && setInventorySettings(list);
-                                                        setIsLoading(false);
-                                                    });
-                                                });
-                                        }}
+                                        disabled={!!item.isdefault || !item.useruid}
+                                        severity={
+                                            !!item.isdefault || !item.useruid
+                                                ? "secondary"
+                                                : "danger"
+                                        }
+                                        onClick={() => handleDeleteGroup(item as UserGroup)}
                                     >
                                         Delete
                                     </Button>
