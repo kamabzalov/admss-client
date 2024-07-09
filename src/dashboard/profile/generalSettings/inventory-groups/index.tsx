@@ -2,9 +2,6 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import {
     addUserGroupList,
     deleteUserGroupList,
@@ -16,32 +13,35 @@ import { Loader } from "dashboard/common/loader";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
+import { useStore } from "store/hooks";
 
 const NEW_ITEM = "new";
 
 export const SettingsInventoryGroups = (): ReactElement => {
     const toast = useToast();
+    const store = useStore().userStore;
+    const { authUser } = store;
+
     const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             getUserGroupList(authUser.useruid).then((list) => {
                 list && setInventorySettings(list);
             });
         }
-    }, []);
+    }, [authUser]);
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
-        if (currentItem) {
+        if (currentItem && authUser) {
             const order = direction === "up" ? --currentItem.order : ++currentItem.order;
-            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+            addUserGroupList(authUser.useruid, {
                 ...currentItem,
                 order,
             }).then(() => {
-                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                getUserGroupList(authUser.useruid).then((list) => {
                     list && setInventorySettings(list);
                     setIsLoading(false);
                 });
@@ -50,7 +50,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
     };
 
     const handleSetGroupDefault = (item: UserGroup) => {
-        if (item) {
+        if (item && authUser) {
             setIsLoading(true);
 
             if (!item.enabled) {
@@ -65,13 +65,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
             Promise.all(
                 updatedSettings.map((group) =>
-                    addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                    addUserGroupList(authUser.useruid, {
                         ...group,
                         isdefault: group.isdefault ? 1 : 0,
                     })
                 )
             ).then(() => {
-                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                getUserGroupList(authUser.useruid).then((list) => {
                     list && setInventorySettings(list);
                     setIsLoading(false);
                 });
@@ -80,52 +80,58 @@ export const SettingsInventoryGroups = (): ReactElement => {
     };
 
     const handleSaveGroup = () => {
-        setIsLoading(true);
-        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-            description: editedItem.description,
-            itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
-        }).then((response) => {
-            if (response?.status === Status.ERROR) {
-                const { error, status } = response as BaseResponseError;
-                toast.current?.show({
-                    severity: "error",
-                    summary: status,
-                    detail: error,
-                    life: TOAST_LIFETIME,
+        if (authUser) {
+            setIsLoading(true);
+            addUserGroupList(authUser.useruid, {
+                description: editedItem.description,
+                itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
+            }).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    toast.current?.show({
+                        severity: "error",
+                        summary: status,
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                    return setIsLoading(false);
+                }
+                getUserGroupList(authUser.useruid).then((list) => {
+                    list && setInventorySettings(list);
+                    setEditedItem({});
+                    setIsLoading(false);
                 });
-                return setIsLoading(false);
-            }
-            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
-                list && setInventorySettings(list);
-                setEditedItem({});
-                setIsLoading(false);
             });
-        });
+        }
     };
 
     const handleToggleGroupVisible = (item: UserGroup) => {
-        setIsLoading(true);
-        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-            enabled: !item.enabled ? 1 : 0,
-            itemuid: item.itemuid,
-            description: item.description,
-        }).then(() => {
-            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
-                list && setInventorySettings(list);
-                setIsLoading(false);
-            });
-        });
-    };
-
-    const handleDeleteGroup = (item: UserGroup) => {
-        setIsLoading(true);
-        item.itemuid &&
-            deleteUserGroupList(item.itemuid).then(() => {
-                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+        if (authUser) {
+            setIsLoading(true);
+            addUserGroupList(authUser.useruid, {
+                enabled: !item.enabled ? 1 : 0,
+                itemuid: item.itemuid,
+                description: item.description,
+            }).then(() => {
+                getUserGroupList(authUser.useruid).then((list) => {
                     list && setInventorySettings(list);
                     setIsLoading(false);
                 });
             });
+        }
+    };
+
+    const handleDeleteGroup = (item: UserGroup) => {
+        if (authUser) {
+            setIsLoading(true);
+            item.itemuid &&
+                deleteUserGroupList(item.itemuid).then(() => {
+                    getUserGroupList(authUser.useruid).then((list) => {
+                        list && setInventorySettings(list);
+                        setIsLoading(false);
+                    });
+                });
+        }
     };
 
     return (
@@ -163,13 +169,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                 onChange={({ checked }) => {
                                     setIsLoading(true);
                                     inventorySettings.forEach((item, index) => {
-                                        if (!index) return;
-                                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                                        if (!index || !authUser) return;
+                                        addUserGroupList(authUser.useruid, {
                                             enabled: checked ? 1 : 0,
                                             itemuid: item.itemuid,
                                             description: item.description,
                                         }).then(() => {
-                                            getUserGroupList(getKeyValue(LS_APP_USER).useruid)
+                                            getUserGroupList(authUser.useruid)
                                                 .then((list) => {
                                                     list && setInventorySettings(list);
                                                     setIsLoading(false);
