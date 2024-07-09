@@ -8,7 +8,7 @@ import {
     getUserGroupList,
 } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
-import { Checkbox } from "primereact/checkbox";
+import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
 import { Loader } from "dashboard/common/loader";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
@@ -26,13 +26,19 @@ export const SettingsInventoryGroups = (): ReactElement => {
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    useEffect(() => {
+    const handleGetUserGroupList = () => {
         if (authUser) {
             getUserGroupList(authUser.useruid).then((list) => {
                 list && setInventorySettings(list);
+                setIsLoading(false);
             });
         }
-    }, [authUser]);
+    };
+
+    useEffect(() => {
+        handleGetUserGroupList();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
         if (currentItem && authUser) {
@@ -40,69 +46,47 @@ export const SettingsInventoryGroups = (): ReactElement => {
             addUserGroupList(authUser.useruid, {
                 ...currentItem,
                 order,
-            }).then(() => {
-                getUserGroupList(authUser.useruid).then((list) => {
-                    list && setInventorySettings(list);
-                    setIsLoading(false);
-                });
-            });
+            }).then(handleGetUserGroupList);
         }
     };
 
     const handleSetGroupDefault = (item: UserGroup) => {
-        if (item && authUser) {
+        if (item) {
             setIsLoading(true);
 
             if (!item.enabled) {
                 return setIsLoading(false);
             }
 
-            const updatedSettings = inventorySettings.map((group) => {
-                return group.itemuid === item.itemuid
-                    ? { ...group, isdefault: 1 }
-                    : { ...group, isdefault: 0 };
-            });
-
-            Promise.all(
-                updatedSettings.map((group) =>
-                    addUserGroupList(authUser.useruid, {
-                        ...group,
-                        isdefault: group.isdefault ? 1 : 0,
-                    })
-                )
-            ).then(() => {
-                getUserGroupList(authUser.useruid).then((list) => {
-                    list && setInventorySettings(list);
-                    setIsLoading(false);
-                });
-            });
+            addUserGroupList(authUser!.useruid, {
+                ...item,
+                isdefault: !!item.isdefault ? 0 : 1,
+            }).then(handleGetUserGroupList);
         }
     };
 
     const handleSaveGroup = () => {
-        if (authUser) {
-            setIsLoading(true);
-            addUserGroupList(authUser.useruid, {
-                description: editedItem.description,
-                itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
-            }).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    const { error, status } = response as BaseResponseError;
-                    toast.current?.show({
-                        severity: "error",
-                        summary: status,
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                    return setIsLoading(false);
-                }
-                getUserGroupList(authUser.useruid).then((list) => {
-                    list && setInventorySettings(list);
-                    setEditedItem({});
-                    setIsLoading(false);
+        setIsLoading(true);
+        addUserGroupList(authUser!.useruid, {
+            description: editedItem.description,
+            itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
+        }).then((response) => {
+            if (response?.status === Status.ERROR) {
+                const { error, status } = response as BaseResponseError;
+                toast.current?.show({
+                    severity: "error",
+                    summary: status,
+                    detail: error,
+                    life: TOAST_LIFETIME,
                 });
+                return setIsLoading(false);
+            }
+            getUserGroupList(authUser!.useruid).then((list) => {
+                list && setInventorySettings(list);
+                setEditedItem({});
+                setIsLoading(false);
             });
-        }
+        });
     };
 
     const handleToggleGroupVisible = (item: UserGroup) => {
@@ -112,26 +96,41 @@ export const SettingsInventoryGroups = (): ReactElement => {
                 enabled: !item.enabled ? 1 : 0,
                 itemuid: item.itemuid,
                 description: item.description,
-            }).then(() => {
-                getUserGroupList(authUser.useruid).then((list) => {
-                    list && setInventorySettings(list);
-                    setIsLoading(false);
-                });
-            });
+            }).then(handleGetUserGroupList);
         }
     };
 
     const handleDeleteGroup = (item: UserGroup) => {
-        if (authUser) {
-            setIsLoading(true);
-            item.itemuid &&
-                deleteUserGroupList(item.itemuid).then(() => {
-                    getUserGroupList(authUser.useruid).then((list) => {
+        setIsLoading(true);
+        item.itemuid &&
+            deleteUserGroupList(item.itemuid).then(() => {
+                getUserGroupList(authUser!.useruid).then((list) => {
+                    list && setInventorySettings(list);
+                    setIsLoading(false);
+                });
+            });
+    };
+
+    const handleCheckAllGroups = ({ checked }: CheckboxChangeEvent) => {
+        setIsLoading(true);
+        inventorySettings.forEach((item, index) => {
+            if (!index || !authUser) return;
+            addUserGroupList(authUser.useruid, {
+                enabled: checked ? 1 : 0,
+                itemuid: item.itemuid,
+                description: item.description,
+            }).then(() => {
+                getUserGroupList(authUser.useruid)
+                    .then((list) => {
                         list && setInventorySettings(list);
                         setIsLoading(false);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
                     });
-                });
-        }
+            });
+        });
+        setIsLoading(false);
     };
 
     return (
@@ -166,27 +165,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                         <div className='col-1 flex justify-content-center align-items-center'>
                             <Checkbox
                                 checked={inventorySettings.every((item) => item.enabled)}
-                                onChange={({ checked }) => {
-                                    setIsLoading(true);
-                                    inventorySettings.forEach((item, index) => {
-                                        if (!index || !authUser) return;
-                                        addUserGroupList(authUser.useruid, {
-                                            enabled: checked ? 1 : 0,
-                                            itemuid: item.itemuid,
-                                            description: item.description,
-                                        }).then(() => {
-                                            getUserGroupList(authUser.useruid)
-                                                .then((list) => {
-                                                    list && setInventorySettings(list);
-                                                    setIsLoading(false);
-                                                })
-                                                .finally(() => {
-                                                    setIsLoading(false);
-                                                });
-                                        });
-                                    });
-                                    setIsLoading(false);
-                                }}
+                                onChange={handleCheckAllGroups}
                             />
                         </div>
                         <div className='col-7 flex align-items-center'>Group</div>
