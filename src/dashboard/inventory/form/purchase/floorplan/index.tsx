@@ -2,10 +2,13 @@ import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/for
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
+import { useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 
 export const PurchaseFloorplan = observer((): ReactElement => {
     const store = useStore().inventoryStore;
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
     const {
         inventoryExtData: {
             fpFloorplanCompany,
@@ -45,6 +48,7 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-3'>

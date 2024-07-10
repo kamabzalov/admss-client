@@ -15,6 +15,7 @@ const FIELD: keyof ContactUser = "companyName";
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
+    originalPath?: string;
 }
 
 export const CompanySearch = ({
@@ -23,6 +24,7 @@ export const CompanySearch = ({
     onRowClick,
     contactCategory,
     onChange,
+    originalPath,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -91,6 +93,7 @@ export const CompanySearch = ({
                 <ContactsDataTable
                     onRowClick={handleOnRowClick}
                     contactCategory={contactCategory}
+                    originalPath={originalPath}
                 />
             </Dialog>
         </>

@@ -676,13 +676,20 @@ export class InventoryStore {
         this._documents = [];
     };
 
-    public clearInventory = () => {
+    public saveCachedInventory = () => {
         this._cachedInventory = {
             options_info: this._inventoryOptions,
             Audit: this._inventoryAudit,
             extdata: this._inventoryExtData,
             ...this._inventory,
         };
+    };
+
+    public clearCachedInventory = () => {
+        this._cachedInventory = {} as Inventory;
+    };
+
+    public clearInventory = () => {
         this._inventory = {} as Inventory;
         this._inventoryAudit = initialAuditState as Audit;
         this._inventoryOptions = [];

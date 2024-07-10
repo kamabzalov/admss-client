@@ -8,9 +8,12 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { useLocation } from "react-router-dom";
 
 export const PurchaseConsign = observer((): ReactElement => {
     const store = useStore().inventoryStore;
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
     const {
         inventoryExtData: {
             csDate,
@@ -68,6 +71,7 @@ export const PurchaseConsign = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-3'>
