@@ -79,6 +79,8 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         getCachedInventory,
+        saveCachedInventory,
+        clearCachedInventory,
         inventory,
         inventoryExtData,
         isFormChanged,
@@ -203,6 +205,7 @@ export const InventoryForm = observer(() => {
 
         return () => {
             sections.forEach((section) => section.clearCount());
+            saveCachedInventory();
             clearInventory();
         };
     }, [id, store]);
@@ -401,6 +404,8 @@ export const InventoryForm = observer(() => {
                                                 setValidateOnMount(false);
                                                 saveInventory(id);
                                                 navigate(`/dashboard/inventory`);
+                                                clearInventory();
+                                                clearCachedInventory();
                                                 toast.current?.show({
                                                     severity: "success",
                                                     summary: "Success",

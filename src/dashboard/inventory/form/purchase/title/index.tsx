@@ -7,6 +7,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
+import { useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 
 export const PurchaseTitle = observer((): ReactElement => {
@@ -33,6 +34,9 @@ export const PurchaseTitle = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
+
     return (
         <div className='grid purchase-title row-gap-2'>
             <div className='col-3 flex align-items-center'>
@@ -150,6 +154,7 @@ export const PurchaseTitle = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-3'>
@@ -239,6 +244,7 @@ export const PurchaseTitle = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-3'>

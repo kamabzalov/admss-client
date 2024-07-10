@@ -74,11 +74,12 @@ export const ContactForm = observer((): ReactElement => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, getContact, clearContact, saveContact } = store;
+    const { contact, contactExtData, getContact, clearContact, saveContact, memoRoute } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
         if (id) {
@@ -250,7 +251,12 @@ export const ContactForm = observer((): ReactElement => {
                                             onSubmit={() => {
                                                 setValidateOnMount(false);
                                                 saveContact();
-                                                navigate(`/dashboard/contacts`);
+                                                if (memoRoute) {
+                                                    navigate(memoRoute);
+                                                    store.memoRoute = "";
+                                                } else {
+                                                    navigate(`/dashboard/contacts`);
+                                                }
                                                 toast.current?.show({
                                                     severity: "success",
                                                     summary: "Success",

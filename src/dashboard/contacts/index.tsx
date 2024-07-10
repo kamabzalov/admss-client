@@ -28,6 +28,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
+import { useStore } from "store/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
@@ -36,6 +37,7 @@ interface TableColumnProps extends ColumnProps {
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
+    originalPath?: string;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -47,7 +49,11 @@ const renderColumnsData: TableColumnProps[] = [
     { field: "created", header: "Created" },
 ];
 
-export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataTableProps) => {
+export const ContactsDataTable = ({
+    onRowClick,
+    contactCategory,
+    originalPath,
+}: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -59,6 +65,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
     const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const store = useStore().contactStore;
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -223,6 +230,9 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
     };
 
     const handleCreateContact = () => {
+        if (originalPath) {
+            store.memoRoute = originalPath;
+        }
         navigate("/dashboard/contacts/create");
     };
 

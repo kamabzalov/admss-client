@@ -25,6 +25,7 @@ export class ContactStore {
     private _backSiteDLurl: string = "";
     private _frontSiteDL: File = {} as File;
     private _backSiteDL: File = {} as File;
+    private _memoRoute: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -59,8 +60,8 @@ export class ContactStore {
         return this._isLoading;
     }
 
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
+    public get memoRoute() {
+        return this._memoRoute;
     }
 
     public getContact = async (itemuid: string) => {
@@ -188,6 +189,14 @@ export class ContactStore {
 
     public set backSideDL(file: File) {
         this._backSiteDL = file;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
+
+    public set memoRoute(state: string) {
+        this._memoRoute = state;
     }
 
     public removeImagesDL = async (): Promise<any> => {
