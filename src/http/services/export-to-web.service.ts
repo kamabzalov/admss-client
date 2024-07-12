@@ -7,6 +7,7 @@ import {
     ExportWebPostData,
     ExportWebScheduleList,
 } from "common/models/export-web";
+import { isAxiosError } from "axios";
 
 export interface TotalExportToWebList extends BaseResponse {
     total: number;
@@ -34,10 +35,12 @@ export const addExportTask = async (useruid: string, { data, columns }: ExportWe
         );
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while add export task",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while add export task",
+            };
+        }
     }
 };
 
@@ -52,10 +55,12 @@ export const addExportTaskToSchedule = async (
         );
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while schedule export task",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while add export task to schedule",
+            };
+        }
     }
 };
 
