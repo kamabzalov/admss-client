@@ -14,13 +14,13 @@ import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
-import { ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     addExportTask,
     addExportTaskToSchedule,
     getExportToWebList,
 } from "http/services/export-to-web.service";
-import { ExportWebList } from "common/models/export-web";
+import { ExportWebList, ExportWebPostData } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,6 +36,8 @@ import { FilterOptions, filterOptions } from "dashboard/common/filter";
 import { createStringifyFilterQuery } from "common/helpers";
 import { store } from "store";
 import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { Loader } from "dashboard/common/loader";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -90,6 +92,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const userStore = store.userStore;
     const { authUser } = userStore;
+    const toast = useToast();
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
@@ -102,6 +105,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -360,7 +364,30 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         }
     };
 
+    const handleExportTask = async (
+        useruid: string,
+        report: ExportWebPostData,
+        isScheduled: boolean
+    ) => {
+        setIsLoading(true);
+
+        const exportTaskFunction = isScheduled ? addExportTaskToSchedule : addExportTask;
+        const res = await exportTaskFunction(useruid, report);
+
+        setIsLoading(false);
+
+        if (res?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: res?.status,
+                detail: res?.error,
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
+
     const handleExport = (schedule?: boolean) => {
+        setIsLoading(true);
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field,
@@ -386,11 +413,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             columns,
         };
         if (JSONreport && authUser) {
-            if (schedule) {
-                addExportTaskToSchedule(authUser.useruid, JSONreport);
-            } else {
-                addExportTask(authUser?.useruid, JSONreport);
-            }
+            handleExportTask(authUser.useruid, JSONreport, schedule || false);
         }
     };
 
@@ -552,6 +575,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             </div>
             <div className='grid'>
                 <div className='col-12'>
+                    {isLoading && <Loader overlay />}
                     <DataTable
                         showGridlines
                         value={exportsToWeb}
