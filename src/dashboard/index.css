@@ -322,6 +322,10 @@
     font-weight: 700;
 }
 
+.p-datatable .p-sortable-column .p-sortable-column-icon {
+    color: var(--admss-app-blue-text);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
