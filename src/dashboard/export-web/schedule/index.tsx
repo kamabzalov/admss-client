@@ -56,7 +56,7 @@ export const ExportSchedule = (): ReactElement => {
         ]);
 
         if (totalResponse && !Array.isArray(totalResponse)) {
-            setTotalRecords(totalResponse.total ?? 0);
+            setTotalRecords(totalResponse.total ?? 1);
         }
 
         if (Array.isArray(dataResponse)) {
@@ -259,7 +259,7 @@ export const ExportSchedule = (): ReactElement => {
                     <Button
                         severity='success'
                         type='button'
-                        icon='icon adms-blank'
+                        icon='pi pi-download'
                         tooltip='Download export to web form'
                     />
                 </div>
@@ -279,7 +279,7 @@ export const ExportSchedule = (): ReactElement => {
                         paginator
                         first={lazyState.first}
                         rows={lazyState.rows}
-                        totalRecords={totalRecords}
+                        totalRecords={totalRecords || 1}
                         onPage={pageChanged}
                         onSort={sortData}
                         sortOrder={lazyState.sortOrder}
@@ -308,40 +308,45 @@ export const ExportSchedule = (): ReactElement => {
                                 />
                             );
                         })}
-                        <Column
-                            bodyStyle={{ textAlign: "center" }}
-                            reorderable={false}
-                            resizeable={false}
-                            body={() => {
-                                return (
-                                    <div className='schedule-control'>
-                                        <Button
-                                            outlined
-                                            className='text schedule-button'
-                                            icon='icon adms-pause'
-                                        />
-                                        <Button
-                                            outlined
-                                            className='text schedule-button'
-                                            icon='icon adms-play-prev'
-                                        />
-                                        <Button
-                                            outlined
-                                            className='text schedule-button'
-                                            icon='icon adms-trash-can'
-                                        />
-                                    </div>
-                                );
-                            }}
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "100px",
-                                        padding: "0 15px",
+                        {!!scheduleList.length && (
+                            <Column
+                                bodyStyle={{ textAlign: "center" }}
+                                reorderable={false}
+                                resizeable={false}
+                                body={() => {
+                                    return (
+                                        <div className='schedule-control'>
+                                            <Button
+                                                outlined
+                                                tooltip='Pause'
+                                                className='text schedule-button'
+                                                icon='icon adms-pause'
+                                            />
+                                            <Button
+                                                outlined
+                                                tooltip='Play'
+                                                className='text schedule-button'
+                                                icon='icon adms-play-prev'
+                                            />
+                                            <Button
+                                                outlined
+                                                tooltip='Delete'
+                                                className='text schedule-button'
+                                                icon='icon adms-trash-can'
+                                            />
+                                        </div>
+                                    );
+                                }}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "100px",
+                                            padding: "0 15px",
+                                        },
                                     },
-                                },
-                            }}
-                        />
+                                }}
+                            />
+                        )}
                     </DataTable>
                 </div>
             </div>

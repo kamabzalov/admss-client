@@ -30,6 +30,11 @@
     white-space: nowrap;
 }
 
+.export-web .p-button.p-button-icon-only,
+.export-web .p-button.p-button-icon-only .pi {
+    font-size: 22px;
+}
+
 .export-web-controls__button-icon {
     margin-left: 10px;
     line-height: 1;

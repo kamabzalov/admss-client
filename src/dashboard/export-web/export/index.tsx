@@ -559,7 +559,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     <Button
                         severity='success'
                         type='button'
-                        icon='icon adms-blank'
+                        icon='pi pi-download'
                         tooltip='Download export to web form'
                         onClick={() => printTableData()}
                     />
@@ -586,7 +586,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                         first={lazyState.first}
                         rows={lazyState.rows}
                         rowsPerPageOptions={ROWS_PER_PAGE}
-                        totalRecords={totalRecords}
+                        totalRecords={totalRecords || 1}
                         onPage={pageChanged}
                         onSort={sortData}
                         rowExpansionTemplate={rowExpansionTemplate}
