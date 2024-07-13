@@ -272,7 +272,7 @@ export const InventoryForm = observer(() => {
         });
     };
 
-    const handleSubmit = async (id: string) => {
+    const handleSubmit = async (id: string | undefined) => {
         setValidateOnMount(false);
         await saveInventory(id).then(() => {
             navigateAndClear();
@@ -422,7 +422,7 @@ export const InventoryForm = observer(() => {
                                             validateOnChange={false}
                                             validateOnBlur={false}
                                             validateOnMount={validateOnMount}
-                                            onSubmit={() => handleSubmit(id as string)}
+                                            onSubmit={() => handleSubmit(id)}
                                         >
                                             <Form name='inventoryForm' className='w-full'>
                                                 {inventorySections.map((section) =>
