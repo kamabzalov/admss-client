@@ -258,6 +258,28 @@ export const InventoryForm = observer(() => {
         });
     };
 
+    const navigateAndClear = () => {
+        navigate(`/dashboard/inventory`);
+        clearInventory();
+        clearCachedInventory();
+    };
+
+    const showToastMessage = () => {
+        toast.current?.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Inventory saved successfully",
+        });
+    };
+
+    const handleSubmit = async (id: string | undefined) => {
+        setValidateOnMount(false);
+        await saveInventory(id).then(() => {
+            navigateAndClear();
+            showToastMessage();
+        });
+    };
+
     return (
         <Suspense>
             <div className='grid relative'>
@@ -400,18 +422,7 @@ export const InventoryForm = observer(() => {
                                             validateOnChange={false}
                                             validateOnBlur={false}
                                             validateOnMount={validateOnMount}
-                                            onSubmit={() => {
-                                                setValidateOnMount(false);
-                                                saveInventory(id);
-                                                navigate(`/dashboard/inventory`);
-                                                clearInventory();
-                                                clearCachedInventory();
-                                                toast.current?.show({
-                                                    severity: "success",
-                                                    summary: "Success",
-                                                    detail: "Inventory saved successfully",
-                                                });
-                                            }}
+                                            onSubmit={() => handleSubmit(id)}
                                         >
                                             <Form name='inventoryForm' className='w-full'>
                                                 {inventorySections.map((section) =>
