@@ -19,6 +19,7 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { Status } from "common/models/base-response";
+import { InputText } from "primereact/inputtext";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -45,6 +46,7 @@ export const ExportHistory = (): ReactElement => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+    const [globalSearch, setGlobalSearch] = useState<string>("");
 
     const handleGetExportHistoryList = async (params: QueryParams) => {
         if (!authUser) return;
@@ -126,6 +128,10 @@ export const ExportHistory = (): ReactElement => {
         if (!settingsLoaded) return;
         let qry: string = "";
 
+        if (globalSearch) {
+            qry += globalSearch;
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -137,7 +143,7 @@ export const ExportHistory = (): ReactElement => {
 
         handleGetExportHistoryList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, settingsLoaded]);
+    }, [lazyState, settingsLoaded, globalSearch]);
 
     const handleCheckboxChange = () => {
         if (historyColumns.length === activeHistoryColumns.length) {
@@ -259,6 +265,14 @@ export const ExportHistory = (): ReactElement => {
                         icon='pi pi-download'
                         tooltip='Download export to web form'
                     />
+                    <span className='p-input-icon-right export-web__search ml-auto'>
+                        <i className='pi pi-search' />
+                        <InputText
+                            value={globalSearch}
+                            placeholder='Search'
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                    </span>
                 </div>
             </div>
             <div className='grid'>

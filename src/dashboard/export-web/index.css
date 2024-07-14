@@ -126,3 +126,8 @@
     color: var(--admss-app-main-blue);
 }
 
+.export-web__search,
+.export-web__search .p-inputtext {
+    width: 180px;
+}
+
