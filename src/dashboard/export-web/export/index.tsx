@@ -563,7 +563,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                         tooltip='Download export to web form'
                         onClick={() => printTableData()}
                     />
-                    <span className='p-input-icon-right ml-auto'>
+                    <span className='p-input-icon-right export-web__search ml-auto'>
                         <i className='pi pi-search' />
                         <InputText
                             value={globalSearch}
