@@ -205,7 +205,7 @@ export const InventoryForm = observer(() => {
 
         return () => {
             sections.forEach((section) => section.clearCount());
-            saveCachedInventory();
+            !id && saveCachedInventory();
             clearInventory();
         };
     }, [id, store]);
