@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
-    deleteContactDL,
+    deleteContactFrontDL,
+    deleteContactBackDL,
     getContactInfo,
     setContactDL,
     setContact,
@@ -12,7 +14,12 @@ import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
-export type DLSide = "front" | "back";
+enum DLSides {
+    FRONT = "front",
+    BACK = "back",
+}
+
+export type DLSide = DLSides.FRONT | DLSides.BACK;
 
 export class ContactStore {
     public rootStore: RootStore;
@@ -199,12 +206,18 @@ export class ContactStore {
         this._memoRoute = state;
     }
 
-    public removeImagesDL = async (): Promise<any> => {
+    public removeImagesDL = async (side: DLSide): Promise<any> => {
         this._isLoading = true;
         try {
-            await deleteContactDL(this._contactID);
-            this._frontSiteDLurl = "";
-            this._backSiteDLurl = "";
+            if (side === DLSides.FRONT) {
+                await deleteContactFrontDL(this._contactID);
+                this._frontSiteDLurl = "";
+            }
+
+            if (side === DLSides.BACK) {
+                await deleteContactBackDL(this._contactID);
+                this._backSiteDLurl = "";
+            }
             return Status.OK;
         } catch (error) {
             return Status.ERROR;

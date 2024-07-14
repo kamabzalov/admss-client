@@ -64,12 +64,12 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (isString: boolean = false) => {
+    const handleDeleteImage = (side: DLSide) => {
         fileUploadFrontRef.current?.clear();
         fileUploadBackRef.current?.clear();
         store.frontSideDL = {} as File;
         store.backSideDL = {} as File;
-        isString && removeImagesDL();
+        removeImagesDL(side);
     };
 
     const itemTemplate = (image: File | string, side: DLSide) => {
@@ -82,7 +82,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={() => handleDeleteImage(isString)}
+                    onClick={() => isString && handleDeleteImage(side)}
                     className='p-button dl-presentation__remove-button'
                 />
             </div>
