@@ -190,18 +190,14 @@ export class InventoryStore {
             const response = await getInventoryInfo(itemuid);
             if (response) {
                 this._inventoryID = response.itemuid;
-                if (response.itemuid === this._cachedInventory.itemuid) {
-                    this.getCachedInventory();
-                } else {
-                    const { extdata, options_info, Audit, ...inventory } = response;
-                    this._inventory =
-                        { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
+                const { extdata, options_info, Audit, ...inventory } = response;
+                this._inventory =
+                    { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
 
-                    this._inventoryOptions = options_info || [];
+                this._inventoryOptions = options_info || [];
 
-                    this._inventoryExtData = extdata || ({} as InventoryExtData);
-                    this._inventoryAudit = Audit || (initialAuditState as Audit);
-                }
+                this._inventoryExtData = extdata || ({} as InventoryExtData);
+                this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
         } finally {
