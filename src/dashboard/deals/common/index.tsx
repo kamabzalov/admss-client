@@ -32,6 +32,9 @@ export enum AccordionDealItems {
     FINANCES = "Finances",
     PICKUP = "Pickup payments",
     CONTRACT = "Contract Printing",
+    LHPH = "LHPH",
+    BHPH = "BHPH",
+    DISMANTLE = "Dismantle",
 }
 
 export class DealsSection implements Deals {

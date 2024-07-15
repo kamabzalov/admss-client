@@ -17,6 +17,7 @@ export interface Deal {
     differentSellerInfo: string;
     differentSellerUID: string;
     extdata: DealExtData;
+    finance: DealFinance;
     inventoryinfo: string;
     inventorystatus: number;
     inventoryuid: string;
@@ -71,6 +72,7 @@ export interface DealExtData {
     Con_Total_of_Pmts: number;
     Date_Acquired: number;
     Date_First_Operated: number;
+    Days_to_First_Payment: number;
     Dealer_Number: string;
     DismantledDate: number;
     DismantledSoldTo: string;

@@ -145,6 +145,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         value={values.dealtype}
                         onChange={(e) => {
                             setFieldValue("dealtype", e.value);
+                            store.dealType = e.value;
                             changeDeal({ key: "dealtype", value: e.value });
                         }}
                         className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}

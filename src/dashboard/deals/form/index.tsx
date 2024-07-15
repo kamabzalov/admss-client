@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
-import { DealRetail } from "./retail";
+import { DealBHPH, DealDismantleForm, DealLHPH, DealRetail, DealWholeSale } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
@@ -173,7 +173,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
+    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -207,7 +207,24 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo, DealRetail];
+        id && getDeal(id);
+        return () => clearDeal();
+    }, [id]);
+
+    useEffect(() => {
+        let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
+        if (dealType === 7) {
+            dealsSections = [...dealsSections, DealLHPH];
+        } else if (dealType === 6) {
+            dealsSections = [...dealsSections, DealDismantleForm];
+        } else if (dealType === 5) {
+            dealsSections = [...dealsSections, DealWholeSale];
+        } else if (dealType === 0) {
+            dealsSections = [...dealsSections, DealBHPH];
+        } else {
+            dealsSections = [...dealsSections, DealRetail];
+        }
+
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
         setAccordionSteps(sections.map((item) => item.startIndex));
@@ -215,12 +232,10 @@ export const DealsForm = observer(() => {
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
 
-        id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
-            clearDeal();
         };
-    }, [id]);
+    }, [dealType]);
 
     useEffect(() => {
         accordionSteps.forEach((step) => {
@@ -352,7 +367,7 @@ export const DealsForm = observer(() => {
                                                 {
                                                     contactuid: deal.contactuid || "",
                                                     inventoryuid: deal.inventoryuid || "",
-                                                    dealtype: deal.dealtype,
+                                                    dealtype: deal.dealtype || dealType,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase || DATE_NOW,
