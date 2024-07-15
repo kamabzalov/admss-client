@@ -3,7 +3,7 @@
   gap: 15px;
 }
 
-.schedule-button.p-button {
+.schedule-button.p-button.p-button-icon-only {
   display: inline-flex;
   align-items: center;
   justify-content: center;
