@@ -96,17 +96,16 @@ export default function SignIn() {
                             <span className='w-full p-float-label sign-in__password'>
                                 <InputText
                                     placeholder='Password'
-                                    className={`sign__input ${formik.errors.password ? "p-invalid" : ""}`}
+                                    className={`sign__input ${formik.touched.password && formik.errors.password ? "p-invalid" : ""}`}
                                     id='password'
                                     type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
                                     value={formik.values.password}
                                 />
 
                                 <i
-                                    className={`adms-${currentPassIcon(
-                                        !!formik.values.password
-                                    )} sign__icon`}
+                                    className={`adms-${currentPassIcon(!!formik.values.password)} sign__icon`}
                                     onClick={() =>
                                         !!formik.values.password &&
                                         setPasswordVisible((prev) => !prev)
@@ -114,11 +113,12 @@ export default function SignIn() {
                                 />
                                 <label htmlFor='password'>Password</label>
                             </span>
-                            {formik.errors.password ? (
+                            {formik.touched.password && formik.errors.password ? (
                                 <small className='p-error'>{formik.errors.password}</small>
                             ) : (
+                                formik.touched.password &&
                                 formik.values.password.trim() === "" && (
-                                    <small className='p-error'>Password is requared</small>
+                                    <small className='p-error'>Password is required</small>
                                 )
                             )}
                         </div>
