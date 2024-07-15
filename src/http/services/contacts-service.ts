@@ -114,20 +114,6 @@ export const setContactDL = async (
     }
 };
 
-export const deleteContactDL = async (contactuid: string) => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `contacts/${contactuid}/deletedlicense`
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
 export const getContactsProspectList = async (contactuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<unknown[] | BaseResponseError>(
@@ -148,6 +134,44 @@ export const getContactsProspectList = async (contactuid: string) => {
             status: Status.ERROR,
             error: error || errorMessage,
         };
+    }
+};
+
+export const deleteContactFrontDL = async (contactuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/deletedlicensefront`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
+    }
+};
+
+export const deleteContactBackDL = async (contactuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/deletedlicenseback`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
     }
 };
 
