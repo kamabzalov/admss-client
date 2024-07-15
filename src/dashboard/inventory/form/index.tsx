@@ -57,6 +57,9 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
+let lastCheckedValue = "";
+let lastResolvedValue = true;
+
 export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
@@ -112,13 +115,23 @@ export const InventoryForm = observer(() => {
     }): Yup.ObjectSchema<Partial<PartialInventory>> => {
         const debouncedCheckStockNoAvailability = debounce(
             async (value: string, resolve: (exists: boolean) => void) => {
+                if (lastCheckedValue === value) {
+                    resolve(lastResolvedValue);
+                    return;
+                }
                 if (!value || initialStockNo === value) {
+                    lastCheckedValue = value;
+                    lastResolvedValue = true;
                     resolve(true);
                 } else {
+                    if (lastCheckedValue === value) {
+                    }
                     const res = (await checkStockNoAvailability(
                         value
                     )) as unknown as InventoryStockNumber;
-                    resolve(!(res && res.status === Status.OK && res.exists));
+                    lastCheckedValue = value;
+                    lastResolvedValue = !(res && res.status === Status.OK && res.exists);
+                    resolve(lastResolvedValue);
                 }
             },
             500
