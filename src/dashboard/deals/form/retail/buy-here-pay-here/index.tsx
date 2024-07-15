@@ -212,3 +212,4 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
         </div>
     );
 });
+
