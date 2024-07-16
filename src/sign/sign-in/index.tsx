@@ -59,12 +59,6 @@ export default function SignIn() {
         },
     });
 
-    const currentPassIcon = (filled: boolean): string => {
-        if (!filled) return "password";
-        if (passwordVisible) return "hide";
-        return "show";
-    };
-
     return (
         <section className='sign'>
             <div className='sign-in'>
@@ -77,15 +71,18 @@ export default function SignIn() {
                                 <InputText
                                     placeholder='Username'
                                     className={`sign__input ${
-                                        formik.errors.username ? "p-invalid" : ""
+                                        formik.touched.username && formik.errors.username
+                                            ? "p-invalid"
+                                            : ""
                                     }`}
                                     id='username'
                                     onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
                                     value={formik.values.username}
                                 />
                                 <label htmlFor='username'>Username</label>
                             </span>
-                            {formik.errors.username ? (
+                            {formik.touched.username && formik.errors.username ? (
                                 <small className='p-error error-space'>
                                     {formik.errors.username}
                                 </small>
@@ -105,22 +102,14 @@ export default function SignIn() {
                                 />
 
                                 <i
-                                    className={`adms-${currentPassIcon(!!formik.values.password)} sign__icon`}
-                                    onClick={() =>
-                                        !!formik.values.password &&
-                                        setPasswordVisible((prev) => !prev)
-                                    }
+                                    className={`adms-${passwordVisible ? "eye-open" : "eye-closed"} sign__icon`}
+                                    onClick={() => setPasswordVisible((prev) => !prev)}
                                 />
                                 <label htmlFor='password'>Password</label>
                             </span>
                             {formik.touched.password && formik.errors.password ? (
                                 <small className='p-error'>{formik.errors.password}</small>
-                            ) : (
-                                formik.touched.password &&
-                                formik.values.password.trim() === "" && (
-                                    <small className='p-error'>Password is required</small>
-                                )
-                            )}
+                            ) : null}
                         </div>
 
                         <div className='flex justify-content-between user-help'>
