@@ -59,12 +59,6 @@ export default function SignIn() {
         },
     });
 
-    const currentPassIcon = (filled: boolean): string => {
-        if (!filled) return "password";
-        if (passwordVisible) return "hide";
-        return "show";
-    };
-
     return (
         <section className='sign'>
             <div className='sign-in'>
@@ -77,15 +71,18 @@ export default function SignIn() {
                                 <InputText
                                     placeholder='Username'
                                     className={`sign__input ${
-                                        formik.errors.username ? "p-invalid" : ""
+                                        formik.touched.username && formik.errors.username
+                                            ? "p-invalid"
+                                            : ""
                                     }`}
                                     id='username'
                                     onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
                                     value={formik.values.username}
                                 />
                                 <label htmlFor='username'>Username</label>
                             </span>
-                            {formik.errors.username ? (
+                            {formik.touched.username && formik.errors.username ? (
                                 <small className='p-error error-space'>
                                     {formik.errors.username}
                                 </small>
@@ -96,24 +93,21 @@ export default function SignIn() {
                             <span className='w-full p-float-label sign-in__password'>
                                 <InputText
                                     placeholder='Password'
-                                    className='sign__input'
+                                    className={`sign__input ${formik.touched.password && formik.errors.password ? "p-invalid" : ""}`}
                                     id='password'
                                     type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
                                     value={formik.values.password}
                                 />
+
                                 <i
-                                    className={`adms-${currentPassIcon(
-                                        !!formik.values.password
-                                    )} sign__icon`}
-                                    onClick={() =>
-                                        !!formik.values.password &&
-                                        setPasswordVisible((prev) => !prev)
-                                    }
+                                    className={`adms-${passwordVisible ? "eye-open" : "eye-closed"} sign__icon`}
+                                    onClick={() => setPasswordVisible((prev) => !prev)}
                                 />
                                 <label htmlFor='password'>Password</label>
                             </span>
-                            {formik.errors.password ? (
+                            {formik.touched.password && formik.errors.password ? (
                                 <small className='p-error'>{formik.errors.password}</small>
                             ) : null}
                         </div>
