@@ -163,6 +163,11 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     }),
 });
 
+const DEAL_TYPE_LHPH = 7;
+const DEAL_TYPE_DISMANTLE = 6;
+const DEAL_TYPE_WHOLESALE = 5;
+const DEAL_TYPE_BHPH = 0;
+
 const DATE_NOW = new Date().toISOString();
 
 export const DealsForm = observer(() => {
@@ -213,16 +218,23 @@ export const DealsForm = observer(() => {
 
     useEffect(() => {
         let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
-        if (dealType === 7) {
-            dealsSections = [...dealsSections, DealLHPH];
-        } else if (dealType === 6) {
-            dealsSections = [...dealsSections, DealDismantleForm];
-        } else if (dealType === 5) {
-            dealsSections = [...dealsSections, DealWholeSale];
-        } else if (dealType === 0) {
-            dealsSections = [...dealsSections, DealBHPH];
-        } else {
-            dealsSections = [...dealsSections, DealRetail];
+
+        switch (dealType) {
+            case DEAL_TYPE_LHPH:
+                dealsSections = [...dealsSections, DealLHPH];
+                break;
+            case DEAL_TYPE_DISMANTLE:
+                dealsSections = [...dealsSections, DealDismantleForm];
+                break;
+            case DEAL_TYPE_WHOLESALE:
+                dealsSections = [...dealsSections, DealWholeSale];
+                break;
+            case DEAL_TYPE_BHPH:
+                dealsSections = [...dealsSections, DealBHPH];
+                break;
+            default:
+                dealsSections = [...dealsSections, DealRetail];
+                break;
         }
 
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
