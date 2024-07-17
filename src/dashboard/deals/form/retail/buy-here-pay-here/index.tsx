@@ -24,10 +24,15 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             Con_Pmt_Amt,
             Con_Final_Pmt,
             Con_First_Pmt_Date,
+            Con_Final_Pmt_Date,
             Con_Late_Fee,
             Con_Late_Fee_Max,
             Con_Late_Percent,
             Con_Grace_Period,
+            Con_Interest_Method,
+            Con_PassTimeBox,
+            Con_OnTimeBox,
+            Con_DontReportToCB,
         },
         dealFinance: { TaxableAmount, BHPHCollectedInterest },
         changeDeal,
@@ -135,7 +140,14 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <DateInput name='Final Payment Due' />
+                <DateInput
+                    name='Final Payment Due'
+                    date={Con_Final_Pmt_Date}
+                    onChange={({ value }) =>
+                        value &&
+                        changeDealExtData({ key: "Con_Final_Pmt_Date", value: Number(value) })
+                    }
+                />
             </div>
 
             <hr className='form-line' />
@@ -184,15 +196,39 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown />
+                    <Dropdown
+                        value={Con_Interest_Method}
+                        editable
+                        onChange={({ target: { value } }) =>
+                            changeDealExtData({ key: "Con_Interest_Method", value })
+                        }
+                    />
                     <label className='float-label'>Interest Method</label>
                 </span>
             </div>
             <div className='col-3'>
-                <BorderedCheckbox checked name='Use PassTime Box' />
+                <BorderedCheckbox
+                    checked={!!Con_PassTimeBox}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Con_PassTimeBox",
+                            value: !Con_PassTimeBox ? 1 : 0,
+                        })
+                    }
+                    name='Use PassTime Box'
+                />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox checked name='Use OnTime Box' />
+                <BorderedCheckbox
+                    checked={!!Con_OnTimeBox}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Con_OnTimeBox",
+                            value: !Con_OnTimeBox ? 1 : 0,
+                        })
+                    }
+                    name='Use OnTime Box'
+                />
             </div>
             <div className='col-3'>
                 <DateInput
@@ -204,7 +240,17 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3 flex align-items-center'>
-                <Checkbox inputId='buy-here-report' name='buy-here-report' checked={false} />
+                <Checkbox
+                    inputId='buy-here-report'
+                    name='buy-here-report'
+                    checked={!!Con_DontReportToCB}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Con_DontReportToCB",
+                            value: !Con_DontReportToCB ? 1 : 0,
+                        })
+                    }
+                />
                 <label htmlFor='buy-here-report' className='ml-2'>
                     Don’t report to Credit Bureau
                 </label>

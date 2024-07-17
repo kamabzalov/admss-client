@@ -15,11 +15,15 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
         dealExtData: {
             Con_Pmt_Freq,
             Con_Term,
+            Con_MoneyFactor,
             Con_Pmt_Amt,
             Con_Lease_Prop_Tax,
             Con_Total_of_Pmts,
             Con_Lease_Purch_Option,
             Con_Lease_Taxes,
+            Con_Second_Pmt_Date,
+            Con_Final_Pmt_Date,
+            Con_First_Payment_Due_on_Delivery,
             Con_Late_Fee,
             Con_Grace_Period,
             Con_Lease_Miles,
@@ -93,7 +97,14 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber min={1} className='deal-lease__text-input w-full' />
+                    <InputNumber
+                        min={1}
+                        className='deal-lease__text-input w-full'
+                        value={Con_MoneyFactor}
+                        onChange={({ value }) =>
+                            changeDealExtData({ key: "Con_MoneyFactor", value: value || 0 })
+                        }
+                    />
                     <label className='float-label'>Money Factor</label>
                 </span>
             </div>
@@ -157,17 +168,35 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <DateInput name='Second Payment Due' />
+                <DateInput
+                    name='Second Payment Due'
+                    value={String(Con_Second_Pmt_Date)}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Second_Pmt_Date", value: Number(value) })
+                    }
+                />
             </div>
             <div className='col-3'>
-                <DateInput name='Final Payment Due' />
+                <DateInput
+                    name='Final Payment Due'
+                    value={String(Con_Final_Pmt_Date)}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Final_Pmt_Date", value: Number(value) })
+                    }
+                />
             </div>
 
             <div className='col-4 flex align-items-center'>
                 <Checkbox
                     inputId='lease-first-payment'
                     name='lease-first-payment'
-                    checked={false}
+                    checked={!!Con_First_Payment_Due_on_Delivery}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Con_First_Payment_Due_on_Delivery",
+                            value: !Con_First_Payment_Due_on_Delivery ? 1 : 0,
+                        })
+                    }
                 />
                 <label htmlFor='lease-first-payment' className='ml-2'>
                     First Payment Due on Delivery
