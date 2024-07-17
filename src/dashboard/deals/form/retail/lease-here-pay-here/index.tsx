@@ -7,6 +7,7 @@ import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
 import { Checkbox } from "primereact/checkbox";
+import { LateFeeInput } from "./late-fee";
 
 export const DealLeaseHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -25,6 +26,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             Con_Final_Pmt_Date,
             Con_First_Payment_Due_on_Delivery,
             Con_Late_Fee,
+            Con_Late_Percent,
             Con_Grace_Period,
             Con_Lease_Miles,
             Con_Lease_Overage,
@@ -206,13 +208,11 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Late_Fee}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Fee", value: value || 0 })
-                    }
-                    title='Late Fee'
+                <LateFeeInput
+                    percentValue={Con_Late_Percent}
+                    currencyValue={Con_Late_Fee}
+                    percentChange={(value) => changeDealExtData({ key: "Con_Late_Percent", value })}
+                    currencyChange={(value) => changeDealExtData({ key: "Con_Late_Fee", value })}
                 />
             </div>
             <div className='col-3'>
