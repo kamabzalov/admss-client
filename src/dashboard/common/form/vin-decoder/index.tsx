@@ -8,8 +8,12 @@ interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
     buttonClassName?: string;
 }
-export const MIN_VIN_LENGTH = 7;
+export const MIN_VIN_LENGTH = 1;
 export const MAX_VIN_LENGTH = 17;
+
+const validateVin = (vin: string): boolean => {
+    return typeof vin === "string" && vin.length >= 1 && vin.length <= 17;
+};
 
 export const VINDecoder = ({
     value,
@@ -22,13 +26,12 @@ export const VINDecoder = ({
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const handleGetVinInfo = () => {
-        if (!buttonDisabled) {
-            value &&
-                inventoryDecodeVIN(value).then((response) => {
-                    if (response) {
-                        onAction(response);
-                    }
-                });
+        if (!buttonDisabled && value && validateVin(value)) {
+            inventoryDecodeVIN(value).then((response) => {
+                if (response) {
+                    onAction(response);
+                }
+            });
         }
     };
 
@@ -40,6 +43,8 @@ export const VINDecoder = ({
         if (value) {
             const valueLength = value.replaceAll(" ", "").length;
             setButtonDisabled(valueLength < MIN_VIN_LENGTH || valueLength > MAX_VIN_LENGTH);
+        } else {
+            setButtonDisabled(true);
         }
     }, [disabled, value, buttonDisabled]);
 
@@ -55,7 +60,7 @@ export const VINDecoder = ({
                 className={`vin-decoder__decode-button ${buttonClassName}`}
                 disabled={buttonDisabled || disabled}
                 type='button'
-                onClick={() => value && !buttonDisabled && handleGetVinInfo()}
+                onClick={handleGetVinInfo}
             >
                 Decode
             </Button>
