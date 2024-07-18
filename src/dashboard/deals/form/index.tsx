@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
@@ -163,10 +164,12 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     }),
 });
 
-const DEAL_TYPE_LHPH = 7;
-const DEAL_TYPE_DISMANTLE = 6;
-const DEAL_TYPE_WHOLESALE = 5;
-const DEAL_TYPE_BHPH = 0;
+enum DealType {
+    LHPH = 7,
+    DISMANTLE = 6,
+    WHOLESALE = 5,
+    BHPH = 0,
+}
 
 const DATE_NOW = new Date().toISOString();
 
@@ -220,16 +223,16 @@ export const DealsForm = observer(() => {
         let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
 
         switch (dealType) {
-            case DEAL_TYPE_LHPH:
+            case DealType.LHPH:
                 dealsSections = [...dealsSections, DealLHPH];
                 break;
-            case DEAL_TYPE_DISMANTLE:
+            case DealType.DISMANTLE:
                 dealsSections = [...dealsSections, DealDismantleForm];
                 break;
-            case DEAL_TYPE_WHOLESALE:
+            case DealType.WHOLESALE:
                 dealsSections = [...dealsSections, DealWholeSale];
                 break;
-            case DEAL_TYPE_BHPH:
+            case DealType.BHPH:
                 dealsSections = [...dealsSections, DealBHPH];
                 break;
             default:
