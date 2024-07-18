@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
@@ -9,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
-import { DealRetail } from "./retail";
+import { DealBHPH, DealDismantleForm, DealLHPH, DealRetail, DealWholeSale } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
@@ -163,6 +164,13 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     }),
 });
 
+enum DealType {
+    LHPH = 7,
+    DISMANTLE = 6,
+    WHOLESALE = 5,
+    BHPH = 0,
+}
+
 const DATE_NOW = new Date().toISOString();
 
 export const DealsForm = observer(() => {
@@ -173,7 +181,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
+    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -207,7 +215,31 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo, DealRetail];
+        id && getDeal(id);
+        return () => clearDeal();
+    }, [id]);
+
+    useEffect(() => {
+        let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
+
+        switch (dealType) {
+            case DealType.LHPH:
+                dealsSections = [...dealsSections, DealLHPH];
+                break;
+            case DealType.DISMANTLE:
+                dealsSections = [...dealsSections, DealDismantleForm];
+                break;
+            case DealType.WHOLESALE:
+                dealsSections = [...dealsSections, DealWholeSale];
+                break;
+            case DealType.BHPH:
+                dealsSections = [...dealsSections, DealBHPH];
+                break;
+            default:
+                dealsSections = [...dealsSections, DealRetail];
+                break;
+        }
+
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
         setAccordionSteps(sections.map((item) => item.startIndex));
@@ -215,12 +247,10 @@ export const DealsForm = observer(() => {
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
 
-        id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
-            clearDeal();
         };
-    }, [id]);
+    }, [dealType]);
 
     useEffect(() => {
         accordionSteps.forEach((step) => {
@@ -352,7 +382,7 @@ export const DealsForm = observer(() => {
                                                 {
                                                     contactuid: deal.contactuid || "",
                                                     inventoryuid: deal.inventoryuid || "",
-                                                    dealtype: deal.dealtype,
+                                                    dealtype: deal.dealtype || dealType,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase || DATE_NOW,
