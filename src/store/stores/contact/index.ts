@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
@@ -210,17 +210,26 @@ export class ContactStore {
         this._isLoading = true;
         try {
             if (side === DLSides.FRONT) {
-                await deleteContactFrontDL(this._contactID);
+                const response = await deleteContactFrontDL(this._contactID);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
                 this._frontSiteDLurl = "";
             }
 
             if (side === DLSides.BACK) {
-                await deleteContactBackDL(this._contactID);
+                const response = await deleteContactBackDL(this._contactID);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
                 this._backSiteDLurl = "";
             }
+
             return Status.OK;
         } catch (error) {
-            return Status.ERROR;
+            return { status: Status.ERROR, error };
         } finally {
             this._isLoading = false;
         }

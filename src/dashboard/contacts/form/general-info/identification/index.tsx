@@ -17,6 +17,9 @@ import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 const SexList = [
     {
@@ -47,6 +50,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         backSideDLurl,
         isLoading,
     } = store;
+    const toast = useToast();
     const fileUploadFrontRef = useRef<FileUpload>(null);
     const fileUploadBackRef = useRef<FileUpload>(null);
 
@@ -69,7 +73,17 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         fileUploadBackRef.current?.clear();
         store.frontSideDL = {} as File;
         store.backSideDL = {} as File;
-        removeImagesDL(side);
+        removeImagesDL(side).then((response) => {
+            if (response?.status === Status.ERROR) {
+                const { error, status } = response as BaseResponseError;
+                toast.current?.show({
+                    severity: "error",
+                    summary: status,
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
     };
 
     const itemTemplate = (image: File | string, side: DLSide) => {
