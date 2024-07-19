@@ -1,0 +1,8 @@
+.down-payment__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    width: 210px;
+    font-weight: 700;
+}

@@ -1,0 +1,79 @@
+.account-insurance__tabs .p-tabview-nav {
+    flex-direction: row;
+    flex: 0 0;
+    width: auto;
+    border: none;
+    min-height: auto;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+    text-transform: uppercase;
+    font-weight: 700;
+    gap: 10px;
+}
+
+.account-insurance__tabs .p-tabview-panels {
+    flex: 1;
+    padding-top: 0;
+}
+
+.account-insurance__tabs .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.account-insurance__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    border-radius: 0;
+    border-bottom: 2px solid var(--admss-app-primary);
+}
+
+.insurance-info {
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 20px;
+    border: 1px solid var(--admss-app-light-grey);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.insurance-info__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.insurance-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.insurance-field label {
+    flex: 1;
+    font-weight: 700;
+}
+
+.insurance-field span,
+.insurance-field input {
+    flex: 2;
+}
+
+.insurance-info__footer {
+    flex: 1 0 100%;
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.insurance-info__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    font-weight: 700;
+    width: 244px;
+}

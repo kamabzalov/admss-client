@@ -1,0 +1,8 @@
+.account-info__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    font-weight: 700;
+    width: 100%;
+}

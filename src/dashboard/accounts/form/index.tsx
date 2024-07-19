@@ -1,210 +1,93 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { Accounts, AccountsItem, AccountsSection } from "../common";
-import { useNavigate, useParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { observer } from "mobx-react-lite";
-import { GeneralInfoData } from "./general-info";
-import { Loader } from "dashboard/common/loader";
+import { ReactElement, useState } from "react";
+import "./index.css";
+import { TabPanel, TabView } from "primereact/tabview";
+import { AccountInformation } from "./information";
+import { AccountDownPayment } from "./down-payment";
+import { AccountInsurance } from "./insuranse";
+import { AccountManagement } from "./management";
+import { AccountNotes } from "./notes";
+import { AccountPaymentHistory } from "./payment-history";
+import { AccountPromiseToPay } from "./promise-to-pay";
+import { AccountSettings } from "./settings";
+import { useNavigate } from "react-router-dom";
 
-const STEP = "step";
+interface TabItem {
+    tabName: string;
+    component?: ReactElement;
+}
+const tabItems: TabItem[] = [
+    { tabName: "Account information", component: <AccountInformation /> },
+    { tabName: "Account Management", component: <AccountManagement /> },
+    { tabName: "Payment History", component: <AccountPaymentHistory /> },
+    { tabName: "Down Payment", component: <AccountDownPayment /> },
+    { tabName: "Account Settings", component: <AccountSettings /> },
+    { tabName: "Notes", component: <AccountNotes /> },
+    { tabName: "Promise To Pay", component: <AccountPromiseToPay /> },
+    { tabName: "Insurance", component: <AccountInsurance /> },
+];
 
-export const AccountsForm = observer(() => {
-    const { id } = useParams();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
-
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-    const stepsRef = useRef<HTMLDivElement>(null);
+export const AccountsForm = (): ReactElement => {
     const navigate = useNavigate();
-    const [accountsSections, setAccountsSections] = useState<AccountsSection[]>([]);
-    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
-    const [itemsMenuCount, setItemsMenuCount] = useState(0);
-
-    useEffect(() => {
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, stepsRef.current]);
-
-    const getUrl = (activeIndex: number) => {
-        const currentPath = id ? id : "create";
-        return `/dashboard/accounts/${currentPath}?step=${activeIndex + 1}`;
-    };
-
-    useEffect(() => {
-        const accountsSections: Pick<Accounts, "label" | "items">[] = [GeneralInfoData];
-        const sections = accountsSections.map((sectionData) => new AccountsSection(sectionData));
-        setAccountsSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
-        setItemsMenuCount(itemsMenuCount);
-
-        return () => {
-            sections.forEach((section) => section.clearCount());
-        };
-    }, [id]);
-
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
-            }
-        });
-    }, [stepActiveIndex]);
-
+    const [activeTab, setActiveTab] = useState<number>(0);
     return (
-        <Suspense>
-            <div className='grid relative'>
-                <Button
-                    icon='pi pi-times'
-                    className='p-button close-button'
-                    onClick={() => navigate("/dashboard/accounts")}
-                />
-                <div className='col-12'>
-                    <div className='card account'>
-                        <div className='card-header flex'>
-                            <h2 className='card-header__title uppercase m-0'>
-                                {id ? "Edit" : "Create new"} Account
-                            </h2>
+        <div className='grid relative'>
+            <Button
+                icon='pi pi-times'
+                className='p-button close-button'
+                onClick={() => navigate("/dashboard/accounts")}
+            />
+            <div className='col-12'>
+                <div className='card account'>
+                    <div className='card-header flex'>
+                        <h2 className='card-header__title uppercase m-0'>Edit account</h2>
+
+                        <div className='card-header-info'>
+                            Account Number
+                            <span className='card-header-info__data'>CLU989432</span>
+                            Status
+                            <span className='card-header-info__data uppercase'>Active</span>
+                            Overdue Status
+                            <span className='card-header-info__data'>54</span>
                         </div>
-                        <div className='card-content account__card'>
-                            <div className='grid flex-nowrap account__card-content'>
-                                <div className='p-0 card-content__wrapper' ref={stepsRef}>
-                                    <Accordion
-                                        activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
-                                        className='account__accordion'
-                                        multiple
-                                    >
-                                        {accountsSections.map((section) => (
-                                            <AccordionTab
-                                                key={section.sectionId}
-                                                header={section.label}
-                                            >
-                                                <Steps
-                                                    readOnly={false}
-                                                    activeIndex={
-                                                        stepActiveIndex - section.startIndex
-                                                    }
-                                                    onSelect={(e) => {
-                                                        setStepActiveIndex(
-                                                            e.index + section.startIndex
-                                                        );
-                                                    }}
-                                                    model={section.items.map(
-                                                        (
-                                                            { itemLabel, template }: any,
-                                                            idx: number
-                                                        ) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
-                                                                );
-                                                            },
-                                                        })
-                                                    )}
-                                                    className='vertical-step-menu'
-                                                    pt={{
-                                                        menu: { className: "flex-column w-full" },
-                                                        step: {
-                                                            className: "border-circle account-step",
-                                                        },
-                                                    }}
-                                                />
-                                            </AccordionTab>
-                                        ))}
-                                    </Accordion>
-                                </div>
-                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
-                                    <div className='flex flex-grow-1'>
-                                        {accountsSections.map((section) =>
-                                            section.items.map((item: AccountsItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block account-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='account-form__title uppercase'>
-                                                        {item.itemLabel}
-                                                    </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
-                                <Button
-                                    onClick={() => {
-                                        if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/accounts`);
-                                        }
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev - 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        });
-                                    }}
-                                    className='form-nav__button account__button'
-                                    outlined
-                                >
-                                    Back
-                                </Button>
-                                <Button
-                                    onClick={() =>
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev + 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        })
-                                    }
-                                    disabled={stepActiveIndex >= itemsMenuCount}
-                                    severity={
-                                        stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
-                                    }
-                                    className='form-nav__button account__button'
-                                    outlined
-                                >
-                                    Next
-                                </Button>
-                                <Button
-                                    onClick={() => {}}
-                                    className='form-nav__button account__button'
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </div>
+                    </div>
+                    <div className='card-content account__card grid'>
+                        <TabView
+                            className='account__tabs'
+                            activeIndex={activeTab}
+                            onTabChange={(e) => setActiveTab(e.index)}
+                        >
+                            {tabItems.map(({ tabName, component }) => {
+                                return (
+                                    <TabPanel
+                                        header={tabName}
+                                        children={component}
+                                        key={tabName}
+                                        className='account__panel'
+                                    />
+                                );
+                            })}
+                        </TabView>
+                    </div>
+                    <div className='account__footer gap-3 ml-auto mr-3'>
+                        <Button
+                            className='uppercase px-6 account__button'
+                            onClick={() => setActiveTab(activeTab - 1)}
+                            disabled={activeTab === 0}
+                        >
+                            Back
+                        </Button>
+                        <Button
+                            className='uppercase px-6 account__button'
+                            onClick={() => setActiveTab(activeTab + 1)}
+                            disabled={activeTab === tabItems.length - 1}
+                        >
+                            Next
+                        </Button>
+                        <Button className='uppercase px-6 account__button'>Update</Button>
                     </div>
                 </div>
             </div>
-        </Suspense>
+        </div>
     );
-});
+};
