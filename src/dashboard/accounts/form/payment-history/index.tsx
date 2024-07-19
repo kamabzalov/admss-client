@@ -20,8 +20,8 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 export const AccountPaymentHistory = (): ReactElement => {
     return (
         <div className='account-history'>
-            <h2 className='account-history__title'>Account Payment History</h2>
-            <div className='account-details grid'>
+            <h3 className='account-history__title account-title'>Payment History</h3>
+            <div className='grid'>
                 <div className='col-3'>
                     <Dropdown
                         className='w-full'

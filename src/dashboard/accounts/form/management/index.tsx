@@ -16,7 +16,7 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 export const AccountManagement = (): ReactElement => {
     return (
         <div className='account-management'>
-            <h2 className='account-management__title'>Account Management</h2>
+            <h3 className='account-management__title account-title'>Account Management</h3>
             <div className='account-details grid'>
                 <div className='col-3'>
                     <Dropdown

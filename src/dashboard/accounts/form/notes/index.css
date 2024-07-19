@@ -1,0 +1,35 @@
+.account-note {
+    border-radius: 5px;
+    border: 1px solid var(--admss-app-primary);
+    padding: 0;
+    overflow: hidden;
+}
+
+.account-note__input {
+    width: 100%;
+    height: 88px;
+    border: none;
+    resize: none;
+}
+
+.account-note__button.p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--admss-app-light-grey);
+    height: 31px;
+    width: 100%;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 0;
+    color: var(--admss-app-primary);
+}
+
+.account-notes__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    width: 210px;
+    font-weight: 700;
+}

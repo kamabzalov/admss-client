@@ -3,7 +3,7 @@
     border-right: 2px solid var(--admss-app-light-blue);
 }
 
-.account__tabs .p-tabview-nav {
+.account__tabs > .p-tabview-nav-container .p-tabview-nav {
     flex-direction: column;
     flex: 0 0;
     width: 294px;

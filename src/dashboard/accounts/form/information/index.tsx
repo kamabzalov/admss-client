@@ -6,7 +6,7 @@ import { Button } from "primereact/button";
 export const AccountInformation = (): ReactElement => {
     return (
         <div className='account-info'>
-            <h2>Account Information</h2>
+            <h3 className='account-info__title account-title'>Account Information</h3>
             <div className='account-details grid'>
                 <div className='col-6'>
                     <InfoSection
