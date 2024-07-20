@@ -137,9 +137,14 @@ export const BorderedCheckbox = ({
             }}
             className='p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox'
         >
-            <label>{name}</label>
+            <label
+                className={`cursor-pointer ${props.disabled ? "p-disabled" : ""}`}
+                htmlFor={name}
+            >
+                {name}
+            </label>
             <span className='p-inputgroup-addon'>
-                <Checkbox {...props} />
+                <Checkbox inputId={name} {...props} />
             </span>
         </div>
     );

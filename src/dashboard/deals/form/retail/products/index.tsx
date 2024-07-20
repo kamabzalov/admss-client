@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
@@ -6,6 +7,12 @@ import { Dropdown } from "primereact/dropdown";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
+import { TERM_MONTH_LIST } from "common/constants/contract-options";
+
+enum WarrantyTerm {
+    MILES = "Miles",
+    MONTH = "Month",
+}
 
 export const DealRetailProducts = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -65,7 +72,7 @@ export const DealRetailProducts = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         filter
-                        options={["Month", "Miles"]}
+                        options={[WarrantyTerm.MONTH, WarrantyTerm.MILES]}
                         value={Warranty_Miles}
                         onChange={({ value }) =>
                             changeDealExtData({ key: "Warranty_Miles", value })
@@ -75,18 +82,23 @@ export const DealRetailProducts = observer((): ReactElement => {
                     <label className='float-label'>Term (month or miles)</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        editable
-                        value={Warranty_Term}
-                        onChange={({ value }) => changeDealExtData({ key: "Warranty_Term", value })}
-                        filter
-                        className='w-full deal-products__dropdown'
-                    />
-                    <label className='float-label'>Duration</label>
-                </span>
-            </div>
+            {Warranty_Miles === WarrantyTerm.MONTH && (
+                <div className='col-3'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            editable
+                            options={TERM_MONTH_LIST}
+                            value={Warranty_Term}
+                            onChange={({ value }) =>
+                                changeDealExtData({ key: "Warranty_Term", value })
+                            }
+                            filter
+                            className='w-full deal-products__dropdown'
+                        />
+                        <label className='float-label'>Duration</label>
+                    </span>
+                </div>
+            )}
 
             <div className='col-12'>
                 <span className='p-float-label'>

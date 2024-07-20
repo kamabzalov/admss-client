@@ -77,8 +77,8 @@ export const DealBHPH: Pick<Deals, "label" | "items"> = {
 export const DealDismantleForm: Pick<Deals, "label" | "items"> = {
     label: "Dismantle",
     items: [
-        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
         { itemLabel: AccordionDealItems.DISMANTLE, component: <DealDismantle /> },
+        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
     ],
 };
 

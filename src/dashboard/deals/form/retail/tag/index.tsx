@@ -52,7 +52,9 @@ export const DealRetailTag = observer((): ReactElement => {
                             changeDealExtData({ key: "Title_and_License", value: 1 });
                         }
                     }}
-                    initialValue={Title_Only === 1 ? "0" : "1"}
+                    initialValue={
+                        !Title_Only && !Title_and_License ? undefined : Title_Only === 1 ? "0" : "1"
+                    }
                     style={{ width: `${95 / tagTopRadio.length}%` }}
                 />
             </div>

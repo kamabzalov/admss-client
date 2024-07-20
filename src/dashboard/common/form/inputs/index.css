@@ -122,6 +122,10 @@
     box-shadow: none;
 }
 
+.bordered-checkbox .p-disabled {
+    color: var(--admss-app-medium-grey);
+}
+
 .search-input__wrapper,
 .search-input__wrapper .p-dropdown.p-inputwrapper,
 .search-input__wrapper .p-inputtext {
