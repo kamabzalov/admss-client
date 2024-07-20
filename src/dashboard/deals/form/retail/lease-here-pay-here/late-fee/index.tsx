@@ -25,7 +25,7 @@ export const LateFeeInput = ({
     currencyChange,
     ...props
 }: LateFeeInputProps): ReactElement => {
-    const [activeValue, setActiveValue] = useState<ActiveValue>(LateFeeType.PERCENT);
+    const [activeValue, setActiveValue] = useState<ActiveValue | null>(null);
 
     return (
         <div className={"flex align-items-center justify-content-between late-fee relative"}>
