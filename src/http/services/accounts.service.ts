@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { AccountPayment } from "common/models/accounts";
+import { AccountHistory, AccountInfo, AccountNote, AccountPayment } from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { InventoryExtData } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
@@ -83,7 +83,7 @@ export const setAccountPayment = async (
 
 export const getAccountInfo = async (itemid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountInfo>(
             `accounts/${itemid}/info`
         );
         return request.data;
@@ -179,7 +179,7 @@ export const getAccountNotes = async (accountuid: string) => {
 
 export const listAccountHistory = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountHistory[]>(
             `accounts/${accountuid}/listhistory`
         );
         return request.data;
@@ -227,7 +227,7 @@ export const listAccountPayments = async (accountuid: string) => {
 
 export const listAccountNotes = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountNote[]>(
             `accounts/${accountuid}/listnotes`
         );
         return request.data;
