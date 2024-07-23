@@ -68,35 +68,41 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (side: DLSide) => {
-        fileUploadFrontRef.current?.clear();
-        fileUploadBackRef.current?.clear();
-        store.frontSideDL = {} as File;
-        store.backSideDL = {} as File;
-        removeImagesDL(side).then((response) => {
-            if (response?.status === Status.ERROR) {
-                const { error, status } = response as BaseResponseError;
-                toast.current?.show({
-                    severity: "error",
-                    summary: status,
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-        });
+    const handleDeleteImage = (side: DLSide, withRequest?: boolean) => {
+        if (side === DLSides.FRONT) {
+            fileUploadFrontRef.current?.clear();
+            store.frontSideDL = {} as File;
+        }
+        if (side === DLSides.BACK) {
+            fileUploadBackRef.current?.clear();
+            store.backSideDL = {} as File;
+        }
+        if (withRequest) {
+            removeImagesDL(side).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    toast.current?.show({
+                        severity: "error",
+                        summary: status,
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+        }
     };
 
     const itemTemplate = (image: File | string, side: DLSide) => {
-        const isString = typeof image === "string";
-        const alt = isString ? "driven license" : image?.name;
-        const src = isString ? image : URL.createObjectURL(image);
+        const isFilePath = typeof image === "string";
+        const alt = isFilePath ? "driven license" : image?.name;
+        const src = isFilePath ? image : URL.createObjectURL(image);
         return (
             <div className='flex align-items-center dl-presentation relative'>
                 <img alt={alt} src={src} role='presentation' className='dl-presentation__image' />
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={() => isString && handleDeleteImage(side)}
+                    onClick={() => handleDeleteImage(side, isFilePath)}
                     className='p-button dl-presentation__remove-button'
                 />
             </div>
