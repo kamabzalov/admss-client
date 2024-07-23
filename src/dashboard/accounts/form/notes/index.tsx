@@ -1,18 +1,36 @@
 import { InputTextarea } from "primereact/inputtextarea";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import "./index.css";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
+import { listAccountNotes } from "http/services/accounts.service";
+import { useParams } from "react-router-dom";
+import { AccountNote } from "common/models/accounts";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "date", header: "Date" },
-    { field: "note_taker", header: "Note Taker" },
-    { field: "type", header: "Contact Type" },
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountNote;
+}
+
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "Date", header: "Date" },
+    { field: "NoteBy", header: "Note Taker" },
+    { field: "ContactMethod", header: "Contact Type" },
 ];
 
 export const AccountNotes = (): ReactElement => {
+    const { id } = useParams();
+    const [notesList, setNotesList] = useState<AccountNote[]>([]);
+
+    useEffect(() => {
+        if (id) {
+            listAccountNotes(id).then((res) => {
+                if (Array.isArray(res) && res.length) setNotesList(res);
+            });
+        }
+    }, [id]);
+
     return (
         <div className='account-notes'>
             <h3 className='account-notes__title account-title'>Notes</h3>
@@ -48,8 +66,9 @@ export const AccountNotes = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
-                        className='mt-6 account-management__table'
-                        value={[]}
+                        showGridlines
+                        className='mt-6 account-notes__table'
+                        value={notesList}
                         emptyMessage='No notes added yet.'
                         reorderableColumns
                         resizableColumns
@@ -62,8 +81,14 @@ export const AccountNotes = (): ReactElement => {
                             body={(options, { rowIndex }) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
-                                        <Button className='text' icon='icon adms-edit-item' />
-                                        <Button className='text' icon='pi pi-angle-down' />
+                                        <Button
+                                            className='text account-notes__table-button'
+                                            icon='icon adms-edit-item'
+                                        />
+                                        <Button
+                                            className='text account-notes__table-button'
+                                            icon='pi pi-angle-down'
+                                        />
                                     </div>
                                 );
                             }}

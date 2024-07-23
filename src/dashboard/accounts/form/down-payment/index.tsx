@@ -3,10 +3,16 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { listAccountPayments } from "http/services/accounts.service";
+import { useParams } from "react-router-dom";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+interface TableColumnProps extends ColumnProps {
+    field: any;
+}
+
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "receiptNo", header: "Receipt#" },
     { field: "date", header: "Date" },
     { field: "amount", header: "Amount" },
@@ -14,6 +20,17 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 ];
 
 export const AccountDownPayment = (): ReactElement => {
+    const { id } = useParams();
+    const [paymentList, setPaymentList] = useState<any>([]);
+
+    useEffect(() => {
+        if (id) {
+            listAccountPayments(id).then((res) => {
+                if (Array.isArray(res) && res.length) setPaymentList(res);
+            });
+        }
+    }, [id]);
+
     return (
         <div className='down-payment'>
             <h3 className='down-payment__title account-title'>Down Payment</h3>
@@ -43,8 +60,9 @@ export const AccountDownPayment = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 down-payment__table'
-                        value={[]}
+                        value={paymentList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
                         resizableColumns

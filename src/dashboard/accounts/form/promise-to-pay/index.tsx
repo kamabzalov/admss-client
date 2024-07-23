@@ -29,6 +29,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 account-promise__table'
                         value={[]}
                         emptyMessage='No activity yet.'

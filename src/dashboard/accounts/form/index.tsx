@@ -1,5 +1,5 @@
 import { Button } from "primereact/button";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountInformation } from "./information";
@@ -10,7 +10,9 @@ import { AccountNotes } from "./notes";
 import { AccountPaymentHistory } from "./payment-history";
 import { AccountPromiseToPay } from "./promise-to-pay";
 import { AccountSettings } from "./settings";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
 interface TabItem {
     tabName: string;
@@ -27,9 +29,19 @@ const tabItems: TabItem[] = [
     { tabName: "Insurance", component: <AccountInsurance /> },
 ];
 
-export const AccountsForm = (): ReactElement => {
+export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const store = useStore().accountStore;
+    const {
+        getAccount,
+        account: { accountnumber, accountstatus },
+    } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
+    useEffect(() => {
+        id && getAccount(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
     return (
         <div className='grid relative'>
             <Button
@@ -41,15 +53,18 @@ export const AccountsForm = (): ReactElement => {
                 <div className='card account'>
                     <div className='card-header flex'>
                         <h2 className='card-header__title uppercase m-0'>Edit account</h2>
-
-                        <div className='card-header-info'>
-                            Account Number
-                            <span className='card-header-info__data'>CLU989432</span>
-                            Status
-                            <span className='card-header-info__data uppercase'>Active</span>
-                            Overdue Status
-                            <span className='card-header-info__data'>54</span>
-                        </div>
+                        {id && (
+                            <div className='card-header-info'>
+                                Account Number
+                                <span className='card-header-info__data'>{accountnumber}</span>
+                                Status
+                                <span className='card-header-info__data uppercase'>
+                                    {accountstatus}
+                                </span>
+                                Overdue Status
+                                <span className='card-header-info__data'>54</span>
+                            </div>
+                        )}
                     </div>
                     <div className='card-content account__card grid'>
                         <TabView
@@ -90,4 +105,4 @@ export const AccountsForm = (): ReactElement => {
             </div>
         </div>
     );
-};
+});

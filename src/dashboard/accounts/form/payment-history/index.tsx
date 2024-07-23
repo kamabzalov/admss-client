@@ -3,21 +3,39 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { useParams } from "react-router-dom";
+import { listAccountHistory } from "http/services/accounts.service";
+import { AccountHistory } from "common/models/accounts";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "status", header: "Status" },
-    { field: "receiptNo", header: "Receipt#" },
-    { field: "type", header: "Type" },
-    { field: "date", header: "Date" },
-    { field: "days_late", header: "Days Late" },
-    { field: "method", header: "Method" },
-    { field: "bal_increase", header: "Bal.Increase" },
-    { field: "payment", header: "Payment" },
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountHistory | "";
+}
+
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "", header: "Status" },
+    { field: "RECEIPT_NUM", header: "Receipt#" },
+    { field: "Type", header: "Type" },
+    { field: "Pmt_Date", header: "Date" },
+    { field: "Late_Date", header: "Days Late" },
+    { field: "", header: "Method" },
+    { field: "Balance", header: "Bal.Increase" },
+    { field: "", header: "Payment" },
 ];
 
 export const AccountPaymentHistory = (): ReactElement => {
+    const { id } = useParams();
+    const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
+
+    useEffect(() => {
+        if (id) {
+            listAccountHistory(id).then((res) => {
+                if (Array.isArray(res) && res.length) setHistoryList(res);
+            });
+        }
+    }, [id]);
+
     return (
         <div className='account-history'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -34,8 +52,9 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 account-history__table'
-                        value={[]}
+                        value={historyList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
                         resizableColumns

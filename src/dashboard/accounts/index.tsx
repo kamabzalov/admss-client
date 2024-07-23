@@ -9,7 +9,7 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
-import { getAccountsList } from "http/services/accounts.service";
+import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
@@ -100,7 +100,10 @@ export default function Accounts() {
         if (authUser) {
             setUser(authUser);
             getAccountsList(authUser.useruid, { total: 1 }).then((response) => {
-                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+                if (response && !Array.isArray(response)) {
+                    const { total } = response as TotalAccountList;
+                    setTotalRecords(total ?? 0);
+                }
             });
         }
     }, []);
@@ -178,7 +181,7 @@ export default function Accounts() {
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
-                                {!accounts.length || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>
