@@ -181,7 +181,7 @@ export default function Accounts() {
                         </div>
                         <div className='grid'>
                             <div className='col-12'>
-                                {!accounts.length || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>

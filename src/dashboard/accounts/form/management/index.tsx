@@ -3,8 +3,10 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { useParams } from "react-router-dom";
+import { listAccountActivity } from "http/services/accounts.service";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "date", header: "Date" },
@@ -14,6 +16,16 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 ];
 
 export const AccountManagement = (): ReactElement => {
+    const { id } = useParams();
+    const [activityList, setActivityList] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (id) {
+            listAccountActivity(id).then((res) => {
+                if (Array.isArray(res) && res.length) setActivityList(res);
+            });
+        }
+    }, [id]);
     return (
         <div className='account-management'>
             <h3 className='account-management__title account-title'>Account Management</h3>
@@ -32,7 +44,7 @@ export const AccountManagement = (): ReactElement => {
                 <div className='col-12'>
                     <DataTable
                         className='mt-6 account-management__table'
-                        value={[]}
+                        value={activityList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
                         resizableColumns
