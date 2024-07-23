@@ -33,3 +33,19 @@
     width: 210px;
     font-weight: 700;
 }
+
+.account-notes__table-button.p-button {
+    color: var(--admss-app-primary-main-green);
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border: none;
+}
+.account-notes__table-button.p-button:last-child {
+    color: var(--admss-app-primary);
+}
+
+.account-notes__table-button.p-button:hover {
+    color: var(--admss-app-primary-main-green);
+    background: transparent;
+}

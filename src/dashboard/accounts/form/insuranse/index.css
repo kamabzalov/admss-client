@@ -8,6 +8,7 @@
     text-transform: uppercase;
     font-weight: 700;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
 .account-insurance__tabs .p-tabview-panels {

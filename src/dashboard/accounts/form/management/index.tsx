@@ -43,6 +43,7 @@ export const AccountManagement = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 account-management__table'
                         value={activityList}
                         emptyMessage='No activity yet.'

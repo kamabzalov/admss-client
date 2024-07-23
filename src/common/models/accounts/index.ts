@@ -1,3 +1,5 @@
+import { Status } from "../base-response";
+
 export interface Account {
     accountnumber: string;
     accountstatus: string;
@@ -358,4 +360,23 @@ export interface AccountNote {
     itemuid: string;
     updated: number;
     useruid: string;
+}
+
+export interface AccountInsurance {
+    status: Status;
+    error: string;
+    info: string;
+    message: string;
+    itemuid: string;
+    Insurance_Eff_Date: string;
+    Insurance_Exp_Date: string;
+    Insurance_Updated: string;
+    Insurance_userUID: string;
+    Insurance_Company: string;
+    Insurance_Co_Num: string;
+    Insurance_Policy_Number: string;
+    Insurance_Notes: string;
+    Insurance_Agent_Name: string;
+    Insurance_Agent_Address: string;
+    Insurance_Agent_Phone_No: string;
 }

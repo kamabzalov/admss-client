@@ -60,6 +60,7 @@ export const AccountDownPayment = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 down-payment__table'
                         value={paymentList}
                         emptyMessage='No activity yet.'

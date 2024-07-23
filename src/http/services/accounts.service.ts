@@ -1,5 +1,12 @@
+
 import { isAxiosError } from "axios";
-import { AccountHistory, AccountInfo, AccountNote, AccountPayment } from "common/models/accounts";
+import {
+    AccountHistory,
+    AccountInfo,
+    AccountInsurance,
+    AccountNote,
+    AccountPayment,
+} from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { InventoryExtData } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
@@ -307,7 +314,7 @@ export const getLockState = async (accountuid: string) => {
 
 export const listInsuranceHistory = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountInsurance[]>(
             `accounts/${accountuid}/listinsurancehistory`
         );
         return request.data;
@@ -323,7 +330,7 @@ export const listInsuranceHistory = async (accountuid: string) => {
 
 export const getInsuranceHistory = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountInsurance>(
             `accounts/${accountuid}/insurance`
         );
         return request.data;

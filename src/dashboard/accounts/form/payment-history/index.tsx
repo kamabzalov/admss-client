@@ -52,6 +52,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
+                        showGridlines
                         className='mt-6 account-history__table'
                         value={historyList}
                         emptyMessage='No activity yet.'

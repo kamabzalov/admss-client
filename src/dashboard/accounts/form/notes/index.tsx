@@ -66,7 +66,8 @@ export const AccountNotes = (): ReactElement => {
                 </div>
                 <div className='col-12'>
                     <DataTable
-                        className='mt-6 account-management__table'
+                        showGridlines
+                        className='mt-6 account-notes__table'
                         value={notesList}
                         emptyMessage='No notes added yet.'
                         reorderableColumns
@@ -80,8 +81,14 @@ export const AccountNotes = (): ReactElement => {
                             body={(options, { rowIndex }) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
-                                        <Button className='text' icon='icon adms-edit-item' />
-                                        <Button className='text' icon='pi pi-angle-down' />
+                                        <Button
+                                            className='text account-notes__table-button'
+                                            icon='icon adms-edit-item'
+                                        />
+                                        <Button
+                                            className='text account-notes__table-button'
+                                            icon='pi pi-angle-down'
+                                        />
                                     </div>
                                 );
                             }}
