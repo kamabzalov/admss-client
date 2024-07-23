@@ -72,11 +72,11 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         if (side === DLSides.FRONT) {
             fileUploadFrontRef.current?.clear();
             store.frontSideDL = {} as File;
-        }
-        if (side === DLSides.BACK) {
+        } else {
             fileUploadBackRef.current?.clear();
             store.backSideDL = {} as File;
         }
+
         if (withRequest) {
             removeImagesDL(side).then((response) => {
                 if (response?.status === Status.ERROR) {
