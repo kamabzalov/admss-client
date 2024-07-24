@@ -237,7 +237,7 @@ export interface AccountExtData {
     Term: number;
     Termination_Fees: number;
     Title_Num: string;
-    Title_Received: number;
+    Title_Received: 0 | 1;
     Total_Paid: number;
     Update_Periods: number;
     UseQF: number;
@@ -375,6 +375,7 @@ export interface AccountInsurance {
     Insurance_Company: string;
     Insurance_Co_Num: string;
     Insurance_Policy_Number: string;
+    Insurance_Policy_Received: 0 | 1;
     Insurance_Notes: string;
     Insurance_Agent_Name: string;
     Insurance_Agent_Address: string;

@@ -4,7 +4,7 @@ import { Status } from "common/models/base-response";
 import { AccountInfo, AccountExtData } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
-import { getAccountInfo } from "http/services/accounts.service";
+import { createOrUpdateAccount, getAccountInfo } from "http/services/accounts.service";
 
 export class AccountStore {
     public rootStore: RootStore;
@@ -61,6 +61,11 @@ export class AccountStore {
     public saveAccount = action(async (): Promise<string | undefined> => {
         try {
             this._isLoading = true;
+
+            createOrUpdateAccount(this._accountID, {
+                ...this._account,
+                extdata: this._accountExtData,
+            });
 
             return Status.ERROR;
         } catch (error) {
