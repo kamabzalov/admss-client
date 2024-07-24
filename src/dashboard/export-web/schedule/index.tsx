@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import {
     DataTable,
@@ -8,9 +9,14 @@ import {
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
-import { ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import { store } from "store";
-import { getExportScheduleList } from "http/services/export-to-web.service";
+import {
+    exportTaskScheduleContinue,
+    exportTaskScheduleDelete,
+    exportTaskSchedulePause,
+    getExportScheduleList,
+} from "http/services/export-to-web.service";
 import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
@@ -20,6 +26,7 @@ import { QueryParams } from "common/models/query-params";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -37,6 +44,12 @@ const scheduleColumns: ScheduleColumnsList[] = [
     { field: "nextrun", header: "Next Run", checked: true },
 ];
 
+enum ExportWebScheduleAction {
+    PAUSE = "pause",
+    CONTINUE = "continue",
+    DELETE = "delete",
+}
+
 export const ExportSchedule = (): ReactElement => {
     const userStore = store.userStore;
     const { authUser } = userStore;
@@ -47,6 +60,7 @@ export const ExportSchedule = (): ReactElement => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+    const toast = useToast();
 
     const handleGetExportScheduleList = async (params: QueryParams) => {
         if (!authUser) return;
@@ -223,6 +237,35 @@ export const ExportSchedule = (): ReactElement => {
         setActiveScheduleColumns(sortedValue);
     };
 
+    const handleTaskAction = (taskuid: string, action: ExportWebScheduleAction) => {
+        let actionPromise;
+
+        switch (action) {
+            case ExportWebScheduleAction.PAUSE:
+                actionPromise = exportTaskSchedulePause(taskuid);
+                break;
+            case ExportWebScheduleAction.CONTINUE:
+                actionPromise = exportTaskScheduleContinue(taskuid);
+                break;
+            case ExportWebScheduleAction.DELETE:
+                actionPromise = exportTaskScheduleDelete(taskuid);
+                break;
+            default:
+                throw new Error(`Unknown action: ${action}`);
+        }
+
+        actionPromise.then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response?.error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
+    };
+
     return (
         <div className='card-content schedule'>
             <div className='grid datatable-controls'>
@@ -313,7 +356,7 @@ export const ExportSchedule = (): ReactElement => {
                                 bodyStyle={{ textAlign: "center" }}
                                 reorderable={false}
                                 resizeable={false}
-                                body={() => {
+                                body={({ taskuid }: ExportWebScheduleList) => {
                                     return (
                                         <div className='schedule-control'>
                                             <Button
@@ -321,18 +364,36 @@ export const ExportSchedule = (): ReactElement => {
                                                 tooltip='Pause'
                                                 className='text schedule-button'
                                                 icon='icon adms-pause'
+                                                onClick={() =>
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.PAUSE
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 outlined
                                                 tooltip='Play'
                                                 className='text schedule-button'
                                                 icon='icon adms-play-prev'
+                                                onClick={() =>
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.CONTINUE
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 outlined
                                                 tooltip='Delete'
                                                 className='text schedule-button'
                                                 icon='icon adms-trash-can'
+                                                onClick={() =>
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.DELETE
+                                                    )
+                                                }
                                             />
                                         </div>
                                     );

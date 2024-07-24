@@ -13,7 +13,12 @@
   font-size: 14px;
 }
 
+.schedule-button.p-button.p-button-icon-only.p-button-outlined:enabled:active {
+  color: var(--admss-app-white);
+  background: var(--admss-app-primary-main-green);
+  border-color: var(--admss-app-primary-main-green);
+}
+
 .schedule .p-datatable .p-datatable-tbody > tr {
   height: 40px;
 }
-
