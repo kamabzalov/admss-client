@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import {
     DataTable,
@@ -42,6 +43,12 @@ const scheduleColumns: ScheduleColumnsList[] = [
     { field: "lasttrun", header: "Last Run", checked: true },
     { field: "nextrun", header: "Next Run", checked: true },
 ];
+
+enum ExportWebScheduleAction {
+    PAUSE = "pause",
+    CONTINUE = "continue",
+    DELETE = "delete",
+}
 
 export const ExportSchedule = (): ReactElement => {
     const userStore = store.userStore;
@@ -230,17 +237,17 @@ export const ExportSchedule = (): ReactElement => {
         setActiveScheduleColumns(sortedValue);
     };
 
-    const handleTaskAction = (taskuid: string, action: "pause" | "continue" | "delete") => {
+    const handleTaskAction = (taskuid: string, action: ExportWebScheduleAction) => {
         let actionPromise;
 
         switch (action) {
-            case "pause":
+            case ExportWebScheduleAction.PAUSE:
                 actionPromise = exportTaskSchedulePause(taskuid);
                 break;
-            case "continue":
+            case ExportWebScheduleAction.CONTINUE:
                 actionPromise = exportTaskScheduleContinue(taskuid);
                 break;
-            case "delete":
+            case ExportWebScheduleAction.DELETE:
                 actionPromise = exportTaskScheduleDelete(taskuid);
                 break;
             default:
@@ -357,7 +364,12 @@ export const ExportSchedule = (): ReactElement => {
                                                 tooltip='Pause'
                                                 className='text schedule-button'
                                                 icon='icon adms-pause'
-                                                onClick={() => handleTaskAction(taskuid, "pause")}
+                                                onClick={() =>
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.PAUSE
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 outlined
@@ -365,7 +377,10 @@ export const ExportSchedule = (): ReactElement => {
                                                 className='text schedule-button'
                                                 icon='icon adms-play-prev'
                                                 onClick={() =>
-                                                    handleTaskAction(taskuid, "continue")
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.CONTINUE
+                                                    )
                                                 }
                                             />
                                             <Button
@@ -373,7 +388,12 @@ export const ExportSchedule = (): ReactElement => {
                                                 tooltip='Delete'
                                                 className='text schedule-button'
                                                 icon='icon adms-trash-can'
-                                                onClick={() => handleTaskAction(taskuid, "delete")}
+                                                onClick={() =>
+                                                    handleTaskAction(
+                                                        taskuid,
+                                                        ExportWebScheduleAction.DELETE
+                                                    )
+                                                }
                                             />
                                         </div>
                                     );
