@@ -37,15 +37,15 @@ export const AccountDownPayment = (): ReactElement => {
             <div className='down-payment__header grid'>
                 <div className='col-4'>
                     <span className='font-bold'>Contact Cash Down: </span>
-                    <span>$0.00</span>
+                    <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
                     <span className='font-bold'>Cash Down Payment: </span>
-                    <span>$0.00</span>
+                    <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
                     <span className='font-bold'>Cash Dow Balance: </span>
-                    <span>$0.00</span>
+                    <span>$ 0.00</span>
                 </div>
             </div>
 
