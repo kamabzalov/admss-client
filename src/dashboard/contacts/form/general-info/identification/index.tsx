@@ -124,7 +124,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
         return (
             <div
-                className={`col-6 ml-auto flex justify-content-center flex-wrap mb-3 dl-header ${
+                className={`col-6 flex justify-content-center m-auto flex-wrap mb-3 dl-header ${
                     size ? "dl-header__active" : ""
                 }`}
             >
@@ -135,7 +135,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     const emptyTemplate = () => {
         return (
-            <div className='grid col-6 ml-auto'>
+            <div className='grid col-6 m-auto'>
                 <div className='flex align-items-center flex-column col-12'>
                     <i className='pi pi-cloud-upload dl__upload-icon' />
                     <span className='text-center dl__upload-icon-label'>
