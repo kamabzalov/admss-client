@@ -29,27 +29,24 @@ export const AccountManagement = (): ReactElement => {
         }
     }, [id]);
     return (
-        <div className='account-management'>
+        <div className='account-management account-card'>
             <h3 className='account-management__title account-title'>Account Management</h3>
-            <div className='account-details grid'>
-                <div className='col-3'>
+            <div className='grid account__body'>
+                <div className='col-12 account__control'>
                     <Dropdown
-                        className='w-full'
+                        className='account__dropdown'
                         options={ACCOUNT_ACTIVITY_LIST}
                         value={selectedActivity}
                         onChange={({ target: { value } }) => setSelectedActivity(value)}
                         optionValue='name'
                         optionLabel='name'
                     />
-                </div>
-                <div className='col-9 flex gap-3 justify-content-end'>
-                    <Button className='account-management__button' label='Take Payment' />
+                    <Button className='account-management__button ml-auto' label='Take Payment' />
                     <Button className='account-management__button' label='Add Fee' />
                 </div>
-                <div className='col-12'>
+                <div className='col-12 account__table'>
                     <DataTable
                         showGridlines
-                        className='mt-6 account-management__table'
                         value={activityList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
@@ -85,10 +82,12 @@ export const AccountManagement = (): ReactElement => {
                         ))}
                     </DataTable>
                 </div>
-            </div>
-            <div className='col-12 flex gap-3'>
-                <Button className='account-management__button'>Print</Button>
-                <Button className='account-management__button'>Download</Button>
+                {!!activityList.length && (
+                    <div className='col-12 flex gap-3 align-items-end justify-content-start account-management__actions'>
+                        <Button className='account-management__button'>Print</Button>
+                        <Button className='account-management__button'>Download</Button>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -1,5 +1,6 @@
 .account-note {
     border-radius: 5px;
+    flex: 1 1 50%;
     border: 1px solid var(--admss-app-primary);
     padding: 0;
     overflow: hidden;

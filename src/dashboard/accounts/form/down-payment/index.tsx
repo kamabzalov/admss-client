@@ -32,7 +32,7 @@ export const AccountDownPayment = (): ReactElement => {
     }, [id]);
 
     return (
-        <div className='down-payment'>
+        <div className='down-payment account-card'>
             <h3 className='down-payment__title account-title'>Down Payment</h3>
             <div className='down-payment__header grid'>
                 <div className='col-4'>
@@ -49,19 +49,19 @@ export const AccountDownPayment = (): ReactElement => {
                 </div>
             </div>
 
-            <div className='splitter my-4'>
+            <div className='splitter my-5'>
                 <h3 className='splitter__title m-0 pr-3'>Scheduled down payments</h3>
                 <hr className='splitter__line flex-1' />
             </div>
 
-            <div className='grid'>
+            <div className='grid account__body'>
                 <div className='col-3 ml-auto'>
                     <Dropdown className='w-full' options={["Take Payment"]} value='Take Payment' />
                 </div>
                 <div className='col-12'>
                     <DataTable
                         showGridlines
-                        className='mt-6 down-payment__table'
+                        className='account__table'
                         value={paymentList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
@@ -97,10 +97,12 @@ export const AccountDownPayment = (): ReactElement => {
                         ))}
                     </DataTable>
                 </div>
-            </div>
-            <div className='col-12 flex gap-3'>
-                <Button className='down-payment__button'>Print</Button>
-                <Button className='down-payment__button'>Download</Button>
+                {!!paymentList.length && (
+                    <div className='col-12 flex gap-3 align-items-end justify-content-start'>
+                        <Button className='down-payment__button'>Print</Button>
+                        <Button className='down-payment__button'>Download</Button>
+                    </div>
+                )}
             </div>
         </div>
     );

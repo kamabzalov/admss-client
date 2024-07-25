@@ -32,10 +32,10 @@ export const AccountNotes = (): ReactElement => {
     }, [id]);
 
     return (
-        <div className='account-notes'>
+        <div className='account-notes account-card'>
             <h3 className='account-notes__title account-title'>Notes</h3>
-            <div className='grid'>
-                <div className='col-6'>
+            <div className='grid account__body'>
+                <div className='col-12 account__control'>
                     <div className='account-note'>
                         <span className='p-float-label'>
                             <InputTextarea id='account-memo' className='account-note__input' />
@@ -47,8 +47,6 @@ export const AccountNotes = (): ReactElement => {
                             label='Save'
                         />
                     </div>
-                </div>
-                <div className='col-6'>
                     <div className='account-note'>
                         <span className='p-float-label'>
                             <InputTextarea id='account-payment' className='account-note__input' />
@@ -61,13 +59,12 @@ export const AccountNotes = (): ReactElement => {
                         />
                     </div>
                 </div>
-                <div className='col-12 flex justify-content-end'>
+                <div className='col-12 mt-5 flex justify-content-end'>
                     <Button className='account-notes__button'>Add Note</Button>
                 </div>
-                <div className='col-12'>
+                <div className='col-12 account__table'>
                     <DataTable
                         showGridlines
-                        className='mt-6 account-notes__table'
                         value={notesList}
                         emptyMessage='No notes added yet.'
                         reorderableColumns
@@ -112,10 +109,12 @@ export const AccountNotes = (): ReactElement => {
                         ))}
                     </DataTable>
                 </div>
-                <div className='col-12 flex gap-3'>
-                    <Button className='account-notes__button'>Print</Button>
-                    <Button className='account-notes__button'>Download</Button>
-                </div>
+                {!!notesList.length && (
+                    <div className='col-12 flex gap-3'>
+                        <Button className='account-notes__button'>Print</Button>
+                        <Button className='account-notes__button'>Download</Button>
+                    </div>
+                )}
             </div>
         </div>
     );
