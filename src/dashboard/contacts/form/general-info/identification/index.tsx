@@ -59,6 +59,17 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contact]);
 
+    useEffect(() => {
+        if (frontSideDL.size) {
+            store.frontSideDLurl = URL.createObjectURL(frontSideDL);
+        }
+
+        if (backSideDL.size) {
+            store.backSideDLurl = URL.createObjectURL(backSideDL);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
         if (side === DLSides.FRONT) {
             store.frontSideDL = e.files[0];

@@ -198,6 +198,14 @@ export class ContactStore {
         this._backSiteDL = file;
     }
 
+    public set frontSideDLurl(url: string) {
+        this._frontSiteDLurl = url;
+    }
+
+    public set backSideDLurl(url: string) {
+        this._backSiteDLurl = url;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
