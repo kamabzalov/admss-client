@@ -12,9 +12,24 @@
     padding-bottom: 10px;
 }
 
+.info-section__details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 20px;
+    row-gap: 0.3rem;
+}
+
+.info-section__detail {
+    display: contents;
+}
+
 .info-section__detail-title {
     font-weight: 600;
+    padding-right: 10px;
+    grid-column: 1;
 }
-.info-section__detail {
-    padding: 5px 0;
+
+.info-section__detail-value {
+    grid-column: 2;
+    text-align: left;
 }

@@ -50,3 +50,36 @@
     font-weight: 700;
     width: 200px;
 }
+
+.account__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    width: 210px;
+    font-weight: 700;
+}
+
+.account-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.account__body {
+    height: 100%;
+    flex-direction: column;
+}
+
+.account__table {
+    flex-grow: 1;
+}
+
+.account__control {
+    display: flex;
+    gap: 25px;
+}
+
+.account__dropdown {
+    flex: 0 0 245px;
+}

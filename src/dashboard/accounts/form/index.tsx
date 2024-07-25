@@ -71,6 +71,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='account__tabs'
                             activeIndex={activeTab}
                             onTabChange={(e) => setActiveTab(e.index)}
+                            panelContainerClassName='card-content__wrapper'
                         >
                             {tabItems.map(({ tabName, component }) => {
                                 return (
@@ -78,7 +79,7 @@ export const AccountsForm = observer((): ReactElement => {
                                         header={tabName}
                                         children={component}
                                         key={tabName}
-                                        className='account__panel'
+                                        className='account__panel h-full'
                                     />
                                 );
                             })}

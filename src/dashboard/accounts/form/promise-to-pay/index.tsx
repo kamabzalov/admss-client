@@ -3,7 +3,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import "./index.css";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
@@ -13,25 +13,28 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 ];
 
 export const AccountPromiseToPay = (): ReactElement => {
+    const [promiseList] = useState<any>([]);
     return (
-        <div className='account-promise'>
+        <div className='account-promise account-card'>
             <h3 className='account-promise__title account-title'>Promise to pay</h3>
-            <div className='grid'>
-                <div className='col-3'>
-                    <Dropdown className='w-full' options={["Add Promise"]} value='Add Promise' />
-                </div>
-                <div className='col-3 ml-auto'>
+            <div className='grid account__body'>
+                <div className='col-12 account__control'>
                     <Dropdown
-                        className='w-full'
+                        className='account__dropdown'
+                        options={["Add Promise"]}
+                        value='Add Promise'
+                    />
+                    <Dropdown
+                        className='account__dropdown ml-auto'
                         options={["Set Paid As Promised"]}
                         value='Set Paid As Promised'
                     />
                 </div>
-                <div className='col-12'>
+                <div className='col-12 account__table'>
                     <DataTable
                         showGridlines
-                        className='mt-6 account-promise__table'
-                        value={[]}
+                        className='account-promise__table'
+                        value={promiseList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
                         resizableColumns
@@ -66,10 +69,12 @@ export const AccountPromiseToPay = (): ReactElement => {
                         ))}
                     </DataTable>
                 </div>
-            </div>
-            <div className='col-12 flex gap-3'>
-                <Button className='account-promise__button'>Print</Button>
-                <Button className='account-promise__button'>Download</Button>
+                {!!promiseList.length && (
+                    <div className='col-12 flex gap-3'>
+                        <Button className='account-promise__button'>Print</Button>
+                        <Button className='account-promise__button'>Download</Button>
+                    </div>
+                )}
             </div>
         </div>
     );
