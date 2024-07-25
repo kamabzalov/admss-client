@@ -1,22 +1,30 @@
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 
 import "./index.css";
 import { Button } from "primereact/button";
+import { ACCOUNT_STATUS_LIST } from "common/constants/account-options";
 
 export const AccountSettings = (): ReactElement => {
+    const [accountStatus, setAccountStatus] = useState<string>("");
     return (
         <div className='account-settings'>
             <h3 className='account-settings__title account-title'>Account Settings</h3>
 
             <div className='account-settings__header grid'>
                 <div className='col-3'>
-                    <Dropdown
-                        className='w-full'
-                        options={["Account status"]}
-                        value='Account status'
-                    />
+                    <span className='p-float-label'>
+                        <Dropdown
+                            className='w-full'
+                            options={ACCOUNT_STATUS_LIST}
+                            optionValue='name'
+                            optionLabel='name'
+                            value={accountStatus}
+                            onChange={({ value }) => setAccountStatus(value)}
+                        />
+                        <label className='float-label'>Account Status</label>
+                    </span>
                 </div>
                 <div className='col-3 account-settings__checkbox'>
                     <Checkbox

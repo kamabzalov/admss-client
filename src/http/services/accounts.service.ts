@@ -1,4 +1,3 @@
-
 import { isAxiosError } from "axios";
 import {
     AccountHistory,
@@ -641,7 +640,10 @@ export const setLockState = async (accountuid: string, lockState: any) => {
     }
 };
 
-export const updateInsuranceHistory = async (accountuid: string, insuranceData: any) => {
+export const updateInsuranceHistory = async (
+    accountuid: string,
+    insuranceData: AccountInsurance
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
             `accounts/${accountuid}/insurance`,

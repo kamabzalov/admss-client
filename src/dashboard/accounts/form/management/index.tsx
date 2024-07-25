@@ -7,6 +7,7 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useParams } from "react-router-dom";
 import { listAccountActivity } from "http/services/accounts.service";
+import { ACCOUNT_ACTIVITY_LIST } from "common/constants/account-options";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "date", header: "Date" },
@@ -18,6 +19,7 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
     const [activityList, setActivityList] = useState<any[]>([]);
+    const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
 
     useEffect(() => {
         if (id) {
@@ -33,8 +35,11 @@ export const AccountManagement = (): ReactElement => {
                 <div className='col-3'>
                     <Dropdown
                         className='w-full'
-                        options={["All Activity", "Edit", "Delete"]}
-                        value='All Activity'
+                        options={ACCOUNT_ACTIVITY_LIST}
+                        value={selectedActivity}
+                        onChange={({ target: { value } }) => setSelectedActivity(value)}
+                        optionValue='name'
+                        optionLabel='name'
                     />
                 </div>
                 <div className='col-9 flex gap-3 justify-content-end'>

@@ -8,6 +8,7 @@ import "./index.css";
 import { useParams } from "react-router-dom";
 import { listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
+import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -27,6 +28,9 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
+    const [selectedPayment, setSelectedPayment] = useState<string>(
+        ACCOUNT_PAYMENT_STATUS_LIST[0].name
+    );
 
     useEffect(() => {
         if (id) {
@@ -43,8 +47,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                 <div className='col-3'>
                     <Dropdown
                         className='w-full'
-                        options={["All Payments", "Sold", "Unsold"]}
-                        value='All Payments'
+                        options={ACCOUNT_PAYMENT_STATUS_LIST}
+                        optionValue='name'
+                        optionLabel='name'
+                        value={selectedPayment}
+                        onChange={({ target: { value } }) => setSelectedPayment(value)}
                     />
                 </div>
                 <div className='col-3 ml-auto'>
