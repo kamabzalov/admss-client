@@ -22,3 +22,16 @@
 .schedule .p-datatable .p-datatable-tbody > tr {
   height: 40px;
 }
+
+.schedule-confirm-dialog .p-confirm-dialog-reject,
+.schedule-confirm-dialog .p-confirm-dialog-accept {
+  padding: 20px 33px;
+  height: 60px;
+  font-size: 20px;
+}
+
+.schedule-confirm-dialog {
+  width: 455px;
+  height: 451px;
+  color: var(--admss-app-primary);
+}

@@ -27,6 +27,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -60,6 +61,7 @@ export const ExportSchedule = (): ReactElement => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+    const [deletedId, setDeletedId] = useState<string | null>(null);
     const toast = useToast();
 
     const handleGetExportScheduleList = async (params: QueryParams) => {
@@ -388,12 +390,7 @@ export const ExportSchedule = (): ReactElement => {
                                                 tooltip='Delete'
                                                 className='text schedule-button'
                                                 icon='icon adms-trash-can'
-                                                onClick={() =>
-                                                    handleTaskAction(
-                                                        taskuid,
-                                                        ExportWebScheduleAction.DELETE
-                                                    )
-                                                }
+                                                onClick={() => setDeletedId(taskuid)}
                                             />
                                         </div>
                                     );
@@ -411,6 +408,19 @@ export const ExportSchedule = (): ReactElement => {
                     </DataTable>
                 </div>
             </div>
+            <ConfirmModal
+                visible={!!deletedId}
+                bodyMessage='Do you really want to delete this task? 
+                This process cannot be undone.'
+                confirmAction={() =>
+                    deletedId && handleTaskAction(deletedId, ExportWebScheduleAction.DELETE)
+                }
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='schedule-confirm-dialog'
+                onHide={() => setDeletedId(null)}
+            />
         </div>
     );
 };
