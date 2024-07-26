@@ -410,7 +410,7 @@ export const ExportSchedule = (): ReactElement => {
             </div>
             <ConfirmModal
                 visible={!!deletedId}
-                bodyMessage='Do you really want to delete this task? 
+                bodyMessage='Do you really want to delete this record? 
                 This process cannot be undone.'
                 confirmAction={() =>
                     deletedId && handleTaskAction(deletedId, ExportWebScheduleAction.DELETE)

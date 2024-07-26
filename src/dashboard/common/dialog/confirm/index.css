@@ -5,13 +5,17 @@
     flex-wrap: wrap;
 }
 
+.p-confirm-dialog .p-dialog-header {
+    padding-bottom: 0;
+}
+
 .confirm-header__icon {
     font-size: 5rem;
     color: var(--admss-app-red);
     flex-grow: 1;
     width: 100%;
     text-align: center;
-    margin-bottom: 36px;
+    padding-bottom: 48px;
 }
 
 .confirm-header__title {
@@ -30,11 +34,16 @@
 }
 
 .p-confirm-dialog .p-dialog-content {
-    padding: 0 30px;
+    padding: 0 40px;
+    padding-top: 14px;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
 }
 
 .p-confirm-dialog .p-dialog-footer {
     padding: 30px;
+    padding-bottom: 48px;
+    gap: 10px;
     margin: 0;
     border-radius: 0 0 var(--admss-app-dialog-border-radius) var(--admss-app-dialog-border-radius);
 }
