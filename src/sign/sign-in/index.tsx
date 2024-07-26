@@ -91,6 +91,17 @@ export default function SignIn() {
 
                         <div className='sign-in__input space pt-2 pb-2'>
                             <span className='w-full p-float-label sign-in__password'>
+                                <i
+                                    className={`icon ${
+                                        formik.values.password
+                                            ? passwordVisible
+                                                ? "icon adms-hide"
+                                                : "icon adms-show"
+                                            : "icon adms-password"
+                                    } sign__icon`}
+                                    onClick={() => setPasswordVisible((prev) => !prev)}
+                                />
+
                                 <InputText
                                     placeholder='Password'
                                     className={`sign__input ${formik.touched.password && formik.errors.password ? "p-invalid" : ""}`}
@@ -101,10 +112,6 @@ export default function SignIn() {
                                     value={formik.values.password}
                                 />
 
-                                <i
-                                    className={`adms-${passwordVisible ? "eye-open" : "eye-closed"} sign__icon`}
-                                    onClick={() => setPasswordVisible((prev) => !prev)}
-                                />
                                 <label htmlFor='password'>Password</label>
                             </span>
                             {formik.touched.password && formik.errors.password ? (
