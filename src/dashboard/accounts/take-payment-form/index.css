@@ -1,0 +1,8 @@
+.take-payment__card {
+ display: flex;
+ flex-direction: column;
+ row-gap: 12px;
+ padding: 20px;
+ border-radius: 8px;
+ border: 1px solid var(--surface-d);
+}

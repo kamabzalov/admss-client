@@ -1,0 +1,51 @@
+.pay-off__item {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+}
+
+.pay-off__label {
+ padding-right: 1rem;
+ font-weight: 600;
+ font-size: 16px;
+ display: flex;
+ align-items: center;
+ flex: 0 1 60%;
+}
+
+.pay-off__item .currency-item {
+ flex: 0 0 40%;
+}
+
+.pay-off__item .currency-item__input {
+ height: 32px;
+}
+
+.pay-off__item {
+ .currency-item__input .p-inputnumber-input,
+ .date-item__input .p-inputtext {
+     height: 30px;
+ }
+
+ .date-item__input {
+     margin-left: auto;
+     width: 80%;
+ }
+
+ .p-dropdown {
+     height: 30px;
+     width: 40%;
+ }
+ .p-inputtext {
+     height: 30px;
+     width: 40%;
+ }
+}
+
+.pay-off__item {
+ .currency-item__input .input-icon,
+ .date-item__icon {
+     height: 30px;
+     width: 30px;
+ }
+}
