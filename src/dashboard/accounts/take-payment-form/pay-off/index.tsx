@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { InputNumber, InputNumberProps } from "primereact/inputnumber";
+import { InputNumberProps } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
