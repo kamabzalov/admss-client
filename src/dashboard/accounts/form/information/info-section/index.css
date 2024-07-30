@@ -1,6 +1,6 @@
 .info-section {
     padding: 20px;
-    border: 1px solid #d1d1d1;
+    border: 1px solid var(--admss-app-light-grey);
     border-radius: 5px;
     margin-bottom: 20px;
 }

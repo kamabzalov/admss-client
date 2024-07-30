@@ -6,7 +6,7 @@ import { Button } from "primereact/button";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { AccountPayOff } from "./pay-off";
-import { AccountBalanceAdjustment } from "./balance-adjustment/index";
+import { AccountBalanceAdjustment } from "./balance-adjustment";
 
 export const AccountTakePayment = (): ReactElement => {
     const { id } = useParams();
@@ -16,7 +16,7 @@ export const AccountTakePayment = (): ReactElement => {
         account: { accountnumber, accountstatus },
     } = store;
     return (
-        <div className='grid relative'>
+        <div className='grid relative take-payment'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
@@ -40,8 +40,8 @@ export const AccountTakePayment = (): ReactElement => {
                         )}
                     </div>
                     <div className='card-content account__card grid'>
-                        <TabView className='take-payment__tabs' activeIndex={1}>
-                            <TabPanel disabled header='Quick Pay'>
+                        <TabView className='take-payment__tabs'>
+                            <TabPanel header='Quick Pay'>
                                 <AccountQuickPay />
                             </TabPanel>
                             <TabPanel header='Pay Off'>
@@ -51,6 +51,16 @@ export const AccountTakePayment = (): ReactElement => {
                                 <AccountBalanceAdjustment />
                             </TabPanel>
                         </TabView>
+                    </div>
+                    <div className='account__footer gap-3 ml-auto mr-3'>
+                        <Button
+                            className='uppercase px-6 account__button'
+                            onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                            outlined
+                        >
+                            Cancel
+                        </Button>
+                        <Button className='uppercase px-6 account__button'>Save</Button>
                     </div>
                 </div>
             </div>
