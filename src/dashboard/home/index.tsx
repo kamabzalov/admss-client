@@ -4,6 +4,8 @@ import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tasks } from "dashboard/tasks";
 import { useStore } from "store/hooks";
+import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
+import { Button } from "primereact/button";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -20,6 +22,7 @@ export const Home = (): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
     const [date] = useState(null);
+    const [supportHistory, setSupportHistory] = useState<boolean>(false);
 
     return (
         <div className='grid'>
@@ -143,9 +146,15 @@ export const Home = (): ReactElement => {
                                 </tr>
                             </tbody>
                         </table>
-                        <p className='text-right cursor-pointer underline messages-more'>
-                            See more...
-                        </p>
+                        <div className='card-content__footer'>
+                            <Button
+                                onClick={() => setSupportHistory(true)}
+                                className='underline messages-more'
+                                text
+                            >
+                                See more...
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,6 +210,15 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
+            {authUser && (
+                <>
+                    <SupportHistoryDialog
+                        onHide={() => setSupportHistory(false)}
+                        useruid={authUser.useruid}
+                        visible={supportHistory}
+                    />
+                </>
+            )}
         </div>
     );
 };
