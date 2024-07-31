@@ -41,6 +41,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     const {
         contact,
         contactExtData,
+        changeContact,
         changeContactExtData,
         frontSideDL,
         backSideDL,
@@ -83,9 +84,11 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         if (side === DLSides.FRONT) {
             fileUploadFrontRef.current?.clear();
             store.frontSideDL = {} as File;
+            changeContact("dluidfront", "");
         } else {
             fileUploadBackRef.current?.clear();
             store.backSideDL = {} as File;
+            changeContact("dluidback", "");
         }
 
         if (withRequest) {

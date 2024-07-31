@@ -49,7 +49,7 @@
     border-radius: 3px;
     box-shadow: 0 0 5px 0 rgba(134, 173, 251, 0.8);
     color: var(--admss-app-main-blue);
-    font-size: .88rem;
+    font-size: 0.88rem;
     font-weight: 600;
     padding: 25px 30px;
     text-align: center;
@@ -142,10 +142,28 @@
     font-weight: 600;
 }
 
-.messages-more {
+.card-content__footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.messages-more.p-button.p-button-text {
     text-align: right;
+    background: none;
+    border: none;
     cursor: pointer;
     text-decoration: underline;
     font-weight: 600;
     color: var(--admss-darkest-grey);
+    &:enabled:hover {
+        background: none;
+        border: none;
+        color: var(--admss-darkest-grey);
+    }
+    &:enabled:focus {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
 }
