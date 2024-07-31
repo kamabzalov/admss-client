@@ -1,0 +1,92 @@
+.take-payment .p-tabview-nav-content {
+    padding: 10px 20px;
+}
+
+.take-payment__card {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.take-payment__title {
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+.take-payment__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.take-payment__item--bold .take-payment__value,
+.take-payment__item--bold .take-payment__label {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.take-payment__item--opacity .take-payment__value,
+.take-payment__item--opacity .take-payment__label {
+    color: var(--admss-app-medium-grey);
+}
+
+.take-payment__label {
+    padding-right: 1rem;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    flex: 0 1 60%;
+}
+
+.take-payment__item .currency-item {
+    flex: 0 0 40%;
+}
+
+.take-payment__item .currency-item__input {
+    height: 32px;
+}
+
+.take-payment__item {
+    .currency-item__input .p-inputnumber-input,
+    .date-item__input .p-inputtext {
+        height: 30px;
+    }
+
+    .date-item__input {
+        margin-left: auto;
+        width: 80%;
+    }
+
+    .p-dropdown {
+        height: 30px;
+        width: 40%;
+    }
+    .p-inputtext {
+        height: 30px;
+        width: 40%;
+    }
+}
+
+.take-payment__item {
+    .currency-item__input .input-icon,
+    .date-item__icon {
+        height: 30px;
+        width: 30px;
+    }
+}
+
+.take-payment__info {
+    border-left: 1px solid var(--admss-app-light-grey);
+    padding-left: 20px;
+    height: 100%;
+}
+
+.take-payment .form-line {
+    margin: 20px 0;
+}

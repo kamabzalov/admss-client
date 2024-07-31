@@ -4,13 +4,37 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
-        account: { name },
-        accountExtData: { APR, Term, Payment_Amt, Curr_Due },
+        account: { startingballance },
+        accountExtData: {
+            APR,
+            Term,
+            Curr_Due,
+            buyerName,
+            buyerWorkPhone,
+            buyerMobile,
+            cobuyerName,
+            Principal_Paid,
+            Interest_Paid,
+            Total_Paid,
+            Total_Adjustments,
+            Balance,
+            Con_Amt_To_Finance,
+            Con_Pmt_Amt,
+            dateeffective,
+            Down_Pmt_Balance,
+            Fees,
+            Next_Pmt_Due,
+            DaysOverdue,
+            Last_Paid,
+            Last_Paid_Date,
+        },
     } = store;
+    const navigate = useNavigate();
 
     return (
         <div className='account-info'>
@@ -20,29 +44,29 @@ export const AccountInformation = observer((): ReactElement => {
                     <InfoSection
                         title='Contact Information'
                         details={[
-                            `Full Name: ${name}`,
-                            "Work Phone: 631-429-6822",
-                            "Mobile: 633-899-1958",
-                            "Co-Buyer: Paul Anderson",
+                            `Full Name: ${buyerName}`,
+                            `Work Phone: ${buyerWorkPhone}`,
+                            `Mobile: ${buyerMobile}`,
+                            `Co-Buyer: ${cobuyerName}`,
                         ]}
                     />
 
                     <InfoSection
                         title='Selling Dealer'
                         details={[
-                            "Full Name: Albert Naumov",
+                            `Full Name: Selling Dealer Name`,
                             "Address: 0540 Marquardt Meadows, Tallahassee",
                         ]}
                     />
                     <InfoSection
                         title='Account Balance'
                         details={[
-                            "Starting Balance: $0.00",
-                            "Principal Paid: $0.00",
-                            "Interest Paid: $0.00",
-                            "Total Paid: $0.00",
-                            "Total Adjustments: $0.00",
-                            "Current Balance: $0.00",
+                            `Starting Balance: ${startingballance}`,
+                            `Principal Paid: $${Principal_Paid?.toFixed(2)}`,
+                            `Interest Paid: $${Interest_Paid?.toFixed(2)}`,
+                            `Total Paid: $${Total_Paid?.toFixed(2)}`,
+                            `Total Adjustments: $${Total_Adjustments?.toFixed(2)}`,
+                            `Current Balance: $${Balance?.toFixed(2)}`,
                         ]}
                     />
                 </div>
@@ -50,26 +74,30 @@ export const AccountInformation = observer((): ReactElement => {
                     <InfoSection
                         title='Contact Values'
                         details={[
-                            "Atm Financed: $0.00",
+                            `Atm Financed: $ ${Con_Amt_To_Finance?.toFixed(2)}`,
                             `APR (%): ${APR?.toFixed(2)} %`,
                             `Term: ${Term} months`,
-                            `Payment Amount: $ ${Payment_Amt?.toFixed(2)}`,
-                            "Deal's Date: 06/09/2024",
+                            `Payment Amount: $ ${Con_Pmt_Amt?.toFixed(2)}`,
+                            `Deal's Date: ${dateeffective}`,
                         ]}
                     />
                     <InfoSection
                         title='Account Standing'
                         details={[
                             `Current Due: $ ${Curr_Due}`,
-                            "Down Pmt Balance: $0.00",
-                            "Fees: $0.00",
-                            "Due Date: 06/10/2024",
-                            "Days Overdue: 8",
-                            "Last Paid: $0.00",
-                            "Last Paid Date: 8",
+                            `Down Pmt Balance: $${Down_Pmt_Balance}`,
+                            `Fees: $${Fees}`,
+                            `Due Date: ${Next_Pmt_Due}`,
+                            `Days Overdue: ${DaysOverdue}`,
+                            `Last Paid: $${Last_Paid}`,
+                            `Last Paid Date: ${Last_Paid_Date}`,
                         ]}
                     />
-                    <Button className='account-info__button' outlined>
+                    <Button
+                        className='account-info__button'
+                        onClick={() => navigate(`take-payment`)}
+                        outlined
+                    >
                         Calculate Payoff
                     </Button>
                 </div>
