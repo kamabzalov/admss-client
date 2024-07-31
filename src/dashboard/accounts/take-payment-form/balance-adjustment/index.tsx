@@ -4,8 +4,7 @@ import { DateInput, CurrencyInput } from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-
-import { TakePaymentInfo } from "../take-payment-form/index"
+import { TakePaymentInfo } from "../take-payment-form/index";
 
 const cashDrawers = [
     { label: "Drawer 1", value: "drawer1" },
