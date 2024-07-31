@@ -47,7 +47,7 @@ export const AccountTakePayment = (): ReactElement => {
                             <TabPanel header='Pay Off'>
                                 <AccountPayOff />
                             </TabPanel>
-                            <TabPanel disabled header='Balance Adjustment'>
+                            <TabPanel header='Balance Adjustment'>
                                 <AccountBalanceAdjustment />
                             </TabPanel>
                         </TabView>
