@@ -181,7 +181,7 @@ export class DealStore {
         }
     );
 
-    public saveDeal = action(async (): Promise<string | undefined> => {
+    public saveDeal = action(async (): Promise<string | undefined | BaseResponseError> => {
         try {
             this._isLoading = true;
             const dealData: Deal = {
@@ -189,7 +189,12 @@ export class DealStore {
                 extdata: this._dealExtData,
                 finance: this._dealFinances,
             };
-            const dealResponse = await setDeal(this._dealID, dealData);
+            const dealResponse = await setDeal(this._dealID, dealData).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    throw new Error(response.error);
+                }
+                return response;
+            });
             const financesResponse = await setDealFinance(this._dealID, this._dealFinances);
             const paymentsResponse = await this._dealPickupPayments
                 .filter((item) => item.changed)
@@ -201,8 +206,10 @@ export class DealStore {
                 (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
-            // TODO: add error handlers
-            return undefined;
+            return {
+                status: Status.ERROR,
+                error: error as string,
+            };
         } finally {
             this._isLoading = false;
         }

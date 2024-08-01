@@ -19,6 +19,7 @@ import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 const STEP = "step";
 
@@ -423,7 +424,16 @@ export const DealsForm = observer(() => {
                                             validateOnChange={false}
                                             validateOnBlur={false}
                                             onSubmit={() => {
-                                                saveDeal();
+                                                saveDeal().then((response) => {
+                                                    const res = response as BaseResponseError;
+                                                    if (res.status === Status.ERROR) {
+                                                        toast.current?.show({
+                                                            severity: "error",
+                                                            summary: "Error",
+                                                            detail: res.error,
+                                                        });
+                                                    }
+                                                });
                                                 navigate(`/dashboard/deals`);
                                                 toast.current?.show({
                                                     severity: "success",
