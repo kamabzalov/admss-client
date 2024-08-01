@@ -35,6 +35,8 @@ export const DealGeneralSale = observer((): ReactElement => {
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
+    const [make, setMake] = useState<string>("");
+    const [buyer, setBuyer] = useState<string>("");
 
     useEffect(() => {
         getDealTypes().then((res) => {
@@ -100,14 +102,17 @@ export const DealGeneralSale = observer((): ReactElement => {
             <div className='col-6 relative'>
                 <CompanySearch
                     {...getFieldProps("contactuid")}
-                    value={values.contactuid}
                     onChange={({ target: { value } }) => {
                         setFieldValue("contactuid", value);
+                        setBuyer(value);
                         changeDeal({ key: "contactuid", value });
                     }}
-                    onRowClick={(value) => {
-                        setFieldValue("contactuid", value);
-                        changeDeal({ key: "contactuid", value });
+                    value={buyer}
+                    returnedField='contactuid'
+                    getFullInfo={(contact) => {
+                        setBuyer(`${contact.firstName} ${contact.lastName}`);
+                        setFieldValue("contactuid", contact.contactuid);
+                        changeDeal({ key: "contactuid", value: contact.contactuid });
                     }}
                     name='Buyer Name (required)'
                     className={`${errors.contactuid && "p-invalid"}`}
@@ -120,12 +125,15 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("inventoryuid")}
                         className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
+                            setMake(value);
                             setFieldValue("inventoryuid", value);
                             changeDeal({ key: "inventoryuid", value });
                         }}
-                        onRowClick={(value) => {
-                            setFieldValue("inventoryuid", value);
-                            changeDeal({ key: "inventoryuid", value });
+                        value={make}
+                        getFullInfo={(inventory) => {
+                            setMake(inventory.Make);
+                            setFieldValue("inventoryuid", inventory.itemuid);
+                            changeDeal({ key: "inventoryuid", value: inventory.itemuid });
                         }}
                         name='Vehicle (required)'
                     />
