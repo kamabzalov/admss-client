@@ -28,15 +28,13 @@ export const DealGeneralSale = observer((): ReactElement => {
     const toast = useToast();
 
     const { authUser } = userStore;
-    const { deal, changeDeal, changeDealExtData } = store;
+    const { deal, changeDeal, changeDealExtData, dealInventory, dealBuyer } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
-    const [make, setMake] = useState<string>("");
-    const [buyer, setBuyer] = useState<string>("");
 
     useEffect(() => {
         getDealTypes().then((res) => {
@@ -104,13 +102,13 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("contactuid")}
                     onChange={({ target: { value } }) => {
                         setFieldValue("contactuid", value);
-                        setBuyer(value);
+                        store.dealBuyer = value;
                         changeDeal({ key: "contactuid", value });
                     }}
-                    value={buyer}
+                    value={dealBuyer}
                     returnedField='contactuid'
                     getFullInfo={(contact) => {
-                        setBuyer(`${contact.firstName} ${contact.lastName}`);
+                        store.dealBuyer = `${contact.firstName} ${contact.lastName}`;
                         setFieldValue("contactuid", contact.contactuid);
                         changeDeal({ key: "contactuid", value: contact.contactuid });
                     }}
@@ -125,13 +123,13 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("inventoryuid")}
                         className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
-                            setMake(value);
+                            store.dealInventory = value;
                             setFieldValue("inventoryuid", value);
                             changeDeal({ key: "inventoryuid", value });
                         }}
-                        value={make}
+                        value={dealInventory}
                         getFullInfo={(inventory) => {
-                            setMake(inventory.Make);
+                            store.dealInventory = inventory.Make;
                             setFieldValue("inventoryuid", inventory.itemuid);
                             changeDeal({ key: "inventoryuid", value: inventory.itemuid });
                         }}

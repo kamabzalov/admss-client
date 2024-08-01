@@ -35,6 +35,8 @@ export class DealStore {
     private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
+    private _dealInventory: string = "";
+    private _dealBuyer: string = "";
     protected _isLoading = false;
     protected _isFormChanged = false;
 
@@ -72,6 +74,14 @@ export class DealStore {
 
     public get dealErrorMessage() {
         return this._dealErrorMessage;
+    }
+
+    public get dealInventory() {
+        return this._dealInventory;
+    }
+
+    public get dealBuyer() {
+        return this._dealBuyer;
     }
 
     public get isLoading() {
@@ -247,6 +257,14 @@ export class DealStore {
         this._dealType = type;
     }
 
+    public set dealInventory(name: string) {
+        this._dealInventory = name;
+    }
+
+    public set dealBuyer(name: string) {
+        this._dealBuyer = name;
+    }
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
@@ -255,6 +273,8 @@ export class DealStore {
         this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;
         this._printList = {} as DealPrintCollection;
+        this._dealInventory = "";
+        this._dealBuyer = "";
         this._dealPickupPayments = [] as DealPickupPayment[];
     };
 }
