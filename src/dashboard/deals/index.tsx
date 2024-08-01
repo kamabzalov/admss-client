@@ -293,9 +293,9 @@ export default function Deals() {
                                         sortField={lazyState.sortField}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onRowClick={({
-                                            data: { contactuid },
+                                            data: { dealuid },
                                         }: DataTableRowClickEvent) => {
-                                            navigate(contactuid);
+                                            navigate(dealuid);
                                         }}
                                     >
                                         {renderColumnsData.map(({ field, header }) => (
