@@ -123,9 +123,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                             setFieldValue("inventoryuid", value);
                             changeDeal({ key: "inventoryuid", value });
                         }}
-                        onRowClick={(value) => {
-                            setFieldValue("inventoryuid", value);
-                            changeDeal({ key: "inventoryuid", value });
+                        getFullInfo={(inventory) => {
+                            setFieldValue("inventoryuid", inventory.itemuid);
+                            changeDeal({ key: "inventoryuid", value: inventory.Make });
                         }}
                         name='Vehicle (required)'
                     />
