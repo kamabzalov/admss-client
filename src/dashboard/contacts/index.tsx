@@ -38,6 +38,8 @@ interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
+    returnedField?: keyof ContactUser;
+    getFullInfo?: (company: ContactUser) => void;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -53,6 +55,8 @@ export const ContactsDataTable = ({
     onRowClick,
     contactCategory,
     originalPath,
+    returnedField,
+    getFullInfo,
 }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
@@ -215,13 +219,17 @@ export const ContactsDataTable = ({
         }
     };
 
-    const handleOnRowClick = ({
-        data: { contactuid, firstName, lastName },
-    }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+        if (getFullInfo) {
+            getFullInfo(data as ContactUser);
+        }
         if (onRowClick) {
-            onRowClick(`${firstName} ${lastName}`);
+            const value = returnedField
+                ? data[returnedField]
+                : `${data.firstName} ${data.lastName}`;
+            onRowClick(value);
         } else {
-            navigate(contactuid);
+            navigate(data.contactuid);
         }
     };
 

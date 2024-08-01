@@ -53,11 +53,17 @@ const DATA_FIELD = "data-field";
 
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
+    returnedField?: keyof Inventory;
+    getFullInfo?: (inventory: Inventory) => void;
 }
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
-export default function Inventories({ onRowClick }: InventoriesProps): ReactElement {
+export default function Inventories({
+    onRowClick,
+    returnedField,
+    getFullInfo,
+}: InventoriesProps): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -241,15 +247,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                           .filter(([column]) =>
                               settings.activeColumns?.some((col) => col === column)
                           )
-                          .reduce(
-                              (obj, [key, value]) => {
-                                  return {
-                                      ...obj,
-                                      [key]: value,
-                                  };
-                              },
-                              {} as { [key: string]: number }
-                          )
+                          .reduce((obj, [key, value]) => {
+                              return {
+                                  ...obj,
+                                  [key]: value,
+                              };
+                          }, {} as { [key: string]: number })
                     : {};
                 const updatedSettings = {
                     ...serverSettings,
@@ -701,11 +704,15 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
-    const handleOnRowClick = ({ data: { itemuid, Make } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+        if (getFullInfo) {
+            getFullInfo(data as Inventory);
+        }
         if (onRowClick) {
-            onRowClick(Make);
+            const value = returnedField ? data[returnedField] : data.Make;
+            onRowClick(value);
         } else {
-            navigate(itemuid);
+            navigate(data.itemuid);
         }
     };
 
@@ -873,3 +880,4 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 }
+
