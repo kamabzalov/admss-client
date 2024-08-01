@@ -527,3 +527,4 @@ export const DealsForm = observer(() => {
         </Suspense>
     );
 });
+
