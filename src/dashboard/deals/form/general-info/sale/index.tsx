@@ -97,7 +97,6 @@ export const DealGeneralSale = observer((): ReactElement => {
     }, [authUser, toast]);
 
     useEffect(() => {
-        //TODO: temporary solution for getting contact name
         deal.contactuid &&
             getContactInfo(deal.contactuid).then((res) => {
                 if (res) {
@@ -105,13 +104,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                 }
             });
 
-        //TODO: temporary solution for getting inventory name
-        // deal.inventoryuid &&
-        //     getInventoryInfo(deal.inventoryuid).then((res) => {
-        //         if (res) {
-        //             store.dealInventory = res.name;
-        //         }
-        //     });
     }, [deal.contactuid, deal.inventoryuid, store]);
 
     return (
