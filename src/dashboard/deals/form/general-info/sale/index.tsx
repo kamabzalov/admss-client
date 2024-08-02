@@ -94,16 +94,22 @@ export const DealGeneralSale = observer((): ReactElement => {
             getHowToKnowList(authUser?.useruid).then((res) => {
                 if (Array.isArray(res) && res.length) setHowToKnowList(res);
             });
-            getContactInfo(deal.contactuid).then((res) => {
-                if (res) {
-                    store.dealBuyer = `${res.firstName} ${res.lastName}`;
-                }
-            });
-            getInventoryInfo(deal.inventoryuid).then((res) => {
-                if (res) {
-                    store.dealInventory = res.name;
-                }
-            });
+
+            //TODO: temporary solution for getting contact name
+            deal.contactuid &&
+                getContactInfo(deal.contactuid).then((res) => {
+                    if (res) {
+                        store.dealBuyer = `${res.firstName} ${res.lastName}`;
+                    }
+                });
+
+            //TODO: temporary solution for getting inventory name
+            deal.inventoryuid &&
+                getInventoryInfo(deal.inventoryuid).then((res) => {
+                    if (res) {
+                        store.dealInventory = res.name;
+                    }
+                });
         }
     }, [authUser, deal.contactuid, deal.inventoryuid, store, toast]);
 
