@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { observer } from "mobx-react-lite";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
@@ -37,6 +38,8 @@ export const DealGeneralSale = observer((): ReactElement => {
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
+
+    console.log(getFieldProps("inventoryuid"));
 
     useEffect(() => {
         getDealTypes().then((res) => {
@@ -107,12 +110,12 @@ export const DealGeneralSale = observer((): ReactElement => {
             });
 
         //TODO: temporary solution for getting inventory name
-        deal.inventoryuid &&
-            getInventoryInfo(deal.inventoryuid).then((res) => {
-                if (res) {
-                    store.dealInventory = res.name;
-                }
-            });
+        // deal.inventoryuid &&
+        //     getInventoryInfo(deal.inventoryuid).then((res) => {
+        //         if (res) {
+        //             store.dealInventory = res.name;
+        //         }
+        //     });
     }, [deal.contactuid, deal.inventoryuid, store]);
 
     return (
@@ -141,6 +144,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InventorySearch
                         {...getFieldProps("inventoryuid")}
+                        onRowClick={(name) => {
+                            store.dealInventory = name;
+                            setFieldValue("inventoryuid", name);
+                        }}
                         className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
                             store.dealInventory = value;
@@ -149,6 +156,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         }}
                         value={dealInventory}
                         getFullInfo={(inventory) => {
+                            console.log(inventory, "(inventory)");
                             store.dealInventory = inventory.Make;
                             setFieldValue("inventoryuid", inventory.itemuid);
                             changeDeal({ key: "inventoryuid", value: inventory.itemuid });
