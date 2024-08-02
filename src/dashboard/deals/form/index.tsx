@@ -25,8 +25,8 @@ const STEP = "step";
 
 export type PartialDeal = Pick<
     Deal,
-    | "contactuid"
-    | "inventoryuid"
+    | "contactinfo"
+    | "inventoryinfo"
     | "dealtype"
     | "dealstatus"
     | "saletype"
@@ -59,8 +59,8 @@ export type PartialDeal = Pick<
 
 const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
     [AccordionDealItems.SALE]: [
-        "contactuid",
-        "inventoryuid",
+        "contactinfo",
+        "inventoryinfo",
         "dealtype",
         "dealstatus",
         "saletype",
@@ -95,8 +95,8 @@ const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
 export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
-    contactuid: Yup.string().required("Data is required."),
-    inventoryuid: Yup.string().required("Data is required."),
+    contactinfo: Yup.string().required("Data is required."),
+    inventoryinfo: Yup.string().required("Data is required."),
     dealtype: Yup.number().required("Data is required."),
     dealstatus: Yup.number().required("Data is required."),
     saletype: Yup.number().required("Data is required."),
@@ -381,8 +381,8 @@ export const DealsForm = observer(() => {
                                             innerRef={formikRef}
                                             initialValues={
                                                 {
-                                                    contactuid: deal.contactuid || "",
-                                                    inventoryuid: deal.inventoryuid || "",
+                                                    contactinfo: deal.contactinfo || "",
+                                                    inventoryinfo: deal.inventoryinfo || "",
                                                     dealtype: deal.dealtype || dealType,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,

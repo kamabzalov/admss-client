@@ -297,7 +297,7 @@ export interface ContactType {
     name: ContactTypeNameList | string;
 }
 
-export interface ContactUser {
+export interface ContactUser extends Contact {
     ZIP: string;
     city: string;
     companyName: string;
