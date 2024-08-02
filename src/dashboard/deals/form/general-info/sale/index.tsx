@@ -19,7 +19,8 @@ import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
-import { getContactInfo } from "http/services/contacts-service";
+import { ContactUser } from "common/models/contact";
+import { Inventory } from "common/models/inventory";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -29,7 +30,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const toast = useToast();
 
     const { authUser } = userStore;
-    const { deal, changeDeal, changeDealExtData, dealInventory, dealBuyer } = store;
+    const { deal, changeDeal, changeDealExtData } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
@@ -96,63 +97,65 @@ export const DealGeneralSale = observer((): ReactElement => {
         }
     }, [authUser, toast]);
 
-    useEffect(() => {
-        deal.contactuid &&
-            getContactInfo(deal.contactuid).then((res) => {
-                if (res) {
-                    store.dealBuyer = `${res.firstName} ${res.lastName}`;
-                }
-            });
+    const handleGetCompanyInfo = (contact: ContactUser) => {
+        setFieldValue(
+            "contactinfo",
+            contact.companyName || `${contact.firstName} ${contact.lastName}`
+        );
+        changeDeal({
+            key: "contactinfo",
+            value: contact.companyName || `${contact.firstName} ${contact.lastName}`,
+        });
+        changeDeal({
+            key: "contactuid",
+            value: contact.contactuid,
+        });
+    };
 
-    }, [deal.contactuid, deal.inventoryuid, store]);
+    const handleGetInventoryInfo = (inventory: Inventory) => {
+        setFieldValue("inventoryinfo", inventory.name || inventory.Make);
+        changeDeal({
+            key: "inventoryinfo",
+            value: inventory.name || inventory.Make,
+        });
+        changeDeal({
+            key: "inventoryuid",
+            value: inventory.itemuid,
+        });
+    };
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
             <div className='col-6 relative'>
                 <CompanySearch
-                    {...getFieldProps("contactuid")}
+                    {...getFieldProps("contactinfo")}
                     onChange={({ target: { value } }) => {
-                        setFieldValue("contactuid", value);
-                        store.dealBuyer = value;
-                        changeDeal({ key: "contactuid", value });
+                        setFieldValue("contactinfo", value);
+                        changeDeal({ key: "contactinfo", value });
                     }}
-                    value={dealBuyer}
-                    returnedField='contactuid'
-                    getFullInfo={(contact) => {
-                        store.dealBuyer = `${contact.firstName} ${contact.lastName}`;
-                        setFieldValue("contactuid", contact.contactuid);
-                        changeDeal({ key: "contactuid", value: contact.contactuid });
-                    }}
+                    value={values?.contactinfo}
+                    getFullInfo={handleGetCompanyInfo}
                     name='Buyer Name (required)'
-                    className={`${errors.contactuid && "p-invalid"}`}
+                    className={`${errors.contactinfo && "p-invalid"}`}
                 />
-                <small className='p-error'>{errors.contactuid}</small>
+                <small className='p-error'>{errors.contactinfo}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InventorySearch
-                        {...getFieldProps("inventoryuid")}
-                        onRowClick={(name) => {
-                            store.dealInventory = name;
-                            setFieldValue("inventoryuid", name);
-                        }}
-                        className={`${errors.inventoryuid && "p-invalid"}`}
+                        {...getFieldProps("inventoryinfo")}
+                        className={`${errors.inventoryinfo && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
-                            store.dealInventory = value;
-                            setFieldValue("inventoryuid", value);
-                            changeDeal({ key: "inventoryuid", value });
+                            setFieldValue("inventoryinfo", value);
+                            changeDeal({ key: "inventoryinfo", value });
                         }}
-                        value={dealInventory}
-                        getFullInfo={(inventory) => {
-                            store.dealInventory = inventory.Make;
-                            setFieldValue("inventoryuid", inventory.itemuid);
-                            changeDeal({ key: "inventoryuid", value: inventory.itemuid });
-                        }}
+                        value={values?.inventoryinfo}
+                        getFullInfo={handleGetInventoryInfo}
                         name='Vehicle (required)'
                     />
                     <label className='float-label'></label>
                 </span>
-                <small className='p-error'>{errors.inventoryuid}</small>
+                <small className='p-error'>{errors.inventoryinfo}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
