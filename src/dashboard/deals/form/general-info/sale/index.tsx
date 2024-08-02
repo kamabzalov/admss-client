@@ -94,24 +94,26 @@ export const DealGeneralSale = observer((): ReactElement => {
             getHowToKnowList(authUser?.useruid).then((res) => {
                 if (Array.isArray(res) && res.length) setHowToKnowList(res);
             });
-
-            //TODO: temporary solution for getting contact name
-            deal.contactuid &&
-                getContactInfo(deal.contactuid).then((res) => {
-                    if (res) {
-                        store.dealBuyer = `${res.firstName} ${res.lastName}`;
-                    }
-                });
-
-            //TODO: temporary solution for getting inventory name
-            deal.inventoryuid &&
-                getInventoryInfo(deal.inventoryuid).then((res) => {
-                    if (res) {
-                        store.dealInventory = res.name;
-                    }
-                });
         }
-    }, [authUser, deal.contactuid, deal.inventoryuid, store, toast]);
+    }, [authUser, toast]);
+
+    useEffect(() => {
+        //TODO: temporary solution for getting contact name
+        deal.contactuid &&
+            getContactInfo(deal.contactuid).then((res) => {
+                if (res) {
+                    store.dealBuyer = `${res.firstName} ${res.lastName}`;
+                }
+            });
+
+        //TODO: temporary solution for getting inventory name
+        deal.inventoryuid &&
+            getInventoryInfo(deal.inventoryuid).then((res) => {
+                if (res) {
+                    store.dealInventory = res.name;
+                }
+            });
+    }, [deal.contactuid, deal.inventoryuid, store]);
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
