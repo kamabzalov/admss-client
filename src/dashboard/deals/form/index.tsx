@@ -426,7 +426,7 @@ export const DealsForm = observer(() => {
                                             onSubmit={() => {
                                                 saveDeal().then((response) => {
                                                     const res = response as BaseResponseError;
-                                                    if (res.status === Status.ERROR) {
+                                                    if (res?.status === Status.ERROR) {
                                                         toast.current?.show({
                                                             severity: "error",
                                                             summary: "Error",
@@ -527,4 +527,3 @@ export const DealsForm = observer(() => {
         </Suspense>
     );
 });
-
