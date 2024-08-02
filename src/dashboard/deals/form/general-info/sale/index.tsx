@@ -19,6 +19,8 @@ import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
+import { getContactInfo } from "http/services/contacts-service";
+import { getInventoryInfo } from "http/services/inventory-service";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -92,8 +94,18 @@ export const DealGeneralSale = observer((): ReactElement => {
             getHowToKnowList(authUser?.useruid).then((res) => {
                 if (Array.isArray(res) && res.length) setHowToKnowList(res);
             });
+            getContactInfo(deal.contactuid).then((res) => {
+                if (res) {
+                    store.dealBuyer = `${res.firstName} ${res.lastName}`;
+                }
+            });
+            getInventoryInfo(deal.inventoryuid).then((res) => {
+                if (res) {
+                    store.dealInventory = res.name;
+                }
+            });
         }
-    }, [authUser, toast]);
+    }, [authUser, deal.contactuid, deal.inventoryuid, store, toast]);
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
