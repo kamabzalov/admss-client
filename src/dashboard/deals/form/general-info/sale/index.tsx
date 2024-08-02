@@ -20,7 +20,6 @@ import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { getContactInfo } from "http/services/contacts-service";
-import { getInventoryInfo } from "http/services/inventory-service";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -98,7 +97,6 @@ export const DealGeneralSale = observer((): ReactElement => {
     }, [authUser, toast]);
 
     useEffect(() => {
-        //TODO: temporary solution for getting contact name
         deal.contactuid &&
             getContactInfo(deal.contactuid).then((res) => {
                 if (res) {
@@ -106,13 +104,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                 }
             });
 
-        //TODO: temporary solution for getting inventory name
-        deal.inventoryuid &&
-            getInventoryInfo(deal.inventoryuid).then((res) => {
-                if (res) {
-                    store.dealInventory = res.name;
-                }
-            });
     }, [deal.contactuid, deal.inventoryuid, store]);
 
     return (
@@ -141,6 +132,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InventorySearch
                         {...getFieldProps("inventoryuid")}
+                        onRowClick={(name) => {
+                            store.dealInventory = name;
+                            setFieldValue("inventoryuid", name);
+                        }}
                         className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
                             store.dealInventory = value;
