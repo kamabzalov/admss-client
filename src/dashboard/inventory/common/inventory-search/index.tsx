@@ -55,11 +55,11 @@ export const InventorySearch = ({
         onRowClick && onRowClick(inventoryName);
         setDialogVisible(false);
     };
-
     const handleGetFullInfo = (inventory: Inventory) => {
         getFullInfo && getFullInfo(inventory);
         setDialogVisible(false);
     };
+
     return (
         <>
             <SearchInput

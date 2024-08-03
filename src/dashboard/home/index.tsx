@@ -96,10 +96,13 @@ export const Home = (): ReactElement => {
                                 </>
                             )}
                             <div className='col-12 md:col-6 lg:col-3'>
-                                <div className='common-tasks-menu__item cursor-pointer'>
+                                <Link
+                                    to='test-drive'
+                                    className='common-tasks-menu__item cursor-pointer'
+                                >
                                     <div className='common-tasks-menu__icon print-test-drive'></div>
                                     Print (for test drive)
-                                </div>
+                                </Link>
                             </div>
                         </div>
                     </div>
