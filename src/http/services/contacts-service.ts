@@ -75,7 +75,7 @@ export const getContactsSalesmanList = async (uid: string) => {
 };
 
 export const setContact = async (
-    contactuid: string,
+    contactuid: string | null,
     contactData: Partial<Contact>
 ): Promise<BaseResponse | undefined> => {
     try {

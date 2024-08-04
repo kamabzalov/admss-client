@@ -39,7 +39,7 @@ interface ContactsDataTableProps {
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
     returnedField?: keyof ContactUser;
-    getFullInfo?: (company: ContactUser) => void;
+    getFullInfo?: (contact: ContactUser) => void;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -163,16 +163,21 @@ export const ContactsDataTable = ({
             if (!selectedCategory && contactCategory) {
                 return;
             }
+            setIsLoading(true);
             getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
                 setTotalRecords(response?.total ?? 0);
             });
-            getContacts(authUser.useruid, params).then((response) => {
-                if (response?.length) {
-                    setUserContacts(response);
-                } else {
-                    setUserContacts([]);
-                }
-            });
+            getContacts(authUser.useruid, params)
+                .then((response) => {
+                    if (response?.length) {
+                        setUserContacts(response);
+                    } else {
+                        setUserContacts([]);
+                    }
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
@@ -316,7 +321,7 @@ export const ContactsDataTable = ({
                 <div className='col-12'>
                     {isLoading ? (
                         <div className='dashboard-loader__wrapper'>
-                            <Loader overlay />
+                            <Loader />
                         </div>
                     ) : (
                         <DataTable

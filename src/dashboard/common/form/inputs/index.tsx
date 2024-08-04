@@ -5,6 +5,8 @@ import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { InputText, InputTextProps } from "primereact/inputtext";
+import { STATES_LIST } from "common/constants/states";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -22,6 +24,35 @@ interface CurrencyInputProps extends InputNumberProps {
 
 interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
+}
+
+type Push<N extends number, T extends any[]> = ((...args: T) => void) extends (
+    head: any,
+    ...tail: infer R
+) => void
+    ? [...R, any]["length"] extends N
+        ? T
+        : Push<N, [...T, any]>
+    : never;
+
+type Range<
+    Start extends number,
+    End extends number,
+    T extends any[] = Push<Start, []>
+> = T["length"] extends End ? never : T["length"] | Range<Start, End, [any, ...T]>;
+
+interface DateInputProps extends CalendarProps {
+    date?: number;
+    colWidth?: Range<1, 13>;
+    checkbox?: boolean;
+}
+
+interface TextInputProps extends InputTextProps {
+    colWidth?: Range<1, 13>;
+}
+
+interface StateDropdownProps extends DropdownProps {
+    colWidth?: Range<1, 13>;
 }
 
 export const DashboardRadio = ({
@@ -209,16 +240,12 @@ export const SearchInput = ({
     );
 };
 
-interface DateInputProps extends CalendarProps {
-    date?: number;
-    checkbox?: boolean;
-}
-
 export const DateInput = ({
     date,
     name,
     value,
     checkbox,
+    colWidth,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
@@ -232,7 +259,8 @@ export const DateInput = ({
     }, [date]);
 
     const dateToNumber = (selectedDate: Date) => setInnerDate(selectedDate);
-    return (
+
+    const content = (
         <div
             key={name}
             className='flex align-items-center justify-content-between date-item relative'
@@ -240,7 +268,7 @@ export const DateInput = ({
             <label htmlFor={name} className='date-item__label label-top'>
                 {name}
             </label>
-            <div className='date-item__input flex'>
+            <div className='date-item__input w-full flex'>
                 {checkbox && (
                     <Checkbox
                         className='date-item__checkbox'
@@ -252,7 +280,9 @@ export const DateInput = ({
                     inputId={name}
                     value={innerDate}
                     disabled={checkbox && !isChecked}
-                    className={`date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
+                    className={`w-full date-item__calendar ${
+                        checkbox && "date-item__calendar--checkbox"
+                    }`}
                     onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}
                 />
@@ -262,4 +292,40 @@ export const DateInput = ({
             </div>
         </div>
     );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
+};
+
+export const TextInput = ({ name, colWidth, ...props }: TextInputProps): ReactElement => {
+    const content = (
+        <span className='p-float-label'>
+            <InputText
+                className='w-full'
+                style={{ height: `${props.height || 50}px` }}
+                {...props}
+            />
+            <label className='float-label'>{name}</label>
+        </span>
+    );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
+};
+
+export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
+    const content = (
+        <span className='p-float-label'>
+            <Dropdown
+                optionLabel='label'
+                optionValue='id'
+                filter={props.filter || true}
+                options={STATES_LIST}
+                className={`w-full ${props.className || ""}`}
+                style={{ height: `${props.height || 50}px` }}
+                {...props}
+            />
+            <label className='float-label'>{name}</label>
+        </span>
+    );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
