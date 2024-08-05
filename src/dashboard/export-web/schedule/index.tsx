@@ -264,6 +264,19 @@ export const ExportSchedule = (): ReactElement => {
                     detail: response?.error,
                     life: TOAST_LIFETIME,
                 });
+            } else {
+                let qry: string = "";
+
+                const params: QueryParams = {
+                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                    ...(lazyState.sortField && { column: lazyState.sortField }),
+                    qry,
+                    skip: lazyState.first,
+                    top: lazyState.rows,
+                };
+
+                handleGetExportScheduleList(params);
             }
         });
     };
