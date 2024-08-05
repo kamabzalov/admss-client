@@ -1,4 +1,5 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ExportWeb } from "./export";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
@@ -18,7 +19,11 @@ interface TabHeaderProps {
 }
 
 export const ExportToWeb = (): ReactElement => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [selectedInventories, setSelectedInventories] = useState<number>(0);
+    const [activeIndex, setActiveIndex] = useState<number>(0);
+
     const tabItems: TabItem[] = [
         {
             tabName: "Export to web",
@@ -44,30 +49,46 @@ export const ExportToWeb = (): ReactElement => {
         </>
     );
 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tab = params.get("tab");
+        if (tab) {
+            const index = tabItems.findIndex((item) => item.tabName === tab);
+            if (index !== -1) {
+                setActiveIndex(index);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.search]);
+
+    const handleTabChange = (e: { index: number }) => {
+        const tabName = tabItems[e.index].tabName;
+        setActiveIndex(e.index);
+        navigate(`?tab=${tabName}`);
+    };
+
     return (
         <div className='grid export-web'>
-            <div className='col-12'>
-                <TabView className='card'>
-                    {tabItems.map(({ tabName, component, headerCount }) => {
-                        return (
-                            <TabPanel
-                                header={
-                                    headerCount ? (
-                                        <TabHeader
-                                            tabName={tabName}
-                                            count={selectedInventories}
-                                            isActive={selectedInventories > 0}
-                                        />
-                                    ) : (
-                                        tabName
-                                    )
-                                }
-                                headerClassName='card-header export-web__header uppercase m-0'
-                                children={component}
-                                key={tabName}
-                            />
-                        );
-                    })}
+            <div className='col-12 export-web__body'>
+                <TabView className='card' activeIndex={activeIndex} onTabChange={handleTabChange}>
+                    {tabItems.map(({ tabName, component, headerCount }) => (
+                        <TabPanel
+                            header={
+                                headerCount ? (
+                                    <TabHeader
+                                        tabName={tabName}
+                                        count={selectedInventories}
+                                        isActive={selectedInventories > 0}
+                                    />
+                                ) : (
+                                    tabName
+                                )
+                            }
+                            headerClassName='card-header export-web__header uppercase m-0'
+                            children={component}
+                            key={tabName}
+                        />
+                    ))}
                 </TabView>
             </div>
         </div>

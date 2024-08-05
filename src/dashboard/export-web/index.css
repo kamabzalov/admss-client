@@ -5,6 +5,12 @@
     height: 20px;
     border: none;
 }
+
+.export-web__body .p-tabview-panels,
+.export-web__body .p-tabview-panel {
+    height: 80dvh;
+}
+
 .export-web__icon-button.p-button:last-child {
     color: var(--admss-app-primary);
 }
