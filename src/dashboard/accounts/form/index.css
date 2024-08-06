@@ -68,16 +68,28 @@
 
 .account__body {
     height: 100%;
-    flex-direction: column;
+    row-gap: 10px;
 }
 
 .account__table {
     flex-grow: 1;
+    height: 474px;
+    min-height: 29vh;
+
+    .p-datatable {
+        height: 100%;
+
+        .p-datatable-wrapper {
+            height: 100%;
+        }
+    }
 }
 
 .account__control {
     display: flex;
+    height: 72px;
     gap: 25px;
+    flex-grow: 0;
 }
 
 .account__dropdown {

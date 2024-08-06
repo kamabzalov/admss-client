@@ -2,11 +2,11 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { listAccountPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
+import { Menubar } from "primereact/menubar";
 
 interface TableColumnProps extends ColumnProps {
     field: any;
@@ -56,7 +56,20 @@ export const AccountDownPayment = (): ReactElement => {
 
             <div className='grid account__body'>
                 <div className='col-3 ml-auto'>
-                    <Dropdown className='w-full' options={["Take Payment"]} value='Take Payment' />
+                    <Menubar
+                        className='account__menubar ml-auto'
+                        model={[
+                            {
+                                label: "Take Payment",
+                                items: [
+                                    {
+                                        label: "Delete Payment",
+                                        icon: "icon adms-close",
+                                    },
+                                ],
+                            },
+                        ]}
+                    />
                 </div>
                 <div className='col-12'>
                     <DataTable

@@ -140,14 +140,6 @@ export default function Accounts() {
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button'
-                                        icon='pi pi-plus-circle'
-                                        severity='success'
-                                        type='button'
-                                        tooltip='Add new account'
-                                        onClick={() => navigate("create")}
-                                    />
-                                    <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-print'

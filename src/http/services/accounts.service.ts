@@ -591,6 +591,22 @@ export const undeleteNote = async (itemuid: string) => {
     }
 };
 
+export const getPaymentInfo = async (accountuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+            `accounts/${accountuid}/paymentinfo`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting payment info",
+            };
+        }
+    }
+};
+
 export const deletePaymentInfo = async (itemuid: string) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(

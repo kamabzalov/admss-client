@@ -1,10 +1,19 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { InfoSection } from "dashboard/accounts/form/information/info-section";
 import { InputTextarea } from "primereact/inputtextarea";
+import { getPaymentInfo } from "http/services/accounts.service";
+import { useParams } from "react-router-dom";
 
 export const TakePaymentInfo = observer((): ReactElement => {
+    const { id } = useParams();
+    const [, setPaymentInfo] = useState<any>({});
+
+    useEffect(() => {
+        id && getPaymentInfo(id).then((res) => setPaymentInfo(res));
+    }, [id]);
+
     return (
         <div className='take-payment__info'>
             <InfoSection

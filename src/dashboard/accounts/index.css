@@ -56,3 +56,41 @@
     text-transform: uppercase;
     padding-bottom: 20px;
 }
+
+.account__menubar {
+    background-color: transparent;
+    font-weight: 700;
+    border: 1px solid var(--admss-app-light-grey);
+    height: 50px;
+    width: 246px;
+
+    .p-menuitem-link {
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .p-submenu-list {
+        z-index: 99;
+    }
+    .p-menubar-root-list > .p-menuitem > .p-menuitem-link:focus {
+        box-shadow: none;
+    }
+
+    .p-icon {
+        scale: 1.5;
+    }
+
+    .p-submenu-list {
+        .p-menuitem-text {
+            font-weight: 400;
+            padding-left: 10px;
+        }
+    }
+
+    .p-menuitem-active {
+        .p-icon {
+            rotate: 180deg;
+        }
+    }
+}

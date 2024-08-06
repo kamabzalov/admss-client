@@ -35,10 +35,10 @@
     border-bottom: 2px solid var(--admss-app-primary);
 }
 
-.insurance-info {
+.insurance-info__container {
     margin-top: 20px;
     border-radius: 5px;
-    padding: 20px;
+    padding: 30px;
     border: 1px solid var(--admss-app-light-grey);
     display: flex;
     flex-wrap: wrap;
@@ -47,6 +47,7 @@
 .insurance-info__item {
     flex: 1;
     display: flex;
+    padding: 10px;
     flex-direction: column;
     row-gap: 20px;
 }
@@ -57,13 +58,14 @@
     align-items: center;
 }
 
-.insurance-field label {
+.insurance-field__label {
     flex: 1;
     font-weight: 700;
+    white-space: nowrap;
 }
 
-.insurance-field span,
-.insurance-field input {
+.insurance-field__value,
+.insurance-field__input {
     flex: 2;
 }
 
@@ -81,4 +83,18 @@
     height: 54px;
     font-weight: 700;
     width: 244px;
+}
+
+.insurance-info__button--edit {
+    width: 514px;
+    margin-top: 20px;
+}
+
+.insurance-info--splitter {
+    border-right: 1px solid var(--admss-app-light-grey);
+    margin-right: 30px;
+}
+
+.insurance-field__label--thin {
+    font-weight: 400;
 }

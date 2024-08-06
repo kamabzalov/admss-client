@@ -7,8 +7,8 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import "./index.css";
-
-import { TakePaymentInfo } from "../take-payment-form/index";
+import { TakePaymentInfo } from "dashboard/accounts/take-payment-form/take-payment-info";
+import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
 
 const PayOffItem = observer(({ title, value }: InputNumberProps): ReactElement => {
     return (
@@ -20,11 +20,6 @@ const PayOffItem = observer(({ title, value }: InputNumberProps): ReactElement =
 });
 
 export const AccountPayOff = observer((): ReactElement => {
-    const paymentMethods = [
-        { label: "Method 1", value: "method1" },
-        { label: "Method 2", value: "method2" },
-    ];
-
     const cashDrawers = [
         { label: "Drawer 1", value: "drawer1" },
         { label: "Drawer 2", value: "drawer2" },
@@ -86,7 +81,12 @@ export const AccountPayOff = observer((): ReactElement => {
 
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Pmt Method</label>
-                        <Dropdown id='pmtMethod' options={paymentMethods} />
+                        <Dropdown
+                            id='pmtMethod'
+                            options={ACCOUNT_PAYMENT_METHODS}
+                            optionValue='id'
+                            optionLabel='name'
+                        />
                     </div>
 
                     <div className='take-payment__item'>
