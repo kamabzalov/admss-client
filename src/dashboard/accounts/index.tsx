@@ -1,190 +1,222 @@
-import { Button } from "primereact/button";
-import { Checkbox } from "primereact/checkbox";
-import { Column, ColumnProps } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
-import { ReactElement, useEffect, useState } from "react";
-import "./index.css";
-import { useParams } from "react-router-dom";
-import { listAccountHistory } from "http/services/accounts.service";
-import { AccountHistory } from "common/models/accounts";
-import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
+import { useEffect, useState } from "react";
+import { AuthUser } from "http/services/auth.service";
+import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+
 import {
-    MultiSelect,
-    MultiSelectChangeEvent,
-    MultiSelectPanelHeaderTemplateEvent,
-} from "primereact/multiselect";
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
+import { getKeyValue } from "services/local-storage.service";
+import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Column, ColumnProps } from "primereact/column";
+import { QueryParams } from "common/models/query-params";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { ROWS_PER_PAGE } from "common/settings";
+import { makeShortReports } from "http/services/reports.service";
+import "./index.css";
+import { useNavigate } from "react-router-dom";
+import { ReportsColumn } from "common/models/reports";
+import { Loader } from "dashboard/common/loader";
 
-interface TableColumnProps extends ColumnProps {
-    field: keyof AccountHistory | "";
-}
-
-export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
-
-const renderColumnsData: TableColumnsList[] = [
-    { field: "", header: "Status", checked: true },
-    { field: "RECEIPT_NUM", header: "Receipt#", checked: true },
-    { field: "Type", header: "Type", checked: true },
-    { field: "Pmt_Date", header: "Date", checked: true },
-    { field: "Late_Date", header: "Days Late", checked: true },
-    { field: "", header: "Method", checked: true },
-    { field: "Balance", header: "Bal.Increase", checked: true },
-    { field: "", header: "Payment", checked: true },
+const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "accountnumber", header: "Account" },
+    { field: "accounttype", header: "Type" },
+    { field: "accountstatus", header: "Name" },
+    { field: "created", header: "Date" },
 ];
 
-export const AccountPaymentHistory = (): ReactElement => {
-    const { id } = useParams();
-    const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
-    const [selectedPayment, setSelectedPayment] = useState<string>(
-        ACCOUNT_PAYMENT_STATUS_LIST[0].name
-    );
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+export default function Accounts() {
+    const [accounts, setAccounts] = useState<any[]>([]);
+    const [authUser, setUser] = useState<AuthUser | null>(null);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [globalSearch, setGlobalSearch] = useState<string>("");
+    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (id) {
-            listAccountHistory(id).then((res) => {
-                if (Array.isArray(res) && res.length) setHistoryList(res);
+    const printTableData = async (print: boolean = false) => {
+        setIsLoading(true);
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `accounts_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = accounts.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
             });
         }
-        setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
-    }, [id]);
-
-    const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        onChange={() => {
-                            if (renderColumnsData.length === activeColumns.length) {
-                                setActiveColumns(
-                                    renderColumnsData.filter(({ checked }) => checked)
-                                );
-                            } else {
-                                setActiveColumns(renderColumnsData);
-                            }
-                        }}
-                        checked={renderColumnsData.length === activeColumns.length}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
-                        onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
+        setIsLoading(false);
     };
 
-    return (
-        <div className='account-history account-card'>
-            <h3 className='account-history__title account-title'>Payment History</h3>
-            <div className='grid account__body'>
-                <div className='col-12 account__control'>
-                    <Dropdown
-                        className='account__dropdown'
-                        options={ACCOUNT_PAYMENT_STATUS_LIST}
-                        optionValue='name'
-                        optionLabel='name'
-                        value={selectedPayment}
-                        onChange={({ target: { value } }) => setSelectedPayment(value)}
-                    />
-                    <MultiSelect
-                        options={renderColumnsData}
-                        value={activeColumns}
-                        optionLabel='header'
-                        onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                            stopPropagation();
-                            const sortedValue = value.sort(
-                                (a: TableColumnsList, b: TableColumnsList) => {
-                                    const firstIndex = renderColumnsData.findIndex(
-                                        (col) => col.field === a.field
-                                    );
-                                    const secondIndex = renderColumnsData.findIndex(
-                                        (col) => col.field === b.field
-                                    );
-                                    return firstIndex - secondIndex;
-                                }
-                            );
+    const pageChanged = (event: DataTablePageEvent) => {
+        setLazyState(event);
+    };
 
-                            setActiveColumns(sortedValue);
-                        }}
-                        panelHeaderTemplate={dropdownHeaderPanel}
-                        className='account__dropdown flex align-items-center column-picker'
-                        display='chip'
-                        pt={{
-                            header: {
-                                className: "column-picker__header",
-                            },
-                            wrapper: {
-                                className: "column-picker__wrapper",
-                                style: {
-                                    maxHeight: "500px",
-                                },
-                            },
-                        }}
-                    />
-                    <Dropdown
-                        className='ml-auto'
-                        options={["Add Note", "Delete Payment"]}
-                        value='Take Payment'
-                        placeholder='Take Payment'
-                        pt={{
-                            input: { className: "custom-dropdown-input" },
-                        }}
-                    />
-                </div>
-                <div className='col-12 account__table'>
-                    <DataTable
-                        showGridlines
-                        value={historyList}
-                        emptyMessage='No activity yet.'
-                        reorderableColumns
-                        resizableColumns
-                        scrollable
-                    >
-                        <Column
-                            bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
-                                return (
-                                    <div className='flex gap-3 align-items-center'>
-                                        <Checkbox checked={false} />
-                                    </div>
-                                );
-                            }}
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "60px",
-                                    },
-                                },
-                            }}
-                        />
-                        {activeColumns.map(({ field, header }) => (
-                            <Column
-                                field={field}
-                                header={header}
-                                alignHeader={"left"}
-                                key={field}
-                                headerClassName='cursor-move'
-                                className='max-w-16rem overflow-hidden text-overflow-ellipsis'
-                            />
-                        ))}
-                    </DataTable>
-                </div>
-                {!!historyList.length && (
-                    <div className='col-12 flex gap-3'>
-                        <Button className='account-history__button'>Print</Button>
-                        <Button className='account-history__button'>Download</Button>
+    const sortData = (event: DataTableSortEvent) => {
+        setLazyState(event);
+    };
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser) {
+            setUser(authUser);
+            getAccountsList(authUser.useruid, { total: 1 }).then((response) => {
+                if (response && !Array.isArray(response)) {
+                    const { total } = response as TotalAccountList;
+                    setTotalRecords(total ?? 0);
+                }
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(globalSearch && { qry: globalSearch }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+        if (authUser) {
+            getAccountsList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setAccounts(response);
+                } else {
+                    setAccounts([]);
+                }
+            });
+        }
+    }, [lazyState, authUser, globalSearch]);
+
+    return (
+        <div className='grid'>
+            <div className='col-12'>
+                <div className='card'>
+                    <div className='card-header'>
+                        <h2 className='card-header__title uppercase m-0'>Accounts</h2>
                     </div>
-                )}
+                    <div className='card-content'>
+                        <div className='grid datatable-controls'>
+                            <div className='col-6'>
+                                <div className='contact-top-controls'>
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-print'
+                                        tooltip='Print accounts form'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        tooltip='Download accounts form'
+                                        onClick={() => printTableData()}
+                                    />
+                                </div>
+                            </div>
+                            <div className='col-6 text-right'>
+                                <Button
+                                    className='contact-top-controls__button m-r-20px'
+                                    label='Advanced search'
+                                    severity='success'
+                                    type='button'
+                                />
+                                <span className='p-input-icon-right'>
+                                    <i className='pi pi-search' />
+                                    <InputText
+                                        value={globalSearch}
+                                        onChange={(e) => setGlobalSearch(e.target.value)}
+                                    />
+                                </span>
+                            </div>
+                        </div>
+                        <div className='grid'>
+                            <div className='col-12'>
+                                {isLoading ? (
+                                    <div className='dashboard-loader__wrapper'>
+                                        <Loader overlay />
+                                    </div>
+                                ) : (
+                                    <DataTable
+                                        showGridlines
+                                        value={accounts}
+                                        lazy
+                                        paginator
+                                        first={lazyState.first}
+                                        rows={lazyState.rows}
+                                        rowsPerPageOptions={ROWS_PER_PAGE}
+                                        totalRecords={totalRecords}
+                                        onPage={pageChanged}
+                                        onSort={sortData}
+                                        reorderableColumns
+                                        resizableColumns
+                                        sortOrder={lazyState.sortOrder}
+                                        sortField={lazyState.sortField}
+                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        onRowClick={({
+                                            data: { accountuid },
+                                        }: DataTableRowClickEvent) => {
+                                            navigate(accountuid);
+                                        }}
+                                    >
+                                        {renderColumnsData.map(({ field, header }) => (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                headerClassName='cursor-move'
+                                            />
+                                        ))}
+                                    </DataTable>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
-};
+}
 
