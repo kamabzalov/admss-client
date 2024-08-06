@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
@@ -14,6 +14,7 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
+import { Menubar } from "primereact/menubar";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -22,7 +23,6 @@ interface TableColumnProps extends ColumnProps {
 export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
 const renderColumnsData: TableColumnsList[] = [
-    { field: "", header: "Status", checked: true },
     { field: "RECEIPT_NUM", header: "Receipt#", checked: true },
     { field: "Type", header: "Type", checked: true },
     { field: "Pmt_Date", header: "Date", checked: true },
@@ -30,6 +30,13 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "", header: "Method", checked: true },
     { field: "Balance", header: "Bal.Increase", checked: true },
     { field: "", header: "Payment", checked: true },
+    { field: "New_Balance", header: "New Balance", checked: false },
+    { field: "Principal_Paid", checked: false },
+    { field: "Interest_Paid", header: "Interest", checked: false },
+    { field: "", header: "Add’l", checked: false },
+    { field: "Down_Pmt_Paid", header: "Down", checked: false },
+    { field: "Taxes_Memo", header: "Taxes", checked: false },
+    { field: "Fees_Memo", header: "Misc/Fees", checked: false },
 ];
 
 export const AccountPaymentHistory = (): ReactElement => {
@@ -39,11 +46,16 @@ export const AccountPaymentHistory = (): ReactElement => {
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
 
     useEffect(() => {
         if (id) {
             listAccountHistory(id).then((res) => {
-                if (Array.isArray(res) && res.length) setHistoryList(res);
+                if (Array.isArray(res) && res.length) {
+                    setHistoryList(res);
+                    setSelectedRows(Array(res.length).fill(false));
+                }
             });
         }
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
@@ -79,6 +91,23 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </button>
             </div>
         );
+    };
+
+    const rowExpansionTemplate = (data: AccountHistory) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Payment comment: </div>
+                <div className='expanded-row__text'>{data.Comment || ""}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: AccountHistory) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     return (
@@ -129,10 +158,23 @@ export const AccountPaymentHistory = (): ReactElement => {
                             },
                         }}
                     />
-                    <Dropdown
-                        className='account__dropdown ml-auto'
-                        options={["Take Payment"]}
-                        value='Take Payment'
+                    <Menubar
+                        className='account__menubar ml-auto'
+                        model={[
+                            {
+                                label: "Take Payment",
+                                items: [
+                                    {
+                                        label: "Add Note",
+                                        icon: "icon adms-calendar",
+                                    },
+                                    {
+                                        label: "Delete Payment",
+                                        icon: "icon adms-close",
+                                    },
+                                ],
+                            },
+                        ]}
                     />
                 </div>
                 <div className='col-12 account__table'>
@@ -143,20 +185,48 @@ export const AccountPaymentHistory = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            header={
+                                <Checkbox
+                                    checked={selectedRows.every((checkbox) => !!checkbox)}
+                                    onClick={({ checked }) => {
+                                        setSelectedRows(selectedRows.map(() => !!checked));
+                                    }}
+                                />
+                            }
+                            reorderable={false}
+                            resizeable={false}
+                            body={(options, { rowIndex }) => {
                                 return (
-                                    <div className='flex gap-3 align-items-center'>
-                                        <Checkbox checked={false} />
+                                    <div className={`flex gap-3 align-items-center`}>
+                                        <Checkbox
+                                            checked={selectedRows[rowIndex]}
+                                            onClick={() => {
+                                                setSelectedRows(
+                                                    selectedRows.map((state, index) =>
+                                                        index === rowIndex ? !state : state
+                                                    )
+                                                );
+                                            }}
+                                        />
+
+                                        <Button
+                                            className='text export-web__icon-button'
+                                            icon='pi pi-angle-down'
+                                            onClick={() => handleRowExpansionClick(options)}
+                                        />
                                     </div>
                                 );
                             }}
                             pt={{
                                 root: {
                                     style: {
-                                        width: "60px",
+                                        width: "100px",
                                     },
                                 },
                             }}

@@ -402,3 +402,98 @@ export interface AccountInsurance {
     Insurance_Agent_Phone_No: string;
 }
 
+export interface AccountDetails {
+    status: string;
+    error: string;
+    info: string;
+    message: string;
+    accountuid: string;
+    CurrentStatus: AccountCurrentStatus;
+    CollectionDetails: AccountCollectionDetails;
+    OriginalAmounts: AccountOriginalAmounts;
+    NewAmounts: AccountNewAmounts;
+    QuickPay: AccountQuickPay;
+    PaymentDistribution: AccountPaymentDistribution;
+    CashDealPayoff: AccountCashDealPayoff;
+    WriteOff: AccountWriteOff;
+}
+
+export interface AccountCurrentStatus {
+    PastDueAmount: string;
+    CurrentDue: string;
+    DownPickupDue: string;
+    Fees: string;
+    TotalDue: string;
+    CurrentBalance: string;
+}
+
+export interface AccountCollectionDetails {
+    RegularPayment: string;
+    NextPmtDue: string;
+    DaysOverdue: string;
+    LastPaid: string;
+    LastPaidDays: string;
+    LastLate: string;
+}
+
+export interface AccountOriginalAmounts {
+    AmountFinanced: string;
+    ExpectedInterest: string;
+    PrincipalPaid: string;
+    InterestPaid: string;
+    ExtraPrincipalPmts: string;
+    DownPaymentPaid: string;
+    TotalPaid: string;
+    CurrentBalance: string;
+    NextPmtDue: string;
+}
+
+export interface AccountNewAmounts {
+    PrincipalPaid: string;
+    InterestPaid: string;
+    ExtraPrincipalPmts: string;
+    DownPaymentPaid: string;
+    TotalPaid: string;
+    NewBalance: string;
+    NextPmtDue: string;
+}
+
+export interface AccountQuickPay {
+    DownPaymentBalance: string;
+    FeesBalance: string;
+    NewLateFeesDate: string;
+    NewLateFeesDue: string;
+    InterestDate: string;
+    InterestDue: string;
+    PrincipalBalance: string;
+}
+
+export interface AccountPaymentDistribution {
+    DownPickupPayment: string;
+    Fees: string;
+    Principal: string;
+    AdditionalPrincipal: string;
+    Interest: string;
+    TaxesPaid: string;
+    TotalPaid: string;
+    NextPmtDue: string;
+    RemainingPastDue: string;
+    NewAccountBalance: string;
+    NewDownPaymentBalance: string;
+    NewFeesAdded: string;
+    NewFeesBalance: string;
+    NewTotalBalance: string;
+}
+
+export interface AccountCashDealPayoff {
+    DownPaymentBalance: string;
+    AmountFinancedBalance: string;
+    UnearnedInterest: string;
+}
+
+export interface AccountWriteOff {
+    PrincipalWriteOff: string;
+    InterestWriteOff: string;
+    LateChargeWriteOff: string;
+}
+
