@@ -245,15 +245,9 @@ export const ExportSchedule = (): ReactElement => {
     const handleTaskAction = useCallback(
         (taskuid: string, action: ExportWebScheduleAction) => {
             let actionPromise;
-            // eslint-disable-next-line no-console
-            console.log("action", action);
-            // eslint-disable-next-line no-console
-            console.log("taskuid", taskuid);
             switch (action) {
                 case ExportWebScheduleAction.PAUSE:
                     actionPromise = exportTaskSchedulePause(taskuid);
-                    // eslint-disable-next-line no-console
-                    console.log("exportTaskSchedulePause", actionPromise);
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
