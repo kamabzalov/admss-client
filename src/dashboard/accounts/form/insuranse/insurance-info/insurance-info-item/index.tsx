@@ -13,8 +13,8 @@ interface EditableFieldProps {
 export const InsuranceInfoField = ({
     label,
     value,
-    onChange,
     editMode,
+    onChange,
     inputType = "text",
 }: EditableFieldProps): ReactElement => {
     if (editMode) {

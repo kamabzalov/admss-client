@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getInsuranceHistory, updateInsuranceHistory } from "http/services/accounts.service";
+import { getAccountInsurance, updateAccountInsurance } from "http/services/accounts.service";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -8,9 +8,13 @@ import { AccountInsurance } from "common/models/accounts";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InsuranceInfoField } from "./insurance-info-item";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 export const AccountInsuranceInfo = observer((): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
     const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
     const store = useStore().accountStore;
     const [insuranceEdit, setInsuranceEdit] = useState<boolean>(false);
@@ -23,7 +27,15 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
 
     const handleGetInsuranceHistory = async () => {
         if (id) {
-            getInsuranceHistory(id).then((res) => {
+            getAccountInsurance(id).then((res) => {
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
                 if (res) setInsuranceInfo(res as AccountInsurance);
             });
         }
@@ -37,7 +49,15 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const handleChangeInsuranceInfo = () => {
         if (insuranceInfo) {
             id &&
-                updateInsuranceHistory(id, insuranceInfo).then((res) => {
+                updateAccountInsurance(id, insuranceInfo).then((res) => {
+                    if (res?.status === Status.ERROR) {
+                        toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: res.error,
+                            life: TOAST_LIFETIME,
+                        });
+                    }
                     if (res) {
                         setInsuranceInfo(res as AccountInsurance);
                         saveAccount();
@@ -51,6 +71,10 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
         setInsuranceEdit((prevState) => !prevState);
     };
 
+    const handleChangeInsurance = (field: keyof AccountInsurance, value: string) => {
+        setInsuranceInfo((prev) => ({ ...prev!, [field]: value }));
+    };
+
     return (
         <div className='insurance-info'>
             <div className='insurance-info__container'>
@@ -58,6 +82,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                     <InsuranceInfoField
                         label='Insurance Company'
                         value={insuranceInfo?.Insurance_Company}
+                        onChange={(e) => handleChangeInsurance("Insurance_Company", e)}
                         editMode={insuranceEdit}
                     />
                     <InsuranceInfoField

@@ -327,7 +327,7 @@ export const listInsuranceHistory = async (accountuid: string) => {
     }
 };
 
-export const getInsuranceHistory = async (accountuid: string) => {
+export const getAccountInsurance = async (accountuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | AccountInsurance>(
             `accounts/${accountuid}/insurance`
@@ -337,7 +337,7 @@ export const getInsuranceHistory = async (accountuid: string) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting insurance history",
+                error: error.response?.data.error || "Error while getting insurance",
             };
         }
     }
@@ -656,7 +656,7 @@ export const setLockState = async (accountuid: string, lockState: any) => {
     }
 };
 
-export const updateInsuranceHistory = async (
+export const updateAccountInsurance = async (
     accountuid: string,
     insuranceData: AccountInsurance
 ) => {
@@ -670,7 +670,7 @@ export const updateInsuranceHistory = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while updating insurance history",
+                error: error.response?.data.error || "Error while updating insurance",
             };
         }
     }
