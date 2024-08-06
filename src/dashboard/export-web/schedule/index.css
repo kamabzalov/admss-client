@@ -15,7 +15,7 @@
 
 .schedule-button.p-button.p-button-icon-only.p-button-outlined:enabled:active {
   color: var(--admss-app-white);
-  background: var(--admss-app-primary-main-green);
+  background: var( --admss-app-primary-main-green);
   border-color: var(--admss-app-primary-main-green);
 }
 

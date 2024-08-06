@@ -65,6 +65,9 @@ export const ExportToWeb = (): ReactElement => {
         const tabName = tabItems[e.index].tabName;
         setActiveIndex(e.index);
         navigate(`?tab=${tabName}`);
+
+        // eslint-disable-next-line no-console
+        console.log("tabName", tabName);
     };
 
     return (

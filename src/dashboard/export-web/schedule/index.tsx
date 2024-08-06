@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
     DataTable,
     DataTableColReorderEvent,
@@ -20,7 +20,7 @@ import {
 import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
-import { ExportWebScheduleList } from "common/models/export-web";
+import { defaultExportWebScheduleList, ExportWebScheduleList } from "common/models/export-web";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { QueryParams } from "common/models/query-params";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
@@ -28,6 +28,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { action } from "mobx";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -239,47 +240,71 @@ export const ExportSchedule = (): ReactElement => {
         setActiveScheduleColumns(sortedValue);
     };
 
-    const handleTaskAction = (taskuid: string, action: ExportWebScheduleAction) => {
-        let actionPromise;
+    let taskuid: ExportWebScheduleList = { ...defaultExportWebScheduleList };
 
-        switch (action) {
-            case ExportWebScheduleAction.PAUSE:
-                actionPromise = exportTaskSchedulePause(taskuid);
-                break;
-            case ExportWebScheduleAction.CONTINUE:
-                actionPromise = exportTaskScheduleContinue(taskuid);
-                break;
-            case ExportWebScheduleAction.DELETE:
-                actionPromise = exportTaskScheduleDelete(taskuid);
-                break;
-            default:
-                throw new Error(`Unknown action: ${action}`);
-        }
+    const handleTaskAction = useCallback(
+        (taskuid: string, action: ExportWebScheduleAction) => {
+            let actionPromise;
+            // eslint-disable-next-line no-console
+            console.log("action", action);
+            // eslint-disable-next-line no-console
+            console.log("taskuid", taskuid);
+            switch (action) {
+                case ExportWebScheduleAction.PAUSE:
+                    actionPromise = exportTaskSchedulePause(taskuid);
+                    // eslint-disable-next-line no-console
+                    console.log("exportTaskSchedulePause", actionPromise);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "status has been changed on paused ",
+                    });
 
-        actionPromise.then((response) => {
-            if (response?.status === Status.ERROR) {
-                toast?.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                let qry: string = "";
+                    break;
+                case ExportWebScheduleAction.CONTINUE:
+                    actionPromise = exportTaskScheduleContinue(taskuid);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "status has been on ignored ",
+                    });
+                    // eslint-disable-next-line no-console
+                    console.log("exportTaskScheduleContinue", actionPromise);
 
-                const params: QueryParams = {
-                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                    ...(lazyState.sortField && { column: lazyState.sortField }),
-                    qry,
-                    skip: lazyState.first,
-                    top: lazyState.rows,
-                };
-
-                handleGetExportScheduleList(params);
+                    break;
+                case ExportWebScheduleAction.DELETE:
+                    actionPromise = exportTaskScheduleDelete(taskuid);
+                    break;
+                default:
+                    throw new Error(`Unknown action: ${action}`);
             }
-        });
-    };
+
+            actionPromise.then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast?.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    let qry: string = "";
+
+                    const params: QueryParams = {
+                        ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                        ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                        ...(lazyState.sortField && { column: lazyState.sortField }),
+                        qry,
+                        skip: lazyState.first,
+                        top: lazyState.rows,
+                    };
+
+                    handleGetExportScheduleList(params);
+                }
+            });
+        },
+        [taskuid, action]
+    );
 
     return (
         <div className='card-content schedule'>

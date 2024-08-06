@@ -87,14 +87,36 @@ export const getExportHistoryList = async (useruid: string, params?: QueryParams
 };
 
 export const exportTaskScheduleDelete = async (taskuid: string) => {
+    if (!taskuid || typeof taskuid !== "string" || taskuid.trim() === "") {
+        // eslint-disable-next-line no-console
+        console.error("incorrect taskuid", taskuid);
+        return {
+            status: "Error",
+            error: "Invalid taskUID parameter",
+        };
+    }
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `external/${taskuid}/delete`
         );
+
         return request.data;
-    } catch (error) {
+    } catch (error: any) {
+        // eslint-disable-next-line no-console
+        console.error("Error deleting export task", error.response?.data || error);
+
+        if (error.response) {
+            if (error.response.status === 422) {
+                return {
+                    status: "Error",
+                    error: error.response.data.error || "Unprocessable Entity",
+                    info: error.response.data.info || "Invalid parameters",
+                };
+            }
+        }
+
         return {
-            status: Status.ERROR,
+            status: "Error",
             error: "Error while delete export task",
         };
     }
