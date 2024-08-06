@@ -213,3 +213,4 @@ export const AccountQuickPay = observer((): ReactElement => {
         </div>
     );
 });
+
