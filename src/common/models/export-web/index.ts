@@ -67,21 +67,6 @@ export interface ExportWebScheduleList {
     useruid: string;
 }
 
-export const defaultExportWebScheduleList: ExportWebScheduleList = {
-    created: "",
-    datapath: "",
-    info: "",
-    id: 0,
-    lasttatus: "",
-    lasttrun: "",
-    nextrun: "",
-    paused: 0,
-    tasktype: "",
-    taskuid: "",
-    updated: "",
-    useruid: "",
-};
-
 export interface ExportWebPostData {
     data: Record<string, unknown>[];
     columns: ReportsColumn[];

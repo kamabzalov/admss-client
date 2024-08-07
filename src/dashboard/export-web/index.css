@@ -1,38 +1,138 @@
-.schedule .schedule-control {
-    display: flex;
-    gap: 15px;
+.export-web__icon-button.p-button {
+    color: var(--admss-app-primary-main-green);
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border: none;
 }
 
-.schedule-button.p-button.p-button-icon-only {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    padding: 0;
-    font-size: 14px;
+.export-web__body .p-tabview-panels,
+.export-web__body .p-tabview-panel {
+    height: 80vh;
 }
 
-.schedule-button.p-button.p-button-icon-only.p-button-outlined:enabled:active {
-    color: var(--admss-app-white);
-    background: var( --admss-app-primary-main-green);
-    border-color: var(--admss-app-primary-main-green);
-}
-
-.schedule .p-datatable .p-datatable-tbody > tr {
-    height: 40px;
-}
-
-.schedule-confirm-dialog .p-confirm-dialog-reject,
-.schedule-confirm-dialog .p-confirm-dialog-accept {
-    padding: 20px 33px;
-    height: 60px;
-    font-size: 20px;
-}
-
-.schedule-confirm-dialog {
-    width: 455px;
-    height: 451px;
+.export-web__icon-button.p-button:last-child {
     color: var(--admss-app-primary);
 }
 
+.export-web__icon-button.p-button:hover {
+    color: var(--admss-app-primary-main-green);
+    background: transparent;
+}
+
+.export-web-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.export-web-controls__button {
+    width: 160px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.export-web .p-button.p-button-icon-only,
+.export-web .p-button.p-button-icon-only .pi {
+    font-size: 22px;
+}
+
+.export-web-controls__button-icon {
+    margin-left: 10px;
+    line-height: 1;
+}
+
+.export-web-controls__input {
+    width: 230px;
+    height: 100%;
+}
+
+.export-web-service {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+    max-width: 129px;
+}
+
+.row--selected {
+    background: var(--admss-app-light-green);
+}
+
+.export-web-service__input .p-inputnumber-input {
+    width: 94px;
+    height: 34px;
+}
+
+.export-web-table tr td:has(.row--selected) {
+    background: var(--admss-app-light-green);
+}
+
+.expanded-row {
+    width: 100%;
+    display: flex;
+    column-gap: 45px;
+}
+
+.expanded-row__label {
+    font-weight: 700;
+    flex: 0 1 20%;
+    text-align: right;
+}
+
+.expanded-row__text {
+    flex: 0 1 80%;
+    text-wrap: wrap;
+}
+
+.export-web .card-header {
+    align-items: stretch;
+}
+
+.export-web .p-tabview .p-tabview-nav {
+    margin: 0 1.25rem;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    font-weight: 700;
+    color: var(----admss-app-primary);
+}
+
+.p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
+    border: none;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight.export-web__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.p-tabview
+    .p-tabview-nav
+    li.export-web__header:not(.p-highlight):not(.p-disabled):hover
+    .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-color: transparent;
+    border-bottom-color: var(--admss-app-light-grey);
+}
+
+.export-web__header-count {
+    font-weight: 400;
+    margin-left: 10px;
+    font-size: 20px;
+    color: var(--admss-app-light-grey);
+}
+
+.export-web__header-count--active {
+    color: var(--admss-app-main-blue);
+}
+
+.export-web__search,
+.export-web__search .p-inputtext {
+    width: 180px;
+}
