@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportCollection, ReportsPostData } from "common/models/reports";
+import { ReportACL, ReportCollection, ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportTemplate = async (uid: string) => {
@@ -82,6 +82,22 @@ export const getUserFavoriteReportList = async (uid: string) => {
                 status: Status.ERROR,
                 error:
                     error.response?.data.error || "Error while getting user favorite report list",
+            };
+        }
+    }
+};
+
+export const getReportAccessList = async (reportuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | ReportACL>(
+            `user/${reportuid}/reportacl`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting user report access list",
             };
         }
     }
