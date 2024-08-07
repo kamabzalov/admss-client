@@ -160,3 +160,14 @@
     height: 40px;
     background: var(--admss-app-white);
 }
+
+.reports-accordion-header__label {
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--admss-app-warning-blue);
+    background-color: var(--admss-app-white);
+    border: 1px solid var(--admss-app-warning-blue);
+}

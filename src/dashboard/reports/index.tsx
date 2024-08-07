@@ -30,7 +30,7 @@ export default function Reports(): ReactElement {
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
-    const [customCollections] = useState<ReportCollection[]>([]);
+    const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
 
     const toast = useToast();
 
@@ -55,6 +55,7 @@ export default function Reports(): ReactElement {
                     (collection: ReportCollection) => collection.description !== "Favorites"
                 );
                 setCollections(collectionsWithoutFavorite);
+                setCustomCollections(response.slice(0, 5));
             } else {
                 setCollections([]);
             }
@@ -168,7 +169,16 @@ export default function Reports(): ReactElement {
                                         header={
                                             <ReportsAccordionHeader
                                                 title='Custom Collections'
-                                                info={`(${customCollections?.length || 0} reports)`}
+                                                info={`(${
+                                                    customCollections?.length || 0
+                                                } collections/ ${
+                                                    customCollections?.reduce(
+                                                        (acc, { documents }: ReportCollection) =>
+                                                            acc + documents?.length || acc,
+                                                        0
+                                                    ) || 0
+                                                } reports)`}
+                                                label='New'
                                             />
                                         }
                                         className='reports__accordion-tab'
@@ -181,11 +191,14 @@ export default function Reports(): ReactElement {
                                                 [...collections]
                                                     .splice(0, 5)
                                                     .map(
-                                                        ({
-                                                            itemUID,
-                                                            name,
-                                                            documents,
-                                                        }: ReportCollection) => (
+                                                        (
+                                                            {
+                                                                itemUID,
+                                                                name,
+                                                                documents,
+                                                            }: ReportCollection,
+                                                            index: number
+                                                        ) => (
                                                             <AccordionTab
                                                                 key={itemUID}
                                                                 header={
@@ -201,6 +214,7 @@ export default function Reports(): ReactElement {
                                                                                 outlined
                                                                             />
                                                                         }
+                                                                        label={index === 1 && "New"}
                                                                     />
                                                                 }
                                                                 className='reports__accordion-tab'
@@ -263,4 +277,3 @@ export default function Reports(): ReactElement {
         </div>
     );
 }
-

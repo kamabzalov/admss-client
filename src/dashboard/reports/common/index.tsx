@@ -83,18 +83,21 @@ interface ReportsAccordionHeaderProps {
     title: string;
     info: string;
     actionButton?: ReactElement;
+    label?: string | false;
 }
 
 export const ReportsAccordionHeader = ({
     title,
     info,
     actionButton,
+    label,
 }: ReportsAccordionHeaderProps): ReactElement => {
     return (
         <div className='reports-accordion-header'>
             <div className='flex gap-1'>
                 <div className='reports-accordion-header__title'>{title}</div>
                 <div className='reports-accordion-header__info'>{info}</div>
+                {label && <div className='reports-accordion-header__label'>{label}</div>}
             </div>
             {actionButton}
         </div>
