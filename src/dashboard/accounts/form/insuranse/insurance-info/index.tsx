@@ -61,7 +61,9 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                     if (res) {
                         setInsuranceInfo(res as AccountInsurance);
                         saveAccount();
-                        handleGetInsuranceHistory();
+                        handleGetInsuranceHistory().then(() => {
+                            setInsuranceEdit(false);
+                        });
                     }
                 });
         }
@@ -88,11 +90,13 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                     <InsuranceInfoField
                         label='Insurance Agent'
                         value={insuranceInfo?.Insurance_Agent_Name}
+                        onChange={(e) => handleChangeInsurance("Insurance_Agent_Name", e)}
                         editMode={insuranceEdit}
                     />
                     <InsuranceInfoField
                         label='Policy#'
                         value={insuranceInfo?.Insurance_Policy_Number}
+                        onChange={(e) => handleChangeInsurance("Insurance_Policy_Number", e)}
                         editMode={insuranceEdit}
                     />
 

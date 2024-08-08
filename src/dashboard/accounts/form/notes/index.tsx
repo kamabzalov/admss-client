@@ -3,7 +3,7 @@ import { ReactElement, useEffect, useState } from "react";
 
 import "./index.css";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { listAccountNotes } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
@@ -22,6 +22,7 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
 export const AccountNotes = (): ReactElement => {
     const { id } = useParams();
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
 
     useEffect(() => {
         if (id) {
@@ -30,6 +31,28 @@ export const AccountNotes = (): ReactElement => {
             });
         }
     }, [id]);
+
+    const handleDeleteNote = ({ itemuid }: AccountNote) => {
+        // TODO: add API call to delete
+        setNotesList(notesList.filter((item) => item.itemuid !== itemuid));
+    };
+
+    const rowExpansionTemplate = (data: AccountNote) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Note: </div>
+                <div className='expanded-row__text'>{data.Note || ""}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: AccountNote) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
+    };
 
     return (
         <div className='account-notes account-card'>
@@ -70,12 +93,15 @@ export const AccountNotes = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
-                            body={(options, { rowIndex }) => {
+                            body={(options) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
                                         <Button
@@ -83,8 +109,9 @@ export const AccountNotes = (): ReactElement => {
                                             icon='icon adms-edit-item'
                                         />
                                         <Button
-                                            className='text account-notes__table-button'
+                                            className='text export-web__icon-button'
                                             icon='pi pi-angle-down'
+                                            onClick={() => handleRowExpansionClick(options)}
                                         />
                                     </div>
                                 );
@@ -107,6 +134,33 @@ export const AccountNotes = (): ReactElement => {
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={(options) => {
+                                return (
+                                    <div className={`flex gap-3 align-items-center `}>
+                                        <Button
+                                            outlined
+                                            tooltip='Delete note'
+                                            className='account-notes__delete-button'
+                                            icon='icon adms-trash-can'
+                                            text
+                                            onClick={() => handleDeleteNote(options)}
+                                        />
+                                    </div>
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "40px",
+                                        borderLeft: "none",
+                                    },
+                                },
+                            }}
+                        />
                     </DataTable>
                 </div>
                 {!!notesList.length && (

@@ -31,7 +31,7 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "Balance", header: "Bal.Increase", checked: true },
     { field: "", header: "Payment", checked: true },
     { field: "New_Balance", header: "New Balance", checked: false },
-    { field: "Principal_Paid", checked: false },
+    { field: "Principal_Paid", header: "Principal", checked: false },
     { field: "Interest_Paid", header: "Interest", checked: false },
     { field: "", header: "Add’l", checked: false },
     { field: "Down_Pmt_Paid", header: "Down", checked: false },
@@ -236,6 +236,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 field={field}
                                 header={header}
                                 alignHeader={"left"}
+                                body={({ [field]: value }) => value || "-"}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'

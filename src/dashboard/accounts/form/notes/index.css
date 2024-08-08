@@ -6,6 +6,10 @@
     overflow: hidden;
 }
 
+.account-notes .account__control {
+    height: auto;
+}
+
 .account-note__input {
     width: 100%;
     height: 88px;
@@ -48,5 +52,16 @@
 
 .account-notes__table-button.p-button:hover {
     color: var(--admss-app-primary-main-green);
+    background: transparent;
+}
+
+.account-notes__delete-button.p-button.p-button-text {
+    color: var(--admss-app-primary);
+    width: 20px;
+    height: 20px;
+}
+
+.account-notes__delete-button.p-button.p-button-text:enabled:hover {
+    color: var(--admss-darkest-grey);
     background: transparent;
 }
