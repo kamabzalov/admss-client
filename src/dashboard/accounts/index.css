@@ -94,26 +94,3 @@
         }
     }
 }
-
-.account-history__button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 54px;
-    width: 210px;
-    font-weight: 700;
-}
-
-.account__dropdown.column-picker {
-    max-width: 245px;
-}
-
-.custom-dropdown-input {
-    display: flex;
-    justify-content: center;
-    border-right: 1px solid #ccc !important;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #b7b7b7;
-}
-

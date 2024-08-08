@@ -67,3 +67,4 @@ export const AccountTakePayment = (): ReactElement => {
         </div>
     );
 };
+

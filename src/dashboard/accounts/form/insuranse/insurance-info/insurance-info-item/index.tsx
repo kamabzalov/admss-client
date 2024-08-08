@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { InputText } from "primereact/inputtext";
 import { DateInput } from "dashboard/common/form/inputs";
+import { CalendarChangeEvent } from "primereact/calendar";
 
 interface EditableFieldProps {
     label: string;
@@ -17,13 +18,19 @@ export const InsuranceInfoField = ({
     onChange,
     inputType = "text",
 }: EditableFieldProps): ReactElement => {
+    const handleDateChange = (e: CalendarChangeEvent) => {
+        const dateInMs = new Date(e.target.value as string).getTime();
+        if (onChange) {
+            onChange(dateInMs.toString());
+        }
+    };
     if (editMode) {
         return inputType === "date" ? (
             <DateInput
                 id='account-insurance-title-num'
                 className='insurance-info__input w-full'
-                value={value || ""}
-                onChange={(e) => onChange && onChange(e.target.value as string)}
+                value={value}
+                onChange={handleDateChange}
             />
         ) : (
             <span className='p-float-label'>
@@ -32,7 +39,7 @@ export const InsuranceInfoField = ({
                     className='insurance-info__input w-full'
                     value={value || ""}
                     onChange={(e) => onChange && onChange(e.target.value)}
-                />{" "}
+                />
                 <label className='float-label'>{label}</label>
             </span>
         );
@@ -45,4 +52,3 @@ export const InsuranceInfoField = ({
         );
     }
 };
-

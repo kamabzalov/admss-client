@@ -2,15 +2,15 @@ import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
-import { AccountInformation } from "./information";
-import { AccountDownPayment } from "./down-payment";
-import { AccountInsurance } from "./insuranse";
-import { AccountManagement } from "./management";
-import { AccountNotes } from "./notes";
-import { AccountPaymentHistory } from "./payment-history";
-import { AccountPromiseToPay } from "./promise-to-pay";
-import { AccountSettings } from "./settings";
-import { useNavigate, useParams } from "react-router-dom";
+import { AccountInformation } from "dashboard/accounts/form/information";
+import { AccountDownPayment } from "dashboard/accounts/form/down-payment";
+import { AccountInsurance } from "dashboard/accounts/form/insuranse";
+import { AccountManagement } from "dashboard/accounts/form/management";
+import { AccountNotes } from "dashboard/accounts/form/notes";
+import { AccountPaymentHistory } from "dashboard/accounts/form/payment-history";
+import { AccountPromiseToPay } from "dashboard/accounts/form/promise-to-pay";
+import { AccountSettings } from "dashboard/accounts/form/settings";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 
@@ -18,6 +18,7 @@ interface TabItem {
     tabName: string;
     component?: ReactElement;
 }
+
 const tabItems: TabItem[] = [
     { tabName: "Account information", component: <AccountInformation /> },
     { tabName: "Account Management", component: <AccountManagement /> },
@@ -29,19 +30,41 @@ const tabItems: TabItem[] = [
     { tabName: "Insurance", component: <AccountInsurance /> },
 ];
 
+const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
+
 export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const location = useLocation();
     const store = useStore().accountStore;
     const {
         getAccount,
         account: { accountnumber, accountstatus },
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
+
     useEffect(() => {
         id && getAccount(id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tab = queryParams.get("tab");
+        const tabIndex = tab
+            ? tabItems.findIndex((item) => transformTabName(item.tabName) === tab)
+            : 0;
+        setActiveTab(tabIndex >= 0 ? tabIndex : 0);
+    }, [location.search]);
+
+    const handleTabChange = (index: number) => {
+        setActiveTab(index);
+        const tabName = transformTabName(tabItems[index].tabName);
+        const queryParams = new URLSearchParams(location.search);
+        queryParams.set("tab", tabName);
+        navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
+    };
+
     return (
         <div className='grid relative'>
             <Button
@@ -70,17 +93,18 @@ export const AccountsForm = observer((): ReactElement => {
                         <TabView
                             className='account__tabs'
                             activeIndex={activeTab}
-                            onTabChange={(e) => setActiveTab(e.index)}
+                            onTabChange={(e) => handleTabChange(e.index)}
                             panelContainerClassName='card-content__wrapper'
                         >
                             {tabItems.map(({ tabName, component }) => {
                                 return (
                                     <TabPanel
                                         header={tabName}
-                                        children={component}
                                         key={tabName}
                                         className='account__panel h-full'
-                                    />
+                                    >
+                                        {component}
+                                    </TabPanel>
                                 );
                             })}
                         </TabView>
@@ -88,14 +112,14 @@ export const AccountsForm = observer((): ReactElement => {
                     <div className='account__footer gap-3 ml-auto mr-3'>
                         <Button
                             className='uppercase px-6 account__button'
-                            onClick={() => setActiveTab(activeTab - 1)}
+                            onClick={() => handleTabChange(activeTab - 1)}
                             disabled={activeTab === 0}
                         >
                             Back
                         </Button>
                         <Button
                             className='uppercase px-6 account__button'
-                            onClick={() => setActiveTab(activeTab + 1)}
+                            onClick={() => handleTabChange(activeTab + 1)}
                             disabled={activeTab === tabItems.length - 1}
                         >
                             Next
