@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
-    getReportTemplate,
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
@@ -12,22 +11,26 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
-import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
+import { Panel } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportDocument } from "common/models/reports";
-import { useNavigate } from "react-router-dom";
+import {
+    ActionButtons,
+    ReportsAccordionHeader,
+    ReportsPanelHeader,
+} from "dashboard/reports/common";
 
 export default function Reports(): ReactElement {
-    const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
+    const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
 
     const toast = useToast();
 
@@ -52,6 +55,7 @@ export default function Reports(): ReactElement {
                     (collection: ReportCollection) => collection.description !== "Favorites"
                 );
                 setCollections(collectionsWithoutFavorite);
+                setCustomCollections(response.slice(0, 5));
             } else {
                 setCollections([]);
             }
@@ -68,108 +72,6 @@ export default function Reports(): ReactElement {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
-
-    const handleOpenReport = async (templateuid: string, preview: boolean = false) => {
-        try {
-            const response = await getReportTemplate(templateuid);
-            if (!response) {
-                throw new Error("Server not responding");
-            }
-            if (response.status === Status.ERROR) {
-                throw new Error(response.error);
-            }
-
-            setTimeout(() => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!preview) {
-                    link.download = `report_${templateuid}.pdf`;
-                    link.click();
-                } else {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
-                }
-            }, 3000);
-        } catch (error) {
-            const err = error as BaseResponseError;
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: err.error || String(err),
-                life: TOAST_LIFETIME,
-            });
-        }
-    };
-
-    const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
-        return (
-            <div className='reports-actions flex gap-3'>
-                <Button className='p-button' icon='pi pi-plus' outlined />
-                <Button className='p-button' icon='pi pi-heart' outlined />
-                <Button
-                    className='p-button reports-actions__button'
-                    outlined
-                    onClick={() => handleOpenReport(reportuid, true)}
-                >
-                    Preview
-                </Button>
-                <Button
-                    className='p-button reports-actions__button'
-                    outlined
-                    onClick={() => handleOpenReport(reportuid)}
-                >
-                    Download
-                </Button>
-            </div>
-        );
-    };
-
-    const ReportsAccordionHeader = ({
-        title,
-        info,
-    }: {
-        title: string;
-        info: string;
-    }): ReactElement => {
-        return (
-            <div className='reports-accordion-header flex gap-1'>
-                <div className='reports-accordion-header__title'>{title}</div>
-                <div className='reports-accordion-header__info'>{info}</div>
-            </div>
-        );
-    };
-
-    const ReportsPanelHeader = (options: PanelHeaderTemplateOptions) => {
-        return (
-            <div className='reports-header col-12 px-0 pb-3'>
-                <Button
-                    icon='pi pi-plus'
-                    className='reports-header__button'
-                    onClick={options.onTogglerClick}
-                >
-                    New collection
-                </Button>
-                <Button className='reports-header__button' onClick={() => navigate("create")}>
-                    Custom Report
-                </Button>
-                <span className='p-input-icon-right reports-header__search'>
-                    <i
-                        className={`pi pi-${!reportSearch ? "search" : "times cursor-pointer"}`}
-                        onClick={() => setReportSearch("")}
-                    />
-                    <InputText
-                        value={reportSearch}
-                        placeholder='Search'
-                        onChange={(e) => setReportSearch(e.target.value)}
-                    />
-                </span>
-            </div>
-        );
-    };
 
     const handleCreateCollection = () => {
         if (collectionName) {
@@ -203,7 +105,14 @@ export default function Reports(): ReactElement {
                         <div className='grid'>
                             <div className='col-12'>
                                 <Panel
-                                    headerTemplate={ReportsPanelHeader}
+                                    headerTemplate={(options) =>
+                                        ReportsPanelHeader({
+                                            options,
+                                            navigatePath: "create",
+                                            state: reportSearch,
+                                            setStateAction: setReportSearch,
+                                        })
+                                    }
                                     className='new-collection w-full'
                                     collapsed
                                     toggleable
@@ -256,6 +165,79 @@ export default function Reports(): ReactElement {
                             </div>
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
+                                    <AccordionTab
+                                        header={
+                                            <ReportsAccordionHeader
+                                                title='Custom Collections'
+                                                info={`(${
+                                                    customCollections?.length || 0
+                                                } collections/ ${
+                                                    customCollections?.reduce(
+                                                        (acc, { documents }: ReportCollection) =>
+                                                            acc + documents?.length || acc,
+                                                        0
+                                                    ) || 0
+                                                } reports)`}
+                                                label='New'
+                                            />
+                                        }
+                                        className='reports__accordion-tab'
+                                    >
+                                        <Accordion
+                                            multiple
+                                            className='reports__accordion reports__accordion--inner'
+                                        >
+                                            {collections &&
+                                                [...collections]
+                                                    .splice(0, 5)
+                                                    .map(
+                                                        (
+                                                            {
+                                                                itemUID,
+                                                                name,
+                                                                documents,
+                                                            }: ReportCollection,
+                                                            index: number
+                                                        ) => (
+                                                            <AccordionTab
+                                                                key={itemUID}
+                                                                header={
+                                                                    <ReportsAccordionHeader
+                                                                        title={name}
+                                                                        info={`(${
+                                                                            documents?.length || 0
+                                                                        } reports)`}
+                                                                        actionButton={
+                                                                            <Button
+                                                                                label='Edit'
+                                                                                className='reports-actions__button'
+                                                                                outlined
+                                                                            />
+                                                                        }
+                                                                        label={index === 1 && "New"}
+                                                                    />
+                                                                }
+                                                                className='reports__accordion-tab'
+                                                            >
+                                                                {documents &&
+                                                                    documents.map((report) => (
+                                                                        <div
+                                                                            className='reports__list-item reports__list-item--inner'
+                                                                            key={report.itemUID}
+                                                                        >
+                                                                            <p>{report.name}</p>
+                                                                            <ActionButtons
+                                                                                reportuid={
+                                                                                    report.itemUID
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                    ))}
+                                                            </AccordionTab>
+                                                        )
+                                                    )}
+                                        </Accordion>
+                                    </AccordionTab>
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
                                             ({ itemUID, name, documents }: ReportCollection) => (
@@ -295,4 +277,3 @@ export default function Reports(): ReactElement {
         </div>
     );
 }
-
