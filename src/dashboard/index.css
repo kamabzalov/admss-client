@@ -331,9 +331,12 @@
     color: var(--admss-app-blue-text);
 }
 
+.p-datatable tr:has(.row--selected) td {
+    background: var(--admss-app-light-green);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
     }
 }
-

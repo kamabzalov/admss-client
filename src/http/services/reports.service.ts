@@ -56,10 +56,13 @@ export const createReportCollection = async (
     }
 };
 
-export const getUserReportCollectionsContent = async (uid: string) => {
+export const getUserReportCollectionsContent = async (uid: string, params?: { qry?: string }) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | ReportCollection>(
-            `reports/${uid}/collectionscontent `
+            `reports/${uid}/collectionscontent`,
+            {
+                params,
+            }
         );
         return request.data;
     } catch (error) {
@@ -73,7 +76,7 @@ export const getUserReportCollectionsContent = async (uid: string) => {
 export const getUserFavoriteReportList = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | ReportCollection>(
-            `reports/${uid}/favorites `
+            `reports/${uid}/favorites`
         );
         return request.data;
     } catch (error) {
