@@ -57,7 +57,7 @@ export const AccountDownPayment = (): ReactElement => {
             <div className='grid account__body'>
                 <div className='col-3 ml-auto'>
                     <Menubar
-                        className='account__menubar ml-auto'
+                        className='account-menubar ml-auto'
                         model={[
                             {
                                 label: "Take Payment",

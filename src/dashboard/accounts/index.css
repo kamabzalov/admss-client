@@ -57,12 +57,16 @@
     padding-bottom: 20px;
 }
 
-.account__menubar {
+.account-menubar {
     background-color: transparent;
     font-weight: 700;
     border: 1px solid var(--admss-app-light-grey);
     height: 50px;
     width: 246px;
+    padding: 0;
+    font-family: Open Sans;
+    font-size: 20px;
+    text-align: center;
 
     .p-menuitem-link {
         width: 100%;
@@ -72,13 +76,15 @@
 
     .p-submenu-list {
         z-index: 99;
+        width: 246px;
     }
-    .p-menubar-root-list > .p-menuitem > .p-menuitem-link:focus {
+    .p-menubar-root-list .p-menuitem .p-menuitem-link:focus {
         box-shadow: none;
     }
 
-    .p-icon {
+    .p-menubar-root-list .p-menuitem .p-menuitem-link .p-submenu-icon {
         scale: 1.5;
+        margin-left: 2rem;
     }
 
     .p-submenu-list {

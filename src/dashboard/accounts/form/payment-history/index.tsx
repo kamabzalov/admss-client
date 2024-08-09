@@ -158,8 +158,8 @@ export const AccountPaymentHistory = (): ReactElement => {
                             },
                         }}
                     />
-                 <Menubar
-                        className='account__menubar ml-auto'
+                    <Menubar
+                        className='account-menubar ml-auto'
                         model={[
                             {
                                 label: "Take Payment",
@@ -175,13 +175,6 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 ],
                             },
                         ]}
-                        pt={{
-                            root: { className: "account-menuBar__root" },
-                            label: { className: "account-menuBar__label" },
-                            menu: { className: "account-menuBar__menu" },
-                            menuitem: { className: "account-menuBar__menuItem" },
-                            submenuIcon: { className: "account-menuBar__subMenuIcon" },
-                        }}
                     />
                 </div>
                 <div className='col-12 account__table'>
