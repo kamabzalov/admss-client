@@ -10,26 +10,3 @@
 .account__dropdown.column-picker {
     max-width: 245px;
 }
-
-.account-menuBar__root {
-    height: 54px;
-    padding: 0;
-}
-
-.account-menuBar__label {
-    font-family: Open Sans;
-    font-size: 20px;
-    text-align: center;
-}
-
-.account-menuBar__menu {
-    width: 245px !important;
-}
-
-.account-menuBar__menuItem {
-    width: 100%;
-}
-
-.account-menuBar__subMenuIcon {
-    margin-left: 2rem !important;
-}
