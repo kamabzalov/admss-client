@@ -5,6 +5,8 @@ import "./index.css";
 
 interface ConfirmModalProps extends ConfirmDialogProps {
     bodyMessage?: string;
+    title?: string;
+    icon?: string;
     confirmAction?: () => void;
     visible: boolean;
     onHide: () => void;
@@ -13,8 +15,10 @@ interface ConfirmModalProps extends ConfirmDialogProps {
 export const ConfirmModal = ({
     bodyMessage,
     confirmAction,
+    title,
     visible,
     onHide,
+    icon,
     ...props
 }: ConfirmModalProps) => {
     const toast = useRef<Toast>(null);
@@ -44,8 +48,8 @@ export const ConfirmModal = ({
         confirmDialog({
             header: (
                 <div className='confirm-header'>
-                    <i className='pi pi-times-circle confirm-header__icon' />
-                    <div className='confirm-header__title'>Are you sure?</div>
+                    <i className={`pi ${icon ? icon : "pi-times-circle"} confirm-header__icon`} />
+                    <div className='confirm-header__title'>{title || "Are you sure?"}</div>
                 </div>
             ),
             message: (

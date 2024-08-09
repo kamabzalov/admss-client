@@ -7,7 +7,6 @@ import {
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
@@ -22,6 +21,7 @@ import {
     ReportsAccordionHeader,
     ReportsPanelHeader,
 } from "dashboard/reports/common";
+import { TextInput } from "dashboard/common/form/inputs";
 
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -39,27 +39,41 @@ export default function Reports(): ReactElement {
         setUser(authUser);
     }, []);
 
-    const handleGetUserReportCollections = (useruid: string) =>
-        getUserReportCollectionsContent(useruid).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                return toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
+    const handleGetUserReportCollections = (useruid: string) => {
+        const qry = reportSearch;
+        const params = {
+            qry,
+        };
+        return getUserReportCollectionsContent(useruid, qry.length ? params : undefined).then(
+            (response) => {
+                const { error } = response as BaseResponseError;
+                if (error && toast.current) {
+                    return toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+                if (Array.isArray(response)) {
+                    const collectionsWithoutFavorite = response.filter(
+                        (collection: ReportCollection) => collection.description !== "Favorites"
+                    );
+                    setCollections(collectionsWithoutFavorite);
+                    setCustomCollections(response.slice(0, 5));
+                } else {
+                    setCollections([]);
+                }
             }
-            if (Array.isArray(response)) {
-                const collectionsWithoutFavorite = response.filter(
-                    (collection: ReportCollection) => collection.description !== "Favorites"
-                );
-                setCollections(collectionsWithoutFavorite);
-                setCustomCollections(response.slice(0, 5));
-            } else {
-                setCollections([]);
-            }
-        });
+        );
+    };
+
+    useEffect(() => {
+        if (user) {
+            handleGetUserReportCollections(user.useruid);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportSearch]);
 
     useEffect(() => {
         if (user) {
@@ -120,40 +134,44 @@ export default function Reports(): ReactElement {
                                     <h3 className='uppercase new-collection__title'>
                                         Add new collection
                                     </h3>
-                                    <div className='grid new-collection__form'>
-                                        <div className='col-4'>
-                                            <InputText
-                                                className='w-full'
-                                                value={collectionName}
-                                                onChange={(e) => setCollectionName(e.target.value)}
-                                                placeholder='Collection name'
-                                            />
-                                        </div>
+                                    <div className='grid new-collection__form mt-3'>
+                                        <TextInput
+                                            name='Collection name'
+                                            colWidth={4}
+                                            height={50}
+                                            value={collectionName}
+                                            onChange={(e) => setCollectionName(e.target.value)}
+                                        />
                                         <div className='col-8'>
-                                            <MultiSelect
-                                                filter
-                                                optionLabel='name'
-                                                options={collections.filter(
-                                                    (collection) => collection.documents
-                                                )}
-                                                optionGroupChildren='documents'
-                                                optionGroupLabel='name'
-                                                className='w-full new-collection__multiselect'
-                                                placeholder='Select reports'
-                                                showSelectAll={false}
-                                                value={selectedReports || []}
-                                                onChange={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedReports(e.value);
-                                                }}
-                                                pt={{
-                                                    wrapper: {
-                                                        style: {
-                                                            minHeight: "420px",
+                                            <span className='p-float-label'>
+                                                <MultiSelect
+                                                    filter
+                                                    optionLabel='name'
+                                                    options={collections.filter(
+                                                        (collection) => collection.documents
+                                                    )}
+                                                    optionGroupChildren='documents'
+                                                    optionGroupLabel='name'
+                                                    className='w-full new-collection__multiselect'
+                                                    placeholder='Select reports'
+                                                    showSelectAll={false}
+                                                    value={selectedReports || []}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedReports(e.value);
+                                                    }}
+                                                    pt={{
+                                                        wrapper: {
+                                                            style: {
+                                                                minHeight: "420px",
+                                                            },
                                                         },
-                                                    },
-                                                }}
-                                            />
+                                                    }}
+                                                />
+                                                <label className='float-label'>
+                                                    Select reports
+                                                </label>
+                                            </span>
                                         </div>
                                         <div className='col-12 flex justify-content-end'>
                                             <Button onClick={handleCreateCollection} outlined>
