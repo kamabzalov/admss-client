@@ -14,14 +14,13 @@ import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel } from "primereact/panel";
-import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     ActionButtons,
+    CollectionPanelContent,
     ReportsAccordionHeader,
     ReportsPanelHeader,
 } from "dashboard/reports/common";
-import { TextInput } from "dashboard/common/form/inputs";
 
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -31,6 +30,7 @@ export default function Reports(): ReactElement {
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
+    const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
 
     const toast = useToast();
 
@@ -108,6 +108,11 @@ export default function Reports(): ReactElement {
         }
     };
 
+    const handleEditCollection = (event: React.MouseEvent<HTMLElement>, id: string) => {
+        event.preventDefault();
+        setIsCollectionEditing(id);
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -127,58 +132,18 @@ export default function Reports(): ReactElement {
                                             setStateAction: setReportSearch,
                                         })
                                     }
-                                    className='new-collection w-full'
+                                    className='edit-collection w-full'
                                     collapsed
                                     toggleable
                                 >
-                                    <h3 className='uppercase new-collection__title'>
-                                        Add new collection
-                                    </h3>
-                                    <div className='grid new-collection__form mt-3'>
-                                        <TextInput
-                                            name='Collection name'
-                                            colWidth={4}
-                                            height={50}
-                                            value={collectionName}
-                                            onChange={(e) => setCollectionName(e.target.value)}
-                                        />
-                                        <div className='col-8'>
-                                            <span className='p-float-label'>
-                                                <MultiSelect
-                                                    filter
-                                                    optionLabel='name'
-                                                    options={collections.filter(
-                                                        (collection) => collection.documents
-                                                    )}
-                                                    optionGroupChildren='documents'
-                                                    optionGroupLabel='name'
-                                                    className='w-full new-collection__multiselect'
-                                                    placeholder='Select reports'
-                                                    showSelectAll={false}
-                                                    value={selectedReports || []}
-                                                    onChange={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedReports(e.value);
-                                                    }}
-                                                    pt={{
-                                                        wrapper: {
-                                                            style: {
-                                                                minHeight: "420px",
-                                                            },
-                                                        },
-                                                    }}
-                                                />
-                                                <label className='float-label'>
-                                                    Select reports
-                                                </label>
-                                            </span>
-                                        </div>
-                                        <div className='col-12 flex justify-content-end'>
-                                            <Button onClick={handleCreateCollection} outlined>
-                                                Create collection
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <CollectionPanelContent
+                                        collectionName={collectionName}
+                                        collections={collections}
+                                        selectedReports={selectedReports}
+                                        setCollectionName={setCollectionName}
+                                        setSelectedReports={setSelectedReports}
+                                        handleCreateCollection={handleCreateCollection}
+                                    />
                                 </Panel>
                             </div>
                             <div className='col-12'>
@@ -204,6 +169,7 @@ export default function Reports(): ReactElement {
                                         <Accordion
                                             multiple
                                             className='reports__accordion reports__accordion--inner'
+                                            onTabClose={() => setIsCollectionEditing(null)}
                                         >
                                             {collections &&
                                                 [...collections]
@@ -230,6 +196,12 @@ export default function Reports(): ReactElement {
                                                                                 label='Edit'
                                                                                 className='reports-actions__button'
                                                                                 outlined
+                                                                                onClick={(e) =>
+                                                                                    handleEditCollection(
+                                                                                        e,
+                                                                                        itemUID
+                                                                                    )
+                                                                                }
                                                                             />
                                                                         }
                                                                         label={index === 1 && "New"}
@@ -237,7 +209,41 @@ export default function Reports(): ReactElement {
                                                                 }
                                                                 className='reports__accordion-tab'
                                                             >
-                                                                {documents &&
+                                                                {isCollectionEditing === itemUID ? (
+                                                                    <div className='edit-collection p-panel'>
+                                                                        <div className='p-panel-content relative'>
+                                                                            <CollectionPanelContent
+                                                                                handleClosePanel={() =>
+                                                                                    setIsCollectionEditing(
+                                                                                        null
+                                                                                    )
+                                                                                }
+                                                                                collectionuid={
+                                                                                    itemUID
+                                                                                }
+                                                                                collectionName={
+                                                                                    name
+                                                                                }
+                                                                                collections={
+                                                                                    collections
+                                                                                }
+                                                                                selectedReports={
+                                                                                    documents
+                                                                                }
+                                                                                setCollectionName={
+                                                                                    setCollectionName
+                                                                                }
+                                                                                setSelectedReports={
+                                                                                    setSelectedReports
+                                                                                }
+                                                                                handleCreateCollection={
+                                                                                    handleCreateCollection
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    documents &&
                                                                     documents.map((report) => (
                                                                         <div
                                                                             className='reports__list-item reports__list-item--inner'
@@ -250,7 +256,8 @@ export default function Reports(): ReactElement {
                                                                                 }
                                                                             />
                                                                         </div>
-                                                                    ))}
+                                                                    ))
+                                                                )}
                                                             </AccordionTab>
                                                         )
                                                     )}
