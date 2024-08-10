@@ -1,6 +1,7 @@
-import { ReportACL } from "common/models/reports";
+import { ReportACL, ReportCollection, ReportDocument } from "common/models/reports";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TextInput } from "dashboard/common/form/inputs";
 import { getReportAccessList } from "http/services/reports.service";
 import { Button, ButtonProps } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -295,5 +296,112 @@ export const ReportsPanelHeader = ({
                 onHide={() => setIsConfirmVisible(null)}
             />
         </div>
+    );
+};
+
+interface CollectionPanelContentProps {
+    collectionName: string;
+    collectionuid?: string;
+    collections: ReportCollection[];
+    selectedReports: ReportDocument[];
+    setCollectionName: (name: string) => void;
+    setSelectedReports: (reports: ReportDocument[]) => void;
+    handleCreateCollection: () => void;
+    handleClosePanel?: () => void;
+}
+
+export const CollectionPanelContent = ({
+    collectionName,
+    collectionuid,
+    collections,
+    selectedReports,
+    setCollectionName,
+    setSelectedReports,
+    handleCreateCollection,
+    handleClosePanel,
+}: CollectionPanelContentProps): ReactElement => {
+    const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+    return (
+        <>
+            <h3 className='edit-collection__title'>Add new collection</h3>
+            {handleClosePanel && (
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={() => setIsConfirmVisible(true)}
+                />
+            )}
+            <div className='grid edit-collection__form mt-3'>
+                <TextInput
+                    name='Collection name'
+                    colWidth={4}
+                    height={50}
+                    value={collectionName}
+                    onChange={(e) => setCollectionName(e.target.value)}
+                />
+                <div className='col-8'>
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            filter
+                            optionLabel='name'
+                            options={collections.filter((collection) => collection.documents)}
+                            optionGroupChildren='documents'
+                            optionGroupLabel='name'
+                            className='w-full edit-collection__multiselect'
+                            placeholder='Select reports'
+                            showSelectAll={false}
+                            value={selectedReports || []}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                setSelectedReports(e.value);
+                            }}
+                            pt={{
+                                wrapper: {
+                                    style: {
+                                        minHeight: "420px",
+                                    },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Select reports</label>
+                    </span>
+                </div>
+                <div className='col-12 flex justify-content-end gap-3'>
+                    {collectionuid && (
+                        <Button
+                            className='edit-collection__button'
+                            type='button'
+                            severity='danger'
+                            outlined
+                            onClick={handleClosePanel}
+                        >
+                            Delete
+                        </Button>
+                    )}
+                    <Button
+                        className='edit-collection__button'
+                        type='button'
+                        onClick={handleCreateCollection}
+                        outlined
+                    >
+                        {collectionuid ? "Update" : "Create"}
+                    </Button>
+                </div>
+            </div>
+            <ConfirmModal
+                visible={!!isConfirmVisible}
+                title='Quit Editing?'
+                icon='pi-exclamation-triangle'
+                bodyMessage='
+                Are you sure you want to cancel creating a new collection?
+                All unsaved data will be lost.'
+                confirmAction={handleClosePanel}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Confirm'
+                className='schedule-confirm-dialog'
+                onHide={() => setIsConfirmVisible(false)}
+            />
+        </>
     );
 };

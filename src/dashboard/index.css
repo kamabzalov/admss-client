@@ -335,6 +335,14 @@
     background: var(--admss-app-light-green);
 }
 
+.p-button.p-button-danger.p-button-outlined {
+    color: var(--admss-app-red);
+}
+
+.p-button.p-button-danger.p-button-outlined:enabled:hover {
+    color: var(--admss-app-focus-red);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
