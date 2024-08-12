@@ -8,17 +8,22 @@ import "./index.css";
 import { useParams } from "react-router-dom";
 import { listAccountActivity } from "http/services/accounts.service";
 import { ACCOUNT_ACTIVITY_LIST } from "common/constants/account-options";
+import { AccountListActivity } from "common/models/accounts";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "date", header: "Date" },
-    { field: "description", header: "Description" },
-    { field: "debit", header: "Debit" },
-    { field: "credit", header: "Credit" },
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountListActivity;
+}
+
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "Date", header: "Date" },
+    { field: "Description", header: "Description" },
+    { field: "Debit", header: "Debit" },
+    { field: "Credit", header: "Credit" },
 ];
 
 export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
-    const [activityList, setActivityList] = useState<any[]>([]);
+    const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
 
     useEffect(() => {
