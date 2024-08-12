@@ -14,41 +14,49 @@ export const ACCOUNT_ACTIVITY_LIST = [
 ];
 
 export const ACCOUNT_PAYMENT_METHODS = [
- { name: "Check"},
- { name: "Cash"},
- { name: "VISA"},
- { name: "MC"},
- { name: "Discovery"},
- { name: "AMEX"},
- { name: "Debit"},
- { name: "ACH"},
- { name: "Money Order"},
- { name: "Western Union"},
- { name: "Travel Check"},
- { name: "Bank Check"},
- { name: "Trade-In"},
+ { name: "Check" },
+ { name: "Cash" },
+ { name: "VISA" },
+ { name: "MC" },
+ { name: "Discovery" },
+ { name: "AMEX" },
+ { name: "Debit" },
+ { name: "ACH" },
+ { name: "Money Order" },
+ { name: "Western Union" },
+ { name: "Travel Check" },
+ { name: "Bank Check" },
+ { name: "Trade-In" },
 ];
 
 export const ACCOUNT_FEE_TYPES = [
- { name: "Other"},
- { name: "Late Fee"},
- { name: "NSF Charge"},
- { name: "Returned Check Fee"},
- { name: "Mechanical Repair Fee"},
- { name: "Repo Fee"},
- { name: "Tow Fee"},
- { name: "Garage Fee"},
- { name: "Property Tax"},
- { name: "Interest"},
+ { name: "Other" },
+ { name: "Late Fee" },
+ { name: "NSF Charge" },
+ { name: "Returned Check Fee" },
+ { name: "Mechanical Repair Fee" },
+ { name: "Repo Fee" },
+ { name: "Tow Fee" },
+ { name: "Garage Fee" },
+ { name: "Property Tax" },
+ { name: "Interest" },
 ];
 
 export const ACCOUNT_PAYMENT_TYPES = [
- { name: "Fee"},
- { name: "Adjustment"},
- { name: "Down Payment"},
- { name: "Pickup Payment"},
- { name: "QuickPay Payment"},
- { name: "Payoff Payment"},
+ { name: "Fee" },
+ { name: "Adjustment" },
+ { name: "Down Payment" },
+ { name: "Pickup Payment" },
+ { name: "QuickPay Payment" },
+ { name: "Payoff Payment" },
+];
+
+export const ACCOUNT_PROMISE_STATUS = [
+ { name: "Default" },
+ { name: "Paid" },
+ { name: "Late" },
+ { name: "Broken" },
+ { name: "Outstanding" },
 ];
 
 export const ACCOUNT_PAYMENT_STATUS_LIST = [{ name: "All Payments" }, { name: "Exclude Deleted" }];

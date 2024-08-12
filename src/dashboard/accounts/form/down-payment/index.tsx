@@ -4,28 +4,29 @@ import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { listAccountPayments } from "http/services/accounts.service";
+import { listAccountDownPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { Menubar } from "primereact/menubar";
+import { AccountDownPayments } from "common/models/accounts";
 
 interface TableColumnProps extends ColumnProps {
-    field: any;
+    field: keyof AccountDownPayments;
 }
 
 const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-    { field: "receiptNo", header: "Receipt#" },
-    { field: "date", header: "Date" },
-    { field: "amount", header: "Amount" },
-    { field: "payed", header: "Payed" },
+    { field: "Receipt", header: "Receipt#" },
+    { field: "Date", header: "Date" },
+    { field: "Amount", header: "Amount" },
+    { field: "Paid", header: "Payed" },
 ];
 
 export const AccountDownPayment = (): ReactElement => {
     const { id } = useParams();
-    const [paymentList, setPaymentList] = useState<any>([]);
+    const [paymentList, setPaymentList] = useState<AccountDownPayments[]>([]);
 
     useEffect(() => {
         if (id) {
-            listAccountPayments(id).then((res) => {
+            listAccountDownPayments(id).then((res) => {
                 if (Array.isArray(res) && res.length) setPaymentList(res);
             });
         }

@@ -6,12 +6,19 @@ import { Button } from "primereact/button";
 import { ACCOUNT_STATUS_LIST } from "common/constants/account-options";
 import { TotalPaidDialog } from "./total-paid-dialog";
 import { useNavigate, useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const AccountSettings = (): ReactElement => {
+export const AccountSettings = observer((): ReactElement => {
     const [accountStatus, setAccountStatus] = useState<string>("");
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
     const navigate = useNavigate();
     const { id } = useParams();
+    const store = useStore().accountStore;
+    const {
+        accountExtData: { DoNotReport, CashOnly },
+        changeAccountExtData,
+    } = store;
 
     const handleNavigate = (tabName: string) => {
         const params = new URLSearchParams();
@@ -41,7 +48,8 @@ export const AccountSettings = (): ReactElement => {
                     <Checkbox
                         inputId='account-settings-cash-only'
                         name='account-settings-cash-only'
-                        checked={false}
+                        checked={!!CashOnly}
+                        onChange={() => changeAccountExtData("CashOnly", !!CashOnly ? 0 : 1)}
                     />
                     <label htmlFor='account-settings-cash-only' className='ml-2'>
                         Mark Account Cash Only
@@ -49,11 +57,12 @@ export const AccountSettings = (): ReactElement => {
                 </div>
                 <div className='col-3 account-settings__checkbox'>
                     <Checkbox
-                        inputId='account-settings-cash-only'
-                        name='account-settings-cash-only'
-                        checked={false}
+                        inputId='account-settings-report'
+                        name='account-settings-report'
+                        checked={!!DoNotReport}
+                        onChange={() => changeAccountExtData("DoNotReport", !!DoNotReport ? 0 : 1)}
                     />
-                    <label htmlFor='account-settings-cash-only' className='ml-2'>
+                    <label htmlFor='account-settings-report' className='ml-2'>
                         Do Not Report To Credit Bureau
                     </label>
                 </div>
@@ -81,4 +90,4 @@ export const AccountSettings = (): ReactElement => {
             <TotalPaidDialog visible={isDialogActive} onHide={() => setIsDialogActive(false)} />
         </div>
     );
-};
+});

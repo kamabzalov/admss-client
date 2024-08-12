@@ -3,17 +3,36 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
+import { listAccountPromises } from "http/services/accounts.service";
+import { useParams } from "react-router-dom";
+import { AccountPromise } from "common/models/accounts";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "Pay Date", header: "Pay Date" },
-    { field: "Note Taker", header: "Note Taker" },
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountPromise | "";
+}
+
+export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
+
+const renderColumnsData: Pick<TableColumnsList, "header" | "field">[] = [
+    { field: "paydate", header: "Pay Date" },
+    { field: "username", header: "Note Taker" },
     { field: "amount", header: "Amount" },
 ];
 
 export const AccountPromiseToPay = (): ReactElement => {
-    const [promiseList] = useState<any>([]);
+    const { id } = useParams();
+    const [promiseList, setPromiseList] = useState<AccountPromise[]>([]);
+
+    useEffect(() => {
+        id &&
+            listAccountPromises(id).then((res) => {
+                if (Array.isArray(res) && res.length) setPromiseList(res);
+            });
+    }, [id]);
+
     return (
         <div className='account-promise account-card'>
             <h3 className='account-promise__title account-title'>Promise to pay</h3>
@@ -21,7 +40,9 @@ export const AccountPromiseToPay = (): ReactElement => {
                 <div className='col-12 account__control'>
                     <Dropdown
                         className='account__dropdown'
-                        options={["Add Promise"]}
+                        options={ACCOUNT_PROMISE_STATUS}
+                        optionLabel='name'
+                        optionValue='name'
                         value='Add Promise'
                     />
                     <Dropdown
