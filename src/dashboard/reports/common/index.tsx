@@ -82,6 +82,9 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                 }
             });
         }
+        return () => {
+            setIsButtonDisabled(true);
+        };
     }, [visible, reportuid]);
 
     const accessField = (data: ReportACL & { access: number }): ReactElement => {
@@ -212,6 +215,7 @@ interface ReportsAccordionHeaderProps {
     info: string;
     actionButton?: ReactElement;
     label?: string | false;
+    selected?: boolean;
 }
 
 export const ReportsAccordionHeader = ({
@@ -219,12 +223,17 @@ export const ReportsAccordionHeader = ({
     info,
     actionButton,
     label,
+    selected,
 }: ReportsAccordionHeaderProps): ReactElement => {
     return (
         <div className='reports-accordion-header'>
             <div className='flex gap-1'>
                 <div className='reports-accordion-header__title'>{title}</div>
-                <div className='reports-accordion-header__info'>{info}</div>
+                <div
+                    className={`reports-accordion-header__info ${selected ? "searched-item" : ""}`}
+                >
+                    {info}
+                </div>
                 {label && <div className='reports-accordion-header__label'>{label}</div>}
             </div>
             {actionButton}
@@ -236,6 +245,7 @@ interface ReportsPanelHeaderProps extends ButtonProps {
     options: PanelHeaderTemplateOptions;
     state: string;
     navigatePath: string;
+    isConfirm: boolean;
     setStateAction: (state: string) => void;
 }
 
@@ -243,6 +253,7 @@ export const ReportsPanelHeader = ({
     options,
     state,
     navigatePath,
+    isConfirm,
     setStateAction,
 }: ReportsPanelHeaderProps): ReactElement => {
     const navigate = useNavigate();
@@ -258,7 +269,7 @@ export const ReportsPanelHeader = ({
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={setIsConfirmVisible}
+                onClick={(e) => (isConfirm ? setIsConfirmVisible(e) : options.onTogglerClick(e))}
             />
             <Button
                 icon='pi pi-plus'
@@ -321,6 +332,10 @@ export const CollectionPanelContent = ({
     handleClosePanel,
 }: CollectionPanelContentProps): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+
+    const selectedItemTemplate = (item: ReportDocument): ReactElement => {
+        return <span className='multiselect-label'>{item?.name || ""}</span>;
+    };
     return (
         <>
             <h3 className='edit-collection__title'>Add new collection</h3>
@@ -348,19 +363,15 @@ export const CollectionPanelContent = ({
                             optionGroupChildren='documents'
                             optionGroupLabel='name'
                             className='w-full edit-collection__multiselect'
+                            selectedItemTemplate={(item) => {
+                                return selectedItemTemplate(item);
+                            }}
                             placeholder='Select reports'
                             showSelectAll={false}
                             value={selectedReports || []}
                             onChange={(e) => {
                                 e.stopPropagation();
                                 setSelectedReports(e.value);
-                            }}
-                            pt={{
-                                wrapper: {
-                                    style: {
-                                        minHeight: "420px",
-                                    },
-                                },
                             }}
                         />
                         <label className='float-label'>Select reports</label>
@@ -380,6 +391,10 @@ export const CollectionPanelContent = ({
                     )}
                     <Button
                         className='edit-collection__button'
+                        disabled={!collectionName || !selectedReports.length}
+                        severity={
+                            !collectionName || !selectedReports.length ? "secondary" : "success"
+                        }
                         type='button'
                         onClick={handleCreateCollection}
                         outlined

@@ -343,6 +343,23 @@
     color: var(--admss-app-focus-red);
 }
 
+.searched-item {
+    color: var(--admss-app-primary-main-green);
+    position: relative;
+}
+
+.searched-item::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    top: 50%;
+    right: 0;
+    translate: 150% -50%;
+    background-color: var(--admss-app-primary-main-green);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
