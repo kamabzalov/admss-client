@@ -71,13 +71,6 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportSearch]);
-
-    useEffect(() => {
-        if (user) {
-            handleGetUserReportCollections(user.useruid);
             getUserFavoriteReportList(user.useruid).then((response) => {
                 if (Array.isArray(response)) {
                     setFavoriteCollections(response);
@@ -129,6 +122,8 @@ export default function Reports(): ReactElement {
                                             options,
                                             navigatePath: "create",
                                             state: reportSearch,
+                                            isConfirm:
+                                                !!selectedReports.length || !!collectionName.length,
                                             setStateAction: setReportSearch,
                                         })
                                     }
@@ -184,6 +179,7 @@ export default function Reports(): ReactElement {
                                                             index: number
                                                         ) => (
                                                             <AccordionTab
+                                                                disabled={!documents?.length}
                                                                 key={itemUID}
                                                                 header={
                                                                     <ReportsAccordionHeader
@@ -265,33 +261,59 @@ export default function Reports(): ReactElement {
                                     </AccordionTab>
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
-                                            ({ itemUID, name, documents }: ReportCollection) => (
-                                                <AccordionTab
-                                                    key={itemUID}
-                                                    header={
-                                                        <ReportsAccordionHeader
-                                                            title={name}
-                                                            info={`(${
-                                                                documents?.length || 0
-                                                            } reports)`}
-                                                        />
-                                                    }
-                                                    className='reports__accordion-tab'
-                                                >
-                                                    {documents &&
-                                                        documents.map((report) => (
-                                                            <div
-                                                                className='reports__list-item'
-                                                                key={report.itemUID}
-                                                            >
-                                                                <p>{report.name}</p>
-                                                                <ActionButtons
-                                                                    reportuid={report.itemUID}
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                </AccordionTab>
-                                            )
+                                            ({ itemUID, name, documents }: ReportCollection) => {
+                                                const isContainsSearchedValue =
+                                                    reportSearch &&
+                                                    documents?.some((report) =>
+                                                        report.name
+                                                            .toLowerCase()
+                                                            .includes(reportSearch.toLowerCase())
+                                                    );
+                                                return (
+                                                    <AccordionTab
+                                                        key={itemUID}
+                                                        disabled={!documents?.length}
+                                                        header={
+                                                            <ReportsAccordionHeader
+                                                                title={name}
+                                                                selected={
+                                                                    isContainsSearchedValue || false
+                                                                }
+                                                                info={`(${
+                                                                    documents?.length || 0
+                                                                } reports)`}
+                                                            />
+                                                        }
+                                                        className='reports__accordion-tab'
+                                                    >
+                                                        {documents &&
+                                                            documents.map((report) => (
+                                                                <div
+                                                                    className='reports__list-item'
+                                                                    key={report.itemUID}
+                                                                >
+                                                                    <p
+                                                                        className={
+                                                                            reportSearch &&
+                                                                            report.name
+                                                                                .toLowerCase()
+                                                                                .includes(
+                                                                                    reportSearch.toLowerCase()
+                                                                                )
+                                                                                ? "searched-item"
+                                                                                : ""
+                                                                        }
+                                                                    >
+                                                                        {report.name}
+                                                                    </p>
+                                                                    <ActionButtons
+                                                                        reportuid={report.itemUID}
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                    </AccordionTab>
+                                                );
+                                            }
                                         )}
                                 </Accordion>
                             </div>

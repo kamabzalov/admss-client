@@ -66,7 +66,7 @@ export const ConfirmModal = ({
 
     return (
         <>
-            <ConfirmDialog {...props} visible={visible} onHide={onHide} />
+            <ConfirmDialog focusOnShow {...props} visible={visible} onHide={onHide} />
             <Toast ref={toast} />
         </>
     );

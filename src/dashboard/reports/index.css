@@ -78,6 +78,12 @@
     background-color: var(--admss-app-light-green);
 }
 
+.p-accordion:has(.searched-item)
+    .p-accordion-header.reports__accordion-tab.p-highlight
+    .p-accordion-header-link {
+    color: var(--admss-app-primary-main-green);
+}
+
 .p-accordion
     .p-accordion-header.reports__accordion-tab
     .p-accordion-header-link
@@ -236,4 +242,8 @@
     width: 140px;
     height: 50px;
     font-weight: 600;
+}
+
+.multiselect-label:not(:last-of-type):after {
+    content: ", ";
 }
