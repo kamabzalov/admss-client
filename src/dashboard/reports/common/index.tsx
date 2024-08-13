@@ -292,20 +292,22 @@ export const ReportsPanelHeader = ({
                     onChange={(e) => setStateAction(e.target.value)}
                 />
             </span>
-            <ConfirmModal
-                visible={!!isConfirmVisible}
-                title='Quit Editing?'
-                icon='pi-exclamation-triangle'
-                bodyMessage='
+            {isConfirm && isConfirmVisible && (
+                <ConfirmModal
+                    visible={!!isConfirmVisible}
+                    title='Quit Editing?'
+                    icon='pi-exclamation-triangle'
+                    bodyMessage='
                 Are you sure you want to cancel creating a new collection?
                 All unsaved data will be lost.'
-                confirmAction={handleClosePanel}
-                draggable={false}
-                rejectLabel='Cancel'
-                acceptLabel='Confirm'
-                className='schedule-confirm-dialog'
-                onHide={() => setIsConfirmVisible(null)}
-            />
+                    confirmAction={handleClosePanel}
+                    draggable={false}
+                    rejectLabel='Cancel'
+                    acceptLabel='Confirm'
+                    className='schedule-confirm-dialog'
+                    onHide={() => setIsConfirmVisible(null)}
+                />
+            )}
         </div>
     );
 };
