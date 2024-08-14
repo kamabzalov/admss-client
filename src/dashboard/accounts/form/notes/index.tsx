@@ -8,6 +8,7 @@ import { Column, ColumnProps } from "primereact/column";
 import { listAccountNotes } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountNote } from "common/models/accounts";
+import { AddNoteDialog } from "./add-note-dialog";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -23,6 +24,7 @@ export const AccountNotes = (): ReactElement => {
     const { id } = useParams();
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const [dialogShow, setDialogShow] = useState<boolean>(false);
 
     useEffect(() => {
         if (id) {
@@ -83,7 +85,9 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 </div>
                 <div className='col-12 mt-5 flex justify-content-end'>
-                    <Button className='account-notes__button'>Add Note</Button>
+                    <Button className='account-notes__button' onClick={() => setDialogShow(true)}>
+                        Add Note
+                    </Button>
                 </div>
                 <div className='col-12 account__table'>
                     <DataTable
@@ -170,6 +174,7 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 )}
             </div>
+            <AddNoteDialog visible={dialogShow} onHide={() => setDialogShow(false)} />
         </div>
     );
 };

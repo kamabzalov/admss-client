@@ -9,6 +9,7 @@ import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 import { listAccountPromises } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
+import { Menubar } from "primereact/menubar";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -25,6 +26,7 @@ const renderColumnsData: Pick<TableColumnsList, "header" | "field">[] = [
 export const AccountPromiseToPay = (): ReactElement => {
     const { id } = useParams();
     const [promiseList, setPromiseList] = useState<AccountPromise[]>([]);
+    const [promiseStatus, setPromiseStatus] = useState<string[]>([]);
 
     useEffect(() => {
         id &&
@@ -41,14 +43,30 @@ export const AccountPromiseToPay = (): ReactElement => {
                     <Dropdown
                         className='account__dropdown'
                         options={ACCOUNT_PROMISE_STATUS}
-                        optionLabel='name'
-                        optionValue='name'
-                        value='Add Promise'
+                        value={promiseStatus}
+                        onChange={(e) => setPromiseStatus(e.value)}
                     />
-                    <Dropdown
-                        className='account__dropdown ml-auto'
-                        options={["Set Paid As Promised"]}
-                        value='Set Paid As Promised'
+                    <Menubar
+                        className='account-menubar ml-auto account-promise__menubar'
+                        model={[
+                            {
+                                label: "Set Paid As Promised",
+                                items: [
+                                    {
+                                        label: "Set Paid Late",
+                                        icon: "pi pi-circle",
+                                    },
+                                    {
+                                        label: "Set Promise Broken",
+                                        icon: "pi pi-circle",
+                                    },
+                                    {
+                                        label: "Set Outstanding",
+                                        icon: "pi pi-circle",
+                                    },
+                                ],
+                            },
+                        ]}
                     />
                 </div>
                 <div className='col-12 account__table'>

@@ -65,3 +65,16 @@
     color: var(--admss-darkest-grey);
     background: transparent;
 }
+
+.account-note__textarea {
+    height: 200px;
+    resize: none;
+}
+
+.add-note {
+    flex: 0 0 660px;
+}
+
+.add-note__time {
+    margin-left: 10px;
+}
