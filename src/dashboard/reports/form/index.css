@@ -58,11 +58,8 @@
  display: flex;
  width: 98%;
  margin: 30px auto;
+ background-color: var(--admss-app-lightest-grey);
  justify-content: center;
- border-radius: 5px;
- box-shadow: 0px 5px 5px 0 var(--admss-app-light-blue);
- border: var(--admss-app-light-blue) solid 1px;
-
  flex-wrap: wrap;
 }
 

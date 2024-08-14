@@ -124,7 +124,6 @@ const AppRouter = (): ReactElement => {
                             ),
                             children: [
                                 { path: "", element: <Reports /> },
-                                { path: ":id", element: <ReportForm /> },
                                 { path: "create", element: <ReportForm /> },
                             ],
                         },
