@@ -317,47 +317,21 @@
 
 .splitter__line {
     border: none;
-    border-top: 1px solid var(--admss-app-light-grey);
+    border-top: 1px solid #E7E7E7;
     margin-top: 12px;
 }
 
 .splitter__title {
+    font-family: Open Sans;
     font-size: 18px;
-    text-transform: uppercase;
     font-weight: 700;
+    line-height: 24.51px;
+    text-align: left;
+    text-transform: uppercase;
 }
 
 .p-datatable .p-sortable-column .p-sortable-column-icon {
     color: var(--admss-app-blue-text);
-}
-
-.p-datatable tr:has(.row--selected) td {
-    background: var(--admss-app-light-green);
-}
-
-.p-button.p-button-danger.p-button-outlined {
-    color: var(--admss-app-red);
-}
-
-.p-button.p-button-danger.p-button-outlined:enabled:hover {
-    color: var(--admss-app-focus-red);
-}
-
-.searched-item {
-    color: var(--admss-app-primary-main-green);
-    position: relative;
-}
-
-.searched-item::after {
-    content: "";
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    top: 50%;
-    right: 0;
-    translate: 150% -50%;
-    background-color: var(--admss-app-primary-main-green);
 }
 
 @media screen and (min-width: 992px) {
