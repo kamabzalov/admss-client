@@ -164,22 +164,6 @@ export const ReportForm = (): ReactElement => {
                                         <label className='float-label w-full'>Name</label>
                                     </span>
                                 </div>
-                                <div className='col-3'>
-                                    <Button
-                                        className='uppercase w-full px-6 report__button'
-                                        outlined
-                                    >
-                                        Preview
-                                    </Button>
-                                </div>
-                                <div className='col-3'>
-                                    <Button
-                                        className='uppercase w-full px-6 report__button'
-                                        outlined
-                                    >
-                                        Download
-                                    </Button>
-                                </div>
                                 <div className='col-12 report-controls'>
                                     <div className='report-controls__top'>
                                         <span className='p-float-label'>
@@ -377,18 +361,6 @@ export const ReportForm = (): ReactElement => {
                         <Button
                             className='report__icon-button'
                             icon='icon adms-password'
-                            severity='secondary'
-                            disabled
-                        />
-                        <Button
-                            className='report__icon-button'
-                            icon='icon adms-blank'
-                            severity='secondary'
-                            disabled
-                        />
-                        <Button
-                            className='report__icon-button'
-                            icon='icon adms-trash-can'
                             severity='secondary'
                             disabled
                         />
