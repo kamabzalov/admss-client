@@ -14,7 +14,7 @@
 }
 
 .account__tabs .p-tabview-panels {
-    flex: 1;
+    flex: 0 1 80%;
     padding-top: 0;
 }
 
