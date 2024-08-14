@@ -374,4 +374,3 @@ export const ReportForm = (): ReactElement => {
         </div>
     );
 };
-
