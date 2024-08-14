@@ -11,6 +11,7 @@ import { InsuranceInfoField } from "./insurance-info-item";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { Loader } from "dashboard/common/loader";
 
 export const AccountInsuranceInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -18,6 +19,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
     const store = useStore().accountStore;
     const [insuranceEdit, setInsuranceEdit] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const {
         accountExtData: { Title_Received, Title_Num },
@@ -27,6 +29,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
 
     const handleGetInsuranceHistory = async () => {
         if (id) {
+            setIsLoading(true);
             getAccountInsurance(id).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
@@ -36,7 +39,10 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                         life: TOAST_LIFETIME,
                     });
                 }
-                if (res) setInsuranceInfo(res as AccountInsurance);
+                if (res) {
+                    setInsuranceInfo(res as AccountInsurance);
+                    setIsLoading(false);
+                }
             });
         }
     };
@@ -80,81 +86,93 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     return (
         <div className='insurance-info'>
             <div className='insurance-info__container'>
-                <div className='insurance-info__item insurance-info--splitter'>
-                    <InsuranceInfoField
-                        label='Insurance Company'
-                        value={insuranceInfo?.Insurance_Company}
-                        onChange={(e) => handleChangeInsurance("Insurance_Company", e)}
-                        editMode={insuranceEdit}
-                    />
-                    <InsuranceInfoField
-                        label='Insurance Agent'
-                        value={insuranceInfo?.Insurance_Agent_Name}
-                        onChange={(e) => handleChangeInsurance("Insurance_Agent_Name", e)}
-                        editMode={insuranceEdit}
-                    />
-                    <InsuranceInfoField
-                        label='Policy#'
-                        value={insuranceInfo?.Insurance_Policy_Number}
-                        onChange={(e) => handleChangeInsurance("Insurance_Policy_Number", e)}
-                        editMode={insuranceEdit}
-                    />
+                {isLoading ? (
+                    <Loader />
+                ) : (
+                    <>
+                        <div className='insurance-info__item insurance-info--splitter'>
+                            <InsuranceInfoField
+                                label='Insurance Company'
+                                value={insuranceInfo?.Insurance_Company}
+                                onChange={(e) => handleChangeInsurance("Insurance_Company", e)}
+                                editMode={insuranceEdit}
+                            />
+                            <InsuranceInfoField
+                                label='Insurance Agent'
+                                value={insuranceInfo?.Insurance_Agent_Name}
+                                onChange={(e) => handleChangeInsurance("Insurance_Agent_Name", e)}
+                                editMode={insuranceEdit}
+                            />
+                            <InsuranceInfoField
+                                label='Policy#'
+                                value={insuranceInfo?.Insurance_Policy_Number}
+                                onChange={(e) =>
+                                    handleChangeInsurance("Insurance_Policy_Number", e)
+                                }
+                                editMode={insuranceEdit}
+                            />
 
-                    <div className='insurance-field'>
-                        <Checkbox
-                            inputId='account-insurance-policy'
-                            name='account-insurance-policy'
-                            checked={!!insuranceInfo?.Insurance_Policy_Received}
-                            onClick={() => {
-                                setInsuranceInfo((prev) => ({
-                                    ...prev!,
-                                    Insurance_Policy_Received: !prev?.Insurance_Policy_Received
-                                        ? 1
-                                        : 0,
-                                }));
-                            }}
-                        />
-                        <label
-                            htmlFor='account-insurance-policy'
-                            className='ml-2 insurance-field__label insurance-field__label--thin'
-                        >
-                            Insurance Policy Received
-                        </label>
-                    </div>
-                    <InsuranceInfoField
-                        label='Expiration Date'
-                        value={insuranceInfo?.Insurance_Exp_Date}
-                        editMode={insuranceEdit}
-                        inputType='date'
-                    />
-                </div>
-                <div className='insurance-info__item'>
-                    <div className='insurance-field'>
-                        <Checkbox
-                            inputId='account-insurance-title-received'
-                            name='account-insurance-title-received'
-                            checked={!!Title_Received}
-                            onClick={() => {
-                                changeAccountExtData("Title_Received", !Title_Received ? 1 : 0);
-                            }}
-                        />
-                        <label
-                            htmlFor='account-insurance-title-received'
-                            className='insurance-field__label ml-2 insurance-field__label--thin'
-                        >
-                            Title Received
-                        </label>
-                    </div>
-                    <span className='p-float-label'>
-                        <InputText
-                            id='account-insurance-title-num'
-                            className='insurance-info__input w-full'
-                            value={Title_Num}
-                            onChange={(e) => changeAccountExtData("Title_Num", e.target.value)}
-                        />
-                        <label className='float-label'>Title#</label>
-                    </span>
-                </div>
+                            <div className='insurance-field'>
+                                <Checkbox
+                                    inputId='account-insurance-policy'
+                                    name='account-insurance-policy'
+                                    checked={!!insuranceInfo?.Insurance_Policy_Received}
+                                    onClick={() => {
+                                        setInsuranceInfo((prev) => ({
+                                            ...prev!,
+                                            Insurance_Policy_Received:
+                                                !prev?.Insurance_Policy_Received ? 1 : 0,
+                                        }));
+                                    }}
+                                />
+                                <label
+                                    htmlFor='account-insurance-policy'
+                                    className='ml-2 insurance-field__label insurance-field__label--thin'
+                                >
+                                    Insurance Policy Received
+                                </label>
+                            </div>
+                            <InsuranceInfoField
+                                label='Expiration Date'
+                                value={insuranceInfo?.Insurance_Exp_Date}
+                                editMode={insuranceEdit}
+                                inputType='date'
+                            />
+                        </div>
+                        <div className='insurance-info__item'>
+                            <div className='insurance-field'>
+                                <Checkbox
+                                    inputId='account-insurance-title-received'
+                                    name='account-insurance-title-received'
+                                    checked={!!Title_Received}
+                                    onClick={() => {
+                                        changeAccountExtData(
+                                            "Title_Received",
+                                            !Title_Received ? 1 : 0
+                                        );
+                                    }}
+                                />
+                                <label
+                                    htmlFor='account-insurance-title-received'
+                                    className='insurance-field__label ml-2 insurance-field__label--thin'
+                                >
+                                    Title Received
+                                </label>
+                            </div>
+                            <span className='p-float-label'>
+                                <InputText
+                                    id='account-insurance-title-num'
+                                    className='insurance-info__input w-full'
+                                    value={Title_Num}
+                                    onChange={(e) =>
+                                        changeAccountExtData("Title_Num", e.target.value)
+                                    }
+                                />
+                                <label className='float-label'>Title#</label>
+                            </span>
+                        </div>
+                    </>
+                )}
                 <div className='insurance-info__footer'>
                     <Button className='insurance-info__button' onClick={handleChangeInsuranceInfo}>
                         Save
