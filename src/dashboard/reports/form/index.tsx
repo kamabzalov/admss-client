@@ -359,7 +359,7 @@ export const ReportForm = (): ReactElement => {
                     </div>
                     <div className='report__footer gap-3 mt-8 mr-3'>
                         <Button
-                            className='report__icon-button '
+                            className='report__icon-button'
                             icon='icon adms-password'
                             severity='secondary'
                             disabled
