@@ -291,3 +291,4 @@ export const ReportEditForm = ({ report }: ReportEditFormProps): ReactElement =>
         </div>
     );
 };
+
