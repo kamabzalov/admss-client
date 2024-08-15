@@ -1,198 +1,134 @@
-.report__card {
- max-height: 70vh;
-}
+import { ReportCollection, ReportDocument } from "common/models/reports";
+import {
+    getUserFavoriteReportList,
+    getUserReportCollectionsContent,
+} from "http/services/reports.service";
+import { Accordion, AccordionTab } from "primereact/accordion";
+import { Button } from "primereact/button";
+import { ReactElement, useEffect, useState } from "react";
+import { useStore } from "store/hooks";
+import { useNavigate } from "react-router-dom";
+import "./index.css";
+import { ReportEditForm } from "./edit";
+import { observer } from "mobx-react-lite";
 
-.report-form {
- max-height: 70vh;
- padding-top: 20px;
-}
+export const ReportForm = observer((): ReactElement => {
+    const userStore = useStore().userStore;
+    const reportStore = useStore().reportStore;
+    const { setReport, report } = reportStore;
+    const navigate = useNavigate();
+    const { authUser } = userStore;
+    const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
 
-.report-form__header {
- font-size: 20px;
- margin-bottom: 30px;
- font-weight: 700;
-}
+    const handleGetUserReportCollections = (useruid: string) =>
+        getUserReportCollectionsContent(useruid).then((response) => {
+            if (Array.isArray(response)) {
+                const collectionsWithoutFavorite = response.filter(
+                    (collection: ReportCollection) => collection.description !== "Favorites"
+                );
+                setCollections(collectionsWithoutFavorite);
+            } else {
+                setCollections([]);
+            }
+        });
 
-.report__accordion {
- max-height: 70vh;
- width: 454px;
- overflow-y: scroll;
-}
+    useEffect(() => {
+        if (authUser) {
+            handleGetUserReportCollections(authUser.useruid);
+            getUserFavoriteReportList(authUser.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authUser]);
 
-.report__accordion.p-accordion .p-accordion-header .p-accordion-header-link {
- border: none;
- background-color: var(--admss-app-white);
- padding-bottom: 10px;
- padding-top: 10px;
-}
+    const handleAccordionTabChange = (report: ReportDocument) => {
+        setReport(report);
+        navigate(`/dashboard/reports/${report.itemUID}`);
+    };
 
-.report__accordion.p-accordion .p-accordion-content {
- background-color: var(--admss-app-white);
- margin: 0;
- padding: 10px 50px;
- border: none;
-}
-
-.reports__accordion--inner.p-accordion .p-accordion-content:has(.edit-collection) {
- padding-top: 0px;
-}
-
-.report__accordion.p-accordion
- .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
- .p-accordion-header-link {
- background-color: var(--admss-app-white);
- border: none;
- padding-bottom: 10px;
- padding-top: 10px;
-}
-.report__accordion.p-accordion
- .p-accordion-header:not(.p-disabled).p-highlight
- .p-accordion-header-link {
- background-color: var(--admss-app-white);
- border: none;
- padding-bottom: 10px;
- padding-top: 10px;
-}
-
-.report-controls {
- display: flex;
- width: 98%;
- margin: 30px auto;
- justify-content: center;
- border-radius: 5px;
- box-shadow: 1px 1px 5px var(--admss-app-light-blue);
- border: var(--admss-app-light-blue) solid 1px;
- flex-wrap: wrap;
-}
-
-.report-controls__top {
- flex: 1 0 100%;
- height: 50px;
- padding-left: 84px;
- margin: 30px;
-}
-.report-controls__dropdown {
- width: 370px;
-}
-
-.report-control {
- justify-content: center;
- margin: 10px;
-}
-
-.report-control {
- display: flex;
- flex-direction: column;
- justify-content: center;
- align-items: center;
- gap: 10px;
-}
-
-.report-control__button.p-button {
- width: 30px;
- height: 30px;
- padding: 0;
- display: inline-flex;
- align-items: center;
- justify-content: center;
- border: none;
- color: var(--admss-app-primary);
- background: var(--admss-app-light-blue);
-}
-
-.report-select {
- border: var(--admss-app-medium-blue) solid 1px;
- border-radius: 5px;
- width: 370px;
- margin-bottom: 30px;
-}
-
-.report-select__header {
- border-bottom: var(--admss-app-medium-blue) solid 1px;
- padding: 5px 10px;
- display: flex;
- align-items: center;
- font-family: Open Sans;
- font-size: 14px;
- font-weight: 700;
- line-height: 19px;
- text-align: left;
- padding: 15px;
-}
-
-.report-control__button.p-button.p-button-outlined:enabled:hover,
-.p-button.p-button-outlined:not(button):not(a):not(.p-disabled):hover {
- box-shadow: none;
- border: none;
- color: var(--admss-app-primary);
- background: var(--admss-app-medium-blue);
-}
-
-.report-select__list {
- background: var(--admss-app-white);
- height: 200px;
- max-height: 200px;
- overflow-y: scroll;
- list-style: none;
- padding: 0;
- margin: 0;
-}
-
-.report-control__checkbox {
- display: flex;
- align-items: center;
- gap: 15px;
-}
-
-.report__button {
- display: inline-flex;
- align-items: center;
- justify-content: center;
- font-weight: 700;
-}
-
-.report-select__item {
- cursor: pointer;
- padding: 10px;
- font-family: Open Sans;
- font-size: 14px;
- font-weight: 400;
- line-height: 19px;
- text-align: left;
- border-top: 0.5px solid var(--admss-app-white);
-}
-
-.report-select__item.selected {
- background-color: var(--admss-app-medium-light-blue);
-}
-
-.report__footer {
- display: flex;
- margin-left: auto;
- margin-bottom: 60px;
- align-items: center;
- width: 65.5%;
- justify-content: flex-end;
-}
-
-.report__footer .report__button.p-button {
- height: 60px;
-}
-
-.report__icon-button.p-button {
- width: 60px;
- height: 60px;
- display: inline-flex;
- align-items: center;
- justify-content: center;
- padding: 0;
- font-size: 1.4rem;
-}
-
-.report-control__title {
- font-family: Open Sans;
- font-size: 18px;
- font-weight: 700;
- line-height: 24.51px;
- text-align: left;
-}
+    return (
+        <div className='grid relative'>
+            <Button
+                icon='pi pi-times'
+                className='p-button close-button'
+                onClick={() => navigate("/dashboard/reports")}
+            />
+            <div className='col-12'>
+                <div className='card report'>
+                    <div className='card-header flex'>
+                        <h2 className='report__title uppercase m-0'>Create custom report</h2>
+                    </div>
+                    <div className='card-content report__card grid'>
+                        <div className='col-4'>
+                            <Accordion multiple className='report__accordion'>
+                                {collections &&
+                                    [...favoriteCollections, ...collections].map(
+                                        ({ itemUID, name, documents }: ReportCollection) => (
+                                            <AccordionTab
+                                                key={itemUID}
+                                                header={name}
+                                                className='report__accordion-tab'
+                                            >
+                                                {documents &&
+                                                    documents.map((report) => (
+                                                        <Button
+                                                            className='report__list-item'
+                                                            key={report.itemUID}
+                                                            text
+                                                            onClick={() =>
+                                                                handleAccordionTabChange(report)
+                                                            }
+                                                        >
+                                                            <p>{report.name}</p>
+                                                        </Button>
+                                                    ))}
+                                            </AccordionTab>
+                                        )
+                                    )}
+                            </Accordion>
+                        </div>
+                        <ReportEditForm />
+                    </div>
+                    <div className='report__footer gap-3 mt-8 mr-3'>
+                        <Button
+                            className='report__icon-button'
+                            icon='icon adms-password'
+                            severity='secondary'
+                            disabled
+                        />
+                        <Button
+                            className='report__icon-button'
+                            icon='icon adms-blank'
+                            severity='secondary'
+                            disabled
+                        />
+                        <Button
+                            className='report__icon-button'
+                            icon='icon adms-trash-can'
+                            severity='secondary'
+                            disabled
+                        />
+                        <Button
+                            className='ml-auto uppercase px-6 report__button'
+                            severity='danger'
+                            outlined
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className='uppercase px-6 report__button'
+                            disabled={!report.name}
+                            severity={!report.name ? "secondary" : "success"}
+                        >
+                            {report ? "Update" : "Create"}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
