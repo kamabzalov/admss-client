@@ -132,4 +132,3 @@ export const ReportForm = observer((): ReactElement => {
         </div>
     );
 });
-
