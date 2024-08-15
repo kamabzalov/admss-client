@@ -324,3 +324,4 @@ export default function Reports(): ReactElement {
         </div>
     );
 }
+
