@@ -98,16 +98,19 @@ export const ReportForm = observer((): ReactElement => {
                             className='report__icon-button'
                             icon='icon adms-password'
                             severity='secondary'
+                            disabled
                         />
                         <Button
                             className='report__icon-button'
                             icon='icon adms-blank'
                             severity='secondary'
+                            disabled
                         />
                         <Button
                             className='report__icon-button'
                             icon='icon adms-trash-can'
                             severity='secondary'
+                            disabled
                         />
                         <Button
                             className='ml-auto uppercase px-6 report__button'
