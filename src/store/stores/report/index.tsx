@@ -51,3 +51,4 @@ export class ReportStore {
         this._report = {} as ReportDocument;
     };
 }
+
