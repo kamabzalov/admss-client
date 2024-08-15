@@ -4,15 +4,14 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useState } from "react";
 import { ReportSelect } from "../common";
-import { ReportDocument } from "common/models/reports";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
 const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
 
-interface ReportEditFormProps {
-    report?: ReportDocument | null;
-}
-
-export const ReportEditForm = ({ report }: ReportEditFormProps): ReactElement => {
+export const ReportEditForm = observer((): ReactElement => {
+    const store = useStore().reportStore;
+    const { report, changeReport } = store;
     const [availableValues, setAvailableValues] = useState<string[]>([
         "Account",
         "Buyer Name",
@@ -94,7 +93,11 @@ export const ReportEditForm = ({ report }: ReportEditFormProps): ReactElement =>
             <div className='report-form__body grid'>
                 <div className='col-6'>
                     <span className='p-float-label'>
-                        <InputText className='w-full' value={report?.name} />
+                        <InputText
+                            className='w-full'
+                            value={report?.name}
+                            onChange={(e) => changeReport("name", e.target.value)}
+                        />
                         <label className='float-label w-full'>Name</label>
                     </span>
                 </div>
@@ -290,4 +293,4 @@ export const ReportEditForm = ({ report }: ReportEditFormProps): ReactElement =>
             </div>
         </div>
     );
-};
+});
