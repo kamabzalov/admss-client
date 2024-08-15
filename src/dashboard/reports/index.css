@@ -247,3 +247,9 @@
 .multiselect-label:not(:last-of-type):after {
     content: ", ";
 }
+
+.p-multiselect-items-wrapper.edit-collection__multiselect-wrapper {
+    min-height: 100px;
+    max-height: 550px;
+    overflow-y: auto;
+}

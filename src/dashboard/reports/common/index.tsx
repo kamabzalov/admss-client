@@ -118,6 +118,7 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
     return (
         <DashboardDialog
             className='edit-access'
+            action={onHide}
             footer='Update'
             header='Edit Access'
             visible={visible}
@@ -139,6 +140,14 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                         onChange={(e) => {
                             e.stopPropagation();
                             setSelectedRole(e.value);
+                        }}
+                        pt={{
+                            wrapper: {
+                                className: "edit-collection__multiselect-wrapper",
+                                style: {
+                                    maxHeight: "550px",
+                                },
+                            },
                         }}
                     />
                 </div>
@@ -374,6 +383,14 @@ export const CollectionPanelContent = ({
                             onChange={(e) => {
                                 e.stopPropagation();
                                 setSelectedReports(e.value);
+                            }}
+                            pt={{
+                                wrapper: {
+                                    className: "edit-collection__multiselect-wrapper",
+                                    style: {
+                                        maxHeight: "550px",
+                                    },
+                                },
                             }}
                         />
                         <label className='float-label'>Select reports</label>
