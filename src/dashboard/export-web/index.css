@@ -7,7 +7,11 @@
 }
 
 .export-web__body .p-datatable-wrapper {
-    height: 60vh;
+    height: 62vh;
+}
+
+.export-web__body .p-tabview-panels {
+    padding-bottom: 0;
 }
 
 .export-web__icon-button.p-button:last-child {
