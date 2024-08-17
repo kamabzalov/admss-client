@@ -352,6 +352,12 @@
     position: relative;
 }
 
+.p-dialog {
+    .p-confirm-dialog-accept.p-button:focus-within {
+        background-color: var(--admss-app-primary-main-green);
+    }
+}
+
 .searched-item::after {
     content: "";
     position: absolute;
@@ -362,6 +368,15 @@
     right: 0;
     translate: 150% -50%;
     background-color: var(--admss-app-primary-main-green);
+}
+
+.p-datatable .p-paginator {
+    padding-top: 34px;
+    padding-bottom: 10px;
+
+    .p-paginator-element {
+        border: none;
+    }
 }
 
 @media screen and (min-width: 992px) {
