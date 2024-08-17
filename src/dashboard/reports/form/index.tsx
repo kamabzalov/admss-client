@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { setReport, report } = reportStore;
+    const { report, reportName } = reportStore;
     const navigate = useNavigate();
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
@@ -46,7 +46,7 @@ export const ReportForm = observer((): ReactElement => {
     }, [authUser]);
 
     const handleAccordionTabChange = (report: ReportDocument) => {
-        setReport(report);
+        reportStore.reportName = report.name;
         navigate(`/dashboard/reports/${report.itemUID}`);
     };
 
@@ -71,6 +71,7 @@ export const ReportForm = observer((): ReactElement => {
                                             <AccordionTab
                                                 key={itemUID}
                                                 header={name}
+                                                disabled={!documents?.length}
                                                 className='report__accordion-tab'
                                             >
                                                 {documents &&
@@ -121,8 +122,8 @@ export const ReportForm = observer((): ReactElement => {
                         </Button>
                         <Button
                             className='uppercase px-6 report__button'
-                            disabled={!report.name}
-                            severity={!report.name ? "secondary" : "success"}
+                            disabled={!reportName}
+                            severity={!reportName ? "secondary" : "success"}
                         >
                             {report ? "Update" : "Create"}
                         </Button>

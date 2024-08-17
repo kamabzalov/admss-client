@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportACL, ReportCollection, ReportsPostData } from "common/models/reports";
+import { ReportACL, ReportCollection, ReportInfo, ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportTemplate = async (uid: string) => {
@@ -12,6 +12,22 @@ export const getReportTemplate = async (uid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting report template",
+            };
+        }
+    }
+};
+
+export const getReportInfo = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ReportInfo>(
+            `reports/${uid}/reportinfo`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report info",
             };
         }
     }
@@ -101,6 +117,23 @@ export const getReportAccessList = async (reportuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting user report access list",
+            };
+        }
+    }
+};
+
+export const upddateReportInfo = async (uid: string, body: Partial<ReportInfo>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${uid}/reportinfo`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating report info",
             };
         }
     }

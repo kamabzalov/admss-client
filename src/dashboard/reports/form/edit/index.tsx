@@ -2,16 +2,18 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { ReportSelect } from "../common";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
 
 const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
 
 export const ReportEditForm = observer((): ReactElement => {
     const store = useStore().reportStore;
-    const { report, changeReport } = store;
+    const { id } = useParams();
+    const { report, reportName, getReport, changeReport } = store;
     const [availableValues, setAvailableValues] = useState<string[]>([
         "Account",
         "Buyer Name",
@@ -24,6 +26,11 @@ export const ReportEditForm = observer((): ReactElement => {
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [currentItem, setCurrentItem] = useState<string | null>(null);
     const [dataSet, setDataSet] = useState<string | null>(null);
+
+    useEffect(() => {
+        id && getReport(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     const moveItem = (
         item: string,
@@ -95,8 +102,8 @@ export const ReportEditForm = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={report?.name}
-                            onChange={(e) => changeReport("name", e.target.value)}
+                            value={reportName}
+                            onChange={(e) => (store.reportName = e.target.value)}
                         />
                         <label className='float-label w-full'>Name</label>
                     </span>
@@ -262,19 +269,34 @@ export const ReportEditForm = observer((): ReactElement => {
 
                 <div className='col-3'>
                     <label className='cursor-pointer report-control__checkbox'>
-                        <Checkbox checked={false} onChange={() => {}} />
+                        <Checkbox
+                            checked={!!report.ShowTotals}
+                            onChange={() => {
+                                changeReport("ShowTotals", !report.ShowTotals ? 1 : 0);
+                            }}
+                        />
                         Show Totals
                     </label>
                 </div>
                 <div className='col-3'>
                     <label className='cursor-pointer report-control__checkbox'>
-                        <Checkbox checked={false} onChange={() => {}} />
+                        <Checkbox
+                            checked={!!report.ShowAverages}
+                            onChange={() => {
+                                changeReport("ShowAverages", !report.ShowAverages ? 1 : 0);
+                            }}
+                        />
                         Show Averages
                     </label>
                 </div>
                 <div className='col-3'>
                     <label className='cursor-pointer report-control__checkbox'>
-                        <Checkbox checked={false} onChange={() => {}} />
+                        <Checkbox
+                            checked={!!report.ShowLineCount}
+                            onChange={() => {
+                                changeReport("ShowLineCount", !report.ShowLineCount ? 1 : 0);
+                            }}
+                        />
                         Show Line Count
                     </label>
                 </div>
@@ -286,7 +308,15 @@ export const ReportEditForm = observer((): ReactElement => {
 
                 <div className='col-4'>
                     <label className='cursor-pointer report-control__checkbox'>
-                        <Checkbox checked={false} onChange={() => {}} />
+                        <Checkbox
+                            checked={!!report.AskForStartAndEndDates}
+                            onChange={() => {
+                                changeReport(
+                                    "AskForStartAndEndDates",
+                                    !report.AskForStartAndEndDates ? 1 : 0
+                                );
+                            }}
+                        />
                         Ask for Start and End Dates
                     </label>
                 </div>
@@ -294,4 +324,3 @@ export const ReportEditForm = observer((): ReactElement => {
         </div>
     );
 });
-
