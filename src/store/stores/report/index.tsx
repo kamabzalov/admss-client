@@ -2,7 +2,7 @@
 
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportInfo } from "common/models/reports";
-import { getReportInfo } from "http/services/reports.service";
+import { getReportInfo, updateReportInfo } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
@@ -40,6 +40,12 @@ export class ReportStore {
                 throw new Error(error);
             }
         } catch (error) {
+            if (error instanceof Error) {
+                return {
+                    status: Status.ERROR,
+                    error: error.message,
+                };
+            }
             return undefined;
         } finally {
             this._isLoading = false;
@@ -50,17 +56,37 @@ export class ReportStore {
         this._report[key] = value as never;
     });
 
-    public saveReport = action(async (): Promise<string | undefined> => {
-        try {
+    public saveReport = action(
+        async (uid = this._report.itemuid): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
-
-            return Status.ERROR;
-        } catch (error) {
-            return undefined;
-        } finally {
-            this._isLoading = false;
+            try {
+                uid &&
+                    (await updateReportInfo(uid, {
+                        ShowTotals: this._report.ShowTotals,
+                        ShowAverages: this._report.ShowAverages,
+                        ShowLineCount: this._report.ShowLineCount,
+                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                    }).then((response) => {
+                        if (response?.status === Status.OK) {
+                            return response as ReportInfo;
+                        } else {
+                            const { error } = response as BaseResponseError;
+                            throw new Error(error);
+                        }
+                    }));
+            } catch (error) {
+                if (error instanceof Error) {
+                    return {
+                        status: Status.ERROR,
+                        error: error.message,
+                    };
+                }
+                return undefined;
+            } finally {
+                this._isLoading = false;
+            }
         }
-    });
+    );
 
     public set isLoading(state: boolean) {
         this._isLoading = state;

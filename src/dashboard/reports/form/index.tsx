@@ -7,17 +7,22 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { report, reportName } = reportStore;
+    const { report, reportName, saveReport } = reportStore;
     const navigate = useNavigate();
+    const { id } = useParams();
     const { authUser } = userStore;
+    const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
 
@@ -48,6 +53,26 @@ export const ReportForm = observer((): ReactElement => {
     const handleAccordionTabChange = (report: ReportDocument) => {
         reportStore.reportName = report.name;
         navigate(`/dashboard/reports/${report.itemUID}`);
+    };
+
+    const handleSaveReport = () => {
+        saveReport(id).then((response: BaseResponseError | undefined) => {
+            if (response?.status === Status.OK) {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "New custom report is successfully saved!",
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response?.error || "Error while saving new custom report",
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
     };
 
     return (
@@ -124,6 +149,7 @@ export const ReportForm = observer((): ReactElement => {
                             className='uppercase px-6 report__button'
                             disabled={!reportName}
                             severity={!reportName ? "secondary" : "success"}
+                            onClick={() => handleSaveReport()}
                         >
                             {report ? "Update" : "Create"}
                         </Button>

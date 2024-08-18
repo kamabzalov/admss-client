@@ -7,13 +7,20 @@ import { ReportSelect } from "../common";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { getReportTaskResult, printReportInfo } from "http/services/reports.service";
 
 const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
 
 export const ReportEditForm = observer((): ReactElement => {
     const store = useStore().reportStore;
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const { id } = useParams();
     const { report, reportName, getReport, changeReport } = store;
+    const toast = useToast();
     const [availableValues, setAvailableValues] = useState<string[]>([
         "Account",
         "Buyer Name",
@@ -28,7 +35,17 @@ export const ReportEditForm = observer((): ReactElement => {
     const [dataSet, setDataSet] = useState<string | null>(null);
 
     useEffect(() => {
-        id && getReport(id);
+        id &&
+            getReport(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error || "Error while fetching report",
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
@@ -94,6 +111,54 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
+    const handlePrintForm = async (print: boolean = false) => {
+        const errorMessage = "Error while print report";
+        if (id && authUser && authUser.useruid) {
+            const response = await printReportInfo(authUser.useruid, id);
+            if (response && response.status === Status.ERROR) {
+                const { error } = response;
+                return toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: error || errorMessage,
+                    life: TOAST_LIFETIME,
+                });
+            }
+            setTimeout(async () => {
+                const { taskuid } = response as { taskuid: string };
+                const taskResult = await getReportTaskResult(taskuid).then((response) => {
+                    if (response && response.status === Status.ERROR) {
+                        const { error } = response;
+                        return toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: error || errorMessage,
+                            life: TOAST_LIFETIME,
+                        });
+                    } else {
+                        return response;
+                    }
+                });
+                if (!taskResult) {
+                    return;
+                }
+                const url = new Blob([taskResult], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `report_form_${id}.pdf`;
+                    link.click();
+                } else {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            }, 3000);
+        }
+    };
+
     return (
         <div className='col-8 grid report-form'>
             <div className='report-form__header uppercase'>{report ? "Edit" : "New"} report</div>
@@ -111,7 +176,11 @@ export const ReportEditForm = observer((): ReactElement => {
                 {report && (
                     <>
                         <div className='col-3'>
-                            <Button className='uppercase w-full px-6 report__button' outlined>
+                            <Button
+                                className='uppercase w-full px-6 report__button'
+                                outlined
+                                onClick={() => handlePrintForm()}
+                            >
                                 Preview
                             </Button>
                         </div>
