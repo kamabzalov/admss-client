@@ -5,7 +5,11 @@ import { Button } from "primereact/button";
 import { AccountUpdateTotalInfo } from "common/models/accounts";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { calcAccountFromHistory, getAccountOriginalAmount } from "http/services/accounts.service";
+import {
+    calcAccountFromHistory,
+    getAccountOriginalAmount,
+    updateAccountTotal,
+} from "http/services/accounts.service";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
@@ -27,6 +31,7 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
     const { id } = useParams();
     const toast = useToast();
     const [totalPaid, setTotalPaid] = useState<TotalPaidInfo>(initialTotalPaid);
+    const [newAmount, setNewAmount] = useState<TotalPaidInfo>(initialTotalPaid);
 
     useEffect(() => {
         if (id) {
@@ -63,6 +68,34 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
         }
     };
 
+    const handleSaveTotalPaid = () => {
+        const amountData: Partial<TotalPaidInfo> = {
+            PrincipalPaid: newAmount.PrincipalPaid,
+            InterestPaid: newAmount.InterestPaid,
+            ExtraPrincipalPayments: newAmount.ExtraPrincipalPayments,
+        };
+        id &&
+            updateAccountTotal(id, amountData).then((res) => {
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Total paid updated successfully",
+                        life: TOAST_LIFETIME,
+                    });
+                    onHide();
+                }
+            });
+        onHide();
+    };
+
     return (
         <DashboardDialog
             className='dialog__total-paid total-paid'
@@ -70,6 +103,7 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
             header='Total Paid'
             visible={visible}
             onHide={onHide}
+            action={handleSaveTotalPaid}
             cancelButton
         >
             <div className='splitter my-3'>
@@ -106,9 +140,33 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
             </div>
 
             <div className='total-paid__control'>
-                <CurrencyInput className='total-paid__input' title='Amount' labelPosition='top' />
-                <CurrencyInput className='total-paid__input' title='Amount' labelPosition='top' />
-                <CurrencyInput className='total-paid__input' title='Amount' labelPosition='top' />
+                <CurrencyInput
+                    className='total-paid__input'
+                    value={newAmount?.PrincipalPaid}
+                    onChange={({ value }) =>
+                        setNewAmount({ ...newAmount, PrincipalPaid: value || 0 })
+                    }
+                    title='Principal'
+                    labelPosition='top'
+                />
+                <CurrencyInput
+                    className='total-paid__input'
+                    value={newAmount?.InterestPaid}
+                    onChange={({ value }) =>
+                        setNewAmount({ ...newAmount, InterestPaid: value || 0 })
+                    }
+                    title='Interest'
+                    labelPosition='top'
+                />
+                <CurrencyInput
+                    className='total-paid__input'
+                    value={newAmount?.ExtraPrincipalPayments}
+                    onChange={({ value }) =>
+                        setNewAmount({ ...newAmount, ExtraPrincipalPayments: value || 0 })
+                    }
+                    title='Extra Principal'
+                    labelPosition='top'
+                />
             </div>
 
             <div className='total-paid__item'>
