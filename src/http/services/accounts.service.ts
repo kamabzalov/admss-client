@@ -5,6 +5,7 @@ import {
     AccountInfo,
     AccountInsurance,
     AccountListActivity,
+    AccountMemoNote,
     AccountNote,
     AccountPayment,
     AccountPromise,
@@ -141,7 +142,7 @@ export const getAccountActivity = async (itemuid: string) => {
 
 export const getAccountNote = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountMemoNote>(
             `accounts/${accountuid}/note`
         );
         return request.data;
@@ -512,9 +513,9 @@ export const setOrUpdateActivityInfo = async (itemuid: string, activityData: any
     }
 };
 
-export const setOrUpdateNotesInfo = async (itemuid: string, notesData: any) => {
+export const addAccountNote = async (itemuid: string, notesData: Partial<AccountNote>) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `accounts/${itemuid}/notes`,
             notesData
         );
@@ -523,15 +524,15 @@ export const setOrUpdateNotesInfo = async (itemuid: string, notesData: any) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while setting or updating notes info",
+                error: error.response?.data.error || "Error while updating notes info",
             };
         }
     }
 };
 
-export const setOrUpdateNote = async (itemuid: string, noteData: any) => {
+export const updateAccountNote = async (itemuid: string, noteData: Partial<AccountMemoNote>) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `accounts/${itemuid}/note`,
             noteData
         );
@@ -744,7 +745,10 @@ export const updateAccountInsurance = async (
     }
 };
 
-export const updateAccountTotal = async (accountuid: string, totalInfo: AccountUpdateTotalInfo) => {
+export const updateAccountTotal = async (
+    accountuid: string,
+    totalInfo: Partial<AccountUpdateTotalInfo>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
             `accounts/${accountuid}/updatetotal`,

@@ -5,10 +5,17 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
-import { listAccountNotes } from "http/services/accounts.service";
+import {
+    getAccountNote,
+    listAccountNotes,
+    updateAccountNote,
+} from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
-import { AccountNote } from "common/models/accounts";
+import { AccountMemoNote, AccountNote } from "common/models/accounts";
 import { AddNoteDialog } from "./add-note-dialog";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -20,18 +27,33 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "ContactMethod", header: "Contact Type" },
 ];
 
+type Note = Pick<AccountMemoNote, "message" | "note">;
+
+const initialNote: Note = {
+    message: "",
+    note: "",
+};
+
 export const AccountNotes = (): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [dialogShow, setDialogShow] = useState<boolean>(false);
+    const [note, setNote] = useState<Note>(initialNote);
+
+    const handleGetNotes = () => {
+        listAccountNotes(id!).then((res) => {
+            if (Array.isArray(res) && res.length) setNotesList(res);
+        });
+    };
 
     useEffect(() => {
         if (id) {
-            listAccountNotes(id).then((res) => {
-                if (Array.isArray(res) && res.length) setNotesList(res);
-            });
+            handleGetNotes();
+            handleGetNote();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleDeleteNote = ({ itemuid }: AccountNote) => {
@@ -56,6 +78,26 @@ export const AccountNotes = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
+    const handleGetNote = () => {
+        getAccountNote(id!).then((res) => {
+            setNote(res as AccountMemoNote);
+        });
+    };
+
+    const handleSaveNote = (saveItem: keyof Note) => {
+        id &&
+            updateAccountNote(id, { [saveItem]: note[saveItem] }).then((res) => {
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+    };
+
     return (
         <div className='account-notes account-card'>
             <h3 className='account-notes__title account-title'>Notes</h3>
@@ -63,24 +105,36 @@ export const AccountNotes = (): ReactElement => {
                 <div className='col-12 account__control'>
                     <div className='account-note'>
                         <span className='p-float-label'>
-                            <InputTextarea id='account-memo' className='account-note__input' />
+                            <InputTextarea
+                                id='account-memo'
+                                value={note.note}
+                                onChange={(e) => setNote({ ...note, note: e.target.value })}
+                                className='account-note__input'
+                            />
                             <label htmlFor='account-memo'>Account Memo</label>
                         </span>
                         <Button
                             severity='secondary'
                             className='account-note__button'
                             label='Save'
+                            onClick={() => handleSaveNote("note")}
                         />
                     </div>
                     <div className='account-note'>
                         <span className='p-float-label'>
-                            <InputTextarea id='account-payment' className='account-note__input' />
+                            <InputTextarea
+                                id='account-payment'
+                                value={note.message}
+                                onChange={(e) => setNote({ ...note, message: e.target.value })}
+                                className='account-note__input'
+                            />
                             <label htmlFor='account-payment'>Payment Alert</label>
                         </span>
                         <Button
                             severity='secondary'
                             className='account-note__button'
                             label='Save'
+                            onClick={() => handleSaveNote("message")}
                         />
                     </div>
                 </div>
@@ -174,7 +228,12 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 )}
             </div>
-            <AddNoteDialog visible={dialogShow} onHide={() => setDialogShow(false)} />
+            <AddNoteDialog
+                action={handleGetNotes}
+                visible={dialogShow}
+                accountuid={id}
+                onHide={() => setDialogShow(false)}
+            />
         </div>
     );
 };
