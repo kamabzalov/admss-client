@@ -1,3 +1,5 @@
+import { BaseResponseError, Status } from "../base-response";
+
 export interface ReportsColumn {
     name: string;
     data: string;
@@ -56,3 +58,15 @@ export interface ReportACL {
     acl: ReportAccess;
 }
 
+export interface ReportInfo extends BaseResponseError {
+    message: string;
+    created: string;
+    updated: string;
+    itemuid: string;
+    useruid: string;
+    ShowTotals: 0 | 1;
+    ShowAverages: 0 | 1;
+    ShowLineCount: 0 | 1;
+    AskForStartAndEndDates: 0 | 1;
+    listid: 0 | 1;
+}
