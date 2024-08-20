@@ -581,7 +581,7 @@ export interface AccountPromise {
 }
 
 export interface AccountMemoNote extends BaseResponseError {
-    info: string;
-    message: string;
+    accountuid: string;
+    alert: string;
     note: string;
 }

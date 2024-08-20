@@ -27,10 +27,10 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "ContactMethod", header: "Contact Type" },
 ];
 
-type Note = Pick<AccountMemoNote, "message" | "note">;
+type Note = Pick<AccountMemoNote, "alert" | "note">;
 
 const initialNote: Note = {
-    message: "",
+    alert: "",
     note: "",
 };
 
@@ -124,8 +124,8 @@ export const AccountNotes = (): ReactElement => {
                         <span className='p-float-label'>
                             <InputTextarea
                                 id='account-payment'
-                                value={note.message}
-                                onChange={(e) => setNote({ ...note, message: e.target.value })}
+                                value={note.alert}
+                                onChange={(e) => setNote({ ...note, alert: e.target.value })}
                                 className='account-note__input'
                             />
                             <label htmlFor='account-payment'>Payment Alert</label>
@@ -134,7 +134,7 @@ export const AccountNotes = (): ReactElement => {
                             severity='secondary'
                             className='account-note__button'
                             label='Save'
-                            onClick={() => handleSaveNote("message")}
+                            onClick={() => handleSaveNote("alert")}
                         />
                     </div>
                 </div>
