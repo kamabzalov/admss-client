@@ -21,8 +21,10 @@ import {
     ReportsAccordionHeader,
     ReportsPanelHeader,
 } from "dashboard/reports/common";
+import { useNavigate } from "react-router-dom";
 
 export default function Reports(): ReactElement {
+    const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
@@ -96,6 +98,14 @@ export default function Reports(): ReactElement {
                     });
                 } else {
                     user && handleGetUserReportCollections(user.useruid);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "New collection is successfully created!",
+                        life: TOAST_LIFETIME,
+                    });
+                    setCollectionName("");
+                    setSelectedReports([]);
                 }
             });
         }
@@ -103,6 +113,7 @@ export default function Reports(): ReactElement {
 
     const handleEditCollection = (event: React.MouseEvent<HTMLElement>, id: string) => {
         event.preventDefault();
+        event.stopPropagation();
         setIsCollectionEditing(id);
     };
 
@@ -245,7 +256,15 @@ export default function Reports(): ReactElement {
                                                                             className='reports__list-item reports__list-item--inner'
                                                                             key={report.itemUID}
                                                                         >
-                                                                            <p>{report.name}</p>
+                                                                            <p
+                                                                                onClick={() =>
+                                                                                    navigate(
+                                                                                        `/dashboard/reports/${report.itemUID}`
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                {report.name}
+                                                                            </p>
                                                                             <ActionButtons
                                                                                 reportuid={
                                                                                     report.itemUID
@@ -302,6 +321,11 @@ export default function Reports(): ReactElement {
                                                                                 )
                                                                                 ? "searched-item"
                                                                                 : ""
+                                                                        }
+                                                                        onClick={() =>
+                                                                            navigate(
+                                                                                `/dashboard/reports/${report.itemUID}`
+                                                                            )
                                                                         }
                                                                     >
                                                                         {report.name}

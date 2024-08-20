@@ -18,7 +18,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { report, reportName, saveReport } = reportStore;
+    const { reportName, saveReport } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams();
     const { authUser } = userStore;
@@ -151,7 +151,7 @@ export const ReportForm = observer((): ReactElement => {
                             severity={!reportName ? "secondary" : "success"}
                             onClick={() => handleSaveReport()}
                         >
-                            {report ? "Update" : "Create"}
+                            {id ? "Update" : "Create"}
                         </Button>
                     </div>
                 </div>
