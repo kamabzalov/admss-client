@@ -12,15 +12,12 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { useFormikContext } from "formik";
-import { Inventory, InventoryExtData } from "common/models/inventory";
 import { useLocation } from "react-router-dom";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const location = useLocation();
     const currentPath = location.pathname + location.search;
-    const { values, errors, setFieldValue } = useFormikContext<Inventory & InventoryExtData>();
     const {
         inventoryExtData: {
             purLotNo,
@@ -28,6 +25,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             purPurchaseAmount,
             purPurchaseAuctCo,
             purPurchaseBuyerComm,
+            purPurchasedFrom,
             purPurchaseBuyerName,
             purPurchaseBuyerPercent,
             purPurchaseCheck,
@@ -45,22 +43,25 @@ export const PurchasePurchases = observer((): ReactElement => {
 
     return (
         <div className='grid purchase-purchases row-gap-2'>
-            <div className='col-6 relative'>
+            <div className='col-6'>
                 <CompanySearch
-                    name='Purchased From (required)'
-                    value={values.purPurchasedFrom}
-                    onChange={({ target: { value } }) => setFieldValue("purPurchasedFrom", value)}
+                    name='Purchased From'
+                    value={purPurchasedFrom}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "purPurchasedFrom",
+                            value,
+                        });
+                    }}
                     onRowClick={(companyName) => {
-                        setFieldValue("purPurchasedFrom", companyName);
                         changeInventoryExtData({
                             key: "purPurchasedFrom",
                             value: companyName,
                         });
                     }}
-                    className={errors.purPurchasedFrom ? "p-invalid" : ""}
+                    className='purchase-purchases__text-input'
                     originalPath={currentPath}
                 />
-                <small className='p-error'>{errors.purPurchasedFrom}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
