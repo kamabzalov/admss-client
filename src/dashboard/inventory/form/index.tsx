@@ -21,11 +21,7 @@ import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import {
-    InventoryExtData,
-    Inventory as InventoryModel,
-    InventoryStockNumber,
-} from "common/models/inventory";
+import { Inventory as InventoryModel, InventoryStockNumber } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
@@ -37,8 +33,7 @@ const STEP = "step";
 type PartialInventory = Pick<
     InventoryModel,
     "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
-> &
-    Pick<InventoryExtData, "purPurchasedFrom">;
+>;
 
 const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
     [AccordionItems.GENERAL]: [
@@ -51,7 +46,6 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "StockNo",
     ],
     [AccordionItems.DESCRIPTION]: ["TypeOfFuel"],
-    [AccordionItems.PURCHASES]: ["purPurchasedFrom"],
 };
 
 const MIN_YEAR = 1970;
@@ -85,7 +79,6 @@ export const InventoryForm = observer(() => {
         saveCachedInventory,
         clearCachedInventory,
         inventory,
-        inventoryExtData,
         isFormChanged,
         currentLocation,
         deleteReason,
@@ -171,7 +164,6 @@ export const InventoryForm = observer(() => {
                     });
                 }),
             TypeOfFuel: Yup.string().trim().required("Data is required."),
-            purPurchasedFrom: Yup.string().trim().required("Data is required."),
         });
     };
 
@@ -427,8 +419,6 @@ export const InventoryForm = observer(() => {
                                                         currentLocation ||
                                                         " ",
                                                     GroupClassName: inventory?.GroupClassName || "",
-                                                    purPurchasedFrom:
-                                                        inventoryExtData?.purPurchasedFrom || "",
                                                 } as PartialInventory
                                             }
                                             enableReinitialize
