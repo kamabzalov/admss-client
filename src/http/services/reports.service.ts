@@ -158,11 +158,17 @@ export const updateReportInfo = async (uid: string, body: Partial<ReportInfo>) =
     }
 };
 
-export const printReportInfo = async (useruid: string, itemUID: string) => {
+export const printReportInfo = async (
+    useruid: string,
+    {
+        itemUID,
+        columns,
+    }: { itemUID: string; columns: { name: string; data: string; with: number }[] }
+) => {
     try {
         const request = await authorizedUserApiInstance.post<
             BaseResponseError & { taskuid: string }
-        >(`reports/${useruid}/report`, { itemUID });
+        >(`reports/${useruid}/report`, { itemUID, columns });
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {

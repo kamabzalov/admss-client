@@ -113,8 +113,18 @@ export const ReportEditForm = observer((): ReactElement => {
 
     const handlePrintForm = async (print: boolean = false) => {
         const errorMessage = "Error while print report";
+        const selectedColumns = selectedValues.map((name) => {
+            return {
+                name,
+                data: name,
+                with: 0,
+            };
+        });
         if (id && authUser && authUser.useruid) {
-            const response = await printReportInfo(authUser.useruid, id);
+            const response = await printReportInfo(authUser.useruid, {
+                itemUID: id,
+                columns: selectedColumns,
+            });
             if (response && response.status === Status.ERROR) {
                 const { error } = response;
                 return toast.current?.show({
