@@ -698,4 +698,3 @@ export class InventoryStore {
         this.clearMedia();
     };
 }
-
