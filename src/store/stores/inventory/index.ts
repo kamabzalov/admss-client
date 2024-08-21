@@ -661,6 +661,10 @@ export class InventoryStore {
         this._deleteReason = state;
     }
 
+    public set isFormChanged(state: boolean) {
+        this._isFormChanged = state;
+    }
+
     public clearMedia = () => {
         this._inventoryImagesID = [];
         this._images = [];
