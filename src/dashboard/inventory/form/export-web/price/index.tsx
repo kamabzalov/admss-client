@@ -23,14 +23,18 @@ export const ExportWebPrice = observer((): ReactElement => {
         },
         changeExportWeb,
     } = store;
+
+    const handleExportWebChange = () => {
+        store.exportWebActive = !exportWebActive;
+        store.isFormChanged = true;
+    };
+
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
                 <Checkbox
                     checked={exportWebActive}
-                    onChange={() => {
-                        store.exportWebActive = !exportWebActive;
-                    }}
+                    onChange={handleExportWebChange}
                     className='export-web-price__checkbox'
                 />
                 Export to Web
