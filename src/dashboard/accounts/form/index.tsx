@@ -90,24 +90,26 @@ export const AccountsForm = observer((): ReactElement => {
                         )}
                     </div>
                     <div className='card-content account__card grid'>
-                        <TabView
-                            className='account__tabs'
-                            activeIndex={activeTab}
-                            onTabChange={(e) => handleTabChange(e.index)}
-                            panelContainerClassName='card-content__wrapper'
-                        >
-                            {tabItems.map(({ tabName, component }) => {
-                                return (
-                                    <TabPanel
-                                        header={tabName}
-                                        key={tabName}
-                                        className='account__panel h-full'
-                                    >
-                                        {component}
-                                    </TabPanel>
-                                );
-                            })}
-                        </TabView>
+                        <div className='col-12'>
+                            <TabView
+                                className='account__tabs'
+                                activeIndex={activeTab}
+                                onTabChange={(e) => handleTabChange(e.index)}
+                                panelContainerClassName='card-content__wrapper'
+                            >
+                                {tabItems.map(({ tabName, component }) => {
+                                    return (
+                                        <TabPanel
+                                            header={tabName}
+                                            key={tabName}
+                                            className='account__panel h-full'
+                                        >
+                                            {component}
+                                        </TabPanel>
+                                    );
+                                })}
+                            </TabView>
+                        </div>
                     </div>
                     <div className='account__footer gap-3 ml-auto mr-3'>
                         <Button

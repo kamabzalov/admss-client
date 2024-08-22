@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
@@ -23,10 +24,17 @@ const renderColumnsData: Pick<TableColumnsList, "header" | "field">[] = [
     { field: "amount", header: "Amount" },
 ];
 
+enum PAID_STATUS {
+    LATE = "Late",
+    BROKEN = "Broken",
+    OUTSTANDING = "Outstanding",
+}
+
 export const AccountPromiseToPay = (): ReactElement => {
     const { id } = useParams();
     const [promiseList, setPromiseList] = useState<AccountPromise[]>([]);
     const [promiseStatus, setPromiseStatus] = useState<string[]>([]);
+    const [selectedPaid, setSelectedPaid] = useState<PAID_STATUS | null>(null);
 
     useEffect(() => {
         id &&
@@ -54,15 +62,30 @@ export const AccountPromiseToPay = (): ReactElement => {
                                 items: [
                                     {
                                         label: "Set Paid Late",
-                                        icon: "pi pi-circle",
+                                        icon: `pi pi-circle${
+                                            selectedPaid === PAID_STATUS.LATE ? "-fill" : ""
+                                        }`,
+                                        command: () => {
+                                            setSelectedPaid(PAID_STATUS.LATE);
+                                        },
                                     },
                                     {
                                         label: "Set Promise Broken",
-                                        icon: "pi pi-circle",
+                                        icon: `pi pi-circle${
+                                            selectedPaid === PAID_STATUS.BROKEN ? "-fill" : ""
+                                        }`,
+                                        command: () => {
+                                            setSelectedPaid(PAID_STATUS.BROKEN);
+                                        },
                                     },
                                     {
                                         label: "Set Outstanding",
-                                        icon: "pi pi-circle",
+                                        icon: `pi pi-circle${
+                                            selectedPaid === PAID_STATUS.OUTSTANDING ? "-fill" : ""
+                                        }`,
+                                        command: () => {
+                                            setSelectedPaid(PAID_STATUS.OUTSTANDING);
+                                        },
                                     },
                                 ],
                             },

@@ -8,6 +8,7 @@ import { addAccountNote } from "http/services/accounts.service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
+import { useStore } from "store/hooks";
 
 interface AddNoteDialogProps {
     visible: boolean;
@@ -23,8 +24,10 @@ export const AddNoteDialog = ({
     accountuid,
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [noteTaker, setNoteTaker] = useState<string>("");
+    const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
     const [contactType, setContactType] = useState(ACCOUNT_NOTE_CONTACT_TYPE[0]);
     const [note, setNote] = useState<string>("");
     const currentTime = useMemo(
@@ -59,7 +62,8 @@ export const AddNoteDialog = ({
                         detail: "Note added successfully",
                         life: TOAST_LIFETIME,
                     });
-
+                    setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+                    setNote("");
                     action();
                     onHide();
                 }
