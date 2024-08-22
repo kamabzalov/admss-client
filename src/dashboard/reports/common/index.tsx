@@ -1,8 +1,11 @@
+import { Status } from "common/models/base-response";
 import { ReportACL, ReportCollection, ReportDocument } from "common/models/reports";
+import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TextInput } from "dashboard/common/form/inputs";
-import { getReportAccessList } from "http/services/reports.service";
+import { useToast } from "dashboard/common/toast";
+import { getReportAccessList, updateReportInfo } from "http/services/reports.service";
 import { Button, ButtonProps } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
@@ -180,11 +183,28 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
     );
 };
 
-export const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
+export const ActionButtons = ({ report }: { report: ReportDocument }): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
+    const toast = useToast();
 
     const handleEditAccess = () => {
         setEditAccessActive(true);
+    };
+
+    const handleChangeIsFavorite = () => {
+        updateReportInfo(report.documentUID, {
+            ...report,
+            isfavorite: !report.isfavorite ? 1 : 0,
+        }).then((response) => {
+            if (response && response.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error || "Error while changing report favorite status",
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
     };
 
     return (
@@ -200,6 +220,7 @@ export const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElemen
                     className='p-button reports-actions__button'
                     icon='pi pi-heart'
                     outlined
+                    onClick={handleChangeIsFavorite}
                     tooltip='Add to Favorites'
                 />
                 <Button
@@ -213,7 +234,7 @@ export const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElemen
             <EditAccessDialog
                 visible={editAccessActive}
                 onHide={() => setEditAccessActive(false)}
-                reportuid={reportuid}
+                reportuid={report.documentUID}
             />
         </>
     );

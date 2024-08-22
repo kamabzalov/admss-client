@@ -1,9 +1,16 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportACL, ReportCollection, ReportInfo, ReportsPostData } from "common/models/reports";
+import {
+    ReportACL,
+    ReportCollection,
+    ReportCreate,
+    ReportDocument,
+    ReportInfo,
+    ReportsPostData,
+} from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
-export const getReportTemplate = async (uid: string) => {
+export const Document = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<any>(`reports/${uid}/get`);
         return request.data;
@@ -141,7 +148,42 @@ export const getReportAccessList = async (reportuid: string) => {
     }
 };
 
-export const updateReportInfo = async (uid: string, body: Partial<ReportInfo>) => {
+export const getReportDocumentTemplate = async (documentuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+            `reports/${documentuid}/template`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error ||
+                    "Error while getting user report document template",
+            };
+        }
+    }
+};
+
+export const createCustomReport = async (templateuid: string, body: Partial<ReportCreate>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${templateuid}/set`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while creating custom report",
+            };
+        }
+    }
+};
+
+export const updateReportInfo = async (uid: string, body: Partial<ReportDocument & ReportInfo>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${uid}/reportinfo`,
@@ -175,6 +217,35 @@ export const printReportInfo = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating report info",
+            };
+        }
+    }
+};
+
+export const setReportDocumentTemplate = async (
+    documentuid: string,
+    {
+        itemUID,
+        columns,
+    }: { itemUID: string; columns: { name: string; data: string; with: number }[] }
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `reports/${documentuid}/template`,
+            { DocumentID: itemUID, columns },
+            {
+                headers: {
+                    Accept: "application/pdf",
+                },
+                responseType: "blob",
+            }
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while setting report document template",
             };
         }
     }

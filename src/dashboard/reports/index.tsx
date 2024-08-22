@@ -30,6 +30,7 @@ export default function Reports(): ReactElement {
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
+    const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
@@ -86,7 +87,7 @@ export default function Reports(): ReactElement {
         if (collectionName) {
             createReportCollection(user!.useruid, {
                 name: collectionName,
-                documents: selectedReports,
+                documents: newCollectionsReports,
             }).then((response) => {
                 const { error } = response as BaseResponseError;
                 if (error && toast.current) {
@@ -102,6 +103,35 @@ export default function Reports(): ReactElement {
                         severity: "success",
                         summary: "Success",
                         detail: "New collection is successfully created!",
+                        life: TOAST_LIFETIME,
+                    });
+                    setCollectionName("");
+                    setNewCollectionsReports([]);
+                }
+            });
+        }
+    };
+
+    const handleUpdateCollection = () => {
+        if (collectionName) {
+            createReportCollection(user!.useruid, {
+                name: collectionName,
+                documents: selectedReports,
+            }).then((response) => {
+                const { error } = response as BaseResponseError;
+                if (error && toast.current) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    user && handleGetUserReportCollections(user.useruid);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Collection is successfully updated!",
                         life: TOAST_LIFETIME,
                     });
                     setCollectionName("");
@@ -145,9 +175,9 @@ export default function Reports(): ReactElement {
                                     <CollectionPanelContent
                                         collectionName={collectionName}
                                         collections={collections}
-                                        selectedReports={selectedReports}
+                                        selectedReports={newCollectionsReports}
                                         setCollectionName={setCollectionName}
-                                        setSelectedReports={setSelectedReports}
+                                        setSelectedReports={setNewCollectionsReports}
                                         handleCreateCollection={handleCreateCollection}
                                     />
                                 </Panel>
@@ -244,7 +274,7 @@ export default function Reports(): ReactElement {
                                                                                     setSelectedReports
                                                                                 }
                                                                                 handleCreateCollection={
-                                                                                    handleCreateCollection
+                                                                                    handleUpdateCollection
                                                                                 }
                                                                             />
                                                                         </div>
@@ -266,9 +296,7 @@ export default function Reports(): ReactElement {
                                                                                 {report.name}
                                                                             </p>
                                                                             <ActionButtons
-                                                                                reportuid={
-                                                                                    report.itemUID
-                                                                                }
+                                                                                report={report}
                                                                             />
                                                                         </div>
                                                                     ))
@@ -331,7 +359,7 @@ export default function Reports(): ReactElement {
                                                                         {report.name}
                                                                     </p>
                                                                     <ActionButtons
-                                                                        reportuid={report.itemUID}
+                                                                        report={report}
                                                                     />
                                                                 </div>
                                                             ))}

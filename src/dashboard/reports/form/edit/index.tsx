@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { getReportTaskResult, printReportInfo } from "http/services/reports.service";
+import { setReportDocumentTemplate } from "http/services/reports.service";
 
 const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
 
@@ -111,8 +111,8 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
-    const handlePrintForm = async (print: boolean = false) => {
-        const errorMessage = "Error while print report";
+    const handleDownloadForm = async (print: boolean = false) => {
+        const errorMessage = "Error while download report";
         const selectedColumns = selectedValues.map((name) => {
             return {
                 name,
@@ -121,51 +121,38 @@ export const ReportEditForm = observer((): ReactElement => {
             };
         });
         if (id && authUser && authUser.useruid) {
-            const response = await printReportInfo(authUser.useruid, {
+            const response = await setReportDocumentTemplate(id, {
                 itemUID: id,
                 columns: selectedColumns,
-            });
-            if (response && response.status === Status.ERROR) {
-                const { error } = response;
-                return toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: error || errorMessage,
-                    life: TOAST_LIFETIME,
-                });
-            }
-            setTimeout(async () => {
-                const { taskuid } = response as { taskuid: string };
-                const taskResult = await getReportTaskResult(taskuid).then((response) => {
-                    if (response && response.status === Status.ERROR) {
-                        const { error } = response;
-                        return toast.current?.show({
-                            severity: "error",
-                            summary: Status.ERROR,
-                            detail: error || errorMessage,
-                            life: TOAST_LIFETIME,
-                        });
-                    } else {
-                        return response;
-                    }
-                });
-                if (!taskResult) {
-                    return;
-                }
-                const url = new Blob([taskResult], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!print) {
-                    link.download = `report_form_${id}.pdf`;
-                    link.click();
+            }).then((response) => {
+                if (response && response.status === Status.ERROR) {
+                    const { error } = response;
+                    return toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: error || errorMessage,
+                        life: TOAST_LIFETIME,
+                    });
                 } else {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
+                    return response;
                 }
-            }, 3000);
+            });
+            if (!response) {
+                return;
+            }
+            const url = new Blob([response], { type: "application/pdf" });
+            let link = document.createElement("a");
+            link.href = window.URL.createObjectURL(url);
+            if (!print) {
+                link.download = `report_form_${id}.pdf`;
+                link.click();
+            } else {
+                window.open(
+                    link.href,
+                    "_blank",
+                    "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                );
+            }
         }
     };
 
@@ -189,7 +176,7 @@ export const ReportEditForm = observer((): ReactElement => {
                             <Button
                                 className='uppercase w-full px-6 report__button'
                                 outlined
-                                onClick={() => handlePrintForm()}
+                                onClick={() => handleDownloadForm()}
                             >
                                 Preview
                             </Button>
