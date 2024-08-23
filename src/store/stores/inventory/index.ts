@@ -12,6 +12,7 @@ import {
     Audit,
     InventoryMediaPostData,
     InventoryMedia,
+    InventoryWebCheck,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -21,6 +22,8 @@ import {
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
+    getInventoryWebCheck,
+    setInventoryWebCheck,
 } from "http/services/inventory-service";
 import {
     getInventoryMediaItemList,
@@ -352,6 +355,30 @@ export class InventoryStore {
         }
     });
 
+    public getWebCheckStatus = async (id = this._inventoryID) => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebCheck(id);
+            if (response?.status === Status.OK) {
+                const { enabled } = response as InventoryWebCheck;
+                this._exportWebActive = !!enabled;
+            } else {
+                const { error } = response as BaseResponseError;
+                throw new Error(error);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                return {
+                    status: Status.ERROR,
+                    error: error.message,
+                };
+            }
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
     public changeExportWeb = action(
         ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {
             const inventoryStore = this.rootStore.inventoryStore;
@@ -386,8 +413,14 @@ export class InventoryStore {
                 };
                 const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
                 const inventoryResponse = await setInventory(inventoryuid, inventoryData);
-                await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                    response.every((item) => item?.status === Status.OK) ? inventoryuid : undefined
+                const InventoryWebCheck = await setInventoryWebCheck(inventoryuid, {
+                    enabled: !!this._exportWebActive ? 1 : 0,
+                });
+                await Promise.all([inventoryResponse, webResponse, InventoryWebCheck]).then(
+                    (response) =>
+                        response.every((item) => item?.status === Status.OK)
+                            ? inventoryuid
+                            : undefined
                 );
             } catch (error) {
                 // TODO: add error handlers
