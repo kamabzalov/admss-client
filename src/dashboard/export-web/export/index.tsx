@@ -142,7 +142,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
             <div className='expanded-row'>
-                <div className='expanded-row__label'>Dealer comment:</div>
+                <div className='expanded-row__label'>Dealer comment: </div>
                 <div className='expanded-row__text'>{data.DealerComments || ""}</div>
             </div>
         );
@@ -596,7 +596,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             return (
                 <InputText
                     className='export-web__edit-input'
-                    {...options}
                     value={exportsToWeb[options.rowIndex!].ListPrice}
                     onChange={({ target }) => {
                         const value = target.value.replace(/[^0-9.]/g, "");
@@ -621,7 +620,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 }) || null;
                             value &&
                                 setInventoryExportWeb(options.rowData.itemuid, {
-                                    ListPrice: (parseFloat(value.ListPrice) * 100).toString(),
+                                    ListPrice: value.ListPrice,
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
@@ -829,7 +828,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({ rowIndex }) => {
+                                    body={({ ListPrice }: ExportWebList, { rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
@@ -878,7 +877,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
-                                                {field === "ListPrice" ? "$" : null} {data[field]}
+                                                {field === "ListPrice" ? "$" : ""}
+                                                {data[field]}
                                             </div>
                                         );
                                     }}
