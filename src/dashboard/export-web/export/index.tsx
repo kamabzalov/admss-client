@@ -39,7 +39,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
-import { setInventory } from "http/services/inventory-service";
+import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -620,8 +620,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     return item.itemuid === options.rowData.itemuid;
                                 }) || null;
                             value &&
-                                setInventory(options.rowData.itemuid, {
-                                    Price: parseFloat(value.ListPrice) * 100,
+                                setInventoryExportWeb(options.rowData.itemuid, {
+                                    ListPrice: parseFloat(value.ListPrice) * 100,
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
