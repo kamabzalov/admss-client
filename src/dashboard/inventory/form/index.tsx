@@ -82,6 +82,7 @@ export const InventoryForm = observer(() => {
         isFormChanged,
         currentLocation,
         deleteReason,
+        memoRoute,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -291,7 +292,7 @@ export const InventoryForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/inventory")}
+                    onClick={() => navigate(memoRoute || "/dashboard/inventory")}
                 />
                 <div className='col-12'>
                     <div className='card inventory'>
@@ -473,7 +474,7 @@ export const InventoryForm = observer(() => {
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/inventory`);
+                                            return navigate(memoRoute || "/dashboard/inventory");
                                         }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
