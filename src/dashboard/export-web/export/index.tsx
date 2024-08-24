@@ -39,6 +39,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
+import { setInventory } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -128,6 +129,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [currentParams, setCurrentParams] = useState<QueryParams | null>(null);
     const location = useLocation();
     const currentPath = location.pathname + location.search;
 
@@ -205,6 +207,13 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setSelectedServices([...selectedServices]);
     };
 
+    const convertPrice = (price: string | number): number => {
+        if (typeof price === "string") {
+            return parseFloat(price.replace(/[$,]/g, ""));
+        }
+        return price;
+    };
+
     const handlePriceChange = (field: string, index: number, value: number) => {
         const updatedServices = selectedServices.map((item) => {
             if (item.field === field) {
@@ -218,11 +227,12 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setSelectedServices(updatedServices);
     };
 
-    const handleGetExportWebList = async (params: QueryParams) => {
+    const handleGetExportWebList = async (params?: QueryParams) => {
         if (!authUser) return;
+        const reqParams = params || currentParams;
         const [totalResponse, dataResponse] = await Promise.all([
-            getExportToWebList(authUser.useruid, { ...params, total: 1 }),
-            getExportToWebList(authUser.useruid, params),
+            getExportToWebList(authUser.useruid, { ...reqParams, total: 1 }),
+            getExportToWebList(authUser.useruid, reqParams || params),
         ]);
 
         if (totalResponse && !Array.isArray(totalResponse)) {
@@ -336,6 +346,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             skip: lazyState.first,
             top: lazyState.rows,
         };
+        setCurrentParams(params);
 
         handleGetExportWebList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -593,7 +604,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 <InputNumber
                     className='export-web__edit-input'
                     {...options}
-                    value={options.value.replace(/[^\d.]/g, "")}
+                    value={options.value.replace(/[^\d.,]/g, "")}
                     onChange={(e) => {
                         setExportsToWeb(
                             exportsToWeb.map((item) => {
@@ -606,6 +617,19 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 return item;
                             })
                         );
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            const value =
+                                exportsToWeb.find((item) => {
+                                    return item.itemuid === options.rowData.itemuid;
+                                }) || null;
+                            value &&
+                                setInventory(options.rowData.itemuid, {
+                                    Price: convertPrice(value.Price) * 100,
+                                }).then(() => handleGetExportWebList());
+                        }
                     }}
                 />
             );
@@ -830,11 +854,11 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                             (item) => item.field === field
                                                         )?.selected[rowIndex]
                                                     }
-                                                    value={
+                                                    value={convertPrice(
                                                         selectedServices.find(
                                                             (item) => item.field === field
-                                                        )?.price[rowIndex]
-                                                    }
+                                                        )?.price[rowIndex] || 0
+                                                    )}
                                                     onChange={({ value }) =>
                                                         value &&
                                                         handlePriceChange(field, rowIndex, value)
