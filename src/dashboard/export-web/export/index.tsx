@@ -829,7 +829,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({}: ExportWebList, { rowIndex }) => {
+                                    body={({ rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
