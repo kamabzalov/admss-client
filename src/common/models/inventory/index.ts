@@ -368,4 +368,3 @@ export interface InventoryStockNumber {
     status: Status;
     stockno: string;
 }
-
