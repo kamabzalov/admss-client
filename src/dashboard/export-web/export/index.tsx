@@ -596,7 +596,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             return (
                 <InputText
                     className='export-web__edit-input'
-                    {...options}
                     value={exportsToWeb[options.rowIndex!].ListPrice}
                     onChange={({ target }) => {
                         const value = target.value.replace(/[^0-9.]/g, "");
