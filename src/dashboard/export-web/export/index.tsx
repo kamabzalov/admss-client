@@ -621,7 +621,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 }) || null;
                             value &&
                                 setInventoryExportWeb(options.rowData.itemuid, {
-                                    ListPrice: parseFloat(value.ListPrice) * 100,
+                                    ListPrice: (parseFloat(value.ListPrice) * 100).toString(),
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
