@@ -146,7 +146,7 @@ export interface InventoryWebInfo {
     InStockDate: number;
     LastExportDate: number;
     LastModifiedDate: number;
-    ListPrice: string;
+    ListPrice: number;
     ModelCode: string;
     PhotoURL: string;
     SpecialPrice: number;
