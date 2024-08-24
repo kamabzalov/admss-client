@@ -1,13 +1,15 @@
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
+import { useParams } from "react-router-dom";
 
 export const ExportWebPrice = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().inventoryStore;
     const {
         exportWebActive,
@@ -22,7 +24,13 @@ export const ExportWebPrice = observer((): ReactElement => {
             DealerComments,
         },
         changeExportWeb,
+        getWebCheckStatus,
     } = store;
+
+    useEffect(() => {
+        getWebCheckStatus(id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     const handleExportWebChange = () => {
         store.exportWebActive = !exportWebActive;
