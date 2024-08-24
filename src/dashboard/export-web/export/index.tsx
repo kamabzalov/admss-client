@@ -142,7 +142,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
             <div className='expanded-row'>
-                <div className='expanded-row__label'>Dealer comment: </div>
+                <div className='expanded-row__label'>Dealer comment:</div>
                 <div className='expanded-row__text'>{data.DealerComments || ""}</div>
             </div>
         );
@@ -829,7 +829,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({ ListPrice }: ExportWebList, { rowIndex }) => {
+                                    body={({}: ExportWebList, { rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
@@ -878,7 +878,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
-                                                {data[field]}
+                                                {field === "ListPrice" ? "$" : null} {data[field]}
                                             </div>
                                         );
                                     }}
