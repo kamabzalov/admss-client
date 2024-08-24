@@ -368,3 +368,8 @@ export interface InventoryStockNumber {
     status: Status;
     stockno: string;
 }
+
+export interface InventoryWebCheck extends BaseResponseError {
+    message: string;
+    enabled: 0 | 1;
+}
