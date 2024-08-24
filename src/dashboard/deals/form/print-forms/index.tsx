@@ -60,8 +60,6 @@ export const PrintDealForms = observer((): ReactElement => {
                     store.isLoading = false;
                 }, 3000);
             } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error(error);
                 //TODO: handle error
             } finally {
                 setIsButtonDisabled(false);

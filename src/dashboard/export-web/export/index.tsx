@@ -13,7 +13,7 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     addExportTask,
@@ -22,7 +22,7 @@ import {
 } from "http/services/export-to-web.service";
 import { ExportWebList, ExportWebPostData } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     MultiSelect,
     MultiSelectChangeEvent,
@@ -39,6 +39,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
+import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -68,7 +69,7 @@ const columns: TableColumnsList[] = [
     { field: "VIN", header: "VIN", checked: false },
     { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
-    { field: "Price", header: "Price", checked: false },
+    { field: "ListPrice", header: "Price", checked: false },
     { field: "lastexportdate", header: "Last Export Date", checked: false },
     { field: "mediacount", header: "Media (qty)", checked: false },
 ];
@@ -109,6 +110,7 @@ interface ExportWebProps {
 export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const userStore = store.userStore;
+    const inventoryStore = store.inventoryStore;
     const { authUser } = userStore;
     const toast = useToast();
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -127,6 +129,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [currentParams, setCurrentParams] = useState<QueryParams | null>(null);
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
 
     const navigate = useNavigate();
 
@@ -137,7 +142,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
             <div className='expanded-row'>
-                <div className='expanded-row__label'>Dealer comment: </div>
+                <div className='expanded-row__label'>Dealer comment:</div>
                 <div className='expanded-row__text'>{data.DealerComments || ""}</div>
             </div>
         );
@@ -215,11 +220,12 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setSelectedServices(updatedServices);
     };
 
-    const handleGetExportWebList = async (params: QueryParams) => {
+    const handleGetExportWebList = async (params?: QueryParams) => {
         if (!authUser) return;
+        const reqParams = params || currentParams;
         const [totalResponse, dataResponse] = await Promise.all([
-            getExportToWebList(authUser.useruid, { ...params, total: 1 }),
-            getExportToWebList(authUser.useruid, params),
+            getExportToWebList(authUser.useruid, { ...reqParams, total: 1 }),
+            getExportToWebList(authUser.useruid, reqParams || params),
         ]);
 
         if (totalResponse && !Array.isArray(totalResponse)) {
@@ -229,7 +235,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         if (Array.isArray(dataResponse)) {
             setExportsToWeb(dataResponse);
             setSelectedInventories(Array(dataResponse.length).fill(false));
-            const price = dataResponse.map((item) => item.Price || 0);
+            const price = dataResponse.map((item) => parseFloat(item.ListPrice));
             setSelectedServices(
                 selectedServices.map((item) => ({
                     ...item,
@@ -282,7 +288,13 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     const serverColumns = columns.filter((column) =>
                         uniqueColumns.find((col) => col === column.field)
                     );
-                    setActiveColumns(serverColumns);
+                    const serverServiceColumns = serviceColumns.filter((column) =>
+                        uniqueColumns.find((col) => col === column.field)
+                    );
+                    setActiveColumns([
+                        ...serverColumns,
+                        ...(serverServiceColumns as TableColumnsList[]),
+                    ]);
                 } else {
                     setActiveColumns(columns.filter(({ checked }) => checked));
                 }
@@ -327,6 +339,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             skip: lazyState.first,
             top: lazyState.rows,
         };
+        setCurrentParams(params);
 
         handleGetExportWebList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -577,6 +590,48 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         });
     };
 
+    const handlePriceEdit = (options: ColumnEditorOptions) => {
+        const field: keyof ExportWebList | string = options.field;
+        if (field === "ListPrice") {
+            return (
+                <InputText
+                    className='export-web__edit-input'
+                    {...options}
+                    value={exportsToWeb[options.rowIndex!].ListPrice}
+                    onChange={({ target }) => {
+                        const value = target.value.replace(/[^0-9.]/g, "");
+                        setExportsToWeb(
+                            exportsToWeb.map((item) => {
+                                if (item.itemuid === options.rowData.itemuid) {
+                                    return {
+                                        ...item,
+                                        [field]: value,
+                                    };
+                                }
+                                return item;
+                            })
+                        );
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            const value =
+                                exportsToWeb.find((item) => {
+                                    return item.itemuid === options.rowData.itemuid;
+                                }) || null;
+                            value &&
+                                setInventoryExportWeb(options.rowData.itemuid, {
+                                    ListPrice: (parseFloat(value.ListPrice) * 100).toString(),
+                                }).then(() => handleGetExportWebList());
+                        }
+                    }}
+                />
+            );
+        } else {
+            return options.value;
+        }
+    };
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -738,6 +793,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                             className='text export-web__icon-button'
                                             icon='icon adms-edit-item'
                                             onClick={() => {
+                                                inventoryStore.memoRoute = currentPath;
                                                 navigate(`/dashboard/inventory/${options.itemuid}`);
                                             }}
                                         />
@@ -773,7 +829,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({ Price }: ExportWebList, { rowIndex }) => {
+                                    body={({ rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
@@ -795,7 +851,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     value={
                                                         selectedServices.find(
                                                             (item) => item.field === field
-                                                        )?.price[rowIndex]
+                                                        )?.price[rowIndex] || 0
                                                     }
                                                     onChange={({ value }) =>
                                                         value &&
@@ -814,6 +870,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     header={header}
                                     key={field}
                                     sortable
+                                    editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
                                         return (
                                             <div
@@ -821,7 +878,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
-                                                {data[field]}
+                                                {field === "ListPrice" ? "$" : null} {data[field]}
                                             </div>
                                         );
                                     }}
@@ -846,4 +903,3 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         </div>
     );
 };
-

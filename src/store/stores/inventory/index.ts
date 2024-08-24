@@ -98,6 +98,7 @@ export class InventoryStore {
     private _formErrorIndex: number[] = [];
     private _currentLocation: string = "";
     private _deleteReason: string = "";
+    private _memoRoute: string = "";
 
     protected _isLoading: boolean = false;
     protected _isFormChanged: boolean = false;
@@ -185,6 +186,10 @@ export class InventoryStore {
 
     public get deleteReason() {
         return this._deleteReason;
+    }
+
+    public get memoRoute() {
+        return this._memoRoute;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -696,6 +701,10 @@ export class InventoryStore {
 
     public set isFormChanged(state: boolean) {
         this._isFormChanged = state;
+    }
+
+    public set memoRoute(state: string) {
+        this._memoRoute = state;
     }
 
     public clearMedia = () => {

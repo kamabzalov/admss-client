@@ -35,6 +35,7 @@ export interface ExportWebList {
     lastexportdate: string;
     mediacount: number;
     Price: number;
+    ListPrice: string;
 }
 
 export interface ExportWebHistoryList {
