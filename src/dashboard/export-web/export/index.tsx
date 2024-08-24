@@ -69,7 +69,7 @@ const columns: TableColumnsList[] = [
     { field: "VIN", header: "VIN", checked: false },
     { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
-    { field: "Price", header: "Price", checked: false },
+    { field: "ListPrice", header: "Price", checked: false },
     { field: "lastexportdate", header: "Last Export Date", checked: false },
     { field: "mediacount", header: "Media (qty)", checked: false },
 ];
@@ -207,13 +207,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setSelectedServices([...selectedServices]);
     };
 
-    const convertPrice = (price: string | number): number => {
-        if (typeof price === "string") {
-            return parseFloat(price.replace(/[$,]/g, ""));
-        }
-        return price;
-    };
-
     const handlePriceChange = (field: string, index: number, value: number) => {
         const updatedServices = selectedServices.map((item) => {
             if (item.field === field) {
@@ -242,7 +235,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         if (Array.isArray(dataResponse)) {
             setExportsToWeb(dataResponse);
             setSelectedInventories(Array(dataResponse.length).fill(false));
-            const price = dataResponse.map((item) => item.Price || 0);
+            const price = dataResponse.map((item) => parseFloat(item.ListPrice));
             setSelectedServices(
                 selectedServices.map((item) => ({
                     ...item,
@@ -599,19 +592,20 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
 
     const handlePriceEdit = (options: ColumnEditorOptions) => {
         const field: keyof ExportWebList | string = options.field;
-        if (field === "Price") {
+        if (field === "ListPrice") {
             return (
-                <InputNumber
+                <InputText
                     className='export-web__edit-input'
                     {...options}
-                    value={options.value.replace(/[^\d.,]/g, "")}
-                    onChange={(e) => {
+                    value={exportsToWeb[options.rowIndex!].ListPrice}
+                    onChange={({ target }) => {
+                        const value = target.value.replace(/[^0-9.]/g, "");
                         setExportsToWeb(
                             exportsToWeb.map((item) => {
                                 if (item.itemuid === options.rowData.itemuid) {
                                     return {
                                         ...item,
-                                        [field]: e.value || 0,
+                                        [field]: value,
                                     };
                                 }
                                 return item;
@@ -627,7 +621,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 }) || null;
                             value &&
                                 setInventory(options.rowData.itemuid, {
-                                    Price: convertPrice(value.Price) * 100,
+                                    Price: parseFloat(value.ListPrice) * 100,
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
@@ -835,7 +829,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({ Price }: ExportWebList, { rowIndex }) => {
+                                    body={({ ListPrice }: ExportWebList, { rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
@@ -854,11 +848,11 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                             (item) => item.field === field
                                                         )?.selected[rowIndex]
                                                     }
-                                                    value={convertPrice(
+                                                    value={
                                                         selectedServices.find(
                                                             (item) => item.field === field
                                                         )?.price[rowIndex] || 0
-                                                    )}
+                                                    }
                                                     onChange={({ value }) =>
                                                         value &&
                                                         handlePriceChange(field, rowIndex, value)
