@@ -146,7 +146,7 @@ export interface InventoryWebInfo {
     InStockDate: number;
     LastExportDate: number;
     LastModifiedDate: number;
-    ListPrice: number;
+    ListPrice: string;
     ModelCode: string;
     PhotoURL: string;
     SpecialPrice: number;
@@ -367,4 +367,9 @@ export interface InventoryStockNumber {
     exists: 0 | 1;
     status: Status;
     stockno: string;
+}
+
+export interface InventoryWebCheck extends BaseResponseError {
+    message: string;
+    enabled: 0 | 1;
 }
