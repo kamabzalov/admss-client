@@ -37,13 +37,6 @@ export const ExportWebPrice = observer((): ReactElement => {
         store.isFormChanged = true;
     };
 
-    const convertPrice = (price: string | number): number => {
-        if (typeof price === "string") {
-            return parseFloat(price.replace(/[$,]/g, ""));
-        }
-        return price;
-    };
-
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
@@ -71,7 +64,7 @@ export const ExportWebPrice = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={convertPrice(ListPrice)}
+                    value={parseFloat(ListPrice)}
                     labelPosition='top'
                     title='List price'
                     onChange={({ value }) => value && changeExportWeb({ key: "ListPrice", value })}
