@@ -620,7 +620,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 }) || null;
                             value &&
                                 setInventoryExportWeb(options.rowData.itemuid, {
-                                    ListPrice: (parseFloat(value.ListPrice) * 100).toString(),
+                                    ListPrice: value.ListPrice,
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
@@ -871,13 +871,20 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     sortable
                                     editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
+                                        let value: string | number;
+                                        if (field === "VIN") {
+                                            value = data[field].toUpperCase();
+                                        } else {
+                                            value = data[field];
+                                        }
+
                                         return (
                                             <div
                                                 className={`${
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
-                                                {field === "ListPrice" ? "$" : null} {data[field]}
+                                                {field === "ListPrice" ? "$" : null} {value}
                                             </div>
                                         );
                                     }}
