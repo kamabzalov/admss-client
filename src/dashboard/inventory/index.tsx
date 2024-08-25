@@ -846,6 +846,12 @@ export default function Inventories({
                                                 sortable
                                                 reorderable
                                                 headerClassName='cursor-move'
+                                                body={(data) => {
+                                                    if (field === "VIN") {
+                                                        return data[field].toUpperCase();
+                                                    }
+                                                    return data[field];
+                                                }}
                                                 pt={{
                                                     root: {
                                                         style: {
