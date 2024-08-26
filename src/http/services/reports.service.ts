@@ -6,6 +6,7 @@ import {
     ReportCreate,
     ReportDocument,
     ReportInfo,
+    ReportServices,
     ReportsPostData,
 } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
@@ -161,6 +162,28 @@ export const getReportDocumentTemplate = async (documentuid: string) => {
                 error:
                     error.response?.data.error ||
                     "Error while getting user report document template",
+            };
+        }
+    }
+};
+
+export const getReportColumns = async ({
+    service,
+    useruid,
+}: {
+    service: ReportServices;
+    useruid: string;
+}) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+            `${service}/${useruid}/reportcolumns`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report columns",
             };
         }
     }

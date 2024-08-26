@@ -10,9 +10,15 @@ import { useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { setReportDocumentTemplate } from "http/services/reports.service";
+import { getReportColumns, setReportDocumentTemplate } from "http/services/reports.service";
+import { ReportServices } from "common/models/reports";
 
-const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
+const dataSetValues: ReportServices[] = [
+    ReportServices.INVENTORY,
+    ReportServices.CONTACTS,
+    ReportServices.DEALS,
+    ReportServices.ACCOUNTS,
+];
 
 export const ReportEditForm = observer((): ReactElement => {
     const store = useStore().reportStore;
@@ -32,7 +38,23 @@ export const ReportEditForm = observer((): ReactElement => {
     ]);
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [currentItem, setCurrentItem] = useState<string | null>(null);
-    const [dataSet, setDataSet] = useState<string | null>(null);
+    const [dataSet, setDataSet] = useState<ReportServices | null>(null);
+
+    useEffect(() => {
+        const useruid = authUser?.useruid;
+        if (dataSet && useruid)
+            getReportColumns({ service: dataSet, useruid }).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dataSet, authUser?.useruid]);
 
     useEffect(() => {
         id &&
