@@ -120,22 +120,34 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo) {
             if (allowOverwrite) {
-                changeDealExtData({ key: "Trade1_Make", value: vinInfo.Make });
-                changeDealExtData({ key: "Trade1_Model", value: vinInfo.Model });
-                changeDealExtData({ key: "Trade1_Year", value: vinInfo.Year });
+                changeDealExtData({
+                    key: "Trade1_Make",
+                    value: vinInfo.Make || values.Trade1_Make,
+                });
+                changeDealExtData({
+                    key: "Trade1_Model",
+                    value: vinInfo.Model || values.Trade1_Model,
+                });
+                changeDealExtData({
+                    key: "Trade1_Year",
+                    value: vinInfo.Year || values.Trade1_Year,
+                });
                 changeDealExtData({
                     key: "Trade1_StockNum",
-                    value: vinInfo.StockNo,
+                    value: vinInfo.StockNo || Trade1_StockNum,
                 });
                 changeDealExtData({
                     key: "Trade1_BodyStyle",
-                    value: vinInfo.BodyStyle,
+                    value: vinInfo.BodyStyle || Trade1_BodyStyle,
                 });
                 changeDealExtData({
                     key: "Trade1_Color",
-                    value: vinInfo.ExteriorColor,
+                    value: vinInfo.ExteriorColor || Trade1_Color,
                 });
-                changeDealExtData({ key: "Trade1_Mileage", value: vinInfo.mileage });
+                changeDealExtData({
+                    key: "Trade1_Mileage",
+                    value: vinInfo.mileage || Trade1_Mileage,
+                });
             } else {
                 changeDealExtData({
                     key: "Trade1_Make",
