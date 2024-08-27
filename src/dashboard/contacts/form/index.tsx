@@ -160,16 +160,15 @@ export const ContactForm = observer((): ReactElement => {
                             <h2 className='card-header__title uppercase m-0 pr-2'>
                                 {id ? "Edit" : "Create new"} contact
                             </h2>
-                            <div className='card-header-info'>
+                            {/* <div className='card-header-info'>
                                 Full Name
-                                <span className='card-header-info__data'>{`${
-                                    contact!.firstName || ""
-                                } ${contact?.lastName || ""}`}</span>
+                                <span className='card-header-info__data'>{`${contact!.firstName || ""
+                                    } ${contact?.lastName || ""}`}</span>
                                 Company name
                                 <span className='card-header-info__data'>
                                     {contact?.companyName}
                                 </span>
-                            </div>
+                            </div> */}
                         </div>
                         <div className='card-content contact__card'>
                             <div className='grid flex-nowrap'>
@@ -339,4 +338,3 @@ export const ContactForm = observer((): ReactElement => {
         </Suspense>
     );
 });
-
