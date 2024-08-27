@@ -11,7 +11,7 @@ import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { getReportColumns, setReportDocumentTemplate } from "http/services/reports.service";
-import { ReportServices } from "common/models/reports";
+import { ReportServiceColumns, ReportServices } from "common/models/reports";
 
 const dataSetValues: ReportServices[] = [
     ReportServices.INVENTORY,
@@ -27,17 +27,9 @@ export const ReportEditForm = observer((): ReactElement => {
     const { id } = useParams();
     const { report, reportName, getReport, changeReport } = store;
     const toast = useToast();
-    const [availableValues, setAvailableValues] = useState<string[]>([
-        "Account",
-        "Buyer Name",
-        "Type",
-        "Info (value)",
-        "Stock#",
-        "VIN",
-        "Date",
-    ]);
-    const [selectedValues, setSelectedValues] = useState<string[]>([]);
-    const [currentItem, setCurrentItem] = useState<string | null>(null);
+    const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
+    const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
+    const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
     const [dataSet, setDataSet] = useState<ReportServices | null>(null);
 
     useEffect(() => {
@@ -51,6 +43,8 @@ export const ReportEditForm = observer((): ReactElement => {
                         detail: response?.error,
                         life: TOAST_LIFETIME,
                     });
+                } else {
+                    setAvailableValues(response);
                 }
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,11 +66,11 @@ export const ReportEditForm = observer((): ReactElement => {
     }, [id]);
 
     const moveItem = (
-        item: string,
-        from: string[],
-        to: string[],
-        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
-        setTo: React.Dispatch<React.SetStateAction<string[]>>
+        item: ReportServiceColumns,
+        from: ReportServiceColumns[],
+        to: ReportServiceColumns[],
+        setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         setFrom(from.filter((i) => i !== item));
         setTo([...to, item]);
@@ -84,16 +78,19 @@ export const ReportEditForm = observer((): ReactElement => {
     };
 
     const moveAllItems = (
-        from: string[],
-        to: string[],
-        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
-        setTo: React.Dispatch<React.SetStateAction<string[]>>
+        from: ReportServiceColumns[],
+        to: ReportServiceColumns[],
+        setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         setTo([...to, ...from]);
         setFrom([]);
     };
 
-    const changeAvailableOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+    const changeAvailableOrder = (
+        item: ReportServiceColumns,
+        direction: "up" | "down" | "top" | "bottom"
+    ) => {
         if (direction === "up") {
             const index = availableValues.indexOf(item);
             const newItems = [...availableValues];
@@ -113,7 +110,10 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
-    const changeSelectedOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+    const changeSelectedOrder = (
+        item: ReportServiceColumns,
+        direction: "up" | "down" | "top" | "bottom"
+    ) => {
         if (direction === "up") {
             const index = selectedValues.indexOf(item);
             const newItems = [...selectedValues];
@@ -135,17 +135,10 @@ export const ReportEditForm = observer((): ReactElement => {
 
     const handleDownloadForm = async (print: boolean = false) => {
         const errorMessage = "Error while download report";
-        const selectedColumns = selectedValues.map((name) => {
-            return {
-                name,
-                data: name,
-                with: 0,
-            };
-        });
         if (id && authUser && authUser.useruid) {
             const response = await setReportDocumentTemplate(id, {
                 itemUID: id,
-                columns: selectedColumns,
+                columns: selectedValues,
             }).then((response) => {
                 if (response && response.status === Status.ERROR) {
                     const { error } = response;
@@ -218,6 +211,11 @@ export const ReportEditForm = observer((): ReactElement => {
                                 options={dataSetValues}
                                 value={dataSet}
                                 onChange={(e) => setDataSet(e.value)}
+                                pt={{
+                                    wrapper: {
+                                        className: "capitalize",
+                                    },
+                                }}
                             />
                             <label className='float-label'>Data Set</label>
                         </span>

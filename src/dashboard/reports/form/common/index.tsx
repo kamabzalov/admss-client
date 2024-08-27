@@ -1,10 +1,11 @@
+import { ReportServiceColumns } from "common/models/reports";
 import { ReactElement } from "react";
 
 interface ReportSelectProps {
     header: string;
-    values: string[];
-    currentItem: string | Record<string, unknown> | null;
-    onItemClick: (item: string) => void;
+    values: ReportServiceColumns[];
+    currentItem: ReportServiceColumns | null;
+    onItemClick: (item: ReportServiceColumns) => void;
 }
 
 export const ReportSelect = ({
@@ -20,12 +21,12 @@ export const ReportSelect = ({
                 {values.map((value) => (
                     <li
                         className={`report-select__item ${currentItem === value ? "selected" : ""}`}
-                        key={value}
+                        key={value.data}
                         onClick={() => {
                             onItemClick(value);
                         }}
                     >
-                        {value}
+                        {value.name}
                     </li>
                 ))}
             </ul>

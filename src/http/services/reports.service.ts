@@ -6,6 +6,7 @@ import {
     ReportCreate,
     ReportDocument,
     ReportInfo,
+    ReportServiceColumns,
     ReportServices,
     ReportsPostData,
 } from "common/models/reports";
@@ -247,10 +248,7 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    {
-        itemUID,
-        columns,
-    }: { itemUID: string; columns: { name: string; data: string; with: number }[] }
+    { itemUID, columns }: { itemUID: string; columns: Partial<ReportServiceColumns>[] }
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
