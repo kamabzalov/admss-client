@@ -60,7 +60,6 @@
     ],
     "rules": {
       "@typescript-eslint/no-unused-vars": "warn",
-      "no-unused-vars": "off",
       "no-console": "error",
       "react-hooks/exhaustive-deps": "off"
     }
