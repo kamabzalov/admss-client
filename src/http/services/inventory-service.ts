@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
+
 import { AxiosResponse, isAxiosError } from "axios";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {

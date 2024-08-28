@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";

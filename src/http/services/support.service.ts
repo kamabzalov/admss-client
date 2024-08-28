@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { authorizedUserApiInstance } from "http/index";
 
 export interface SupportMessage {

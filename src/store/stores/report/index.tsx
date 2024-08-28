@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportInfo } from "common/models/reports";
 import { createCustomReport, getReportInfo, updateReportInfo } from "http/services/reports.service";

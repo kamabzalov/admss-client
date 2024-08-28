@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 import { Status } from "common/models/base-response";
 import { AccountInfo, AccountExtData } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";

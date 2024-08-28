@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 

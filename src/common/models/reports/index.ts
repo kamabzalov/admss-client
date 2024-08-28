@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { BaseResponseError } from "../base-response";
 
 export interface ReportsColumn {

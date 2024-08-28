@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";

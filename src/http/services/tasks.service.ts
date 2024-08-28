@@ -1,5 +1,5 @@
 import { QueryParams } from "common/models/query-params";
-/* eslint-disable no-unused-vars */
+
 import { authorizedUserApiInstance } from "http/index";
 
 export enum TaskStatus {
