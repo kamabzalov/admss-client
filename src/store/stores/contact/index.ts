@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactProspect } from "common/models/contact";

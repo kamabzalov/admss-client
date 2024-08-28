@@ -65,7 +65,6 @@ export const ImagesMedia = observer((): ReactElement => {
         return () => {
             clearMedia();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchImages, checked, id]);
 
     useEffect(() => {

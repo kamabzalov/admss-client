@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
@@ -57,7 +55,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     useEffect(() => {
         getImagesDL();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contact]);
 
     useEffect(() => {
@@ -68,7 +65,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         if (backSideDL.size) {
             store.backSideDLurl = URL.createObjectURL(backSideDL);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {

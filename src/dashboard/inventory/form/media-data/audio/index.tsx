@@ -58,7 +58,6 @@ export const AudioMedia = observer((): ReactElement => {
         return () => {
             clearMedia();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchAudios, checked, id]);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {

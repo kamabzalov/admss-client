@@ -6,6 +6,8 @@ import {
     ReportCreate,
     ReportDocument,
     ReportInfo,
+    ReportServiceColumns,
+    ReportServices,
     ReportsPostData,
 } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
@@ -166,6 +168,28 @@ export const getReportDocumentTemplate = async (documentuid: string) => {
     }
 };
 
+export const getReportColumns = async ({
+    service,
+    useruid,
+}: {
+    service: ReportServices;
+    useruid: string;
+}) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+            `${service}/${useruid}/reportcolumns`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report columns",
+            };
+        }
+    }
+};
+
 export const createCustomReport = async (templateuid: string, body: Partial<ReportCreate>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
@@ -224,10 +248,7 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    {
-        itemUID,
-        columns,
-    }: { itemUID: string; columns: { name: string; data: string; with: number }[] }
+    { itemUID, columns }: { itemUID: string; columns: Partial<ReportServiceColumns>[] }
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(

@@ -137,7 +137,6 @@ export default function Inventories({
         return () => {
             store.memoRoute = "";
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -518,7 +517,6 @@ export default function Inventories({
         }
 
         handleGetInventoryList(params, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         serverSettings,
         globalSearch,

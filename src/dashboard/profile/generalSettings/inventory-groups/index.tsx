@@ -37,7 +37,6 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     useEffect(() => {
         handleGetUserGroupList();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {

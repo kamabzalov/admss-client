@@ -53,7 +53,6 @@ export const AccountNotes = (): ReactElement => {
             handleGetNotes();
             handleGetNote();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleDeleteNote = ({ itemuid }: AccountNote) => {

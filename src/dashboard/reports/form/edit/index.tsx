@@ -10,9 +10,15 @@ import { useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { setReportDocumentTemplate } from "http/services/reports.service";
+import { getReportColumns, setReportDocumentTemplate } from "http/services/reports.service";
+import { ReportServiceColumns, ReportServices } from "common/models/reports";
 
-const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
+const dataSetValues: ReportServices[] = [
+    ReportServices.INVENTORY,
+    ReportServices.CONTACTS,
+    ReportServices.DEALS,
+    ReportServices.ACCOUNTS,
+];
 
 export const ReportEditForm = observer((): ReactElement => {
     const store = useStore().reportStore;
@@ -21,18 +27,27 @@ export const ReportEditForm = observer((): ReactElement => {
     const { id } = useParams();
     const { report, reportName, getReport, changeReport } = store;
     const toast = useToast();
-    const [availableValues, setAvailableValues] = useState<string[]>([
-        "Account",
-        "Buyer Name",
-        "Type",
-        "Info (value)",
-        "Stock#",
-        "VIN",
-        "Date",
-    ]);
-    const [selectedValues, setSelectedValues] = useState<string[]>([]);
-    const [currentItem, setCurrentItem] = useState<string | null>(null);
-    const [dataSet, setDataSet] = useState<string | null>(null);
+    const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
+    const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
+    const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
+    const [dataSet, setDataSet] = useState<ReportServices | null>(null);
+
+    useEffect(() => {
+        const useruid = authUser?.useruid;
+        if (dataSet && useruid)
+            getReportColumns({ service: dataSet, useruid }).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    setAvailableValues(response);
+                }
+            });
+    }, [dataSet, authUser?.useruid]);
 
     useEffect(() => {
         id &&
@@ -46,15 +61,14 @@ export const ReportEditForm = observer((): ReactElement => {
                     });
                 }
             });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const moveItem = (
-        item: string,
-        from: string[],
-        to: string[],
-        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
-        setTo: React.Dispatch<React.SetStateAction<string[]>>
+        item: ReportServiceColumns,
+        from: ReportServiceColumns[],
+        to: ReportServiceColumns[],
+        setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         setFrom(from.filter((i) => i !== item));
         setTo([...to, item]);
@@ -62,16 +76,19 @@ export const ReportEditForm = observer((): ReactElement => {
     };
 
     const moveAllItems = (
-        from: string[],
-        to: string[],
-        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
-        setTo: React.Dispatch<React.SetStateAction<string[]>>
+        from: ReportServiceColumns[],
+        to: ReportServiceColumns[],
+        setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         setTo([...to, ...from]);
         setFrom([]);
     };
 
-    const changeAvailableOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+    const changeAvailableOrder = (
+        item: ReportServiceColumns,
+        direction: "up" | "down" | "top" | "bottom"
+    ) => {
         if (direction === "up") {
             const index = availableValues.indexOf(item);
             const newItems = [...availableValues];
@@ -91,7 +108,10 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
-    const changeSelectedOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+    const changeSelectedOrder = (
+        item: ReportServiceColumns,
+        direction: "up" | "down" | "top" | "bottom"
+    ) => {
         if (direction === "up") {
             const index = selectedValues.indexOf(item);
             const newItems = [...selectedValues];
@@ -111,19 +131,12 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
-    const handleDownloadForm = async (print: boolean = false) => {
+    const handleDownloadForm = async (download: boolean = false) => {
         const errorMessage = "Error while download report";
-        const selectedColumns = selectedValues.map((name) => {
-            return {
-                name,
-                data: name,
-                with: 0,
-            };
-        });
         if (id && authUser && authUser.useruid) {
             const response = await setReportDocumentTemplate(id, {
                 itemUID: id,
-                columns: selectedColumns,
+                columns: selectedValues,
             }).then((response) => {
                 if (response && response.status === Status.ERROR) {
                     const { error } = response;
@@ -143,7 +156,7 @@ export const ReportEditForm = observer((): ReactElement => {
             const url = new Blob([response], { type: "application/pdf" });
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(url);
-            if (!print) {
+            if (download) {
                 link.download = `report_form_${id}.pdf`;
                 link.click();
             } else {
@@ -182,7 +195,11 @@ export const ReportEditForm = observer((): ReactElement => {
                             </Button>
                         </div>
                         <div className='col-3'>
-                            <Button className='uppercase w-full px-6 report__button' outlined>
+                            <Button
+                                className='uppercase w-full px-6 report__button'
+                                outlined
+                                onClick={() => handleDownloadForm(true)}
+                            >
                                 Download
                             </Button>
                         </div>
@@ -196,6 +213,11 @@ export const ReportEditForm = observer((): ReactElement => {
                                 options={dataSetValues}
                                 value={dataSet}
                                 onChange={(e) => setDataSet(e.value)}
+                                pt={{
+                                    wrapper: {
+                                        className: "capitalize",
+                                    },
+                                }}
                             />
                             <label className='float-label'>Data Set</label>
                         </span>

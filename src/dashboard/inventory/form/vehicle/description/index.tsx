@@ -53,7 +53,6 @@ export const VehicleDescription = observer((): ReactElement => {
         } else {
             store.formErrorIndex = formErrorIndex.filter((index) => index !== 2);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [errors]);
 
     return (

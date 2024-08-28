@@ -1,4 +1,4 @@
-import { BaseResponseError, Status } from "../base-response";
+import { BaseResponseError } from "../base-response";
 
 export interface ReportsColumn {
     name: string;
@@ -78,4 +78,20 @@ export interface ReportCreate extends BaseResponseError {
     name: string;
     version: string;
     description: string;
+}
+
+export interface ReportServiceColumns {
+    data: string;
+    dataset: string;
+    datatype: string;
+    index: number;
+    name: string;
+    width: number;
+}
+
+export enum ReportServices {
+    INVENTORY = "inventory",
+    CONTACTS = "contacts",
+    DEALS = "deals",
+    ACCOUNTS = "accounts",
 }

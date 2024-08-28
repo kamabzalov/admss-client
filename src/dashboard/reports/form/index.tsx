@@ -47,7 +47,6 @@ export const ReportForm = observer((): ReactElement => {
                 }
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
 
     const handleAccordionTabChange = (report: ReportDocument) => {

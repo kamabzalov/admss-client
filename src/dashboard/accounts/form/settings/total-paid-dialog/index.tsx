@@ -48,7 +48,6 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                 }
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleCalcAmount = () => {

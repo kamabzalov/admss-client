@@ -58,7 +58,6 @@ export const ExportToWeb = (): ReactElement => {
                 setActiveIndex(index);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
 
     const handleTabChange = (e: { index: number }) => {

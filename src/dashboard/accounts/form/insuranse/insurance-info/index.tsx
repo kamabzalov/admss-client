@@ -49,7 +49,6 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
 
     useEffect(() => {
         handleGetInsuranceHistory();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const handleChangeInsuranceInfo = () => {

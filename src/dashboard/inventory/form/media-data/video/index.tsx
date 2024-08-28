@@ -62,7 +62,6 @@ export const VideoMedia = observer((): ReactElement => {
         return () => {
             clearMedia();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchVideos, checked, id]);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {

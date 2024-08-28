@@ -142,7 +142,6 @@ export const ExportHistory = (): ReactElement => {
         };
 
         handleGetExportHistoryList(params);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, settingsLoaded, globalSearch]);
 
     const handleCheckboxChange = () => {

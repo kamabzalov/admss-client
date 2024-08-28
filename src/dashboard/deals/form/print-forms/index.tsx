@@ -22,7 +22,6 @@ export const PrintDealForms = observer((): ReactElement => {
         if (id) {
             getPrintList(id);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getPrintList, id]);
 
     useEffect(() => {
