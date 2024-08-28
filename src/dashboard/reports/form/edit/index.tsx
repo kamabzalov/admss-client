@@ -133,7 +133,7 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
-    const handleDownloadForm = async (print: boolean = false) => {
+    const handleDownloadForm = async (download: boolean = false) => {
         const errorMessage = "Error while download report";
         if (id && authUser && authUser.useruid) {
             const response = await setReportDocumentTemplate(id, {
@@ -158,7 +158,7 @@ export const ReportEditForm = observer((): ReactElement => {
             const url = new Blob([response], { type: "application/pdf" });
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(url);
-            if (!print) {
+            if (download) {
                 link.download = `report_form_${id}.pdf`;
                 link.click();
             } else {
@@ -197,7 +197,11 @@ export const ReportEditForm = observer((): ReactElement => {
                             </Button>
                         </div>
                         <div className='col-3'>
-                            <Button className='uppercase w-full px-6 report__button' outlined>
+                            <Button
+                                className='uppercase w-full px-6 report__button'
+                                outlined
+                                onClick={() => handleDownloadForm(true)}
+                            >
                                 Download
                             </Button>
                         </div>
