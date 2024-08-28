@@ -1,308 +1,164 @@
-import {
-    BorderedCheckbox,
-    CurrencyInput,
-    DateInput,
-    PercentInput,
-} from "dashboard/common/form/inputs";
-import { InputText } from "primereact/inputtext";
-import { ReactElement } from "react";
+import { BorderedCheckbox, CurrencyInput } from "dashboard/common/form/inputs";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { InputNumber } from "primereact/inputnumber";
-import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { useLocation } from "react-router-dom";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { getAccountPaymentsList, setAccountPayment } from "http/services/accounts.service";
+import { AccountPayment } from "common/models/accounts";
+import { useParams } from "react-router-dom";
 
-export const PurchasePurchases = observer((): ReactElement => {
+interface TableColumnProps extends ColumnProps {
+    field: keyof AccountPayment;
+}
+
+type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+
+export const PurchasePayments = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().inventoryStore;
-    const location = useLocation();
-    const currentPath = location.pathname + location.search;
+    const [user, setUser] = useState<AuthUser | null>(null);
     const {
-        inventoryExtData: {
-            purLotNo,
-            purPurchaseAddress,
-            purPurchaseAmount,
-            purPurchaseAuctCo,
-            purPurchaseBuyerComm,
-            purPurchasedFrom,
-            purPurchaseBuyerName,
-            purPurchaseBuyerPercent,
-            purPurchaseCheck,
-            purPurchaseCheckDate,
-            purPurchaseCity,
-            purPurchaseDate,
-            purPurchasePhone,
-            purPurchaseEmail,
-            purPurchaseZipCode,
-            purSoldByLot,
-            purPurchaseCheckMemo,
-        },
+        inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
         changeInventoryExtData,
+        getInventoryPayments,
     } = store;
 
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
+    }, []);
+
+    useEffect(() => {
+        if (user) {
+            getInventoryPayments(user.useruid);
+            getAccountPaymentsList(user.useruid);
+        }
+    }, [user]);
+
+    const renderColumnsData: TableColumnsList[] = [
+        { field: "ACCT_NUM", header: "Pack for this Vehicle" },
+        { field: "Status", header: "Default Expenses" },
+        { field: "Amount", header: "Paid" },
+        { field: "PTPDate", header: "Sales Tax Paid" },
+    ];
+
+    const handleSavePayment = () => {
+        setAccountPayment("0", {
+            inventoryuid: id,
+            payExpenses,
+            payPack: payPack * 100,
+            payPaid,
+            paySalesTaxPaid,
+        }).then(() => {
+            if (id) {
+                getAccountPaymentsList(id);
+            }
+        });
+    };
+
     return (
-        <div className='grid purchase-purchases row-gap-2'>
-            <div className='col-6'>
-                <CompanySearch
-                    name='Purchased From'
-                    value={purPurchasedFrom}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({
-                            key: "purPurchasedFrom",
-                            value,
-                        });
-                    }}
-                    onRowClick={(companyName) => {
-                        changeInventoryExtData({
-                            key: "purPurchasedFrom",
-                            value: companyName,
-                        });
-                    }}
-                    className='purchase-purchases__text-input'
-                    originalPath={currentPath}
-                />
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchaseEmail}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseEmail",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>E-mail</label>
-                </span>
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchasePhone}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchasePhone",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Phone number</label>
-                </span>
-            </div>
-
-            <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchaseAddress}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseAddress",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Street address</label>
-                </span>
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchaseCity}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseCity",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>City</label>
-                </span>
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchaseZipCode}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseZipCode",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
-            </div>
-
-            <hr className='form-line' />
-
-            <div className='col-6'>
-                <CompanySearch
-                    name='Auction Company'
-                    value={purPurchaseAuctCo}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseAuctCo",
-                            value,
-                        });
-                    }}
-                    onRowClick={(companyName) =>
-                        changeInventoryExtData({
-                            key: "purPurchaseAuctCo",
-                            value: companyName,
-                        })
-                    }
-                    originalPath={currentPath}
-                />
-            </div>
-            <div className='col-6'>
-                <CompanySearch
-                    name='Buyer Name'
-                    value={purPurchaseBuyerName}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseBuyerName",
-                            value,
-                        });
-                    }}
-                    onRowClick={(companyName) =>
-                        changeInventoryExtData({
-                            key: "purPurchaseBuyerName",
-                            value: companyName,
-                        })
-                    }
-                    originalPath={currentPath}
-                />
-            </div>
-            <div className='col-3'>
-                <PercentInput
-                    labelPosition='top'
-                    title='Buyer Percent'
-                    value={purPurchaseBuyerPercent}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseBuyerPercent",
-                            value: Number(value),
-                        });
-                    }}
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    title='Buyer Commission'
-                    value={purPurchaseBuyerComm}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseBuyerComm",
-                            value: Number(value),
-                        });
-                    }}
-                />
-            </div>
-            <div className='col-3 relative'>
-                <DateInput
-                    name='Date'
-                    date={purPurchaseDate}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseDate",
-                            value: Number(value),
-                        });
-                    }}
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    title='Amount'
-                    value={purPurchaseAmount}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseAmount",
-                            value: Number(value),
-                        });
-                    }}
-                />
-            </div>
-
-            <hr className='form-line' />
-
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchaseCheck}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseCheck",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Check Number</label>
-                </span>
-            </div>
-            <div className='col-3'>
-                <DateInput
-                    name='Check Date'
-                    date={purPurchaseCheckDate}
-                    onChange={({ value }) => {
-                        changeInventoryExtData({
-                            key: "purPurchaseCheckDate",
-                            value: Number(value),
-                        });
-                    }}
-                />
-            </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        className='purchase-purchases__number-input w-full'
-                        value={purLotNo}
+        <>
+            <div className='grid purchase-payments row-gap-2'>
+                <div className='col-3'>
+                    <CurrencyInput
+                        labelPosition='top'
+                        title='Pack for this Vehicle'
+                        value={payPack}
                         onChange={({ value }) => {
                             changeInventoryExtData({
-                                key: "purLotNo",
+                                key: "payPack",
                                 value: Number(value),
                             });
                         }}
                     />
-                    <label className='float-label'>Lot #</label>
-                </span>
-            </div>
-            <div className='col-3'>
-                <BorderedCheckbox
-                    name='Sold By Lot'
-                    checked={!!purSoldByLot}
-                    onChange={() =>
-                        changeInventoryExtData({
-                            key: "purSoldByLot",
-                            value: !!purSoldByLot ? 0 : 1,
-                        })
-                    }
-                />
-            </div>
-            <div className='col-12'>
-                <span className='p-float-label'>
-                    <InputTextarea
-                        className='purchase-purchases__text-area'
-                        value={purPurchaseCheckMemo}
-                        onChange={({ target: { value } }) => {
+                </div>
+                <div className='col-3'>
+                    <BorderedCheckbox
+                        checked={!!payExpenses}
+                        onChange={() =>
                             changeInventoryExtData({
-                                key: "purPurchaseCheckMemo",
-                                value,
-                            });
-                        }}
+                                key: "payExpenses",
+                                value: !!payExpenses ? 0 : 1,
+                            })
+                        }
+                        name='Default Expenses'
                     />
-                    <label className='float-label'>Notes</label>
-                </span>
+                </div>
+                <div className='col-3'>
+                    <BorderedCheckbox
+                        checked={!!payPaid}
+                        onChange={() =>
+                            changeInventoryExtData({
+                                key: "payPaid",
+                                value: !!payPaid ? 0 : 1,
+                            })
+                        }
+                        name='Paid'
+                    />
+                </div>
+                <div className='col-3'>
+                    <BorderedCheckbox
+                        checked={!!paySalesTaxPaid}
+                        onChange={() =>
+                            changeInventoryExtData({
+                                key: "paySalesTaxPaid",
+                                value: !!paySalesTaxPaid ? 0 : 1,
+                            })
+                        }
+                        name='Sales Tax Paid'
+                    />
+                </div>
+
+                <div className='col-12'>
+                    <span className='p-float-label'>
+                        <InputTextarea
+                            className='purchase-payments__text-area'
+                            //TODO: missed payment description data
+                        />
+                        <label className='float-label'>Description</label>
+                    </span>
+                </div>
+
+                <Button
+                    className='purchase-payments__button'
+                    type='button'
+                    onClick={handleSavePayment}
+                >
+                    Save
+                </Button>
             </div>
-        </div>
+            <div className='grid'>
+                <div className='col-12'>
+                    <DataTable
+                        showGridlines
+                        className='mt-6 purchase-payments__table'
+                        value={[]}
+                        emptyMessage='No expenses yet.'
+                        reorderableColumns
+                        resizableColumns
+                    >
+                        {renderColumnsData.map(({ field, header }) => (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                headerClassName='cursor-move'
+                            />
+                        ))}
+                    </DataTable>
+                </div>
+                <div className='total-sum'>
+                    <span className='total-sum__label'>Total expenses:</span>
+                    <span className='total-sum__value'> $ 0.00</span>
+                </div>
+            </div>
+        </>
     );
 });
