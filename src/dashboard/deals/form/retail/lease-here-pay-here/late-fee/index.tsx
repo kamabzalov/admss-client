@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { ReactElement, useState } from "react";
 import "./index.css";
