@@ -46,7 +46,6 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
         } else {
             setIsLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (isLoading) {

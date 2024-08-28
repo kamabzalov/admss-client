@@ -24,7 +24,6 @@ export const Dashboard = observer((): ReactElement => {
         } else {
             navigate("/");
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const store = useStore().userStore;

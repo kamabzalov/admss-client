@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
@@ -57,7 +56,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     useEffect(() => {
         getImagesDL();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contact]);
 
     useEffect(() => {
@@ -68,7 +66,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         if (backSideDL.size) {
             store.backSideDLurl = URL.createObjectURL(backSideDL);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {

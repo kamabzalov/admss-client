@@ -27,7 +27,6 @@ export const Tasks = () => {
         if (authUser) {
             getTasks();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleEditTask = (task: Task) => {

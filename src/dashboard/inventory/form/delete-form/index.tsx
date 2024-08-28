@@ -35,7 +35,6 @@ export const DeleteForm = observer(
                     Array.isArray(res) && setDeleteReasonsList(res);
                 });
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, []);
 
         const handleDeleteInventory = () => {
@@ -59,7 +58,6 @@ export const DeleteForm = observer(
             if (isDeleteConfirm) {
                 handleDeleteInventory();
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [isDeleteConfirm]);
 
         return (
@@ -114,4 +112,3 @@ export const DeleteForm = observer(
         );
     }
 );
-

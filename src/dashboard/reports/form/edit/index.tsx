@@ -47,7 +47,6 @@ export const ReportEditForm = observer((): ReactElement => {
                     setAvailableValues(response);
                 }
             });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dataSet, authUser?.useruid]);
 
     useEffect(() => {
@@ -62,7 +61,6 @@ export const ReportEditForm = observer((): ReactElement => {
                     });
                 }
             });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const moveItem = (

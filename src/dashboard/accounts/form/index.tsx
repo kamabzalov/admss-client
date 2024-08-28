@@ -45,7 +45,6 @@ export const AccountsForm = observer((): ReactElement => {
 
     useEffect(() => {
         id && getAccount(id);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     useEffect(() => {

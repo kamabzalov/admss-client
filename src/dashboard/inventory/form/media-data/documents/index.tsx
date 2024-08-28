@@ -56,7 +56,6 @@ export const DocumentsMedia = observer((): ReactElement => {
         return () => {
             clearMedia();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchDocuments, checked, id]);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {

@@ -25,7 +25,6 @@ export const ConfirmModal = ({
 
     useEffect(() => {
         visible && showTemplate();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visible]);
 
     const accept = () => {

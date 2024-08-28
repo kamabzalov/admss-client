@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import {
@@ -342,7 +341,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setCurrentParams(params);
 
         handleGetExportWebList(params);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [globalSearch, lazyState, selectedFilterOptions, settingsLoaded]);
 
     const dropdownHeaderPanel = (

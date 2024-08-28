@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import {
     DataTable,
@@ -155,7 +154,6 @@ export const ExportSchedule = (): ReactElement => {
 
             handleGetExportScheduleList(params);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, settingsLoaded]);
 
     const handleCheckboxChange = () => {

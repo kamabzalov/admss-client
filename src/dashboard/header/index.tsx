@@ -41,7 +41,6 @@ export const Header = observer((): ReactElement => {
             }
             if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
 
     const signOut = ({ useruid }: AuthUser) => {
@@ -93,7 +92,6 @@ export const Header = observer((): ReactElement => {
                     },
                 },
             ].filter(Boolean) as MenuItem[],
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [authUser, isSalesPerson, showChangeLocation]
     );
 

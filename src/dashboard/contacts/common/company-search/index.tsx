@@ -48,7 +48,6 @@ export const CompanySearch = ({
                 }
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleCompanyInputChange = (searchValue: string): void => {
@@ -112,4 +111,3 @@ export const CompanySearch = ({
         </>
     );
 };
-
