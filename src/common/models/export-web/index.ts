@@ -1,41 +1,69 @@
 import { ReportsColumn } from "../reports";
 
+interface Audit {
+    DataNeedsUpdate: 0 | 1;
+    JustArrived: 0 | 1;
+    NeedsCleaning: 0 | 1;
+    ReadyForSale: 0 | 1;
+    Sold: 0 | 1;
+}
+
 export interface ExportWebList {
+    Audit: Audit;
     BodyStyle: string;
     Category: string;
+    CityMPG: string;
+    CostPrice: string;
     Cylinders: string;
     DealerCertified: number;
     DealerComments: string;
     DriveLine: string;
     Engine: string;
     ExteriorColor: string;
+    ExtraField1: string;
+    ExtraField2: string;
+    ExtraField3: string;
+    ExtraPrice1: string;
+    ExtraPrice2: string;
+    ExtraPrice3: string;
     FactoryCertified: number;
-    GroupClass: number;
+    GroupClass: string;
     GroupClassName: string;
+    HwyMPG: string;
+    InStockDate: number;
     InteriorColor: string;
+    LastExportDate: string;
+    LastModifiedDate: string;
+    ListPrice: string;
     Make: string;
     Model: string;
+    ModelCode: string;
     Notes: string;
     Options: number;
+    PhotoURL: string;
+    Price: string;
+    SpecialPrice: string;
     Status: string;
     StockNo: string;
     Transmission: string;
+    Trim: string;
     TypeOfFuel: string;
+    VDPLink: string;
     VIN: string;
     VINimageUID: string;
+    VideoURL: string;
     Year: string;
-    created: string;
+    created: number;
+    deleted: number;
+    enabled: number;
     itemuid: string;
+    locationuid: string;
     mileage: string;
     name: string;
-    options_codes: number[];
-    options_info: string[];
-    updated: string;
+    options_codes: number[] | null;
+    options_info: string[] | null;
+    updated: number;
     useruid: string;
-    lastexportdate: string;
-    mediacount: number;
-    Price: number;
-    ListPrice: string;
 }
 
 export interface ExportWebHistoryList {

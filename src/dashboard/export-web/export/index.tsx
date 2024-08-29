@@ -41,7 +41,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof ExportWebList;
+    field: keyof (ExportWebList & { mediacount: number });
 }
 
 enum ExportToWebStatus {
@@ -69,7 +69,7 @@ const columns: TableColumnsList[] = [
     { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
     { field: "ListPrice", header: "Price", checked: false },
-    { field: "lastexportdate", header: "Last Export Date", checked: false },
+    { field: "LastExportDate", header: "Last Export Date", checked: false },
     { field: "mediacount", header: "Media (qty)", checked: false },
 ];
 
@@ -591,6 +591,16 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const handlePriceEdit = (options: ColumnEditorOptions) => {
         const field: keyof ExportWebList | string = options.field;
         if (field === "ListPrice") {
+            const saveValue = () => {
+                const value =
+                    exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
+                if (value) {
+                    setInventoryExportWeb(options.rowData.itemuid, {
+                        ListPrice: value.ListPrice,
+                    }).then(() => handleGetExportWebList());
+                }
+            };
+
             return (
                 <InputText
                     className='export-web__edit-input'
@@ -612,16 +622,10 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
-                            const value =
-                                exportsToWeb.find((item) => {
-                                    return item.itemuid === options.rowData.itemuid;
-                                }) || null;
-                            value &&
-                                setInventoryExportWeb(options.rowData.itemuid, {
-                                    ListPrice: value.ListPrice,
-                                }).then(() => handleGetExportWebList());
+                            saveValue();
                         }
                     }}
+                    onBlur={saveValue}
                 />
             );
         } else {
