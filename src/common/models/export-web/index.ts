@@ -1,7 +1,15 @@
 import { ReportsColumn } from "../reports";
 
+interface Audit {
+    DataNeedsUpdate: 0 | 1;
+    JustArrived: 0 | 1;
+    NeedsCleaning: 0 | 1;
+    ReadyForSale: 0 | 1;
+    Sold: 0 | 1;
+}
+
 export interface ExportWebList {
-    // Audit: Audit;
+    Audit: Audit;
     BodyStyle: string;
     Category: string;
     CityMPG: string;
