@@ -59,32 +59,6 @@ export class ReportStore {
         this._report[key] = value as never;
     });
 
-    private createReport = action(async (): Promise<BaseResponseError | undefined> => {
-        this._isLoading = true;
-        try {
-            await createCustomReport({ name: this._reportName, columns: this._reportColumns }).then(
-                (response) => {
-                    if (response?.status === Status.OK) {
-                        return response as ReportInfo;
-                    } else {
-                        const { error } = response as BaseResponseError;
-                        throw new Error(error);
-                    }
-                }
-            );
-        } catch (error) {
-            if (error instanceof Error) {
-                return {
-                    status: Status.ERROR,
-                    error: error.message,
-                };
-            }
-            return undefined;
-        } finally {
-            this._isLoading = false;
-        }
-    });
-
     public saveReport = action(
         async (uid = this._report.itemuid): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
