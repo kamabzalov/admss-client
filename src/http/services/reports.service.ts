@@ -190,10 +190,12 @@ export const getReportColumns = async ({
     }
 };
 
-export const createCustomReport = async (templateuid: string, body: Partial<ReportCreate>) => {
+export const createCustomReport = async (
+    body: Partial<ReportCreate> & { columns: ReportServiceColumns[] }
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `reports/${templateuid}/set`,
+            `reports/0/set`,
             body
         );
         return request.data;

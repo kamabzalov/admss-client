@@ -50,6 +50,10 @@ export const ReportEditForm = observer((): ReactElement => {
     }, [dataSet, authUser?.useruid]);
 
     useEffect(() => {
+        store.reportColumns = selectedValues;
+    }, [selectedValues]);
+
+    useEffect(() => {
         id &&
             getReport(id).then((response) => {
                 if (response?.status === Status.ERROR) {
@@ -171,7 +175,7 @@ export const ReportEditForm = observer((): ReactElement => {
 
     return (
         <div className='col-8 grid report-form'>
-            <div className='report-form__header uppercase'>{report ? "Edit" : "New"} report</div>
+            <div className='report-form__header uppercase'>{id ? "Edit" : "New"} report</div>
             <div className='report-form__body grid'>
                 <div className='col-6'>
                     <span className='p-float-label'>

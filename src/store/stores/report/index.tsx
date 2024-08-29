@@ -1,5 +1,5 @@
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportInfo } from "common/models/reports";
+import { ReportInfo, ReportServiceColumns } from "common/models/reports";
 import { createCustomReport, getReportInfo, updateReportInfo } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -8,6 +8,7 @@ export class ReportStore {
     public rootStore: RootStore;
     private _report: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
+    private _reportColumns: ReportServiceColumns[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -21,6 +22,10 @@ export class ReportStore {
 
     public get reportName() {
         return this._reportName;
+    }
+
+    public get reportColumns() {
+        return this._reportColumns;
     }
 
     public get isLoading() {
@@ -54,50 +59,65 @@ export class ReportStore {
         this._report[key] = value as never;
     });
 
-    private createReport = action(
-        async (uid = this._report.itemuid): Promise<BaseResponseError | undefined> => {
-            this._isLoading = true;
-            try {
-                await createCustomReport("", this._report).then((response) => {
+    private createReport = action(async (): Promise<BaseResponseError | undefined> => {
+        this._isLoading = true;
+        try {
+            await createCustomReport({ name: this._reportName, columns: this._reportColumns }).then(
+                (response) => {
                     if (response?.status === Status.OK) {
                         return response as ReportInfo;
                     } else {
                         const { error } = response as BaseResponseError;
                         throw new Error(error);
                     }
-                });
-            } catch (error) {
-                if (error instanceof Error) {
-                    return {
-                        status: Status.ERROR,
-                        error: error.message,
-                    };
                 }
-                return undefined;
-            } finally {
-                this._isLoading = false;
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                return {
+                    status: Status.ERROR,
+                    error: error.message,
+                };
             }
+            return undefined;
+        } finally {
+            this._isLoading = false;
         }
-    );
+    });
 
     public saveReport = action(
         async (uid = this._report.itemuid): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
             try {
-                uid &&
-                    (await updateReportInfo(uid, {
-                        ShowTotals: this._report.ShowTotals,
-                        ShowAverages: this._report.ShowAverages,
-                        ShowLineCount: this._report.ShowLineCount,
-                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                if (!uid) {
+                    await createCustomReport({
+                        name: this._reportName,
+                        columns: this._reportColumns,
                     }).then((response) => {
                         if (response?.status === Status.OK) {
-                            return response as ReportInfo;
+                            uid = (response as ReportInfo).itemuid;
                         } else {
                             const { error } = response as BaseResponseError;
                             throw new Error(error);
                         }
-                    }));
+                    });
+                }
+
+                if (uid) {
+                    const response = await updateReportInfo(uid, {
+                        ShowTotals: this._report.ShowTotals,
+                        ShowAverages: this._report.ShowAverages,
+                        ShowLineCount: this._report.ShowLineCount,
+                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                    });
+
+                    if (response?.status === Status.OK) {
+                        return response as ReportInfo;
+                    } else {
+                        const { error } = response as BaseResponseError;
+                        throw new Error(error);
+                    }
+                }
             } catch (error) {
                 if (error instanceof Error) {
                     return {
@@ -118,6 +138,10 @@ export class ReportStore {
 
     public set reportName(state: string) {
         this._reportName = state;
+    }
+
+    public set reportColumns(state: ReportServiceColumns[]) {
+        this._reportColumns = state;
     }
 
     public clearReport = () => {
