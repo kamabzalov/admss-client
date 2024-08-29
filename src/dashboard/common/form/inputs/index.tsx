@@ -38,7 +38,7 @@ type Push<N extends number, T extends any[]> = ((...args: T) => void) extends (
 type Range<
     Start extends number,
     End extends number,
-    T extends any[] = Push<Start, []>
+    T extends any[] = Push<Start, []>,
 > = T["length"] extends End ? never : T["length"] | Range<Start, End, [any, ...T]>;
 
 interface DateInputProps extends CalendarProps {
@@ -121,6 +121,7 @@ export const CurrencyInput = ({
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
                     minFractionDigits={2}
+                    maxFractionDigits={2}
                     min={0}
                     locale='en-US'
                     value={value || 0}
