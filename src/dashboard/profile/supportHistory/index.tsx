@@ -64,6 +64,7 @@ export const SupportHistoryDialog = ({
                 rowHover
                 reorderableColumns
                 resizableColumns
+                emptyMessage='No messages found'
             >
                 {renderColumnsData.map(({ field, header }) => (
                     <Column
