@@ -12,7 +12,7 @@
     font-size: 16px;
 }
 
-.history-support .p-datatable .p-datatable-tbody tr:first-child {
+.history-support .p-datatable .p-datatable-tbody tr:not(.p-datatable-emptymessage):first-child {
     color: var(--admss-app-primary-main-green);
 }
 
