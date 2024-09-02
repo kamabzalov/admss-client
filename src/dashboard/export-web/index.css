@@ -142,15 +142,14 @@
 
 .export-web__edit-input {
     padding: 0;
-    max-width: 60px;
+    max-width: 100px;
     margin: 0;
     height: 20px;
 }
 
 .export-web__edit-input.p-inputtext {
     width: 100%;
-    padding: 0;
+    padding: 3px 8px;
     margin: 0;
-    border: none;
     height: 100%;
 }
