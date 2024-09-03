@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect, useMemo, useRef } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
@@ -33,6 +34,8 @@ enum DLSides {
     BACK = "back",
 }
 
+const BUYER_TYPE_ID = 1;
+
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
@@ -55,6 +58,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     useEffect(() => {
         getImagesDL();
+    }, [contact]);
+
+    const isContactBuyer = useMemo(() => {
+        return contact.type === BUYER_TYPE_ID;
     }, [contact]);
 
     useEffect(() => {
@@ -171,9 +178,17 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='identification-info__text-input w-full'
-                        value={contactExtData.Buyer_Driver_License_Num || ""}
+                        value={
+                            isContactBuyer
+                                ? contactExtData.Buyer_Driver_License_Num
+                                : contact.dl_number
+                        }
                         onChange={({ target: { value } }) => {
-                            changeContactExtData("Buyer_Driver_License_Num", value);
+                            if (isContactBuyer) {
+                                changeContactExtData("Buyer_Driver_License_Num", value);
+                            } else {
+                                changeContact("dl_number", value);
+                            }
                         }}
                     />
                     <label className='float-label'>Driver License's Number</label>
