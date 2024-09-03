@@ -41,10 +41,17 @@ export function createApiDashboardInstance(navigate: any) {
 
     authorizedUserApiInstance.interceptors.request.use((config) => {
         if (config.params) {
-            config.params = Object.fromEntries(
-                Object.entries(config.params).filter(([_, value]) => value !== "")
-            );
+            const params: URLSearchParams = new URLSearchParams();
+
+            for (const [key, value] of Object.entries(config.params)) {
+                if (value !== "") {
+                    params.append(key, value as string);
+                }
+            }
+
+            config.params = params;
         }
+
         return config;
     });
 
