@@ -25,8 +25,14 @@ import { MultiSelect } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "accountuid", header: "Account" },
+interface TableColumnProps extends ColumnProps {
+    field: keyof Deal | "";
+}
+
+export type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+
+const renderColumnsData: TableColumnsList[] = [
+    { field: "accountInfo", header: "Account" },
     { field: "contactinfo", header: "Customer" },
     { field: "dealtype", header: "Type" },
     { field: "created", header: "Date" },
