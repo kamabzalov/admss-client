@@ -38,6 +38,16 @@ export function createApiDashboardInstance(navigate: any) {
             common: { Authorization: `Bearer ${getToken()}` },
         },
     });
+
+    authorizedUserApiInstance.interceptors.request.use((config) => {
+        if (config.params) {
+            config.params = Object.fromEntries(
+                Object.entries(config.params).filter(([_, value]) => value !== "")
+            );
+        }
+        return config;
+    });
+
     authorizedUserApiInstance.interceptors.response.use(
         (response) => {
             if (response.status === 200) {
