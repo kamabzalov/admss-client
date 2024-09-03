@@ -284,12 +284,12 @@ export const DealGeneralSale = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        {...getFieldProps("accountuid")}
+                        {...getFieldProps("accountInfo")}
                         className='w-full deal-sale__text-input'
-                        value={deal.accountuid}
+                        value={deal.accountInfo}
                         onChange={({ target: { value } }) => {
-                            setFieldValue("accountuid", value);
-                            changeDeal({ key: "accountuid", value });
+                            setFieldValue("accountInfo", value);
+                            changeDeal({ key: "accountInfo", value });
                         }}
                     />
                     <label className='float-label'>Account number</label>

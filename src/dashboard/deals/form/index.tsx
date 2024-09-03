@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -386,7 +388,7 @@ export const DealsForm = observer(() => {
                                                     datepurchase: deal.datepurchase || DATE_NOW,
                                                     dateeffective: deal.dateeffective || DATE_NOW,
                                                     inventorystatus: deal.inventorystatus || "",
-                                                    accountuid: deal.accountuid || "",
+                                                    accountInfo: deal.accountInfo || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
                                                     SaleID: dealExtData?.SaleID || "",
                                                     OdometerReading:
