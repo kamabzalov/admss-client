@@ -17,26 +17,26 @@ export const TakePaymentInfo = observer((): ReactElement => {
     return (
         <div className='take-payment__info'>
             <InfoSection
-                title='Current Status'
-                details={[
-                    `Past Due Amt: $0.00`,
-                    `Current Due: $0.00`,
-                    `Down/Pickup Due: $0.00`,
-                    `Fees: $0.00`,
-                    `Total Due: $0.00`,
-                    `Current Balance: $0.00`,
+                sectionTitle='Current Status'
+                info={[
+                    { title: "Past Due Amt", value: "$0.00" },
+                    { title: "Current Due", value: "$0.00" },
+                    { title: "Down/Pickup Due", value: "$0.00" },
+                    { title: "Fees", value: "$0.00" },
+                    { title: "Total Due", value: "$0.00" },
+                    { title: "Current Balance", value: "$0.00" },
                 ]}
             />
 
             <InfoSection
-                title='Collection Details'
-                details={[
-                    `Regular Pmt: $0.00 Monthly`,
-                    `Next Pmt. due: 07/07/2024`,
-                    `Days Overdue: 3`,
-                    `Last Paid: Never`,
-                    `Last Paid Days: n/a`,
-                    `Last Late: Never`,
+                sectionTitle='Collection Details'
+                info={[
+                    { title: "Regular Pmt", value: "$0.00 Monthly" },
+                    { title: "Next Pmt. due", value: "07/07/2024" },
+                    { title: "Days Overdue", value: "3" },
+                    { title: "Last Paid", value: "Never" },
+                    { title: "Last Paid Days", value: "n/a" },
+                    { title: "Last Late", value: "Never" },
                 ]}
             />
 

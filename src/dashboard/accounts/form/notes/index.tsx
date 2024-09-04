@@ -113,9 +113,10 @@ export const AccountNotes = (): ReactElement => {
                             <label htmlFor='account-memo'>Account Memo</label>
                         </span>
                         <Button
-                            severity='secondary'
+                            severity={!!note.note ? "success" : "secondary"}
                             className='account-note__button'
                             label='Save'
+                            disabled={!note.note}
                             onClick={() => handleSaveNote("note")}
                         />
                     </div>
@@ -130,8 +131,9 @@ export const AccountNotes = (): ReactElement => {
                             <label htmlFor='account-payment'>Payment Alert</label>
                         </span>
                         <Button
-                            severity='secondary'
+                            severity={!!note.alert ? "success" : "secondary"}
                             className='account-note__button'
+                            disabled={!note.alert}
                             label='Save'
                             onClick={() => handleSaveNote("alert")}
                         />

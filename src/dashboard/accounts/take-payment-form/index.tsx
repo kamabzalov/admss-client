@@ -1,20 +1,67 @@
 import { TabView, TabPanel } from "primereact/tabview";
-import { ReactElement } from "react";
-import { AccountQuickPay } from "./quick-pay";
-import "./index.css";
+import { ReactElement, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStore } from "store/hooks";
+import { AccountQuickPay } from "./quick-pay";
 import { AccountPayOff } from "./pay-off";
 import { AccountBalanceAdjustment } from "./balance-adjustment";
+import "./index.css";
+
+export enum AccountTakePaymentTabs {
+    QUICK_PAY = "quick-pay",
+    PAY_OFF = "pay-off",
+    BALANCE_ADJUSTMENT = "balance-adjustment",
+}
 
 export const AccountTakePayment = (): ReactElement => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().accountStore;
     const {
         account: { accountnumber, accountstatus },
     } = store;
+
+    const tabParam = searchParams.get("tab") || AccountTakePaymentTabs.QUICK_PAY;
+
+    const activeIndex = (() => {
+        switch (tabParam) {
+            case AccountTakePaymentTabs.PAY_OFF:
+                return 1;
+            case AccountTakePaymentTabs.BALANCE_ADJUSTMENT:
+                return 2;
+            case AccountTakePaymentTabs.QUICK_PAY:
+            default:
+                return 0;
+        }
+    })();
+
+    const handleTabChange = (e: { index: number }) => {
+        let newTab: AccountTakePaymentTabs;
+        switch (e.index) {
+            case 0:
+                newTab = AccountTakePaymentTabs.QUICK_PAY;
+                break;
+            case 1:
+                newTab = AccountTakePaymentTabs.PAY_OFF;
+                break;
+            case 2:
+                newTab = AccountTakePaymentTabs.BALANCE_ADJUSTMENT;
+                break;
+            default:
+                newTab = AccountTakePaymentTabs.QUICK_PAY;
+        }
+        setSearchParams({ tab: newTab });
+    };
+
+    useEffect(() => {
+        const validTabs = Object.values(AccountTakePaymentTabs);
+        if (!validTabs.includes(tabParam as AccountTakePaymentTabs)) {
+            setSearchParams({ tab: AccountTakePaymentTabs.QUICK_PAY });
+        }
+    }, [tabParam, setSearchParams]);
+
     return (
         <div className='grid relative take-payment'>
             <Button
@@ -40,7 +87,11 @@ export const AccountTakePayment = (): ReactElement => {
                         )}
                     </div>
                     <div className='card-content account__card grid'>
-                        <TabView className='take-payment__tabs'>
+                        <TabView
+                            className='take-payment__tabs'
+                            activeIndex={activeIndex}
+                            onTabChange={handleTabChange}
+                        >
                             <TabPanel header='Quick Pay'>
                                 <AccountQuickPay />
                             </TabPanel>
@@ -56,6 +107,7 @@ export const AccountTakePayment = (): ReactElement => {
                         <Button
                             className='uppercase px-6 account__button'
                             onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                            severity='danger'
                             outlined
                         >
                             Cancel
@@ -67,4 +119,3 @@ export const AccountTakePayment = (): ReactElement => {
         </div>
     );
 };
-

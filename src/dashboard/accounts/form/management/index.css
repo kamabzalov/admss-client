@@ -1,8 +1,14 @@
 .account-management__button {
+    width: 245px;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.account-management__button .p-button {
     display: inline-flex;
+    flex-direction: row-reverse;
     align-items: center;
     justify-content: center;
     height: 54px;
-    width: 210px;
     font-weight: 700;
 }

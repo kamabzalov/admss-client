@@ -1,25 +1,45 @@
 import { ReactElement } from "react";
 import "./index.css";
+import { AppColors } from "common/models/css-variables";
+
+type Info = {
+    title: string;
+    titleColor?: AppColors;
+    value: string | number;
+    valueColor?: AppColors;
+    valueClass?: string;
+};
 
 interface InfoSectionProps {
-    title: string;
-    details: string[];
+    sectionTitle: string;
+    info: Info[];
 }
 
-export const InfoSection = ({ title, details }: InfoSectionProps): ReactElement => {
+export const InfoSection = ({ sectionTitle, info }: InfoSectionProps): ReactElement => {
     return (
         <div className='info-section'>
-            <h3 className='info-section__title'>{title}</h3>
+            <h3 className='info-section__title'>{sectionTitle}</h3>
             <div className='info-section__details'>
-                {details.map((detail, index) => {
-                    const [detailTitle, detailValue] = detail.split(":");
-                    return (
-                        <div className='info-section__detail' key={index}>
-                            <span className='info-section__detail-title'>{detailTitle}:</span>
-                            <span className='info-section__detail-value'>{detailValue}</span>
-                        </div>
-                    );
-                })}
+                {info.map(({ title, titleColor, value, valueColor, valueClass }) => (
+                    <div className='info-section__detail' key={title}>
+                        <span
+                            style={{
+                                color: `var(--admss-app-${titleColor || AppColors.MAIN_BLUE})`,
+                            }}
+                            className='info-section__detail-title font-semibold'
+                        >
+                            {title}:
+                        </span>
+                        <span
+                            style={{
+                                color: `var(--admss-app-${valueColor || AppColors.BLUE_TEXT})`,
+                            }}
+                            className={`info-section__detail-value ${valueClass || ""}`}
+                        >
+                            {value}
+                        </span>
+                    </div>
+                ))}
             </div>
         </div>
     );

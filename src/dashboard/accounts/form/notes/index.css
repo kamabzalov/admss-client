@@ -25,9 +25,9 @@
     height: 31px;
     width: 100%;
     font-weight: 700;
+    font-size: 16px;
     text-transform: uppercase;
     border-radius: 0;
-    color: var(--admss-app-primary);
 }
 
 .account-notes__button {
