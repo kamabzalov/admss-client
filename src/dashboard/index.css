@@ -1,3 +1,27 @@
+.color-dusty-blue {
+    color: var(--admss-app-dusty-blue);
+}
+
+.color-deep-blue {
+    color: var(--admss-app-ultra-deep-blue);
+}
+
+.color-violet {
+    color: var(--admss-app-blue-violet);
+}
+
+.color-red {
+    color: var(--admss-app-deep-red);
+}
+
+.color-green {
+    color: var(--admss-app-deep-green);
+}
+
+.color-purple {
+    color: var(--admss-app-deep-purple);
+}
+
 .main {
     padding-top: 190px;
     height: 100%;

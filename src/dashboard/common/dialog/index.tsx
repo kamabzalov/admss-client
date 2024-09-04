@@ -35,6 +35,7 @@ export const DashboardDialog = ({
                         label='Cancel'
                         className='dialog__cancel-button'
                         onClick={onHide}
+                        severity='danger'
                         outlined
                     />
                 )}
