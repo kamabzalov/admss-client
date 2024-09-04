@@ -156,6 +156,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
+        if (!exportsToWeb.length) {
+            return false;
+        }
         const selectedItem = selectedServices.find((item) => item.field === field);
 
         if (selectedItem) {
