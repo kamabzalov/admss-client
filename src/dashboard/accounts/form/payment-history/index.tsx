@@ -1,11 +1,11 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
@@ -14,7 +14,11 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { Menubar } from "primereact/menubar";
+import { SplitButton } from "primereact/splitbutton";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
+import { AddPaymentNoteDialog } from "./add-payment-note";
+import { AddNoteDialog } from "../notes/add-note-dialog";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -39,15 +43,29 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "Fees_Memo", header: "Misc/Fees", checked: false },
 ];
 
+enum ModalErrors {
+    TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
+    TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
+    TITLE_NO_PAYMENT = "Payment is not Selected!",
+    TEXT_NO_PAYMENT_DELETE = "No payment has been selected for deleting. Please select a payment and try again.",
+}
+
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>(
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
+    const navigate = useNavigate();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [paymentDialogVisible, setPaymentDialogVisible] = useState<boolean>(false);
+    const [noteDialogVisible, setNoteDialogVisible] = useState<boolean>(false);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalTitle, setModalTitle] = useState<string>("");
+    const [modalText, setModalText] = useState<string>("");
 
     useEffect(() => {
         if (id) {
@@ -60,6 +78,55 @@ export const AccountPaymentHistory = (): ReactElement => {
         }
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
     }, [id]);
+
+    const printItems = [
+        {
+            label: "Print receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                setModalVisible(true);
+            },
+        },
+    ];
+
+    const downloadItems = [
+        {
+            label: "Download receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                setModalVisible(true);
+            },
+        },
+    ];
+
+    const takePaymentItems = [
+        {
+            label: "Add Note",
+            icon: "icon adms-calendar",
+            command: () => {
+                if (!!selectedRows.filter(Boolean).length) {
+                    setPaymentDialogVisible(true);
+                    setNoteDialogVisible(false);
+                } else {
+                    setNoteDialogVisible(true);
+                    setPaymentDialogVisible(false);
+                }
+            },
+        },
+        {
+            label: "Delete Payment",
+            icon: "icon adms-close",
+            command: () => {
+                setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
+                setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                setModalVisible(true);
+            },
+        },
+    ];
 
     const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
         return (
@@ -110,6 +177,41 @@ export const AccountPaymentHistory = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
+    const controlColumnHeader = (): ReactElement => (
+        <Checkbox
+            checked={selectedRows.every((checkbox) => !!checkbox)}
+            onClick={({ checked }) => {
+                setSelectedRows(selectedRows.map(() => !!checked));
+            }}
+        />
+    );
+
+    const controlColumnBody = (
+        options: AccountHistory,
+        { rowIndex }: ColumnBodyOptions
+    ): ReactElement => {
+        return (
+            <div className={`flex gap-3 align-items-center`}>
+                <Checkbox
+                    checked={selectedRows[rowIndex]}
+                    onClick={() => {
+                        setSelectedRows(
+                            selectedRows.map((state, index) =>
+                                index === rowIndex ? !state : state
+                            )
+                        );
+                    }}
+                />
+
+                <Button
+                    className='text export-web__icon-button'
+                    icon='pi pi-angle-down'
+                    onClick={() => handleRowExpansionClick(options)}
+                />
+            </div>
+        );
+    };
+
     return (
         <div className='account-history account-card'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -158,23 +260,18 @@ export const AccountPaymentHistory = (): ReactElement => {
                             },
                         }}
                     />
-                    <Menubar
-                        className='account-menubar ml-auto'
-                        model={[
-                            {
-                                label: "Take Payment",
-                                items: [
-                                    {
-                                        label: "Add Note",
-                                        icon: "icon adms-calendar",
-                                    },
-                                    {
-                                        label: "Delete Payment",
-                                        icon: "icon adms-close",
-                                    },
-                                ],
-                            },
-                        ]}
+                    <SplitButton
+                        model={takePaymentItems}
+                        className='account__split-button ml-auto'
+                        label='Take Payment'
+                        tooltip='Take Payment'
+                        tooltipOptions={{
+                            position: "bottom",
+                        }}
+                        onClick={() =>
+                            navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`)
+                        }
+                        outlined
                     />
                 </div>
                 <div className='col-12 account__table'>
@@ -191,38 +288,10 @@ export const AccountPaymentHistory = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            header={
-                                <Checkbox
-                                    checked={selectedRows.every((checkbox) => !!checkbox)}
-                                    onClick={({ checked }) => {
-                                        setSelectedRows(selectedRows.map(() => !!checked));
-                                    }}
-                                />
-                            }
+                            header={controlColumnHeader}
                             reorderable={false}
                             resizeable={false}
-                            body={(options, { rowIndex }) => {
-                                return (
-                                    <div className={`flex gap-3 align-items-center`}>
-                                        <Checkbox
-                                            checked={selectedRows[rowIndex]}
-                                            onClick={() => {
-                                                setSelectedRows(
-                                                    selectedRows.map((state, index) =>
-                                                        index === rowIndex ? !state : state
-                                                    )
-                                                );
-                                            }}
-                                        />
-
-                                        <Button
-                                            className='text export-web__icon-button'
-                                            icon='pi pi-angle-down'
-                                            onClick={() => handleRowExpansionClick(options)}
-                                        />
-                                    </div>
-                                );
-                            }}
+                            body={controlColumnBody}
                             pt={{
                                 root: {
                                     style: {
@@ -236,7 +305,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 field={field}
                                 header={header}
                                 alignHeader={"left"}
-                                body={({ [field]: value }) => value || "-"}
+                                body={({ [field]: value }, { rowIndex }) => (
+                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                        {value || "-"}
+                                    </div>
+                                )}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
@@ -246,11 +319,65 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </div>
                 {!!historyList.length && (
                     <div className='col-12 flex gap-3'>
-                        <Button className='account-history__button'>Print</Button>
-                        <Button className='account-history__button'>Download</Button>
+                        <SplitButton
+                            model={printItems}
+                            className='account__split-button'
+                            label='Print'
+                            icon='pi pi-table'
+                            tooltip='Print table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                            }}
+                            outlined
+                        />
+                        <SplitButton
+                            model={downloadItems}
+                            className='account__split-button'
+                            label='Download'
+                            icon='pi pi-table'
+                            tooltip='Download table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                            }}
+                            outlined
+                        />
                     </div>
                 )}
             </div>
+            <AddPaymentNoteDialog
+                action={() => setPaymentDialogVisible(false)}
+                onHide={() => setPaymentDialogVisible(false)}
+                payments={historyList.filter((_, index) => selectedRows[index])}
+                visible={paymentDialogVisible}
+                accountuid={id}
+            />
+            <AddNoteDialog
+                action={() => setNoteDialogVisible(false)}
+                onHide={() => setNoteDialogVisible(false)}
+                visible={noteDialogVisible}
+                accountuid={id}
+            />
+            <ConfirmModal
+                visible={!!modalVisible}
+                title={modalTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={modalText}
+                confirmAction={() => setModalVisible(false)}
+                draggable={false}
+                acceptLabel='Got It'
+                className='account-warning'
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 };

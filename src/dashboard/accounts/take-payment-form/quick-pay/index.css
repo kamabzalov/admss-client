@@ -1,8 +1,24 @@
+.quick-pay {
+    display: grid;
+    grid-template-columns: 32.66% 32.66% 30.41%;
+    column-gap: 2.1%;
+}
+
+.quick-pay__column {
+    display: flex;
+    flex-direction: column;
+    row-gap: 30px;
+}
+
 .quick-pay__total {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    .quick-pay__total-input {
+        width: 200px;
+    }
 }
 
 .quick-pay__title {

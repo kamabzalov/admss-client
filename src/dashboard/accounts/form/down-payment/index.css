@@ -6,3 +6,7 @@
     width: 210px;
     font-weight: 700;
 }
+
+.down-payment__label {
+    color: var(--admss-app-main-blue);
+}

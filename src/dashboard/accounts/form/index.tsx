@@ -115,6 +115,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='uppercase px-6 account__button'
                             onClick={() => handleTabChange(activeTab - 1)}
                             disabled={activeTab === 0}
+                            outlined
                         >
                             Back
                         </Button>
@@ -122,6 +123,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='uppercase px-6 account__button'
                             onClick={() => handleTabChange(activeTab + 1)}
                             disabled={activeTab === tabItems.length - 1}
+                            outlined
                         >
                             Next
                         </Button>

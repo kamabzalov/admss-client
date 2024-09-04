@@ -95,3 +95,62 @@
 .account__dropdown {
     flex: 0 0 245px;
 }
+
+.account__split-button {
+    width: 245px;
+    font-weight: 700;
+}
+
+.account__split-button .p-button {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.account__split-button.p-splitbutton .p-splitbutton-defaultbutton .p-button-label {
+    flex: 0;
+    padding-right: 15px;
+    white-space: nowrap;
+}
+
+.account__split-button.p-splitbutton .p-splitbutton-menubutton {
+    border-left: none;
+}
+
+.account__split-button.p-splitbutton .p-splitbutton-menubutton::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10%;
+    width: 1px;
+    height: 80%;
+    background: var(--admss-app-dark-green);
+    opacity: 0.2;
+}
+
+.account__split-button.p-splitbutton
+    .p-splitbutton-menubutton[aria-expanded="true"]
+    .p-button-icon {
+    rotate: 180deg;
+}
+
+.account-warning {
+    width: 455px;
+    min-height: 450px;
+
+    .p-confirm-dialog-accept.p-button {
+        display: inline-flex;
+        padding: 0;
+        align-items: center;
+        width: 130px;
+        height: 60px;
+        white-space: nowrap;
+    }
+    .p-confirm-dialog-reject {
+        display: none;
+    }
+}

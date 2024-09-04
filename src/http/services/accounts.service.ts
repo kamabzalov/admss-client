@@ -478,11 +478,14 @@ export const updateAccountStatus = async (id: string, status: any) => {
     }
 };
 
-export const setOrUpdateHistoryInfo = async (itemuid: string, historyData: any) => {
+export const setOrUpdateHistoryInfo = async (
+    itemuid: string,
+    historyData: Partial<AccountHistory>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
             `accounts/${itemuid}/history`,
-            historyData
+            { ...historyData }
         );
         return request.data;
     } catch (error) {

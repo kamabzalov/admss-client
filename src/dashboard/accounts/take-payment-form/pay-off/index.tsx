@@ -10,10 +10,18 @@ import "./index.css";
 import { TakePaymentInfo } from "dashboard/accounts/take-payment-form/take-payment-info";
 import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
 
-const PayOffItem = observer(({ title, value }: InputNumberProps): ReactElement => {
+interface PayOffItemProps extends InputNumberProps {
+    numberSign?: "+" | "-" | "=";
+}
+
+const PayOffItem = observer(({ title, value, numberSign }: PayOffItemProps): ReactElement => {
     return (
         <div className='take-payment__item'>
-            <label className='take-payment__label'>{title}</label>
+            <label className='take-payment__label'>
+                {numberSign && <span className='take-payment__sign'>({numberSign})</span>}
+                &nbsp;
+                {title}
+            </label>
             <CurrencyInput className='take-payment__input' value={value} />
         </div>
     );
@@ -32,26 +40,29 @@ export const AccountPayOff = observer((): ReactElement => {
                     <h3 className='take-payment__title'>Cash Deal Payoff</h3>
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Down Payment Balance</label>
-                        <span className='take-payment__value'>$0.00</span>
+                        <span className='take-payment__value pr-8'>$0.00</span>
                     </div>
 
                     <hr className='form-line' />
 
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Amount Financed/Balance</label>
-                        <span className='take-payment__value'>$0.00</span>
+                        <span className='take-payment__value pr-8'>$0.00</span>
                     </div>
 
-                    <PayOffItem title='(-) Reserve' value={0} />
-                    <PayOffItem title='(-) Discount' value={0} />
-                    <PayOffItem title='(-) Loan Fees' value={0} />
-                    <PayOffItem title='(-) Service Contract Withholding' value={0} />
-                    <PayOffItem title='(-) GAP Withholding' value={0} />
-                    <PayOffItem title='(-) VSI Withholding' value={0} />
-                    <PayOffItem title='(-) Miscellaneous Withholding' value={0} />
-                    <PayOffItem title='(+) Miscellaneous Profit/Commission' value={0} />
+                    <PayOffItem title='Reserve' value={0} numberSign='-' />
+                    <PayOffItem title='Discount' value={0} numberSign='-' />
+                    <PayOffItem title='Loan Fees' value={0} numberSign='-' />
+                    <PayOffItem title='Service Contract Withholding' value={0} numberSign='-' />
+                    <PayOffItem title='GAP Withholding' value={0} numberSign='-' />
+                    <PayOffItem title='VSI Withholding' value={0} numberSign='-' />
+                    <PayOffItem title='Miscellaneous Withholding' value={0} numberSign='-' />
+                    <PayOffItem title='Miscellaneous Profit/Commission' value={0} numberSign='+' />
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>(=) Net Check from Lender</label>
+                        <label className='take-payment__label'>
+                            <span className='take-payment__sign'>(=) </span>Net Check from Lender
+                        </label>
+                        <span className='take-payment__value pr-8'>$0.00</span>
                     </div>
                 </div>
                 <div className='take-payment__card mt-3'>
@@ -64,7 +75,10 @@ export const AccountPayOff = observer((): ReactElement => {
 
                     <div className='take-payment__item px-8 text-center pt-3'>
                         <span>
-                            <b>!</b> Note: You do <b>NOT</b> owe this amount to the customer
+                            <span className='take-payment__warning-sign'>!</span>
+                            Note: You do
+                            <span className='take-payment__warning-sign'>NOT</span>
+                            owe this amount to the customer
                         </span>
                     </div>
                 </div>
@@ -97,8 +111,12 @@ export const AccountPayOff = observer((): ReactElement => {
                     <PayOffItem title='Down Payment' value={0} />
                     <PayOffItem title='Fees Payment' value={0} />
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>Total Paid:</label>
-                        <span className='take-payment__value'>$0.00</span>
+                        <label className='take-payment__label take-payment__label--green'>
+                            Total Paid:
+                        </label>
+                        <span className='take-payment__value take-payment__value--green'>
+                            $0.00
+                        </span>
                     </div>
 
                     <hr className='form-line' />
@@ -116,10 +134,10 @@ export const AccountPayOff = observer((): ReactElement => {
 
                 <div className='take-payment__card mt-3'>
                     <h3 className='take-payment__title'>White Offs</h3>
-                    <div className='take-payment__item'>
-                        <Checkbox checked inputId='whiteOffs' />
-                        <label className='take-payment__label'>
-                            Do not write off these amounts, show them as still owing.
+                    <div className='take-payment__item justify-content-start align-items-start'>
+                        <Checkbox checked inputId='whiteOffs' className='mt-1' />
+                        <label className='take-payment__label ml-2 flex-1'>
+                            Do not write off these amounts, show them <br /> as still owing.
                         </label>
                     </div>
 

@@ -6,23 +6,3 @@
     width: 210px;
     font-weight: 700;
 }
-
-.account-promise__menubar {
-    width: 340px;
-
-    .p-submenu-list {
-        width: 100%;
-        .p-menuitem-link {
-            justify-content: start;
-        }
-    }
-
-    .p-menuitem-link {
-        justify-content: space-between;
-    }
-
-    .p-menuitem,
-    .p-menubar-root-list {
-        width: 100%;
-    }
-}

@@ -6,8 +6,9 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { listAccountDownPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
-import { Menubar } from "primereact/menubar";
 import { AccountDownPayments } from "common/models/accounts";
+import { useToast } from "dashboard/common/toast";
+import { SplitButton } from "primereact/splitbutton";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -22,6 +23,7 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
 
 export const AccountDownPayment = (): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
     const [paymentList, setPaymentList] = useState<AccountDownPayments[]>([]);
 
     useEffect(() => {
@@ -32,20 +34,34 @@ export const AccountDownPayment = (): ReactElement => {
         }
     }, [id]);
 
+    const takePaymentItems = [
+        {
+            label: "Delete Payment",
+            icon: "icon adms-close",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
+
     return (
         <div className='down-payment account-card'>
             <h3 className='down-payment__title account-title'>Down Payment</h3>
             <div className='down-payment__header grid'>
                 <div className='col-4'>
-                    <span className='font-bold'>Contact Cash Down: </span>
+                    <span className='font-bold down-payment__label'>Contact Cash Down: </span>
                     <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
-                    <span className='font-bold'>Cash Down Payment: </span>
+                    <span className='font-bold down-payment__label'>Cash Down Payment: </span>
                     <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
-                    <span className='font-bold'>Cash Dow Balance: </span>
+                    <span className='font-bold down-payment__label'>Cash Dow Balance: </span>
                     <span>$ 0.00</span>
                 </div>
             </div>
@@ -57,19 +73,15 @@ export const AccountDownPayment = (): ReactElement => {
 
             <div className='grid account__body'>
                 <div className='col-3 ml-auto'>
-                    <Menubar
-                        className='account-menubar ml-auto'
-                        model={[
-                            {
-                                label: "Take Payment",
-                                items: [
-                                    {
-                                        label: "Delete Payment",
-                                        icon: "icon adms-close",
-                                    },
-                                ],
-                            },
-                        ]}
+                    <SplitButton
+                        model={takePaymentItems}
+                        className='account__split-button ml-auto'
+                        label='Take Payment'
+                        tooltip='Take Payment'
+                        tooltipOptions={{
+                            position: "bottom",
+                        }}
+                        outlined
                     />
                 </div>
                 <div className='col-12'>
@@ -77,14 +89,14 @@ export const AccountDownPayment = (): ReactElement => {
                         showGridlines
                         className='account__table'
                         value={paymentList}
-                        emptyMessage='No activity yet.'
+                        emptyMessage='No payments yet.'
                         reorderableColumns
                         resizableColumns
                         scrollable
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            body={() => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Checkbox checked={false} />
