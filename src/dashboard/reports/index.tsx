@@ -47,6 +47,11 @@ export default function Reports(): ReactElement {
         const params = {
             qry,
         };
+        getUserFavoriteReportList(useruid).then((response) => {
+            if (Array.isArray(response)) {
+                setFavoriteCollections(response);
+            }
+        });
         return getUserReportCollectionsContent(useruid, qry.length ? params : undefined).then(
             (response) => {
                 const { error } = response as BaseResponseError;
@@ -74,11 +79,6 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
-            getUserFavoriteReportList(user.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
-                }
-            });
         }
     }, [toast, user]);
 
@@ -142,7 +142,6 @@ export default function Reports(): ReactElement {
 
     const handleEditCollection = (event: React.MouseEvent<HTMLElement>, id: string) => {
         event.preventDefault();
-        event.stopPropagation();
         setIsCollectionEditing(id);
     };
 
@@ -264,7 +263,7 @@ export default function Reports(): ReactElement {
                                                                                     collections
                                                                                 }
                                                                                 selectedReports={
-                                                                                    documents
+                                                                                    selectedReports
                                                                                 }
                                                                                 setCollectionName={
                                                                                     setCollectionName
@@ -296,6 +295,15 @@ export default function Reports(): ReactElement {
                                                                             </p>
                                                                             <ActionButtons
                                                                                 report={report}
+                                                                                collectionList={
+                                                                                    collections
+                                                                                }
+                                                                                refetchAction={() => {
+                                                                                    user?.useruid &&
+                                                                                        handleGetUserReportCollections(
+                                                                                            user?.useruid
+                                                                                        );
+                                                                                }}
                                                                             />
                                                                         </div>
                                                                     ))
@@ -359,6 +367,13 @@ export default function Reports(): ReactElement {
                                                                     </p>
                                                                     <ActionButtons
                                                                         report={report}
+                                                                        collectionList={collections}
+                                                                        refetchAction={() => {
+                                                                            user?.useruid &&
+                                                                                handleGetUserReportCollections(
+                                                                                    user?.useruid
+                                                                                );
+                                                                        }}
                                                                     />
                                                                 </div>
                                                             ))}
