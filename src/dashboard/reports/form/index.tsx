@@ -57,6 +57,12 @@ export const ReportForm = observer((): ReactElement => {
     const handleSaveReport = () => {
         saveReport(id).then((response: BaseResponseError | undefined) => {
             if (response?.status === Status.OK) {
+                handleGetUserReportCollections(authUser!.useruid);
+                getUserFavoriteReportList(authUser!.useruid).then((response) => {
+                    if (Array.isArray(response)) {
+                        setFavoriteCollections(response);
+                    }
+                });
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
@@ -101,7 +107,7 @@ export const ReportForm = observer((): ReactElement => {
                                                 {documents &&
                                                     documents.map((report) => (
                                                         <Button
-                                                            className='report__list-item'
+                                                            className='report__list-item w-full'
                                                             key={report.itemUID}
                                                             text
                                                             onClick={() =>
