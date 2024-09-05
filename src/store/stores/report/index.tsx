@@ -60,7 +60,7 @@ export class ReportStore {
     });
 
     public saveReport = action(
-        async (uid = this._report.itemuid): Promise<BaseResponseError | undefined> => {
+        async (uid: string | undefined): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
             try {
                 if (!uid) {
@@ -79,6 +79,7 @@ export class ReportStore {
 
                 if (uid) {
                     const response = await updateReportInfo(uid, {
+                        name: this._reportName,
                         ShowTotals: this._report.ShowTotals,
                         ShowAverages: this._report.ShowAverages,
                         ShowLineCount: this._report.ShowLineCount,
