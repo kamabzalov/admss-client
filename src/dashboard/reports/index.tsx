@@ -142,7 +142,6 @@ export default function Reports(): ReactElement {
 
     const handleEditCollection = (event: React.MouseEvent<HTMLElement>, id: string) => {
         event.preventDefault();
-        // event.stopPropagation();
         setIsCollectionEditing(id);
     };
 
