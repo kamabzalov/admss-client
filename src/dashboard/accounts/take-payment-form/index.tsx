@@ -19,9 +19,20 @@ export const AccountTakePayment = (): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().accountStore;
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const {
         account: { accountnumber, accountstatus },
+        getAccountPaymentsInfo,
+        getDrawers,
     } = store;
+
+    useEffect(() => {
+        if (id) {
+            getAccountPaymentsInfo(id);
+            getDrawers(authUser?.useruid!);
+        }
+    }, [id]);
 
     const tabParam = searchParams.get("tab") || AccountTakePaymentTabs.QUICK_PAY;
 

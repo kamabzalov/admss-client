@@ -442,10 +442,7 @@ export interface AccountInsurance {
     Insurance_Agent_Phone_No: string;
 }
 
-export interface AccountDetails {
-    status: string;
-    error: string;
-    info: string;
+export interface AccountDetails extends BaseResponseError {
     message: string;
     accountuid: string;
     CurrentStatus: AccountCurrentStatus;
@@ -584,4 +581,11 @@ export interface AccountMemoNote extends BaseResponseError {
     accountuid: string;
     alert: string;
     note: string;
+}
+
+export interface AccountDrawer {
+    created: string;
+    drawer: string;
+    itemuid: string;
+    useruid: string;
 }
