@@ -1,3 +1,4 @@
+import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { BaseResponseError, Status } from "../base-response";
 
 export interface Account {
@@ -575,6 +576,40 @@ export interface AccountPromise {
     pstatus: number;
     pstatusname: string;
     notes: string;
+}
+
+export interface AccountUpdateTakePayment {
+    PaymentType: number;
+    PaymentDate: number;
+    PaymentMethod: number;
+    CheckNumber: string;
+    TotalAmount: number;
+    BreakdownDownPayment: number;
+    BreakdownFees: number;
+    BreakdownPrincipal: number;
+    BreakdownContractPayment: number;
+    CashDrawer: string;
+    PaymentTakenBy: string;
+    Notes: string;
+    AmountTendered: number;
+    Charge: number;
+    AdjType: number;
+    AdjDate: number;
+    AdjPrincipal: number;
+    AdjInterest: number;
+    AdjExtraPrincipal: number;
+    AdjDownPayment: number;
+    PayOffBalancePaydown: number;
+    PayOffDownPayment: number;
+    PayOffFees: number;
+    PayoffReserve: number;
+    PayoffDiscount: number;
+    PayoffLoanFees: number;
+    PayoffServiceContractWithholding: number;
+    PayoffGAPWithholding: number;
+    PayoffVSIWithholding: number;
+    PayoffMiscWithholding: number;
+    PayoffMiscProfitComission: number;
 }
 
 export interface AccountMemoNote extends BaseResponseError {
