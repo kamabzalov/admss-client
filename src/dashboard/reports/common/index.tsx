@@ -1,5 +1,5 @@
 import { Status } from "common/models/base-response";
-import { ReportACL, ReportCollection, ReportDocument } from "common/models/reports";
+import { ReportAccess, ReportACL, ReportCollection, ReportDocument } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
@@ -19,15 +19,15 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof ReportACL | "role" | "access";
+    field: keyof ReportAccess;
 }
 
 export type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 const renderColumnsData: TableColumnsList[] = [
     { field: "username", header: "User name" },
-    { field: "role", header: "Role" },
-    { field: "access", header: "Access" },
+    { field: "userrole", header: "Role" },
+    { field: "enabled", header: "Access" },
 ];
 
 interface EditAccessDialogProps {
@@ -56,34 +56,25 @@ const filterOptions = [
     },
 ];
 
-const mockAccessList: any[] = [
-    {
-        username: "John Doe",
-        role: "Manager",
-        access: 0,
-    },
-    {
-        username: "John Smith",
-        role: "Admin",
-        access: 1,
-    },
-    {
-        username: "Mary Smith",
-        role: "Manager",
-        access: 1,
-    },
-];
-
 const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps): ReactElement => {
-    const [accessList, setAccessList] = useState<ReportACL[]>(mockAccessList);
+    const toast = useToast();
+    const [accessList, setAccessList] = useState<ReportAccess[]>([]);
     const [selectedRole, setSelectedRole] = useState();
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     useEffect(() => {
         if (visible) {
             getReportAccessList(reportuid).then((response) => {
-                if (Array.isArray(response)) {
-                    setAccessList(response);
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error || "Error while fetching report access list",
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    const { acl } = response as ReportACL;
+                    Array.isArray(acl) && setAccessList(acl);
                 }
             });
         }
@@ -92,11 +83,11 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
         };
     }, [visible, reportuid]);
 
-    const accessField = (data: ReportACL & { access: number }): ReactElement => {
+    const accessField = (data: ReportAccess): ReactElement => {
         const accessBlock = (
             <label
                 className={`access-field ${
-                    data.access === 1 ? "access-field--green row--selected" : ""
+                    data.enabled === 1 ? "access-field--green row--selected" : ""
                 }`}
             >
                 <Checkbox
@@ -105,16 +96,16 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                         const newList = accessList.map((item: any) => {
                             if (item.username === data.username) {
                                 setIsButtonDisabled(false);
-                                return { ...item, access: item.access === 1 ? 0 : 1 };
+                                return { ...item, access: item.enabled === 1 ? 0 : 1 };
                             }
                             return item;
                         });
 
                         setAccessList(newList);
                     }}
-                    checked={data.access === 1}
+                    checked={data.enabled === 1}
                 />
-                {data.access === 1 ? "Granted" : "Denied"}
+                {data.enabled === 1 ? "Granted" : "Denied"}
             </label>
         );
         return accessBlock;
@@ -170,8 +161,8 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                                 field={column.field}
                                 header={column.header}
                                 body={(data) => {
-                                    if (column.field === "access") {
-                                        return accessField(data as ReportACL & { access: number });
+                                    if (column.field === "enabled") {
+                                        return accessField(data);
                                     } else {
                                         return data[column.field];
                                     }

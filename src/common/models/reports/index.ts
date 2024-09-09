@@ -38,13 +38,14 @@ export interface ReportCollection {
 }
 
 export interface ReportAccess {
-    granted: 0 | 1;
     created: string;
-    updated: string;
     enabled: 0 | 1;
+    index: number;
     itemuid: string;
-    useruid: string;
+    updated: string;
     username: string;
+    userrole: string;
+    useruid: string;
 }
 
 export interface ReportACL {
@@ -55,7 +56,7 @@ export interface ReportACL {
     useruid: string;
     username: string;
     reportuid: string;
-    acl: ReportAccess;
+    acl: ReportAccess[];
 }
 
 export interface ReportInfo extends BaseResponseError {
