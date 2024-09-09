@@ -1,6 +1,8 @@
+import { isAxiosError } from "axios";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "http/index";
 
-export interface VehicleDecodeInfo {
+export interface VehicleDecodeInfo extends BaseResponseError {
     BodyStyle: string;
     Category: string;
     Cylinders: string;
@@ -32,15 +34,18 @@ export interface VehicleDecodeInfo {
     options_info: string[];
 }
 
-export const inventoryDecodeVIN = async (vin: string): Promise<VehicleDecodeInfo | undefined> => {
+export const inventoryDecodeVIN = async (vin: string) => {
     try {
         const request = await authorizedUserApiInstance.get<VehicleDecodeInfo>(
             `decoder/${vin}/vindecode`
         );
-        if (request.status === 200) {
-            return request.data;
-        }
+        return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while decoding VIN",
+            };
+        }
     }
 };

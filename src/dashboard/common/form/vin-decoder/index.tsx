@@ -3,6 +3,9 @@ import { Button } from "primereact/button";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
@@ -23,13 +26,27 @@ export const VINDecoder = ({
     buttonClassName,
     ...props
 }: VINDecoderProps): ReactElement => {
+    const toast = useToast();
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const handleGetVinInfo = () => {
         if (!buttonDisabled && value && validateVin(value)) {
             inventoryDecodeVIN(value).then((response) => {
-                if (response) {
-                    onAction(response);
+                if (response && response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    onAction(response as VehicleDecodeInfo);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "VIN decoded successfully",
+                        life: TOAST_LIFETIME,
+                    });
                 }
             });
         }
