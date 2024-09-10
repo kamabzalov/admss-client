@@ -33,12 +33,13 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactEle
                 if (Array.isArray(response)) {
                     setSupportHistoryData(response);
                 } else {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response?.error,
-                        life: TOAST_LIFETIME,
-                    });
+                    response?.error &&
+                        toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: response.error,
+                            life: TOAST_LIFETIME,
+                        });
                 }
             });
         }
@@ -71,7 +72,7 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactEle
                 resizableColumns
                 emptyMessage='No messages found'
             >
-                {renderColumnsData.map(({ field, header }) => (
+                {renderColumnsData?.map(({ field, header }) => (
                     <Column
                         field={field}
                         header={header}
