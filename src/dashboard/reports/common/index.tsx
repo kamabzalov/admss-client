@@ -79,7 +79,10 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                 });
             } else {
                 const { acl } = response as ReportACL;
-                Array.isArray(acl) && setAccessList(acl);
+                if (Array.isArray(acl)) {
+                    const newAccessList = acl.filter(Boolean);
+                    setAccessList(newAccessList);
+                }
             }
         });
     };
