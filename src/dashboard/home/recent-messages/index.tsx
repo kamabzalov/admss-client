@@ -38,12 +38,13 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                     if (Array.isArray(response)) {
                         setSupportHistoryData(response);
                     } else {
-                        toast.current?.show({
-                            severity: "error",
-                            summary: Status.ERROR,
-                            detail: response?.error,
-                            life: TOAST_LIFETIME,
-                        });
+                        response?.error &&
+                            toast.current?.show({
+                                severity: "error",
+                                summary: Status.ERROR,
+                                detail: response.error,
+                                life: TOAST_LIFETIME,
+                            });
                     }
                 }
             );
@@ -61,7 +62,7 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                     emptyMessage='No messages found'
                     className='table-message'
                 >
-                    {renderColumnsData.map(({ field, header }) => (
+                    {renderColumnsData?.map(({ field, header }) => (
                         <Column
                             field={field}
                             header={header}
