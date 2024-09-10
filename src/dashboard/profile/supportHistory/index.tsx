@@ -5,17 +5,23 @@ import { ReactElement, useEffect, useState } from "react";
 import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { SupportHistory, getSupportMessages } from "http/services/support.service";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 
-interface SupportContactDialogProps extends DialogProps {
-    useruid: string;
+interface TableColumnProps extends ColumnProps {
+    field: keyof SupportHistory;
 }
 
-export const SupportHistoryDialog = ({
-    visible,
-    onHide,
-    useruid,
-}: SupportContactDialogProps): ReactElement => {
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "username", header: "From" },
+    { field: "topic", header: "Theme" },
+    { field: "created", header: "Date" },
+];
+
+export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactElement => {
+    const toast = useToast();
     const store = useStore().userStore;
     const { authUser } = store;
     const [supportHistoryData, setSupportHistoryData] = useState<SupportHistory[]>([]);
@@ -23,11 +29,20 @@ export const SupportHistoryDialog = ({
 
     useEffect(() => {
         if (authUser && visible) {
-            getSupportMessages(useruid).then((response) => {
-                if (Array.isArray(response)) setSupportHistoryData(response);
+            getSupportMessages(authUser.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setSupportHistoryData(response);
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
             });
         }
-    }, [useruid, visible]);
+    }, [authUser, visible]);
 
     const rowExpansionTemplate = (data: SupportHistory) => {
         return <div className='datatable-hidden'>{data.message}</div>;
@@ -36,15 +51,6 @@ export const SupportHistoryDialog = ({
     const handleRowClick = (e: DataTableRowClickEvent) => {
         setExpandedRows([e.data]);
     };
-    interface TableColumnProps extends ColumnProps {
-        field: keyof SupportHistory;
-    }
-
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "username", header: "From" },
-        { field: "topic", header: "Theme" },
-        { field: "created", header: "Date" },
-    ];
 
     return (
         <DashboardDialog
@@ -65,7 +71,7 @@ export const SupportHistoryDialog = ({
                 resizableColumns
                 emptyMessage='No messages found'
             >
-                {renderColumnsData?.map(({ field, header }) => (
+                {renderColumnsData.map(({ field, header }) => (
                     <Column
                         field={field}
                         header={header}

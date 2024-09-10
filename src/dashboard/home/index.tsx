@@ -4,8 +4,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tasks } from "dashboard/tasks";
 import { useStore } from "store/hooks";
-import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
-import { Button } from "primereact/button";
+import { RecentMessages } from "./recent-messages";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -22,7 +21,6 @@ export const Home = (): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
     const [date] = useState(null);
-    const [supportHistory, setSupportHistory] = useState<boolean>(false);
 
     return (
         <div className='grid'>
@@ -123,43 +121,7 @@ export const Home = (): ReactElement => {
                 </div>
             </div>
             <div className='col-12 xl:col-4'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Recent messages</h2>
-                    </div>
-                    <div className='card-content'>
-                        <table className='table-message'>
-                            <thead>
-                                <tr>
-                                    <th>From</th>
-                                    <th>Theme</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className='success fw-600'>Support team</td>
-                                    <td className='success fw-600'>New inventory adding failure</td>
-                                    <td className='success fw-600'>04/26/2023 15:45:12</td>
-                                </tr>
-                                <tr>
-                                    <td>Support team</td>
-                                    <td>Empty tables</td>
-                                    <td>04/14/2023 15:45:12</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div className='card-content__footer'>
-                            <Button
-                                onClick={() => setSupportHistory(true)}
-                                className='underline messages-more'
-                                text
-                            >
-                                See more...
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <RecentMessages />
             </div>
             <div className='col-12 xl:col-4'>
                 <div className='card'>
@@ -213,15 +175,6 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            {authUser && (
-                <>
-                    <SupportHistoryDialog
-                        onHide={() => setSupportHistory(false)}
-                        useruid={authUser.useruid}
-                        visible={supportHistory}
-                    />
-                </>
-            )}
         </div>
     );
 };
