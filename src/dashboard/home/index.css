@@ -13,34 +13,6 @@
     margin-right: 10px;
 }
 
-.table-message {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.table-message thead {
-    background: var(--admss-app-light-blue);
-    text-align: left;
-}
-
-.table-message th,
-.table-message td {
-    padding: 8px 10px;
-}
-
-.table-message th {
-    color: var(--admss-app-main-blue);
-    font-weight: 700;
-}
-
-.table-message tr {
-    border-bottom: 1px solid var(--admss-app-light-grey);
-}
-
-.table-message tr:last-child {
-    border: none;
-}
-
 .common-tasks-menu__item {
     display: flex;
     flex-direction: column;
@@ -146,24 +118,4 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-}
-
-.messages-more.p-button.p-button-text {
-    text-align: right;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: underline;
-    font-weight: 600;
-    color: var(--admss-darkest-grey);
-    &:enabled:hover {
-        background: none;
-        border: none;
-        color: var(--admss-darkest-grey);
-    }
-    &:enabled:focus {
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
 }

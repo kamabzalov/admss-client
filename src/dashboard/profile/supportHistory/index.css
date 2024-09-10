@@ -20,3 +20,7 @@
     color: red;
     background: var(--admss-app-dark-green);
 }
+
+.history-support .p-datatable .p-datatable-tbody .datatable-hidden {
+    white-space: wrap;
+}

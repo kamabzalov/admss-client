@@ -133,7 +133,6 @@ export const Header = observer((): ReactElement => {
                         />
                         <SupportHistoryDialog
                             onHide={() => setSupportHistory(false)}
-                            useruid={authUser.useruid}
                             visible={supportHistory}
                         />
                     </>

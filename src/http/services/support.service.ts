@@ -1,3 +1,6 @@
+import { isAxiosError } from "axios";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
 
 export interface SupportMessage {
@@ -22,14 +25,22 @@ export interface SupportHistory {
     username: string;
 }
 
-export const getSupportMessages = async (useruid: string) => {
+export const getSupportMessages = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<SupportHistory[]>(
-            `log/${useruid}/support`
+        const request = await authorizedUserApiInstance.get<SupportHistory[] | BaseResponseError>(
+            `log/${useruid}/support`,
+            {
+                params,
+            }
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting support messages",
+            };
+        }
     }
 };
 
