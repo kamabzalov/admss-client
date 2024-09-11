@@ -240,7 +240,7 @@ export interface ContactProspect {
     notes: string;
 }
 
-export interface Contact {
+export interface Contact extends BaseResponseError {
     ZIP: string;
     businessName: string;
     businessSite: string;
@@ -279,7 +279,6 @@ export interface Contact {
     prospect: ContactProspect[];
     sex: string;
     state: string;
-    status: string;
     streetAddress: string;
     type: number;
     updated: string;

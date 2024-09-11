@@ -101,7 +101,13 @@ export class DealStore {
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
+                throw error;
             }
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
         } finally {
             this._isFormChanged = false;
             this._isLoading = false;

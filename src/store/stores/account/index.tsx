@@ -32,7 +32,9 @@ export class AccountStore {
         this._isLoading = true;
         try {
             const response = await getAccountInfo(itemuid);
-            if (response) {
+            if (response && response.status === Status.ERROR) {
+                throw response.error;
+            } else {
                 const { extdata, ...account } = response as AccountInfo;
 
                 this._accountID = account.accountuid;
@@ -41,6 +43,10 @@ export class AccountStore {
                 this._accountExtData = extdata || ({} as AccountExtData);
             }
         } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
         } finally {
             this._isLoading = false;
         }

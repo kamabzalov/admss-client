@@ -195,10 +195,13 @@ export class InventoryStore {
     public getInventory = async (itemuid: string) => {
         this._isLoading = true;
         try {
-            const response = await getInventoryInfo(itemuid);
-            if (response) {
-                this._inventoryID = response.itemuid;
-                const { extdata, options_info, Audit, ...inventory } = response;
+            const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
+            if (response?.status === Status.ERROR) {
+                throw response.error;
+            } else {
+                const info = response as Inventory;
+                this._inventoryID = info.itemuid;
+                const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory =
                     { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
 
@@ -208,6 +211,10 @@ export class InventoryStore {
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
         } finally {
             this._isLoading = false;
             this._isFormChanged = false;

@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
 
@@ -214,7 +215,18 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        id && getDeal(id);
+        id &&
+            getDeal(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: (response?.error as string) || "",
+                        life: TOAST_LIFETIME,
+                    });
+                    navigate(`/dashboard/deals`);
+                }
+            });
         return () => clearDeal();
     }, [id]);
 
@@ -286,6 +298,7 @@ export const DealsForm = observer(() => {
                     severity: "error",
                     summary: "Validation Error",
                     detail: "Please fill in all required fields.",
+                    life: TOAST_LIFETIME,
                 });
             }
         });

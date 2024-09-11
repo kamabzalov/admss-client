@@ -39,12 +39,15 @@ export const getDealInfo = async (uid: string) => {
             return request.data;
         }
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal info",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting deal info",
+            };
+        }
     }
 };
+
 interface DealTypeResponse extends BaseResponse {
     deal_types: IndexedDealList[];
 }
@@ -60,9 +63,8 @@ interface InventoryStatusResponse extends BaseResponse {
 
 export const getDealTypes = async () => {
     try {
-        const request = await authorizedUserApiInstance.get<DealTypeResponse>(
-            "deals/listdealtypes"
-        );
+        const request =
+            await authorizedUserApiInstance.get<DealTypeResponse>("deals/listdealtypes");
         return request.data.deal_types;
     } catch (error) {
         return {
@@ -74,9 +76,8 @@ export const getDealTypes = async () => {
 
 export const getDealStatuses = async () => {
     try {
-        const request = await authorizedUserApiInstance.get<DealStatusList>(
-            "deals/listdealstatuses"
-        );
+        const request =
+            await authorizedUserApiInstance.get<DealStatusList>("deals/listdealstatuses");
         return request.data.deal_status;
     } catch (error) {
         return {
@@ -88,9 +89,8 @@ export const getDealStatuses = async () => {
 
 export const getSaleTypes = async () => {
     try {
-        const request = await authorizedUserApiInstance.get<SaleTypeResponse>(
-            "deals/listsaletypes"
-        );
+        const request =
+            await authorizedUserApiInstance.get<SaleTypeResponse>("deals/listsaletypes");
         return request.data.sale_types;
     } catch (error) {
         return {

@@ -13,6 +13,9 @@ import { AccountSettings } from "dashboard/accounts/form/settings";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface TabItem {
     tabName: string;
@@ -35,6 +38,7 @@ const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-
 export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const toast = useToast();
     const location = useLocation();
     const store = useStore().accountStore;
     const {
@@ -44,7 +48,18 @@ export const AccountsForm = observer((): ReactElement => {
     const [activeTab, setActiveTab] = useState<number>(0);
 
     useEffect(() => {
-        id && getAccount(id);
+        id &&
+            getAccount(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: (response?.error as string) || "",
+                        life: TOAST_LIFETIME,
+                    });
+                    navigate(`/dashboard/accounts`);
+                }
+            });
     }, [id]);
 
     useEffect(() => {
