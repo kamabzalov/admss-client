@@ -40,7 +40,12 @@ export const VINDecoder = ({
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    onAction(response as VehicleDecodeInfo);
+                    const stringifiedResponse =
+                        response &&
+                        (Object.fromEntries(
+                            Object.entries(response).map(([key, val]) => [key, String(val)])
+                        ) as unknown as VehicleDecodeInfo);
+                    onAction(stringifiedResponse as VehicleDecodeInfo);
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
