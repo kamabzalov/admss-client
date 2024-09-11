@@ -219,11 +219,15 @@ export interface Audit {
 export interface Inventory {
     Age: number;
     BodyStyle: string;
+    BodyStyle_id: number;
     Category: string;
     Cylinders: string;
+    Cylinders_id: number;
     DealerCertified: number;
     DriveLine: string;
+    DriveLine_id: number;
     Engine: string;
+    Engine_id: number;
     ExteriorColor: string;
     FactoryCertified: number;
     GroupClass: number;
@@ -237,8 +241,10 @@ export interface Inventory {
     Status: string;
     StockNo: string;
     Transmission: string;
+    Transmission_id: number;
     Trim: string;
     TypeOfFuel: string;
+    TypeOfFuel_id: number;
     VIN: string;
     VINimageUID: string;
     Year: string;

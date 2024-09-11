@@ -63,7 +63,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={inventory.Transmission}
+                        value={String(inventory.Transmission_id)}
                         onChange={({ value }) => {
                             changeInventory({ key: "Transmission", value });
                         }}
@@ -80,7 +80,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={inventory.BodyStyle}
+                        value={String(inventory.BodyStyle_id)}
                         onChange={({ value }) => {
                             changeInventory({ key: "BodyStyle", value });
                         }}
@@ -99,7 +99,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionValue='id'
                         filter
                         options={fuelList}
-                        value={inventory.TypeOfFuel}
+                        value={String(inventory.TypeOfFuel_id)}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel", value);
                             changeInventory({ key: "TypeOfFuel", value });
@@ -119,7 +119,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={inventory.DriveLine}
+                        value={String(inventory.DriveLine_id)}
                         onChange={({ value }) => {
                             changeInventory({ key: "DriveLine", value });
                         }}
@@ -137,7 +137,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={inventory.Cylinders}
+                        value={String(inventory.Cylinders_id)}
                         onChange={({ value }) => {
                             changeInventory({ key: "Cylinders", value });
                         }}
@@ -154,7 +154,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='id'
-                        value={inventory.Engine}
+                        value={String(inventory.Engine_id)}
                         filter
                         onChange={({ value }) => {
                             changeInventory({ key: "Engine", value });
