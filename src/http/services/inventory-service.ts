@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { AxiosResponse, isAxiosError } from "axios";
 import { BaseResponse, Status } from "common/models/base-response";
 import {
@@ -35,7 +37,12 @@ export const getInventoryInfo = async (uid: string) => {
         const request = await authorizedUserApiInstance.get<Inventory>(`inventory/${uid}/info`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting inventory info",
+            };
+        }
     }
 };
 

@@ -35,11 +35,14 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
 export const getContactInfo = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<Contact>(`contacts/${uid}/info`);
-        if (request.data.status === Status.OK) {
-            return request.data;
-        }
+        return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contact info",
+            };
+        }
     }
 };
 
@@ -174,4 +177,3 @@ export const deleteContactBackDL = async (contactuid: string) => {
         }
     }
 };
-

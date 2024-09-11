@@ -74,7 +74,9 @@ export class ContactStore {
         this._isLoading = true;
         try {
             const response = await getContactInfo(itemuid);
-            if (response) {
+            if (response && response.status === Status.ERROR) {
+                throw response.error;
+            } else {
                 const { extdata, ...contact } = response as Contact;
 
                 this._contactID = contact.contactuid;
@@ -84,6 +86,10 @@ export class ContactStore {
                 this._contactProspect = this._contact?.prospect || [];
             }
         } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
         } finally {
             this._isLoading = false;
         }

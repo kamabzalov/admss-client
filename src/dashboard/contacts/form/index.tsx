@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
@@ -17,6 +16,8 @@ import { Form, Formik, FormikProps } from "formik";
 import { Contact, ContactExtData } from "common/models/contact";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
+import { Status } from "common/models/base-response";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -83,7 +84,17 @@ export const ContactForm = observer((): ReactElement => {
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
         if (id) {
-            getContact(id);
+            getContact(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: (response?.error as string) || "",
+                        life: TOAST_LIFETIME,
+                    });
+                    navigate(`/dashboard/contacts`);
+                }
+            });
             contactSections.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
@@ -141,6 +152,7 @@ export const ContactForm = observer((): ReactElement => {
                     severity: "error",
                     summary: "Validation Error",
                     detail: "Please fill in all required fields.",
+                    life: TOAST_LIFETIME,
                 });
             }
         });
@@ -339,4 +351,3 @@ export const ContactForm = observer((): ReactElement => {
         </Suspense>
     );
 });
-

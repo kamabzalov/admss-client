@@ -216,7 +216,7 @@ export interface Audit {
     JustArrived: number;
 }
 
-export interface Inventory {
+export interface Inventory extends BaseResponseError {
     Age: number;
     BodyStyle: string;
     Category: string;
