@@ -181,7 +181,8 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
+    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged, isLoading } =
+        store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -304,7 +305,9 @@ export const DealsForm = observer(() => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <Suspense>
             <div className='grid relative'>
                 <Button

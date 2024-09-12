@@ -75,7 +75,8 @@ export const ContactForm = observer((): ReactElement => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, getContact, clearContact, saveContact, memoRoute } = store;
+    const { contact, contactExtData, getContact, clearContact, saveContact, memoRoute, isLoading } =
+        store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
@@ -158,7 +159,9 @@ export const ContactForm = observer((): ReactElement => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <Suspense>
             <div className='grid relative'>
                 <Button
