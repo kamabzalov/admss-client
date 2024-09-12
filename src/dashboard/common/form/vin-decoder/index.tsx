@@ -30,8 +30,9 @@ export const VINDecoder = ({
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const handleGetVinInfo = () => {
-        if (!buttonDisabled && value && validateVin(value)) {
-            inventoryDecodeVIN(value).then((response) => {
+        const trimedValue = value?.replaceAll(" ", "");
+        if (!buttonDisabled && trimedValue && validateVin(trimedValue)) {
+            inventoryDecodeVIN(trimedValue).then((response) => {
                 if (response && response?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
