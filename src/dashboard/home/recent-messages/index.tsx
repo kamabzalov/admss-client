@@ -86,15 +86,17 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                         />
                     ))}
                 </DataTable>
-                <div className='card-content__footer'>
-                    <Button
-                        onClick={() => setDialogActive(true)}
-                        className='underline messages-more'
-                        text
-                    >
-                        See more...
-                    </Button>
-                </div>
+                {!!supportHistoryData.length && (
+                    <div className='card-content__footer'>
+                        <Button
+                            onClick={() => setDialogActive(true)}
+                            className='underline messages-more'
+                            text
+                        >
+                            See more...
+                        </Button>
+                    </div>
+                )}
             </div>
             {authUser && (
                 <SupportHistoryDialog
