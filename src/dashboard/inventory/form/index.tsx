@@ -83,6 +83,7 @@ export const InventoryForm = observer(() => {
         currentLocation,
         deleteReason,
         memoRoute,
+        isLoading,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -297,7 +298,9 @@ export const InventoryForm = observer(() => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <Suspense>
             <div className='grid relative'>
                 <Button

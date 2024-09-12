@@ -16,6 +16,7 @@ import { observer } from "mobx-react-lite";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { Loader } from "dashboard/common/loader";
 
 interface TabItem {
     tabName: string;
@@ -44,6 +45,7 @@ export const AccountsForm = observer((): ReactElement => {
     const {
         getAccount,
         account: { accountnumber, accountstatus },
+        isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
 
@@ -79,7 +81,9 @@ export const AccountsForm = observer((): ReactElement => {
         navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <div className='grid relative'>
             <Button
                 icon='pi pi-times'
