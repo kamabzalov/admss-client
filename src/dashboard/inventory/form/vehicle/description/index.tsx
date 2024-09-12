@@ -65,7 +65,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={String(inventory.Transmission_id)}
                         onChange={({ value }) => {
-                            changeInventory({ key: "Transmission", value });
+                            changeInventory({ key: "Transmission_id", value });
                         }}
                         options={transmissionList}
                         className='w-full vehicle-description__dropdown'
@@ -82,7 +82,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={String(inventory.BodyStyle_id)}
                         onChange={({ value }) => {
-                            changeInventory({ key: "BodyStyle", value });
+                            changeInventory({ key: "BodyStyle_id", value });
                         }}
                         options={bodyTypeList}
                         className='w-full vehicle-description__dropdown'
@@ -102,10 +102,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         value={String(inventory.TypeOfFuel_id)}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel", value);
-                            changeInventory({ key: "TypeOfFuel", value });
+                            changeInventory({ key: "TypeOfFuel_id", value });
                         }}
                         className={`vehicle-description__dropdown w-full ${
-                            errors.TypeOfFuel ? "p-invalid" : ""
+                            errors.TypeOfFuel_id ? "p-invalid" : ""
                         }`}
                         panelStyle={{ maxWidth: "250px" }}
                     />
@@ -121,7 +121,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={String(inventory.DriveLine_id)}
                         onChange={({ value }) => {
-                            changeInventory({ key: "DriveLine", value });
+                            changeInventory({ key: "DriveLine_id", value });
                         }}
                         options={driveLineList}
                         className='w-full vehicle-description__dropdown'
@@ -139,7 +139,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={String(inventory.Cylinders_id)}
                         onChange={({ value }) => {
-                            changeInventory({ key: "Cylinders", value });
+                            changeInventory({ key: "Cylinders_id", value });
                         }}
                         options={cylindersList}
                         className='w-full vehicle-description__dropdown'
@@ -157,7 +157,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         value={String(inventory.Engine_id)}
                         filter
                         onChange={({ value }) => {
-                            changeInventory({ key: "Engine", value });
+                            changeInventory({ key: "Engine_id", value });
                         }}
                         options={engineList}
                         className='w-full vehicle-description__dropdown'
