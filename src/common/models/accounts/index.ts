@@ -87,7 +87,7 @@ export interface AccountListActivity {
     useruid: string;
 }
 
-export interface AccountInfo {
+export interface AccountInfo extends BaseResponseError {
     accountnumber: string;
     accountstatus: string;
     accounttype: string;
@@ -112,7 +112,6 @@ export interface AccountInfo {
     name: string;
     notes: string;
     startingballance: string;
-    status: string;
     updated: string;
     useruid: string;
 }
