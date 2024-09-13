@@ -74,7 +74,8 @@
     }
 
     .currency-item__input.take-payment__input--small .p-inputnumber-input,
-    .p-input.take-payment__input--small .p-inputtext-input {
+    .p-input.take-payment__input--small .p-inputtext-input,
+    .take-payment__input--small .p-inputnumber-input {
         height: var(--input-small);
     }
 
@@ -83,11 +84,16 @@
         width: 66%;
     }
 
+    .p-dropdown.take-payment__input--small .p-inputtext {
+        height: 100%;
+    }
+
     .p-dropdown:not(.take-payment__input--small) {
         height: var(--input-regular);
         width: 66%;
     }
-    .p-inputtext {
+    .p-inputtext,
+    .p-inputnumber {
         height: var(--input-regular);
         width: 66%;
     }
@@ -96,7 +102,8 @@
         height: var(--input-small);
         width: 80%;
     }
-    .p-inputtext.take-payment__input--small {
+    .p-inputtext.take-payment__input--small,
+    .p-inputnumber.take-payment__input--small {
         height: var(--input-small);
         width: 78%;
     }
