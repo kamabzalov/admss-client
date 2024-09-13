@@ -99,7 +99,7 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
     useEffect(() => {
         let qry: string = search;
 
-        if (selectedRole.length) {
+        if (selectedRole) {
             const selectedFilters: string = [...selectedRole]
                 .filter((item) => !item.includes("All_"))
                 .join("+");
