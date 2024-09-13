@@ -62,6 +62,16 @@ const mockAccessList: any[] = [
         role: "Manager",
         access: 0,
     },
+    {
+        username: "John Smith",
+        role: "Admin",
+        access: 1,
+    },
+    {
+        username: "Mary Smith",
+        role: "Manager",
+        access: 1,
+    },
 ];
 
 const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps): ReactElement => {
