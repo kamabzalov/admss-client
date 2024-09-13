@@ -50,7 +50,14 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactEle
     };
 
     const handleRowClick = (e: DataTableRowClickEvent) => {
-        setExpandedRows([e.data]);
+        const rowData = e.data;
+        const isRowExpanded = expandedRows.some((row) => row === rowData);
+
+        if (isRowExpanded) {
+            setExpandedRows(expandedRows.filter((row) => row !== rowData));
+        } else {
+            setExpandedRows([...expandedRows, rowData]);
+        }
     };
 
     return (
