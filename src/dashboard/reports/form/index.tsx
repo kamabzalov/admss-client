@@ -7,22 +7,17 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { ReportFooter } from "./common";
 
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { reportName, saveReport } = reportStore;
     const navigate = useNavigate();
-    const { id } = useParams();
     const { authUser } = userStore;
-    const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
 
@@ -54,28 +49,11 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.itemUID}`);
     };
 
-    const handleSaveReport = () => {
-        saveReport(id).then((response: BaseResponseError | undefined) => {
-            if (response?.status === Status.OK) {
-                handleGetUserReportCollections(authUser!.useruid);
-                getUserFavoriteReportList(authUser!.useruid).then((response) => {
-                    if (Array.isArray(response)) {
-                        setFavoriteCollections(response);
-                    }
-                });
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "New custom report is successfully saved!",
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error || "Error while saving new custom report",
-                    life: TOAST_LIFETIME,
-                });
+    const handleSave = () => {
+        handleGetUserReportCollections(authUser!.useruid);
+        getUserFavoriteReportList(authUser!.useruid).then((response) => {
+            if (Array.isArray(response)) {
+                setFavoriteCollections(response);
             }
         });
     };
@@ -110,9 +88,10 @@ export const ReportForm = observer((): ReactElement => {
                                                             className='report__list-item w-full'
                                                             key={report.itemUID}
                                                             text
-                                                            onClick={() =>
-                                                                handleAccordionTabChange(report)
-                                                            }
+                                                            onClick={() => {
+                                                                reportStore.report = report;
+                                                                handleAccordionTabChange(report);
+                                                            }}
                                                         >
                                                             <p>{report.name}</p>
                                                         </Button>
@@ -124,41 +103,7 @@ export const ReportForm = observer((): ReactElement => {
                         </div>
                         <ReportEditForm />
                     </div>
-                    <div className='report__footer gap-3 mt-8 mr-3'>
-                        <Button
-                            className='report__icon-button'
-                            icon='icon adms-password'
-                            severity='secondary'
-                            disabled
-                        />
-                        <Button
-                            className='report__icon-button'
-                            icon='icon adms-blank'
-                            severity='secondary'
-                            disabled
-                        />
-                        <Button
-                            className='report__icon-button'
-                            icon='icon adms-trash-can'
-                            severity='secondary'
-                            disabled
-                        />
-                        <Button
-                            className='ml-auto uppercase px-6 report__button'
-                            severity='danger'
-                            outlined
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            className='uppercase px-6 report__button'
-                            disabled={!reportName}
-                            severity={!reportName ? "secondary" : "success"}
-                            onClick={() => handleSaveReport()}
-                        >
-                            {id ? "Update" : "Create"}
-                        </Button>
-                    </div>
+                    {<ReportFooter onAction={handleSave} />}
                 </div>
             </div>
         </div>

@@ -74,7 +74,11 @@ const mockAccessList: any[] = [
     },
 ];
 
-const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps): ReactElement => {
+export const EditAccessDialog = ({
+    visible,
+    onHide,
+    reportuid,
+}: EditAccessDialogProps): ReactElement => {
     const [accessList, setAccessList] = useState<ReportACL[]>(mockAccessList);
     const [selectedRole, setSelectedRole] = useState();
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);

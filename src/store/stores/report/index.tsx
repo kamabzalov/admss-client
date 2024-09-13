@@ -65,7 +65,7 @@ export class ReportStore {
             try {
                 if (!uid) {
                     await createCustomReport({
-                        name: this._reportName,
+                        name: this._report.name,
                         columns: this._reportColumns,
                     }).then((response) => {
                         if (response?.status === Status.OK) {
@@ -79,7 +79,7 @@ export class ReportStore {
 
                 if (uid) {
                     const response = await updateReportInfo(uid, {
-                        name: this._reportName,
+                        name: this._report.name,
                         ShowTotals: this._report.ShowTotals,
                         ShowAverages: this._report.ShowAverages,
                         ShowLineCount: this._report.ShowLineCount,
@@ -109,6 +109,10 @@ export class ReportStore {
 
     public set isLoading(state: boolean) {
         this._isLoading = state;
+    }
+
+    public set report(state: Partial<ReportInfo>) {
+        this._report = state;
     }
 
     public set reportName(state: string) {

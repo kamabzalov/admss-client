@@ -273,3 +273,35 @@ export const setReportDocumentTemplate = async (
         }
     }
 };
+
+export const copyReportDocument = async (documentuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${documentuid}/copy`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while copying report document",
+            };
+        }
+    }
+};
+
+export const deleteReportDocument = async (documentuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${documentuid}/delete`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting report document",
+            };
+        }
+    }
+};
