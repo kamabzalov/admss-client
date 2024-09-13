@@ -146,16 +146,16 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
                         const newList = accessList.map((item: any) => {
                             if (item.username === data.username) {
                                 setIsButtonDisabled(false);
-                                return { ...item, enabled: item.enabled === 1 ? 0 : 1 };
+                                return { ...item, enabled: !!item.enabled ? 0 : 1 };
                             }
                             return item;
                         });
 
                         setAccessList(newList);
                     }}
-                    checked={data.enabled === 1}
+                    checked={!!data.enabled}
                 />
-                {data.enabled === 1 ? "Granted" : "Denied"}
+                {!!data.enabled ? "Granted" : "Denied"}
             </label>
         );
         return accessBlock;
