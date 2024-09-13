@@ -137,7 +137,7 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
         const accessBlock = (
             <label
                 className={`access-field ${
-                    data.enabled === 1 ? "access-field--green row--selected" : ""
+                    !!data.enabled ? "access-field--green row--selected" : ""
                 }`}
             >
                 <Checkbox
