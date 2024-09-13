@@ -61,7 +61,11 @@ const filterOptions = [
     },
 ];
 
-const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps): ReactElement => {
+export const EditAccessDialog = ({
+    visible,
+    onHide,
+    reportuid,
+}: EditAccessDialogProps): ReactElement => {
     const toast = useToast();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
     const [selectedRole, setSelectedRole] = useState<string[]>([]);
