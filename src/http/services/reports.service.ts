@@ -1,5 +1,6 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { QueryParams } from "common/models/query-params";
 import {
     ReportACL,
     ReportCollection,
@@ -134,10 +135,11 @@ export const getUserFavoriteReportList = async (uid: string) => {
     }
 };
 
-export const getReportAccessList = async (reportuid: string) => {
+export const getReportAccessList = async (reportuid: string, params?: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | ReportACL>(
-            `user/${reportuid}/reportacl`
+            `user/${reportuid}/reportacl`,
+            { params }
         );
         return request.data;
     } catch (error) {
@@ -279,6 +281,11 @@ export const copyReportDocument = async (documentuid: string) => {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${documentuid}/copy`
         );
+export const setReportAccessList = async (reportuid: string, reportACL: Partial<ReportACL>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(`user/${reportuid}/reportacl`, {
+            ...reportACL,
+        });
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
@@ -301,6 +308,7 @@ export const deleteReportDocument = async (documentuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while deleting report document",
+                error: error.response?.data.error || "Error while setting report access list",
             };
         }
     }
