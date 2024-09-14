@@ -74,6 +74,7 @@ export const InventoryForm = observer(() => {
         clearInventory,
         saveInventory,
         getInventoryExportWeb,
+        getWebCheckStatus,
         getInventoryExportWebHistory,
         getCachedInventory,
         saveCachedInventory,
@@ -235,6 +236,7 @@ export const InventoryForm = observer(() => {
         ) {
             if (id) {
                 getInventoryExportWeb(id);
+                getWebCheckStatus(id);
                 getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
             }
