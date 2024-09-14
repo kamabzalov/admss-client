@@ -1,3 +1,4 @@
+import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { BaseResponseError, Status } from "../base-response";
 
 export interface Account {
@@ -441,10 +442,7 @@ export interface AccountInsurance {
     Insurance_Agent_Phone_No: string;
 }
 
-export interface AccountDetails {
-    status: string;
-    error: string;
-    info: string;
+export interface AccountDetails extends BaseResponseError {
     message: string;
     accountuid: string;
     CurrentStatus: AccountCurrentStatus;
@@ -579,8 +577,49 @@ export interface AccountPromise {
     notes: string;
 }
 
+export interface AccountUpdateTakePayment {
+    PaymentType: number;
+    PaymentDate: number;
+    PaymentMethod: number;
+    CheckNumber: string;
+    TotalAmount: number;
+    BreakdownDownPayment: number;
+    BreakdownFees: number;
+    BreakdownPrincipal: number;
+    BreakdownContractPayment: number;
+    CashDrawer: string;
+    PaymentTakenBy: string;
+    Notes: string;
+    AmountTendered: number;
+    Charge: number;
+    AdjType: number;
+    AdjDate: number;
+    AdjPrincipal: number;
+    AdjInterest: number;
+    AdjExtraPrincipal: number;
+    AdjDownPayment: number;
+    PayOffBalancePaydown: number;
+    PayOffDownPayment: number;
+    PayOffFees: number;
+    PayoffReserve: number;
+    PayoffDiscount: number;
+    PayoffLoanFees: number;
+    PayoffServiceContractWithholding: number;
+    PayoffGAPWithholding: number;
+    PayoffVSIWithholding: number;
+    PayoffMiscWithholding: number;
+    PayoffMiscProfitComission: number;
+}
+
 export interface AccountMemoNote extends BaseResponseError {
     accountuid: string;
     alert: string;
     note: string;
+}
+
+export interface AccountDrawer {
+    created: string;
+    drawer: string;
+    itemuid: string;
+    useruid: string;
 }

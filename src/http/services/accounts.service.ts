@@ -1,6 +1,8 @@
 import { isAxiosError } from "axios";
 import {
+    AccountDetails,
     AccountDownPayments,
+    AccountDrawer,
     AccountHistory,
     AccountInfo,
     AccountInsurance,
@@ -9,6 +11,7 @@ import {
     AccountNote,
     AccountPayment,
     AccountPromise,
+    AccountUpdateTakePayment,
     AccountUpdateTotalInfo,
 } from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
@@ -327,6 +330,22 @@ export const listDeletionReasons = async (useruid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while listing deletion reasons",
+            };
+        }
+    }
+};
+
+export const listPaymentDrawers = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountDrawer>(
+            `accounts/${useruid}/drawers`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while listing payment drawers",
             };
         }
     }
@@ -665,7 +684,7 @@ export const undeleteNote = async (itemuid: string) => {
 
 export const getPaymentInfo = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<AccountDetails>(
             `accounts/${accountuid}/paymentinfo`
         );
         return request.data;
@@ -763,6 +782,26 @@ export const updateAccountTotal = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating total info",
+            };
+        }
+    }
+};
+
+export const updateAccountTakePayment = async (
+    accountuid: string,
+    paymentInfo: Partial<AccountUpdateTakePayment>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${accountuid}/takepayment`,
+            paymentInfo
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating take payment info",
             };
         }
     }
