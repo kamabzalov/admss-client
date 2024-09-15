@@ -5,8 +5,14 @@ import { TakePaymentInfo } from "dashboard/accounts/take-payment-form/take-payme
 import { AccountCashDealInfo } from "./cash-deal";
 import { PayOffInfo } from "./pay-off-account";
 import { WhiteOffsInfo } from "./white-offs-info";
+import { useStore } from "store/hooks";
 
 export const AccountPayOff = observer((): ReactElement => {
+    const store = useStore().accountStore;
+
+    const {
+        accountPaymentsInfo: { CashDealPayoff },
+    } = store;
     return (
         <div className='grid pay-off'>
             <div className='col-12 md:col-4'>
@@ -16,7 +22,9 @@ export const AccountPayOff = observer((): ReactElement => {
 
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Unearned Interest</label>
-                        <span className='take-payment__value'>$0.00</span>
+                        <span className='take-payment__value'>
+                            $ {CashDealPayoff?.UnearnedInterest || "0.00"}
+                        </span>
                     </div>
 
                     <div className='take-payment__item px-8 text-center pt-3'>
