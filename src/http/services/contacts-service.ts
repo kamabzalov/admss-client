@@ -80,18 +80,21 @@ export const getContactsSalesmanList = async (uid: string) => {
 export const setContact = async (
     contactuid: string | null,
     contactData: Partial<Contact>
-): Promise<BaseResponse | undefined> => {
+): Promise<BaseResponseError | undefined> => {
     try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `contacts/${contactuid || 0}/set`,
             contactData
         );
 
-        if (response.status === 200) {
-            return response.data;
-        }
+        return response.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while setting contact",
+            };
+        }
     }
 };
 

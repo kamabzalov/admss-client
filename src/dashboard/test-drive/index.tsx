@@ -103,7 +103,22 @@ export const PrintForTestDrive = (): ReactElement => {
             dl_issuedate: driver.dlIssuingDate,
             dl_expiration: driver.dlExpirationDate,
         };
-        setContact(null, newContact);
+        setContact(null, newContact).then((response) => {
+            if (response?.status === Status.ERROR) {
+                return toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Contact added successfully",
+                life: TOAST_LIFETIME,
+            });
+        });
     };
 
     return (
