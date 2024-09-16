@@ -1,3 +1,4 @@
+import { ADJUSTMENT_TYPES } from "common/constants/account-options";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
@@ -15,20 +16,14 @@ export const AccountAdjustments = observer((): ReactElement => {
             AdjExtraPrincipal,
             AdjDownPayment,
         },
-        accountDrawers,
+        accountExtData: { Total_Adjustments },
     } = store;
     return (
         <div className='take-payment__card'>
             <h3 className='take-payment__title'>Adjustments</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Adjustment Type:</label>
-                <Dropdown
-                    id='cashDrawer'
-                    optionLabel='drawer'
-                    optionValue='drawer'
-                    options={accountDrawers}
-                    value={AdjType}
-                />
+                <Dropdown id='adjType' options={ADJUSTMENT_TYPES} value={AdjType} />
             </div>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Adjustment Date:</label>
@@ -81,7 +76,7 @@ export const AccountAdjustments = observer((): ReactElement => {
             </div>
             <div className='take-payment__item take-payment__item--bold'>
                 <label className='take-payment__label'>Total Adj:</label>
-                <span className='take-payment__value'>$ 0.00</span>
+                <span className='take-payment__value'>$ {Total_Adjustments || "0.00"}</span>
             </div>
         </div>
     );
