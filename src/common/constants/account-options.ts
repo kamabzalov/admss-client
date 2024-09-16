@@ -57,3 +57,5 @@ export const ACCOUNT_NOTE_CONTACT_TYPE = ["Phone", "In Person", "Mail", "E-Mail"
 
 export const ACCOUNT_PAYMENT_STATUS_LIST = [{ name: "All Payments" }, { name: "Exclude Deleted" }];
 
+export const ADJUSTMENT_TYPES = ["Adjustment", "Refund", "WriteOff", "ChargeOff", "Manual"];
+
