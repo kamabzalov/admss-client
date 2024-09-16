@@ -25,12 +25,10 @@ export const AccountTakePayment = (): ReactElement => {
         account: { accountnumber, accountstatus },
         getAccountPaymentsInfo,
         getDrawers,
-        getAccount,
     } = store;
 
     useEffect(() => {
         if (id) {
-            getAccount(id);
             getAccountPaymentsInfo(id);
             getDrawers(authUser?.useruid!);
         }
