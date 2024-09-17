@@ -283,6 +283,7 @@ export const setInventoryWebCheck = async (
     inventoryuid: string,
     { enabled }: Pick<InventoryWebCheck, "enabled">
 ) => {
+    if (inventoryuid === "0") return;
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `inventory/${inventoryuid}/webcheck`,
