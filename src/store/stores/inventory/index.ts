@@ -425,15 +425,16 @@ export class InventoryStore {
                 };
                 const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
                 const inventoryResponse = await setInventory(inventoryuid, inventoryData);
-                const InventoryWebCheck = await setInventoryWebCheck(inventoryuid, {
-                    enabled: !!this._exportWebActive ? 1 : 0,
+
+                await Promise.all([inventoryResponse, webResponse]).then((response) => {
+                    inventoryuid !== "0" &&
+                        setInventoryWebCheck(inventoryuid, {
+                            enabled: !!this._exportWebActive ? 1 : 0,
+                        });
+                    return response.every((item) => item?.status === Status.OK)
+                        ? inventoryuid
+                        : undefined;
                 });
-                await Promise.all([inventoryResponse, webResponse, InventoryWebCheck]).then(
-                    (response) =>
-                        response.every((item) => item?.status === Status.OK)
-                            ? inventoryuid
-                            : undefined
-                );
             } catch (error) {
                 // TODO: add error handlers
                 return undefined;
