@@ -8,6 +8,8 @@ import { listAccountPromises } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
+import { useStore } from "store/hooks";
+import { makeShortReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -29,6 +31,8 @@ enum PAID_STATUS {
 
 export const AccountPromiseToPay = (): ReactElement => {
     const { id } = useParams();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [promiseList, setPromiseList] = useState<AccountPromise[]>([]);
     const [selectedPaid, setSelectedPaid] = useState<PAID_STATUS | null>(null);
 
@@ -75,6 +79,53 @@ export const AccountPromiseToPay = (): ReactElement => {
             },
         },
     ];
+
+    const getShortReports = async (currentData: AccountPromise[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-promise-to-pay_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
 
     return (
         <div className='account-promise account-card'>
@@ -152,8 +203,20 @@ export const AccountPromiseToPay = (): ReactElement => {
                 </div>
                 {!!promiseList.length && (
                     <div className='col-12 flex gap-3'>
-                        <Button className='account-promise__button'>Print</Button>
-                        <Button className='account-promise__button'>Download</Button>
+                        <Button
+                            outlined
+                            className='account-promise__button'
+                            onClick={() => getShortReports(promiseList, true)}
+                        >
+                            Print
+                        </Button>
+                        <Button
+                            outlined
+                            className='account-promise__button'
+                            onClick={() => getShortReports(promiseList)}
+                        >
+                            Download
+                        </Button>
                     </div>
                 )}
             </div>

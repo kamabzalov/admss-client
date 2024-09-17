@@ -14,6 +14,7 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 import { AccountNoteData } from "store/stores/account";
+import { makeShortReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -28,7 +29,9 @@ export const AccountNotes = (): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
     const store = useStore().accountStore;
+    const userStore = useStore().userStore;
     const { getNotes, accountNote } = store;
+    const { authUser } = userStore;
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [dialogShow, setDialogShow] = useState<boolean>(false);
@@ -80,6 +83,53 @@ export const AccountNotes = (): ReactElement => {
                     });
                 }
             });
+    };
+
+    const getShortReports = async (currentData: AccountNote[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-notes_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
     };
 
     return (
@@ -213,8 +263,20 @@ export const AccountNotes = (): ReactElement => {
                 </div>
                 {!!notesList.length && (
                     <div className='col-12 flex gap-3'>
-                        <Button className='account-notes__button'>Print</Button>
-                        <Button className='account-notes__button'>Download</Button>
+                        <Button
+                            outlined
+                            className='account-notes__button'
+                            onClick={() => getShortReports(notesList, true)}
+                        >
+                            Print
+                        </Button>
+                        <Button
+                            outlined
+                            className='account-notes__button'
+                            onClick={() => getShortReports(notesList, false)}
+                        >
+                            Download
+                        </Button>
                     </div>
                 )}
             </div>

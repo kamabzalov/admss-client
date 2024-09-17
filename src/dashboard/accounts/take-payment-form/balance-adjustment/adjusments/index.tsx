@@ -74,7 +74,7 @@ export const AccountAdjustments = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='take-payment__item take-payment__item--bold'>
+            <div className='take-payment__item take-payment__item--bold color-green pt-3'>
                 <label className='take-payment__label'>Total Adj:</label>
                 <span className='take-payment__value'>$ {Total_Adjustments || "0.00"}</span>
             </div>

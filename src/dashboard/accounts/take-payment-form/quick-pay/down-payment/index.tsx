@@ -11,15 +11,15 @@ export const AccountDownPaymentInfo = observer((): ReactElement => {
         accountPaymentsInfo: { QuickPay },
     } = store;
     return (
-        <div className='take-payment__card'>
+        <div className='take-payment__card pr-5'>
             <div className='take-payment__item'>
-                <label className='take-payment__label'>Down Payment Balance:</label>
+                <label className='take-payment__label flex-1'>Down Payment Balance:</label>
                 <span className='take-payment__value'>
                     $ {QuickPay?.DownPaymentBalance || "0.00"}
                 </span>
             </div>
             <div className='take-payment__item color-red'>
-                <label className='take-payment__label'>Fees Balance:</label>
+                <label className='take-payment__label flex-1'>Fees Balance:</label>
                 <span className='take-payment__value'>$ {QuickPay?.FeesBalance || "0.00"}</span>
             </div>
             <div className='take-payment__item color-red'>
@@ -29,11 +29,13 @@ export const AccountDownPaymentInfo = observer((): ReactElement => {
                 <span className='take-payment__value'>$ {QuickPay?.NewLateFeesDue || "0.00"}</span>
             </div>
             <div className='take-payment__item color-green'>
-                <label className='take-payment__label'>Interest Due as of ${currentDate}:</label>
+                <label className='take-payment__label flex-1'>
+                    Interest Due as of ${currentDate}:
+                </label>
                 <span className='take-payment__value'>$ {QuickPay?.InterestDue || "0.00"}</span>
             </div>
             <div className='take-payment__item color-green'>
-                <label className='take-payment__label'>Principal Balance:</label>
+                <label className='take-payment__label flex-1'>Principal Balance:</label>
                 <span className='take-payment__value'>
                     $ {QuickPay?.PrincipalBalance || "0.00"}
                 </span>

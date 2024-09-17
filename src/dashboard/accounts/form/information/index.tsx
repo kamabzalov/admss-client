@@ -63,7 +63,7 @@ export const AccountInformation = observer((): ReactElement => {
                     <InfoSection
                         sectionTitle='Account Balance'
                         info={[
-                            { title: "Starting Balance", value: startingballance || "$ 0.00" },
+                            { title: "Starting Balance", value: `$ ${startingballance || "0.00"}` },
                             {
                                 title: "Principal Paid",
                                 value: `$ ${Principal_Paid?.toFixed(2) || "0.00"}`,

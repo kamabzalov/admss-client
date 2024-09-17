@@ -46,7 +46,7 @@ export const AccountNewAmounts = observer((): ReactElement => {
 
             <hr className='form-line' />
 
-            <div className='take-payment__item take-payment__item--bold'>
+            <div className='take-payment__item take-payment__item--bold color-green'>
                 <label className='take-payment__label text-lg'>New Balance:</label>
                 <span className='take-payment__value text-lg'>
                     $ {NewAmounts?.NewBalance || "0.00"}

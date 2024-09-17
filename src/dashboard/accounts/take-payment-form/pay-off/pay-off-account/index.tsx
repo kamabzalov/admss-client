@@ -43,7 +43,7 @@ export const PayOffInfo = observer((): ReactElement => {
                 <Dropdown
                     id='pmtMethod'
                     options={ACCOUNT_PAYMENT_METHODS}
-                    optionValue='id'
+                    optionValue='name'
                     optionLabel='name'
                     value={PaymentMethod}
                     onChange={(e) => changeAccountTakePayment("PaymentMethod", e.value)}

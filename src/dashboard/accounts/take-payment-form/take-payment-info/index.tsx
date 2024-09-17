@@ -10,6 +10,7 @@ import { useToast } from "dashboard/common/toast";
 import { updateAccountNote } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { TOAST_LIFETIME } from "common/settings";
+import { AppColors } from "common/models/css-variables";
 
 export const TakePaymentInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -39,16 +40,34 @@ export const TakePaymentInfo = observer((): ReactElement => {
             <InfoSection
                 sectionTitle='Current Status'
                 info={[
-                    { title: "Past Due Amt", value: `$ ${CurrentStatus?.PastDueAmount || "0.00"}` },
-                    { title: "Current Due", value: `$ ${CurrentStatus?.CurrentDue || "0.00"}` },
+                    {
+                        title: "Past Due Amt",
+                        titleColor: AppColors.PRIMARY,
+                        value: `$ ${CurrentStatus?.PastDueAmount || "0.00"}`,
+                    },
+                    {
+                        title: "Current Due",
+                        titleColor: AppColors.PRIMARY,
+                        value: `$ ${CurrentStatus?.CurrentDue || "0.00"}`,
+                    },
                     {
                         title: "Down/Pickup Due",
+                        titleColor: AppColors.PRIMARY,
                         value: `$ ${CurrentStatus?.DownPickupDue || "0.00"}`,
                     },
-                    { title: "Fees", value: `$ ${CurrentStatus?.Fees || "0.00"}` },
-                    { title: "Total Due", value: `$ ${CurrentStatus?.TotalDue || "0.00"}` },
+                    {
+                        title: "Fees",
+                        titleColor: AppColors.PRIMARY,
+                        value: `$ ${CurrentStatus?.Fees || "0.00"}`,
+                    },
+                    {
+                        title: "Total Due",
+                        titleColor: AppColors.PRIMARY,
+                        value: `$ ${CurrentStatus?.TotalDue || "0.00"}`,
+                    },
                     {
                         title: "Current Balance",
+                        titleColor: AppColors.PRIMARY,
                         value: `$ ${CurrentStatus?.CurrentBalance || "0.00"}`,
                     },
                 ]}
@@ -59,22 +78,36 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 info={[
                     {
                         title: "Regular Pmt",
+                        titleColor: AppColors.PRIMARY,
                         value: `$ ${CollectionDetails?.RegularPayment || "0.00"}`,
                     },
                     {
                         title: "Next Pmt. due",
-                        value: `$ ${CollectionDetails?.NextPmtDue || "0.00"}`,
+                        titleColor: AppColors.PRIMARY,
+                        value: `${CollectionDetails?.NextPmtDue || "0.00"}`,
                     },
                     {
                         title: "Days Overdue",
-                        value: `$ ${CollectionDetails?.DaysOverdue || "0.00"}`,
+                        titleColor: AppColors.PRIMARY,
+                        valueColor: AppColors.RED,
+                        valueClass: "font-bold",
+                        value: `${CollectionDetails?.DaysOverdue || "0"}`,
                     },
-                    { title: "Last Paid", value: `$ ${CollectionDetails?.LastPaid || "0.00"}` },
+                    {
+                        title: "Last Paid",
+                        titleColor: AppColors.PRIMARY,
+                        value: `${CollectionDetails?.LastPaid || "Never"}`,
+                    },
                     {
                         title: "Last Paid Days",
-                        value: `$ ${CollectionDetails?.LastPaidDays || "0.00"}`,
+                        titleColor: AppColors.PRIMARY,
+                        value: `${CollectionDetails?.LastPaidDays || "n/a"}`,
                     },
-                    { title: "Last Late", value: `$ ${CollectionDetails?.LastLate || "0.00"}` },
+                    {
+                        title: "Last Late",
+                        titleColor: AppColors.PRIMARY,
+                        value: `${CollectionDetails?.LastLate || "Never"}`,
+                    },
                 ]}
             />
 
