@@ -101,7 +101,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         options={fuelList}
                         value={String(inventory.TypeOfFuel_id)}
                         onChange={({ value }) => {
-                            setFieldValue("TypeOfFuel", value);
+                            setFieldValue("TypeOfFuel_id", value);
                             changeInventory({ key: "TypeOfFuel_id", value });
                         }}
                         className={`vehicle-description__dropdown w-full ${
@@ -111,7 +111,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
-                <small className='p-error'>{errors.TypeOfFuel}</small>
+                <small className='p-error'>{errors.TypeOfFuel_id}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>

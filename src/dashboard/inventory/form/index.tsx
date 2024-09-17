@@ -429,7 +429,7 @@ export const InventoryForm = observer(() => {
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
                                                     Year: inventory.Year,
-                                                    TypeOfFuel: inventory?.TypeOfFuel || "",
+                                                    TypeOfFuel: inventory?.TypeOfFuel_id || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
                                                         inventory?.locationuid ||
