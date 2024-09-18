@@ -571,10 +571,8 @@ export const CollectionPanelContent = ({
                     )}
                     <Button
                         className='edit-collection__button'
-                        disabled={!collectionName || !selectedReports.length}
-                        severity={
-                            !collectionName || !selectedReports.length ? "secondary" : "success"
-                        }
+                        disabled={!collectionName}
+                        severity={!collectionName ? "secondary" : "success"}
                         type='button'
                         onClick={handleCreateCollection}
                         outlined

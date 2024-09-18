@@ -99,7 +99,7 @@
     justify-content: center;
     border: none;
     color: var(--admss-app-primary);
-    background: var(--admss-app-light-blue);
+    background-color: var(--admss-app-medium-blue);
 }
 
 .report-select {
@@ -110,6 +110,7 @@
 }
 
 .report-select__header {
+    background-color: var(--admss-app-white-blue);
     border-bottom: var(--admss-app-medium-blue) solid 1px;
     padding: 5px 10px;
     display: flex;

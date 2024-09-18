@@ -15,6 +15,7 @@ interface ReportSelectProps {
     values: ReportServiceColumns[];
     currentItem: ReportServiceColumns | null;
     onItemClick: (item: ReportServiceColumns) => void;
+    onItemDoubleClick?: (item: ReportServiceColumns) => void;
 }
 
 export const ReportSelect = ({
@@ -22,6 +23,7 @@ export const ReportSelect = ({
     values,
     currentItem,
     onItemClick,
+    onItemDoubleClick,
 }: ReportSelectProps): ReactElement => {
     return (
         <div className='report-select'>
@@ -33,6 +35,9 @@ export const ReportSelect = ({
                         key={value.data}
                         onClick={() => {
                             onItemClick(value);
+                        }}
+                        onDoubleClick={() => {
+                            onItemDoubleClick?.(value);
                         }}
                     >
                         {value.name}

@@ -140,6 +140,14 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
+    const handleItemDoubleClick = (item: ReportServiceColumns) => {
+        if (availableValues.includes(item)) {
+            moveItem(item, availableValues, selectedValues, setAvailableValues, setSelectedValues);
+        } else if (selectedValues.includes(item)) {
+            moveItem(item, selectedValues, availableValues, setSelectedValues, setAvailableValues);
+        }
+    };
+
     const handleDownloadForm = async (download: boolean = false) => {
         const errorMessage = "Error while download report";
         if (id && authUser && authUser.useruid) {
@@ -264,6 +272,7 @@ export const ReportEditForm = observer((): ReactElement => {
                         values={availableValues}
                         currentItem={currentItem}
                         onItemClick={(item) => setCurrentItem(item)}
+                        onItemDoubleClick={(item) => handleItemDoubleClick(item)}
                     />
                     <div className='report-control'>
                         <Button
@@ -328,6 +337,7 @@ export const ReportEditForm = observer((): ReactElement => {
                         values={selectedValues}
                         currentItem={currentItem}
                         onItemClick={(item) => setCurrentItem(item)}
+                        onItemDoubleClick={(item) => handleItemDoubleClick(item)}
                     />
                     <div className='report-control'>
                         <Button
