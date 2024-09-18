@@ -623,3 +623,12 @@ export interface AccountDrawer {
     itemuid: string;
     useruid: string;
 }
+
+
+export interface AccountFeeData {
+    feetype: number;
+    feename: string;
+    amount: number;
+    description: string;
+    reason: string;
+}

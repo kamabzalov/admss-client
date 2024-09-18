@@ -65,6 +65,10 @@
     background: var(--admss-app-light-green);
 }
 
+.row--deleted {
+    color: var(--admss-app-light-grey);
+}
+
 .export-web-service__input .p-inputnumber-input {
     width: 94px;
     height: 34px;

@@ -5,6 +5,11 @@ import { Dropdown } from "primereact/dropdown";
 import { useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { addAccountFee } from "http/services/accounts.service";
+import { useParams } from "react-router-dom";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface AddFeeDialogProps extends DashboardDialogProps {}
 type AddFeeInfo = {
@@ -32,10 +37,24 @@ const dropdownOptions = [
 ];
 
 export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => {
+    const { id } = useParams();
     const [addFee, setAddFee] = useState<AddFeeInfo>(initialAddFee);
+    const toast = useToast();
 
     const handleSaveAddFee = () => {
-        onHide();
+        addAccountFee(id!, addFee).then((res) => {
+            if (res?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: res.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                action && action();
+                onHide();
+            }
+        });
     };
 
     return (

@@ -43,7 +43,7 @@ export const AccountManagement = (): ReactElement => {
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
-    const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
+    const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
@@ -90,6 +90,38 @@ export const AccountManagement = (): ReactElement => {
                         "_blank",
                         "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
                     );
+                }
+            });
+        }
+    };
+
+    const handleFilterActivity = () => {
+        if (id) {
+            listAccountActivity(id).then((res) => {
+                if (Array.isArray(res) && res.length) {
+                    switch (selectedActivity) {
+                        case ACCOUNT_ACTIVITY_LIST[1]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === false
+                                );
+                                setActivityList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        case ACCOUNT_ACTIVITY_LIST[2]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === true
+                                );
+                                setActivityList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        default:
+                            setActivityList(activityList);
+                            setSelectedRows(Array(res.length).fill(false));
+                    }
                 }
             });
         }
@@ -178,9 +210,10 @@ export const AccountManagement = (): ReactElement => {
                         className='account__dropdown'
                         options={ACCOUNT_ACTIVITY_LIST}
                         value={selectedActivity}
-                        onChange={({ target: { value } }) => setSelectedActivity(value)}
-                        optionValue='name'
-                        optionLabel='name'
+                        onChange={({ target: { value } }) => {
+                            setSelectedActivity(value);
+                            handleFilterActivity();
+                        }}
                     />
                     <Button
                         className='account-management__button ml-auto'
@@ -229,8 +262,8 @@ export const AccountManagement = (): ReactElement => {
                                     return (
                                         <div
                                             className={`${
-                                                selectedRows[rowIndex] && "row--selected"
-                                            }`}
+                                                selectedRows[rowIndex] ? "row--selected" : ""
+                                            } ${!!data["deleted"] ? "row--deleted" : ""}`}
                                         >
                                             {data[field]}
                                         </div>

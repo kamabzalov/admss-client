@@ -57,9 +57,7 @@ enum ModalErrors {
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
-    const [selectedPayment, setSelectedPayment] = useState<string>(
-        ACCOUNT_PAYMENT_STATUS_LIST[0].name
-    );
+    const [selectedPayment, setSelectedPayment] = useState<string>(ACCOUNT_PAYMENT_STATUS_LIST[0]);
     const toast = useToast();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -302,6 +300,29 @@ export const AccountPaymentHistory = (): ReactElement => {
         );
     };
 
+    const handleFilterActivity = () => {
+        if (id) {
+            listAccountHistory(id).then((res) => {
+                if (Array.isArray(res) && res.length) {
+                    switch (selectedPayment) {
+                        case ACCOUNT_PAYMENT_STATUS_LIST[1]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === true
+                                );
+                                setHistoryList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        default:
+                            setHistoryList(res);
+                            setSelectedRows(Array(res.length).fill(false));
+                    }
+                }
+            });
+        }
+    };
+
     return (
         <div className='account-history account-card'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -310,10 +331,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                     <Dropdown
                         className='account__dropdown'
                         options={ACCOUNT_PAYMENT_STATUS_LIST}
-                        optionValue='name'
-                        optionLabel='name'
                         value={selectedPayment}
-                        onChange={({ target: { value } }) => setSelectedPayment(value)}
+                        onChange={({ target: { value } }) => {
+                            setSelectedPayment(value);
+                            handleFilterActivity();
+                        }}
                     />
                     <MultiSelect
                         options={renderColumnsData}
@@ -396,7 +418,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 header={header}
                                 alignHeader={"left"}
                                 body={({ [field]: value }, { rowIndex }) => (
-                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                    <div
+                                        className={`${
+                                            selectedRows[rowIndex] ? "row--selected" : ""
+                                        } ${field === "deleted" && !value ? "row--deleted" : ""}`}
+                                    >
                                         {value || "-"}
                                     </div>
                                 )}
