@@ -1,6 +1,10 @@
 .take-payment {
     --input-regular: 40px;
     --input-small: 30px;
+
+    .info-section__title {
+        color: var(--admss-app-main-blue);
+    }
 }
 
 .take-payment .p-tabview-nav-content {
@@ -27,13 +31,16 @@
 .take-payment__item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     font-size: 16px;
     font-weight: 600;
 }
 
 .take-payment__item--subtitle {
     font-size: 18px;
+}
+
+.take-payment__value {
+    padding-left: 2.4rem;
 }
 
 .take-payment__item--bold .take-payment__value,
@@ -56,7 +63,7 @@
     padding-right: 1rem;
     font-weight: 600;
     font-size: 16px;
-    flex: 0 1 50%;
+    flex: 0 0 50%;
 }
 
 .take-payment__item .currency-item {
@@ -96,6 +103,10 @@
     .p-inputnumber {
         height: var(--input-regular);
         width: 66%;
+    }
+
+    .currency-item .p-inputnumber {
+        width: 100%;
     }
 
     .take-payment__input--small.p-dropdown {

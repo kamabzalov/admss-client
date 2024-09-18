@@ -13,6 +13,8 @@ import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 import { SplitButton } from "primereact/splitbutton";
 import { AddFeeDialog } from "./add-fee-dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useStore } from "store/hooks";
+import { makeShortReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountListActivity;
@@ -35,23 +37,109 @@ const quickPayPath = `take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`;
 
 export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const navigate = useNavigate();
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
-    const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
+    const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
+
+    const getShortReports = async (currentData: AccountListActivity[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-management_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
+
+    const handleFilterActivity = () => {
+        if (id) {
+            listAccountActivity(id).then((res) => {
+                if (Array.isArray(res) && res.length) {
+                    switch (selectedActivity) {
+                        case ACCOUNT_ACTIVITY_LIST[1]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === false
+                                );
+                                setActivityList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        case ACCOUNT_ACTIVITY_LIST[2]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === true
+                                );
+                                setActivityList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        default:
+                            setActivityList(activityList);
+                            setSelectedRows(Array(res.length).fill(false));
+                    }
+                }
+            });
+        }
+    };
 
     const printItems = [
         {
             label: "Print receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
-                setModalVisible(true);
+                const currentData = activityList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+                getShortReports(currentData, true);
             },
         },
     ];
@@ -61,9 +149,14 @@ export const AccountManagement = (): ReactElement => {
             label: "Download receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
-                setModalVisible(true);
+                const currentData = activityList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+                getShortReports(currentData);
             },
         },
     ];
@@ -117,9 +210,10 @@ export const AccountManagement = (): ReactElement => {
                         className='account__dropdown'
                         options={ACCOUNT_ACTIVITY_LIST}
                         value={selectedActivity}
-                        onChange={({ target: { value } }) => setSelectedActivity(value)}
-                        optionValue='name'
-                        optionLabel='name'
+                        onChange={({ target: { value } }) => {
+                            setSelectedActivity(value);
+                            handleFilterActivity();
+                        }}
                     />
                     <Button
                         className='account-management__button ml-auto'
@@ -168,8 +262,8 @@ export const AccountManagement = (): ReactElement => {
                                     return (
                                         <div
                                             className={`${
-                                                selectedRows[rowIndex] && "row--selected"
-                                            }`}
+                                                selectedRows[rowIndex] ? "row--selected" : ""
+                                            } ${!!data["deleted"] ? "row--deleted" : ""}`}
                                         >
                                             {data[field]}
                                         </div>
@@ -192,9 +286,7 @@ export const AccountManagement = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                                getShortReports(activityList, true);
                             }}
                             outlined
                         />
@@ -208,9 +300,7 @@ export const AccountManagement = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                                getShortReports(activityList);
                             }}
                             outlined
                         />

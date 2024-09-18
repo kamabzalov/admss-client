@@ -58,7 +58,7 @@ export const AccountOriginalAmounts = observer((): ReactElement => {
 
             <hr className='form-line' />
 
-            <div className='take-payment__item take-payment__item--bold'>
+            <div className='take-payment__item take-payment__item--bold color-green'>
                 <label className='take-payment__label text-lg'>Current Balance:</label>
                 <span className='take-payment__value text-lg'>
                     $ {OriginalAmounts?.CurrentBalance || "0.00"}

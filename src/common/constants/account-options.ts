@@ -7,11 +7,7 @@ export const ACCOUNT_STATUS_LIST = [
  { name: "150+ Days Overdue" },
 ];
 
-export const ACCOUNT_ACTIVITY_LIST = [
- { name: "All Activity" },
- { name: "Active data" },
- { name: "Deleted payments" },
-];
+export const ACCOUNT_ACTIVITY_LIST = ["All Activity", "Active data", "Deleted payments"];
 
 export const ACCOUNT_PAYMENT_METHODS = [
  { name: "Check" },
@@ -55,7 +51,7 @@ export const ACCOUNT_PROMISE_STATUS = ["Default", "Paid", "Late", "Broken", "Out
 
 export const ACCOUNT_NOTE_CONTACT_TYPE = ["Phone", "In Person", "Mail", "E-Mail", "Fax"];
 
-export const ACCOUNT_PAYMENT_STATUS_LIST = [{ name: "All Payments" }, { name: "Exclude Deleted" }];
+export const ACCOUNT_PAYMENT_STATUS_LIST = ["All Payments", "Exclude Deleted"];
 
 export const ADJUSTMENT_TYPES = ["Adjustment", "Refund", "WriteOff", "ChargeOff", "Manual"];
 

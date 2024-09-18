@@ -41,7 +41,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                     id='pmtMethod'
                     options={ACCOUNT_PAYMENT_METHODS}
                     value={PaymentMethod}
-                    optionValue='id'
+                    optionValue='name'
                     optionLabel='name'
                 />
             </div>

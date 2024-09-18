@@ -3,6 +3,7 @@ import {
     AccountDetails,
     AccountDownPayments,
     AccountDrawer,
+    AccountFeeData,
     AccountHistory,
     AccountInfo,
     AccountInsurance,
@@ -802,6 +803,23 @@ export const updateAccountTakePayment = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating take payment info",
+            };
+        }
+    }
+};
+
+export const addAccountFee = async (accountuid: string, feeInfo: Partial<AccountFeeData>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${accountuid}/addfee`,
+            feeInfo
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while adding fee",
             };
         }
     }

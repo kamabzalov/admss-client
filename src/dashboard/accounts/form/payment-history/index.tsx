@@ -6,7 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { listAccountHistory } from "http/services/accounts.service";
+import { deleteHistoryInfo, listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
 import {
@@ -19,6 +19,9 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 import { AddPaymentNoteDialog } from "./add-payment-note";
 import { AddNoteDialog } from "../notes/add-note-dialog";
+import { makeShortReports } from "http/services/reports.service";
+import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -54,9 +57,10 @@ enum ModalErrors {
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
-    const [selectedPayment, setSelectedPayment] = useState<string>(
-        ACCOUNT_PAYMENT_STATUS_LIST[0].name
-    );
+    const [selectedPayment, setSelectedPayment] = useState<string>(ACCOUNT_PAYMENT_STATUS_LIST[0]);
+    const toast = useToast();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const navigate = useNavigate();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
@@ -79,14 +83,67 @@ export const AccountPaymentHistory = (): ReactElement => {
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
     }, [id]);
 
+    const getShortReports = async (currentData: AccountHistory[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-history_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
+
     const printItems = [
         {
             label: "Print receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
-                setModalVisible(true);
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+
+                getShortReports(currentData, true);
             },
         },
     ];
@@ -96,9 +153,15 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Download receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
-                setModalVisible(true);
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+
+                getShortReports(currentData);
             },
         },
     ];
@@ -120,10 +183,35 @@ export const AccountPaymentHistory = (): ReactElement => {
         {
             label: "Delete Payment",
             icon: "icon adms-close",
-            command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
-                setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
-                setModalVisible(true);
+            command: async () => {
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
+                    setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                    setModalVisible(true);
+                    return;
+                }
+
+                try {
+                    const deletePromises = currentData.map((item) =>
+                        deleteHistoryInfo(item.itemuid)
+                    );
+
+                    await Promise.all(deletePromises);
+
+                    await listAccountHistory(id!).then((res) => {
+                        if (Array.isArray(res) && res.length) {
+                            setHistoryList(res);
+                            setSelectedRows(Array(res.length).fill(false));
+                        }
+                    });
+                } catch (error) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Something went wrong. Please try again.",
+                    });
+                }
             },
         },
     ];
@@ -212,6 +300,29 @@ export const AccountPaymentHistory = (): ReactElement => {
         );
     };
 
+    const handleFilterActivity = () => {
+        if (id) {
+            listAccountHistory(id).then((res) => {
+                if (Array.isArray(res) && res.length) {
+                    switch (selectedPayment) {
+                        case ACCOUNT_PAYMENT_STATUS_LIST[1]:
+                            {
+                                const newList = res.filter(
+                                    (item) => Boolean(item.deleted) === true
+                                );
+                                setHistoryList(newList);
+                                setSelectedRows(Array(newList.length).fill(false));
+                            }
+                            break;
+                        default:
+                            setHistoryList(res);
+                            setSelectedRows(Array(res.length).fill(false));
+                    }
+                }
+            });
+        }
+    };
+
     return (
         <div className='account-history account-card'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -220,10 +331,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                     <Dropdown
                         className='account__dropdown'
                         options={ACCOUNT_PAYMENT_STATUS_LIST}
-                        optionValue='name'
-                        optionLabel='name'
                         value={selectedPayment}
-                        onChange={({ target: { value } }) => setSelectedPayment(value)}
+                        onChange={({ target: { value } }) => {
+                            setSelectedPayment(value);
+                            handleFilterActivity();
+                        }}
                     />
                     <MultiSelect
                         options={renderColumnsData}
@@ -306,7 +418,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 header={header}
                                 alignHeader={"left"}
                                 body={({ [field]: value }, { rowIndex }) => (
-                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                    <div
+                                        className={`${
+                                            selectedRows[rowIndex] ? "row--selected" : ""
+                                        } ${field === "deleted" && !value ? "row--deleted" : ""}`}
+                                    >
                                         {value || "-"}
                                     </div>
                                 )}
@@ -329,9 +445,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                                getShortReports(historyList, true);
                             }}
                             outlined
                         />
@@ -345,9 +459,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                                getShortReports(historyList);
                             }}
                             outlined
                         />
