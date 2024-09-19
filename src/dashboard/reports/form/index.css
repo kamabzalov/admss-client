@@ -30,7 +30,7 @@
 .report__accordion.p-accordion .p-accordion-content {
     background-color: var(--admss-app-white);
     margin: 0;
-    padding: 10px 50px;
+    padding: 10px;
     border: none;
 }
 
@@ -53,6 +53,10 @@
     border: none;
     padding-bottom: 10px;
     padding-top: 10px;
+}
+
+.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
+    box-shadow: none;
 }
 
 .report-controls {
@@ -207,10 +211,15 @@
 
 .report__list-item.p-button.p-button-text {
     color: var(--admss-app-primary);
+    padding-left: 40px;
+    border-radius: 0;
+}
+
+.report__accordion-tab .report__list-item.p-button.p-button-text:hover {
+    background-color: var(--admss-app-light-blue);
 }
 
 .report__list-item.p-button.p-button-text:enabled:hover {
-    background: transparent;
     color: var(--admss-app-primary);
 }
 
