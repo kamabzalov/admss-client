@@ -340,3 +340,19 @@ export const deleteReportCollection = async (collectionuid: string, reportuid?: 
         }
     }
 };
+
+export const moveReportToCollection = async (collectionuid: string, reportuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid}/move`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while moving report to collection",
+            };
+        }
+    }
+};

@@ -9,6 +9,7 @@ import { useToast } from "dashboard/common/toast";
 import {
     deleteReportCollection,
     getReportAccessList,
+    moveReportToCollection,
     setReportAccessList,
     updateReportInfo,
 } from "http/services/reports.service";
@@ -293,6 +294,20 @@ export const ActionButtons = ({
         {
             items: collectionList?.map((collection) => ({
                 label: collection.name,
+                command: () => {
+                    moveReportToCollection(report.documentUID, collection.itemUID).then(
+                        (response) => {
+                            if (response?.status === Status.ERROR) {
+                                toast.current?.show({
+                                    severity: "error",
+                                    summary: Status.ERROR,
+                                    detail: response?.error,
+                                    life: TOAST_LIFETIME,
+                                });
+                            }
+                        }
+                    );
+                },
             })),
         },
     ];
