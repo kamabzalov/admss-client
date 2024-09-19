@@ -451,11 +451,15 @@ export const ReportsPanelHeader = ({
 
     return (
         <div className='reports-header col-12 px-0 pb-3'>
-            <Button
-                icon='pi pi-times'
-                className='p-button close-button'
-                onClick={(e) => (isConfirm ? setIsConfirmVisible(e) : options.onTogglerClick(e))}
-            />
+            {!options.collapsed && (
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={(e) =>
+                        isConfirm ? setIsConfirmVisible(e) : options.onTogglerClick(e)
+                    }
+                />
+            )}
             <Button
                 icon='pi pi-plus'
                 className='reports-header__button'

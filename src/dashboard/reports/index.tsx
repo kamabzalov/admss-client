@@ -229,11 +229,14 @@ export default function Reports(): ReactElement {
                                                             <div className='edit-collection p-panel'>
                                                                 <div className='p-panel-content relative'>
                                                                     <CollectionPanelContent
-                                                                        handleClosePanel={() =>
+                                                                        handleClosePanel={() => {
                                                                             setIsCollectionEditing(
                                                                                 null
-                                                                            )
-                                                                        }
+                                                                            );
+                                                                            handleGetUserReportCollections(
+                                                                                authUser!.useruid
+                                                                            );
+                                                                        }}
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
                                                                         collections={collections}
