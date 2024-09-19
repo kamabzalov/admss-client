@@ -103,12 +103,12 @@ export default function Reports(): ReactElement {
         }
     };
 
-    const handleUpdateCollection = () => {
+    const handleUpdateCollection = (itemuid: string) => {
         if (collectionName) {
             createReportCollection(authUser!.useruid, {
                 name: collectionName,
                 documents: selectedReports,
-                itemuid: isCollectionEditing!,
+                itemuid,
             }).then((response) => {
                 const { error } = response as BaseResponseError;
                 if (error && toast.current) {
@@ -246,8 +246,10 @@ export default function Reports(): ReactElement {
                                                                         setSelectedReports={
                                                                             setSelectedReports
                                                                         }
-                                                                        handleCreateCollection={
-                                                                            handleUpdateCollection
+                                                                        handleCreateCollection={() =>
+                                                                            handleUpdateCollection(
+                                                                                itemUID
+                                                                            )
                                                                         }
                                                                     />
                                                                 </div>
