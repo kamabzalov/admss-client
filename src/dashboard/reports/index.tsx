@@ -1,5 +1,4 @@
 import { ReactElement, useEffect, useState } from "react";
-import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
     getUserFavoriteReportList,
@@ -8,8 +7,6 @@ import {
 import { Button } from "primereact/button";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import "./index.css";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
@@ -22,10 +19,12 @@ import {
     ReportsPanelHeader,
 } from "dashboard/reports/common";
 import { useNavigate } from "react-router-dom";
+import { useStore } from "store/hooks";
 
 export default function Reports(): ReactElement {
     const navigate = useNavigate();
-    const [user, setUser] = useState<AuthUser | null>(null);
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [reportSearch, setReportSearch] = useState<string>("");
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
@@ -36,11 +35,6 @@ export default function Reports(): ReactElement {
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
 
     const toast = useToast();
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
 
     const handleGetUserReportCollections = (useruid: string) => {
         const qry = reportSearch;
@@ -77,14 +71,14 @@ export default function Reports(): ReactElement {
     };
 
     useEffect(() => {
-        if (user) {
-            handleGetUserReportCollections(user.useruid);
+        if (authUser) {
+            handleGetUserReportCollections(authUser.useruid);
         }
-    }, [toast, user]);
+    }, [toast, authUser]);
 
     const handleCreateCollection = () => {
         if (collectionName) {
-            createReportCollection(user!.useruid, {
+            createReportCollection(authUser!.useruid, {
                 name: collectionName,
                 documents: newCollectionsReports,
             }).then((response) => {
@@ -97,7 +91,7 @@ export default function Reports(): ReactElement {
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    user && handleGetUserReportCollections(user.useruid);
+                    handleGetUserReportCollections(authUser!.useruid);
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
@@ -113,7 +107,7 @@ export default function Reports(): ReactElement {
 
     const handleUpdateCollection = () => {
         if (collectionName) {
-            createReportCollection(user!.useruid, {
+            createReportCollection(authUser!.useruid, {
                 name: collectionName,
                 documents: selectedReports,
             }).then((response) => {
@@ -126,7 +120,7 @@ export default function Reports(): ReactElement {
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    user && handleGetUserReportCollections(user.useruid);
+                    handleGetUserReportCollections(authUser!.useruid);
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
@@ -185,7 +179,7 @@ export default function Reports(): ReactElement {
                                     <AccordionTab
                                         header={
                                             <ReportsAccordionHeader
-                                                title='Custom Collections'
+                                                title='Custom Reports'
                                                 info={`(${
                                                     customCollections?.length || 0
                                                 } collections/ ${
@@ -299,9 +293,9 @@ export default function Reports(): ReactElement {
                                                                                     collections
                                                                                 }
                                                                                 refetchAction={() => {
-                                                                                    user?.useruid &&
+                                                                                    authUser?.useruid &&
                                                                                         handleGetUserReportCollections(
-                                                                                            user?.useruid
+                                                                                            authUser?.useruid
                                                                                         );
                                                                                 }}
                                                                             />
@@ -315,7 +309,12 @@ export default function Reports(): ReactElement {
                                     </AccordionTab>
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
-                                            ({ itemUID, name, documents }: ReportCollection) => {
+                                            ({
+                                                itemUID,
+                                                name,
+                                                documents,
+                                                userUID,
+                                            }: ReportCollection) => {
                                                 const isContainsSearchedValue =
                                                     reportSearch &&
                                                     documents?.some((report) =>
@@ -326,7 +325,6 @@ export default function Reports(): ReactElement {
                                                 return (
                                                     <AccordionTab
                                                         key={itemUID}
-                                                        disabled={!documents?.length}
                                                         header={
                                                             <ReportsAccordionHeader
                                                                 title={name}
@@ -336,27 +334,64 @@ export default function Reports(): ReactElement {
                                                                 info={`(${
                                                                     documents?.length || 0
                                                                 } reports)`}
+                                                                actionButton={
+                                                                    userUID ===
+                                                                    authUser?.useruid ? (
+                                                                        <Button
+                                                                            label='Edit'
+                                                                            className='reports-actions__button'
+                                                                            outlined
+                                                                            onClick={(e) =>
+                                                                                handleEditCollection(
+                                                                                    e,
+                                                                                    itemUID
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <></>
+                                                                    )
+                                                                }
                                                             />
                                                         }
                                                         className='reports__accordion-tab'
                                                     >
-                                                        {documents &&
+                                                        {isCollectionEditing === itemUID &&
+                                                        userUID === authUser?.useruid ? (
+                                                            <div className='edit-collection p-panel'>
+                                                                <div className='p-panel-content relative'>
+                                                                    <CollectionPanelContent
+                                                                        handleClosePanel={() =>
+                                                                            setIsCollectionEditing(
+                                                                                null
+                                                                            )
+                                                                        }
+                                                                        collectionuid={itemUID}
+                                                                        collectionName={name}
+                                                                        collections={collections}
+                                                                        selectedReports={
+                                                                            selectedReports
+                                                                        }
+                                                                        setCollectionName={
+                                                                            setCollectionName
+                                                                        }
+                                                                        setSelectedReports={
+                                                                            setSelectedReports
+                                                                        }
+                                                                        handleCreateCollection={
+                                                                            handleUpdateCollection
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            documents &&
                                                             documents.map((report) => (
                                                                 <div
-                                                                    className='reports__list-item'
+                                                                    className='reports__list-item reports__list-item--inner'
                                                                     key={report.itemUID}
                                                                 >
                                                                     <p
-                                                                        className={
-                                                                            reportSearch &&
-                                                                            report.name
-                                                                                .toLowerCase()
-                                                                                .includes(
-                                                                                    reportSearch.toLowerCase()
-                                                                                )
-                                                                                ? "searched-item"
-                                                                                : ""
-                                                                        }
                                                                         onClick={() =>
                                                                             navigate(
                                                                                 `/dashboard/reports/${report.itemUID}`
@@ -369,14 +404,15 @@ export default function Reports(): ReactElement {
                                                                         report={report}
                                                                         collectionList={collections}
                                                                         refetchAction={() => {
-                                                                            user?.useruid &&
+                                                                            authUser?.useruid &&
                                                                                 handleGetUserReportCollections(
-                                                                                    user?.useruid
+                                                                                    authUser?.useruid
                                                                                 );
                                                                         }}
                                                                     />
                                                                 </div>
-                                                            ))}
+                                                            ))
+                                                        )}
                                                     </AccordionTab>
                                                 );
                                             }

@@ -12,12 +12,17 @@
     padding-left: 0;
     padding-right: 0;
 }
-.reports__accordion-tab:has(.reports__accordion--inner) .p-accordion-header-text {
+
+.reports__accordion-tab:has(.reports-actions__button) .p-accordion-header-text {
     display: flex;
     width: 100%;
 }
 
-.reports__accordion-tab:has(.reports__accordion--inner) .reports-accordion-header {
+.reports__accordion-tab:has(.reports-actions__button) .p-accordion-header-text {
+    padding: 0;
+}
+
+.reports__accordion-tab:has(.reports-actions__button) .reports-accordion-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
