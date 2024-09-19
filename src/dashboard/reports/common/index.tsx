@@ -304,6 +304,8 @@ export const ActionButtons = ({
                                     detail: response?.error,
                                     life: TOAST_LIFETIME,
                                 });
+                            } else {
+                                refetchAction && refetchAction();
                             }
                         }
                     );
