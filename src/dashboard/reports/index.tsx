@@ -108,6 +108,7 @@ export default function Reports(): ReactElement {
             createReportCollection(authUser!.useruid, {
                 name: collectionName,
                 documents: selectedReports,
+                itemuid: isCollectionEditing!,
             }).then((response) => {
                 const { error } = response as BaseResponseError;
                 if (error && toast.current) {

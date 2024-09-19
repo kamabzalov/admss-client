@@ -4,6 +4,7 @@ import { QueryParams } from "common/models/query-params";
 import {
     ReportACL,
     ReportCollection,
+    ReportCollectionUpdate,
     ReportCreate,
     ReportDocument,
     ReportInfo,
@@ -85,12 +86,12 @@ export const makeShortReports = async (uid: string | undefined, body?: ReportsPo
 
 export const createReportCollection = async (
     useruid: string,
-    { name, documents }: Partial<ReportCollection>
+    { name, documents, itemuid }: Partial<ReportCollectionUpdate>
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${useruid}/collection`,
-            { name, documents }
+            { name, documents, itemuid }
         );
         return request.data;
     } catch (error) {

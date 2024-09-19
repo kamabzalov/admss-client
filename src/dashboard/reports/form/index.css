@@ -163,6 +163,11 @@
     line-height: 19px;
     text-align: left;
     border-top: 0.5px solid var(--admss-app-white);
+    transition: background-color 0.3s ease;
+}
+
+.report-select__item:hover {
+    background-color: var(--admss-app-light-green);
 }
 
 .report-select__item.selected {

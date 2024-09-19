@@ -504,6 +504,7 @@ export const CollectionPanelContent = ({
     handleClosePanel,
 }: CollectionPanelContentProps): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+    const [collectionNameInput, setCollectionNameInput] = useState<string>(collectionName);
     const toast = useToast();
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
@@ -539,8 +540,11 @@ export const CollectionPanelContent = ({
                     name='Collection name'
                     colWidth={4}
                     height={50}
-                    value={collectionName}
-                    onChange={(e) => setCollectionName(e.target.value)}
+                    value={collectionNameInput}
+                    onChange={(e) => {
+                        setCollectionNameInput(e.target.value);
+                        setCollectionName(e.target.value);
+                    }}
                 />
                 <div className='col-8'>
                     <span className='p-float-label'>
