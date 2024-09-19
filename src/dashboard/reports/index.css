@@ -18,8 +18,8 @@
     width: 100%;
 }
 
-.reports__accordion-tab:has(.reports-actions__button) .p-accordion-header-text {
-    padding: 0;
+.reports__accordion-tab:has(.reports-actions__button) .p-accordion-header-link {
+    padding: 0.5rem 1rem;
 }
 
 .reports__accordion-tab:has(.reports-actions__button) .reports-accordion-header {

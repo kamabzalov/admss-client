@@ -323,3 +323,19 @@ export const setReportAccessList = async (reportuid: string, reportACL: Partial<
         }
     }
 };
+
+export const deleteReportCollection = async (collectionuid: string, reportuid?: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid || 0}/delete`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting report collection",
+            };
+        }
+    }
+};

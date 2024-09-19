@@ -7,6 +7,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import {
+    deleteReportCollection,
     getReportAccessList,
     setReportAccessList,
     updateReportInfo,
@@ -503,9 +504,25 @@ export const CollectionPanelContent = ({
     handleClosePanel,
 }: CollectionPanelContentProps): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+    const toast = useToast();
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
         return <span className='multiselect-label'>{item?.name || ""}</span>;
+    };
+
+    const handleDeleteCollection = (collectionuid: string) => {
+        deleteReportCollection(collectionuid).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response?.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                handleClosePanel?.();
+            }
+        });
     };
     return (
         <>
@@ -564,7 +581,7 @@ export const CollectionPanelContent = ({
                             type='button'
                             severity='danger'
                             outlined
-                            onClick={handleClosePanel}
+                            onClick={() => handleDeleteCollection(collectionuid)}
                         >
                             Delete
                         </Button>

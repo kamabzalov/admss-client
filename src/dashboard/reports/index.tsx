@@ -31,7 +31,6 @@ export default function Reports(): ReactElement {
     const [collectionName, setCollectionName] = useState<string>("");
     const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
-    const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
 
     const toast = useToast();
@@ -62,7 +61,6 @@ export default function Reports(): ReactElement {
                         (collection: ReportCollection) => collection.description !== "Favorites"
                     );
                     setCollections(collectionsWithoutFavorite);
-                    setCustomCollections(response.slice(0, 5));
                 } else {
                     setCollections([]);
                 }
@@ -176,137 +174,6 @@ export default function Reports(): ReactElement {
                             </div>
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
-                                    <AccordionTab
-                                        header={
-                                            <ReportsAccordionHeader
-                                                title='Custom Reports'
-                                                info={`(${
-                                                    customCollections?.length || 0
-                                                } collections/ ${
-                                                    customCollections?.reduce(
-                                                        (acc, { documents }: ReportCollection) =>
-                                                            acc + documents?.length || acc,
-                                                        0
-                                                    ) || 0
-                                                } reports)`}
-                                                label='New'
-                                            />
-                                        }
-                                        className='reports__accordion-tab'
-                                    >
-                                        <Accordion
-                                            multiple
-                                            className='reports__accordion reports__accordion--inner'
-                                            onTabClose={() => setIsCollectionEditing(null)}
-                                        >
-                                            {collections &&
-                                                [...collections]
-                                                    .splice(0, 5)
-                                                    .map(
-                                                        (
-                                                            {
-                                                                itemUID,
-                                                                name,
-                                                                documents,
-                                                            }: ReportCollection,
-                                                            index: number
-                                                        ) => (
-                                                            <AccordionTab
-                                                                disabled={!documents?.length}
-                                                                key={itemUID}
-                                                                header={
-                                                                    <ReportsAccordionHeader
-                                                                        title={name}
-                                                                        info={`(${
-                                                                            documents?.length || 0
-                                                                        } reports)`}
-                                                                        actionButton={
-                                                                            <Button
-                                                                                label='Edit'
-                                                                                className='reports-actions__button'
-                                                                                outlined
-                                                                                onClick={(e) =>
-                                                                                    handleEditCollection(
-                                                                                        e,
-                                                                                        itemUID
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        }
-                                                                        label={index === 1 && "New"}
-                                                                    />
-                                                                }
-                                                                className='reports__accordion-tab'
-                                                            >
-                                                                {isCollectionEditing === itemUID ? (
-                                                                    <div className='edit-collection p-panel'>
-                                                                        <div className='p-panel-content relative'>
-                                                                            <CollectionPanelContent
-                                                                                handleClosePanel={() =>
-                                                                                    setIsCollectionEditing(
-                                                                                        null
-                                                                                    )
-                                                                                }
-                                                                                collectionuid={
-                                                                                    itemUID
-                                                                                }
-                                                                                collectionName={
-                                                                                    name
-                                                                                }
-                                                                                collections={
-                                                                                    collections
-                                                                                }
-                                                                                selectedReports={
-                                                                                    selectedReports
-                                                                                }
-                                                                                setCollectionName={
-                                                                                    setCollectionName
-                                                                                }
-                                                                                setSelectedReports={
-                                                                                    setSelectedReports
-                                                                                }
-                                                                                handleCreateCollection={
-                                                                                    handleUpdateCollection
-                                                                                }
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    documents &&
-                                                                    documents.map((report) => (
-                                                                        <div
-                                                                            className='reports__list-item reports__list-item--inner'
-                                                                            key={report.itemUID}
-                                                                        >
-                                                                            <p
-                                                                                onClick={() =>
-                                                                                    navigate(
-                                                                                        `/dashboard/reports/${report.itemUID}`
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {report.name}
-                                                                            </p>
-                                                                            <ActionButtons
-                                                                                report={report}
-                                                                                collectionList={
-                                                                                    collections
-                                                                                }
-                                                                                refetchAction={() => {
-                                                                                    authUser?.useruid &&
-                                                                                        handleGetUserReportCollections(
-                                                                                            authUser?.useruid
-                                                                                        );
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                    ))
-                                                                )}
-                                                            </AccordionTab>
-                                                        )
-                                                    )}
-                                        </Accordion>
-                                    </AccordionTab>
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
                                             ({
