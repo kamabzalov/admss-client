@@ -35,42 +35,51 @@ export default function Reports(): ReactElement {
 
     const toast = useToast();
 
-    const handleGetUserReportCollections = (useruid: string) => {
+    const getReportCollections = () => {
         const qry = reportSearch;
         const params = {
             qry,
         };
-        getUserFavoriteReportList(useruid).then((response) => {
+        return getUserReportCollectionsContent(
+            authUser!.useruid,
+            qry.length ? params : undefined
+        ).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+            if (Array.isArray(response)) {
+                const collectionsWithoutFavorite = response.filter(
+                    (collection: ReportCollection) => collection.description !== "Favorites"
+                );
+                setCollections(collectionsWithoutFavorite);
+            } else {
+                setCollections([]);
+            }
+        });
+    };
+
+    const getFavoriteReportCollections = () => {
+        return getUserFavoriteReportList(authUser!.useruid).then((response) => {
             if (Array.isArray(response)) {
                 setFavoriteCollections(response);
             }
         });
-        return getUserReportCollectionsContent(useruid, qry.length ? params : undefined).then(
-            (response) => {
-                const { error } = response as BaseResponseError;
-                if (error && toast.current) {
-                    return toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                }
-                if (Array.isArray(response)) {
-                    const collectionsWithoutFavorite = response.filter(
-                        (collection: ReportCollection) => collection.description !== "Favorites"
-                    );
-                    setCollections(collectionsWithoutFavorite);
-                } else {
-                    setCollections([]);
-                }
-            }
-        );
+    };
+
+    const handleGetUserReportCollections = () => {
+        getFavoriteReportCollections();
+        return getReportCollections();
     };
 
     useEffect(() => {
         if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
+            handleGetUserReportCollections();
         }
     }, [toast, authUser]);
 
@@ -89,7 +98,7 @@ export default function Reports(): ReactElement {
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    handleGetUserReportCollections(authUser!.useruid);
+                    handleGetUserReportCollections();
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
@@ -119,7 +128,7 @@ export default function Reports(): ReactElement {
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    handleGetUserReportCollections(authUser!.useruid);
+                    handleGetUserReportCollections();
                     toast.current?.show({
                         severity: "success",
                         summary: "Success",
@@ -234,9 +243,7 @@ export default function Reports(): ReactElement {
                                                                             setIsCollectionEditing(
                                                                                 null
                                                                             );
-                                                                            handleGetUserReportCollections(
-                                                                                authUser!.useruid
-                                                                            );
+                                                                            handleGetUserReportCollections();
                                                                         }}
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
@@ -277,12 +284,12 @@ export default function Reports(): ReactElement {
                                                                     <ActionButtons
                                                                         report={report}
                                                                         collectionList={collections}
-                                                                        refetchAction={() => {
-                                                                            authUser?.useruid &&
-                                                                                handleGetUserReportCollections(
-                                                                                    authUser?.useruid
-                                                                                );
-                                                                        }}
+                                                                        refetchCollectionsAction={
+                                                                            getReportCollections
+                                                                        }
+                                                                        refetchFavoritesAction={
+                                                                            getFavoriteReportCollections
+                                                                        }
                                                                     />
                                                                 </div>
                                                             ))

@@ -274,12 +274,14 @@ export const EditAccessDialog = ({
 interface ActionButtonsProps {
     report: ReportDocument;
     collectionList?: ReportCollection[];
-    refetchAction: () => void;
+    refetchCollectionsAction?: () => void;
+    refetchFavoritesAction?: () => void;
 }
 
 export const ActionButtons = ({
     report,
-    refetchAction,
+    refetchCollectionsAction,
+    refetchFavoritesAction,
     collectionList,
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
@@ -305,7 +307,7 @@ export const ActionButtons = ({
                                     life: TOAST_LIFETIME,
                                 });
                             } else {
-                                refetchAction && refetchAction();
+                                refetchCollectionsAction?.();
                             }
                         }
                     );
@@ -330,7 +332,7 @@ export const ActionButtons = ({
                 const detail = !!report.isfavorite
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
-                refetchAction && refetchAction();
+                refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
@@ -569,7 +571,9 @@ export const CollectionPanelContent = ({
 
     return (
         <>
-            <h3 className='edit-collection__title'>Add new collection</h3>
+            <h3 className='edit-collection__title'>
+                {collectionuid ? "Edit" : "Add new"} collection
+            </h3>
             {handleClosePanel && (
                 <Button
                     icon='pi pi-times'
