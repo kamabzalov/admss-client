@@ -50,12 +50,7 @@ export const ReportForm = observer((): ReactElement => {
     };
 
     const handleSave = () => {
-        handleGetUserReportCollections(authUser!.useruid);
-        getUserFavoriteReportList(authUser!.useruid).then((response) => {
-            if (Array.isArray(response)) {
-                setFavoriteCollections(response);
-            }
-        });
+        navigate(`/dashboard/reports`);
     };
 
     return (
@@ -68,7 +63,9 @@ export const ReportForm = observer((): ReactElement => {
             <div className='col-12'>
                 <div className='card report'>
                     <div className='card-header flex'>
-                        <h2 className='report__title uppercase m-0'>Create custom report</h2>
+                        <h2 className='report__title uppercase m-0'>
+                            {reportStore.report.itemuid ? "Edit" : "Create"} custom report
+                        </h2>
                     </div>
                     <div className='card-content report__card grid'>
                         <div className='col-4'>

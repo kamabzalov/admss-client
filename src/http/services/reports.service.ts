@@ -4,6 +4,7 @@ import { QueryParams } from "common/models/query-params";
 import {
     ReportACL,
     ReportCollection,
+    ReportCollectionUpdate,
     ReportCreate,
     ReportDocument,
     ReportInfo,
@@ -85,12 +86,12 @@ export const makeShortReports = async (uid: string | undefined, body?: ReportsPo
 
 export const createReportCollection = async (
     useruid: string,
-    { name, documents }: Partial<ReportCollection>
+    { name, documents, itemuid }: Partial<ReportCollectionUpdate>
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${useruid}/collection`,
-            { name, documents }
+            { name, documents, itemuid }
         );
         return request.data;
     } catch (error) {
@@ -319,6 +320,38 @@ export const setReportAccessList = async (reportuid: string, reportACL: Partial<
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while setting report access list",
+            };
+        }
+    }
+};
+
+export const deleteReportCollection = async (collectionuid: string, reportuid?: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid || 0}/delete`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting report collection",
+            };
+        }
+    }
+};
+
+export const moveReportToCollection = async (collectionuid: string, reportuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid}/move`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while moving report to collection",
             };
         }
     }

@@ -37,6 +37,16 @@ export interface ReportCollection {
     userUID: string;
 }
 
+export interface ReportCollectionUpdate {
+    index: number;
+    created: string;
+    updated: string;
+    itemuid: string;
+    name: string;
+    description: string;
+    documents: ReportDocument[];
+}
+
 export interface ReportAccess {
     created: string;
     enabled: 0 | 1;

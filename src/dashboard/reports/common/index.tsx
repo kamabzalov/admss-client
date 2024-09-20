@@ -7,7 +7,9 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import {
+    deleteReportCollection,
     getReportAccessList,
+    moveReportToCollection,
     setReportAccessList,
     updateReportInfo,
 } from "http/services/reports.service";
@@ -272,12 +274,14 @@ export const EditAccessDialog = ({
 interface ActionButtonsProps {
     report: ReportDocument;
     collectionList?: ReportCollection[];
-    refetchAction: () => void;
+    refetchCollectionsAction?: () => void;
+    refetchFavoritesAction?: () => void;
 }
 
 export const ActionButtons = ({
     report,
-    refetchAction,
+    refetchCollectionsAction,
+    refetchFavoritesAction,
     collectionList,
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
@@ -292,6 +296,22 @@ export const ActionButtons = ({
         {
             items: collectionList?.map((collection) => ({
                 label: collection.name,
+                command: () => {
+                    moveReportToCollection(report.documentUID, collection.itemUID).then(
+                        (response) => {
+                            if (response?.status === Status.ERROR) {
+                                toast.current?.show({
+                                    severity: "error",
+                                    summary: Status.ERROR,
+                                    detail: response?.error,
+                                    life: TOAST_LIFETIME,
+                                });
+                            } else {
+                                refetchCollectionsAction?.();
+                            }
+                        }
+                    );
+                },
             })),
         },
     ];
@@ -312,7 +332,7 @@ export const ActionButtons = ({
                 const detail = !!report.isfavorite
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
-                refetchAction && refetchAction();
+                refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
@@ -435,11 +455,15 @@ export const ReportsPanelHeader = ({
 
     return (
         <div className='reports-header col-12 px-0 pb-3'>
-            <Button
-                icon='pi pi-times'
-                className='p-button close-button'
-                onClick={(e) => (isConfirm ? setIsConfirmVisible(e) : options.onTogglerClick(e))}
-            />
+            {!options.collapsed && (
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={(e) =>
+                        isConfirm ? setIsConfirmVisible(e) : options.onTogglerClick(e)
+                    }
+                />
+            )}
             <Button
                 icon='pi pi-plus'
                 className='reports-header__button'
@@ -503,18 +527,58 @@ export const CollectionPanelContent = ({
     handleClosePanel,
 }: CollectionPanelContentProps): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+    const [collectionNameInput, setCollectionNameInput] = useState<string>(collectionName);
+    const [confirmMessage, setConfirmMessage] = useState<string>("");
+    const [confirmTitle, setConfirmTitle] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+    const toast = useToast();
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
         return <span className='multiselect-label'>{item?.name || ""}</span>;
     };
+
+    const handleDeleteCollection = () => {
+        collectionuid &&
+            deleteReportCollection(collectionuid).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    handleClosePanel?.();
+                }
+            });
+    };
+
+    const handleCloseClick = () => {
+        setConfirmTitle("Quit Editing?");
+        setConfirmMessage(
+            "Are you sure you want to cancel creating a new collection? All unsaved data will be lost."
+        );
+        setConfirmAction(() => handleClosePanel!);
+        setIsConfirmVisible(true);
+    };
+
+    const handleDeleteClick = () => {
+        setConfirmTitle("Delete Collection?");
+        setConfirmMessage("Are you sure you want to delete this collection?");
+        setConfirmAction(() => handleDeleteCollection);
+        setIsConfirmVisible(true);
+    };
+
     return (
         <>
-            <h3 className='edit-collection__title'>Add new collection</h3>
+            <h3 className='edit-collection__title'>
+                {collectionuid ? "Edit" : "Add new"} collection
+            </h3>
             {handleClosePanel && (
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => setIsConfirmVisible(true)}
+                    onClick={handleCloseClick}
                 />
             )}
             <div className='grid edit-collection__form mt-3'>
@@ -522,8 +586,11 @@ export const CollectionPanelContent = ({
                     name='Collection name'
                     colWidth={4}
                     height={50}
-                    value={collectionName}
-                    onChange={(e) => setCollectionName(e.target.value)}
+                    value={collectionNameInput}
+                    onChange={(e) => {
+                        setCollectionNameInput(e.target.value);
+                        setCollectionName(e.target.value);
+                    }}
                 />
                 <div className='col-8'>
                     <span className='p-float-label'>
@@ -564,7 +631,7 @@ export const CollectionPanelContent = ({
                             type='button'
                             severity='danger'
                             outlined
-                            onClick={handleClosePanel}
+                            onClick={handleDeleteClick}
                         >
                             Delete
                         </Button>
@@ -583,12 +650,10 @@ export const CollectionPanelContent = ({
             </div>
             <ConfirmModal
                 visible={!!isConfirmVisible}
-                title='Quit Editing?'
+                title={confirmTitle}
                 icon='pi-exclamation-triangle'
-                bodyMessage='
-                Are you sure you want to cancel creating a new collection?
-                All unsaved data will be lost.'
-                confirmAction={handleClosePanel}
+                bodyMessage={confirmMessage}
+                confirmAction={confirmAction}
                 draggable={false}
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'
