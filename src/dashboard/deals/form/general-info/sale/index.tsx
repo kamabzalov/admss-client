@@ -21,10 +21,11 @@ import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
+import { useParams } from "react-router-dom";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
-
+    const { id } = useParams();
     const store = useStore().dealStore;
     const userStore = useStore().userStore;
     const toast = useToast();
@@ -286,8 +287,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                     <InputText
                         {...getFieldProps("accountInfo")}
                         className='w-full deal-sale__text-input'
+                        disabled={!!id}
                         value={deal.accountInfo}
                         onChange={({ target: { value } }) => {
+                            if (id) return;
                             setFieldValue("accountInfo", value);
                             changeDeal({ key: "accountInfo", value });
                         }}
