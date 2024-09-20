@@ -50,12 +50,7 @@ export const ReportForm = observer((): ReactElement => {
     };
 
     const handleSave = () => {
-        handleGetUserReportCollections(authUser!.useruid);
-        getUserFavoriteReportList(authUser!.useruid).then((response) => {
-            if (Array.isArray(response)) {
-                setFavoriteCollections(response);
-            }
-        });
+        navigate(`/dashboard/reports`);
     };
 
     return (
