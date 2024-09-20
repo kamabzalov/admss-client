@@ -526,26 +526,47 @@ export const CollectionPanelContent = ({
 }: CollectionPanelContentProps): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     const [collectionNameInput, setCollectionNameInput] = useState<string>(collectionName);
+    const [confirmMessage, setConfirmMessage] = useState<string>("");
+    const [confirmTitle, setConfirmTitle] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
     const toast = useToast();
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
         return <span className='multiselect-label'>{item?.name || ""}</span>;
     };
 
-    const handleDeleteCollection = (collectionuid: string) => {
-        deleteReportCollection(collectionuid).then((response) => {
-            if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleClosePanel?.();
-            }
-        });
+    const handleDeleteCollection = () => {
+        collectionuid &&
+            deleteReportCollection(collectionuid).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    handleClosePanel?.();
+                }
+            });
     };
+
+    const handleCloseClick = () => {
+        setConfirmTitle("Quit Editing?");
+        setConfirmMessage(
+            "Are you sure you want to cancel creating a new collection? All unsaved data will be lost."
+        );
+        setConfirmAction(() => handleClosePanel!);
+        setIsConfirmVisible(true);
+    };
+
+    const handleDeleteClick = () => {
+        setConfirmTitle("Delete Collection?");
+        setConfirmMessage("Are you sure you want to delete this collection?");
+        setConfirmAction(() => handleDeleteCollection);
+        setIsConfirmVisible(true);
+    };
+
     return (
         <>
             <h3 className='edit-collection__title'>Add new collection</h3>
@@ -553,7 +574,7 @@ export const CollectionPanelContent = ({
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => setIsConfirmVisible(true)}
+                    onClick={handleCloseClick}
                 />
             )}
             <div className='grid edit-collection__form mt-3'>
@@ -606,7 +627,7 @@ export const CollectionPanelContent = ({
                             type='button'
                             severity='danger'
                             outlined
-                            onClick={() => handleDeleteCollection(collectionuid)}
+                            onClick={handleDeleteClick}
                         >
                             Delete
                         </Button>
@@ -625,12 +646,10 @@ export const CollectionPanelContent = ({
             </div>
             <ConfirmModal
                 visible={!!isConfirmVisible}
-                title='Quit Editing?'
+                title={confirmTitle}
                 icon='pi-exclamation-triangle'
-                bodyMessage='
-                Are you sure you want to cancel creating a new collection?
-                All unsaved data will be lost.'
-                confirmAction={handleClosePanel}
+                bodyMessage={confirmMessage}
+                confirmAction={confirmAction}
                 draggable={false}
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'

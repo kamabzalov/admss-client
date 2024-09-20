@@ -180,6 +180,7 @@ export default function Reports(): ReactElement {
                                             ({
                                                 itemUID,
                                                 name,
+                                                isfavorite,
                                                 documents,
                                                 userUID,
                                             }: ReportCollection) => {
@@ -203,8 +204,8 @@ export default function Reports(): ReactElement {
                                                                     documents?.length || 0
                                                                 } reports)`}
                                                                 actionButton={
-                                                                    userUID ===
-                                                                    authUser?.useruid ? (
+                                                                    userUID === authUser?.useruid &&
+                                                                    !isfavorite ? (
                                                                         <Button
                                                                             label='Edit'
                                                                             className='reports-actions__button'
