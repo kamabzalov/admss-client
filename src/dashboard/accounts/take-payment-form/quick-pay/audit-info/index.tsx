@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
-import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
@@ -45,19 +44,11 @@ export const AccountAuditInfo = observer((): ReactElement => {
             </div>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Amount Tendered:</label>
-                <InputNumber
-                    className='take-payment__input--small'
-                    value={AmountTendered}
-                    onChange={(e) => changeAccountTakePayment("AmountTendered", e.value || 0)}
-                />
+                <span className='take-payment__value pl-0'>$ {AmountTendered || "0.00"}</span>
             </div>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Change:</label>
-                <InputNumber
-                    className='take-payment__input--small'
-                    value={Charge}
-                    onChange={(e) => changeAccountTakePayment("Charge", e.value || 0)}
-                />
+                <span className='take-payment__value pl-0'>$ {Charge || "0.00"}</span>
             </div>
         </div>
     );
