@@ -1,5 +1,4 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { AuthUser } from "http/services/auth.service";
 import {
     DataTable,
     DataTablePageEvent,
@@ -8,13 +7,11 @@ import {
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { getKeyValue } from "services/local-storage.service";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
 import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import {
@@ -64,8 +61,9 @@ export default function Inventories({
     returnedField,
     getFullInfo,
 }: InventoriesProps): ReactElement {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [inventories, setInventories] = useState<Inventory[]>([]);
-    const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({});
@@ -119,17 +117,15 @@ export default function Inventories({
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
-            setUser(authUser);
             Promise.all([
                 getInventoryLocations(authUser.useruid),
                 getUserGroupList(authUser.useruid),
             ]).then(([locationsResponse, userGroupsResponse]) => {
-                if (locationsResponse) {
+                if (locationsResponse && Array.isArray(locationsResponse)) {
                     setLocations(locationsResponse);
                 }
-                if (userGroupsResponse) {
+                if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
                     setInventoryType(userGroupsResponse);
                 }
             });
@@ -287,7 +283,7 @@ export default function Inventories({
                 });
             }
             getInventoryList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
+                if (Array.isArray(response) && response.length) {
                     setInventories(response);
                 } else {
                     setInventories([]);
