@@ -73,10 +73,14 @@ export const VehicleGeneral = observer((): ReactElement => {
     useEffect(() => {
         if (user) {
             getInventoryLocations(user.useruid).then((list) => {
-                list && setLocationList(list);
+                if (list && Array.isArray(list)) {
+                    setLocationList(list);
+                }
             });
             getUserGroupActiveList(user.useruid).then((list) => {
-                list && setGroupClassList(list);
+                if (list && Array.isArray(list)) {
+                    setGroupClassList(list);
+                }
             });
         }
     }, [user]);

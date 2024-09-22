@@ -297,7 +297,7 @@ export const ActionButtons = ({
             items: collectionList?.map((collection) => ({
                 label: collection.name,
                 command: () => {
-                    moveReportToCollection(report.documentUID, collection.itemUID).then(
+                    moveReportToCollection(collection.itemUID, report.documentUID).then(
                         (response) => {
                             if (response?.status === Status.ERROR) {
                                 toast.current?.show({
