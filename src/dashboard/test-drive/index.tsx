@@ -96,18 +96,26 @@ export const PrintForTestDrive = (): ReactElement => {
 
     const handleAddToContact = () => {
         const newContact: Partial<ContactUser> = {
-            firstName: driver.customerName,
-            lastName: driver.customerLastName,
-            phone1: driver.homePhone,
-            dl_number: driver.dlNumber,
-            dl_issuedate: driver.dlIssuingDate,
-            dl_expiration: driver.dlExpirationDate,
+            firstName: driver.customerName.trim(),
+            lastName: driver.customerLastName.trim(),
+            phone1: driver.homePhone.trim(),
+            dl_number: driver.dlNumber.trim(),
+            dl_issuedate: driver.dlIssuingDate.trim(),
+            dl_expiration: driver.dlExpirationDate.trim(),
         };
+        if (!newContact.firstName || !newContact.lastName) {
+            return toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: "Please fill all required fields",
+                life: TOAST_LIFETIME,
+            });
+        }
         setContact(null, newContact).then((response) => {
             if (response?.status === Status.ERROR) {
                 return toast.current?.show({
                     severity: "error",
-                    summary: "Error",
+                    summary: Status.ERROR,
                     detail: response.error,
                     life: TOAST_LIFETIME,
                 });
@@ -166,6 +174,12 @@ export const PrintForTestDrive = (): ReactElement => {
                                         onChange={({ target: { value } }) => {
                                             return setDriver({ ...driver, customerName: value });
                                         }}
+                                        onBlur={() =>
+                                            setDriver((prevDriver) => ({
+                                                ...prevDriver,
+                                                customerName: prevDriver.customerName.trim(),
+                                            }))
+                                        }
                                     />
                                 </div>
                                 <div className='col-6'>
@@ -184,6 +198,13 @@ export const PrintForTestDrive = (): ReactElement => {
                                         }
                                         onChange={({ target: { value } }) =>
                                             setDriver({ ...driver, customerLastName: value })
+                                        }
+                                        onBlur={() =>
+                                            setDriver((prevDriver) => ({
+                                                ...prevDriver,
+                                                customerLastName:
+                                                    prevDriver.customerLastName.trim(),
+                                            }))
                                         }
                                     />
                                 </div>
