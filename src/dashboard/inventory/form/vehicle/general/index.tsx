@@ -364,8 +364,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         value={values.Make}
-                        filter
-                        required
                         options={automakesList}
                         onChange={({ value }) => {
                             setFieldValue("Make", value);
@@ -374,7 +372,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         valueTemplate={selectedAutoMakesTemplate}
                         itemTemplate={autoMakesOptionTemplate}
                         placeholder='Make (required)'
-                        editable
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
