@@ -42,6 +42,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         useFormikContext<Inventory>();
 
     const [user, setUser] = useState<AuthUser | null>(null);
+    const [initialAutoMakesList, setInitialAutoMakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -59,6 +60,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     ...item,
                     name: item.name.toUpperCase(),
                 }));
+                setInitialAutoMakesList(upperCasedList);
                 setAutomakesList(upperCasedList);
             }
         });
@@ -365,7 +367,14 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='name'
                         value={values.Make}
                         options={automakesList}
+                        editable
+                        filter
                         onChange={({ value }) => {
+                            setAutomakesList(
+                                initialAutoMakesList.filter((item) =>
+                                    item.name.includes(value.toUpperCase())
+                                )
+                            );
                             setFieldValue("Make", value);
                             changeInventory({ key: "Make", value });
                         }}
