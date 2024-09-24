@@ -110,6 +110,7 @@ export const PrintForms = observer((): ReactElement => {
                         event: DataTableSelectionMultipleChangeEvent<InventoryPrintForm[]>
                     ) => setSelectedPrints(event.value)}
                     dataKey='itemuid'
+                    scrollHeight='32vh'
                 >
                     <Column selectionMode='multiple' headerStyle={{ width: "3rem" }}></Column>
                     <Column field='name' header='Form' />
@@ -135,6 +136,8 @@ export const PrintForms = observer((): ReactElement => {
                     <Button
                         className='p-button inventory-print__button'
                         outlined
+                        severity={isButtonDisabled ? "secondary" : "success"}
+                        disabled={isButtonDisabled}
                         onClick={() => setSelectedPrints(null)}
                     >
                         Clear all
