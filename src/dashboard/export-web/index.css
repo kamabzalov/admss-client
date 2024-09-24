@@ -158,3 +158,8 @@
     border: none;
     height: 100%;
 }
+
+.expanded-row__link-text {
+    color: var(--admss-app-main-blue);
+    font-weight: 600;
+}
