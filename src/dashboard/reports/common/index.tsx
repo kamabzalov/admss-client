@@ -20,9 +20,9 @@ import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { PanelHeaderTemplateOptions } from "primereact/panel";
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface TableColumnProps extends ColumnProps {
@@ -43,22 +43,35 @@ interface EditAccessDialogProps {
     reportuid: string;
 }
 
+enum ROLE {
+    ALL = "All_roles",
+    ADMIN = "admin.role",
+    MANAGER = "manager.role",
+    SALES = "sales.role",
+}
+
+enum ACCESS {
+    ALL = "All_access",
+    GRANTED = "granted.access",
+    DENIED = "denied.access",
+}
+
 const filterOptions = [
     {
         label: "Role",
         items: [
-            { name: "All roles", value: "All_roles" },
-            { name: "Admin", value: "admin.role" },
-            { name: "Manager", value: "manager.role" },
-            { name: "Sales person", value: "sales.role" },
+            { name: "All roles", value: ROLE.ALL },
+            { name: "Admin", value: ROLE.ADMIN },
+            { name: "Manager", value: ROLE.MANAGER },
+            { name: "Sales person", value: ROLE.SALES },
         ],
     },
     {
         label: "Access",
         items: [
-            { name: "All access", value: "All_access" },
-            { name: "Denied", value: "denied.access" },
-            { name: "Granted", value: "granted.access" },
+            { name: "All access", value: ACCESS.ALL },
+            { name: "Denied", value: ACCESS.DENIED },
+            { name: "Granted", value: ACCESS.GRANTED },
         ],
     },
 ];
@@ -70,7 +83,7 @@ export const EditAccessDialog = ({
 }: EditAccessDialogProps): ReactElement => {
     const toast = useToast();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
-    const [selectedRole, setSelectedRole] = useState<string[]>([]);
+    const [selectedRole, setSelectedRole] = useState<(ROLE | ACCESS)[]>([]);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [search, setSearch] = useState<string>("");
 
@@ -107,36 +120,95 @@ export const EditAccessDialog = ({
 
         if (selectedRole) {
             const selectedFilters: string = [...selectedRole]
-                .filter((item) => !item.includes("All_"))
+                .filter((item) => !item.includes(ROLE.ALL || ACCESS.ALL))
                 .join("+");
             if (selectedFilters.length) {
                 qry = `${search ? `${qry}+` : ""}${selectedFilters}`;
             }
         }
-        qry.length && handleGetReportAccessList({ qry });
+        handleGetReportAccessList({ qry });
     }, [search, selectedRole]);
 
     const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
     };
 
-    const handleRoleSelection = (selectedValues: string[]) => {
-        let newSelectedValues = [...selectedValues];
+    const handleRoleSelection = (selectData: MultiSelectChangeEvent) => {
+        const selectedValue: { name: string; value: ROLE | ACCESS } = selectData.selectedOption;
+        let newSelectedValues: (ROLE | ACCESS)[] = [...selectedRole];
 
-        const allRolesSelected = selectedValues.includes("All_roles");
-        const allAccessSelected = selectedValues.includes("All_access");
+        const allRoles: ROLE[] = [ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES];
+        const allAccess: ACCESS[] = [ACCESS.GRANTED, ACCESS.DENIED];
 
-        if (allRolesSelected) {
-            const allRoles = filterOptions[0].items.map((item) => item.value);
-            newSelectedValues = Array.from(new Set([...newSelectedValues, ...allRoles]));
+        if (selectedValue.value === ROLE.ALL) {
+            const isAllRolesSelected = newSelectedValues.includes(ROLE.ALL);
+
+            if (isAllRolesSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => !allRoles.includes(value as ROLE)
+                );
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ROLE.ALL
+                );
+            } else {
+                newSelectedValues = Array.from(
+                    new Set([...newSelectedValues, ...allRoles, ROLE.ALL])
+                );
+            }
+        } else if (selectedValue.value === ACCESS.ALL) {
+            const isAllAccessSelected = newSelectedValues.includes(ACCESS.ALL);
+
+            if (isAllAccessSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => !allAccess.includes(value as ACCESS)
+                );
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ACCESS.ALL
+                );
+            } else {
+                newSelectedValues = Array.from(
+                    new Set([...newSelectedValues, ...allAccess, ACCESS.ALL])
+                );
+            }
+        } else {
+            const isItemSelected = newSelectedValues.includes(selectedValue.value);
+
+            if (isItemSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== selectedValue.value
+                );
+            } else {
+                newSelectedValues.push(selectedValue.value);
+            }
+
+            const allRolesSelected = allRoles.every((role) => newSelectedValues.includes(role));
+
+            if (allRolesSelected) {
+                if (!newSelectedValues.includes(ROLE.ALL)) {
+                    newSelectedValues.push(ROLE.ALL);
+                }
+            } else {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ROLE.ALL
+                );
+            }
+
+            const allAccessSelected = allAccess.every((access) =>
+                newSelectedValues.includes(access)
+            );
+
+            if (allAccessSelected) {
+                if (!newSelectedValues.includes(ACCESS.ALL)) {
+                    newSelectedValues.push(ACCESS.ALL);
+                }
+            } else {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ACCESS.ALL
+                );
+            }
         }
 
-        if (allAccessSelected) {
-            const allAccess = filterOptions[1].items.map((item) => item.value);
-            newSelectedValues = Array.from(new Set([...newSelectedValues, ...allAccess]));
-        }
-
-        setSelectedRole(newSelectedValues);
+        setSelectedRole(newSelectedValues.filter(Boolean));
     };
 
     const accessField = (data: ReportAccess): ReactElement => {
@@ -210,9 +282,9 @@ export const EditAccessDialog = ({
                         value={selectedRole}
                         display='chip'
                         panelHeaderTemplate={<></>}
-                        onChange={(e) => {
-                            e.stopPropagation();
-                            handleRoleSelection(e.value);
+                        onChange={(event) => {
+                            event.stopPropagation();
+                            handleRoleSelection(event);
                         }}
                         pt={{
                             wrapper: {
@@ -287,6 +359,7 @@ export const ActionButtons = ({
     const [editAccessActive, setEditAccessActive] = useState(false);
     const toast = useToast();
     const menu = useRef<Menu>(null!);
+    const navigate = useNavigate();
 
     const handleEditAccess = () => {
         setEditAccessActive(true);
@@ -343,6 +416,10 @@ export const ActionButtons = ({
         });
     };
 
+    const handleEditReport = () => {
+        navigate(`/dashboard/reports/${report.itemUID}`);
+    };
+
     return (
         <>
             <div className='reports-actions flex'>
@@ -381,6 +458,13 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                />
+                <Button
+                    className='p-button reports-actions__button'
+                    icon='icon adms-edit-item'
+                    outlined
+                    tooltip='Edit Report'
+                    onClick={handleEditReport}
                 />
                 <Button
                     className='p-button reports-actions__button'
@@ -532,6 +616,21 @@ export const CollectionPanelContent = ({
     const [confirmTitle, setConfirmTitle] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
     const toast = useToast();
+    const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
+    const [initialSelectedReports, setInitialSelectedReports] =
+        useState<ReportDocument[]>(selectedReports);
+
+    useEffect(() => {
+        setInitialCollectionName(collectionName);
+        setInitialSelectedReports(selectedReports);
+    }, [collectionuid]);
+
+    const reportsAreEqual = (reports1: ReportDocument[], reports2: ReportDocument[]) => {
+        if (reports1.length !== reports2.length) return false;
+        const sorted1 = [...reports1].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
+        const sorted2 = [...reports2].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
+        return sorted1.every((item, idx) => item.itemUID === sorted2[idx].itemUID);
+    };
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
         return <span className='multiselect-label'>{item?.name || ""}</span>;
@@ -549,17 +648,22 @@ export const CollectionPanelContent = ({
                     });
                 } else {
                     handleClosePanel?.();
+                    setCollectionNameInput("");
                 }
             });
     };
 
     const handleCloseClick = () => {
-        setConfirmTitle("Quit Editing?");
-        setConfirmMessage(
-            "Are you sure you want to cancel creating a new collection? All unsaved data will be lost."
-        );
-        setConfirmAction(() => handleClosePanel!);
-        setIsConfirmVisible(true);
+        if (isUpdateDisabled) {
+            handleClosePanel?.();
+        } else {
+            setConfirmTitle("Quit Editing?");
+            setConfirmMessage(
+                "Are you sure you want to cancel editing? All unsaved data will be lost."
+            );
+            setConfirmAction(() => handleClosePanel!);
+            setIsConfirmVisible(true);
+        }
     };
 
     const handleDeleteClick = () => {
@@ -568,6 +672,14 @@ export const CollectionPanelContent = ({
         setConfirmAction(() => handleDeleteCollection);
         setIsConfirmVisible(true);
     };
+
+    const isUpdateDisabled = useMemo(() => {
+        return (
+            !collectionNameInput ||
+            (collectionNameInput === initialCollectionName &&
+                reportsAreEqual(selectedReports, initialSelectedReports))
+        );
+    }, [collectionNameInput, initialCollectionName, selectedReports, initialSelectedReports]);
 
     return (
         <>
@@ -638,8 +750,8 @@ export const CollectionPanelContent = ({
                     )}
                     <Button
                         className='edit-collection__button'
-                        disabled={!collectionName}
-                        severity={!collectionName ? "secondary" : "success"}
+                        disabled={isUpdateDisabled}
+                        severity={isUpdateDisabled ? "secondary" : "success"}
                         type='button'
                         onClick={handleCreateCollection}
                         outlined
