@@ -80,10 +80,15 @@
         height: var(--input-regular);
     }
 
-    .currency-item__input.take-payment__input--small .p-inputnumber-input,
+    .currency-item__input .take-payment__input--small .p-inputnumber-input,
     .p-input.take-payment__input--small .p-inputtext-input,
     .take-payment__input--small .p-inputnumber-input {
         height: var(--input-small);
+    }
+
+    .currency-item__input:has(.take-payment__input--small) .currency-item__icon {
+        height: var(--input-small);
+        width: var(--input-small);
     }
 
     .date-item__input {
@@ -112,6 +117,10 @@
     .take-payment__input--small.p-dropdown {
         height: var(--input-small);
         width: 80%;
+    }
+
+    .currency-item__input .p-inputnumber.take-payment__input--small {
+        width: 100%;
     }
     .p-inputtext.take-payment__input--small,
     .p-inputnumber.take-payment__input--small {
