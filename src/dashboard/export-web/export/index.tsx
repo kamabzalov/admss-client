@@ -21,7 +21,7 @@ import {
 } from "http/services/export-to-web.service";
 import { ExportWebList, ExportWebPostData } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
     MultiSelect,
     MultiSelectChangeEvent,
@@ -139,10 +139,28 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     }, [selectedInventories, countCb]);
 
     const rowExpansionTemplate = (data: ExportWebList) => {
+        const maxLength = 480;
+        const comment = data.DealerComments || "";
+
+        const truncatedComment =
+            comment.length > maxLength ? comment.substring(0, maxLength) + "... " : comment;
+
         return (
             <div className='expanded-row'>
                 <div className='expanded-row__label'>Dealer comment:</div>
-                <div className='expanded-row__text'>{data.DealerComments || ""}</div>
+                <div className='expanded-row__text'>
+                    {truncatedComment}
+                    {comment.length > maxLength && (
+                        <span className='expanded-row__link'>
+                            <Link
+                                className='expanded-row__link-text'
+                                to={`/dashboard/inventory/${data.itemuid}?step=19`}
+                            >
+                                To read the complete comment, visit the inventory card.
+                            </Link>
+                        </span>
+                    )}
+                </div>
             </div>
         );
     };
