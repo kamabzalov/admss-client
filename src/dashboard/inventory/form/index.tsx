@@ -10,7 +10,7 @@ import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { checkStockNoAvailability } from "http/services/inventory-service";
+import { checkStockNoAvailability, getVINCheck } from "http/services/inventory-service";
 import { InventoryExportWebData } from "./export-web";
 
 import { useLocation } from "react-router-dom";
@@ -97,6 +97,13 @@ export const InventoryForm = observer(() => {
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
+    const initialVIN = useMemo(() => {
+        if (inventory) {
+            return inventory?.VIN;
+        }
+        return "";
+    }, [inventory]);
+
     const initialStockNo = useMemo(() => {
         if (inventory) {
             return inventory?.StockNo;
@@ -105,8 +112,10 @@ export const InventoryForm = observer(() => {
     }, [inventory]);
 
     const InventoryFormSchema = ({
+        initialVIN,
         initialStockNo,
     }: {
+        initialVIN?: string;
         initialStockNo?: string;
     }): Yup.ObjectSchema<Partial<PartialInventory>> => {
         const debouncedCheckStockNoAvailability = debounce(
@@ -133,11 +142,38 @@ export const InventoryForm = observer(() => {
             500
         );
 
+        const debouncedCheckVINAvailability = debounce(
+            async (value: string, resolve: (exists: boolean) => void) => {
+                if (lastCheckedValue === value) {
+                    resolve(lastResolvedValue);
+                    return;
+                }
+                if (!value || initialVIN === value) {
+                    lastCheckedValue = value;
+                    lastResolvedValue = true;
+                    resolve(true);
+                } else {
+                    if (lastCheckedValue === value) {
+                    }
+                    const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
+                    lastCheckedValue = value;
+                    lastResolvedValue = !(res && res.status === Status.OK && res.exists);
+                    resolve(lastResolvedValue);
+                }
+            },
+            500
+        );
+
         return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
                 .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
                 .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+                .test("is-vin-available", "VIN is already in use", function (value) {
+                    return new Promise((resolve) => {
+                        debouncedCheckVINAvailability(value || "", resolve);
+                    });
+                })
                 .required("Data is required."),
             Make: Yup.string().trim().required("Data is required."),
             Model: Yup.string().trim().required("Data is required."),
@@ -421,6 +457,7 @@ export const InventoryForm = observer(() => {
                                         <Formik
                                             innerRef={formikRef}
                                             validationSchema={InventoryFormSchema({
+                                                initialVIN,
                                                 initialStockNo,
                                             })}
                                             initialValues={
