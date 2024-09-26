@@ -76,6 +76,7 @@ export const PrintForms = observer((): ReactElement => {
         return (
             <div className='flex gap-3'>
                 <Button
+                    type='button'
                     className='p-button inventory-print__action-button'
                     outlined
                     disabled={isButtonDisabled}
@@ -84,6 +85,7 @@ export const PrintForms = observer((): ReactElement => {
                     Print
                 </Button>
                 <Button
+                    type='button'
                     className='p-button inventory-print__action-button'
                     outlined
                     disabled={isButtonDisabled}
@@ -118,6 +120,7 @@ export const PrintForms = observer((): ReactElement => {
                 </DataTable>
                 <div className='inventory-print__control'>
                     <Button
+                        type='button'
                         className='p-button inventory-print__button'
                         onClick={() => handlePrintSelectedForms(true)}
                         severity={isButtonDisabled ? "secondary" : "success"}
@@ -126,6 +129,7 @@ export const PrintForms = observer((): ReactElement => {
                         Print
                     </Button>
                     <Button
+                        type='button'
                         className='p-button inventory-print__button'
                         onClick={() => handlePrintSelectedForms()}
                         disabled={isButtonDisabled}
@@ -134,6 +138,7 @@ export const PrintForms = observer((): ReactElement => {
                         Download
                     </Button>
                     <Button
+                        type='button'
                         className='p-button inventory-print__button'
                         outlined
                         severity={isButtonDisabled ? "secondary" : "success"}
