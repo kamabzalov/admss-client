@@ -323,9 +323,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <div className='col-6 relative'>
                         <VINDecoder
                             value={values.VIN}
-                            onChange={({ target: { value } }) => {
-                                setFieldValue("VIN", value);
+                            onChange={async ({ target: { value } }) => {
+                                await setFieldValue("VIN", value);
+                                await setFieldTouched("VIN", true, true);
                                 changeInventory({ key: "VIN", value });
+                                await validateField("VIN");
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}

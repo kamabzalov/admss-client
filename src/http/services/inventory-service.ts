@@ -14,6 +14,7 @@ import {
     InventoryLocations,
     InventoryStockNumber,
     InventoryWebCheck,
+    InventoryCheckVIN,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -130,6 +131,22 @@ export const getInventoryWebCheck = async (inventoryuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting inventory web check",
+            };
+        }
+    }
+};
+
+export const getVINCheck = async (VIN: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryCheckVIN>(
+            `inventory/${VIN}/checkvin`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while VIN check",
             };
         }
     }

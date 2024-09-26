@@ -369,10 +369,18 @@ export interface InventoryLocations {
     useruid: string;
 }
 
-export interface InventoryStockNumber {
+interface InventoryCheckInfo {
     exists: 0 | 1;
     status: Status;
+}
+
+export interface InventoryStockNumber extends InventoryCheckInfo {
     stockno: string;
+}
+
+export interface InventoryCheckVIN extends InventoryCheckInfo {
+    info: string;
+    inventoryuid: string;
 }
 
 export interface InventoryWebCheck extends BaseResponseError {
