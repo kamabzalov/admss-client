@@ -130,13 +130,15 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     onClick={handleDuplicateReport}
                     outlined
                 />
-                <Button
-                    className='report__icon-button'
-                    icon='icon adms-trash-can'
-                    onClick={handleDeleteReport}
-                    outlined
-                    severity='danger'
-                />
+                {!report.isdefault && (
+                    <Button
+                        className='report__icon-button'
+                        icon='icon adms-trash-can'
+                        onClick={handleDeleteReport}
+                        outlined
+                        severity='danger'
+                    />
+                )}
                 <Button
                     className='ml-auto uppercase px-6 report__button'
                     severity='danger'
