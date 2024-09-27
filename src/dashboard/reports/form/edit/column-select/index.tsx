@@ -19,6 +19,7 @@ const dataSetValues: ReportServices[] = [
 
 export const ReportColumnSelect = observer((): ReactElement => {
     const store = useStore().reportStore;
+    const { report } = store;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const toast = useToast();
@@ -124,6 +125,18 @@ export const ReportColumnSelect = observer((): ReactElement => {
         }
     };
 
+    const ControlButton = (icon: string, action: () => void) => {
+        return (
+            <Button
+                className='report-control__button'
+                icon={`pi pi-angle-${icon}`}
+                disabled={!!report.isdefault}
+                outlined
+                onClick={() => currentItem && action()}
+            />
+        );
+    };
+
     return (
         <div className='col-12 report-controls'>
             <div className='report-controls__top'>
@@ -132,6 +145,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         className='report-controls__dropdown'
                         options={dataSetValues}
                         value={dataSet}
+                        disabled={!!report.isdefault}
                         onChange={(e) => setDataSet(e.value)}
                         pt={{
                             wrapper: {
@@ -143,30 +157,19 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 </span>
             </div>
             <div className='report-control'>
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-up'
-                    outlined
-                    onClick={() => currentItem && changeAvailableOrder(currentItem, "up")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-up'
-                    outlined
-                    onClick={() => currentItem && changeAvailableOrder(currentItem, "top")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-down'
-                    outlined
-                    onClick={() => currentItem && changeAvailableOrder(currentItem, "down")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-down'
-                    outlined
-                    onClick={() => currentItem && changeAvailableOrder(currentItem, "bottom")}
-                />
+                {ControlButton("up", () => currentItem && changeAvailableOrder(currentItem, "up"))}
+                {ControlButton(
+                    "double-up",
+                    () => currentItem && changeAvailableOrder(currentItem, "top")
+                )}
+                {ControlButton(
+                    "down",
+                    () => currentItem && changeAvailableOrder(currentItem, "down")
+                )}
+                {ControlButton(
+                    "double-down",
+                    () => currentItem && changeAvailableOrder(currentItem, "bottom")
+                )}
             </div>
             <ReportSelect
                 header='Available'
@@ -176,11 +179,9 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}
             />
             <div className='report-control'>
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-right'
-                    outlined
-                    onClick={() =>
+                {ControlButton(
+                    "right",
+                    () =>
                         currentItem &&
                         moveItem(
                             currentItem,
@@ -189,26 +190,20 @@ export const ReportColumnSelect = observer((): ReactElement => {
                             setAvailableValues,
                             setSelectedValues
                         )
-                    }
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-right'
-                    outlined
-                    onClick={() =>
-                        moveAllItems(
-                            availableValues,
-                            selectedValues,
-                            setAvailableValues,
-                            setSelectedValues
-                        )
-                    }
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-left'
-                    outlined
-                    onClick={() =>
+                )}
+
+                {ControlButton("double-right", () =>
+                    moveAllItems(
+                        availableValues,
+                        selectedValues,
+                        setAvailableValues,
+                        setSelectedValues
+                    )
+                )}
+
+                {ControlButton(
+                    "left",
+                    () =>
                         currentItem &&
                         moveItem(
                             currentItem,
@@ -217,21 +212,16 @@ export const ReportColumnSelect = observer((): ReactElement => {
                             setSelectedValues,
                             setAvailableValues
                         )
-                    }
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-left'
-                    outlined
-                    onClick={() =>
-                        moveAllItems(
-                            selectedValues,
-                            availableValues,
-                            setSelectedValues,
-                            setAvailableValues
-                        )
-                    }
-                />
+                )}
+
+                {ControlButton("double-left", () =>
+                    moveAllItems(
+                        selectedValues,
+                        availableValues,
+                        setSelectedValues,
+                        setAvailableValues
+                    )
+                )}
             </div>
             <ReportSelect
                 header='Selected'
@@ -241,30 +231,22 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}
             />
             <div className='report-control'>
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-up'
-                    outlined
-                    onClick={() => currentItem && changeSelectedOrder(currentItem, "up")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-up'
-                    outlined
-                    onClick={() => currentItem && changeSelectedOrder(currentItem, "top")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-down'
-                    outlined
-                    onClick={() => currentItem && changeSelectedOrder(currentItem, "down")}
-                />
-                <Button
-                    className='report-control__button'
-                    icon='pi pi-angle-double-down'
-                    outlined
-                    onClick={() => currentItem && changeSelectedOrder(currentItem, "bottom")}
-                />
+                {ControlButton("up", () => currentItem && changeSelectedOrder(currentItem, "up"))}
+
+                {ControlButton(
+                    "double-up",
+                    () => currentItem && changeSelectedOrder(currentItem, "top")
+                )}
+
+                {ControlButton(
+                    "down",
+                    () => currentItem && changeSelectedOrder(currentItem, "down")
+                )}
+
+                {ControlButton(
+                    "double-down",
+                    () => currentItem && changeSelectedOrder(currentItem, "bottom")
+                )}
             </div>
         </div>
     );

@@ -40,9 +40,9 @@ export const ReportEditForm = observer((): ReactElement => {
 
     const handleDownloadForm = async (download: boolean = false) => {
         const errorMessage = "Error while download report";
-        if (id && authUser && authUser.useruid) {
-            const response = await setReportDocumentTemplate(id, {
-                itemUID: id,
+        if (authUser && authUser.useruid) {
+            const response = await setReportDocumentTemplate(id || "0", {
+                itemUID: id || "0",
                 columns: reportColumns,
             }).then((response) => {
                 if (response && response.status === Status.ERROR) {
@@ -64,7 +64,7 @@ export const ReportEditForm = observer((): ReactElement => {
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(url);
             if (download) {
-                link.download = `report_form_${id}.pdf`;
+                link.download = `report_form_${id || reportName}.pdf`;
                 link.click();
             } else {
                 window.open(
@@ -124,6 +124,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <label className='cursor-pointer report-control__checkbox'>
                         <Checkbox
                             checked={!!report.ShowTotals}
+                            disabled={!!report.isdefault}
                             onChange={() => {
                                 changeReport("ShowTotals", !report.ShowTotals ? 1 : 0);
                             }}
