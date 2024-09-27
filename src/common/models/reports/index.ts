@@ -19,6 +19,7 @@ export interface ReportDocument {
     documentUID: string;
     index: number;
     isfavorite: 0 | 1;
+    isDefault: 0 | 1;
     itemUID: string;
     name: string;
     updated: string;
