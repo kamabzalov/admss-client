@@ -4,10 +4,8 @@ import { ReactElement } from "react";
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 export enum ContactAccordionItems {
-    GENERAL = "General",
-    ADDRESS = "Address",
-    MAILING_ADDRESS = "Mailing address",
-    IDENTIFICATION = "Identification",
+    BUYER = "Buyer information",
+    CO_BUYER = "Co-buyer information",
     CONTACTS = "Contacts",
     COMPANY = "Company/Workplace",
     PROSPECTING = "Prospecting and notes",
