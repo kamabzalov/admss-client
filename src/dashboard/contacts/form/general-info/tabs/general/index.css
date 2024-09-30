@@ -1,0 +1,17 @@
+.general-info__dropdown {
+    height: 50px;
+}
+
+.general-info__button {
+    width: 246px;
+    height: 54px;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 23px;
+    text-transform: uppercase;
+}
+
+.general-info-overwrite {
+    display: flex;
+    align-items: center;
+}

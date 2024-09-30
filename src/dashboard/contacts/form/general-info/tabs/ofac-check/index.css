@@ -1,0 +1,14 @@
+.ofac-check__button {
+    width: 246px;
+    height: 54px;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 23px;
+    text-transform: uppercase;
+}
+
+.ofac-check__field {
+    margin-top: 20px;
+    min-height: 30vh;
+    background-color: var(--admss-app-white-blue);
+}

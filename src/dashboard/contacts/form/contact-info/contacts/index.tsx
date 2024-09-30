@@ -181,4 +181,3 @@ export const ContactsSocialInfo = observer((): ReactElement => {
         </div>
     );
 });
-

@@ -136,4 +136,3 @@ export const ContactsProspecting = observer((): ReactElement => {
         </div>
     );
 });
-

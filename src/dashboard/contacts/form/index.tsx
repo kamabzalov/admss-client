@@ -27,7 +27,7 @@ export type PartialContact = Pick<
     Pick<ContactExtData, "Buyer_Emp_Ext" | "Buyer_Emp_Phone">;
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
-    [ContactAccordionItems.GENERAL]: ["firstName", "lastName", "type", "companyName"],
+    [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "companyName"],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };

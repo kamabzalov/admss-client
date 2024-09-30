@@ -1,0 +1,15 @@
+.identification__dropdown {
+    height: 50px;
+}
+
+.identification__line {
+    border: none;
+    border-top: 1px solid var(--admss-app-light-grey);
+    margin-top: 12px;
+}
+
+.identification__title {
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
