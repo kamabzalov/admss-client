@@ -23,8 +23,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                 (data) => typeof data === "number" && setTotalPayments(data)
             );
         }
-        // eslint-disable-next-line
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         if (dealErrorMessage.length && toast.current) {

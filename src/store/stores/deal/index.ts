@@ -116,7 +116,6 @@ export class DealStore {
 
     public getDealFinances = async (dealuid: string) => {
         try {
-            this._isLoading = true;
             this._dealErrorMessage = "";
             const response = await getDealFinance(dealuid);
             if (response && response.status === Status.OK) {
@@ -236,7 +235,6 @@ export class DealStore {
 
     public getPickupPayments = action(async (dealuid = this._dealID) => {
         try {
-            this._isLoading = true;
             this._dealErrorMessage = "";
             const response = await getDealPayments(dealuid);
             if (Array.isArray(response)) {
