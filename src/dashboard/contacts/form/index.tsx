@@ -18,6 +18,8 @@ import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { DashboardDialog } from "dashboard/common/dialog";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -62,6 +64,23 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     }),
 });
 
+const DialogBody = (): ReactElement => {
+    return (
+        <>
+            <div className='confirm-header'>
+                <i className='pi pi-exclamation-triangle confirm-header__icon' />
+                <div className='confirm-header__title'>Required data is missing</div>
+            </div>
+            <div className='text-center w-full confirm-body'>
+                The form cannot be saved as it missing required data.
+            </div>
+            <div className='text-center w-full confirm-body--bold'>
+                Please fill in the required fields and try again.
+            </div>
+        </>
+    );
+};
+
 export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
@@ -75,12 +94,25 @@ export const ContactForm = observer((): ReactElement => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, getContact, clearContact, saveContact, memoRoute, isLoading } =
-        store;
+    const {
+        contact,
+        contactExtData,
+        getContact,
+        clearContact,
+        saveContact,
+        isContactChanged,
+        memoRoute,
+        isLoading,
+    } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+    const [confirmMessage, setConfirmMessage] = useState<string>("");
+    const [confirmTitle, setConfirmTitle] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+    const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
+    const [isDataMissingConfirm, setIsDataMissingConfirm] = useState<boolean>(false);
 
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
@@ -116,6 +148,44 @@ export const ContactForm = observer((): ReactElement => {
         return `/dashboard/contacts/${currentPath}?step=${activeIndex + 1}`;
     };
 
+    const handleCloseClick = () => {
+        const performNavigation = () => {
+            if (memoRoute) {
+                navigate(memoRoute);
+                store.memoRoute = "";
+            } else {
+                navigate(`/dashboard/contacts`);
+            }
+        };
+
+        if (isContactChanged) {
+            setConfirmTitle("Quit Editing?");
+            setConfirmMessage(
+                "Are you sure you want to leave this page? All unsaved data will be lost."
+            );
+            setConfirmAction(() => performNavigation);
+            setIsConfirmVisible(true);
+        } else {
+            performNavigation();
+        }
+    };
+
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (isContactChanged) {
+                event.preventDefault();
+                event.returnValue =
+                    "Are you sure you want to reload this page? All unsaved data will be lost.";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isContactChanged]);
+
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
@@ -149,12 +219,7 @@ export const ContactForm = observer((): ReactElement => {
                 });
                 setErrorSections(currentSectionsWithErrors);
 
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
-                    life: TOAST_LIFETIME,
-                });
+                setIsDataMissingConfirm(true);
             }
         });
     };
@@ -167,7 +232,7 @@ export const ContactForm = observer((): ReactElement => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/contacts")}
+                    onClick={handleCloseClick}
                 />
                 <div className='col-12'>
                     <div className='card contact'>
@@ -351,6 +416,28 @@ export const ContactForm = observer((): ReactElement => {
                     </div>
                 </div>
             </div>
+            <ConfirmModal
+                visible={!!isConfirmVisible}
+                title={confirmTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={confirmMessage}
+                confirmAction={confirmAction}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Confirm'
+                className='contact-confirm-dialog'
+                onHide={() => setIsConfirmVisible(false)}
+            />
+
+            <DashboardDialog
+                visible={!!isDataMissingConfirm}
+                className='contact-missed-data-dialog'
+                onHide={() => setIsDataMissingConfirm(false)}
+                footer='Got it'
+                action={() => setIsDataMissingConfirm(false)}
+            >
+                <DialogBody />
+            </DashboardDialog>
         </Suspense>
     );
 });
