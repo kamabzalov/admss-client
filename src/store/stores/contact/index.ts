@@ -31,6 +31,7 @@ export class ContactStore {
     private _backSiteDLurl: string = "";
     private _frontSiteDL: File = {} as File;
     private _backSiteDL: File = {} as File;
+    private _isContactChanged: boolean = false;
     private _memoRoute: string = "";
 
     public constructor(rootStore: RootStore) {
@@ -60,6 +61,10 @@ export class ContactStore {
 
     public get backSideDLurl() {
         return this._backSiteDLurl;
+    }
+
+    public get isContactChanged() {
+        return this._isContactChanged;
     }
 
     public get isLoading() {
@@ -114,11 +119,13 @@ export class ContactStore {
 
     public changeContact = action(
         (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) => {
+            this._isContactChanged = true;
             this._contact[key] = value as never;
         }
     );
 
     public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
+        this._isContactChanged = true;
         this._contactExtData[key] = value as never;
     });
 

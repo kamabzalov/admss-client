@@ -114,3 +114,43 @@
     border-radius: 0;
     border-bottom: 2px solid var(--admss-app-primary);
 }
+
+.contact-confirm-dialog .p-confirm-dialog-reject,
+.contact-confirm-dialog .p-confirm-dialog-accept {
+    padding: 20px 33px;
+    height: 60px;
+    font-size: 20px;
+}
+
+.contact-confirm-dialog {
+    width: 455px;
+    height: 451px;
+    color: var(--admss-app-primary);
+}
+
+.contact-missed-data-dialog {
+    width: 396px;
+    height: 520px;
+}
+
+.contact-missed-data-dialog .p-dialog-header {
+    padding-bottom: 20px;
+}
+
+.contact-missed-data-dialog .confirm-header__icon {
+    padding-bottom: 20px;
+}
+
+.contact-missed-data-dialog .p-dialog-footer .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0;
+    width: 130px;
+    height: 60px;
+}
+
+.contact-missed-data-dialog .confirm-body--bold {
+    font-weight: 400;
+}
