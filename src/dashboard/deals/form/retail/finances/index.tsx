@@ -15,8 +15,7 @@ export const DealRetailFinances = observer((): ReactElement => {
 
     useEffect(() => {
         id && getDealFinances(id);
-        // eslint-disable-next-line
-    }, []);
+    }, [id]);
 
     const changeFinance = (key: keyof DealFinance, value: number | null) => {
         if (dealFinances) {
