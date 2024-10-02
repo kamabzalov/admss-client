@@ -417,7 +417,7 @@ export const ActionButtons = ({
     };
 
     const handleEditReport = () => {
-        navigate(`/dashboard/reports/${report.itemUID}`);
+        navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
     return (
