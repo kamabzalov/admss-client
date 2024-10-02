@@ -236,7 +236,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='locationuid'
                         filter
                         options={locationList}
-                        value={values.locationuid}
+                        value={values.locationuid.trim() || locationList[0]?.locationuid}
                         onChange={({ value }) => {
                             setFieldValue("locationuid", value);
                             changeInventory({ key: "locationuid", value });
@@ -353,6 +353,14 @@ export const VehicleGeneral = observer((): ReactElement => {
                             changeInventory({ key: "StockNo", value });
                             await validateField("StockNo");
                         }}
+                        onInput={(event: React.FormEvent<HTMLInputElement>) => {
+                            const value = (event.target as HTMLInputElement).value;
+                            if (!value) {
+                                return changeInventory({ key: "StockNo", value: "" });
+                            }
+                            setFieldValue("StockNo", value);
+                            changeInventory({ key: "StockNo", value });
+                        }}
                     />
                     <label className='float-label'>Stock#</label>
                 </span>
@@ -436,6 +444,14 @@ export const VehicleGeneral = observer((): ReactElement => {
                         useGrouping={false}
                         value={parseInt(values.Year) || null}
                         onChange={({ value }) => {
+                            if (!value) {
+                                return changeInventory({ key: "Year", value: "" });
+                            }
+                            setFieldValue("Year", value);
+                            changeInventory({ key: "Year", value: String(value) });
+                        }}
+                        onInput={(event: React.FormEvent<HTMLInputElement>) => {
+                            const value = (event.target as HTMLInputElement).value;
                             if (!value) {
                                 return changeInventory({ key: "Year", value: "" });
                             }
