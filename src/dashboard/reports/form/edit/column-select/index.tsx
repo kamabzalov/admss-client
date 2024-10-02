@@ -125,12 +125,12 @@ export const ReportColumnSelect = observer((): ReactElement => {
         }
     };
 
-    const ControlButton = (icon: string, action: () => void) => {
+    const ControlButton = (icon: string, action: () => void, disabled?: boolean) => {
         return (
             <Button
                 className='report-control__button'
                 icon={`pi pi-angle-${icon}`}
-                disabled={!!report.isdefault}
+                disabled={!!report.isdefault || !currentItem || disabled}
                 outlined
                 onClick={() => currentItem && action()}
             />
@@ -157,18 +157,27 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 </span>
             </div>
             <div className='report-control'>
-                {ControlButton("up", () => currentItem && changeAvailableOrder(currentItem, "up"))}
+                {ControlButton(
+                    "up",
+                    () => currentItem && changeAvailableOrder(currentItem, "up"),
+                    availableValues.findIndex((i) => i === currentItem) === 0
+                )}
                 {ControlButton(
                     "double-up",
-                    () => currentItem && changeAvailableOrder(currentItem, "top")
+                    () => currentItem && changeAvailableOrder(currentItem, "top"),
+                    availableValues.findIndex((i) => i === currentItem) === 0
                 )}
                 {ControlButton(
                     "down",
-                    () => currentItem && changeAvailableOrder(currentItem, "down")
+                    () => currentItem && changeAvailableOrder(currentItem, "down"),
+                    availableValues.findIndex((i) => i === currentItem) ===
+                        availableValues.length - 1
                 )}
                 {ControlButton(
                     "double-down",
-                    () => currentItem && changeAvailableOrder(currentItem, "bottom")
+                    () => currentItem && changeAvailableOrder(currentItem, "bottom"),
+                    availableValues.findIndex((i) => i === currentItem) ===
+                        availableValues.length - 1
                 )}
             </div>
             <ReportSelect
@@ -189,16 +198,20 @@ export const ReportColumnSelect = observer((): ReactElement => {
                             selectedValues,
                             setAvailableValues,
                             setSelectedValues
-                        )
+                        ),
+                    !!selectedValues.includes(currentItem!)
                 )}
 
-                {ControlButton("double-right", () =>
-                    moveAllItems(
-                        availableValues,
-                        selectedValues,
-                        setAvailableValues,
-                        setSelectedValues
-                    )
+                {ControlButton(
+                    "double-right",
+                    () =>
+                        moveAllItems(
+                            availableValues,
+                            selectedValues,
+                            setAvailableValues,
+                            setSelectedValues
+                        ),
+                    !!selectedValues.includes(currentItem!)
                 )}
 
                 {ControlButton(
@@ -211,16 +224,20 @@ export const ReportColumnSelect = observer((): ReactElement => {
                             availableValues,
                             setSelectedValues,
                             setAvailableValues
-                        )
+                        ),
+                    !!availableValues.includes(currentItem!)
                 )}
 
-                {ControlButton("double-left", () =>
-                    moveAllItems(
-                        selectedValues,
-                        availableValues,
-                        setSelectedValues,
-                        setAvailableValues
-                    )
+                {ControlButton(
+                    "double-left",
+                    () =>
+                        moveAllItems(
+                            selectedValues,
+                            availableValues,
+                            setSelectedValues,
+                            setAvailableValues
+                        ),
+                    !!availableValues.includes(currentItem!)
                 )}
             </div>
             <ReportSelect
@@ -231,21 +248,28 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}
             />
             <div className='report-control'>
-                {ControlButton("up", () => currentItem && changeSelectedOrder(currentItem, "up"))}
+                {ControlButton(
+                    "up",
+                    () => currentItem && changeSelectedOrder(currentItem, "up"),
+                    selectedValues.findIndex((i) => i === currentItem) === 0
+                )}
 
                 {ControlButton(
                     "double-up",
-                    () => currentItem && changeSelectedOrder(currentItem, "top")
+                    () => currentItem && changeSelectedOrder(currentItem, "top"),
+                    selectedValues.findIndex((i) => i === currentItem) === 0
                 )}
 
                 {ControlButton(
                     "down",
-                    () => currentItem && changeSelectedOrder(currentItem, "down")
+                    () => currentItem && changeSelectedOrder(currentItem, "down"),
+                    selectedValues.findIndex((i) => i === currentItem) === selectedValues.length - 1
                 )}
 
                 {ControlButton(
                     "double-down",
-                    () => currentItem && changeSelectedOrder(currentItem, "bottom")
+                    () => currentItem && changeSelectedOrder(currentItem, "bottom"),
+                    selectedValues.findIndex((i) => i === currentItem) === selectedValues.length - 1
                 )}
             </div>
         </div>
