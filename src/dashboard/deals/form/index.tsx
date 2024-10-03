@@ -181,8 +181,17 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged, isLoading } =
-        store;
+    const {
+        deal,
+        dealType,
+        dealExtData,
+        getDeal,
+        getPrintList,
+        saveDeal,
+        clearDeal,
+        isFormChanged,
+        isLoading,
+    } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -209,6 +218,12 @@ export const DealsForm = observer(() => {
             }
         }
     }, [stepActiveIndex, stepsRef.current]);
+
+    useEffect(() => {
+        if (stepActiveIndex === printActiveIndex) {
+            getPrintList(id);
+        }
+    }, [stepActiveIndex, printActiveIndex]);
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
