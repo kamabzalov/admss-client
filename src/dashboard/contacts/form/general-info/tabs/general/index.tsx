@@ -37,7 +37,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
-                <Button label='Scan driver license' className='general-info__button' outlined />
+                <Button
+                    type='button'
+                    label='Scan driver license'
+                    className='general-info__button'
+                    outlined
+                />
             </div>
             <div className='col-9'>
                 <div className='general-info-overwrite pb-3'>
