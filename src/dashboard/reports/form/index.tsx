@@ -46,7 +46,7 @@ export const ReportForm = observer((): ReactElement => {
 
     const handleAccordionTabChange = (report: ReportDocument) => {
         reportStore.reportName = report.name;
-        navigate(`/dashboard/reports/${report.itemUID}`);
+        navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
     const handleSave = () => {
@@ -100,7 +100,7 @@ export const ReportForm = observer((): ReactElement => {
                         </div>
                         <ReportEditForm />
                     </div>
-                    {<ReportFooter onAction={handleSave} />}
+                    <ReportFooter onAction={handleSave} />
                 </div>
             </div>
         </div>
