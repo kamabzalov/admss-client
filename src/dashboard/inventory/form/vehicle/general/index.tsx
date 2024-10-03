@@ -21,9 +21,6 @@ import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { AuthUser } from "http/services/auth.service";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { getKeyValue } from "services/local-storage.service";
 import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -38,11 +35,13 @@ const parseMileage = (mileage: string): number => {
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
+    const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
+        store;
     const { values, errors, setFieldValue, getFieldProps, validateField, setFieldTouched } =
         useFormikContext<Inventory>();
 
-    const [user, setUser] = useState<AuthUser | null>(null);
     const [initialAutoMakesList, setInitialAutoMakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -53,8 +52,6 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
         getInventoryAutomakesList().then((list) => {
             if (list) {
                 const upperCasedList = list.map((item) => ({
@@ -74,19 +71,25 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, []);
 
     useEffect(() => {
-        if (user) {
-            getInventoryLocations(user.useruid).then((list) => {
+        if (authUser) {
+            getInventoryLocations(authUser.useruid).then((list) => {
                 if (list && Array.isArray(list)) {
                     setLocationList(list);
                 }
             });
-            getUserGroupActiveList(user.useruid).then((list) => {
+            getUserGroupActiveList(authUser.useruid).then((list) => {
                 if (list && Array.isArray(list)) {
                     setGroupClassList(list);
                 }
             });
         }
-    }, [user]);
+    }, [authUser]);
+
+    useEffect(() => {
+        if (!values?.locationuid?.trim()) {
+            store.currentLocation = locationList[0]?.locationuid;
+        }
+    }, [currentLocation, locationList, values.locationuid, store]);
 
     const handleSelectMake = useCallback(() => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
@@ -236,10 +239,13 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='locationuid'
                         filter
                         options={locationList}
-                        value={values.locationuid.trim() || locationList[0]?.locationuid}
+                        value={values.locationuid}
                         onChange={({ value }) => {
-                            setFieldValue("locationuid", value);
-                            changeInventory({ key: "locationuid", value });
+                            setFieldValue("locationuid", value || locationList[0].locationuid);
+                            changeInventory({
+                                key: "locationuid",
+                                value: value || locationList[0].locationuid,
+                            });
                         }}
                         placeholder='Location name'
                         className={`w-full vehicle-general__dropdown ${
