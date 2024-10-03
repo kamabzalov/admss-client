@@ -417,7 +417,7 @@ export const ActionButtons = ({
     };
 
     const handleEditReport = () => {
-        navigate(`/dashboard/reports/${report.documentUID}`);
+        navigate(`/dashboard/reports/${report.itemUID}`);
     };
 
     return (
@@ -619,8 +619,6 @@ export const CollectionPanelContent = ({
     const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
     const [initialSelectedReports, setInitialSelectedReports] =
         useState<ReportDocument[]>(selectedReports);
-    const [panelSelectedReports, setPanelSelectedReports] =
-        useState<ReportDocument[]>(selectedReports);
 
     useEffect(() => {
         setInitialCollectionName(collectionName);
@@ -679,9 +677,9 @@ export const CollectionPanelContent = ({
         return (
             !collectionNameInput ||
             (collectionNameInput === initialCollectionName &&
-                reportsAreEqual(panelSelectedReports, initialSelectedReports))
+                reportsAreEqual(selectedReports, initialSelectedReports))
         );
-    }, [collectionNameInput, initialCollectionName, panelSelectedReports, initialSelectedReports]);
+    }, [collectionNameInput, initialCollectionName, selectedReports, initialSelectedReports]);
 
     return (
         <>
@@ -721,10 +719,9 @@ export const CollectionPanelContent = ({
                             maxSelectedLabels={4}
                             placeholder='Select reports'
                             showSelectAll={false}
-                            value={panelSelectedReports || []}
+                            value={selectedReports || []}
                             onChange={(e) => {
                                 e.stopPropagation();
-                                setPanelSelectedReports(e.value);
                                 setSelectedReports(e.value);
                             }}
                             pt={{
