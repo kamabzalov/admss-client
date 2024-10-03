@@ -9,20 +9,17 @@ import { getDealPrintFormTemplate } from "http/services/deals.service";
 import { DealPrintForm } from "common/models/deals";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Checkbox } from "primereact/checkbox";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 export const PrintDealForms = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().dealStore;
-    const { printList, getPrintList, isLoading } = store;
+    const toast = useToast();
+    const { printList, isLoading } = store;
 
     const [selectedPrints, setSelectedPrints] = useState<any[] | null>(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (id) {
-            getPrintList(id);
-        }
-    }, [getPrintList, id]);
 
     useEffect(() => {
         if (!selectedPrints?.length) {
@@ -59,7 +56,12 @@ export const PrintDealForms = observer((): ReactElement => {
                     store.isLoading = false;
                 }, 3000);
             } catch (error) {
-                //TODO: handle error
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Error while printing form",
+                    life: TOAST_LIFETIME,
+                });
             } finally {
                 setIsButtonDisabled(false);
             }
