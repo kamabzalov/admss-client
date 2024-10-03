@@ -111,10 +111,10 @@ export default function Reports(): ReactElement {
         }
     };
 
-    const handleUpdateCollection = (itemuid: string) => {
-        if (collectionName) {
+    const handleUpdateCollection = (itemuid: string, editCollectionName?: string) => {
+        if (collectionName || editCollectionName) {
             createReportCollection(authUser!.useruid, {
-                name: collectionName,
+                name: collectionName || editCollectionName,
                 documents: selectedReports,
                 itemuid,
             }).then((response) => {
@@ -266,9 +266,7 @@ export default function Reports(): ReactElement {
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
                                                                         collections={collections}
-                                                                        selectedReports={
-                                                                            selectedReports
-                                                                        }
+                                                                        selectedReports={documents}
                                                                         setCollectionName={
                                                                             setCollectionName
                                                                         }
@@ -277,7 +275,8 @@ export default function Reports(): ReactElement {
                                                                         }
                                                                         handleCreateCollection={() =>
                                                                             handleUpdateCollection(
-                                                                                itemUID
+                                                                                itemUID,
+                                                                                name
                                                                             )
                                                                         }
                                                                     />

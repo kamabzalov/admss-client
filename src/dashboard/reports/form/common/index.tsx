@@ -130,7 +130,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     onClick={handleDuplicateReport}
                     outlined
                 />
-                {!report.isdefault && (
+                {!report.isdefault && report.itemuid && (
                     <Button
                         className='report__icon-button'
                         icon='icon adms-trash-can'

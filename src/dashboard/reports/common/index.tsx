@@ -619,6 +619,8 @@ export const CollectionPanelContent = ({
     const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
     const [initialSelectedReports, setInitialSelectedReports] =
         useState<ReportDocument[]>(selectedReports);
+    const [panelSelectedReports, setPanelSelectedReports] =
+        useState<ReportDocument[]>(selectedReports);
 
     useEffect(() => {
         setInitialCollectionName(collectionName);
@@ -677,9 +679,9 @@ export const CollectionPanelContent = ({
         return (
             !collectionNameInput ||
             (collectionNameInput === initialCollectionName &&
-                reportsAreEqual(selectedReports, initialSelectedReports))
+                reportsAreEqual(panelSelectedReports, initialSelectedReports))
         );
-    }, [collectionNameInput, initialCollectionName, selectedReports, initialSelectedReports]);
+    }, [collectionNameInput, initialCollectionName, panelSelectedReports, initialSelectedReports]);
 
     return (
         <>
@@ -719,9 +721,10 @@ export const CollectionPanelContent = ({
                             maxSelectedLabels={4}
                             placeholder='Select reports'
                             showSelectAll={false}
-                            value={selectedReports || []}
+                            value={panelSelectedReports || []}
                             onChange={(e) => {
                                 e.stopPropagation();
+                                setPanelSelectedReports(e.value);
                                 setSelectedReports(e.value);
                             }}
                             pt={{
