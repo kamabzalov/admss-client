@@ -183,3 +183,22 @@ export const deleteContactBackDL = async (contactuid: string) => {
         }
     }
 };
+
+export const checkContactOFAC = async (contactuid: string = "0") => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `contacts/${contactuid}/check `
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
+    }
+};
