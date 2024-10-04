@@ -51,9 +51,6 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
-let lastCheckedValue = "";
-let lastResolvedValue = true;
-
 export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
@@ -120,23 +117,18 @@ export const InventoryForm = observer(() => {
     }): Yup.ObjectSchema<Partial<PartialInventory>> => {
         const debouncedCheckStockNoAvailability = debounce(
             async (value: string, resolve: (exists: boolean) => void) => {
-                if (lastCheckedValue === value) {
-                    resolve(lastResolvedValue);
+                if (!value || initialStockNo === value) {
+                    resolve(true);
                     return;
                 }
-                if (!value || initialStockNo === value) {
-                    lastCheckedValue = value;
-                    lastResolvedValue = true;
-                    resolve(true);
-                } else {
-                    if (lastCheckedValue === value) {
-                    }
+
+                try {
                     const res = (await checkStockNoAvailability(
                         value
                     )) as unknown as InventoryStockNumber;
-                    lastCheckedValue = value;
-                    lastResolvedValue = !(res && res.status === Status.OK && res.exists);
-                    resolve(lastResolvedValue);
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                } catch (error) {
+                    resolve(true);
                 }
             },
             500
@@ -144,21 +136,16 @@ export const InventoryForm = observer(() => {
 
         const debouncedCheckVINAvailability = debounce(
             async (value: string, resolve: (exists: boolean) => void) => {
-                if (lastCheckedValue === value) {
-                    resolve(lastResolvedValue);
+                if (!value || initialVIN === value) {
+                    resolve(true);
                     return;
                 }
-                if (!value || initialVIN === value) {
-                    lastCheckedValue = value;
-                    lastResolvedValue = true;
-                    resolve(true);
-                } else {
-                    if (lastCheckedValue === value) {
-                    }
+
+                try {
                     const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
-                    lastCheckedValue = value;
-                    lastResolvedValue = !(res && res.status === Status.OK && res.exists);
-                    resolve(lastResolvedValue);
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                } catch (error) {
+                    resolve(true);
                 }
             },
             500
@@ -469,7 +456,9 @@ export const InventoryForm = observer(() => {
                                                     TypeOfFuel: inventory?.TypeOfFuel_id || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
-                                                        inventory?.locationuid || currentLocation,
+                                                        inventory?.locationuid ||
+                                                        currentLocation ||
+                                                        " ",
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                 } as PartialInventory
                                             }
