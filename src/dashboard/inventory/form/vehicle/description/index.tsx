@@ -27,24 +27,23 @@ export const VehicleDescription = observer((): ReactElement => {
     const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
 
     useEffect(() => {
-        getInventoryTransmissionTypesList().then((list) => {
-            list && setTransmissionList(list);
-        });
-        getInventoryFuelTypesList().then((list) => {
-            list && setFuelList(list);
-        });
-        getInventoryDrivelineList().then((list) => {
-            list && setDriveLineList(list);
-        });
-        getInventoryCylindersList().then((list) => {
-            list && setCylindersList(list);
-        });
-        getInventoryEngineList().then((list) => {
-            list && setEngineList(list);
-        });
-        getInventoryBodyTypesList().then((list) => {
-            list && setBodyTypeList(list);
-        });
+        const fetchData = async () => {
+            const [transmission, fuel, driveline, cylinders, engine, bodyType] = await Promise.all([
+                getInventoryTransmissionTypesList(),
+                getInventoryFuelTypesList(),
+                getInventoryDrivelineList(),
+                getInventoryCylindersList(),
+                getInventoryEngineList(),
+                getInventoryBodyTypesList(),
+            ]);
+            setTransmissionList(transmission || []);
+            setFuelList(fuel || []);
+            setDriveLineList(driveline || []);
+            setCylindersList(cylinders || []);
+            setEngineList(engine || []);
+            setBodyTypeList(bodyType || []);
+        };
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -63,7 +62,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={String(inventory.Transmission_id)}
+                        value={inventory.Transmission_id?.toString() || ""}
                         onChange={({ value }) => {
                             changeInventory({ key: "Transmission_id", value });
                         }}
@@ -80,7 +79,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={String(inventory.BodyStyle_id)}
+                        value={inventory.BodyStyle_id?.toString() || ""}
                         onChange={({ value }) => {
                             changeInventory({ key: "BodyStyle_id", value });
                         }}
@@ -99,7 +98,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionValue='id'
                         filter
                         options={fuelList}
-                        value={String(inventory.TypeOfFuel_id)}
+                        value={inventory.TypeOfFuel_id?.toString() || ""}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel_id", value);
                             changeInventory({ key: "TypeOfFuel_id", value });
@@ -119,7 +118,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={String(inventory.DriveLine_id)}
+                        value={inventory.DriveLine_id?.toString() || ""}
                         onChange={({ value }) => {
                             changeInventory({ key: "DriveLine_id", value });
                         }}
@@ -137,7 +136,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='id'
                         filter
-                        value={String(inventory.Cylinders_id)}
+                        value={inventory.Cylinders_id?.toString() || ""}
                         onChange={({ value }) => {
                             changeInventory({ key: "Cylinders_id", value });
                         }}
@@ -154,7 +153,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='id'
-                        value={String(inventory.Engine_id)}
+                        value={inventory.Engine_id?.toString() || ""}
                         filter
                         onChange={({ value }) => {
                             changeInventory({ key: "Engine_id", value });
