@@ -1,16 +1,19 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
 import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList } from "http/services/contacts-service";
+import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface ContactsGeneralInfoProps {
     type?: "buyer" | "co-buyer";
@@ -21,8 +24,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
     const { contact, changeContact } = store;
+    const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
-
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
     useEffect(() => {
@@ -34,6 +38,27 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         });
     }, [id]);
 
+    const handleScanDL = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            scanContactDL(file).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+            event.target.value = "";
+        }
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
@@ -42,6 +67,14 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     label='Scan driver license'
                     className='general-info__button'
                     outlined
+                    onClick={handleScanDL}
+                />
+                <input
+                    type='file'
+                    accept='image/*'
+                    style={{ display: "none" }}
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
                 />
             </div>
             <div className='col-9'>

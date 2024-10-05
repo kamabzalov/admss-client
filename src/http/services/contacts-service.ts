@@ -202,3 +202,31 @@ export const checkContactOFAC = async (contactuid: string = "0") => {
         }
     }
 };
+
+export const scanContactDL = async (dlImage: File) => {
+    try {
+        const formData = new FormData();
+        formData.append("dlImage", dlImage);
+
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            "decoder/dlbarcode",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
+    }
+};
