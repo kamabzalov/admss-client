@@ -1,28 +1,35 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
 import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList } from "http/services/contacts-service";
+import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+
+const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
 interface ContactsGeneralInfoProps {
-    type?: "buyer" | "co-buyer";
+    type?: typeof BUYER | typeof CO_BUYER;
 }
 
 export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, changeContact } = store;
+    const { contact, changeContact, contactExtData, changeContactExtData } = store;
+    const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
-
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
     useEffect(() => {
@@ -34,6 +41,27 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         });
     }, [id]);
 
+    const handleScanDL = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            scanContactDL(file).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+            event.target.value = "";
+        }
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
@@ -42,6 +70,14 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     label='Scan driver license'
                     className='general-info__button'
                     outlined
+                    onClick={handleScanDL}
+                />
+                <input
+                    type='file'
+                    accept='image/*'
+                    style={{ display: "none" }}
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
                 />
             </div>
             <div className='col-9'>
@@ -97,10 +133,18 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         className={`general-info__text-input w-full ${
                             errors.firstName ? "p-invalid" : ""
                         }`}
-                        value={contact.firstName || ""}
+                        value={
+                            (type === BUYER
+                                ? contact.firstName
+                                : contactExtData.CoBuyer_First_Name) || ""
+                        }
                         onChange={({ target: { value } }) => {
-                            setFieldValue("firstName", value);
-                            changeContact("firstName", value);
+                            if (type === BUYER) {
+                                setFieldValue("firstName", value);
+                                changeContact("firstName", value);
+                            } else {
+                                changeContactExtData("CoBuyer_First_Name", value);
+                            }
                         }}
                     />
                     <label className='float-label'>
@@ -115,9 +159,17 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='general-info__text-input w-full'
-                        value={contact.middleName || ""}
+                        value={
+                            (type === BUYER
+                                ? contact.middleName
+                                : contactExtData.CoBuyer_Middle_Name) || ""
+                        }
                         onChange={({ target: { value } }) => {
-                            changeContact("middleName", value);
+                            if (type === BUYER) {
+                                changeContact("middleName", value);
+                            } else {
+                                changeContactExtData("CoBuyer_Middle_Name", value);
+                            }
                         }}
                     />
                     <label className='float-label'>Middle Name</label>
@@ -130,10 +182,18 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         className={`general-info__text-input w-full ${
                             errors.lastName ? "p-invalid" : ""
                         }`}
-                        value={contact.lastName || ""}
+                        value={
+                            (type === BUYER
+                                ? contact.lastName
+                                : contactExtData.CoBuyer_Last_Name) || ""
+                        }
                         onChange={({ target: { value } }) => {
-                            setFieldValue("lastName", value);
-                            changeContact("lastName", value);
+                            if (type === BUYER) {
+                                setFieldValue("lastName", value);
+                                changeContact("lastName", value);
+                            } else {
+                                changeContactExtData("CoBuyer_Last_Name", value);
+                            }
                         }}
                     />
                     <label className='float-label'>

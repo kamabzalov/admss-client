@@ -1,5 +1,4 @@
-import { ContactAccordionItems } from "dashboard/contacts/common/step-navigation";
-import { Inventory } from "dashboard/inventory/common";
+import { Contact, ContactAccordionItems } from "dashboard/contacts/common/step-navigation";
 import { lazy } from "react";
 
 const ContactsBuyerInfo = lazy(() =>
@@ -9,10 +8,18 @@ const ContactsCoBuyerInfo = lazy(() =>
     import("./co-buyer-info").then((module) => ({ default: module.ContactsCoBuyerInfo }))
 );
 
-export const GeneralInfoData: Pick<Inventory, "label" | "items"> = {
+export enum GENERAL_CONTACT_TYPE {
+    BUYER = "buyer",
+    CO_BUYER = "co-buyer",
+}
+
+export const GeneralInfoData: Pick<Contact, "label" | "items"> = {
     label: "General information",
     items: [
-        { itemLabel: ContactAccordionItems.BUYER, component: <ContactsBuyerInfo /> },
+        {
+            itemLabel: ContactAccordionItems.BUYER,
+            component: <ContactsBuyerInfo />,
+        },
         { itemLabel: ContactAccordionItems.CO_BUYER, component: <ContactsCoBuyerInfo /> },
     ],
 };
