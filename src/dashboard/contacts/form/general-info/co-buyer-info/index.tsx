@@ -7,21 +7,23 @@ import { ContactsIdentificationInfo } from "dashboard/contacts/form/general-info
 import { ContactsOfacCheck } from "dashboard/contacts/form/general-info/tabs/ofac-check";
 import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
+const { CO_BUYER } = GENERAL_CONTACT_TYPE;
+
 export const ContactsCoBuyerInfo = observer((): ReactElement => {
     return (
         <div className='col-12'>
             <TabView className='contact-form__tabs'>
                 <TabPanel header='General'>
-                    <ContactsGeneralInfo type={GENERAL_CONTACT_TYPE.CO_BUYER} />
+                    <ContactsGeneralInfo type={CO_BUYER} />
                 </TabPanel>
                 <TabPanel header='Address'>
-                    <ContactsAddressInfo type={GENERAL_CONTACT_TYPE.CO_BUYER} />
+                    <ContactsAddressInfo type={CO_BUYER} />
                 </TabPanel>
                 <TabPanel header='Identification'>
-                    <ContactsIdentificationInfo type={GENERAL_CONTACT_TYPE.CO_BUYER} />
+                    <ContactsIdentificationInfo type={CO_BUYER} />
                 </TabPanel>
                 <TabPanel header='OFAC CHECK'>
-                    <ContactsOfacCheck type={GENERAL_CONTACT_TYPE.CO_BUYER} />
+                    <ContactsOfacCheck type={CO_BUYER} />
                 </TabPanel>
             </TabView>
         </div>

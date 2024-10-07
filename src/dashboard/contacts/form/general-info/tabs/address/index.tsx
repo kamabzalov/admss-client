@@ -8,13 +8,15 @@ import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
+const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
+
 interface ContactsAddressInfoProps {
-    type?: GENERAL_CONTACT_TYPE.BUYER | GENERAL_CONTACT_TYPE.CO_BUYER;
+    type?: typeof BUYER | typeof CO_BUYER;
 }
 
 export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps): ReactElement => {
     const store = useStore().contactStore;
-    const { contact, changeContact } = store;
+    const { contact, changeContact, contactExtData, changeContactExtData } = store;
     const [isSameAsMailing, setIsSameAsMailing] = useState<boolean>(true);
 
     return (
@@ -23,8 +25,16 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.streetAddress || ""}
-                        onChange={({ target: { value } }) => changeContact("streetAddress", value)}
+                        value={
+                            (type === BUYER
+                                ? contact.streetAddress
+                                : contactExtData.CoBuyer_Emp_Address) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("streetAddress", value)
+                                : changeContactExtData("CoBuyer_Emp_Address", value)
+                        }
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
@@ -35,9 +45,15 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     optionValue='id'
                     filter
                     placeholder='State'
-                    value={contact.state || ""}
+                    value={
+                        (type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State) || ""
+                    }
                     options={STATES_LIST}
-                    onChange={({ target: { value } }) => changeContact("state", value)}
+                    onChange={({ target: { value } }) =>
+                        type === BUYER
+                            ? changeContact("state", value)
+                            : changeContactExtData("CoBuyer_Emp_State", value)
+                    }
                     className='w-full address-info__dropdown'
                 />
             </div>
@@ -46,8 +62,14 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.city || ""}
-                        onChange={({ target: { value } }) => changeContact("city", value)}
+                        value={
+                            (type === BUYER ? contact.city : contactExtData.CoBuyer_Emp_City) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("city", value)
+                                : changeContactExtData("CoBuyer_Emp_City", value)
+                        }
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -57,8 +79,14 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={contact.ZIP || ""}
-                        onChange={({ target: { value } }) => changeContact("ZIP", value)}
+                        value={
+                            (type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Emp_Zip) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("ZIP", value)
+                                : changeContactExtData("CoBuyer_Emp_Zip", value)
+                        }
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>
@@ -88,9 +116,15 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='mailing-address-info__text-input w-full'
-                        value={contact.mailStreetAddress || ""}
+                        value={
+                            (type === BUYER
+                                ? contact.mailStreetAddress
+                                : contactExtData.CoBuyer_Mailing_Address) || ""
+                        }
                         onChange={({ target: { value } }) =>
-                            store.changeContact("mailStreetAddress", value)
+                            type === BUYER
+                                ? changeContact("mailStreetAddress", value)
+                                : changeContactExtData("CoBuyer_Mailing_Address", value)
                         }
                     />
                     <label className='float-label'>Street address</label>
@@ -102,8 +136,16 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     optionValue='id'
                     filter
                     placeholder='State'
-                    value={contact.mailState || ""}
-                    onChange={({ target: { value } }) => store.changeContact("mailState", value)}
+                    value={
+                        (type === BUYER
+                            ? contact.mailState
+                            : contactExtData.CoBuyer_Mailing_State) || ""
+                    }
+                    onChange={({ target: { value } }) =>
+                        type === BUYER
+                            ? changeContact("mailState", value)
+                            : changeContactExtData("CoBuyer_Mailing_State", value)
+                    }
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
                 />
@@ -113,8 +155,16 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='mailing-address-info__text-input w-full'
-                        value={contact.mailCity || ""}
-                        onChange={({ target: { value } }) => store.changeContact("mailCity", value)}
+                        value={
+                            (type === BUYER
+                                ? contact.mailCity
+                                : contactExtData.CoBuyer_Mailing_City) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("mailCity", value)
+                                : changeContactExtData("CoBuyer_Mailing_City", value)
+                        }
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -124,8 +174,16 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <span className='p-float-label'>
                     <InputText
                         className='mailing-address-info__text-input w-full'
-                        value={contact.mailZIP || ""}
-                        onChange={({ target: { value } }) => store.changeContact("mailZIP", value)}
+                        value={
+                            (type === BUYER
+                                ? contact.mailZIP
+                                : contactExtData.CoBuyer_Mailing_Zip) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("mailZIP", value)
+                                : changeContactExtData("CoBuyer_Mailing_Zip", value)
+                        }
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>

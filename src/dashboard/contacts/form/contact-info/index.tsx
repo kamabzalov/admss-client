@@ -1,5 +1,4 @@
-import { ContactAccordionItems } from "dashboard/contacts/common/step-navigation";
-import { Inventory } from "dashboard/inventory/common";
+import { Contact, ContactAccordionItems } from "dashboard/contacts/common/step-navigation";
 import { lazy } from "react";
 
 const ContactsSocialInfo = lazy(() =>
@@ -12,7 +11,7 @@ const ContactsProspecting = lazy(() =>
     import("./prospecting").then((module) => ({ default: module.ContactsProspecting }))
 );
 
-export const ContactInfoData: Pick<Inventory, "label" | "items"> = {
+export const ContactInfoData: Pick<Contact, "label" | "items"> = {
     label: "Contact Information",
     items: [
         { itemLabel: ContactAccordionItems.CONTACTS, component: <ContactsSocialInfo /> },
