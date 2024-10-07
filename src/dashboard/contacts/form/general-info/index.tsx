@@ -9,6 +9,11 @@ const ContactsCoBuyerInfo = lazy(() =>
     import("./co-buyer-info").then((module) => ({ default: module.ContactsCoBuyerInfo }))
 );
 
+export enum GENERAL_CONTACT_TYPE {
+    BUYER = "buyer",
+    CO_BUYER = "co-buyer",
+}
+
 export const GeneralInfoData: Pick<Inventory, "label" | "items"> = {
     label: "General information",
     items: [

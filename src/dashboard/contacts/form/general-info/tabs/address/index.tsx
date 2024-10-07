@@ -6,9 +6,10 @@ import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
+import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
 interface ContactsAddressInfoProps {
-    type?: "buyer" | "co-buyer";
+    type?: GENERAL_CONTACT_TYPE.BUYER | GENERAL_CONTACT_TYPE.CO_BUYER;
 }
 
 export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps): ReactElement => {

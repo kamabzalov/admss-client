@@ -7,6 +7,7 @@ import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
+import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
 const SexList = [
     {
@@ -20,7 +21,7 @@ const SexList = [
 const BUYER_TYPE_ID = 1;
 
 interface ContactsIdentificationInfoProps {
-    type?: "buyer" | "co-buyer";
+    type?: GENERAL_CONTACT_TYPE.BUYER | GENERAL_CONTACT_TYPE.CO_BUYER;
 }
 
 export const ContactsIdentificationInfo = observer(

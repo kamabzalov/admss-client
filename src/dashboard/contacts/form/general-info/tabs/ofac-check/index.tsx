@@ -9,9 +9,10 @@ import { ContactOFAC } from "common/models/contact";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
 interface ContactsOfacCheckProps {
-    type?: "buyer" | "co-buyer";
+    type?: GENERAL_CONTACT_TYPE.BUYER | GENERAL_CONTACT_TYPE.CO_BUYER;
 }
 
 export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): ReactElement => {
