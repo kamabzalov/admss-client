@@ -143,7 +143,7 @@ export const ContactsIdentificationInfo = observer(
             const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
             return (
                 <div
-                    className={`col-6 flex justify-content-center m-auto flex-wrap mb-3 dl-header ${
+                    className={`col-6 flex justify-content-center ml-auto flex-wrap mb-3 dl-header ${
                         size ? "dl-header__active" : ""
                     }`}
                 >
@@ -154,16 +154,15 @@ export const ContactsIdentificationInfo = observer(
 
         const emptyTemplate = (side: DLSide) => {
             return (
-                <div className='grid'>
-                    <div className='col-6'>
+                <div className='grid upload-empty'>
+                    <div className='col-6 flex align-items-center justify-content-center upload-empty__image'>
                         <img
                             alt={`empty ${DLSides.FRONT} DL`}
                             src={side === DLSides.FRONT ? dlFrontImage : dlBackImage}
-                            className='mr-2 dropdown-icon'
                         />
                     </div>
                     <div className='col-6 flex align-items-center flex-column'>
-                        <img alt='upload icon' src={uploadImage} className='mr-2 dropdown-icon' />
+                        <img alt='upload icon' src={uploadImage} className='upload-empty__icon' />
                         <span className='text-center dl__upload-icon-label'>
                             Drag and Drop Images Here
                         </span>
@@ -332,12 +331,17 @@ export const ContactsIdentificationInfo = observer(
                                     ref={fileUploadFrontRef}
                                     accept='image/*'
                                     headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
+                                    chooseLabel='Choose from files'
+                                    chooseOptions={{
+                                        icon: <></>,
+                                    }}
                                     itemTemplate={(file) =>
                                         itemTemplate(file as File, DLSides.FRONT)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.FRONT)}
                                     onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
                                     progressBarTemplate={<></>}
+                                    className='contact-upload'
                                 />
                             )}
                         </div>
@@ -356,11 +360,16 @@ export const ContactsIdentificationInfo = observer(
                                     ref={fileUploadBackRef}
                                     accept='image/*'
                                     headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
+                                    chooseLabel='Choose from files'
+                                    chooseOptions={{
+                                        icon: <></>,
+                                    }}
                                     itemTemplate={(file) =>
                                         itemTemplate(file as File, DLSides.BACK)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.BACK)}
                                     onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
+                                    className='contact-upload'
                                     progressBarTemplate={<></>}
                                 />
                             )}

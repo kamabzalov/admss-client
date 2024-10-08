@@ -13,3 +13,49 @@
     text-transform: uppercase;
     font-weight: 700;
 }
+
+.identification-dl__title {
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-family: "Open Sans", sans-serif;
+    padding-bottom: 20px;
+}
+
+.contact-upload {
+    display: flex;
+    flex-direction: column-reverse;
+    background-color: var(--admss-app-white-blue);
+    border-radius: 5px;
+    border: 1px dotted var(--admss-app-medium-blue);
+    height: 282px;
+}
+
+.contact-upload .upload-empty__image {
+    translate: 0 25%;
+}
+
+.contact-upload .upload-empty__icon {
+    width: 50px;
+    height: 40px;
+    margin: 20px 0 10px;
+}
+
+.contact-upload .p-fileupload-content {
+    background-color: transparent;
+    border: none;
+    padding-bottom: 0;
+}
+
+.contact-upload .p-button {
+    background-color: var(--admss-app-main-blue);
+    border: none;
+    outline: none;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.contact-upload .p-button:enabled:hover,
+.p-button:not(button):not(a):not(.p-disabled):hover {
+    background-color: var(--admss-app-medium-blue);
+}
