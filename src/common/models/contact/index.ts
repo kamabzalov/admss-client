@@ -286,15 +286,21 @@ export interface Contact extends BaseResponseError {
     useruid: string;
 }
 
+export enum OFAC_CHECK_STATUS {
+    PASSED = "PASSED",
+    FAILED = "FAILED",
+}
+
 export interface ContactOFAC extends BaseResponseError {
-    check_status: string;
-    created: string;
-    updated: string;
-    listid: number;
-    dob: string;
-    firstname: string;
-    lastname: string;
-    details: string;
+    check_status: OFAC_CHECK_STATUS;
+    blacklist?: string;
+    created?: string;
+    updated?: string;
+    listid?: number;
+    dob?: string;
+    firstname?: string;
+    lastname?: string;
+    details?: string;
 }
 
 export interface ContactCheckOFAC extends Contact {
