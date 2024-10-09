@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
@@ -17,7 +17,36 @@ interface ContactsAddressInfoProps {
 export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps): ReactElement => {
     const store = useStore().contactStore;
     const { contact, changeContact, contactExtData, changeContactExtData } = store;
-    const [isSameAsMailing, setIsSameAsMailing] = useState<boolean>(true);
+    const [isSameAsMailing, setIsSameAsMailing] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isSameAsMailing) {
+            if (type === BUYER) {
+                changeContact("mailStreetAddress", contact.streetAddress);
+                changeContact("mailState", contact.state);
+                changeContact("mailCity", contact.city);
+                changeContact("mailZIP", contact.ZIP);
+            } else {
+                changeContactExtData("CoBuyer_Mailing_Address", contactExtData.CoBuyer_Emp_Address);
+                changeContactExtData("CoBuyer_Mailing_State", contactExtData.CoBuyer_Emp_State);
+                changeContactExtData("CoBuyer_Mailing_City", contactExtData.CoBuyer_Emp_City);
+                changeContactExtData("CoBuyer_Mailing_Zip", contactExtData.CoBuyer_Emp_Zip);
+            }
+        }
+    }, [
+        isSameAsMailing,
+        contact.streetAddress,
+        contact.state,
+        contact.city,
+        contact.ZIP,
+        contactExtData.CoBuyer_Emp_Address,
+        contactExtData.CoBuyer_Emp_State,
+        contactExtData.CoBuyer_Emp_City,
+        contactExtData.CoBuyer_Emp_Zip,
+        type,
+        changeContact,
+        changeContactExtData,
+    ]);
 
     return (
         <div className='grid address-info row-gap-2'>
@@ -126,6 +155,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailStreetAddress", value)
                                 : changeContactExtData("CoBuyer_Mailing_Address", value)
                         }
+                        disabled={isSameAsMailing}
                     />
                     <label className='float-label'>Street address</label>
                 </span>
@@ -148,6 +178,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     }
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
+                    disabled={isSameAsMailing}
                 />
             </div>
 
@@ -165,6 +196,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailCity", value)
                                 : changeContactExtData("CoBuyer_Mailing_City", value)
                         }
+                        disabled={isSameAsMailing}
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -184,6 +216,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailZIP", value)
                                 : changeContactExtData("CoBuyer_Mailing_Zip", value)
                         }
+                        disabled={isSameAsMailing}
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>

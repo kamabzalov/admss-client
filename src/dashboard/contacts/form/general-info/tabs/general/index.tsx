@@ -32,6 +32,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
+    const [savedFirstName, setSavedFirstName] = useState<string>("");
+    const [savedLastName, setSavedLastName] = useState<string>("");
+    const [savedMiddleName, setSavedMiddleName] = useState<string>("");
+    const [savedBusinessName, setSavedBusinessName] = useState<string>("");
+
     useEffect(() => {
         getContactsTypeList(id || "0").then((response) => {
             if (response) {
@@ -61,6 +66,91 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
             event.target.value = "";
         }
     };
+
+    const isBusinessNameRequired = REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
+
+    const isNameFieldsFilled = () => {
+        if (type === BUYER) {
+            return contact.firstName?.trim() !== "" || contact.lastName?.trim() !== "";
+        } else {
+            return (
+                contactExtData.CoBuyer_First_Name?.trim() !== "" ||
+                contactExtData.CoBuyer_Last_Name?.trim() !== ""
+            );
+        }
+    };
+
+    const shouldDisableNameFields =
+        isBusinessNameRequired || (contact.businessName && contact.businessName?.trim() !== "");
+
+    const shouldDisableBusinessName = !isBusinessNameRequired && isNameFieldsFilled();
+
+    useEffect(() => {
+        if (shouldDisableNameFields) {
+            if (type === BUYER) {
+                setSavedFirstName(contact.firstName);
+                setSavedLastName(contact.lastName);
+                setSavedMiddleName(contact.middleName);
+                setFieldValue("firstName", "");
+                setFieldValue("lastName", "");
+                changeContact("firstName", "");
+                changeContact("lastName", "");
+                changeContact("middleName", "");
+            } else {
+                setSavedFirstName(contactExtData.CoBuyer_First_Name);
+                setSavedLastName(contactExtData.CoBuyer_Last_Name);
+                setSavedMiddleName(contactExtData.CoBuyer_Middle_Name);
+                changeContactExtData("CoBuyer_First_Name", "");
+                changeContactExtData("CoBuyer_Last_Name", "");
+                changeContactExtData("CoBuyer_Middle_Name", "");
+            }
+        } else {
+            if (type === BUYER) {
+                if (!contact.firstName && savedFirstName) {
+                    setFieldValue("firstName", savedFirstName);
+                    changeContact("firstName", savedFirstName);
+                }
+                if (!contact.lastName && savedLastName) {
+                    setFieldValue("lastName", savedLastName);
+                    changeContact("lastName", savedLastName);
+                }
+                if (!contact.middleName && savedMiddleName) {
+                    changeContact("middleName", savedMiddleName);
+                }
+            } else {
+                if (!contactExtData.CoBuyer_First_Name && savedFirstName) {
+                    changeContactExtData("CoBuyer_First_Name", savedFirstName);
+                }
+                if (!contactExtData.CoBuyer_Last_Name && savedLastName) {
+                    changeContactExtData("CoBuyer_Last_Name", savedLastName);
+                }
+                if (!contactExtData.CoBuyer_Middle_Name && savedMiddleName) {
+                    changeContactExtData("CoBuyer_Middle_Name", savedMiddleName);
+                }
+            }
+        }
+    }, [shouldDisableNameFields, contact.businessName, contact.type, type]);
+
+    useEffect(() => {
+        if (shouldDisableBusinessName) {
+            setSavedBusinessName(contact.businessName);
+            setFieldValue("businessName", "");
+            changeContact("businessName", "");
+        } else {
+            if (!contact.businessName && savedBusinessName) {
+                setFieldValue("businessName", savedBusinessName);
+                changeContact("businessName", savedBusinessName);
+            }
+        }
+    }, [
+        shouldDisableBusinessName,
+        contact.firstName,
+        contact.lastName,
+        contactExtData.CoBuyer_First_Name,
+        contactExtData.CoBuyer_Last_Name,
+        contact.type,
+        type,
+    ]);
 
     return (
         <div className='grid general-info row-gap-2'>
@@ -146,10 +236,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_First_Name", value);
                             }
                         }}
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
                         First Name
-                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {!isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.firstName}</small>
@@ -171,6 +262,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Middle_Name", value);
                             }
                         }}
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>Middle Name</label>
                 </span>
@@ -195,10 +287,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Last_Name", value);
                             }
                         }}
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
                         Last Name
-                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {!isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.lastName}</small>
@@ -212,10 +305,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         }`}
                         value={contact.businessName || ""}
                         onChange={({ target: { value } }) => changeContact("businessName", value)}
+                        disabled={shouldDisableBusinessName}
                     />
                     <label className='float-label'>
                         Business Name
-                        {REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.businessName}</small>

@@ -26,10 +26,10 @@ import uploadImage from "assets/images/upload.svg";
 
 const SexList = [
     {
-        name: "M",
+        name: "Male",
     },
     {
-        name: "F",
+        name: "Female",
     },
 ];
 
@@ -142,11 +142,7 @@ export const ContactsIdentificationInfo = observer(
         ) => {
             const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
             return (
-                <div
-                    className={`col-6 flex justify-content-center ml-auto flex-wrap mb-3 dl-header ${
-                        size ? "dl-header__active" : ""
-                    }`}
-                >
+                <div className={`col-6 dl-header ${size ? "dl-header__active" : ""}`}>
                     {chooseButton}
                 </div>
             );
@@ -309,12 +305,7 @@ export const ContactsIdentificationInfo = observer(
                 </div>
                 {id && (
                     <>
-                        <div className='flex col-12'>
-                            <h3 className='identification__title m-0 pr-3'>
-                                Driver license's photos
-                            </h3>
-                            <hr className='identification__line flex-1' />
-                        </div>
+                        <hr className='form-line' />
 
                         <div
                             className={`col-6 identification-dl ${
