@@ -1,8 +1,12 @@
-.account-info__button {
+.account-info__button.p-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    color: var(--admss-app-main-blue);
     height: 60px;
     font-weight: 700;
     width: 100%;
+    &:hover {
+        color: var(--admss-app-medium-blue);
+    }
 }

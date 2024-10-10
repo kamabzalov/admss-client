@@ -33,6 +33,10 @@
 .add-fee__input {
     display: inline-flex;
     flex: 1 1 100%;
+
+    .p-inputnumber-input {
+        color: var(--admss-app-light-grey);
+    }
 }
 
 .add-fee__area {

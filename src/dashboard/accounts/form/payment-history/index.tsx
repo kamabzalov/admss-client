@@ -6,7 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteHistoryInfo, listAccountHistory } from "http/services/accounts.service";
+import { deletePaymentInfo, listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
 import {
@@ -71,16 +71,19 @@ export const AccountPaymentHistory = (): ReactElement => {
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
 
-    useEffect(() => {
+    const getNotesData = async () => {
         if (id) {
-            listAccountHistory(id).then((res) => {
-                if (Array.isArray(res) && res.length) {
-                    setHistoryList(res);
-                    setSelectedRows(Array(res.length).fill(false));
-                }
-            });
+            const res = await listAccountHistory(id);
+            if (Array.isArray(res) && res.length) {
+                setHistoryList(res);
+                setSelectedRows(Array(res.length).fill(false));
+            }
         }
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
+    };
+
+    useEffect(() => {
+        getNotesData();
     }, [id]);
 
     const getShortReports = async (currentData: AccountHistory[], print = false) => {
@@ -194,7 +197,7 @@ export const AccountPaymentHistory = (): ReactElement => {
 
                 try {
                     const deletePromises = currentData.map((item) =>
-                        deleteHistoryInfo(item.itemuid)
+                        deletePaymentInfo(item.itemuid)
                     );
 
                     await Promise.all(deletePromises);
@@ -467,20 +470,29 @@ export const AccountPaymentHistory = (): ReactElement => {
                 )}
             </div>
             <AddPaymentNoteDialog
-                action={() => setPaymentDialogVisible(false)}
+                position='top'
+                action={() => {
+                    setPaymentDialogVisible(false);
+                    getNotesData();
+                }}
                 onHide={() => setPaymentDialogVisible(false)}
                 payments={historyList.filter((_, index) => selectedRows[index])}
                 visible={paymentDialogVisible}
                 accountuid={id}
             />
             <AddNoteDialog
-                action={() => setNoteDialogVisible(false)}
+                position='top'
+                action={() => {
+                    setNoteDialogVisible(false);
+                    getNotesData();
+                }}
                 onHide={() => setNoteDialogVisible(false)}
                 visible={noteDialogVisible}
                 accountuid={id}
             />
             <ConfirmModal
                 visible={!!modalVisible}
+                position='top'
                 title={modalTitle}
                 icon='pi-exclamation-triangle'
                 bodyMessage={modalText}

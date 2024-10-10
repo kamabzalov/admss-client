@@ -108,6 +108,8 @@
     .p-inputnumber {
         height: var(--input-regular);
         width: 66%;
+        font-size: 14px;
+        color: var(--admss-app-light-grey);
     }
 
     .currency-item .p-inputnumber {

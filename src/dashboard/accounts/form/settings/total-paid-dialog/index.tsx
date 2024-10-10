@@ -98,6 +98,7 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
     return (
         <DashboardDialog
             className='dialog__total-paid total-paid'
+            position='top'
             footer='Save'
             header='Total Paid'
             visible={visible}

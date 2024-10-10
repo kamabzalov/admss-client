@@ -65,6 +65,7 @@
     margin-left: 6px;
     margin-right: 30px;
     color: var(--admss-app-primary-main-green);
+    text-transform: uppercase;
 }
 
 .p-paginator .p-dropdown .p-inputtext {
@@ -311,6 +312,10 @@
     width: 30px;
 }
 
+.p-menu .p-menuitem-link {
+    height: 32px;
+}
+
 .p-menu .p-menuitem-link:not(.p-disabled):hover {
     background: var(--admss-app-light-green);
 }
@@ -417,6 +422,10 @@
 .p-autocomplete-dd .p-autocomplete-dropdown:hover {
     background: transparent;
     color: var(--admss-app-blue-text);
+}
+
+.p-datepicker:not(.p-datepicker-inline) .p-datepicker-header {
+    background: var(--admss-app-white);
 }
 
 @media screen and (min-width: 992px) {
