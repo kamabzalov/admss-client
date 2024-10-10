@@ -5,12 +5,13 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { addAccountNote } from "http/services/accounts.service";
+import { DialogProps } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
 
-interface AddNoteDialogProps {
+interface AddNoteDialogProps extends DialogProps {
     visible: boolean;
     accountuid?: string;
     action: () => void;
@@ -22,6 +23,7 @@ export const AddNoteDialog = ({
     onHide,
     action,
     accountuid,
+    ...props
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
     const userStore = useStore().userStore;
@@ -80,6 +82,7 @@ export const AddNoteDialog = ({
             onHide={onHide}
             action={handleAddNote}
             buttonDisabled={isButtonDisabled}
+            {...props}
         >
             <div className='grid gap-3'>
                 <div className='add-note__info m-3'>

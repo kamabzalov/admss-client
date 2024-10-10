@@ -18,6 +18,7 @@ export const DashboardDialog = ({
     action,
     buttonDisabled,
     cancelButton,
+    ...props
 }: DashboardDialogProps) => {
     return (
         <Dialog
@@ -26,6 +27,7 @@ export const DashboardDialog = ({
             className={`dialog ${className}`}
             visible={visible}
             onHide={onHide}
+            {...props}
         >
             <div className='p-dialog-content-body'>{children}</div>
 

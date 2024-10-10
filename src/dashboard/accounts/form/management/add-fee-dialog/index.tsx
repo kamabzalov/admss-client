@@ -2,7 +2,7 @@ import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { addAccountFee } from "http/services/accounts.service";
@@ -52,10 +52,20 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                 });
             } else {
                 action && action();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Fee added successfully!",
+                    life: TOAST_LIFETIME,
+                });
                 onHide();
             }
         });
     };
+
+    const buttonDisabled = useMemo(() => {
+        return !addFee.type || !addFee.amount || !addFee.reason || !addFee.description;
+    }, [addFee]);
 
     return (
         <DashboardDialog
@@ -65,11 +75,14 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
             visible={visible}
             onHide={onHide}
             action={handleSaveAddFee}
+            buttonDisabled={buttonDisabled}
             cancelButton
         >
             <span className='p-float-label'>
                 <Dropdown
                     className='w-full'
+                    value={addFee.type}
+                    onChange={({ value }) => setAddFee({ ...addFee, type: value })}
                     options={dropdownOptions}
                     pt={{
                         wrapper: {
@@ -90,7 +103,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                 <label className='float-label'>Other</label>
             </span>
 
-            <div className='splitter my-3'>
+            <div className='splitter mb-2'>
                 <hr className='splitter__line flex-1' />
             </div>
 

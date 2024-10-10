@@ -232,7 +232,7 @@ export const AccountManagement = (): ReactElement => {
                     <DataTable
                         showGridlines
                         value={activityList}
-                        emptyMessage='No activity yet.'
+                        emptyMessage='No data yet.'
                         reorderableColumns
                         resizableColumns
                         scrollable

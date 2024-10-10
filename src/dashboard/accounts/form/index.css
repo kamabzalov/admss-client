@@ -163,3 +163,8 @@
         display: none;
     }
 }
+
+.account__body .p-datatable:has(.p-datatable-emptymessage) .p-datatable-thead > tr > th,
+.account__body .p-datatable:has(.p-datatable-emptymessage) .p-datatable-tbody > tr > td {
+    border: none;
+}
