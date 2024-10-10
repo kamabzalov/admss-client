@@ -126,6 +126,10 @@
     width: 455px;
     height: 451px;
     color: var(--admss-app-primary);
+
+    .confirm-body {
+        max-width: 350px;
+    }
 }
 
 .contact-missed-data-dialog {

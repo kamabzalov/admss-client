@@ -173,7 +173,7 @@ export const ContactForm = observer((): ReactElement => {
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (isContactChanged) {
-                // event.preventDefault();
+                event.preventDefault();
             }
         };
 
@@ -374,9 +374,6 @@ export const ContactForm = observer((): ReactElement => {
                             <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
                                     onClick={() => {
-                                        if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/contacts`);
-                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
@@ -385,6 +382,8 @@ export const ContactForm = observer((): ReactElement => {
                                     }}
                                     className='form-nav__button'
                                     outlined
+                                    disabled={stepActiveIndex <= 0}
+                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
                                 >
                                     Back
                                 </Button>
@@ -425,6 +424,7 @@ export const ContactForm = observer((): ReactElement => {
                 draggable={false}
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'
+                resizable={false}
                 className='contact-confirm-dialog'
                 onHide={() => setIsConfirmVisible(false)}
             />
