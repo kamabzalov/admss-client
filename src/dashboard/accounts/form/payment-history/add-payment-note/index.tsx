@@ -1,7 +1,7 @@
 import { AccountHistory } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { DashboardDialog } from "dashboard/common/dialog";
+import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { setOrUpdateHistoryInfo } from "http/services/accounts.service";
@@ -9,7 +9,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
 
-interface AddNoteDialogProps {
+interface AddNoteDialogProps extends DashboardDialogProps {
     visible: boolean;
     accountuid?: string;
     action: () => void;
@@ -23,6 +23,7 @@ export const AddPaymentNoteDialog = ({
     action,
     accountuid,
     payments,
+    ...props
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
     const userStore = useStore().userStore;
@@ -80,6 +81,7 @@ export const AddPaymentNoteDialog = ({
             onHide={onHide}
             action={handleAddNote}
             buttonDisabled={isButtonDisabled}
+            {...props}
         >
             <div className='grid gap-3'>
                 <div className='add-note__info m-3'>
