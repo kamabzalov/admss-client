@@ -12,13 +12,13 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel } from "primereact/panel";
 import { ReportCollection, ReportDocument } from "common/models/reports";
-import {
-    ActionButtons,
-    CollectionPanelContent,
-    ReportsAccordionHeader,
-    ReportsPanelHeader,
-} from "dashboard/reports/common";
 import { useStore } from "store/hooks";
+import { CollectionPanelContent } from "dashboard/reports/common/panel-content";
+import {
+    ReportsPanelHeader,
+    ReportsAccordionHeader,
+} from "dashboard/reports/common/report-headers";
+import { ActionButtons } from "dashboard/reports/common/report-buttons";
 
 export default function Reports(): ReactElement {
     const userStore = useStore().userStore;
