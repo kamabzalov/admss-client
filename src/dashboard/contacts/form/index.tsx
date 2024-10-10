@@ -37,8 +37,8 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
-    firstName: Yup.string().trim().required("Data is required."),
-    lastName: Yup.string().trim().required("Data is required."),
+    firstName: Yup.string()?.trim().required("Data is required."),
+    lastName: Yup.string()?.trim().required("Data is required."),
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
@@ -51,11 +51,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         excludeEmptyString: false,
     }),
     companyName: Yup.string()
-        .trim()
+        ?.trim()
         .when("type", ([type]) => {
             return REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
-                ? Yup.string().trim().required("Data is required.")
-                : Yup.string().trim();
+                ? Yup.string()?.trim().required("Data is required.")
+                : Yup.string()?.trim();
         }),
     Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
     Buyer_Emp_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
@@ -174,8 +174,6 @@ export const ContactForm = observer((): ReactElement => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (isContactChanged) {
                 event.preventDefault();
-                event.returnValue =
-                    "Are you sure you want to reload this page? All unsaved data will be lost.";
             }
         };
 
@@ -240,16 +238,18 @@ export const ContactForm = observer((): ReactElement => {
                             <h2 className='card-header__title uppercase m-0 pr-2'>
                                 {id ? "Edit" : "Create new"} contact
                             </h2>
-                            <div className='card-header-info'>
-                                Full Name
-                                <span className='card-header-info__data'>{`${
-                                    contact!.firstName || ""
-                                } ${contact?.lastName || ""}`}</span>
-                                Company name
-                                <span className='card-header-info__data'>
-                                    {contact?.companyName}
-                                </span>
-                            </div>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Full Name
+                                    <span className='card-header-info__data'>{`${
+                                        contact!.firstName || ""
+                                    } ${contact?.lastName || ""}`}</span>
+                                    Company name
+                                    <span className='card-header-info__data'>
+                                        {contact?.companyName}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content contact__card'>
                             <div className='grid flex-nowrap'>
@@ -374,9 +374,6 @@ export const ContactForm = observer((): ReactElement => {
                             <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
                                     onClick={() => {
-                                        if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/contacts`);
-                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
@@ -385,6 +382,8 @@ export const ContactForm = observer((): ReactElement => {
                                     }}
                                     className='form-nav__button'
                                     outlined
+                                    disabled={stepActiveIndex <= 0}
+                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
                                 >
                                     Back
                                 </Button>
@@ -425,6 +424,7 @@ export const ContactForm = observer((): ReactElement => {
                 draggable={false}
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'
+                resizable={false}
                 className='contact-confirm-dialog'
                 onHide={() => setIsConfirmVisible(false)}
             />

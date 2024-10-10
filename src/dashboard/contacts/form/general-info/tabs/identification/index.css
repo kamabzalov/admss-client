@@ -21,14 +21,34 @@
     font-family: "Open Sans", sans-serif;
     padding-bottom: 20px;
 }
-
 .contact-upload {
+    height: 282px;
+    width: 514px;
+}
+
+.contact-upload:has(.upload-empty) {
     display: flex;
     flex-direction: column-reverse;
     background-color: var(--admss-app-white-blue);
     border-radius: 5px;
     border: 1px dotted var(--admss-app-medium-blue);
-    height: 282px;
+}
+
+.contact-upload .dl-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-left: auto;
+    margin-bottom: 20px;
+}
+
+.contact-upload:not(.upload-empty) .dl-header.dl-header__active {
+    display: none;
+}
+
+.contact-upload .p-fileupload-content {
+    padding: 0;
 }
 
 .contact-upload .upload-empty__image {
@@ -41,13 +61,13 @@
     margin: 20px 0 10px;
 }
 
-.contact-upload .p-fileupload-content {
+.contact-upload .p-fileupload-content:has(.upload-empty) {
     background-color: transparent;
     border: none;
     padding-bottom: 0;
 }
 
-.contact-upload .p-button {
+.contact-upload:has(.upload-empty) .p-button {
     background-color: var(--admss-app-main-blue);
     border: none;
     outline: none;
@@ -55,7 +75,50 @@
     margin-bottom: 20px;
 }
 
-.contact-upload .p-button:enabled:hover,
+.contact-upload:has(.upload-empty) .p-button:enabled:hover,
 .p-button:not(button):not(a):not(.p-disabled):hover {
     background-color: var(--admss-app-medium-blue);
+}
+
+.dl__upload-icon-label {
+    width: 60%;
+    font-weight: 600;
+}
+
+.upload-empty .dl__line {
+    border-top: 1px solid var(--admss-app-medium-blue);
+}
+
+.p-fileupload .p-fileupload-row .dl-presentation {
+    padding: 0;
+}
+
+.dl-presentation {
+    height: 282px;
+    overflow: hidden;
+
+    .p-image-preview-container:hover > .p-image-preview-indicator {
+        background-color: transparent;
+    }
+
+    img {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .dl-presentation__remove-button {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--admss-app-main-blue);
+        &:hover {
+            color: var(--admss-app-medium-blue);
+            background-color: transparent;
+            border: none;
+            outline: none;
+        }
+    }
 }

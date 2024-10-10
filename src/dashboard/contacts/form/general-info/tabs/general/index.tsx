@@ -5,8 +5,12 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
+import { Contact, ContactOFAC, ContactType } from "common/models/contact";
+import {
+    checkContactOFAC,
+    getContactsTypeList,
+    scanContactDL,
+} from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
@@ -22,6 +26,9 @@ interface ContactsGeneralInfoProps {
     type?: typeof BUYER | typeof CO_BUYER;
 }
 
+const ifBusinessNameFilledMessage =
+    "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.";
+
 export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
@@ -31,6 +38,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, setFieldValue } = useFormikContext<Contact>();
+
+    const [savedFirstName, setSavedFirstName] = useState<string>("");
+    const [savedLastName, setSavedLastName] = useState<string>("");
+    const [savedMiddleName, setSavedMiddleName] = useState<string>("");
+    const [savedBusinessName, setSavedBusinessName] = useState<string>("");
 
     useEffect(() => {
         getContactsTypeList(id || "0").then((response) => {
@@ -62,6 +74,106 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         }
     };
 
+    const isBusinessNameRequired = REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
+
+    const isNameFieldsFilled = () => {
+        if (type === BUYER) {
+            return contact.firstName?.trim() !== "" || contact.lastName?.trim() !== "";
+        } else {
+            return (
+                contactExtData.CoBuyer_First_Name?.trim() !== "" ||
+                contactExtData.CoBuyer_Last_Name?.trim() !== ""
+            );
+        }
+    };
+
+    const shouldDisableNameFields =
+        isBusinessNameRequired || (contact.businessName && contact.businessName?.trim() !== "");
+
+    const shouldDisableBusinessName = !isBusinessNameRequired && isNameFieldsFilled();
+
+    useEffect(() => {
+        if (shouldDisableNameFields) {
+            if (type === BUYER) {
+                setSavedFirstName(contact.firstName);
+                setSavedLastName(contact.lastName);
+                setSavedMiddleName(contact.middleName);
+                setFieldValue("firstName", "");
+                setFieldValue("lastName", "");
+                changeContact("firstName", "");
+                changeContact("lastName", "");
+                changeContact("middleName", "");
+            } else {
+                setSavedFirstName(contactExtData.CoBuyer_First_Name);
+                setSavedLastName(contactExtData.CoBuyer_Last_Name);
+                setSavedMiddleName(contactExtData.CoBuyer_Middle_Name);
+                changeContactExtData("CoBuyer_First_Name", "");
+                changeContactExtData("CoBuyer_Last_Name", "");
+                changeContactExtData("CoBuyer_Middle_Name", "");
+            }
+        } else {
+            if (type === BUYER) {
+                if (!contact.firstName && savedFirstName) {
+                    setFieldValue("firstName", savedFirstName);
+                    changeContact("firstName", savedFirstName);
+                }
+                if (!contact.lastName && savedLastName) {
+                    setFieldValue("lastName", savedLastName);
+                    changeContact("lastName", savedLastName);
+                }
+                if (!contact.middleName && savedMiddleName) {
+                    changeContact("middleName", savedMiddleName);
+                }
+            } else {
+                if (!contactExtData.CoBuyer_First_Name && savedFirstName) {
+                    changeContactExtData("CoBuyer_First_Name", savedFirstName);
+                }
+                if (!contactExtData.CoBuyer_Last_Name && savedLastName) {
+                    changeContactExtData("CoBuyer_Last_Name", savedLastName);
+                }
+                if (!contactExtData.CoBuyer_Middle_Name && savedMiddleName) {
+                    changeContactExtData("CoBuyer_Middle_Name", savedMiddleName);
+                }
+            }
+        }
+    }, [shouldDisableNameFields, contact.businessName, contact.type, type]);
+
+    useEffect(() => {
+        if (shouldDisableBusinessName) {
+            setSavedBusinessName(contact.businessName);
+            setFieldValue("businessName", "");
+            changeContact("businessName", "");
+        } else {
+            if (!contact.businessName && savedBusinessName) {
+                setFieldValue("businessName", savedBusinessName);
+                changeContact("businessName", savedBusinessName);
+            }
+        }
+    }, [
+        shouldDisableBusinessName,
+        contact.firstName,
+        contact.lastName,
+        contactExtData.CoBuyer_First_Name,
+        contactExtData.CoBuyer_Last_Name,
+        contact.type,
+        type,
+    ]);
+
+    const handleOfacCheck = () => {
+        checkContactOFAC(id).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                store.contactOFAC = response as ContactOFAC;
+            }
+        });
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
@@ -69,6 +181,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     type='button'
                     label='Scan driver license'
                     className='general-info__button'
+                    tooltip='Data received from the DL’s backside will fill in related fields'
                     outlined
                     onClick={handleScanDL}
                 />
@@ -98,9 +211,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         text
                         tooltip='Data received from the DL’s backside will overwrite user-entered data'
                         icon='icon adms-help'
+                        outlined
                         type='button'
-                        severity='info'
-                        className='general-info-overwrite__icon transparent'
+                        className='general-info-overwrite__icon'
                     />
                 </div>
             </div>
@@ -146,10 +259,17 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_First_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
+                        tooltip={
+                            shouldDisableNameFields
+                                ? "The type of contact you have selected requires entering only the business name"
+                                : ""
+                        }
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
                         First Name
-                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {!isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.firstName}</small>
@@ -171,6 +291,8 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Middle_Name", value);
                             }
                         }}
+                        tooltip={shouldDisableNameFields ? ifBusinessNameFilledMessage : ""}
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>Middle Name</label>
                 </span>
@@ -195,10 +317,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Last_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
+                        disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
                         Last Name
-                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {!isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.lastName}</small>
@@ -212,10 +336,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         }`}
                         value={contact.businessName || ""}
                         onChange={({ target: { value } }) => changeContact("businessName", value)}
+                        disabled={shouldDisableBusinessName}
                     />
                     <label className='float-label'>
                         Business Name
-                        {REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                        {isBusinessNameRequired && " (required)"}
                     </label>
                 </span>
                 <small className='p-error'>{errors.businessName}</small>
