@@ -5,8 +5,12 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
+import { Contact, ContactOFAC, ContactType } from "common/models/contact";
+import {
+    checkContactOFAC,
+    getContactsTypeList,
+    scanContactDL,
+} from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
@@ -21,6 +25,9 @@ const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 interface ContactsGeneralInfoProps {
     type?: typeof BUYER | typeof CO_BUYER;
 }
+
+const ifBusinessNameFilledMessage =
+    "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.";
 
 export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {
     const { id } = useParams();
@@ -152,6 +159,21 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         type,
     ]);
 
+    const handleOfacCheck = () => {
+        checkContactOFAC(id).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                store.contactOFAC = response as ContactOFAC;
+            }
+        });
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
@@ -159,6 +181,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     type='button'
                     label='Scan driver license'
                     className='general-info__button'
+                    tooltip='Data received from the DL’s backside will fill in related fields'
                     outlined
                     onClick={handleScanDL}
                 />
@@ -188,9 +211,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         text
                         tooltip='Data received from the DL’s backside will overwrite user-entered data'
                         icon='icon adms-help'
+                        outlined
                         type='button'
-                        severity='info'
-                        className='general-info-overwrite__icon transparent'
+                        className='general-info-overwrite__icon'
                     />
                 </div>
             </div>
@@ -236,6 +259,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_First_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
+                        tooltip={
+                            shouldDisableNameFields
+                                ? "The type of contact you have selected requires entering only the business name"
+                                : ""
+                        }
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
@@ -262,6 +291,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Middle_Name", value);
                             }
                         }}
+                        tooltip={shouldDisableNameFields ? ifBusinessNameFilledMessage : ""}
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>Middle Name</label>
@@ -287,6 +317,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Last_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>

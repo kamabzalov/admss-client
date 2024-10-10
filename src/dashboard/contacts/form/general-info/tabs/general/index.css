@@ -15,3 +15,14 @@
     display: flex;
     align-items: center;
 }
+
+.general-info-overwrite__icon.p-button {
+    color: var(--admss-app-main-blue);
+    &:enabled:hover {
+        color: var(--admss-app-main-blue);
+        border: none;
+        background-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
+}

@@ -1,6 +1,6 @@
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { Contact, ContactExtData, ContactProspect } from "common/models/contact";
+import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
     deleteContactFrontDL,
@@ -26,6 +26,7 @@ export class ContactStore {
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
     private _contactID: string = "";
+    private _contactOFAC: ContactOFAC = {} as ContactOFAC;
     protected _isLoading = false;
     private _frontSiteDLurl: string = "";
     private _backSiteDLurl: string = "";
@@ -65,6 +66,10 @@ export class ContactStore {
 
     public get isContactChanged() {
         return this._isContactChanged;
+    }
+
+    public get contactOFAC() {
+        return this._contactOFAC;
     }
 
     public get isLoading() {
@@ -216,6 +221,10 @@ export class ContactStore {
 
     public set backSideDLurl(url: string) {
         this._backSiteDLurl = url;
+    }
+
+    public set contactOFAC(state: ContactOFAC) {
+        this._contactOFAC = state;
     }
 
     public set isLoading(state: boolean) {
