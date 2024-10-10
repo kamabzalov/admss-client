@@ -34,6 +34,8 @@ export class AccountStore {
     private _accountID: string = "";
     private _accountNote: AccountNoteData = initialNote;
     private _accountTakePayment: Partial<AccountUpdateTakePayment> = {} as AccountUpdateTakePayment;
+    private _isAccountChanged: boolean = false;
+    private _isAccountPaymentChanged: boolean = false;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -63,6 +65,14 @@ export class AccountStore {
 
     public get accountTakePayment() {
         return this._accountTakePayment;
+    }
+
+    public get isAccountChanged() {
+        return this._isAccountChanged;
+    }
+
+    public get isAccountPaymentChanged() {
+        return this._isAccountPaymentChanged;
     }
 
     public get isLoading() {
@@ -128,22 +138,26 @@ export class AccountStore {
 
     public changeAccount = action(
         (key: keyof Omit<AccountInfo, "extdata">, value: string | number | string[]) => {
+            this._isAccountChanged = true;
             this._account[key] = value as never;
         }
     );
 
     public changeAccountExtData = action((key: keyof AccountExtData, value: string | number) => {
+        this._isAccountChanged = true;
         this._accountExtData[key] = value as never;
     });
 
     public changeAccountPaymentsInfo = action(
         (key: keyof AccountDetails, value: string | number) => {
+            this._isAccountPaymentChanged = true;
             this._accountPaymentsInfo[key] = value as never;
         }
     );
 
     public changeAccountTakePayment = action(
         (key: keyof AccountUpdateTakePayment, value: string | number) => {
+            this._isAccountPaymentChanged = true;
             this._accountTakePayment[key] = value as never;
         }
     );

@@ -23,6 +23,7 @@ export const AccountTakePayment = (): ReactElement => {
     const { authUser } = userStore;
     const {
         account: { accountnumber, accountstatus },
+        isAccountPaymentChanged,
         getAccountPaymentsInfo,
         getDrawers,
         getAccount,
@@ -105,10 +106,10 @@ export const AccountTakePayment = (): ReactElement => {
                             activeIndex={activeIndex}
                             onTabChange={handleTabChange}
                         >
-                            <TabPanel header='Quick Pay'>
+                            <TabPanel header='QuickPay'>
                                 <AccountQuickPay />
                             </TabPanel>
-                            <TabPanel header='Pay Off'>
+                            <TabPanel header='Pay Off Account'>
                                 <AccountPayOff />
                             </TabPanel>
                             <TabPanel header='Balance Adjustment'>
@@ -125,7 +126,14 @@ export const AccountTakePayment = (): ReactElement => {
                         >
                             Cancel
                         </Button>
-                        <Button className='uppercase px-6 account__button'>Save</Button>
+                        <Button
+                            onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                            disabled={!isAccountPaymentChanged}
+                            severity={isAccountPaymentChanged ? "success" : "secondary"}
+                            className='uppercase px-6 account__button'
+                        >
+                            Save
+                        </Button>
                     </div>
                 </div>
             </div>

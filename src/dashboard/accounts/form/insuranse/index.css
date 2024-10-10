@@ -6,7 +6,6 @@
     border: none;
     min-height: auto;
     border-bottom: 2px solid var(--admss-app-light-grey);
-    text-transform: uppercase;
     font-weight: 700;
     gap: 10px;
     margin-bottom: 20px;

@@ -44,6 +44,7 @@ export const AccountsForm = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
         getAccount,
+        isAccountChanged,
         account: { accountnumber, accountstatus },
         isLoading,
     } = store;
@@ -133,8 +134,9 @@ export const AccountsForm = observer((): ReactElement => {
                         <Button
                             className='uppercase px-6 account__button'
                             onClick={() => handleTabChange(activeTab - 1)}
-                            disabled={activeTab === 0}
+                            disabled={activeTab <= 0}
                             outlined
+                            severity={activeTab <= 0 ? "secondary" : "success"}
                         >
                             Back
                         </Button>
@@ -146,7 +148,13 @@ export const AccountsForm = observer((): ReactElement => {
                         >
                             Next
                         </Button>
-                        <Button className='uppercase px-6 account__button'>Update</Button>
+                        <Button
+                            disabled={!isAccountChanged}
+                            severity={isAccountChanged ? "success" : "secondary"}
+                            className='uppercase px-6 account__button'
+                        >
+                            Update
+                        </Button>
                     </div>
                 </div>
             </div>
