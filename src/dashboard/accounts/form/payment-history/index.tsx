@@ -6,7 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteHistoryInfo, listAccountHistory } from "http/services/accounts.service";
+import { deletePaymentInfo, listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
 import {
@@ -194,7 +194,7 @@ export const AccountPaymentHistory = (): ReactElement => {
 
                 try {
                     const deletePromises = currentData.map((item) =>
-                        deleteHistoryInfo(item.itemuid)
+                        deletePaymentInfo(item.itemuid)
                     );
 
                     await Promise.all(deletePromises);
