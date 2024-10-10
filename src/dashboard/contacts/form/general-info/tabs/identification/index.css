@@ -23,6 +23,7 @@
 }
 .contact-upload {
     height: 282px;
+    width: 514px;
 }
 
 .contact-upload:has(.upload-empty) {
@@ -44,6 +45,10 @@
 
 .contact-upload:not(.upload-empty) .dl-header.dl-header__active {
     display: none;
+}
+
+.contact-upload .p-fileupload-content {
+    padding: 0;
 }
 
 .contact-upload .upload-empty__image {
@@ -84,19 +89,27 @@
     border-top: 1px solid var(--admss-app-medium-blue);
 }
 
+.p-fileupload .p-fileupload-row .dl-presentation {
+    padding: 0;
+}
+
 .dl-presentation {
     height: 282px;
+    overflow: hidden;
+
+    .p-image-preview-container:hover > .p-image-preview-indicator {
+        background-color: transparent;
+    }
 
     img {
         width: 100%;
-        object-fit: cover;
         overflow: hidden;
     }
 
     .dl-presentation__remove-button {
         position: absolute;
-        top: -20px;
-        right: 10px;
+        top: 0px;
+        right: 0px;
         background: transparent;
         border: none;
         outline: none;

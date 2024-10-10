@@ -23,6 +23,7 @@ import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import dlFrontImage from "assets/images/empty_front_dl.svg";
 import dlBackImage from "assets/images/empty_back_dl.svg";
 import uploadImage from "assets/images/upload.svg";
+import { Image } from "primereact/image";
 
 const SexList = [
     {
@@ -109,6 +110,13 @@ export const ContactsIdentificationInfo = observer(
                             detail: error,
                             life: TOAST_LIFETIME,
                         });
+                    } else {
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Image deleted successfully",
+                            life: TOAST_LIFETIME,
+                        });
                     }
                 });
             }
@@ -120,10 +128,12 @@ export const ContactsIdentificationInfo = observer(
             const src = isFilePath ? image : URL.createObjectURL(image);
             return (
                 <div className='flex align-items-center dl-presentation relative'>
-                    <img
+                    <Image
                         alt={alt}
                         src={src}
                         role='presentation'
+                        preview
+                        indicatorIcon={<></>}
                         className='dl-presentation__image'
                     />
                     <Button
@@ -142,7 +152,7 @@ export const ContactsIdentificationInfo = observer(
         ) => {
             const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
             return (
-                <div className={`col-6 dl-header ${size ? "dl-header__active" : ""}`}>
+                <div className={`col-6 dl-header ${size ? "dl-header__active" : "mr-1"}`}>
                     {chooseButton}
                 </div>
             );
@@ -150,7 +160,7 @@ export const ContactsIdentificationInfo = observer(
 
         const emptyTemplate = (side: DLSide) => {
             return (
-                <div className='grid upload-empty'>
+                <div className='grid upload-empty px-4'>
                     <div className='col-6 flex align-items-center justify-content-center upload-empty__image'>
                         <img
                             alt={`empty ${DLSides.FRONT} DL`}
