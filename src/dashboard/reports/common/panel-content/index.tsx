@@ -47,6 +47,14 @@ export const CollectionPanelContent = ({
         setInitialSelectedReports(selectedReports);
     }, [collectionuid]);
 
+    const handleCreateCollectionClick = () => {
+        if (collectionNameInput) {
+            handleCreateCollection();
+            setCollectionNameInput("");
+            setPanelSelectedReports([]);
+        }
+    };
+
     const reportsAreEqual = (reports1: ReportDocument[], reports2: ReportDocument[]) => {
         if (reports1.length !== reports2.length) return false;
         const sorted1 = [...reports1].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
@@ -176,7 +184,7 @@ export const CollectionPanelContent = ({
                         disabled={isUpdateDisabled}
                         severity={isUpdateDisabled ? "secondary" : "success"}
                         type='button'
-                        onClick={handleCreateCollection}
+                        onClick={handleCreateCollectionClick}
                         outlined
                     >
                         {collectionuid ? "Update" : "Create"}

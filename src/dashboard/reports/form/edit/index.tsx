@@ -78,7 +78,9 @@ export const ReportEditForm = observer((): ReactElement => {
 
     return (
         <div className='col-8 grid report-form'>
-            <div className='report-form__header uppercase'>{id ? "Edit" : "New"} report</div>
+            <div className='report-form__header uppercase'>
+                {report.isdefault ? "View" : id ? "Edit" : "New"} report
+            </div>
             <div className='report-form__body grid'>
                 <div className='col-6'>
                     <span className='p-float-label'>

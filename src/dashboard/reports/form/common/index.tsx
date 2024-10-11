@@ -60,6 +60,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
 
     const handleSaveReport = () => {
+        if (!!report.isdefault) return;
         saveReport(report?.itemuid).then((response: BaseResponseError | undefined) => {
             if (response?.status === Status.OK) {
                 onAction();
@@ -152,8 +153,8 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                 </Button>
                 <Button
                     className='uppercase px-6 report__button'
-                    disabled={!report.name}
-                    severity={!report.name ? "secondary" : "success"}
+                    disabled={!report.name || !!report.isdefault}
+                    severity={!report.name || !!report.isdefault ? "secondary" : "success"}
                     onClick={() => handleSaveReport()}
                 >
                     {report?.itemuid ? "Update" : "Create"}
