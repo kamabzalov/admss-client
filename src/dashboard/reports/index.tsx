@@ -228,6 +228,13 @@ export default function Reports(): ReactElement {
                                                         header={
                                                             <ReportsAccordionHeader
                                                                 title={name}
+                                                                label={
+                                                                    documents?.some(
+                                                                        (report) => report.isNew
+                                                                    )
+                                                                        ? "New"
+                                                                        : ""
+                                                                }
                                                                 selected={
                                                                     isContainsSearchedValue || false
                                                                 }

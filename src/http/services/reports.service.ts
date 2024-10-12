@@ -356,3 +356,19 @@ export const moveReportToCollection = async (collectionuid: string, reportuid: s
         }
     }
 };
+
+export const addReportToCollection = async (collectionuid: string, reportuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid}/add`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while adding report to collection",
+            };
+        }
+    }
+};
