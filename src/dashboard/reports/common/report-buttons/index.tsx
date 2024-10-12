@@ -2,7 +2,11 @@ import { Status } from "common/models/base-response";
 import { ReportDocument, ReportCollection } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
-import { moveReportToCollection, updateReportInfo } from "http/services/reports.service";
+import {
+    addReportToCollection,
+    moveReportToCollection,
+    updateReportInfo,
+} from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -36,21 +40,38 @@ export const ActionButtons = ({
         {
             items: collectionList?.map((collection) => ({
                 label: collection.name,
-                command: () => {
-                    moveReportToCollection(collection.itemUID, report.documentUID).then(
-                        (response) => {
-                            if (response?.status === Status.ERROR) {
-                                toast.current?.show({
-                                    severity: "error",
-                                    summary: Status.ERROR,
-                                    detail: response?.error,
-                                    life: TOAST_LIFETIME,
-                                });
-                            } else {
-                                refetchCollectionsAction?.();
-                            }
+                command: async () => {
+                    if (!!report.isdefault) {
+                        const response = await addReportToCollection(
+                            collection.itemUID,
+                            report.documentUID
+                        );
+                        if (response?.status === Status.ERROR) {
+                            toast.current?.show({
+                                severity: "error",
+                                summary: Status.ERROR,
+                                detail: response?.error,
+                                life: TOAST_LIFETIME,
+                            });
+                        } else {
+                            refetchCollectionsAction?.();
                         }
-                    );
+                    } else {
+                        const response = await moveReportToCollection(
+                            collection.itemUID,
+                            report.documentUID
+                        );
+                        if (response?.status === Status.ERROR) {
+                            toast.current?.show({
+                                severity: "error",
+                                summary: Status.ERROR,
+                                detail: response?.error,
+                                life: TOAST_LIFETIME,
+                            });
+                        } else {
+                            refetchCollectionsAction?.();
+                        }
+                    }
                 },
             })),
         },

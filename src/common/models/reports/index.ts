@@ -18,8 +18,9 @@ export interface ReportDocument {
     created: string;
     documentUID: string;
     index: number;
+    isNew: 0 | 1;
     isfavorite: 0 | 1;
-    isDefault: 0 | 1;
+    isdefault: 0 | 1;
     itemUID: string;
     name: string;
     updated: string;
@@ -77,6 +78,7 @@ export interface ReportInfo extends BaseResponseError {
     itemuid: string;
     useruid: string;
     name: string;
+    isNew: 0 | 1;
     isdefault: 0 | 1;
     isfavorite: 0 | 1;
     ShowTotals: 0 | 1;

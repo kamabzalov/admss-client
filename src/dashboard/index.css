@@ -428,6 +428,18 @@
     background: var(--admss-app-white);
 }
 
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+    background-color: var(--admss-app-light-green);
+}
+
+.p-dropdown .p-dropdown-trigger {
+    transition: rotate 0.4s;
+}
+
+.p-dropdown .p-dropdown-trigger[aria-expanded="true"] {
+    rotate: 180deg;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);

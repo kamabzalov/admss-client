@@ -5,7 +5,7 @@ import {
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { Accordion, AccordionTab } from "primereact/accordion";
+import { Accordion, AccordionTab, AccordionTabChangeEvent } from "primereact/accordion";
 import "./index.css";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
@@ -142,6 +142,10 @@ export default function Reports(): ReactElement {
         }
     };
 
+    const handleTabChange = (e: AccordionTabChangeEvent) => {
+        setActiveIndexes(e.index as number[]);
+    };
+
     const handleEditCollection = (
         event: React.MouseEvent<HTMLElement>,
         id: string,
@@ -196,7 +200,7 @@ export default function Reports(): ReactElement {
                                     multiple
                                     className='reports__accordion'
                                     activeIndex={activeIndexes}
-                                    onTabChange={(e) => setActiveIndexes(e.index as number[])}
+                                    onTabChange={handleTabChange}
                                 >
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
@@ -220,9 +224,17 @@ export default function Reports(): ReactElement {
                                                 return (
                                                     <AccordionTab
                                                         key={itemUID}
+                                                        disabled={!documents?.length}
                                                         header={
                                                             <ReportsAccordionHeader
                                                                 title={name}
+                                                                label={
+                                                                    documents?.some(
+                                                                        (report) => report.isNew
+                                                                    )
+                                                                        ? "New"
+                                                                        : ""
+                                                                }
                                                                 selected={
                                                                     isContainsSearchedValue || false
                                                                 }
@@ -234,7 +246,7 @@ export default function Reports(): ReactElement {
                                                                     !isfavorite ? (
                                                                         <Button
                                                                             label='Edit'
-                                                                            className='reports-actions__button'
+                                                                            className='reports-actions__button cursor-pointer'
                                                                             outlined
                                                                             onClick={(e) =>
                                                                                 handleEditCollection(
@@ -250,7 +262,7 @@ export default function Reports(): ReactElement {
                                                                 }
                                                             />
                                                         }
-                                                        className='reports__accordion-tab'
+                                                        className='reports__accordion-tab opacity-100'
                                                     >
                                                         {isCollectionEditing === itemUID &&
                                                         userUID === authUser?.useruid ? (
@@ -266,7 +278,9 @@ export default function Reports(): ReactElement {
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
                                                                         collections={collections}
-                                                                        selectedReports={documents}
+                                                                        selectedReports={
+                                                                            documents || []
+                                                                        }
                                                                         setCollectionName={
                                                                             setCollectionName
                                                                         }

@@ -202,6 +202,11 @@
     background: var(--admss-app-white);
 }
 
+.p-disabled .reports-actions__button.p-button.p-button-outlined {
+    user-select: all;
+    pointer-events: all;
+}
+
 .reports-accordion-header__label {
     border-radius: 20px;
     padding: 5px 10px;

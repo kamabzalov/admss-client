@@ -45,7 +45,19 @@ export const CollectionPanelContent = ({
     useEffect(() => {
         setInitialCollectionName(collectionName);
         setInitialSelectedReports(selectedReports);
+        if (!collectionuid) {
+            setCollectionNameInput("");
+            setPanelSelectedReports([]);
+        }
     }, [collectionuid]);
+
+    const handleCreateCollectionClick = () => {
+        if (collectionNameInput) {
+            handleCreateCollection();
+            setCollectionNameInput("");
+            setPanelSelectedReports([]);
+        }
+    };
 
     const reportsAreEqual = (reports1: ReportDocument[], reports2: ReportDocument[]) => {
         if (reports1.length !== reports2.length) return false;
@@ -176,7 +188,7 @@ export const CollectionPanelContent = ({
                         disabled={isUpdateDisabled}
                         severity={isUpdateDisabled ? "secondary" : "success"}
                         type='button'
-                        onClick={handleCreateCollection}
+                        onClick={handleCreateCollectionClick}
                         outlined
                     >
                         {collectionuid ? "Update" : "Create"}
