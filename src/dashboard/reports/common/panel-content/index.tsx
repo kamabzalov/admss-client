@@ -45,6 +45,10 @@ export const CollectionPanelContent = ({
     useEffect(() => {
         setInitialCollectionName(collectionName);
         setInitialSelectedReports(selectedReports);
+        if (!collectionuid) {
+            setCollectionNameInput("");
+            setPanelSelectedReports([]);
+        }
     }, [collectionuid]);
 
     const handleCreateCollectionClick = () => {
