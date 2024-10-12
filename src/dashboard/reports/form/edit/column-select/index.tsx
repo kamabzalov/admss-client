@@ -145,6 +145,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         className='report-controls__dropdown'
                         options={dataSetValues}
                         value={dataSet}
+                        emptyMessage='-'
                         disabled={!!report.isdefault}
                         onChange={(e) => setDataSet(e.value)}
                         pt={{
