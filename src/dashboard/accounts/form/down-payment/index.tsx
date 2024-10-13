@@ -1,7 +1,7 @@
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { deletePaymentInfo, listAccountDownPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { Button } from "primereact/button";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -25,9 +26,11 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
 
 enum ModalErrors {
     TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TITLE_CONFIRM = "Are you sure?",
     TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
     TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
     TEXT_NO_PAYMENT_DELETE = "No payment has been selected for deleting. Please select a payment and try again.",
+    TEXT_DELETE_PAYMENT = "Do you really want to delete this payment? This process cannot be undone.",
 }
 
 export const AccountDownPayment = (): ReactElement => {
@@ -40,52 +43,41 @@ export const AccountDownPayment = (): ReactElement => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
+    const [modalAction, setModalAction] = useState<(() => void) | null>(null);
+
+    const getDownPayments = async () => {
+        if (id) {
+            const res = await listAccountDownPayments(id);
+            if (Array.isArray(res) && res.length) {
+                setPaymentList(res);
+                setSelectedRows(Array(res.length).fill(false));
+            }
+        }
+    };
 
     useEffect(() => {
-        if (id) {
-            listAccountDownPayments(id).then((res) => {
-                if (Array.isArray(res) && res.length) {
-                    setPaymentList(res);
-                    setSelectedRows(Array(res.length).fill(false));
-                }
-            });
-        }
+        getDownPayments();
     }, [id]);
+
+    const currentPaymentList = useMemo(() => {
+        return paymentList.filter((_, index) => selectedRows[index]);
+    }, [paymentList, selectedRows]);
 
     const takePaymentItems = [
         {
             label: "Delete Payment",
             icon: "icon adms-close",
-            command: async () => {
-                const currentData = paymentList.filter((_, index) => selectedRows[index]);
-                if (!currentData.length) {
+            command: () => {
+                if (!currentPaymentList.length) {
                     setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
                     setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                    setModalAction(null);
                     setModalVisible(true);
-                    return;
-                }
-
-                try {
-                    const deletePromises = currentData.map((item) =>
-                        deletePaymentInfo(item.itemuid)
-                    );
-
-                    await Promise.all(deletePromises);
-
-                    if (id) {
-                        listAccountDownPayments(id).then((res) => {
-                            if (Array.isArray(res) && res.length) {
-                                setPaymentList(res);
-                                setSelectedRows(Array(res.length).fill(false));
-                            }
-                        });
-                    }
-                } catch (error) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: "Something went wrong. Please try again.",
-                    });
+                } else {
+                    setModalTitle(ModalErrors.TITLE_CONFIRM);
+                    setModalText(ModalErrors.TEXT_DELETE_PAYMENT);
+                    setModalAction(() => handleDeletePayments);
+                    setModalVisible(true);
                 }
             },
         },
@@ -201,6 +193,24 @@ export const AccountDownPayment = (): ReactElement => {
         },
     ];
 
+    const handleDeletePayments = async () => {
+        try {
+            const deletePromises = currentPaymentList.map((item) =>
+                deletePaymentInfo(item.itemuid)
+            );
+
+            await Promise.all(deletePromises);
+
+            getDownPayments();
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Something went wrong. Please try again.",
+            });
+        }
+    };
+
     return (
         <div className='down-payment account-card'>
             <h3 className='down-payment__title account-title'>Down Payment</h3>
@@ -274,6 +284,28 @@ export const AccountDownPayment = (): ReactElement => {
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}
+
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={() => {
+                                return (
+                                    <div className={`flex gap-3 align-items-center `}>
+                                        <Button className='down-payment__table-button' outlined>
+                                            Pay
+                                        </Button>
+                                    </div>
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "100px",
+                                    },
+                                },
+                            }}
+                        />
                     </DataTable>
                 </div>
                 {!!paymentList.length && (
@@ -311,13 +343,18 @@ export const AccountDownPayment = (): ReactElement => {
             </div>
             <ConfirmModal
                 visible={!!modalVisible}
+                position='top'
                 title={modalTitle}
-                icon='pi-exclamation-triangle'
+                icon={`pi-${modalAction ? "times-circle" : "exclamation-triangle"}`}
                 bodyMessage={modalText}
-                confirmAction={() => setModalVisible(false)}
+                confirmAction={() => {
+                    modalAction?.();
+                    setModalVisible(false);
+                }}
                 draggable={false}
-                acceptLabel='Got It'
-                className='account-warning'
+                rejectLabel={"Cancel"}
+                acceptLabel={modalAction ? "Delete" : "Got it"}
+                className={`account-warning ${modalAction ? "account-warning--reject" : ""}`}
                 onHide={() => setModalVisible(false)}
             />
         </div>

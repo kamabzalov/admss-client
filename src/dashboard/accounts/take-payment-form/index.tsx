@@ -120,7 +120,7 @@ export const AccountTakePayment = (): ReactElement => {
                     <div className='account__footer gap-3 ml-auto mr-3'>
                         <Button
                             className='uppercase px-6 account__button'
-                            onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                            onClick={() => navigate(-1)}
                             severity='danger'
                             outlined
                         >

@@ -3,6 +3,10 @@
     min-height: 40vh;
 }
 
+.dialog__add-fee .p-button {
+    height: 60px;
+}
+
 .dialog__add-fee .p-dialog-content {
     padding-top: 20px;
 }
