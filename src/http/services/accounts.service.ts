@@ -824,3 +824,23 @@ export const addAccountFee = async (accountuid: string, feeInfo: Partial<Account
         }
     }
 };
+
+export const checkAccountPaymentInfo = async (
+    accountuid: string,
+    paymentData: Partial<AccountUpdateTakePayment>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${accountuid}/checkpayment`,
+            paymentData
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while checking payment info",
+            };
+        }
+    }
+};

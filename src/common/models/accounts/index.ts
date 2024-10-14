@@ -1,4 +1,3 @@
-import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { BaseResponseError, Status } from "../base-response";
 
 export interface Account {
@@ -623,7 +622,6 @@ export interface AccountDrawer {
     itemuid: string;
     useruid: string;
 }
-
 
 export interface AccountFeeData {
     feetype: number;

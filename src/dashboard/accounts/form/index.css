@@ -150,7 +150,8 @@
     width: 455px;
     min-height: 450px;
 
-    .p-confirm-dialog-accept.p-button {
+    .p-confirm-dialog-accept.p-button,
+    .p-confirm-dialog-reject.p-button {
         display: inline-flex;
         padding: 0;
         align-items: center;
@@ -158,9 +159,10 @@
         height: 60px;
         white-space: nowrap;
     }
-    .p-confirm-dialog-reject {
-        display: none;
-    }
+}
+
+.account-warning:not(.account-warning--reject) .p-confirm-dialog-reject {
+    display: none;
 }
 
 .account__body .p-datatable:has(.p-datatable-emptymessage) .p-datatable-thead > tr > th,

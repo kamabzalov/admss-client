@@ -15,6 +15,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 import { AccountNoteData } from "store/stores/account";
 import { makeShortReports } from "http/services/reports.service";
+import { observer } from "mobx-react-lite";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -25,7 +26,7 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "NoteBy", header: "Note Taker" },
     { field: "ContactMethod", header: "Contact Type" },
 ];
-export const AccountNotes = (): ReactElement => {
+export const AccountNotes = observer((): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
     const store = useStore().accountStore;
@@ -179,7 +180,11 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 </div>
                 <div className='col-12 mt-5 flex justify-content-end'>
-                    <Button className='account-notes__button' onClick={() => setDialogShow(true)}>
+                    <Button
+                        className='account-notes__button'
+                        outlined
+                        onClick={() => setDialogShow(true)}
+                    >
                         Add Note
                     </Button>
                 </div>
@@ -288,4 +293,4 @@ export const AccountNotes = (): ReactElement => {
             />
         </div>
     );
-};
+});

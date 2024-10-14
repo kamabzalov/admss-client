@@ -10,6 +10,7 @@ import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { makeShortReports } from "http/services/reports.service";
+import { AddPromiseDialog } from "dashboard/accounts/form/promise-to-pay/add-promise";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -35,12 +36,17 @@ export const AccountPromiseToPay = (): ReactElement => {
     const { authUser } = userStore;
     const [promiseList, setPromiseList] = useState<AccountPromise[]>([]);
     const [selectedPaid, setSelectedPaid] = useState<PAID_STATUS | null>(null);
+    const [addPromiseVisible, setAddPromiseVisible] = useState<boolean>(false);
+
+    const getPromiseList = async () => {
+        if (id) {
+            const res = await listAccountPromises(id);
+            if (Array.isArray(res) && res.length) setPromiseList(res);
+        }
+    };
 
     useEffect(() => {
-        id &&
-            listAccountPromises(id).then((res) => {
-                if (Array.isArray(res) && res.length) setPromiseList(res);
-            });
+        getPromiseList();
     }, [id]);
 
     const promiseItems = [
@@ -140,7 +146,9 @@ export const AccountPromiseToPay = (): ReactElement => {
                         tooltipOptions={{
                             position: "bottom",
                         }}
-                        onClick={() => {}}
+                        onClick={() => {
+                            setAddPromiseVisible(true);
+                        }}
                         outlined
                     />
                     <SplitButton
@@ -151,7 +159,6 @@ export const AccountPromiseToPay = (): ReactElement => {
                         tooltipOptions={{
                             position: "bottom",
                         }}
-                        onClick={() => {}}
                         outlined
                         pt={{
                             root: {
@@ -220,6 +227,16 @@ export const AccountPromiseToPay = (): ReactElement => {
                     </div>
                 )}
             </div>
+            <AddPromiseDialog
+                position='top'
+                action={() => {
+                    setAddPromiseVisible(false);
+                    getPromiseList();
+                }}
+                onHide={() => setAddPromiseVisible(false)}
+                visible={addPromiseVisible}
+                accountuid={id}
+            />
         </div>
     );
 };

@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { ACCOUNT_FEE_TYPES } from "common/constants/account-options";
 
 interface AddFeeDialogProps extends DashboardDialogProps {}
 type AddFeeInfo = {
@@ -27,14 +28,6 @@ const initialAddFee: AddFeeInfo = {
     reason: "",
     description: "",
 };
-
-const dropdownOptions = [
-    "Late Fee",
-    "NSF Charge",
-    "Returned Check Fee",
-    "Mechanical Repair Fee",
-    "Repo Fee",
-];
 
 export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => {
     const { id } = useParams();
@@ -82,8 +75,16 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                 <Dropdown
                     className='w-full'
                     value={addFee.type}
-                    onChange={({ value }) => setAddFee({ ...addFee, type: value })}
-                    options={dropdownOptions}
+                    onChange={({ value }) => {
+                        if (value !== "Other") {
+                            setAddFee({ ...addFee, type: value, other: "" });
+                        } else {
+                            setAddFee({ ...addFee, type: value });
+                        }
+                    }}
+                    options={ACCOUNT_FEE_TYPES}
+                    optionLabel='name'
+                    optionValue='name'
                     pt={{
                         wrapper: {
                             style: { minHeight: "235px" },
@@ -95,6 +96,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
             <span className='p-float-label'>
                 <InputText
                     className='w-full'
+                    disabled={addFee.type !== "Other"}
                     value={addFee.other}
                     onChange={({ target: { value } }) => {
                         setAddFee({ ...addFee, other: value });
