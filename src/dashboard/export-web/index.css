@@ -72,6 +72,7 @@
 .export-web-service__input .p-inputnumber-input {
     width: 94px;
     height: 34px;
+    border: 1px solid var(--admss-app-light-grey);
 }
 
 .export-web-table tr td:has(.row--selected) {
@@ -144,22 +145,36 @@
     width: 180px;
 }
 
-.export-web__edit-input {
-    padding: 0;
-    max-width: 60px;
-    margin: 0;
-    height: 20px;
-}
-
-.export-web__edit-input.p-inputtext {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
-    height: 100%;
-}
-
 .expanded-row__link-text {
     color: var(--admss-app-main-blue);
     font-weight: 600;
+}
+
+.export-web__input-price .p-inputnumber-input {
+    width: 94px;
+    height: 34px;
+    padding: 0.25rem;
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.price-change-confirm-dialog {
+    width: 392px;
+    height: 478px;
+
+    .confirm-header__icon {
+        color: var(--admss-app-primary-main-green);
+        scale: -1 1;
+    }
+
+    .p-dialog-footer .p-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 18px;
+        text-transform: uppercase;
+        font-weight: 700;
+        height: 60px;
+        width: 130px;
+    }
 }

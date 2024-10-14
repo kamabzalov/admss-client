@@ -161,7 +161,7 @@ export interface InventoryWebInfo {
     useruid: string;
 }
 
-export interface InventorySetResponse extends BaseResponse {
+export interface InventorySetResponse extends BaseResponseError {
     itemuid: string;
 }
 
