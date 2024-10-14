@@ -217,29 +217,30 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     />
                 </div>
             </div>
-            <div className='col-12 grid'>
-                <div className='col-4 relative'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='id'
-                            value={contact.type || 0}
-                            filter
-                            options={typeList}
-                            onChange={(e) => {
-                                setFieldValue("type", e.value);
-                                changeContact("type", e.value);
-                            }}
-                            className={`w-full general-info__dropdown ${
-                                errors.type ? "p-invalid" : ""
-                            }`}
-                        />
-                        <label className='float-label'>Type (required)</label>
-                    </span>
-                    <small className='p-error'>{errors.type}</small>
+            {type === BUYER && (
+                <div className='col-12 grid'>
+                    <div className='col-4 relative'>
+                        <span className='p-float-label'>
+                            <Dropdown
+                                optionLabel='name'
+                                optionValue='id'
+                                value={contact.type || 0}
+                                filter
+                                options={typeList}
+                                onChange={(e) => {
+                                    setFieldValue("type", e.value);
+                                    changeContact("type", e.value);
+                                }}
+                                className={`w-full general-info__dropdown ${
+                                    errors.type ? "p-invalid" : ""
+                                }`}
+                            />
+                            <label className='float-label'>Type (required)</label>
+                        </span>
+                        <small className='p-error'>{errors.type}</small>
+                    </div>
                 </div>
-            </div>
-
+            )}
             <div className='col-4 relative'>
                 <span className='p-float-label'>
                     <InputText
