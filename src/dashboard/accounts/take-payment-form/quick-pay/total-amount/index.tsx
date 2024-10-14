@@ -1,14 +1,20 @@
 import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
+import { TOAST_LIFETIME } from "common/settings";
 import { DateInput, CurrencyInput } from "dashboard/common/form/inputs";
+import { useToast } from "dashboard/common/toast";
+import { checkAccountPaymentInfo } from "http/services/accounts.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
+import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 
 export const AccountTotalAmount = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().accountStore;
+    const toast = useToast();
     const {
         accountTakePayment: {
             PaymentDate,
@@ -22,6 +28,24 @@ export const AccountTotalAmount = observer((): ReactElement => {
         },
         changeAccountTakePayment,
     } = store;
+
+    const handleCheckPayment = async () => {
+        if (TotalAmount && id) {
+            const response = await checkAccountPaymentInfo(id, {
+                TotalAmount,
+            });
+
+            if (response?.error) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        }
+    };
+
     return (
         <div className='take-payment__card'>
             <div className='take-payment__item'>
@@ -69,7 +93,11 @@ export const AccountTotalAmount = observer((): ReactElement => {
                             changeAccountTakePayment("TotalAmount", value as number);
                         }}
                     />
-                    <Button severity='secondary' icon='pi pi-arrow-right' />
+                    <Button
+                        severity='secondary'
+                        icon='pi pi-arrow-right'
+                        onClick={handleCheckPayment}
+                    />
                 </div>
             </div>
 

@@ -47,6 +47,10 @@ export class AccountStore {
         return this._account;
     }
 
+    public get accountID() {
+        return this._accountID;
+    }
+
     public get accountExtData() {
         return this._accountExtData;
     }
