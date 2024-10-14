@@ -12,7 +12,7 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     addExportTask,
@@ -38,6 +38,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
@@ -131,6 +132,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [currentParams, setCurrentParams] = useState<QueryParams | null>(null);
     const location = useLocation();
     const currentPath = location.pathname + location.search;
+    const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [currentInventory, setCurrentInventory] = useState<Partial<ExportWebList> | null>(null);
+    const [priceChanged, setPriceChanged] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -616,48 +620,30 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         });
     };
 
-    const handlePriceEdit = (options: ColumnEditorOptions) => {
-        const field: keyof ExportWebList | string = options.field;
-        if (field === "ListPrice") {
-            const saveValue = () => {
-                const value =
-                    exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
-                if (value) {
-                    setInventoryExportWeb(options.rowData.itemuid, {
-                        ListPrice: value.ListPrice,
-                    }).then(() => handleGetExportWebList());
-                }
-            };
+    const handleChangePrice = () => {
+        if (priceChanged) {
+            setConfirmActive(true);
+            setPriceChanged(false);
+        }
+    };
 
-            return (
-                <InputText
-                    className='export-web__edit-input'
-                    value={exportsToWeb[options.rowIndex!].ListPrice}
-                    onChange={({ target }) => {
-                        const value = target.value.replace(/[^0-9.]/g, "");
-                        setExportsToWeb(
-                            exportsToWeb.map((item) => {
-                                if (item.itemuid === options.rowData.itemuid) {
-                                    return {
-                                        ...item,
-                                        [field]: value,
-                                    };
-                                }
-                                return item;
-                            })
-                        );
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            saveValue();
-                        }
-                    }}
-                    onBlur={saveValue}
-                />
-            );
-        } else {
-            return options.value;
+    const handleConfirmSavePrice = async () => {
+        if (currentInventory && currentInventory.itemuid) {
+            const res = await setInventoryExportWeb(currentInventory.itemuid, {
+                ListPrice: currentInventory.ListPrice,
+            });
+
+            if (res?.error) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: res?.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                setConfirmActive(false);
+                handleGetExportWebList();
+            }
         }
     };
 
@@ -862,7 +848,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
-                                                    selectedInventories[rowIndex] && "row--selected"
+                                                    selectedInventories[rowIndex]
+                                                        ? "row--selected"
+                                                        : ""
                                                 }`}
                                             >
                                                 <Checkbox
@@ -899,7 +887,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     header={header}
                                     key={field}
                                     sortable
-                                    editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
                                         let value: string | number;
                                         if (field === "VIN") {
@@ -911,10 +898,31 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         return (
                                             <div
                                                 className={`${
-                                                    selectedInventories[rowIndex] && "row--selected"
+                                                    selectedInventories[rowIndex]
+                                                        ? "row--selected"
+                                                        : ""
                                                 }`}
                                             >
-                                                {field === "ListPrice" ? "$" : null} {value}
+                                                {field === "ListPrice" ? (
+                                                    <InputNumber
+                                                        className='export-web__input-price'
+                                                        value={Number(value)}
+                                                        onChange={({ value }) => {
+                                                            setPriceChanged(true);
+                                                            setCurrentInventory({
+                                                                ...data,
+                                                                ListPrice: value?.toString() || "",
+                                                            });
+                                                        }}
+                                                        onKeyDown={(evt) =>
+                                                            evt.key === "Enter" &&
+                                                            handleChangePrice()
+                                                        }
+                                                        onBlur={handleChangePrice}
+                                                    />
+                                                ) : (
+                                                    value
+                                                )}
                                             </div>
                                         );
                                     }}
@@ -936,6 +944,19 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     </DataTable>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                position='top'
+                title='Save new price?'
+                bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
+                confirmAction={handleConfirmSavePrice}
+                draggable={false}
+                icon='pi pi-save'
+                rejectLabel='Cancel'
+                acceptLabel='Save'
+                className='price-change-confirm-dialog'
+                onHide={() => setConfirmActive(false)}
+            />
         </div>
     );
 };
