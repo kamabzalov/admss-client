@@ -179,7 +179,11 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 </div>
                 <div className='col-12 mt-5 flex justify-content-end'>
-                    <Button className='account-notes__button' onClick={() => setDialogShow(true)}>
+                    <Button
+                        className='account-notes__button'
+                        outlined
+                        onClick={() => setDialogShow(true)}
+                    >
                         Add Note
                     </Button>
                 </div>
