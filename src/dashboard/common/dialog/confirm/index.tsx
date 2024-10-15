@@ -8,6 +8,7 @@ interface ConfirmModalProps extends ConfirmDialogProps {
     title?: string;
     icon?: string;
     confirmAction?: () => void;
+    rejectAction?: () => void;
     visible: boolean;
     onHide: () => void;
 }
@@ -15,6 +16,7 @@ interface ConfirmModalProps extends ConfirmDialogProps {
 export const ConfirmModal = ({
     bodyMessage,
     confirmAction,
+    rejectAction,
     title,
     visible,
     onHide,
@@ -28,7 +30,7 @@ export const ConfirmModal = ({
     }, [visible]);
 
     const accept = () => {
-        confirmAction && confirmAction();
+        confirmAction?.();
         onHide();
     };
 
@@ -40,6 +42,7 @@ export const ConfirmModal = ({
                 detail: "You have rejected",
                 life: 3000,
             });
+        rejectAction?.();
         onHide();
     };
 

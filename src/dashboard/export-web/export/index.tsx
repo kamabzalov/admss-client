@@ -134,6 +134,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const currentPath = location.pathname + location.search;
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [currentInventory, setCurrentInventory] = useState<Partial<ExportWebList> | null>(null);
+    const [initialPrice, setInitialPrice] = useState<string>("");
     const [priceChanged, setPriceChanged] = useState<boolean>(false);
 
     const navigate = useNavigate();
@@ -573,6 +574,13 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         }
     };
 
+    const handleRejectSavePrice = () => {
+        setConfirmActive(false);
+        setPriceChanged(false);
+
+        setCurrentInventory({ ...currentInventory, ListPrice: initialPrice });
+    };
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -851,6 +859,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
                                                             setPriceChanged(true);
+                                                            !initialPrice &&
+                                                                setInitialPrice(data.ListPrice);
                                                             setCurrentInventory({
                                                                 ...data,
                                                                 ListPrice: value?.toString() || "",
@@ -891,6 +901,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 position='top'
                 title='Save new price?'
                 bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
+                rejectAction={handleRejectSavePrice}
                 confirmAction={handleConfirmSavePrice}
                 draggable={false}
                 icon='pi pi-save'
