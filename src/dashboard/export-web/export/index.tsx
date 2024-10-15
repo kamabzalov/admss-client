@@ -136,6 +136,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [currentInventory, setCurrentInventory] = useState<Partial<ExportWebList> | null>(null);
     const [initialPrice, setInitialPrice] = useState<string>("");
     const [priceChanged, setPriceChanged] = useState<boolean>(false);
+    const [forceUpdate, setForceUpdate] = useState<number>(0);
 
     const navigate = useNavigate();
 
@@ -577,8 +578,24 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const handleRejectSavePrice = () => {
         setConfirmActive(false);
         setPriceChanged(false);
+        if (currentInventory) {
+            const updatedInventory = {
+                ...currentInventory,
+                ListPrice: initialPrice,
+            };
 
-        setCurrentInventory({ ...currentInventory, ListPrice: initialPrice });
+            setExportsToWeb((prevExports) =>
+                prevExports.map((item) =>
+                    item.itemuid === currentInventory.itemuid
+                        ? { ...item, ListPrice: initialPrice }
+                        : item
+                )
+            );
+
+            setCurrentInventory(updatedInventory);
+
+            setForceUpdate((prev) => prev + 1);
+        }
     };
 
     return (
@@ -855,12 +872,14 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                             >
                                                 {field === "ListPrice" ? (
                                                     <InputNumber
+                                                        key={forceUpdate}
                                                         className='export-web__input-price'
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
                                                             setPriceChanged(true);
-                                                            !initialPrice &&
+                                                            if (!initialPrice) {
                                                                 setInitialPrice(data.ListPrice);
+                                                            }
                                                             setCurrentInventory({
                                                                 ...data,
                                                                 ListPrice: value?.toString() || "",
