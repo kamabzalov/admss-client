@@ -71,14 +71,19 @@ export const ReportsPanelHeader = ({
                 />
             )}
             <Button
+                tooltip='Add New Custom Report'
+                className='reports-header__button'
+                onClick={() => navigate(navigatePath)}
+            >
+                Custom Report
+            </Button>
+            <Button
+                tooltip='Add New Collection'
                 icon='pi pi-plus'
                 className='reports-header__button'
                 onClick={options.onTogglerClick}
             >
                 New collection
-            </Button>
-            <Button className='reports-header__button' onClick={() => navigate(navigatePath)}>
-                Custom Report
             </Button>
             <span className='p-input-icon-right reports-header__search'>
                 <i
