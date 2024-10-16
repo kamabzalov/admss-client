@@ -468,8 +468,13 @@ export const ContactForm = observer((): ReactElement => {
             ) : (
                 <ConfirmModal
                     visible={confirmActive}
+                    draggable={false}
+                    position='top'
+                    className='contact-delete-dialog'
                     bodyMessage='Do you really want to delete this contact? 
                 This process cannot be undone.'
+                    rejectLabel='Cancel'
+                    acceptLabel='Delete'
                     confirmAction={() => setIsDeleteConfirm(true)}
                     onHide={() => setConfirmActive(false)}
                 />
