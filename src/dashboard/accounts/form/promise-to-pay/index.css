@@ -6,3 +6,40 @@
     width: 210px;
     font-weight: 700;
 }
+
+.p-menu .p-menuitem-link .p-menuitem-icon {
+    &.pi-circle--red {
+        color: var(--admss-app-red);
+    }
+
+    &.pi-circle--yellow {
+        color: var(--admss-app-yellow);
+    }
+
+    &.pi-circle--blue {
+        color: var(--admss-app-main-blue);
+    }
+
+    &.pi-circle--grey {
+        color: var(--admss-app-medium-grey);
+    }
+}
+
+.account-promise__table {
+    .p-button-icon-only.p-button-text {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 20px;
+        width: 20px;
+        border: none;
+        background: transparent;
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+    }
+}

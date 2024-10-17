@@ -1,5 +1,9 @@
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import { TextInput } from "dashboard/common/form/inputs";
+import { useToast } from "dashboard/common/toast";
+import { addAccountPromise } from "http/services/accounts.service";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
@@ -23,10 +27,37 @@ export const AddPromiseDialog = ({
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
     const [note, setNote] = useState<string>("");
+    const toast = useToast();
     const currentTime = useMemo(
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
         []
     );
+
+    const handleAddPromise = async () => {
+        if (accountuid) {
+            const res = await addAccountPromise(accountuid, {
+                username: noteTaker,
+                notes: note,
+            });
+            if (res && res.status === Status.ERROR) {
+                return toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: res.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                action();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Promise added successfully!",
+                    life: TOAST_LIFETIME,
+                });
+                onHide();
+            }
+        }
+    };
 
     useEffect(() => {
         if (noteTaker && note) {
@@ -42,7 +73,7 @@ export const AddPromiseDialog = ({
             cancelButton
             visible={visible}
             onHide={onHide}
-            action={() => onHide()}
+            action={handleAddPromise}
             buttonDisabled={isButtonDisabled}
             {...props}
         >

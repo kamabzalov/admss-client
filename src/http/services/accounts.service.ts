@@ -844,3 +844,43 @@ export const checkAccountPaymentInfo = async (
         }
     }
 };
+
+export const addAccountPromise = async (
+    accountuid: string,
+    promiseData: Partial<AccountPromise>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${accountuid}/promiseadd`,
+            promiseData
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while adding promise",
+            };
+        }
+    }
+};
+
+export const updateAccountPromise = async (
+    promiseuid: string,
+    promiseData: Partial<AccountPromise>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${promiseuid}/promiseset`,
+            promiseData
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating promise",
+            };
+        }
+    }
+};
