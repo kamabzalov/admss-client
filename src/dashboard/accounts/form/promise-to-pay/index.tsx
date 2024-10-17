@@ -60,6 +60,18 @@ export const AccountPromiseToPay = (): ReactElement => {
         getPromiseList();
     }, [id]);
 
+    const handlePromiseStatusChange = async (status: PAID_STATUS) => {
+        const promises = promiseList.filter((_, index) => {
+            return selectedRows[index];
+        });
+
+        if (promises.length) {
+            promises.forEach((promise) => {
+                promise.status = status;
+            });
+        }
+    };
+
     const promiseItems = [
         {
             label: "Edit Promise",
@@ -78,21 +90,21 @@ export const AccountPromiseToPay = (): ReactElement => {
             label: "Set Paid Late",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.LATE}`,
             command: () => {
-                // setSelectedPaid(PAID_STATUS.LATE);
+                handlePromiseStatusChange(PAID_STATUS.LATE);
             },
         },
         {
             label: "Set Promise Broken",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.BROKEN}`,
             command: () => {
-                // setSelectedPaid(PAID_STATUS.BROKEN);
+                handlePromiseStatusChange(PAID_STATUS.BROKEN);
             },
         },
         {
             label: "Set Outstanding",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.OUTSTANDING}`,
             command: () => {
-                // setSelectedPaid(PAID_STATUS.OUTSTANDING);
+                handlePromiseStatusChange(PAID_STATUS.OUTSTANDING);
             },
         },
     ];
@@ -136,6 +148,10 @@ export const AccountPromiseToPay = (): ReactElement => {
                     icon='pi pi-angle-down'
                     disabled={!options.notes}
                     onClick={() => handleRowExpansionClick(options)}
+                />
+                <Button
+                    icon={`pi pi-circle pi-circle--${options.status === PAID_STATUS.LATE ? PAID_COLOR.LATE : PAID_COLOR.DISABLED}`}
+                    text
                 />
             </div>
         );
