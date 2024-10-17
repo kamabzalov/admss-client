@@ -131,6 +131,19 @@ export const AccountPromiseToPay = (): ReactElement => {
         options: AccountPromise,
         { rowIndex }: ColumnBodyOptions
     ): ReactElement => {
+        let color = PAID_COLOR.DISABLED;
+        switch (options.status) {
+            case PAID_STATUS.LATE:
+                color = PAID_COLOR.LATE;
+                break;
+            case PAID_STATUS.BROKEN:
+                color = PAID_COLOR.BROKEN;
+                break;
+            case PAID_STATUS.OUTSTANDING:
+                color = PAID_COLOR.OUTSTANDING;
+                break;
+        }
+
         return (
             <div className={`flex gap-3 align-items-center`}>
                 <Checkbox
@@ -149,10 +162,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     disabled={!options.notes}
                     onClick={() => handleRowExpansionClick(options)}
                 />
-                <Button
-                    icon={`pi pi-circle pi-circle--${options.status === PAID_STATUS.LATE ? PAID_COLOR.LATE : PAID_COLOR.DISABLED}`}
-                    text
-                />
+                <Button icon={`pi pi-circle pi-circle--${color}`} text />
             </div>
         );
     };
