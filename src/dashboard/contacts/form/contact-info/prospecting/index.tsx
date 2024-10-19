@@ -11,6 +11,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { useParams } from "react-router-dom";
+import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
@@ -19,6 +20,7 @@ export const ContactsProspecting = observer((): ReactElement => {
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
     const [prospectList, setProspectList] = useState<any>([]);
+    const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -61,6 +63,8 @@ export const ContactsProspecting = observer((): ReactElement => {
                     <DateInput
                         placeholder='Contact till...'
                         date={contactExtData.created}
+                        showTime
+                        hourFormat='24'
                         onChange={() => changeContactExtData("created", "")}
                         className='contacts-prospecting__date-input w-full'
                     />
@@ -129,10 +133,21 @@ export const ContactsProspecting = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-12 flex justify-content-end '>
-                <Button type='button' className='px-4 font-bold' outlined>
+                <Button
+                    type='button'
+                    className='px-4 font-bold'
+                    onClick={() => setShowAddTaskDialog(true)}
+                    outlined
+                >
                     Schedule Call Back
                 </Button>
             </div>
+            <AddTaskDialog
+                position='top'
+                visible={showAddTaskDialog}
+                onHide={() => setShowAddTaskDialog(false)}
+                header='Add Task'
+            />
         </div>
     );
 });
