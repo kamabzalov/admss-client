@@ -99,6 +99,8 @@ export const ReportEditForm = observer((): ReactElement => {
                                 className='uppercase w-full px-6 report__button'
                                 outlined
                                 onClick={() => handleDownloadForm()}
+                                disabled={!report.name}
+                                severity={!report.name ? "secondary" : "success"}
                             >
                                 Preview
                             </Button>
@@ -108,6 +110,8 @@ export const ReportEditForm = observer((): ReactElement => {
                                 className='uppercase w-full px-6 report__button'
                                 outlined
                                 onClick={() => handleDownloadForm(true)}
+                                disabled={!report.name}
+                                severity={!report.name ? "secondary" : "success"}
                             >
                                 Download
                             </Button>

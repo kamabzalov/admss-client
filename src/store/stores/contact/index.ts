@@ -35,6 +35,8 @@ export class ContactStore {
     private _isContactChanged: boolean = false;
     private _memoRoute: string = "";
     private _deleteReason: string = "";
+    private _activeTab: number | null = null;
+    private _tabLength: number = 0;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -83,6 +85,14 @@ export class ContactStore {
 
     public get memoRoute() {
         return this._memoRoute;
+    }
+
+    public get tabLength() {
+        return this._tabLength;
+    }
+
+    public get activeTab() {
+        return this._activeTab;
     }
 
     public getContact = async (itemuid: string) => {
@@ -272,6 +282,14 @@ export class ContactStore {
             this._isLoading = false;
         }
     };
+
+    public set tabLength(state: number) {
+        this._tabLength = state;
+    }
+
+    public set activeTab(state: number | null) {
+        this._activeTab = state;
+    }
 
     public clearContact = () => {
         this._contact = {} as Contact;

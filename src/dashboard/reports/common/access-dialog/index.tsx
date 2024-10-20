@@ -5,12 +5,14 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
 import { getReportAccessList, setReportAccessList } from "http/services/reports.service";
+import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import "./index.css";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ReportAccess;
@@ -247,9 +249,50 @@ export const EditAccessDialog = ({
         });
     };
 
+    const selectedItemTemplate = (item: ROLE | ACCESS) => {
+        if (!item) {
+            return <></>;
+        }
+        const items = filterOptions.flatMap(
+            (option: { items: { name: string; value: ROLE | ACCESS }[] }) => option.items
+        );
+        const [currentRole] = items.filter(({ value }) => value === item);
+        const handleDelete = (evt: React.MouseEvent<HTMLElement, MouseEvent>) => {
+            evt.preventDefault();
+            selectedRole.forEach((role: ROLE | ACCESS, index: number) => {
+                if (role === item) {
+                    selectedRole.splice(index, 1);
+                    setSelectedRole([...selectedRole]);
+                }
+            });
+        };
+        return (
+            <div
+                className='access-multiselect__select p-multiselect-label-container'
+                data-pc-section='labelcontainer'
+            >
+                <div className='p-multiselect-label' data-pc-section='label'>
+                    <div className='p-multiselect-token' data-pc-section='token'>
+                        <span className='p-multiselect-token-label' data-pc-section='tokenlabel'>
+                            {currentRole?.name}
+                        </span>
+                        <Button
+                            type='button'
+                            rounded
+                            icon='pi pi-times'
+                            onClick={handleDelete}
+                            className='p-multiselect-token-icon'
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <DashboardDialog
             className='edit-access'
+            position='top'
             action={handleSaveAccess}
             footer='Update'
             header='Edit Access'
@@ -262,13 +305,14 @@ export const EditAccessDialog = ({
                     <MultiSelect
                         optionLabel='name'
                         options={filterOptions}
-                        className='w-full'
+                        className='access-multiselect'
                         optionGroupChildren='items'
                         optionGroupLabel='label'
                         showSelectAll={false}
                         value={selectedRole}
                         display='chip'
                         panelHeaderTemplate={<></>}
+                        selectedItemTemplate={selectedItemTemplate}
                         onChange={(event) => {
                             event.stopPropagation();
                             handleRoleSelection(event);
