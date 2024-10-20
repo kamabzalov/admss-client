@@ -148,4 +148,3 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
         </DashboardDialog>
     );
 };
-
