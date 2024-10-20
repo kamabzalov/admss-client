@@ -20,7 +20,6 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { DeleteForm } from "./delete-form";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -103,7 +102,6 @@ export const ContactForm = observer((): ReactElement => {
         saveContact,
         isContactChanged,
         memoRoute,
-        deleteReason,
         isLoading,
         activeTab,
         tabLength,
@@ -117,10 +115,6 @@ export const ContactForm = observer((): ReactElement => {
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     const [isDataMissingConfirm, setIsDataMissingConfirm] = useState<boolean>(false);
-    const [confirmActive, setConfirmActive] = useState<boolean>(false);
-    const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
-    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
-    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
@@ -145,7 +139,6 @@ export const ContactForm = observer((): ReactElement => {
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
-        setDeleteActiveIndex(itemsMenuCount + 1);
         return () => {
             clearContact();
             sections.forEach((section) => section.clearCount());
@@ -253,6 +246,29 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
+    const stepAccordionHeader = (section: ContactSection) => {
+        const validTabsCount = section.items.reduce((count, item) => {
+            const tabFieldsForItem = tabFields[item.itemLabel];
+
+            const hasErrors = tabFieldsForItem?.some(
+                (fieldName) => formikRef.current?.errors[fieldName]
+            );
+
+            return hasErrors ? count : count + 1;
+        }, 0);
+
+        const totalTabsCount = section.items.length;
+
+        return (
+            <div className='p-0'>
+                {section.label}
+                <span className='ml-2 text--green'>
+                    ({validTabsCount}/{totalTabsCount})
+                </span>
+            </div>
+        );
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -294,7 +310,7 @@ export const ContactForm = observer((): ReactElement => {
                                         {contactSections.map((section) => (
                                             <AccordionTab
                                                 key={section.sectionId}
-                                                header={section.label}
+                                                header={stepAccordionHeader(section)}
                                             >
                                                 <Steps
                                                     model={section.items.map(
@@ -333,16 +349,6 @@ export const ContactForm = observer((): ReactElement => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
-                                    {id && (
-                                        <Button
-                                            icon='pi pi-times'
-                                            className='p-button gap-2 inventory__delete-nav w-full'
-                                            severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
-                                        >
-                                            Delete contact
-                                        </Button>
-                                    )}
                                 </div>
                                 <div className='w-full flex flex-column p-0'>
                                     <div className='flex flex-grow-1'>
@@ -409,12 +415,6 @@ export const ContactForm = observer((): ReactElement => {
                                                 )}
                                             </Form>
                                         </Formik>
-                                        {stepActiveIndex === deleteActiveIndex && (
-                                            <DeleteForm
-                                                attemptedSubmit={attemptedSubmit}
-                                                isDeleteConfirm={isDeleteConfirm}
-                                            />
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -441,58 +441,30 @@ export const ContactForm = observer((): ReactElement => {
                                 >
                                     Next
                                 </Button>
-                                {stepActiveIndex === deleteActiveIndex ? (
-                                    <Button
-                                        onClick={() =>
-                                            deleteReason.length
-                                                ? setConfirmActive(true)
-                                                : setAttemptedSubmit(true)
-                                        }
-                                        className='form-nav__button form-nav__button--danger'
-                                    >
-                                        Delete
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        className='form-nav__button'
-                                        onClick={handleSaveContactForm}
-                                    >
-                                        Save
-                                    </Button>
-                                )}
+                                <Button
+                                    className='form-nav__button'
+                                    onClick={handleSaveContactForm}
+                                >
+                                    Save
+                                </Button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {isConfirmVisible ? (
-                <ConfirmModal
-                    visible={!!isConfirmVisible}
-                    title={confirmTitle}
-                    icon='pi-exclamation-triangle'
-                    bodyMessage={confirmMessage}
-                    confirmAction={confirmAction}
-                    draggable={false}
-                    rejectLabel='Cancel'
-                    acceptLabel='Confirm'
-                    resizable={false}
-                    className='contact-confirm-dialog'
-                    onHide={() => setIsConfirmVisible(false)}
-                />
-            ) : (
-                <ConfirmModal
-                    visible={confirmActive}
-                    draggable={false}
-                    position='top'
-                    className='contact-delete-dialog'
-                    bodyMessage='Do you really want to delete this contact? 
-                This process cannot be undone.'
-                    rejectLabel='Cancel'
-                    acceptLabel='Delete'
-                    confirmAction={() => setIsDeleteConfirm(true)}
-                    onHide={() => setConfirmActive(false)}
-                />
-            )}
+            <ConfirmModal
+                visible={!!isConfirmVisible}
+                title={confirmTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={confirmMessage}
+                confirmAction={confirmAction}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Confirm'
+                resizable={false}
+                className='contact-confirm-dialog'
+                onHide={() => setIsConfirmVisible(false)}
+            />
 
             <DashboardDialog
                 visible={!!isDataMissingConfirm}
