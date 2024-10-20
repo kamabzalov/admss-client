@@ -5,7 +5,6 @@
     height: 50px;
 }
 
-.contacts-prospecting__text-area.p-inputtext {
-    resize: none;
+.contacts-prospecting__text-area {
     height: 120px;
 }

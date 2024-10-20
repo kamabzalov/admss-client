@@ -440,8 +440,17 @@
     rotate: 180deg;
 }
 
+.text--red {
+    color: var(--admss-app-red);
+}
+
+.text--green {
+    color: var(--admss-app-green);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
     }
 }
+
