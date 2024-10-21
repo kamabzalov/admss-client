@@ -166,7 +166,7 @@ export const getContactsProspectList = async (contactuid: string) => {
 export const deleteContact = async (contactuid: string, data: Record<string, string>) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
-            `contact/${contactuid}/delete`,
+            `contact/${contactuid}/deletecontact`,
             data
         );
         return response.data;
