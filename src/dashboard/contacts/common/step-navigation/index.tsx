@@ -1,3 +1,4 @@
+import { Button } from "primereact/button";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
@@ -53,23 +54,19 @@ export class ContactSection implements Contact {
         { props, onClick, className, labelClassName }: MenuItemOptions,
         index: number
     ): ReactElement {
-        const isGreen =
+        const isActive =
             (ContactSection.instancesCount > this.items.length || index <= props.activeIndex) &&
             props.activeIndex !== 0;
 
         return (
-            <a
-                href='#'
-                onClick={onClick}
-                className={`${className} vertical-nav flex-row align-items-center justify-content-start w-full`}
-            >
+            <Button onClick={onClick} className={`${className} vertical-nav`}>
                 <label
                     className={`vertical-nav__icon p-steps-number ${
-                        isGreen && "p-steps-number--green"
+                        isActive && "p-steps-number--green"
                     } border-circle`}
                 />
                 <span className={`${labelClassName} vertical-nav__label`}>{item.label}</span>
-            </a>
+            </Button>
         );
     }
 
