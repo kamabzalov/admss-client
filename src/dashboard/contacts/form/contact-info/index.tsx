@@ -11,11 +11,13 @@ const ContactsProspecting = lazy(() =>
     import("./prospecting").then((module) => ({ default: module.ContactsProspecting }))
 );
 
+const items = [
+    { itemLabel: ContactAccordionItems.CONTACTS, component: <ContactsSocialInfo /> },
+    { itemLabel: ContactAccordionItems.COMPANY, component: <ContactsWorkplace /> },
+    { itemLabel: ContactAccordionItems.PROSPECTING, component: <ContactsProspecting /> },
+];
+
 export const ContactInfoData: Pick<Contact, "label" | "items"> = {
-    label: "Contact Information",
-    items: [
-        { itemLabel: ContactAccordionItems.CONTACTS, component: <ContactsSocialInfo /> },
-        { itemLabel: ContactAccordionItems.COMPANY, component: <ContactsWorkplace /> },
-        { itemLabel: ContactAccordionItems.PROSPECTING, component: <ContactsProspecting /> },
-    ],
+    label: `Contact Information`,
+    items,
 };

@@ -1,3 +1,4 @@
+import { Button } from "primereact/button";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
@@ -37,35 +38,35 @@ export class ContactSection implements Contact {
     public constructor({ label, items }: { label: string; items: ContactItem[] }) {
         this.sectionId = ++ContactSection.instancesCount;
         this.label = label;
-        this.items = items.map(({ itemLabel, component }) => ({
+        this.items = items.map(({ itemLabel, component }, index: number) => ({
             itemLabel,
             component,
             itemIndex: ContactSection.itemIndex++,
-            template: (item: MenuItem, options: MenuItemOptions) => this.newTemplate(item, options),
+            template: (item: MenuItem, options: MenuItemOptions) => {
+                return this.newTemplate(item, options, index);
+            },
         }));
         this.startIndex = ContactSection.itemIndex - this.items.length;
     }
 
-    private newTemplate(item: MenuItem, options: MenuItemOptions): JSX.Element {
+    private newTemplate(
+        item: MenuItem,
+        { props, onClick, className, labelClassName }: MenuItemOptions,
+        index: number
+    ): ReactElement {
+        const isActive =
+            (ContactSection.instancesCount > this.items.length || index <= props.activeIndex) &&
+            props.activeIndex !== 0;
+
         return (
-            <a
-                href='#'
-                role='presentation'
-                data-pc-section='action'
-                onClick={options.onClick}
-                className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
-            >
+            <Button onClick={onClick} className={`${className} vertical-nav`}>
                 <label
-                    className={"vertical-nav__icon p-steps-number border-circle "}
-                    data-pc-section='step'
+                    className={`vertical-nav__icon p-steps-number ${
+                        isActive && "p-steps-number--green"
+                    } border-circle`}
                 />
-                <span
-                    className={`${options.labelClassName} vertical-nav__label`}
-                    data-pc-section='label'
-                >
-                    {item.label}
-                </span>
-            </a>
+                <span className={`${labelClassName} vertical-nav__label`}>{item.label}</span>
+            </Button>
         );
     }
 

@@ -1,7 +1,6 @@
+import { Button } from "primereact/button";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
-
-/* eslint-disable jsx-a11y/anchor-is-valid */
 
 export enum AccordionItems {
     GENERAL = "General",
@@ -47,15 +46,28 @@ export interface Inventory {
 export class InventorySection implements Inventory {
     private static instancesCount: number = 0;
     private static itemIndex: number = 0;
-    public sectionId: number;
-    public label: string;
-    public startIndex: number = 0;
-    public items: InventoryItem[];
+    private _sectionId: number;
+    private _label: string;
+    private _startIndex: number = 0;
+    private _items: InventoryItem[];
+
+    public get sectionId(): number {
+        return this._sectionId;
+    }
+    public get label(): string {
+        return this._label;
+    }
+    public get items(): InventoryItem[] {
+        return this._items;
+    }
+    public get startIndex(): number {
+        return this._startIndex;
+    }
 
     public constructor({ label, items }: { label: string; items: InventoryItem[] }) {
-        this.sectionId = ++InventorySection.instancesCount;
-        this.label = label;
-        this.items = items.map(({ itemLabel, component }, index: number) => ({
+        this._sectionId = ++InventorySection.instancesCount;
+        this._label = label;
+        this._items = items.map(({ itemLabel, component }, index: number) => ({
             itemLabel,
             component,
             itemIndex: InventorySection.itemIndex++,
@@ -63,31 +75,27 @@ export class InventorySection implements Inventory {
                 return this.newTemplate(item, options, index);
             },
         }));
-        this.startIndex = InventorySection.itemIndex - this.items.length;
+        this._startIndex = InventorySection.itemIndex - this.items.length;
     }
 
     private newTemplate(
         item: MenuItem,
         { props, onClick, className, labelClassName }: MenuItemOptions,
         index: number
-    ): JSX.Element {
-        const isGreen =
+    ): ReactElement {
+        const isActive =
             (InventorySection.instancesCount > this.items.length || index <= props.activeIndex) &&
             props.activeIndex !== 0;
 
         return (
-            <a
-                href='#'
-                onClick={onClick}
-                className={`${className} vertical-nav flex-row align-items-center justify-content-start w-full`}
-            >
+            <Button onClick={onClick} className={`${className} vertical-nav`}>
                 <label
                     className={`vertical-nav__icon p-steps-number ${
-                        isGreen && "p-steps-number--green"
+                        isActive && "p-steps-number--green"
                     } border-circle`}
                 />
                 <span className={`${labelClassName} vertical-nav__label`}>{item.label}</span>
-            </a>
+            </Button>
         );
     }
 

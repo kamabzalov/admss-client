@@ -1,6 +1,5 @@
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -10,6 +9,10 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { DateInput } from "dashboard/common/form/inputs";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -33,6 +36,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
     const [description, setDescription] = useState<string>(currentTask?.description || "");
     const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
+    const toast = useToast();
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -43,7 +47,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
         }
     }, [visible]);
 
-    const handleSaveTaskData = () => {
+    const handleSaveTaskData = async () => {
         const taskData: any = {
             assignTo,
             startDate,
@@ -55,12 +59,22 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             description,
         };
 
-        createTask(taskData).then((response) => {});
+        const response = await createTask(taskData);
+
+        if (response.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+        }
         onHide();
     };
 
     return (
         <DashboardDialog
+            position='top'
             onHide={onHide}
             visible={visible}
             header={header}
@@ -80,21 +94,19 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                     />
                 )}
                 <div className='flex flex-column md:flex-row column-gap-3'>
-                    <div className='p-inputgroup flex-1'>
-                        <Calendar
+                    <div className='p-inputgroup'>
+                        <DateInput
                             placeholder='Start Date'
                             value={startDate}
                             onChange={(e) => setStartDate(e.value as Date)}
                         />
-                        <DialogIcon icon='support-history' />
                     </div>
-                    <div className='p-inputgroup flex-1'>
-                        <Calendar
+                    <div className='p-inputgroup'>
+                        <DateInput
                             placeholder='Due Date'
                             value={dueDate}
                             onChange={(e) => setDueDate(e.value as Date)}
                         />
-                        <DialogIcon icon='support-history' />
                     </div>
                 </div>
                 <div className='p-inputgroup flex-1'>
