@@ -235,11 +235,12 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             setExportsToWeb(dataResponse);
             setSelectedInventories(Array(dataResponse.length).fill(false));
             const price = dataResponse.map((item) => parseFloat(item.ListPrice));
+
             setSelectedServices(
                 selectedServices.map((item) => ({
                     ...item,
                     selected: Array(dataResponse.length).fill(false),
-                    price,
+                    price: item.price.length > 0 ? item.price : price,
                 }))
             );
         } else {
