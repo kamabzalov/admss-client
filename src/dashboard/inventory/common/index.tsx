@@ -1,7 +1,6 @@
+import { Button } from "primereact/button";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
-
-/* eslint-disable jsx-a11y/anchor-is-valid */
 
 export enum AccordionItems {
     GENERAL = "General",
@@ -83,24 +82,20 @@ export class InventorySection implements Inventory {
         item: MenuItem,
         { props, onClick, className, labelClassName }: MenuItemOptions,
         index: number
-    ): JSX.Element {
-        const isGreen =
+    ): ReactElement {
+        const isActive =
             (InventorySection.instancesCount > this.items.length || index <= props.activeIndex) &&
             props.activeIndex !== 0;
 
         return (
-            <a
-                href='#'
-                onClick={onClick}
-                className={`${className} vertical-nav flex-row align-items-center justify-content-start w-full`}
-            >
+            <Button onClick={onClick} className={`${className} vertical-nav`}>
                 <label
                     className={`vertical-nav__icon p-steps-number ${
-                        isGreen && "p-steps-number--green"
+                        isActive && "p-steps-number--green"
                     } border-circle`}
                 />
                 <span className={`${labelClassName} vertical-nav__label`}>{item.label}</span>
-            </a>
+            </Button>
         );
     }
 
