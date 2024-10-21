@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
-import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -48,6 +48,11 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
         changeContactExtData,
     ]);
 
+    const isControlDisabled = useMemo(
+        () => type === CO_BUYER && contact.type !== BUYER_ID,
+        [type, contact.type]
+    );
+
     return (
         <div className='grid address-info row-gap-2'>
             <div className='col-6'>
@@ -64,6 +69,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("streetAddress", value)
                                 : changeContactExtData("CoBuyer_Emp_Address", value)
                         }
+                        disabled={isControlDisabled}
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
@@ -84,6 +90,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                             : changeContactExtData("CoBuyer_Emp_State", value)
                     }
                     className='w-full address-info__dropdown'
+                    disabled={isControlDisabled}
                 />
             </div>
 
@@ -99,6 +106,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("city", value)
                                 : changeContactExtData("CoBuyer_Emp_City", value)
                         }
+                        disabled={isControlDisabled}
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -116,6 +124,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("ZIP", value)
                                 : changeContactExtData("CoBuyer_Emp_Zip", value)
                         }
+                        disabled={isControlDisabled}
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>
@@ -133,6 +142,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                             name='contact-same-address'
                             checked={isSameAsMailing}
                             onChange={() => setIsSameAsMailing(!isSameAsMailing)}
+                            disabled={isControlDisabled}
                         />
                         <label htmlFor='contact-same-address' className='ml-2'>
                             Same as primary address
@@ -155,7 +165,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailStreetAddress", value)
                                 : changeContactExtData("CoBuyer_Mailing_Address", value)
                         }
-                        disabled={isSameAsMailing}
+                        disabled={isSameAsMailing || isControlDisabled}
                     />
                     <label className='float-label'>Street address</label>
                 </span>
@@ -178,7 +188,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     }
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
-                    disabled={isSameAsMailing}
+                    disabled={isSameAsMailing || isControlDisabled}
                 />
             </div>
 
@@ -196,7 +206,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailCity", value)
                                 : changeContactExtData("CoBuyer_Mailing_City", value)
                         }
-                        disabled={isSameAsMailing}
+                        disabled={isSameAsMailing || isControlDisabled}
                     />
                     <label className='float-label'>City</label>
                 </span>
@@ -216,7 +226,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? changeContact("mailZIP", value)
                                 : changeContactExtData("CoBuyer_Mailing_Zip", value)
                         }
-                        disabled={isSameAsMailing}
+                        disabled={isSameAsMailing || isControlDisabled}
                     />
                     <label className='float-label'>Zip Code</label>
                 </span>

@@ -13,6 +13,8 @@ export enum GENERAL_CONTACT_TYPE {
     CO_BUYER = "co-buyer",
 }
 
+export const BUYER_ID = 1;
+
 export const GeneralInfoData: Pick<Contact, "label" | "items"> = {
     label: "General information",
     items: [

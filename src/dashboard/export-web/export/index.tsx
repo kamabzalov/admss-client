@@ -134,7 +134,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const currentPath = location.pathname + location.search;
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [currentInventory, setCurrentInventory] = useState<Partial<ExportWebList> | null>(null);
+    const [initialPrice, setInitialPrice] = useState<string>("");
     const [priceChanged, setPriceChanged] = useState<boolean>(false);
+    const [forceUpdate, setForceUpdate] = useState<number>(0);
 
     const navigate = useNavigate();
 
@@ -573,6 +575,29 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         }
     };
 
+    const handleRejectSavePrice = () => {
+        setConfirmActive(false);
+        setPriceChanged(false);
+        if (currentInventory) {
+            const updatedInventory = {
+                ...currentInventory,
+                ListPrice: initialPrice,
+            };
+
+            setExportsToWeb((prevExports) =>
+                prevExports.map((item) =>
+                    item.itemuid === currentInventory.itemuid
+                        ? { ...item, ListPrice: initialPrice }
+                        : item
+                )
+            );
+
+            setCurrentInventory(updatedInventory);
+
+            setForceUpdate((prev) => prev + 1);
+        }
+    };
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -847,10 +872,14 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                             >
                                                 {field === "ListPrice" ? (
                                                     <InputNumber
+                                                        key={forceUpdate}
                                                         className='export-web__input-price'
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
                                                             setPriceChanged(true);
+                                                            if (!initialPrice) {
+                                                                setInitialPrice(data.ListPrice);
+                                                            }
                                                             setCurrentInventory({
                                                                 ...data,
                                                                 ListPrice: value?.toString() || "",
@@ -891,6 +920,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 position='top'
                 title='Save new price?'
                 bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
+                rejectAction={handleRejectSavePrice}
                 confirmAction={handleConfirmSavePrice}
                 draggable={false}
                 icon='pi pi-save'
