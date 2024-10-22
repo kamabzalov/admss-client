@@ -246,6 +246,29 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
+    const stepAccordionHeader = (section: ContactSection) => {
+        const validTabsCount = section.items.reduce((count, item) => {
+            const tabFieldsForItem = tabFields[item.itemLabel];
+
+            const hasErrors = tabFieldsForItem?.some(
+                (fieldName) => formikRef.current?.errors[fieldName]
+            );
+
+            return hasErrors ? count : count + 1;
+        }, 0);
+
+        const totalTabsCount = section.items.length;
+
+        return (
+            <div className='p-0'>
+                {section.label}
+                <span className='ml-2 text--green'>
+                    ({validTabsCount}/{totalTabsCount})
+                </span>
+            </div>
+        );
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -287,7 +310,7 @@ export const ContactForm = observer((): ReactElement => {
                                         {contactSections.map((section) => (
                                             <AccordionTab
                                                 key={section.sectionId}
-                                                header={section.label}
+                                                header={stepAccordionHeader(section)}
                                             >
                                                 <Steps
                                                     model={section.items.map(
