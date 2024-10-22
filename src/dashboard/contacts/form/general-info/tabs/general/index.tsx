@@ -235,6 +235,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 filter
                                 options={typeList}
                                 onChange={(e) => {
+                                    store.contactType = e.value;
                                     setFieldValue("type", e.value);
                                     changeContact("type", e.value);
                                 }}
