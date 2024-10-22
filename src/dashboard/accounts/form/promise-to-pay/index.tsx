@@ -3,7 +3,7 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { listAccountPromises } from "http/services/accounts.service";
+import { addAccountPromise, listAccountPromises } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
@@ -11,6 +11,9 @@ import { useStore } from "store/hooks";
 import { makeShortReports } from "http/services/reports.service";
 import { AddPromiseDialog } from "dashboard/accounts/form/promise-to-pay/add-promise";
 import { Checkbox } from "primereact/checkbox";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -45,6 +48,7 @@ export const AccountPromiseToPay = (): ReactElement => {
     const [addPromiseVisible, setAddPromiseVisible] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const toast = useToast();
 
     const getPromiseList = async () => {
         if (id) {
@@ -60,14 +64,26 @@ export const AccountPromiseToPay = (): ReactElement => {
         getPromiseList();
     }, [id]);
 
-    const handlePromiseStatusChange = async (status: PAID_STATUS) => {
-        const promises = promiseList.filter((_, index) => {
-            return selectedRows[index];
-        });
-
-        if (promises.length) {
-            promises.forEach((promise) => {
-                promise.status = status;
+    const handleChangePromiseStatus = (status: PAID_STATUS) => {
+        if (id && selectedRows.length) {
+            const promises = promiseList.filter((_, index) => {
+                return selectedRows[index];
+            });
+            promises.forEach(async (promise) => {
+                const res = await addAccountPromise(id, {
+                    ...promise,
+                    pstatusname: status,
+                });
+                if (res && res.status === Status.ERROR) {
+                    return toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    getPromiseList();
+                }
             });
         }
     };
@@ -90,21 +106,21 @@ export const AccountPromiseToPay = (): ReactElement => {
             label: "Set Paid Late",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.LATE}`,
             command: () => {
-                handlePromiseStatusChange(PAID_STATUS.LATE);
+                handleChangePromiseStatus(PAID_STATUS.LATE);
             },
         },
         {
             label: "Set Promise Broken",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.BROKEN}`,
             command: () => {
-                handlePromiseStatusChange(PAID_STATUS.BROKEN);
+                handleChangePromiseStatus(PAID_STATUS.BROKEN);
             },
         },
         {
             label: "Set Outstanding",
             icon: `pi pi-circle pi-circle--${PAID_COLOR.OUTSTANDING}`,
             command: () => {
-                handlePromiseStatusChange(PAID_STATUS.OUTSTANDING);
+                handleChangePromiseStatus(PAID_STATUS.OUTSTANDING);
             },
         },
     ];
