@@ -878,7 +878,10 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
                                                             setPriceChanged(true);
-                                                            if (!initialPrice) {
+                                                            if (
+                                                                !initialPrice ||
+                                                                initialPrice !== String(value)
+                                                            ) {
                                                                 setInitialPrice(data.ListPrice);
                                                             }
                                                             setCurrentInventory({
