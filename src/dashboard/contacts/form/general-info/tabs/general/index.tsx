@@ -252,9 +252,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
             <div className='col-4 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.firstName ? "p-invalid" : ""
-                        }`}
+                        className={`general-info__text-input w-full ${errors.firstName ? "p-invalid" : ""}`}
                         value={
                             (type === BUYER
                                 ? contact.firstName
@@ -274,8 +272,15 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 ? "The type of contact you have selected requires entering only the business name"
                                 : ""
                         }
-                        disabled={!!shouldDisableNameFields || isControlDisabled}
+                        readOnly={!!shouldDisableNameFields || isControlDisabled}
+                        onMouseDown={(e) => {
+                            if (shouldDisableNameFields || isControlDisabled) {
+                                e.preventDefault();
+                            }
+                        }}
+                        id='firstName'
                     />
+
                     <label className='float-label'>
                         First Name
                         {!isBusinessNameRequired && " (required)"}
@@ -327,7 +332,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                             }
                         }}
                         onBlur={handleOfacCheck}
-                        disabled={!!shouldDisableNameFields || isControlDisabled}
+                        readOnly={!!shouldDisableNameFields || isControlDisabled}
+                        onMouseDown={(e) => {
+                            if (shouldDisableNameFields || isControlDisabled) {
+                                e.preventDefault();
+                            }
+                        }}
                     />
                     <label className='float-label'>
                         Last Name
@@ -345,7 +355,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         }`}
                         value={contact.businessName || ""}
                         onChange={({ target: { value } }) => changeContact("businessName", value)}
-                        disabled={shouldDisableBusinessName || isControlDisabled}
+                        readOnly={!!shouldDisableNameFields || isControlDisabled}
+                        onMouseDown={(e) => {
+                            if (!!shouldDisableNameFields || isControlDisabled) {
+                                e.preventDefault();
+                            }
+                        }}
                     />
                     <label className='float-label'>
                         Business Name

@@ -2,6 +2,13 @@
     height: 50px;
 }
 
+.general-info__text-input[readonly] {
+    user-select: none;
+    &:hover {
+        border-color: var(--admss-app-light-grey);
+    }
+}
+
 .general-info__button {
     width: 246px;
     height: 54px;
