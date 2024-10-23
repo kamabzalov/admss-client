@@ -146,3 +146,17 @@
 .search-input__icon .icon {
     font-size: 20px;
 }
+
+.clear-input-button.p-button {
+    color: var(--admss-app-light-grey);
+    position: absolute;
+    right: 0;
+    border: none;
+    &:hover:enabled {
+        color: var(--admss-app-light-grey);
+        background-color: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+    }
+}

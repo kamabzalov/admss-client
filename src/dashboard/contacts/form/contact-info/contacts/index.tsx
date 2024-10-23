@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { Contact } from "common/models/contact";
+import { InputMask } from "primereact/inputmask";
 
 interface SocialInputProps extends InputTextProps {
     social: "Skype" | "Facebook" | "WhatsApp" | "Slack";
@@ -45,6 +46,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
+                        type='email'
                         className={`contacts-social__text-input w-full ${
                             errors.email1 ? "p-invalid" : ""
                         }`}
@@ -64,6 +66,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <div className='col-6 relative'>
                     <span className='p-float-label'>
                         <InputText
+                            type='email'
                             className={`contacts-social__text-input w-full ${
                                 errors.email2 ? "p-invalid" : ""
                             }`}
@@ -96,15 +99,17 @@ export const ContactsSocialInfo = observer((): ReactElement => {
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <InputText
+                    <InputMask
+                        type='tel'
                         className={`contacts-social__text-input w-full ${
                             errors.phone1 ? "p-invalid" : ""
                         }`}
+                        mask='999-999-9999'
                         onBlur={handleBlur}
-                        value={values.phone1 || ""}
+                        value={values?.phone1 ?? ""}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("phone1", value);
-                            changeContact("phone1", value);
+                            value && changeContact("phone1", value);
                             setFieldTouched("phone1", true, true);
                         }}
                     />
@@ -115,16 +120,18 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             {anotherPhone ? (
                 <div className='col-6 relative'>
                     <span className='p-float-label'>
-                        <InputText
+                        <InputMask
+                            type='tel'
+                            mask='999-999-9999'
                             className={`contacts-social__text-input w-full ${
                                 errors.phone2 ? "p-invalid" : ""
                             }`}
-                            value={values.phone2 || ""}
+                            value={values.phone2 ?? ""}
                             onBlur={handleBlur}
                             onChange={async ({ target: { value } }) => {
                                 if (!value?.length) setAnotherPhone(false);
                                 await setFieldValue("phone2", value);
-                                changeContact("phone2", value);
+                                value && changeContact("phone2", value);
                                 setFieldTouched("phone2", true, true);
                             }}
                         />

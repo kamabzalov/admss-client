@@ -42,14 +42,18 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
-    phone1: Yup.string().matches(/^[\d]{10,13}$/, {
-        message: "Invalid phone number.",
-        excludeEmptyString: false,
-    }),
-    phone2: Yup.string().matches(/^[\d]{10,13}$/, {
-        message: "Invalid phone number.",
-        excludeEmptyString: false,
-    }),
+    phone1: Yup.string()
+        .transform((value) => value.replace(/-/g, ""))
+        .matches(/^[\d]{10,13}$/, {
+            message: "Invalid phone number.",
+            excludeEmptyString: false,
+        }),
+    phone2: Yup.string()
+        .transform((value) => value.replace(/-/g, ""))
+        .matches(/^[\d]{10,13}$/, {
+            message: "Invalid phone number.",
+            excludeEmptyString: false,
+        }),
     companyName: Yup.string()
         ?.trim()
         .when("type", ([type]) => {

@@ -3,7 +3,7 @@
 }
 
 .general-info__text-input[readonly] {
-    user-select: none;
+    cursor: default;
     &:hover {
         border-color: var(--admss-app-light-grey);
     }
@@ -32,4 +32,12 @@
         outline: none;
         box-shadow: none;
     }
+}
+
+.p-float-label .p-tooltip-target-wrapper ~ label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
 }
