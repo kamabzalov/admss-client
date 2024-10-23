@@ -19,8 +19,10 @@ import {
     ReportsAccordionHeader,
 } from "dashboard/reports/common/report-headers";
 import { ActionButtons } from "dashboard/reports/common/report-buttons";
+import { useNavigate } from "react-router-dom";
 
 export default function Reports(): ReactElement {
+    const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [reportSearch, setReportSearch] = useState<string>("");
@@ -301,7 +303,12 @@ export default function Reports(): ReactElement {
                                                             documents.map((report) => (
                                                                 <div
                                                                     className='reports__list-item reports__list-item--inner'
-                                                                    key={report.itemUID}
+                                                                    key={report.documentUID}
+                                                                    onDoubleClick={() => {
+                                                                        navigate(
+                                                                            `/dashboard/reports/${report.documentUID}`
+                                                                        );
+                                                                    }}
                                                                 >
                                                                     <p>{report.name}</p>
                                                                     <ActionButtons
