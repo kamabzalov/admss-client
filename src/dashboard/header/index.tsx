@@ -5,7 +5,7 @@ import { MenuItem } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
@@ -14,14 +14,17 @@ import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
-import { HELP_PAGE } from "common/constants/links";
+import { CONTACT_SUPPORT, HELP_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
-    const [supportContact, setSupportContact] = useState<boolean>(false);
+    const location = useLocation();
+    const [supportContact, setSupportContact] = useState<boolean>(
+        new URLSearchParams(location.search).has(CONTACT_SUPPORT)
+    );
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
     const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
@@ -48,6 +51,12 @@ export const Header = observer((): ReactElement => {
             localStorageClear(LS_APP_USER);
             navigate("/");
         });
+    };
+
+    const removeSupportHistoryParam = () => {
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.delete(CONTACT_SUPPORT);
+        navigate({ search: searchParams.toString() }, { replace: true });
     };
 
     const menuItems = useMemo(
@@ -128,7 +137,10 @@ export const Header = observer((): ReactElement => {
                             authUser={authUser}
                         />
                         <SupportContactDialog
-                            onHide={() => setSupportContact(false)}
+                            onHide={() => {
+                                setSupportContact(false);
+                                removeSupportHistoryParam();
+                            }}
                             visible={supportContact}
                         />
                         <SupportHistoryDialog
