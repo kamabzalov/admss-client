@@ -23,6 +23,7 @@ export type DLSide = DLSides.FRONT | DLSides.BACK;
 export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = {} as Contact;
+    private _contactType: number = 0;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
     private _contactID: string = "";
@@ -44,6 +45,10 @@ export class ContactStore {
 
     public get contact() {
         return this._contact;
+    }
+
+    public get contactType() {
+        return this._contactType;
     }
 
     public get contactExtData() {
@@ -216,6 +221,10 @@ export class ContactStore {
             this._isLoading = false;
         }
     });
+
+    public set contactType(state: number) {
+        this._contactType = state;
+    }
 
     public set frontSideDL(file: File) {
         this._frontSiteDL = file;
