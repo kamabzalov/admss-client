@@ -3,7 +3,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
 
-export interface SupportMessage {
+export interface SupportMessage extends BaseResponseError {
     email: string;
     topic: string;
     message: string;
@@ -65,16 +65,21 @@ export const getSupportThread = async (threaduid: string) => {
 };
 
 export const createOrUpdateSupportMessage = async (
-    supportData: SupportMessage,
+    supportData: Partial<SupportMessage>,
     itemuid?: string | undefined
 ) => {
     try {
-        await authorizedUserApiInstance
-            .post<SupportMessage>(`log/${itemuid || 0}/support`, supportData)
-            .then((response) => {
-                return response.status;
-            });
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `log/${itemuid || 0}/support`,
+            supportData
+        );
+        return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while sending support message",
+            };
+        }
     }
 };
