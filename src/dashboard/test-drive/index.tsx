@@ -18,10 +18,6 @@ import { ContactUser } from "common/models/contact";
 import { setContact } from "http/services/contacts-service";
 import { Form, Formik } from "formik";
 
-const isFormComplete = (obj: object): boolean => {
-    return Object.values(obj).every((value) => value !== "");
-};
-
 const validationSchema = Yup.object().shape({
     customerName: Yup.string().required("First Name is required"),
     customerLastName: Yup.string().required("Last Name is required"),
@@ -143,7 +139,15 @@ export const PrintForTestDrive = (): ReactElement => {
                                 validationSchema={validationSchema}
                                 onSubmit={(values) => handlePrintForm(values)}
                             >
-                                {({ values, errors, touched, handleChange, handleBlur }) => (
+                                {({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    isValid,
+                                    dirty,
+                                }) => (
                                     <Form className='grid test-drive__card-content'>
                                         <div className='col-12 test-drive__subtitle'>Driver</div>
                                         <div className='col-9 grid row-gap-2'>
@@ -155,6 +159,14 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     onChange={({ value }) =>
                                                         handleChange({
                                                             target: { name: "customerName", value },
+                                                        })
+                                                    }
+                                                    onRowClick={(value) =>
+                                                        handleChange({
+                                                            target: {
+                                                                name: "customerName",
+                                                                value,
+                                                            },
                                                         })
                                                     }
                                                     onBlur={handleBlur}
@@ -171,6 +183,14 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     value={values.customerLastName}
                                                     returnedField='lastName'
                                                     onChange={({ value }) =>
+                                                        handleChange({
+                                                            target: {
+                                                                name: "customerLastName",
+                                                                value,
+                                                            },
+                                                        })
+                                                    }
+                                                    onRowClick={(value) =>
                                                         handleChange({
                                                             target: {
                                                                 name: "customerLastName",
@@ -355,6 +375,11 @@ export const PrintForTestDrive = (): ReactElement => {
                                             <TextInput
                                                 name='Odometer (required)'
                                                 value={values.outOdometer}
+                                                onChange={({ target: { value } }) =>
+                                                    handleChange({
+                                                        target: { name: "outOdometer", value },
+                                                    })
+                                                }
                                                 onBlur={handleBlur}
                                                 colWidth={4}
                                             />
@@ -396,31 +421,28 @@ export const PrintForTestDrive = (): ReactElement => {
                                             <Button
                                                 className='test-drive__button'
                                                 severity={
-                                                    !isFormComplete(values)
-                                                        ? "secondary"
-                                                        : "success"
+                                                    !isValid || !dirty ? "secondary" : "success"
                                                 }
                                                 onClick={() => handlePrintForm(values)}
+                                                disabled={!isValid || !dirty}
                                                 label='Preview'
                                             />
                                             <Button
                                                 className='test-drive__button'
                                                 severity={
-                                                    !isFormComplete(values)
-                                                        ? "secondary"
-                                                        : "success"
+                                                    !isValid || !dirty ? "secondary" : "success"
                                                 }
                                                 onClick={() => handlePrintForm(values, true)}
+                                                disabled={!isValid || !dirty}
                                                 label='Print'
                                             />
                                             <Button
                                                 className='test-drive__button'
                                                 severity={
-                                                    !isFormComplete(values)
-                                                        ? "secondary"
-                                                        : "success"
+                                                    !isValid || !dirty ? "secondary" : "success"
                                                 }
                                                 onClick={() => handlePrintForm(values)}
+                                                disabled={!isValid || !dirty}
                                                 label='Download'
                                             />
                                         </div>
