@@ -17,6 +17,7 @@
     width: 294px;
     border: none;
     min-height: 527px;
+
     gap: 10px;
 }
 
@@ -82,7 +83,7 @@
 .account__table {
     flex-grow: 1;
     height: 474px;
-    min-height: 29vh;
+    min-height: 26vh;
 
     .p-datatable {
         height: 100%;

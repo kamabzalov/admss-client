@@ -256,6 +256,15 @@ export const AccountDownPayment = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
+                        scrollHeight='310px'
+                        pt={{
+                            root: {
+                                style: {
+                                    minHeight: "18vh",
+                                    height: "310px",
+                                },
+                            },
+                        }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}

@@ -188,9 +188,10 @@ export const AccountNotes = observer((): ReactElement => {
                         Add Note
                     </Button>
                 </div>
-                <div className='col-12 account__table'>
+                <div className='col-12'>
                     <DataTable
                         showGridlines
+                        className='account__table'
                         value={notesList}
                         emptyMessage='No notes added yet.'
                         reorderableColumns
@@ -199,6 +200,15 @@ export const AccountNotes = observer((): ReactElement => {
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                        scrollHeight='310px'
+                        pt={{
+                            root: {
+                                style: {
+                                    minHeight: "15vh",
+                                    height: "300px",
+                                },
+                            },
+                        }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
