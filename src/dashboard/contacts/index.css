@@ -51,6 +51,10 @@
     font-weight: 700;
 }
 
+.contact-form__title--danger {
+    color: var(--admss-app-red);
+}
+
 .contacts__button.p-button-outlined {
     display: inline-flex;
     align-items: center;
@@ -164,4 +168,27 @@
 .contact .p-inputnumber {
     width: 100%;
     height: 50px;
+}
+
+.form-nav__button--danger {
+    background-color: var(--admss-app-red);
+    border: none;
+    &:hover:enabled {
+        background-color: var(--admss-app-deep-red);
+    }
+}
+
+.contact-delete-dialog {
+    width: 456px;
+    height: 450px;
+    .p-dialog-footer .p-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 130px;
+        height: 60px;
+        white-space: nowrap;
+        font-weight: 700;
+        padding: 0;
+    }
 }

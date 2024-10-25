@@ -35,6 +35,7 @@ export class ContactStore {
     private _backSiteDL: File = {} as File;
     private _isContactChanged: boolean = false;
     private _memoRoute: string = "";
+    private _deleteReason: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
 
@@ -77,6 +78,10 @@ export class ContactStore {
 
     public get contactOFAC() {
         return this._contactOFAC;
+    }
+
+    public get deleteReason() {
+        return this._deleteReason;
     }
 
     public get isLoading() {
@@ -246,6 +251,10 @@ export class ContactStore {
         this._contactOFAC = state;
     }
 
+    public set deleteReason(state: string) {
+        this._deleteReason = state;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
@@ -299,5 +308,6 @@ export class ContactStore {
         this._frontSiteDL = {} as File;
         this._backSiteDL = {} as File;
         this._contactExtData = {} as ContactExtData;
+        this._deleteReason = "";
     };
 }
