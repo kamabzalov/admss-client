@@ -18,7 +18,7 @@ export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, formErrorIndex } = store;
 
-    const { errors, setFieldValue } = useFormikContext<Inventory>();
+    const { errors, setFieldValue, values } = useFormikContext<Inventory>();
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
@@ -47,7 +47,7 @@ export const VehicleDescription = observer((): ReactElement => {
     }, []);
 
     useEffect(() => {
-        if (errors.TypeOfFuel) {
+        if (errors.TypeOfFuel_id) {
             store.formErrorIndex = [...formErrorIndex, 2];
         } else {
             store.formErrorIndex = formErrorIndex.filter((index) => index !== 2);
@@ -98,10 +98,10 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionValue='id'
                         filter
                         options={fuelList}
-                        value={inventory.TypeOfFuel_id?.toString() || ""}
+                        value={inventory.TypeOfFuel_id?.toString() || "0"}
                         onChange={({ value }) => {
-                            setFieldValue("TypeOfFuel_id", value);
-                            changeInventory({ key: "TypeOfFuel_id", value });
+                            setFieldValue("TypeOfFuel_id", value || "0");
+                            changeInventory({ key: "TypeOfFuel_id", value: value || "0" });
                         }}
                         className={`vehicle-description__dropdown w-full ${
                             errors.TypeOfFuel_id ? "p-invalid" : ""
@@ -110,7 +110,9 @@ export const VehicleDescription = observer((): ReactElement => {
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
-                <small className='p-error'>{errors.TypeOfFuel_id}</small>
+                <small className='p-error'>
+                    {errors.TypeOfFuel_id} id: {values.TypeOfFuel_id}
+                </small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
