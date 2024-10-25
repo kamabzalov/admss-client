@@ -465,7 +465,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             changeInventory({ key: "Year", value: String(value) });
                         }}
                     />
-                    <label className='float-label'>Year</label>
+                    <label className='float-label'>Year (required)</label>
                 </span>
                 <small className='p-error'>{errors.Year}</small>
             </div>

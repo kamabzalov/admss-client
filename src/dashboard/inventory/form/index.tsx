@@ -164,20 +164,24 @@ export const InventoryForm = observer(() => {
                 .required("Data is required."),
             Make: Yup.string().trim().required("Data is required."),
             Model: Yup.string().trim().required("Data is required."),
-            Year: Yup.string().test(
-                "is-valid-year",
-                `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-                function (value) {
-                    const year = Number(value);
-                    if (year < MIN_YEAR) {
-                        return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            Year: Yup.string()
+                .test(
+                    "is-valid-year",
+                    `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+                    function (value) {
+                        const year = Number(value);
+                        if (year < MIN_YEAR) {
+                            return this.createError({
+                                message: `Must be greater than ${MIN_YEAR}`,
+                            });
+                        }
+                        if (year > MAX_YEAR) {
+                            return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+                        }
+                        return true;
                     }
-                    if (year > MAX_YEAR) {
-                        return this.createError({ message: `Must be less than ${MAX_YEAR}` });
-                    }
-                    return true;
-                }
-            ),
+                )
+                .required("Data is required."),
             locationuid: Yup.string().trim().required("Data is required."),
             GroupClassName: Yup.string().trim().required("Data is required."),
             StockNo: Yup.string()
@@ -456,9 +460,7 @@ export const InventoryForm = observer(() => {
                                                     TypeOfFuel: inventory?.TypeOfFuel_id || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
-                                                        inventory?.locationuid ||
-                                                        currentLocation ||
-                                                        " ",
+                                                        inventory?.locationuid || currentLocation,
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                 } as PartialInventory
                                             }
