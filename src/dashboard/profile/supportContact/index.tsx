@@ -6,6 +6,8 @@ import { DialogProps } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import "./index.css";
 import { createOrUpdateSupportMessage } from "http/services/support.service";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 const SUPPORT_CONTACT_TOPICS: ReadonlyArray<string> = [
     "Question",
@@ -15,6 +17,7 @@ const SUPPORT_CONTACT_TOPICS: ReadonlyArray<string> = [
 ];
 
 export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
+    const toast = useToast();
     const [email, setEmail] = useState<string>("");
     const [topic, setTopic] = useState<string>("");
     const [description, setDescription] = useState<string>("");
@@ -26,20 +29,37 @@ export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Elem
         setIsButtonDisabled(!isEveryFieldFilled);
     }, [email, topic, description]);
 
-    const handleSendSupportContact = (): void => {
-        createOrUpdateSupportMessage({ email: email, topic: topic, message: description })
-            .then((response) => {
-                // TODO: Show success message
-            })
-            .catch((error) => {
-                // TODO: Show error message
+    const handleSendSupportContact = async (): Promise<void> => {
+        const response = await createOrUpdateSupportMessage({
+            email: email,
+            topic: topic,
+            message: description,
+        });
+
+        if (!response || response?.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.error || "Error while sending message",
+                life: TOAST_LIFETIME,
             });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Message sent successfully",
+                life: TOAST_LIFETIME,
+            });
+        }
+
         onHide();
         return;
     };
 
     return (
         <DashboardDialog
+            draggable={false}
+            position='top'
             className='dialog__contact-support contact-support'
             footer='Send'
             header='Contact support'
