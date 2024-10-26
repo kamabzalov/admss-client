@@ -111,7 +111,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
                 <small className='p-error'>
-                    {errors.TypeOfFuel_id} 
+                    {errors.TypeOfFuel_id} id: {values.TypeOfFuel}
                 </small>
             </div>
             <div className='col-3'>
