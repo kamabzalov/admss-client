@@ -213,6 +213,7 @@ export default function Reports(): ReactElement {
                                                     isfavorite,
                                                     documents,
                                                     userUID,
+                                                    collections: innerCollections,
                                                 }: ReportCollection,
                                                 index: number
                                             ) => {
