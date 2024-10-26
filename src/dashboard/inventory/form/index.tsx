@@ -32,7 +32,14 @@ const STEP = "step";
 
 type PartialInventory = Pick<
     InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
+    | "VIN"
+    | "Make"
+    | "Model"
+    | "Year"
+    | "locationuid"
+    | "GroupClassName"
+    | "StockNo"
+    | "TypeOfFuel_id"
 >;
 
 const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
@@ -45,7 +52,7 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "GroupClassName",
         "StockNo",
     ],
-    [AccordionItems.DESCRIPTION]: ["TypeOfFuel"],
+    [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
 };
 
 const MIN_YEAR = 1970;
@@ -193,7 +200,7 @@ export const InventoryForm = observer(() => {
                         debouncedCheckStockNoAvailability(value || "", resolve);
                     });
                 }),
-            TypeOfFuel: Yup.string().trim().required("Data is required."),
+            TypeOfFuel_id: Yup.string().trim().required("Data is required."),
         });
     };
 
@@ -457,7 +464,7 @@ export const InventoryForm = observer(() => {
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
                                                     Year: inventory.Year,
-                                                    TypeOfFuel: inventory?.TypeOfFuel_id || "",
+                                                    TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
                                                         inventory?.locationuid || currentLocation,
