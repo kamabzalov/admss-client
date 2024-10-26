@@ -18,7 +18,7 @@ export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, formErrorIndex } = store;
 
-    const { errors, setFieldValue, values } = useFormikContext<Inventory>();
+    const { errors, setFieldValue} = useFormikContext<Inventory>();
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
@@ -111,7 +111,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
                 <small className='p-error'>
-                    {errors.TypeOfFuel_id} id: {values.TypeOfFuel}
+                    {errors.TypeOfFuel_id} 
                 </small>
             </div>
             <div className='col-3'>
