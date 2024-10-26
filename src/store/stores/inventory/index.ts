@@ -104,8 +104,6 @@ export class InventoryStore {
     protected _isFormChanged: boolean = false;
     protected _formErrorMessage: string = "";
 
-    private _cachedInventory: Inventory = {} as Inventory;
-
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
@@ -201,8 +199,7 @@ export class InventoryStore {
                 const info = response as Inventory;
                 this._inventoryID = info.itemuid;
                 const { extdata, options_info, Audit, ...inventory } = info;
-                this._inventory =
-                    { ...inventory, Make: inventory.Make.toUpperCase() } || ({} as Inventory);
+                this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
                 this._inventoryOptions = options_info || [];
 
@@ -218,14 +215,6 @@ export class InventoryStore {
             this._isLoading = false;
             this._isFormChanged = false;
         }
-    };
-
-    public getCachedInventory = () => {
-        const { extdata, options_info, Audit, ...inventory } = this._cachedInventory;
-        this._inventory = inventory || ({} as Inventory);
-        this._inventoryOptions = options_info || [];
-        this._inventoryExtData = extdata || ({} as InventoryExtData);
-        this._inventoryAudit = Audit || (initialAuditState as Audit);
     };
 
     private getInventoryMedia = async (): Promise<Status> => {
@@ -705,19 +694,6 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
-    };
-
-    public saveCachedInventory = () => {
-        this._cachedInventory = {
-            options_info: this._inventoryOptions,
-            Audit: this._inventoryAudit,
-            extdata: this._inventoryExtData,
-            ...this._inventory,
-        };
-    };
-
-    public clearCachedInventory = () => {
-        this._cachedInventory = {} as Inventory;
     };
 
     public clearInventory = () => {
