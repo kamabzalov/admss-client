@@ -2,7 +2,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect, useMemo, useRef } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
@@ -19,7 +19,7 @@ import { Loader } from "dashboard/common/loader";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
-import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import dlFrontImage from "assets/images/empty_front_dl.svg";
 import dlBackImage from "assets/images/empty_back_dl.svg";
 import uploadImage from "assets/images/upload.svg";
@@ -69,6 +69,11 @@ export const ContactsIdentificationInfo = observer(
         useEffect(() => {
             getImagesDL();
         }, [contact]);
+
+        const isControlDisabled = useMemo(
+            () => type === CO_BUYER && contact.type !== BUYER_ID,
+            [type, contact.type]
+        );
 
         useEffect(() => {
             if (frontSideDL.size) {
@@ -204,6 +209,7 @@ export const ContactsIdentificationInfo = observer(
                                     )
                                 }
                                 className='w-full identification-info__dropdown'
+                                disabled={isControlDisabled}
                             />
                             <label className='float-label'>DL's State</label>
                         </span>
@@ -226,6 +232,7 @@ export const ContactsIdentificationInfo = observer(
                                         value
                                     );
                                 }}
+                                disabled={isControlDisabled}
                             />
                             <label className='float-label'>Driver License's Number</label>
                         </span>
@@ -246,6 +253,7 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            disabled={isControlDisabled}
                         />
                     </div>
 
@@ -268,6 +276,7 @@ export const ContactsIdentificationInfo = observer(
                                     )
                                 }
                                 className='w-full identification-info__dropdown'
+                                disabled={isControlDisabled}
                             />
                             <label className='float-label'>Sex</label>
                         </span>
@@ -288,6 +297,7 @@ export const ContactsIdentificationInfo = observer(
                                         value
                                     );
                                 }}
+                                disabled={isControlDisabled}
                             />
                             <label className='float-label'>Social Security Number</label>
                         </span>
@@ -310,10 +320,11 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            disabled={isControlDisabled}
                         />
                     </div>
                 </div>
-                {id && (
+                {id && !isControlDisabled && (
                     <>
                         <hr className='form-line' />
 

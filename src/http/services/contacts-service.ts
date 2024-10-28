@@ -9,6 +9,7 @@ import {
 } from "common/models/contact";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { isAxiosError } from "axios";
+import { ListData } from "./inventory-service";
 
 export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
@@ -59,6 +60,22 @@ export const getContactsTypeList = async (uid: string | "0") => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error on get contacts type list",
+            };
+        }
+    }
+};
+
+export const getContactDeleteReasonsList = async (uid: string | "0") => {
+    try {
+        const request = await authorizedUserApiInstance.get<ListData[]>(
+            `contacts/${uid}/listdeletionreasons`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contact delete reasons",
             };
         }
     }
@@ -143,6 +160,23 @@ export const getContactsProspectList = async (contactuid: string) => {
             status: Status.ERROR,
             error: error || errorMessage,
         };
+    }
+};
+
+export const deleteContact = async (contactuid: string, data: Record<string, string>) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `contacts/${contactuid}/delete`,
+            data
+        );
+        return response.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting contact",
+            };
+        }
     }
 };
 

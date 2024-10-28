@@ -34,6 +34,9 @@ export class ContactStore {
     private _backSiteDL: File = {} as File;
     private _isContactChanged: boolean = false;
     private _memoRoute: string = "";
+    private _deleteReason: string = "";
+    private _activeTab: number | null = null;
+    private _tabLength: number = 0;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -72,12 +75,24 @@ export class ContactStore {
         return this._contactOFAC;
     }
 
+    public get deleteReason() {
+        return this._deleteReason;
+    }
+
     public get isLoading() {
         return this._isLoading;
     }
 
     public get memoRoute() {
         return this._memoRoute;
+    }
+
+    public get tabLength() {
+        return this._tabLength;
+    }
+
+    public get activeTab() {
+        return this._activeTab;
     }
 
     public getContact = async (itemuid: string) => {
@@ -227,6 +242,10 @@ export class ContactStore {
         this._contactOFAC = state;
     }
 
+    public set deleteReason(state: string) {
+        this._deleteReason = state;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
@@ -264,6 +283,14 @@ export class ContactStore {
         }
     };
 
+    public set tabLength(state: number) {
+        this._tabLength = state;
+    }
+
+    public set activeTab(state: number | null) {
+        this._activeTab = state;
+    }
+
     public clearContact = () => {
         this._contact = {} as Contact;
         this._contactID = "";
@@ -272,5 +299,6 @@ export class ContactStore {
         this._frontSiteDL = {} as File;
         this._backSiteDL = {} as File;
         this._contactExtData = {} as ContactExtData;
+        this._deleteReason = "";
     };
 }

@@ -244,7 +244,7 @@ export interface Inventory extends BaseResponseError {
     Transmission_id: number;
     Trim: string;
     TypeOfFuel: string;
-    TypeOfFuel_id: number;
+    TypeOfFuel_id: number | string;
     VIN: string;
     VINimageUID: string;
     Year: string;

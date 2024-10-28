@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
@@ -18,7 +18,7 @@ import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -91,6 +91,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         isBusinessNameRequired || (contact.businessName && contact.businessName?.trim() !== "");
 
     const shouldDisableBusinessName = !isBusinessNameRequired && isNameFieldsFilled();
+
+    const isControlDisabled = useMemo(
+        () => type === CO_BUYER && contact.type !== BUYER_ID,
+        [type, contact.type]
+    );
 
     useEffect(() => {
         if (shouldDisableNameFields) {
@@ -182,6 +187,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     label='Scan driver license'
                     className='general-info__button'
                     tooltip='Data received from the DL’s backside will fill in related fields'
+                    disabled={isControlDisabled}
                     outlined
                     onClick={handleScanDL}
                 />
@@ -197,6 +203,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 <div className='general-info-overwrite pb-3'>
                     <Checkbox
                         checked={allowOverwrite}
+                        disabled={isControlDisabled}
                         inputId='general-info-overwrite'
                         className='general-info-overwrite__checkbox'
                         onChange={() => setAllowOverwrite(!allowOverwrite)}
@@ -266,7 +273,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 ? "The type of contact you have selected requires entering only the business name"
                                 : ""
                         }
-                        disabled={!!shouldDisableNameFields}
+                        disabled={!!shouldDisableNameFields || isControlDisabled}
                     />
                     <label className='float-label'>
                         First Name
@@ -293,7 +300,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                             }
                         }}
                         tooltip={shouldDisableNameFields ? ifBusinessNameFilledMessage : ""}
-                        disabled={!!shouldDisableNameFields}
+                        disabled={!!shouldDisableNameFields || isControlDisabled}
                     />
                     <label className='float-label'>Middle Name</label>
                 </span>
@@ -319,7 +326,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                             }
                         }}
                         onBlur={handleOfacCheck}
-                        disabled={!!shouldDisableNameFields}
+                        disabled={!!shouldDisableNameFields || isControlDisabled}
                     />
                     <label className='float-label'>
                         Last Name
@@ -337,7 +344,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         }`}
                         value={contact.businessName || ""}
                         onChange={({ target: { value } }) => changeContact("businessName", value)}
-                        disabled={shouldDisableBusinessName}
+                        disabled={shouldDisableBusinessName || isControlDisabled}
                     />
                     <label className='float-label'>
                         Business Name

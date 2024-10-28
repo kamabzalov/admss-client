@@ -32,7 +32,14 @@ const STEP = "step";
 
 type PartialInventory = Pick<
     InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
+    | "VIN"
+    | "Make"
+    | "Model"
+    | "Year"
+    | "locationuid"
+    | "GroupClassName"
+    | "StockNo"
+    | "TypeOfFuel_id"
 >;
 
 const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
@@ -45,11 +52,16 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "GroupClassName",
         "StockNo",
     ],
-    [AccordionItems.DESCRIPTION]: ["TypeOfFuel"],
+    [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
 };
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
+
+const enum DIALOG_MESSAGES {
+    QUIT = "Are you sure you want to leave this page? All unsaved data will be lost.",
+    DELETE = "Do you really want to delete this inventory? This process cannot be undone.",
+}
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
@@ -61,7 +73,7 @@ export const InventoryForm = observer(() => {
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([]);
-    const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
 
     const stepsRef = useRef<HTMLDivElement>(null);
@@ -73,9 +85,6 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getWebCheckStatus,
         getInventoryExportWebHistory,
-        getCachedInventory,
-        saveCachedInventory,
-        clearCachedInventory,
         inventory,
         isFormChanged,
         currentLocation,
@@ -93,6 +102,8 @@ export const InventoryForm = observer(() => {
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+    const [confirmQuitEditVisible, setConfirmQuitEditVisible] = useState<boolean>(false);
 
     const initialVIN = useMemo(() => {
         if (inventory) {
@@ -164,20 +175,24 @@ export const InventoryForm = observer(() => {
                 .required("Data is required."),
             Make: Yup.string().trim().required("Data is required."),
             Model: Yup.string().trim().required("Data is required."),
-            Year: Yup.string().test(
-                "is-valid-year",
-                `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-                function (value) {
-                    const year = Number(value);
-                    if (year < MIN_YEAR) {
-                        return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            Year: Yup.string()
+                .test(
+                    "is-valid-year",
+                    `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+                    function (value) {
+                        const year = Number(value);
+                        if (year < MIN_YEAR) {
+                            return this.createError({
+                                message: `Must be greater than ${MIN_YEAR}`,
+                            });
+                        }
+                        if (year > MAX_YEAR) {
+                            return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+                        }
+                        return true;
                     }
-                    if (year > MAX_YEAR) {
-                        return this.createError({ message: `Must be less than ${MAX_YEAR}` });
-                    }
-                    return true;
-                }
-            ),
+                )
+                .required("Data is required."),
             locationuid: Yup.string().trim().required("Data is required."),
             GroupClassName: Yup.string().trim().required("Data is required."),
             StockNo: Yup.string()
@@ -189,7 +204,7 @@ export const InventoryForm = observer(() => {
                         debouncedCheckStockNoAvailability(value || "", resolve);
                     });
                 }),
-            TypeOfFuel: Yup.string().trim().required("Data is required."),
+            TypeOfFuel_id: Yup.string().trim().required("Data is required."),
         });
     };
 
@@ -241,13 +256,10 @@ export const InventoryForm = observer(() => {
                     navigate(`/dashboard/inventory`);
                 }
             });
-        } else {
-            getCachedInventory();
         }
 
         return () => {
             sections.forEach((section) => section.clearCount());
-            !id && saveCachedInventory();
             clearInventory();
         };
     }, [id, store]);
@@ -265,6 +277,24 @@ export const InventoryForm = observer(() => {
             }
         }
     }, [accordionSteps, stepActiveIndex]);
+
+    const handleCloseClick = () => {
+        const performNavigation = () => {
+            if (memoRoute) {
+                navigate(memoRoute);
+                store.memoRoute = "";
+            } else {
+                navigate(`/dashboard/inventory`);
+            }
+        };
+
+        if (isFormChanged) {
+            setConfirmAction(() => performNavigation);
+            setConfirmQuitEditVisible(true);
+        } else {
+            performNavigation();
+        }
+    };
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
@@ -304,7 +334,6 @@ export const InventoryForm = observer(() => {
     const navigateAndClear = () => {
         navigate(`/dashboard/inventory`);
         clearInventory();
-        clearCachedInventory();
     };
 
     const showToastMessage = () => {
@@ -331,7 +360,7 @@ export const InventoryForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate(memoRoute || "/dashboard/inventory")}
+                    onClick={handleCloseClick}
                 />
                 <div className='col-12'>
                     <div className='card inventory'>
@@ -453,12 +482,10 @@ export const InventoryForm = observer(() => {
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
                                                     Year: inventory.Year,
-                                                    TypeOfFuel: inventory?.TypeOfFuel_id || "",
+                                                    TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
-                                                        inventory?.locationuid ||
-                                                        currentLocation ||
-                                                        " ",
+                                                        inventory?.locationuid || currentLocation,
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                 } as PartialInventory
                                             }
@@ -551,7 +578,7 @@ export const InventoryForm = observer(() => {
                                     <Button
                                         onClick={() =>
                                             deleteReason.length
-                                                ? setConfirmActive(true)
+                                                ? setConfirmDeleteVisible(true)
                                                 : setAttemptedSubmit(true)
                                         }
                                         className='p-button uppercase px-6 inventory__button inventory__button--danger'
@@ -573,13 +600,29 @@ export const InventoryForm = observer(() => {
                     </div>
                 </div>
             </div>
-            <ConfirmModal
-                visible={confirmActive}
-                bodyMessage='Do you really want to delete this inventory? 
-                This process cannot be undone.'
-                confirmAction={() => setIsDeleteConfirm(true)}
-                onHide={() => setConfirmActive(false)}
-            />
+            {confirmQuitEditVisible ? (
+                <ConfirmModal
+                    visible={!!confirmQuitEditVisible}
+                    position='top'
+                    title='Quit Editing?'
+                    icon='pi-exclamation-triangle'
+                    bodyMessage={DIALOG_MESSAGES.QUIT}
+                    confirmAction={confirmAction}
+                    draggable={false}
+                    rejectLabel='Cancel'
+                    acceptLabel='Confirm'
+                    resizable={false}
+                    className='contact-confirm-dialog'
+                    onHide={() => setConfirmQuitEditVisible(false)}
+                />
+            ) : (
+                <ConfirmModal
+                    visible={confirmDeleteVisible}
+                    bodyMessage={DIALOG_MESSAGES.DELETE}
+                    confirmAction={() => setIsDeleteConfirm(true)}
+                    onHide={() => setConfirmDeleteVisible(false)}
+                />
+            )}
         </Suspense>
     );
 });

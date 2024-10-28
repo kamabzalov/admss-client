@@ -117,13 +117,15 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
     return (
         <>
             <div className='report__footer gap-3 mt-8 mr-3'>
-                <Button
-                    className='report__icon-button'
-                    icon='icon adms-password'
-                    severity='success'
-                    onClick={() => setAccessDialogVisible(true)}
-                    outlined
-                />
+                {report.itemuid && (
+                    <Button
+                        className='report__icon-button'
+                        icon='icon adms-password'
+                        severity='success'
+                        onClick={() => setAccessDialogVisible(true)}
+                        outlined
+                    />
+                )}
                 {report.itemuid && (
                     <Button
                         className='report__icon-button'
