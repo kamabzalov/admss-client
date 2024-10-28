@@ -86,7 +86,7 @@ export const DealRetailProducts = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <Dropdown
                             editable
-                            options={TERM_MONTH_LIST}
+                            options={[...TERM_MONTH_LIST]}
                             value={Warranty_Term}
                             onChange={({ value }) =>
                                 changeDealExtData({ key: "Warranty_Term", value })

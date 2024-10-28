@@ -42,7 +42,7 @@ export const PayOffInfo = observer((): ReactElement => {
                 <label className='take-payment__label'>Pmt Method</label>
                 <Dropdown
                     id='pmtMethod'
-                    options={ACCOUNT_PAYMENT_METHODS}
+                    options={[...ACCOUNT_PAYMENT_METHODS]}
                     optionValue='name'
                     optionLabel='name'
                     value={PaymentMethod}

@@ -73,7 +73,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
-                        options={PAYMENT_FREQUENCY_LIST}
+                        options={[...PAYMENT_FREQUENCY_LIST]}
                         filter
                         required
                         className='w-full deal-lease__dropdown'
@@ -88,7 +88,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
-                        options={TERM_MONTH_LIST}
+                        options={[...TERM_MONTH_LIST]}
                         editable
                         filter
                         required

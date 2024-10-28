@@ -82,7 +82,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                             setAddFee({ ...addFee, type: value });
                         }
                     }}
-                    options={ACCOUNT_FEE_TYPES}
+                    options={[...ACCOUNT_FEE_TYPES]}
                     optionLabel='name'
                     optionValue='name'
                     pt={{

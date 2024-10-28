@@ -66,7 +66,7 @@ export const PurchaseTitle = observer((): ReactElement => {
                         filter
                         className='w-full purchase-title__dropdown'
                         value={titleStatus}
-                        options={TITLE_STATUS_LIST}
+                        options={[...TITLE_STATUS_LIST]}
                         onChange={({ value }) =>
                             changeInventoryExtData({ key: "titleStatus", value })
                         }

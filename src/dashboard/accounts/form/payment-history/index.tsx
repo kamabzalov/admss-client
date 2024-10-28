@@ -341,7 +341,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                 <div className='col-12 account__control'>
                     <Dropdown
                         className='account__dropdown'
-                        options={ACCOUNT_PAYMENT_STATUS_LIST}
+                        options={[...ACCOUNT_PAYMENT_STATUS_LIST]}
                         value={selectedPayment}
                         onChange={({ target: { value } }) => {
                             setSelectedPayment(value);
