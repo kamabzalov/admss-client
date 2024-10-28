@@ -47,7 +47,28 @@ export const ACCOUNT_PAYMENT_TYPES = [
  { name: "Payoff Payment" },
 ];
 
-export const ACCOUNT_PROMISE_STATUS = ["Default", "Paid", "Late", "Broken", "Outstanding"];
+export const ACCOUNT_PROMISE_STATUS = [
+ {
+     name: "Default",
+     id: 0,
+ },
+ {
+     name: "Paid",
+     id: 1,
+ },
+ {
+     name: "Late",
+     id: 2,
+ },
+ {
+     name: "Broken",
+     id: 3,
+ },
+ {
+     name: "Outstanding",
+     id: 4,
+ },
+];
 
 export const ACCOUNT_NOTE_CONTACT_TYPE = ["Phone", "In Person", "Mail", "E-Mail", "Fax"];
 

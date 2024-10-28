@@ -14,6 +14,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -69,9 +70,11 @@ export const AccountPromiseToPay = (): ReactElement => {
             const promises = promiseList.filter((_, index) => {
                 return selectedRows[index];
             });
+            const pstatus = ACCOUNT_PROMISE_STATUS.find((item) => item.name === status);
             promises.forEach(async (promise) => {
                 const res = await addAccountPromise(id, {
                     ...promise,
+                    pstatus: pstatus?.id,
                     pstatusname: status,
                 });
                 if (res && res.status === Status.ERROR) {
