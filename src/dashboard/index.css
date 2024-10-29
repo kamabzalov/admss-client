@@ -45,8 +45,8 @@
 }
 
 .card-content__wrapper {
-    height: 48vh;
-    max-height: 744px;
+    height: 60vh;
+    max-height: 754px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
