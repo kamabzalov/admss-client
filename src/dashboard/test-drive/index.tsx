@@ -17,6 +17,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { ContactUser } from "common/models/contact";
 import { setContact } from "http/services/contacts-service";
 import { Form, Formik } from "formik";
+import { Inventory } from "common/models/inventory";
 
 const validationSchema = Yup.object().shape({
     customerName: Yup.string().required("First Name is required"),
@@ -51,18 +52,14 @@ export const PrintForTestDrive = (): ReactElement => {
                 });
             }
             setTimeout(() => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!print) {
-                    link.download = `test_drive_print_form_${authUser.username}.pdf`;
-                    link.click();
+                const url = URL.createObjectURL(new Blob([response], { type: "application/pdf" }));
+                if (print) {
+                    const newWindow = window.open(url);
+                    if (newWindow) {
+                        newWindow.onload = () => newWindow.print();
+                    }
                 } else {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
+                    window.open(url, "_blank");
                 }
             }, 3000);
         }
@@ -147,307 +144,399 @@ export const PrintForTestDrive = (): ReactElement => {
                                     handleBlur,
                                     isValid,
                                     dirty,
-                                }) => (
-                                    <Form className='grid test-drive__card-content'>
-                                        <div className='col-12 test-drive__subtitle'>Driver</div>
-                                        <div className='col-9 grid row-gap-2'>
-                                            <div className='col-6 relative'>
-                                                <CompanySearch
-                                                    name='First Name (required)'
-                                                    value={values.customerName}
-                                                    returnedField='firstName'
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "customerName", value },
-                                                        })
-                                                    }
-                                                    onRowClick={(value) =>
-                                                        handleChange({
-                                                            target: {
-                                                                name: "customerName",
-                                                                value,
-                                                            },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.customerName && touched.customerName && (
-                                                    <div className='p-error'>
-                                                        {errors.customerName}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <CompanySearch
-                                                    name='Last Name (required)'
-                                                    value={values.customerLastName}
-                                                    returnedField='lastName'
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: {
-                                                                name: "customerLastName",
-                                                                value,
-                                                            },
-                                                        })
-                                                    }
-                                                    onRowClick={(value) =>
-                                                        handleChange({
-                                                            target: {
-                                                                name: "customerLastName",
-                                                                value,
-                                                            },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.customerLastName &&
-                                                    touched.customerLastName && (
-                                                        <div className='p-error'>
-                                                            {errors.customerLastName}
-                                                        </div>
-                                                    )}
-                                            </div>
-                                            <div className='col-4 relative'>
-                                                <TextInput
-                                                    name='Phone Number (required)'
-                                                    value={values.homePhone}
-                                                    onChange={({ target: { value } }) =>
-                                                        handleChange({
-                                                            target: { name: "homePhone", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.homePhone && touched.homePhone && (
-                                                    <div className='p-error'>
-                                                        {errors.homePhone}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className='col-4 relative'>
-                                                <TextInput
-                                                    name='Driver License’s Number (required)'
-                                                    value={values.dlNumber}
-                                                    onChange={({ target: { value } }) =>
-                                                        handleChange({
-                                                            target: { name: "dlNumber", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.dlNumber && touched.dlNumber && (
-                                                    <div className='p-error'>{errors.dlNumber}</div>
-                                                )}
-                                            </div>
-                                            <div className='col-4 relative'>
-                                                <StateDropdown
-                                                    name='DL’s State (required)'
-                                                    value={values.dlState}
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "dlState", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.dlState && touched.dlState && (
-                                                    <div className='p-error'>{errors.dlState}</div>
-                                                )}
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <DateInput
-                                                    name='DL’s Start Date (required)'
-                                                    value={values.dlIssuingDate}
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "lIssuing", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <DateInput
-                                                    name='DL’s Exp. Date (required)'
-                                                    value={values.dlExpirationDate}
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "lExpiration", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                            </div>
+                                }) => {
+                                    const handleInventoryFill = ({
+                                        VIN,
+                                        Make,
+                                        Model,
+                                        Year,
+                                    }: Inventory) => {
+                                        handleChange({
+                                            target: {
+                                                name: "vclVIN",
+                                                value: VIN,
+                                            },
+                                        });
+                                        handleChange({
+                                            target: {
+                                                name: "vclMake",
+                                                value: Make,
+                                            },
+                                        });
+                                        handleChange({
+                                            target: {
+                                                name: "vclModel",
+                                                value: Model,
+                                            },
+                                        });
+                                        handleChange({
+                                            target: {
+                                                name: "vclYear",
+                                                value: Year,
+                                            },
+                                        });
+                                    };
+                                    return (
+                                        <Form className='grid test-drive__card-content'>
                                             <div className='col-12 test-drive__subtitle'>
-                                                Vehicle
+                                                Driver
                                             </div>
-
-                                            <div className='col-6 relative'>
-                                                <InventorySearch
-                                                    name='VIN (required)'
-                                                    value={values.vclVIN}
-                                                    returnedField='VIN'
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "vclVIN", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.vclVIN && touched.vclVIN && (
-                                                    <div className='p-error'>{errors.vclVIN}</div>
-                                                )}
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <InventorySearch
-                                                    name='Make (required)'
-                                                    value={values.vclMake}
-                                                    returnedField='Make'
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "vclMake", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.vclMake && touched.vclMake && (
-                                                    <div className='p-error'>{errors.vclMake}</div>
-                                                )}
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <InventorySearch
-                                                    name='Model (required)'
-                                                    value={values.vclModel}
-                                                    returnedField='Model'
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "vclModel", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.vclModel && touched.vclModel && (
-                                                    <div className='p-error'>{errors.vclModel}</div>
-                                                )}
-                                            </div>
-                                            <div className='col-6 relative'>
-                                                <TextInput
-                                                    name='Year (required)'
-                                                    value={values.vclYear}
-                                                    onChange={({ target: { value } }) =>
-                                                        handleChange({
-                                                            target: { name: "vclYear", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.vclYear && touched.vclYear && (
-                                                    <div className='p-error'>{errors.vclYear}</div>
-                                                )}
-                                            </div>
-
-                                            <div className='col-12 test-drive__subtitle'>
-                                                Dealer
-                                            </div>
-
-                                            <div className='col-4 relative'>
-                                                <CompanySearch
-                                                    name='Manager (required)'
-                                                    value={values.dealersName}
-                                                    onChange={({ value }) =>
-                                                        handleChange({
-                                                            target: { name: "dealersName", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                />
-                                                {errors.dealersName && touched.dealersName && (
-                                                    <div className='p-error'>
-                                                        {errors.dealersName}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <DateInput
-                                                name='Issue Date/Time (required)'
-                                                onBlur={handleBlur}
-                                                colWidth={4}
-                                            />
-                                            <TextInput
-                                                name='Odometer (required)'
-                                                value={values.outOdometer}
-                                                onChange={({ target: { value } }) =>
-                                                    handleChange({
-                                                        target: { name: "outOdometer", value },
-                                                    })
-                                                }
-                                                onBlur={handleBlur}
-                                                colWidth={4}
-                                            />
-                                            {errors.outOdometer && touched.outOdometer && (
-                                                <div className='p-error'>{errors.outOdometer}</div>
-                                            )}
-                                            <div className='col-12 relative'>
-                                                <span className='p-float-label'>
-                                                    <InputTextarea
-                                                        name='Comment'
-                                                        value={values.comments}
+                                            <div className='col-9 grid row-gap-2'>
+                                                <div className='col-6 relative'>
+                                                    <CompanySearch
+                                                        name='First Name (required)'
+                                                        value={values.customerName}
+                                                        returnedField='firstName'
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerName",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        getFullInfo={(contact) => {
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerName",
+                                                                    value: contact.firstName,
+                                                                },
+                                                            });
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerLastName",
+                                                                    value: contact.lastName,
+                                                                },
+                                                            });
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.customerName &&
+                                                        touched.customerName && (
+                                                            <div className='p-error'>
+                                                                {errors.customerName}
+                                                            </div>
+                                                        )}
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <CompanySearch
+                                                        name='Last Name (required)'
+                                                        value={values.customerLastName}
+                                                        returnedField='lastName'
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerLastName",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        getFullInfo={(contact) => {
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerName",
+                                                                    value: contact.firstName,
+                                                                },
+                                                            });
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "customerLastName",
+                                                                    value: contact.lastName,
+                                                                },
+                                                            });
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.customerLastName &&
+                                                        touched.customerLastName && (
+                                                            <div className='p-error'>
+                                                                {errors.customerLastName}
+                                                            </div>
+                                                        )}
+                                                </div>
+                                                <div className='col-4 relative'>
+                                                    <TextInput
+                                                        name='Phone Number (required)'
+                                                        value={values.homePhone}
                                                         onChange={({ target: { value } }) =>
                                                             handleChange({
-                                                                target: { name: "comments", value },
+                                                                target: {
+                                                                    name: "homePhone",
+                                                                    value,
+                                                                },
                                                             })
                                                         }
                                                         onBlur={handleBlur}
-                                                        className='test-drive__text-area'
                                                     />
-                                                    <label className='float-label'>Comment</label>
-                                                </span>
+                                                    {errors.homePhone && touched.homePhone && (
+                                                        <div className='p-error'>
+                                                            {errors.homePhone}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-4 relative'>
+                                                    <TextInput
+                                                        name='Driver License’s Number (required)'
+                                                        value={values.dlNumber}
+                                                        onChange={({ target: { value } }) =>
+                                                            handleChange({
+                                                                target: { name: "dlNumber", value },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.dlNumber && touched.dlNumber && (
+                                                        <div className='p-error'>
+                                                            {errors.dlNumber}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-4 relative'>
+                                                    <StateDropdown
+                                                        name='DL’s State (required)'
+                                                        value={values.dlState}
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: { name: "dlState", value },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.dlState && touched.dlState && (
+                                                        <div className='p-error'>
+                                                            {errors.dlState}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <DateInput
+                                                        name='DL’s Start Date (required)'
+                                                        value={values.dlIssuingDate}
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: { name: "lIssuing", value },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <DateInput
+                                                        name='DL’s Exp. Date (required)'
+                                                        value={values.dlExpirationDate}
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "lExpiration",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                </div>
+                                                <div className='col-12 test-drive__subtitle'>
+                                                    Vehicle
+                                                </div>
+
+                                                <div className='col-6 relative'>
+                                                    <InventorySearch
+                                                        name='VIN (required)'
+                                                        value={values.vclVIN}
+                                                        returnedField='VIN'
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: { name: "vclVIN", value },
+                                                            })
+                                                        }
+                                                        getFullInfo={handleInventoryFill}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.vclVIN && touched.vclVIN && (
+                                                        <div className='p-error'>
+                                                            {errors.vclVIN}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <InventorySearch
+                                                        name='Make (required)'
+                                                        value={values.vclMake}
+                                                        returnedField='Make'
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: { name: "vclMake", value },
+                                                            })
+                                                        }
+                                                        getFullInfo={handleInventoryFill}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.vclMake && touched.vclMake && (
+                                                        <div className='p-error'>
+                                                            {errors.vclMake}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <InventorySearch
+                                                        name='Model (required)'
+                                                        value={values.vclModel}
+                                                        returnedField='Model'
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: { name: "vclModel", value },
+                                                            })
+                                                        }
+                                                        getFullInfo={handleInventoryFill}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.vclModel && touched.vclModel && (
+                                                        <div className='p-error'>
+                                                            {errors.vclModel}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className='col-6 relative'>
+                                                    <TextInput
+                                                        name='Year (required)'
+                                                        value={values.vclYear}
+                                                        onChange={({ target: { value } }) =>
+                                                            handleChange({
+                                                                target: { name: "vclYear", value },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.vclYear && touched.vclYear && (
+                                                        <div className='p-error'>
+                                                            {errors.vclYear}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className='col-12 test-drive__subtitle'>
+                                                    Dealer
+                                                </div>
+
+                                                <div className='col-4 relative'>
+                                                    <CompanySearch
+                                                        name='Manager (required)'
+                                                        value={values.dealersName}
+                                                        onChange={({ value }) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "dealersName",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        onRowClick={(value) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "dealersName",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.dealersName && touched.dealersName && (
+                                                        <div className='p-error'>
+                                                            {errors.dealersName}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <DateInput
+                                                    name='Issue Date/Time (required)'
+                                                    onBlur={handleBlur}
+                                                    colWidth={4}
+                                                />
+                                                <TextInput
+                                                    name='Odometer (required)'
+                                                    value={values.outOdometer}
+                                                    onChange={({ target: { value } }) =>
+                                                        handleChange({
+                                                            target: { name: "outOdometer", value },
+                                                        })
+                                                    }
+                                                    onBlur={handleBlur}
+                                                    colWidth={4}
+                                                />
+                                                {errors.outOdometer && touched.outOdometer && (
+                                                    <div className='p-error'>
+                                                        {errors.outOdometer}
+                                                    </div>
+                                                )}
+                                                <div className='col-12 relative'>
+                                                    <span className='p-float-label'>
+                                                        <InputTextarea
+                                                            name='Comment'
+                                                            value={values.comments}
+                                                            onChange={({ target: { value } }) =>
+                                                                handleChange({
+                                                                    target: {
+                                                                        name: "comments",
+                                                                        value,
+                                                                    },
+                                                                })
+                                                            }
+                                                            onBlur={handleBlur}
+                                                            className='test-drive__text-area'
+                                                        />
+                                                        <label className='float-label'>
+                                                            Comment
+                                                        </label>
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className='col-3 ml-6 mt-0 test-drive__card-control'>
-                                            <Button
-                                                className='test-drive__button'
-                                                label='Add to contacts'
-                                                onClick={() => handleAddToContact(values)}
-                                                disabled={
-                                                    !values.customerName || !values.customerLastName
-                                                }
-                                                severity={
-                                                    !values.customerName || !values.customerLastName
-                                                        ? "secondary"
-                                                        : "success"
-                                                }
-                                                outlined
-                                            />
-                                            <Button
-                                                className='test-drive__button'
-                                                severity={
-                                                    !isValid || !dirty ? "secondary" : "success"
-                                                }
-                                                onClick={() => handlePrintForm(values)}
-                                                disabled={!isValid || !dirty}
-                                                label='Preview'
-                                            />
-                                            <Button
-                                                className='test-drive__button'
-                                                severity={
-                                                    !isValid || !dirty ? "secondary" : "success"
-                                                }
-                                                onClick={() => handlePrintForm(values, true)}
-                                                disabled={!isValid || !dirty}
-                                                label='Print'
-                                            />
-                                            <Button
-                                                className='test-drive__button'
-                                                severity={
-                                                    !isValid || !dirty ? "secondary" : "success"
-                                                }
-                                                onClick={() => handlePrintForm(values)}
-                                                disabled={!isValid || !dirty}
-                                                label='Download'
-                                            />
-                                        </div>
-                                    </Form>
-                                )}
+                                            <div className='col-3 ml-6 mt-0 test-drive__card-control'>
+                                                <Button
+                                                    className='test-drive__button'
+                                                    label='Add to contacts'
+                                                    onClick={() => handleAddToContact(values)}
+                                                    disabled={
+                                                        !values.customerName ||
+                                                        !values.customerLastName
+                                                    }
+                                                    severity={
+                                                        !values.customerName ||
+                                                        !values.customerLastName
+                                                            ? "secondary"
+                                                            : "success"
+                                                    }
+                                                    outlined
+                                                />
+                                                <Button
+                                                    className='test-drive__button'
+                                                    severity={
+                                                        !isValid || !dirty ? "secondary" : "success"
+                                                    }
+                                                    onClick={() => handlePrintForm(values)}
+                                                    disabled={!isValid || !dirty}
+                                                    label='Preview'
+                                                />
+                                                <Button
+                                                    className='test-drive__button'
+                                                    severity={
+                                                        !isValid || !dirty ? "secondary" : "success"
+                                                    }
+                                                    onClick={() => handlePrintForm(values, true)}
+                                                    disabled={!isValid || !dirty}
+                                                    label='Print'
+                                                />
+                                                <Button
+                                                    className='test-drive__button'
+                                                    severity={
+                                                        !isValid || !dirty ? "secondary" : "success"
+                                                    }
+                                                    onClick={() => handlePrintForm(values)}
+                                                    disabled={!isValid || !dirty}
+                                                    label='Download'
+                                                />
+                                            </div>
+                                        </Form>
+                                    );
+                                }}
                             </Formik>
                         </div>
                     </div>
