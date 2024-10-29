@@ -179,7 +179,8 @@
     background-color: var(--admss-app-lightest-green);
 }
 
-.edit-collection__title {
+.edit-collection__title,
+.report-parameters__title {
     color: var(--admss-app-primary-main-green);
     font-size: 18px;
     font-weight: 700;
@@ -272,4 +273,11 @@
     min-height: 100px;
     max-height: 550px;
     overflow-y: auto;
+}
+
+.report-parameters {
+    border: 1px solid var(--admss-app-focus-green);
+    border-radius: 5px;
+    background-color: var(--admss-app-lightest-green);
+    padding: 1.25rem;
 }
