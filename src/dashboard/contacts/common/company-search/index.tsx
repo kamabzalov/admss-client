@@ -54,7 +54,7 @@ export const CompanySearch = ({
         const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
         const params: QueryParams = {
             qry,
-            param: currentCategory,
+            ...(currentCategory && { param: currentCategory }),
         };
         user &&
             getContacts(user.useruid, params).then((response) => {
