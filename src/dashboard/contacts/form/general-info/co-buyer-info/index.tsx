@@ -5,7 +5,7 @@ import { ContactsAddressInfo } from "dashboard/contacts/form/general-info/tabs/a
 import { ContactsGeneralInfo } from "dashboard/contacts/form/general-info/tabs/general";
 import { ContactsIdentificationInfo } from "dashboard/contacts/form/general-info/tabs/identification";
 import { ContactsOfacCheck } from "dashboard/contacts/form/general-info/tabs/ofac-check";
-import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 
@@ -20,7 +20,7 @@ const tabs = [
 
 export const ContactsCoBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const { activeTab } = store;
+    const { contactType, activeTab } = store;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -46,7 +46,7 @@ export const ContactsCoBuyerInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className='col-12'>
+        <div className={`${contactType !== BUYER_ID ? "hidden" : "col-12"}`}>
             <TabView
                 className='contact-form__tabs'
                 activeIndex={activeTab || 0}

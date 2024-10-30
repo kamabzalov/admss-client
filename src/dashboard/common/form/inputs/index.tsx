@@ -7,6 +7,7 @@ import { Calendar, CalendarProps } from "primereact/calendar";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
+import { Button } from "primereact/button";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -49,6 +50,7 @@ interface DateInputProps extends CalendarProps {
 
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
+    clearButton?: boolean;
 }
 
 interface StateDropdownProps extends DropdownProps {
@@ -297,14 +299,51 @@ export const DateInput = ({
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
 
-export const TextInput = ({ name, colWidth, ...props }: TextInputProps): ReactElement => {
+export const TextInput = ({
+    name,
+    colWidth,
+    clearButton,
+    ...props
+}: TextInputProps): ReactElement => {
+    const [value, setValue] = useState<string>(props.value || "");
+
+    useEffect(() => {
+        setValue(props.value || "");
+    }, [props.value]);
+
+    const handleClear = () => {
+        setValue("");
+        if (props.onChange) {
+            props.onChange({
+                target: {
+                    name,
+                    value: "",
+                },
+            } as React.ChangeEvent<HTMLInputElement>);
+        }
+    };
     const content = (
-        <span className='p-float-label'>
+        <span className='p-float-label relative'>
             <InputText
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
+                tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
+                value={value}
+                onChange={(e) => {
+                    props.onChange && props.onChange(e);
+                    setValue(e.target.value);
+                }}
                 {...props}
             />
+            {clearButton && value && (
+                <Button
+                    type='button'
+                    text
+                    icon='pi pi-times'
+                    className='clear-input-button'
+                    onClick={handleClear}
+                />
+            )}
             <label className='float-label'>{name}</label>
         </span>
     );

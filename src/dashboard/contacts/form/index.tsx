@@ -5,9 +5,8 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
-import { GeneralInfoData } from "./general-info";
+import { BUYER_ID, generalBuyerInfo, generalCoBuyerInfo } from "./general-info";
 import { ContactInfoData } from "./contact-info";
-import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
@@ -20,6 +19,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { ContactMediaData } from "./media-data";
 import { DeleteForm } from "./delete-form";
 const STEP = "step";
 
@@ -43,14 +43,18 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
-    phone1: Yup.string().matches(/^[\d]{10,13}$/, {
-        message: "Invalid phone number.",
-        excludeEmptyString: false,
-    }),
-    phone2: Yup.string().matches(/^[\d]{10,13}$/, {
-        message: "Invalid phone number.",
-        excludeEmptyString: false,
-    }),
+    phone1: Yup.string()
+        .transform((value) => value.replace(/-/g, ""))
+        .matches(/^[\d]{10,13}$/, {
+            message: "Invalid phone number.",
+            excludeEmptyString: false,
+        }),
+    phone2: Yup.string()
+        .transform((value) => value.replace(/-/g, ""))
+        .matches(/^[\d]{10,13}$/, {
+            message: "Invalid phone number.",
+            excludeEmptyString: false,
+        }),
     companyName: Yup.string()
         ?.trim()
         .when("type", ([type]) => {
@@ -63,6 +67,16 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         message: "Invalid phone number.",
         excludeEmptyString: false,
     }),
+    CoBuyer_First_Name: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        }),
+    CoBuyer_Last_Name: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) ? schema.required("Data is required.") : schema;
+        }),
 });
 
 const DialogBody = (): ReactElement => {
@@ -97,6 +111,7 @@ export const ContactForm = observer((): ReactElement => {
     const store = useStore().contactStore;
     const {
         contact,
+        contactType,
         contactExtData,
         getContact,
         clearContact,
@@ -123,7 +138,33 @@ export const ContactForm = observer((): ReactElement => {
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
     useEffect(() => {
-        const contactSections: any[] = [GeneralInfoData, ContactInfoData];
+        let contactsSections = [ContactInfoData];
+
+        switch (contactType) {
+            case BUYER_ID:
+                contactsSections = [generalCoBuyerInfo, ...contactsSections];
+                break;
+            default:
+                contactsSections = [generalBuyerInfo, ...contactsSections];
+                break;
+        }
+
+        if (id) {
+            contactsSections = [...contactsSections, ContactMediaData];
+        }
+
+        const sections = contactsSections.map((sectionData) => new ContactSection(sectionData));
+        setContactSections(sections);
+        setAccordionSteps(sections.map((item) => item.startIndex));
+        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        setItemsMenuCount(itemsMenuCount);
+
+        return () => {
+            sections.forEach((section) => section.clearCount());
+        };
+    }, [contactType]);
+
+    useEffect(() => {
         if (id) {
             getContact(id).then((response) => {
                 if (response?.status === Status.ERROR) {
@@ -136,7 +177,6 @@ export const ContactForm = observer((): ReactElement => {
                     navigate(`/dashboard/contacts`);
                 }
             });
-            contactSections.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
         }
@@ -148,7 +188,6 @@ export const ContactForm = observer((): ReactElement => {
         setDeleteActiveIndex(itemsMenuCount + 1);
         return () => {
             clearContact();
-            sections.forEach((section) => section.clearCount());
         };
     }, [id, store]);
 
@@ -180,15 +219,15 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
+         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+             if (isContactChanged) {
+                 event.preventDefault();
+             }
+         };
+         window.addEventListener("beforeunload", handleBeforeUnload);
+         return () => {
+             window.removeEventListener("beforeunload", handleBeforeUnload);
+         };
     }, [isContactChanged]);
 
     useEffect(() => {
@@ -386,6 +425,10 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.Buyer_Emp_Ext || "",
                                                     Buyer_Emp_Phone:
                                                         contactExtData.Buyer_Emp_Phone || "",
+                                                    CoBuyer_First_Name:
+                                                        contactExtData.CoBuyer_First_Name || "",
+                                                    CoBuyer_Last_Name:
+                                                        contactExtData.CoBuyer_Last_Name || "",
                                                 } as PartialContact
                                             }
                                             enableReinitialize
@@ -410,25 +453,29 @@ export const ContactForm = observer((): ReactElement => {
                                         >
                                             <Form name='contactForm' className='w-full'>
                                                 {contactSections.map((section) =>
-                                                    section.items.map((item: ContactItem) => (
-                                                        <div
-                                                            key={item.itemIndex}
-                                                            className={`${
-                                                                stepActiveIndex === item.itemIndex
-                                                                    ? "block contact-form"
-                                                                    : "hidden"
-                                                            }`}
-                                                        >
-                                                            <div className='contact-form__title uppercase'>
-                                                                {item.itemLabel}
+                                                    section.items.map((item: ContactItem) => {
+                                                        return (
+                                                            <div
+                                                                key={item.itemIndex}
+                                                                className={`${
+                                                                    stepActiveIndex ===
+                                                                    item.itemIndex
+                                                                        ? "block contact-form"
+                                                                        : "hidden"
+                                                                }`}
+                                                            >
+                                                                <div className='contact-form__title uppercase'>
+                                                                    {item.itemLabel}
+                                                                </div>
+                                                                {stepActiveIndex ===
+                                                                    item.itemIndex && (
+                                                                    <Suspense fallback={<Loader />}>
+                                                                        {item.component}
+                                                                    </Suspense>
+                                                                )}
                                                             </div>
-                                                            {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense fallback={<Loader />}>
-                                                                    {item.component}
-                                                                </Suspense>
-                                                            )}
-                                                        </div>
-                                                    ))
+                                                        );
+                                                    })
                                                 )}
                                             </Form>
                                         </Formik>

@@ -2,6 +2,13 @@
     height: 50px;
 }
 
+.general-info__text-input[readonly] {
+    cursor: default;
+    &:hover {
+        border-color: var(--admss-app-light-grey);
+    }
+}
+
 .general-info__button {
     width: 246px;
     height: 54px;
@@ -25,4 +32,12 @@
         outline: none;
         box-shadow: none;
     }
+}
+
+.p-float-label .p-tooltip-target-wrapper ~ label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
 }
