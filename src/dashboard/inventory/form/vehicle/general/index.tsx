@@ -50,6 +50,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
+    const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
@@ -229,6 +230,31 @@ export const VehicleGeneral = observer((): ReactElement => {
         "ReadyForSale",
         "JustArrived",
     ];
+
+    useEffect(() => {
+        const activeKey = renderedAuditKeys.find((key) => inventoryAudit[key] === 1) || null;
+        setSelectedAuditKey(activeKey);
+    }, [inventoryAudit]);
+
+    const auditOptions = renderedAuditKeys.map((key) => ({
+        label: key.replace(/(?!^)([A-Z]|\d+)/g, " $1"),
+        value: key,
+    }));
+
+    const handleAuditChange = (value: keyof Audit) => {
+        changeInventoryAudit(value);
+
+        renderedAuditKeys.forEach((key) => {
+            if (key !== value) {
+                const auditValue = inventoryAudit[key] as number;
+                if (auditValue === 1) {
+                    changeInventoryAudit(key);
+                }
+            }
+        });
+
+        setSelectedAuditKey(value);
+    };
 
     return (
         <div className='grid vehicle-general row-gap-2'>
@@ -527,34 +553,22 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
 
             <div className='flex col-12'>
-                <h3 className='vehicle-general__title m-0 pr-3'>Audit</h3>
+                <h3 className='vehicle-general__title m-0 pr-3'>Vehicle status</h3>
                 <hr className='vehicle-general__line flex-1' />
             </div>
 
-            {Object.entries(inventoryAudit).map(([key, value]) => {
-                const typedKey = key as keyof Audit;
-
-                if (!renderedAuditKeys.includes(typedKey)) return null;
-
-                const inputLabel = typedKey.replace(/(?!^)([A-Z]|\d+)/g, " $1");
-
-                return (
-                    <div
-                        className='col-3 vehicle-options__checkbox flex align-items-center'
-                        key={key}
-                    >
-                        <Checkbox
-                            inputId={`audit-${key}`}
-                            name={`audit-${key}`}
-                            checked={!!value}
-                            onChange={() => changeInventoryAudit(typedKey)}
-                        />
-                        <label htmlFor={`audit-${key}`} className='ml-2'>
-                            {inputLabel}
-                        </label>
-                    </div>
-                );
-            })}
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <Dropdown
+                        options={auditOptions}
+                        value={selectedAuditKey}
+                        onChange={(e) => handleAuditChange(e.value as keyof Audit)}
+                        placeholder='Select Status'
+                        className='w-full vehicle-general__dropdown'
+                    />
+                    <label className='float-label'>Status</label>
+                </span>
+            </div>
         </div>
     );
 });
