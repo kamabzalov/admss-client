@@ -219,15 +219,15 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        // const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-        //     if (isContactChanged) {
-        //         event.preventDefault();
-        //     }
-        // };
-        // window.addEventListener("beforeunload", handleBeforeUnload);
-        // return () => {
-        //     window.removeEventListener("beforeunload", handleBeforeUnload);
-        // };
+         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+             if (isContactChanged) {
+                 event.preventDefault();
+             }
+         };
+         window.addEventListener("beforeunload", handleBeforeUnload);
+         return () => {
+             window.removeEventListener("beforeunload", handleBeforeUnload);
+         };
     }, [isContactChanged]);
 
     useEffect(() => {
