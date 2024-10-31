@@ -308,3 +308,15 @@
     height: 44px;
 }
 
+.inventory-top-controls__search-button {
+    width: 200px;
+}
+
+.inventory-top-controls__search.p-input-icon-right > .p-inputtext {
+    width: 200px;
+    padding-right: 0;
+}
+
+.inventory-filter.p-multiselect {
+    height: 50px;
+}
