@@ -26,10 +26,11 @@ export interface ReportDocument {
     updated: string;
 }
 
-export interface ReportCollection {
+export interface ReportCollection extends BaseResponseError {
     accessed: string;
     created: string;
     description: string;
+    collections?: ReportCollection[];
     documents: ReportDocument[];
     index: number;
     isfavorite: 0 | 1;

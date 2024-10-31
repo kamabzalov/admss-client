@@ -123,6 +123,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         icon='icon adms-password'
                         severity='success'
                         onClick={() => setAccessDialogVisible(true)}
+                        tooltip='Edit access'
                         outlined
                     />
                 )}
@@ -133,6 +134,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         severity='success'
                         onClick={handleDuplicateReport}
                         outlined
+                        tooltip='Duplicate report'
                     />
                 )}
 
@@ -143,6 +145,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         onClick={handleDeleteReport}
                         outlined
                         severity='danger'
+                        tooltip='Delete report'
                     />
                 )}
                 <Button

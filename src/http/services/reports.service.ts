@@ -104,7 +104,7 @@ export const createReportCollection = async (
 
 export const getUserReportCollectionsContent = async (uid: string, params?: { qry?: string }) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | ReportCollection>(
+        const request = await authorizedUserApiInstance.get<ReportCollection>(
             `reports/${uid}/collectionscontent`,
             {
                 params,
