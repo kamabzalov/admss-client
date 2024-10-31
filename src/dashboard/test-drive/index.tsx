@@ -451,22 +451,26 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     onBlur={handleBlur}
                                                     colWidth={4}
                                                 />
-                                                <TextInput
-                                                    name='Odometer (required)'
-                                                    value={values.outOdometer}
-                                                    onChange={({ target: { value } }) =>
-                                                        handleChange({
-                                                            target: { name: "outOdometer", value },
-                                                        })
-                                                    }
-                                                    onBlur={handleBlur}
-                                                    colWidth={4}
-                                                />
-                                                {errors.outOdometer && touched.outOdometer && (
-                                                    <div className='p-error'>
-                                                        {errors.outOdometer}
-                                                    </div>
-                                                )}
+                                                <div className='col-4 relative'>
+                                                    <TextInput
+                                                        name='Odometer (required)'
+                                                        value={values.outOdometer}
+                                                        onChange={({ target: { value } }) =>
+                                                            handleChange({
+                                                                target: {
+                                                                    name: "outOdometer",
+                                                                    value,
+                                                                },
+                                                            })
+                                                        }
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {errors.outOdometer && touched.outOdometer && (
+                                                        <div className='p-error'>
+                                                            {errors.outOdometer}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <div className='col-12 relative'>
                                                     <span className='p-float-label'>
                                                         <InputTextarea
@@ -491,6 +495,7 @@ export const PrintForTestDrive = (): ReactElement => {
                                             </div>
                                             <div className='col-3 ml-6 mt-0 test-drive__card-control'>
                                                 <Button
+                                                    type='button'
                                                     className='test-drive__button'
                                                     label='Add to contacts'
                                                     onClick={() => handleAddToContact(values)}
