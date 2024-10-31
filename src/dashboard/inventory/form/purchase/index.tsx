@@ -23,11 +23,11 @@ const PurchasePayments = lazy(() =>
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",
     items: [
+        { itemLabel: AccordionItems.PURCHASES, component: <PurchasePurchases /> },
+        { itemLabel: AccordionItems.PAYMENTS, component: <PurchasePayments /> },
+        { itemLabel: AccordionItems.EXPENSES, component: <PurchaseExpenses /> },
+        { itemLabel: AccordionItems.TITLE, component: <PurchaseTitle /> },
         { itemLabel: AccordionItems.FLOORPLAN, component: <PurchaseFloorplan /> },
         { itemLabel: AccordionItems.CONSIGN, component: <PurchaseConsign /> },
-        { itemLabel: AccordionItems.TITLE, component: <PurchaseTitle /> },
-        { itemLabel: AccordionItems.PURCHASES, component: <PurchasePurchases /> },
-        { itemLabel: AccordionItems.EXPENSES, component: <PurchaseExpenses /> },
-        { itemLabel: AccordionItems.PAYMENTS, component: <PurchasePayments /> },
     ],
 };
