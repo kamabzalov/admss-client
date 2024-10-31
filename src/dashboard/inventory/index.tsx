@@ -246,12 +246,15 @@ export default function Inventories({
                           .filter(([column]) =>
                               settings.activeColumns?.some((col) => col === column)
                           )
-                          .reduce((obj, [key, value]) => {
-                              return {
-                                  ...obj,
-                                  [key]: value,
-                              };
-                          }, {} as { [key: string]: number })
+                          .reduce(
+                              (obj, [key, value]) => {
+                                  return {
+                                      ...obj,
+                                      [key]: value,
+                                  };
+                              },
+                              {} as { [key: string]: number }
+                          )
                     : {};
                 const updatedSettings = {
                     ...serverSettings,
@@ -546,7 +549,56 @@ export default function Inventories({
 
     const header = (
         <div className='grid datatable-controls'>
-            <div className='col-2'>
+            <div className='flex justify-content-between align-items-center gap-3'>
+                <span className='p-input-icon-right inventory-top-controls__search'>
+                    <i
+                        className={`pi pi-${!globalSearch ? "search" : "times cursor-pointer"}`}
+                        onClick={() => setGlobalSearch("")}
+                    />
+                    <InputText
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
+                </span>
+                <Button
+                    className='inventory-top-controls__search-button'
+                    label='Advanced search'
+                    severity='success'
+                    type='button'
+                    onClick={() => setDialogVisible(true)}
+                />
+            </div>
+            <div className='flex justify-content-between align-items-center gap-3 ml-3'>
+                <div className='inventory-top-controls'>
+                    <Button
+                        className='inventory-top-controls__button new-inventory-button'
+                        icon='icon adms-add-item'
+                        severity='success'
+                        type='button'
+                        tooltip='Add new inventory'
+                        onClick={() => navigate("create")}
+                    >
+                        New
+                    </Button>
+                    <Button
+                        className='inventory-top-controls__button'
+                        severity='success'
+                        type='button'
+                        icon='pi pi-print'
+                        tooltip='Print inventory form'
+                        onClick={() => printTableData(true)}
+                    />
+                    <Button
+                        className='inventory-top-controls__button'
+                        severity='success'
+                        type='button'
+                        icon='icon adms-blank'
+                        tooltip='Download inventory form'
+                        onClick={() => printTableData()}
+                    />
+                </div>
+            </div>
+            <div className='col-2 ml-auto'>
                 <MultiSelect
                     optionValue='value'
                     optionLabel='label'
@@ -563,7 +615,7 @@ export default function Inventories({
                         });
                     }}
                     placeholder='Filter'
-                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                    className='w-full pb-0 flex align-items-center inventory-filter'
                     display='chip'
                     selectedItemsLabel='Clear Filter'
                     panelHeaderTemplate={dropdownFilterHeaderPanel}
@@ -651,53 +703,6 @@ export default function Inventories({
                         },
                     }}
                 />
-            </div>
-            <div className='col-2'>
-                <div className='inventory-top-controls'>
-                    <Button
-                        className='inventory-top-controls__button new-inventory-button'
-                        icon='icon adms-add-item'
-                        severity='success'
-                        type='button'
-                        tooltip='Add new inventory'
-                        onClick={() => navigate("create")}
-                    >
-                        New
-                    </Button>
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='pi pi-print'
-                        tooltip='Print inventory form'
-                        onClick={() => printTableData(true)}
-                    />
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-blank'
-                        tooltip='Download inventory form'
-                        onClick={() => printTableData()}
-                    />
-                </div>
-            </div>
-            <div className='col-4 text-right'>
-                <Button
-                    className='inventory-top-controls__button m-r-20px'
-                    label='Advanced search'
-                    severity='success'
-                    type='button'
-                    onClick={() => setDialogVisible(true)}
-                />
-                <span className='p-input-icon-right'>
-                    <i
-                        className={`pi pi-${!globalSearch ? "search" : "times cursor-pointer"}`}
-                        onClick={() => setGlobalSearch("")}
-                    />
-                    <InputText
-                        value={globalSearch}
-                        onChange={(e) => setGlobalSearch(e.target.value)}
-                    />
-                </span>
             </div>
         </div>
     );
