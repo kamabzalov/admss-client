@@ -98,7 +98,7 @@ export const AddNoteDialog = ({
                 <div className='col-12'>
                     <span className='p-float-label'>
                         <Dropdown
-                            options={ACCOUNT_NOTE_CONTACT_TYPE}
+                            options={[...ACCOUNT_NOTE_CONTACT_TYPE]}
                             value={contactType}
                             onChange={(e) => setContactType(e.value)}
                             className='w-full'

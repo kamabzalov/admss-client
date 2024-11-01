@@ -266,7 +266,7 @@ export const VideoMedia = observer((): ReactElement => {
                     placeholder='Category'
                     optionLabel={"name"}
                     optionValue={"id"}
-                    options={CATEGORIES}
+                    options={[...CATEGORIES]}
                     value={uploadFileVideos?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />

@@ -250,7 +250,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                     placeholder='Category'
                     optionLabel={"name"}
                     optionValue={"id"}
-                    options={CATEGORIES}
+                    options={[...CATEGORIES]}
                     value={uploadFileDocuments?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />

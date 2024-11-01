@@ -75,7 +75,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
-                        options={PAYMENT_FREQUENCY_LIST}
+                        options={[...PAYMENT_FREQUENCY_LIST]}
                         filter
                         required
                         className='w-full deal-sale__dropdown'
@@ -90,7 +90,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
-                        options={TERM_MONTH_LIST}
+                        options={[...TERM_MONTH_LIST]}
                         editable
                         filter
                         required
@@ -258,4 +258,3 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
         </div>
     );
 });
-

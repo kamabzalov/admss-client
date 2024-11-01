@@ -63,7 +63,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                 <label className='take-payment__label'>Pmt Method</label>
                 <Dropdown
                     id='pmtMethod'
-                    options={ACCOUNT_PAYMENT_METHODS}
+                    options={[...ACCOUNT_PAYMENT_METHODS]}
                     value={PaymentMethod}
                     optionValue='name'
                     optionLabel='name'

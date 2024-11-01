@@ -23,7 +23,7 @@ export const AccountAdjustments = observer((): ReactElement => {
             <h3 className='take-payment__title'>Adjustments</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Adjustment Type:</label>
-                <Dropdown id='adjType' options={ADJUSTMENT_TYPES} value={AdjType} />
+                <Dropdown id='adjType' options={[...ADJUSTMENT_TYPES]} value={AdjType} />
             </div>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Adjustment Date:</label>

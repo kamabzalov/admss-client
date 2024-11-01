@@ -257,7 +257,7 @@ export const AudioMedia = observer((): ReactElement => {
                     placeholder='Category'
                     optionLabel={"name"}
                     optionValue={"id"}
-                    options={CATEGORIES}
+                    options={[...CATEGORIES]}
                     value={uploadFileAudios?.data?.contenttype}
                     onChange={handleCategorySelect}
                 />

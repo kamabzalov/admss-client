@@ -1,4 +1,4 @@
-const STATES = [
+const STATES: readonly { id: string; name: string }[] = [
     {
         id: "AL",
         name: "Alabama",

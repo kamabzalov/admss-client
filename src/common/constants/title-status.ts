@@ -1,4 +1,6 @@
-export const TITLE_STATUS_LIST = [
+import { TypeList } from "common/models";
+
+export const TITLE_STATUS_LIST: readonly TypeList[] = [
     {
         name: "Default",
         id: 0,
