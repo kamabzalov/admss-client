@@ -33,13 +33,24 @@ const validationSchema = Yup.object().shape({
     outOdometer: Yup.string().required("Odometer is required"),
 });
 
+enum TEST_DRIVE_ACTIONS {
+    PRINT = "print",
+    DOWNLOAD = "download",
+    PREVIEW = "preview",
+}
+
+const getCurrentDate = () => {
+    const date = new Date();
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+};
+
 export const PrintForTestDrive = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const toast = useToast();
     const navigate = useNavigate();
 
-    const handlePrintForm = async (values: TestDriver, print: boolean = false) => {
+    const handlePrintForm = async (values: TestDriver, action?: TEST_DRIVE_ACTIONS) => {
         if (authUser && authUser.useruid) {
             const response = await printTestDrive(authUser.useruid, values);
             if (response.status === Status.ERROR) {
@@ -52,14 +63,31 @@ export const PrintForTestDrive = (): ReactElement => {
                 });
             }
             setTimeout(() => {
-                const url = URL.createObjectURL(new Blob([response], { type: "application/pdf" }));
-                if (print) {
-                    const newWindow = window.open(url);
-                    if (newWindow) {
-                        newWindow.onload = () => newWindow.print();
-                    }
-                } else {
-                    window.open(url, "_blank");
+                const url = new Blob([response], { type: "application/pdf" });
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+
+                switch (action) {
+                    case TEST_DRIVE_ACTIONS.DOWNLOAD:
+                        link.download = `${values.customerLastName}_test_drive_form.pdf`;
+                        link.click();
+                        break;
+                    case TEST_DRIVE_ACTIONS.PREVIEW:
+                        window.open(
+                            link.href,
+                            "_blank",
+                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                        );
+                        break;
+                    case TEST_DRIVE_ACTIONS.PRINT:
+                        const printWindow = window.open(
+                            link.href,
+                            "toolbar=no,scrollbars=no,resizable=yes,top=100,left=100,width=1280,height=720"
+                        );
+                        printWindow?.addEventListener("load", () => {
+                            printWindow.print();
+                        });
+                        break;
                 }
             }, 3000);
         }
@@ -123,8 +151,8 @@ export const PrintForTestDrive = (): ReactElement => {
                                     homePhone: "",
                                     dlNumber: "",
                                     dlState: "",
-                                    dlIssuingDate: "",
-                                    dlExpirationDate: "",
+                                    dlIssuingDate: getCurrentDate(),
+                                    dlExpirationDate: getCurrentDate(),
                                     vclVIN: "",
                                     vclMake: "",
                                     vclModel: "",
@@ -512,29 +540,47 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     outlined
                                                 />
                                                 <Button
+                                                    type='button'
                                                     className='test-drive__button'
                                                     severity={
                                                         !isValid || !dirty ? "secondary" : "success"
                                                     }
-                                                    onClick={() => handlePrintForm(values)}
+                                                    onClick={() =>
+                                                        handlePrintForm(
+                                                            values,
+                                                            TEST_DRIVE_ACTIONS.PREVIEW
+                                                        )
+                                                    }
                                                     disabled={!isValid || !dirty}
                                                     label='Preview'
                                                 />
                                                 <Button
+                                                    type='button'
                                                     className='test-drive__button'
                                                     severity={
                                                         !isValid || !dirty ? "secondary" : "success"
                                                     }
-                                                    onClick={() => handlePrintForm(values, true)}
+                                                    onClick={() =>
+                                                        handlePrintForm(
+                                                            values,
+                                                            TEST_DRIVE_ACTIONS.PRINT
+                                                        )
+                                                    }
                                                     disabled={!isValid || !dirty}
                                                     label='Print'
                                                 />
                                                 <Button
+                                                    type='button'
                                                     className='test-drive__button'
                                                     severity={
                                                         !isValid || !dirty ? "secondary" : "success"
                                                     }
-                                                    onClick={() => handlePrintForm(values)}
+                                                    onClick={() =>
+                                                        handlePrintForm(
+                                                            values,
+                                                            TEST_DRIVE_ACTIONS.DOWNLOAD
+                                                        )
+                                                    }
                                                     disabled={!isValid || !dirty}
                                                     label='Download'
                                                 />
