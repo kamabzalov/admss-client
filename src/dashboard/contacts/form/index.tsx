@@ -158,6 +158,7 @@ export const ContactForm = observer((): ReactElement => {
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
+        setDeleteActiveIndex(itemsMenuCount + 1);
 
         return () => {
             sections.forEach((section) => section.clearCount());
@@ -180,12 +181,6 @@ export const ContactForm = observer((): ReactElement => {
         } else {
             clearContact();
         }
-        const sections = contactSections.map((sectionData) => new ContactSection(sectionData));
-        setContactSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
-        setItemsMenuCount(itemsMenuCount);
-        setDeleteActiveIndex(itemsMenuCount + 1);
         return () => {
             clearContact();
         };
@@ -219,15 +214,15 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     useEffect(() => {
-         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-             if (isContactChanged) {
-                 event.preventDefault();
-             }
-         };
-         window.addEventListener("beforeunload", handleBeforeUnload);
-         return () => {
-             window.removeEventListener("beforeunload", handleBeforeUnload);
-         };
+        // const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+        //     if (isContactChanged) {
+        //         event.preventDefault();
+        //     }
+        // };
+        // window.addEventListener("beforeunload", handleBeforeUnload);
+        // return () => {
+        //     window.removeEventListener("beforeunload", handleBeforeUnload);
+        // };
     }, [isContactChanged]);
 
     useEffect(() => {
