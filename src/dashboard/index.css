@@ -41,7 +41,7 @@
 }
 
 .card-header__title {
-    width: 312px;
+    width: 343px;
 }
 
 .card-content__wrapper {
@@ -58,6 +58,10 @@
 .card-content__title {
     margin-bottom: 30px;
     margin-top: 0;
+}
+
+.card-header-info {
+    padding-left: 1.75rem;
 }
 
 .card-header-info__data {
