@@ -14,10 +14,11 @@ import { printTestDrive } from "http/services/print";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { ContactUser } from "common/models/contact";
+import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { setContact } from "http/services/contacts-service";
 import { Form, Formik } from "formik";
 import { Inventory } from "common/models/inventory";
+import { InputMask } from "primereact/inputmask";
 
 const validationSchema = Yup.object().shape({
     customerName: Yup.string().required("First Name is required"),
@@ -283,24 +284,31 @@ export const PrintForTestDrive = (): ReactElement => {
                                                         )}
                                                 </div>
                                                 <div className='col-4 relative'>
-                                                    <TextInput
-                                                        name='Phone Number (required)'
-                                                        value={values.homePhone}
-                                                        onChange={({ target: { value } }) =>
-                                                            handleChange({
-                                                                target: {
-                                                                    name: "homePhone",
-                                                                    value,
-                                                                },
-                                                            })
-                                                        }
-                                                        onBlur={handleBlur}
-                                                    />
-                                                    {errors.homePhone && touched.homePhone && (
-                                                        <div className='p-error'>
-                                                            {errors.homePhone}
-                                                        </div>
-                                                    )}
+                                                    <span className='p-float-label'>
+                                                        <InputMask
+                                                            type='tel'
+                                                            mask='999-999-9999'
+                                                            className='w-full'
+                                                            onBlur={handleBlur}
+                                                            value={values.homePhone}
+                                                            onChange={({ target: { value } }) =>
+                                                                handleChange({
+                                                                    target: {
+                                                                        name: "homePhone",
+                                                                        value,
+                                                                    },
+                                                                })
+                                                            }
+                                                        />
+                                                        {errors.homePhone && touched.homePhone && (
+                                                            <div className='p-error'>
+                                                                {errors.homePhone}
+                                                            </div>
+                                                        )}
+                                                        <label className='float-label'>
+                                                            Phone Number
+                                                        </label>
+                                                    </span>
                                                 </div>
                                                 <div className='col-4 relative'>
                                                     <TextInput
@@ -457,6 +465,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                                                     value,
                                                                 },
                                                             })
+                                                        }
+                                                        contactCategory={
+                                                            ContactTypeNameList.DEALERS
                                                         }
                                                         onRowClick={(value) =>
                                                             handleChange({
