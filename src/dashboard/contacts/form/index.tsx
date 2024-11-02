@@ -214,15 +214,15 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
+        // const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+        //     if (isContactChanged) {
+        //         event.preventDefault();
+        //     }
+        // };
+        // window.addEventListener("beforeunload", handleBeforeUnload);
+        // return () => {
+        //     window.removeEventListener("beforeunload", handleBeforeUnload);
+        // };
     }, [isContactChanged]);
 
     useEffect(() => {
@@ -340,8 +340,8 @@ export const ContactForm = observer((): ReactElement => {
                             )}
                         </div>
                         <div className='card-content contact__card'>
-                            <div className='grid flex-nowrap'>
-                                <div className='p-0 card-content__wrapper'>
+                            <div className='grid flex-nowrap card-content__wrapper'>
+                                <div className='p-0'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
