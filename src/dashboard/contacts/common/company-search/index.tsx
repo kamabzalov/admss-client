@@ -95,7 +95,7 @@ export const CompanySearch = ({
             <Dialog
                 header={<div className='uppercase'>Choose a Contact</div>}
                 visible={dialogVisible}
-                style={{ width: "75vw" }}
+                style={{ width: "75vw", height: "75vh" }}
                 maximizable
                 modal
                 onHide={() => setDialogVisible(false)}
