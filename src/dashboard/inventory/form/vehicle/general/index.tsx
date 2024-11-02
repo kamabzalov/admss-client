@@ -225,10 +225,10 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const renderedAuditKeys: (keyof Audit)[] = [
-        "DataNeedsUpdate",
-        "NeedsCleaning",
-        "ReadyForSale",
         "JustArrived",
+        "NeedsCleaning",
+        "DataNeedsUpdate",
+        "ReadyForSale",
     ];
 
     useEffect(() => {

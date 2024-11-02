@@ -392,8 +392,8 @@ export const InventoryForm = observer(() => {
                             )}
                         </div>
                         <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap inventory__card-content'>
-                                <div className='p-0 card-content__wrapper' ref={stepsRef}>
+                            <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
+                                <div className='p-0' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
