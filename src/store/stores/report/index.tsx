@@ -1,5 +1,5 @@
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportInfo, ReportServiceColumns } from "common/models/reports";
+import { ReportCreate, ReportInfo, ReportServiceColumns } from "common/models/reports";
 import { createCustomReport, getReportInfo, updateReportInfo } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -64,10 +64,18 @@ export class ReportStore {
             this._isLoading = true;
             try {
                 if (!uid) {
-                    await createCustomReport({
-                        name: this._report.name,
-                        columns: this._reportColumns,
-                    }).then((response) => {
+                    const reportData: Partial<ReportCreate> & { columns?: ReportServiceColumns[] } =
+                        {
+                            name: this._report.name,
+                        };
+
+                    if (this._reportColumns && this._reportColumns.length > 0) {
+                        reportData.columns = this._reportColumns;
+                    }
+
+                    await createCustomReport(
+                        reportData as Partial<ReportCreate> & { columns: ReportServiceColumns[] }
+                    ).then((response) => {
                         if (response?.status === Status.OK) {
                             uid = (response as ReportInfo).itemuid;
                         } else {
