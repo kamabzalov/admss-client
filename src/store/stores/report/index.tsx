@@ -69,7 +69,7 @@ export class ReportStore {
                             name: this._report.name,
                         };
 
-                    if (this._reportColumns && this._reportColumns.length > 0) {
+                    if (this._reportColumns && this._reportColumns.length) {
                         reportData.columns = this._reportColumns;
                     }
 
