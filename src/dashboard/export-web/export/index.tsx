@@ -829,6 +829,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                 />
                                                 <InputNumber
                                                     maxFractionDigits={2}
+                                                    minFractionDigits={2}
                                                     disabled={
                                                         !selectedServices.find(
                                                             (item) => item.field === field
@@ -876,6 +877,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     <InputNumber
                                                         key={forceUpdate}
                                                         maxFractionDigits={2}
+                                                        minFractionDigits={2}
                                                         className='export-web__input-price'
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
