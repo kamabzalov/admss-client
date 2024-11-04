@@ -536,6 +536,23 @@
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
+.p-checkbox .p-checkbox-box {
+    border-radius: 3px;
+}
+
+.p-datepicker-calendar {
+    thead th,
+    tbody td {
+        padding: 1px;
+        width: 45px;
+    }
+
+    thead th > span,
+    tbody td > span {
+        margin: 0px;
+    }
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);

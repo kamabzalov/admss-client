@@ -4,6 +4,7 @@ import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { ContactExtData } from "common/models/contact";
+import { PhoneInput } from "dashboard/common/form/inputs";
 
 export const ContactsWorkplace = observer((): ReactElement => {
     const store = useStore().contactStore;
@@ -58,21 +59,19 @@ export const ContactsWorkplace = observer((): ReactElement => {
             </div>
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`contacts-workplace__text-input w-full ${
-                            errors.Buyer_Emp_Phone ? "p-invalid" : ""
-                        }`}
-                        onBlur={handleBlur}
-                        value={values.Buyer_Emp_Phone || ""}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("Buyer_Emp_Phone", value);
-                            changeContactExtData("Buyer_Emp_Phone", value);
-                            setFieldTouched("Buyer_Emp_Phone", true, true);
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
+                <PhoneInput
+                    name='Phone Number'
+                    className={`contacts-workplace__text-input w-full ${
+                        errors.Buyer_Emp_Phone ? "p-invalid" : ""
+                    }`}
+                    onBlur={handleBlur}
+                    value={values.Buyer_Emp_Phone || ""}
+                    onChange={async ({ target: { value } }) => {
+                        await setFieldValue("Buyer_Emp_Phone", value);
+                        changeContactExtData("Buyer_Emp_Phone", Number(value));
+                        setFieldTouched("Buyer_Emp_Phone", true, true);
+                    }}
+                />
                 <small className='p-error'>{errors.Buyer_Emp_Phone}</small>
             </div>
         </div>

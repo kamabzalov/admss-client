@@ -91,6 +91,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     }
                     className='w-full address-info__dropdown'
                     disabled={isControlDisabled}
+                    showClear
                 />
             </div>
 
