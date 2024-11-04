@@ -8,6 +8,7 @@ import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
+import { InputMask, InputMaskProps } from "primereact/inputmask";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -51,6 +52,10 @@ interface DateInputProps extends CalendarProps {
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
     clearButton?: boolean;
+}
+
+interface PhoneInputProps extends InputMaskProps {
+    colWidth?: Range<1, 13>;
 }
 
 interface StateDropdownProps extends DropdownProps {
@@ -363,6 +368,25 @@ export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps):
                 style={{ height: `${props.height || 50}px` }}
                 {...props}
             />
+            <label className='float-label'>{name}</label>
+        </span>
+    );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
+};
+
+export const PhoneInput = ({ name, colWidth, ...props }: PhoneInputProps): ReactElement => {
+    const content = (
+        <span className='p-float-label relative'>
+            <InputMask
+                type='tel'
+                mask='999-999-9999'
+                className='w-full'
+                style={{ height: `${props.height || 50}px` }}
+                tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
+                {...props}
+            />
+
             <label className='float-label'>{name}</label>
         </span>
     );

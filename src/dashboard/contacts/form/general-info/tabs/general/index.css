@@ -10,7 +10,7 @@
 }
 
 .general-info__button {
-    width: 246px;
+    width: 245px;
     height: 54px;
     font-weight: 700;
     font-size: 18px;
@@ -21,10 +21,20 @@
 .general-info-overwrite {
     display: flex;
     align-items: center;
+    font-weight: 400;
+    font-family: "Open Sans";
+    font-size: 18px;
+}
+
+.general-info-overwrite__label {
+    padding-left: 15px;
+    line-height: 1;
 }
 
 .general-info-overwrite__icon.p-button {
     color: var(--admss-app-main-blue);
+    border: none;
+    background-color: transparent;
     &:enabled:hover {
         color: var(--admss-app-main-blue);
         border: none;
@@ -40,4 +50,9 @@
     color: var(--admss-app-medium-grey);
     margin-top: -16px;
     font-size: 12px;
+}
+
+.overwrite-tooltip .p-tooltip-text {
+    box-shadow: 0 0 5px 0 var(--admss-app-dark-blue);
+    background-color: var(--admss-app-white-blue);
 }

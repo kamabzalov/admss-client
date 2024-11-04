@@ -61,7 +61,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     date={contactExtData.created}
                     name='Contact till'
                     showTime
-                    hourFormat='24'
+                    hourFormat='12'
                     onChange={({ target: { value } }) =>
                         changeContactExtData("created", Number(value))
                     }

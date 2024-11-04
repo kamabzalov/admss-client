@@ -40,7 +40,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, setFieldValue } = useFormikContext<Contact>();
+    const { errors, values, setFieldValue } = useFormikContext<Contact>();
 
     const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
     const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
@@ -88,9 +88,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
     const shouldDisableNameFields = useMemo(() => {
         return (
-            isBusinessNameRequired || (!!contact.businessName && contact.businessName.trim() !== "")
+            isBusinessNameRequired || (!!values.businessName && values.businessName.trim() !== "")
         );
-    }, [isBusinessNameRequired, contact.businessName]);
+    }, [isBusinessNameRequired, values.businessName]);
 
     const shouldDisableBusinessName = useMemo(() => {
         return (
@@ -182,7 +182,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     />
                     <label
                         htmlFor='general-info-overwrite'
-                        className='pl-3 general-info-overwrite__label'
+                        className='general-info-overwrite__label'
                     >
                         Overwrite data
                     </label>
@@ -193,6 +193,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         outlined
                         type='button'
                         className='general-info-overwrite__icon'
+                        tooltipOptions={{
+                            className: "overwrite-tooltip",
+                        }}
                     />
                 </div>
             </div>
@@ -216,7 +219,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 }`}
                                 showClear={contact.type >= 1}
                             />
-                            <label className='float-label'>Type (required) {contact.type}</label>
+                            <label className='float-label'>Type (required)</label>
                         </span>
                         <small className='p-error'>{errors.type}</small>
                     </div>
@@ -265,6 +268,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     onChange={({ target: { value } }) => {
                         if (type === BUYER) {
                             changeContact("middleName", value);
+                            setFieldValue("middleName", value);
                         } else {
                             changeContactExtData("CoBuyer_Middle_Name", value);
                         }
@@ -320,6 +324,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     value={savedBusinessName || contact.businessName}
                     onChange={({ target: { value } }) => {
                         changeContact("businessName", value);
+                        setFieldValue("businessName", value);
                     }}
                     disabled={!!shouldDisableBusinessName}
                     tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}

@@ -210,6 +210,7 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
+                                showClear
                             />
                             <label className='float-label'>DL's State</label>
                         </span>
@@ -277,6 +278,7 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
+                                showClear
                             />
                             <label className='float-label'>Sex</label>
                         </span>
