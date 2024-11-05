@@ -344,7 +344,20 @@ export default function Reports(): ReactElement {
                                                                         );
                                                                     }}
                                                                 >
-                                                                    <p>{report.name}</p>
+                                                                    <p
+                                                                        className={
+                                                                            reportSearch &&
+                                                                            report.name
+                                                                                .toLowerCase()
+                                                                                .includes(
+                                                                                    reportSearch.toLowerCase()
+                                                                                )
+                                                                                ? "searched-item"
+                                                                                : ""
+                                                                        }
+                                                                    >
+                                                                        {report.name}
+                                                                    </p>
                                                                     <ActionButtons
                                                                         report={report}
                                                                         collectionList={collections}

@@ -523,6 +523,10 @@
     font-family: "Open Sans", sans-serif;
 }
 
+.reports-accordion-header:has(.searched-item) .reports-accordion-header__label {
+    margin-left: 16px;
+}
+
 .vertical-step-menu .p-steps-item.p-highlight.p-steps-current {
     width: 100%;
     background: var(--admss-app-light-blue);

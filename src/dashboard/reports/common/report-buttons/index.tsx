@@ -28,11 +28,12 @@ export const ActionButtons = ({
     collectionList,
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
+    const [addedToCollection, setAddedToCollection] = useState(false);
     const toast = useToast();
     const menu = useRef<Menu>(null!);
     const navigate = useNavigate();
-
-    const handleEditAccess = () => {
+    const handleEditAccess = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         setEditAccessActive(true);
     };
 
@@ -54,7 +55,9 @@ export const ActionButtons = ({
                                 life: TOAST_LIFETIME,
                             });
                         } else {
+                            setAddedToCollection(true);
                             refetchCollectionsAction?.();
+                            setTimeout(() => setAddedToCollection(false), 2000);
                         }
                     } else {
                         const response = await moveReportToCollection(
@@ -77,7 +80,8 @@ export const ActionButtons = ({
         },
     ];
 
-    const handleChangeIsFavorite = () => {
+    const handleChangeIsFavorite = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         updateReportInfo(report.documentUID, {
             ...report,
             isfavorite: !report.isfavorite ? 1 : 0,
@@ -93,6 +97,7 @@ export const ActionButtons = ({
                 const detail = !!report.isfavorite
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
+                refetchCollectionsAction?.();
                 refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
@@ -104,8 +109,14 @@ export const ActionButtons = ({
         });
     };
 
-    const handleEditReport = () => {
+    const handleEditReport = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         navigate(`/dashboard/reports/${report.documentUID}`);
+    };
+
+    const handleAddToCollection = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        menu.current.toggle(event);
     };
 
     return (
@@ -115,6 +126,7 @@ export const ActionButtons = ({
                     model={items}
                     popup
                     ref={menu}
+                    className='reports-actions__menu'
                     pt={{
                         root: {
                             style: {
@@ -135,10 +147,11 @@ export const ActionButtons = ({
                 />
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
-                    icon='pi pi-plus'
+                    icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
                     tooltip='Add to Collection'
+                    tooltipOptions={{ position: "mouse" }}
                     outlined
-                    onClick={(event) => menu.current.toggle(event)}
+                    onClick={handleAddToCollection}
                 />
                 <Button
                     className='p-button reports-actions__button'
@@ -146,12 +159,14 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    tooltipOptions={{ position: "mouse" }}
                 />
                 <Button
                     className='p-button reports-actions__button'
                     icon='icon adms-edit-item'
                     outlined
                     tooltip='Edit Report'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditReport}
                 />
                 <Button
@@ -159,6 +174,7 @@ export const ActionButtons = ({
                     icon='icon adms-password'
                     outlined={!editAccessActive}
                     tooltip='Edit Access'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditAccess}
                 />
             </div>
