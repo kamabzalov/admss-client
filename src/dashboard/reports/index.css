@@ -281,3 +281,7 @@
     background-color: var(--admss-app-lightest-green);
     padding: 1.25rem;
 }
+
+.reports-actions__menu.p-menu .p-menuitem-link {
+    height: auto;
+}

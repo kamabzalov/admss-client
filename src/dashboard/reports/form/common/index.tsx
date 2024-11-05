@@ -1,6 +1,7 @@
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportServiceColumns } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useToast } from "dashboard/common/toast";
 import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
@@ -58,6 +59,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
     const { report, saveReport, isReportChanged } = reportStore;
     const toast = useToast();
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
+    const [duplicateDialogVisible, setDuplicateDialogVisible] = useState<boolean>(false);
 
     const handleSaveReport = () => {
         if (!!report.isdefault) return;
@@ -133,7 +135,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         className='report__icon-button'
                         icon='icon adms-blank'
                         severity='success'
-                        onClick={handleDuplicateReport}
+                        onClick={() => setDuplicateDialogVisible(true)}
                         outlined
                         tooltip='Duplicate report'
                         tooltipOptions={{ position: "mouse" }}
@@ -172,11 +174,28 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     {report?.itemuid ? "Update" : "Create"}
                 </Button>
             </div>
-            {report.itemuid && (
+            {report.itemuid && accessDialogVisible && (
                 <EditAccessDialog
                     visible={accessDialogVisible}
                     onHide={() => setAccessDialogVisible(false)}
                     reportuid={report.itemuid}
+                />
+            )}
+            {report.itemuid && (
+                <ConfirmModal
+                    visible={duplicateDialogVisible}
+                    position='top'
+                    title='Duplicate report?'
+                    icon='pi-exclamation-triangle'
+                    bodyMessage={`Are you sure you want to duplicate ${report.name} report?`}
+                    confirmAction={() => {
+                        handleDuplicateReport();
+                        setDuplicateDialogVisible(false);
+                    }}
+                    draggable={false}
+                    rejectLabel={"Cancel"}
+                    acceptLabel={"Copy"}
+                    onHide={() => setDuplicateDialogVisible(false)}
                 />
             )}
         </>

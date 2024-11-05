@@ -28,10 +28,10 @@ export const ActionButtons = ({
     collectionList,
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
+    const [addedToCollection, setAddedToCollection] = useState(false);
     const toast = useToast();
     const menu = useRef<Menu>(null!);
     const navigate = useNavigate();
-
     const handleEditAccess = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
         setEditAccessActive(true);
@@ -55,7 +55,9 @@ export const ActionButtons = ({
                                 life: TOAST_LIFETIME,
                             });
                         } else {
+                            setAddedToCollection(true);
                             refetchCollectionsAction?.();
+                            setTimeout(() => setAddedToCollection(false), 2000);
                         }
                     } else {
                         const response = await moveReportToCollection(
@@ -95,6 +97,7 @@ export const ActionButtons = ({
                 const detail = !!report.isfavorite
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
+                refetchCollectionsAction?.();
                 refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
@@ -123,6 +126,7 @@ export const ActionButtons = ({
                     model={items}
                     popup
                     ref={menu}
+                    className='reports-actions__menu'
                     pt={{
                         root: {
                             style: {
@@ -143,7 +147,7 @@ export const ActionButtons = ({
                 />
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
-                    icon='pi pi-plus'
+                    icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
                     tooltip='Add to Collection'
                     tooltipOptions={{ position: "mouse" }}
                     outlined
