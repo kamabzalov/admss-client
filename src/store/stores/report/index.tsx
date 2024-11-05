@@ -9,6 +9,7 @@ export class ReportStore {
     private _report: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
+    private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -26,6 +27,10 @@ export class ReportStore {
 
     public get reportColumns() {
         return this._reportColumns;
+    }
+
+    public get isReportChanged() {
+        return this._isReportChanged;
     }
 
     public get isLoading() {
@@ -56,6 +61,7 @@ export class ReportStore {
     });
 
     public changeReport = action((key: keyof ReportInfo, value: string | number) => {
+        this._isReportChanged = true;
         this._report[key] = value as never;
     });
 
@@ -129,6 +135,10 @@ export class ReportStore {
 
     public set reportColumns(state: ReportServiceColumns[]) {
         this._reportColumns = state;
+    }
+
+    public set isReportChanged(state: boolean) {
+        this._isReportChanged = state;
     }
 
     public clearReport = () => {

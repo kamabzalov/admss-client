@@ -302,30 +302,33 @@ export const EditAccessDialog = ({
         >
             <div className='grid'>
                 <div className='col-5'>
-                    <MultiSelect
-                        optionLabel='name'
-                        options={filterOptions}
-                        className='access-multiselect'
-                        optionGroupChildren='items'
-                        optionGroupLabel='label'
-                        showSelectAll={false}
-                        value={selectedRole}
-                        display='chip'
-                        panelHeaderTemplate={<></>}
-                        selectedItemTemplate={selectedItemTemplate}
-                        onChange={(event) => {
-                            event.stopPropagation();
-                            handleRoleSelection(event);
-                        }}
-                        pt={{
-                            wrapper: {
-                                className: "edit-collection__multiselect-wrapper",
-                                style: {
-                                    maxHeight: "550px",
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            optionLabel='name'
+                            options={filterOptions}
+                            className='access-multiselect'
+                            optionGroupChildren='items'
+                            optionGroupLabel='label'
+                            showSelectAll={false}
+                            value={selectedRole}
+                            display='chip'
+                            panelHeaderTemplate={<></>}
+                            selectedItemTemplate={selectedItemTemplate}
+                            onChange={(event) => {
+                                event.stopPropagation();
+                                handleRoleSelection(event);
+                            }}
+                            pt={{
+                                wrapper: {
+                                    className: "edit-collection__multiselect-wrapper",
+                                    style: {
+                                        maxHeight: "550px",
+                                    },
                                 },
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                        <label className='float-label'>Filter</label>
+                    </span>
                 </div>
                 <div className='col-4 ml-auto'>
                     <span className='p-input-icon-right'>

@@ -56,6 +56,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
         setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
+        store.isReportChanged = true;
         setFrom(from.filter((i) => i !== item));
         setTo([...to, item]);
         setCurrentItem(null);
@@ -137,6 +138,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 icon={`pi pi-angle-${icon}`}
                 disabled={!!report.isdefault || !currentItem || disabled}
                 tooltip={tooltip}
+                tooltipOptions={{ position: "mouse" }}
                 outlined
                 onClick={() => currentItem && action()}
             />

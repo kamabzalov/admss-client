@@ -32,7 +32,8 @@ export const ActionButtons = ({
     const menu = useRef<Menu>(null!);
     const navigate = useNavigate();
 
-    const handleEditAccess = () => {
+    const handleEditAccess = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         setEditAccessActive(true);
     };
 
@@ -77,7 +78,8 @@ export const ActionButtons = ({
         },
     ];
 
-    const handleChangeIsFavorite = () => {
+    const handleChangeIsFavorite = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         updateReportInfo(report.documentUID, {
             ...report,
             isfavorite: !report.isfavorite ? 1 : 0,
@@ -104,8 +106,14 @@ export const ActionButtons = ({
         });
     };
 
-    const handleEditReport = () => {
+    const handleEditReport = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         navigate(`/dashboard/reports/${report.documentUID}`);
+    };
+
+    const handleAddToCollection = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        menu.current.toggle(event);
     };
 
     return (
@@ -137,8 +145,9 @@ export const ActionButtons = ({
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon='pi pi-plus'
                     tooltip='Add to Collection'
+                    tooltipOptions={{ position: "mouse" }}
                     outlined
-                    onClick={(event) => menu.current.toggle(event)}
+                    onClick={handleAddToCollection}
                 />
                 <Button
                     className='p-button reports-actions__button'
@@ -146,12 +155,14 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    tooltipOptions={{ position: "mouse" }}
                 />
                 <Button
                     className='p-button reports-actions__button'
                     icon='icon adms-edit-item'
                     outlined
                     tooltip='Edit Report'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditReport}
                 />
                 <Button
@@ -159,6 +170,7 @@ export const ActionButtons = ({
                     icon='icon adms-password'
                     outlined={!editAccessActive}
                     tooltip='Edit Access'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditAccess}
                 />
             </div>

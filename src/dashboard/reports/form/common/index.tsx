@@ -55,7 +55,7 @@ interface ReportFooterProps {
 export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactElement => {
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
-    const { report, saveReport } = reportStore;
+    const { report, saveReport, isReportChanged } = reportStore;
     const toast = useToast();
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
 
@@ -123,8 +123,9 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         icon='icon adms-password'
                         severity='success'
                         onClick={() => setAccessDialogVisible(true)}
-                        tooltip='Edit access'
                         outlined
+                        tooltip='Edit access'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
                 {report.itemuid && (
@@ -135,6 +136,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         onClick={handleDuplicateReport}
                         outlined
                         tooltip='Duplicate report'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
 
@@ -146,6 +148,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         outlined
                         severity='danger'
                         tooltip='Delete report'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
                 <Button
@@ -158,8 +161,12 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                 </Button>
                 <Button
                     className='uppercase px-6 report__button'
-                    disabled={!report.name || !!report.isdefault}
-                    severity={!report.name || !!report.isdefault ? "secondary" : "success"}
+                    disabled={!report.name || !!report.isdefault || !isReportChanged}
+                    severity={
+                        !report.name || !!report.isdefault || !isReportChanged
+                            ? "secondary"
+                            : "success"
+                    }
                     onClick={() => handleSaveReport()}
                 >
                     {report?.itemuid ? "Update" : "Create"}
