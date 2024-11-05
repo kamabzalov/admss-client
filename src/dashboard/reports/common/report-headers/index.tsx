@@ -72,6 +72,7 @@ export const ReportsPanelHeader = ({
             )}
             <Button
                 tooltip='Add New Custom Report'
+                tooltipOptions={{ position: "mouse" }}
                 className='reports-header__button'
                 onClick={() => navigate(navigatePath)}
             >
@@ -79,6 +80,7 @@ export const ReportsPanelHeader = ({
             </Button>
             <Button
                 tooltip='Add New Collection'
+                tooltipOptions={{ position: "mouse" }}
                 icon='pi pi-plus'
                 className='reports-header__button'
                 onClick={options.onTogglerClick}
