@@ -18,13 +18,11 @@ interface ActionButtonsProps {
     report: ReportDocument;
     collectionList?: ReportCollection[];
     refetchCollectionsAction?: () => void;
-    refetchFavoritesAction?: () => void;
 }
 
 export const ActionButtons = ({
     report,
     refetchCollectionsAction,
-    refetchFavoritesAction,
     collectionList,
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
@@ -98,7 +96,6 @@ export const ActionButtons = ({
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
                 refetchCollectionsAction?.();
-                refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",

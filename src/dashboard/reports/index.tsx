@@ -362,10 +362,7 @@ export default function Reports(): ReactElement {
                                                                         report={report}
                                                                         collectionList={collections}
                                                                         refetchCollectionsAction={
-                                                                            getReportCollections
-                                                                        }
-                                                                        refetchFavoritesAction={
-                                                                            getFavoriteReportCollections
+                                                                            handleGetUserReportCollections
                                                                         }
                                                                     />
                                                                 </div>
@@ -528,10 +525,7 @@ export default function Reports(): ReactElement {
                                                                                 collections
                                                                             }
                                                                             refetchCollectionsAction={
-                                                                                getReportCollections
-                                                                            }
-                                                                            refetchFavoritesAction={
-                                                                                getFavoriteReportCollections
+                                                                                handleGetUserReportCollections
                                                                             }
                                                                         />
                                                                     </div>
