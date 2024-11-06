@@ -176,7 +176,6 @@ export default function Reports(): ReactElement {
         index: number
     ) => {
         event.preventDefault();
-        event.stopPropagation();
         setIsCollectionEditing(id);
 
         setCustomActiveIndex(index);
@@ -450,9 +449,18 @@ export default function Reports(): ReactElement {
                                                                                                         );
                                                                                                     }}
                                                                                                     onClick={() => {
-                                                                                                        setIsParametersEditing(
-                                                                                                            report
-                                                                                                        );
+                                                                                                        if (
+                                                                                                            isParametersEditing?.documentUID ===
+                                                                                                            report.documentUID
+                                                                                                        ) {
+                                                                                                            setIsParametersEditing(
+                                                                                                                null
+                                                                                                            );
+                                                                                                        } else {
+                                                                                                            setIsParametersEditing(
+                                                                                                                report
+                                                                                                            );
+                                                                                                        }
                                                                                                     }}
                                                                                                 >
                                                                                                     <p>
@@ -534,9 +542,18 @@ export default function Reports(): ReactElement {
                                                                         className='reports__list-item reports__list-item--inner'
                                                                         key={report.documentUID}
                                                                         onClick={() => {
-                                                                            setIsParametersEditing(
-                                                                                report
-                                                                            );
+                                                                            if (
+                                                                                isParametersEditing?.documentUID ===
+                                                                                report.documentUID
+                                                                            ) {
+                                                                                setIsParametersEditing(
+                                                                                    null
+                                                                                );
+                                                                            } else {
+                                                                                setIsParametersEditing(
+                                                                                    report
+                                                                                );
+                                                                            }
                                                                         }}
                                                                         onDoubleClick={() => {
                                                                             navigate(
