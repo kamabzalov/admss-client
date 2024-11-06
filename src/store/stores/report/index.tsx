@@ -98,6 +98,7 @@ export class ReportStore {
                         ShowAverages: this._report.ShowAverages,
                         ShowLineCount: this._report.ShowLineCount,
                         AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                        columns: this._reportColumns,
                     });
 
                     if (response?.status === Status.OK) {

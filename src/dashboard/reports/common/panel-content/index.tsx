@@ -141,6 +141,7 @@ export const CollectionPanelContent = ({
                 <div className='col-8'>
                     <span className='p-float-label'>
                         <MultiSelect
+                            dataKey='itemUID'
                             filter
                             optionLabel='name'
                             options={collections.filter((collection) => collection.documents)}
@@ -153,7 +154,7 @@ export const CollectionPanelContent = ({
                             maxSelectedLabels={4}
                             placeholder='Select reports'
                             showSelectAll={false}
-                            value={panelSelectedReports || []}
+                            value={panelSelectedReports || selectedReports}
                             onChange={(e) => {
                                 e.stopPropagation();
                                 setPanelSelectedReports(e.value);

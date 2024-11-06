@@ -87,6 +87,7 @@ export interface ReportInfo extends BaseResponseError {
     ShowLineCount: 0 | 1;
     AskForStartAndEndDates: 0 | 1;
     listid: 0 | 1;
+    columns: ReportServiceColumns[];
 }
 
 export interface ReportCreate extends BaseResponseError {
