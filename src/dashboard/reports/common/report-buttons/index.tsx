@@ -156,7 +156,7 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
-                    tooltipOptions={{ position: "mouse" }}
+                    tooltipOptions={!!report.isfavorite ? { position: "left" } : undefined}
                 />
                 <Button
                     className='p-button reports-actions__button'

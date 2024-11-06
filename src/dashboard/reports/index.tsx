@@ -27,7 +27,7 @@ export default function Reports(): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [reportSearch, setReportSearch] = useState<string>("");
-    const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [reportCollections, setReportCollections] = useState<ReportCollection[]>([]);
     const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
@@ -65,10 +65,10 @@ export default function Reports(): ReactElement {
                 const customCollections = collectionsWithoutFavorite
                     .flatMap((collection) => collection.collections)
                     .filter(Boolean);
-                setCollections(collectionsWithoutFavorite);
+                setReportCollections(collectionsWithoutFavorite);
                 setCustomCollections(customCollections);
             } else {
-                setCollections([]);
+                setReportCollections([]);
             }
         });
     };
@@ -81,9 +81,9 @@ export default function Reports(): ReactElement {
         });
     };
 
-    const handleGetUserReportCollections = () => {
-        getFavoriteReportCollections();
-        return getReportCollections();
+    const handleGetUserReportCollections = async () => {
+        await getFavoriteReportCollections();
+        await getReportCollections();
     };
 
     useEffect(() => {
@@ -182,15 +182,6 @@ export default function Reports(): ReactElement {
         setCustomActiveIndex(index);
     };
 
-    const getIsCollectionHasNewReport = (collections: ReportCollection[]): boolean => {
-        if (Array.isArray(collections)) {
-            const currentCollections = collections.flatMap((collection) => collection.documents);
-            const filteredReports = currentCollections.filter((report) => report && report.isNew);
-            return filteredReports.length > 0 || currentCollections.length > 0;
-        }
-        return false;
-    };
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -218,7 +209,7 @@ export default function Reports(): ReactElement {
                                 >
                                     <CollectionPanelContent
                                         collectionName={collectionName}
-                                        collections={collections}
+                                        collections={reportCollections}
                                         selectedReports={newCollectionsReports}
                                         setCollectionName={setCollectionName}
                                         setSelectedReports={setNewCollectionsReports}
@@ -233,8 +224,8 @@ export default function Reports(): ReactElement {
                                     activeIndex={activeIndexes}
                                     onTabChange={handleTabChange}
                                 >
-                                    {collections &&
-                                        [...favoriteCollections, ...collections].map(
+                                    {reportCollections &&
+                                        [...favoriteCollections, ...reportCollections].map(
                                             (
                                                 {
                                                     itemUID,
@@ -269,9 +260,29 @@ export default function Reports(): ReactElement {
                                                                 selected={
                                                                     isContainsSearchedValue || false
                                                                 }
-                                                                info={`(${
-                                                                    documents?.length || 0
-                                                                } reports)`}
+                                                                info={
+                                                                    index === 1
+                                                                        ? `(${
+                                                                              customCollections?.length ||
+                                                                              0
+                                                                          } collections / ${
+                                                                              customCollections
+                                                                                  ?.flatMap(
+                                                                                      ({
+                                                                                          collections,
+                                                                                      }) =>
+                                                                                          collections
+                                                                                  )
+                                                                                  .map(
+                                                                                      (documents) =>
+                                                                                          documents
+                                                                                  ).length || 0
+                                                                          } reports)
+                                                                `
+                                                                        : `(${
+                                                                              documents?.length || 0
+                                                                          } reports)`
+                                                                }
                                                                 actionButton={
                                                                     userUID === authUser?.useruid &&
                                                                     !isfavorite ? (
@@ -295,6 +306,184 @@ export default function Reports(): ReactElement {
                                                         }
                                                         className='reports__accordion-tab opacity-100'
                                                     >
+                                                        {index === 1 && (
+                                                            <Accordion
+                                                                activeIndex={customActiveIndex}
+                                                                className='reports__accordion reports__accordion--inner'
+                                                            >
+                                                                {customCollections?.map(
+                                                                    (
+                                                                        {
+                                                                            itemUID,
+                                                                            name,
+                                                                            isfavorite,
+                                                                            documents,
+                                                                            userUID,
+                                                                        }: ReportCollection,
+                                                                        index: number
+                                                                    ) => {
+                                                                        const isContainsSearchedValue =
+                                                                            reportSearch &&
+                                                                            documents?.some(
+                                                                                (report) =>
+                                                                                    report.name
+                                                                                        .toLowerCase()
+                                                                                        .includes(
+                                                                                            reportSearch.toLowerCase()
+                                                                                        )
+                                                                            );
+                                                                        return (
+                                                                            <AccordionTab
+                                                                                key={itemUID}
+                                                                                disabled={
+                                                                                    !documents?.length
+                                                                                }
+                                                                                header={
+                                                                                    <ReportsAccordionHeader
+                                                                                        title={name}
+                                                                                        label={
+                                                                                            documents?.some(
+                                                                                                (
+                                                                                                    report
+                                                                                                ) =>
+                                                                                                    report.isNew
+                                                                                            )
+                                                                                                ? "New"
+                                                                                                : ""
+                                                                                        }
+                                                                                        selected={
+                                                                                            isContainsSearchedValue ||
+                                                                                            false
+                                                                                        }
+                                                                                        info={`(${
+                                                                                            documents?.length ||
+                                                                                            0
+                                                                                        } reports)`}
+                                                                                        actionButton={
+                                                                                            userUID ===
+                                                                                                authUser?.useruid &&
+                                                                                            !isfavorite ? (
+                                                                                                <Button
+                                                                                                    label='Edit'
+                                                                                                    className='reports-actions__button cursor-pointer'
+                                                                                                    outlined
+                                                                                                    onClick={(
+                                                                                                        e
+                                                                                                    ) =>
+                                                                                                        handleCustomEditCollection(
+                                                                                                            e,
+                                                                                                            itemUID,
+                                                                                                            index
+                                                                                                        )
+                                                                                                    }
+                                                                                                />
+                                                                                            ) : (
+                                                                                                <>
+
+                                                                                                </>
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                }
+                                                                                className='reports__accordion-tab opacity-100'
+                                                                            >
+                                                                                {isCollectionEditing ===
+                                                                                    itemUID &&
+                                                                                userUID ===
+                                                                                    authUser?.useruid ? (
+                                                                                    <div className='edit-collection p-panel'>
+                                                                                        <div className='p-panel-content relative'>
+                                                                                            <CollectionPanelContent
+                                                                                                handleClosePanel={() => {
+                                                                                                    setIsCollectionEditing(
+                                                                                                        null
+                                                                                                    );
+                                                                                                    handleGetUserReportCollections();
+                                                                                                }}
+                                                                                                collectionuid={
+                                                                                                    itemUID
+                                                                                                }
+                                                                                                collectionName={
+                                                                                                    name
+                                                                                                }
+                                                                                                collections={
+                                                                                                    reportCollections
+                                                                                                }
+                                                                                                selectedReports={
+                                                                                                    documents ||
+                                                                                                    []
+                                                                                                }
+                                                                                                setCollectionName={
+                                                                                                    setCollectionName
+                                                                                                }
+                                                                                                setSelectedReports={
+                                                                                                    setSelectedReports
+                                                                                                }
+                                                                                                handleCreateCollection={() =>
+                                                                                                    handleUpdateCollection(
+                                                                                                        itemUID,
+                                                                                                        name
+                                                                                                    )
+                                                                                                }
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    documents &&
+                                                                                    documents.map(
+                                                                                        (
+                                                                                            report
+                                                                                        ) => (
+                                                                                            <div
+                                                                                                className='reports__list-item reports__list-item--inner'
+                                                                                                key={
+                                                                                                    report.documentUID
+                                                                                                }
+                                                                                                onDoubleClick={() => {
+                                                                                                    navigate(
+                                                                                                        `/dashboard/reports/${report.documentUID}`
+                                                                                                    );
+                                                                                                }}
+                                                                                                onClick={() => {
+                                                                                                    setIsParametersEditing(
+                                                                                                        report
+                                                                                                    );
+                                                                                                }}
+                                                                                            >
+                                                                                                <p>
+                                                                                                    {
+                                                                                                        report.name
+                                                                                                    }
+                                                                                                </p>
+                                                                                                <ActionButtons
+                                                                                                    report={
+                                                                                                        report
+                                                                                                    }
+                                                                                                    collectionList={
+                                                                                                        reportCollections
+                                                                                                    }
+                                                                                                    refetchCollectionsAction={
+                                                                                                        handleGetUserReportCollections
+                                                                                                    }
+                                                                                                />
+                                                                                            </div>
+                                                                                        )
+                                                                                    )
+                                                                                )}
+                                                                                {isParametersEditing &&
+                                                                                    !isCollectionEditing && (
+                                                                                        <ReportParameters
+                                                                                            report={
+                                                                                                isParametersEditing
+                                                                                            }
+                                                                                        />
+                                                                                    )}
+                                                                            </AccordionTab>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </Accordion>
+                                                        )}
                                                         {isCollectionEditing === itemUID &&
                                                         userUID === authUser?.useruid ? (
                                                             <div className='edit-collection p-panel'>
@@ -308,7 +497,9 @@ export default function Reports(): ReactElement {
                                                                         }}
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
-                                                                        collections={collections}
+                                                                        collections={
+                                                                            reportCollections
+                                                                        }
                                                                         selectedReports={
                                                                             documents || []
                                                                         }
@@ -360,7 +551,9 @@ export default function Reports(): ReactElement {
                                                                     </p>
                                                                     <ActionButtons
                                                                         report={report}
-                                                                        collectionList={collections}
+                                                                        collectionList={
+                                                                            reportCollections
+                                                                        }
                                                                         refetchCollectionsAction={
                                                                             handleGetUserReportCollections
                                                                         }
@@ -377,172 +570,6 @@ export default function Reports(): ReactElement {
                                                 );
                                             }
                                         )}
-                                    <AccordionTab
-                                        className='reports__accordion-tab'
-                                        header={
-                                            <ReportsAccordionHeader
-                                                title='Custom Collections'
-                                                label={
-                                                    getIsCollectionHasNewReport(customCollections)
-                                                        ? "New"
-                                                        : ""
-                                                }
-                                                info={`(${
-                                                    customCollections?.length || 0
-                                                } collections / ${
-                                                    customCollections
-                                                        ?.flatMap(({ collections }) => collections)
-                                                        .map((documents) => documents).length || 0
-                                                } reports)
-                                                `}
-                                            />
-                                        }
-                                    >
-                                        <Accordion
-                                            activeIndex={customActiveIndex}
-                                            className='reports__accordion reports__accordion--inner'
-                                        >
-                                            {customCollections?.map(
-                                                (
-                                                    {
-                                                        itemUID,
-                                                        name,
-                                                        isfavorite,
-                                                        documents,
-                                                        userUID,
-                                                    }: ReportCollection,
-                                                    index: number
-                                                ) => {
-                                                    const isContainsSearchedValue =
-                                                        reportSearch &&
-                                                        documents?.some((report) =>
-                                                            report.name
-                                                                .toLowerCase()
-                                                                .includes(
-                                                                    reportSearch.toLowerCase()
-                                                                )
-                                                        );
-                                                    return (
-                                                        <AccordionTab
-                                                            key={itemUID}
-                                                            disabled={!documents?.length}
-                                                            header={
-                                                                <ReportsAccordionHeader
-                                                                    title={name}
-                                                                    label={
-                                                                        documents?.some(
-                                                                            (report) => report.isNew
-                                                                        )
-                                                                            ? "New"
-                                                                            : ""
-                                                                    }
-                                                                    selected={
-                                                                        isContainsSearchedValue ||
-                                                                        false
-                                                                    }
-                                                                    info={`(${
-                                                                        documents?.length || 0
-                                                                    } reports)`}
-                                                                    actionButton={
-                                                                        userUID ===
-                                                                            authUser?.useruid &&
-                                                                        !isfavorite ? (
-                                                                            <Button
-                                                                                label='Edit'
-                                                                                className='reports-actions__button cursor-pointer'
-                                                                                outlined
-                                                                                onClick={(e) =>
-                                                                                    handleCustomEditCollection(
-                                                                                        e,
-                                                                                        itemUID,
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        ) : (
-                                                                            <></>
-                                                                        )
-                                                                    }
-                                                                />
-                                                            }
-                                                            className='reports__accordion-tab opacity-100'
-                                                        >
-                                                            {isCollectionEditing === itemUID &&
-                                                            userUID === authUser?.useruid ? (
-                                                                <div className='edit-collection p-panel'>
-                                                                    <div className='p-panel-content relative'>
-                                                                        <CollectionPanelContent
-                                                                            handleClosePanel={() => {
-                                                                                setIsCollectionEditing(
-                                                                                    null
-                                                                                );
-                                                                                handleGetUserReportCollections();
-                                                                            }}
-                                                                            collectionuid={itemUID}
-                                                                            collectionName={name}
-                                                                            collections={
-                                                                                collections
-                                                                            }
-                                                                            selectedReports={
-                                                                                documents || []
-                                                                            }
-                                                                            setCollectionName={
-                                                                                setCollectionName
-                                                                            }
-                                                                            setSelectedReports={
-                                                                                setSelectedReports
-                                                                            }
-                                                                            handleCreateCollection={() =>
-                                                                                handleUpdateCollection(
-                                                                                    itemUID,
-                                                                                    name
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                documents &&
-                                                                documents.map((report) => (
-                                                                    <div
-                                                                        className='reports__list-item reports__list-item--inner'
-                                                                        key={report.documentUID}
-                                                                        onDoubleClick={() => {
-                                                                            navigate(
-                                                                                `/dashboard/reports/${report.documentUID}`
-                                                                            );
-                                                                        }}
-                                                                        onClick={() => {
-                                                                            setIsParametersEditing(
-                                                                                report
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <p>{report.name}</p>
-                                                                        <ActionButtons
-                                                                            report={report}
-                                                                            collectionList={
-                                                                                collections
-                                                                            }
-                                                                            refetchCollectionsAction={
-                                                                                handleGetUserReportCollections
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                ))
-                                                            )}
-                                                            {isParametersEditing &&
-                                                                !isCollectionEditing && (
-                                                                    <ReportParameters
-                                                                        report={isParametersEditing}
-                                                                    />
-                                                                )}
-                                                        </AccordionTab>
-                                                    );
-                                                }
-                                            )}
-                                        </Accordion>
-                                    </AccordionTab>
                                 </Accordion>
                             </div>
                         </div>
