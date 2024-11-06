@@ -37,6 +37,7 @@ export default function Reports(): ReactElement {
     const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
     const [customActiveIndex, setCustomActiveIndex] = useState<number | null>(null);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
+    const [defaultReportsCount, setDefaultReportsCount] = useState<number>(0);
 
     const toast = useToast();
 
@@ -65,6 +66,21 @@ export default function Reports(): ReactElement {
                 const customCollections = collectionsWithoutFavorite
                     .flatMap((collection) => collection.collections)
                     .filter(Boolean);
+
+                const mainCollectionDefaultsCount = response.flatMap(
+                    (collection) =>
+                        collection.documents?.filter((doc: ReportDocument) => !doc.isdefault) || []
+                ).length;
+
+                const customCollectionsDefaultsCount = customCollections.flatMap(
+                    (collection) =>
+                        collection.documents?.filter((doc: ReportDocument) => !doc.isdefault) || []
+                ).length;
+
+                setDefaultReportsCount(
+                    mainCollectionDefaultsCount + customCollectionsDefaultsCount
+                );
+
                 setReportCollections(collectionsWithoutFavorite);
                 setCustomCollections(customCollections);
             } else {
@@ -264,19 +280,7 @@ export default function Reports(): ReactElement {
                                                                         ? `(${
                                                                               customCollections?.length ||
                                                                               0
-                                                                          } collections / ${
-                                                                              customCollections
-                                                                                  ?.flatMap(
-                                                                                      ({
-                                                                                          collections,
-                                                                                      }) =>
-                                                                                          collections
-                                                                                  )
-                                                                                  .map(
-                                                                                      (documents) =>
-                                                                                          documents
-                                                                                  ).length || 0
-                                                                          } reports)
+                                                                          } collections / ${defaultReportsCount} reports)
                                                                 `
                                                                         : `(${
                                                                               documents?.length || 0
