@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import {
     createReportCollection,
     getUserFavoriteReportList,
@@ -320,7 +320,7 @@ export default function Reports(): ReactElement {
                                                                             documents,
                                                                             userUID,
                                                                         }: ReportCollection,
-                                                                        index: number
+                                                                        idx: number
                                                                     ) => {
                                                                         const isContainsSearchedValue =
                                                                             reportSearch &&
@@ -373,7 +373,7 @@ export default function Reports(): ReactElement {
                                                                                                         handleCustomEditCollection(
                                                                                                             e,
                                                                                                             itemUID,
-                                                                                                            index
+                                                                                                            idx
                                                                                                         )
                                                                                                     }
                                                                                                 />
@@ -434,50 +434,56 @@ export default function Reports(): ReactElement {
                                                                                         (
                                                                                             report
                                                                                         ) => (
-                                                                                            <div
-                                                                                                className='reports__list-item reports__list-item--inner'
+                                                                                            <React.Fragment
                                                                                                 key={
                                                                                                     report.documentUID
                                                                                                 }
-                                                                                                onDoubleClick={() => {
-                                                                                                    navigate(
-                                                                                                        `/dashboard/reports/${report.documentUID}`
-                                                                                                    );
-                                                                                                }}
-                                                                                                onClick={() => {
-                                                                                                    setIsParametersEditing(
-                                                                                                        report
-                                                                                                    );
-                                                                                                }}
                                                                                             >
-                                                                                                <p>
-                                                                                                    {
-                                                                                                        report.name
+                                                                                                <div
+                                                                                                    className='reports__list-item reports__list-item--inner'
+                                                                                                    key={
+                                                                                                        report.documentUID
                                                                                                     }
-                                                                                                </p>
-                                                                                                <ActionButtons
-                                                                                                    report={
-                                                                                                        report
-                                                                                                    }
-                                                                                                    collectionList={
-                                                                                                        reportCollections
-                                                                                                    }
-                                                                                                    refetchCollectionsAction={
-                                                                                                        handleGetUserReportCollections
-                                                                                                    }
-                                                                                                />
-                                                                                            </div>
+                                                                                                    onDoubleClick={() => {
+                                                                                                        navigate(
+                                                                                                            `/dashboard/reports/${report.documentUID}`
+                                                                                                        );
+                                                                                                    }}
+                                                                                                    onClick={() => {
+                                                                                                        setIsParametersEditing(
+                                                                                                            report
+                                                                                                        );
+                                                                                                    }}
+                                                                                                >
+                                                                                                    <p>
+                                                                                                        {
+                                                                                                            report.name
+                                                                                                        }
+                                                                                                    </p>
+                                                                                                    <ActionButtons
+                                                                                                        report={
+                                                                                                            report
+                                                                                                        }
+                                                                                                        collectionList={
+                                                                                                            reportCollections
+                                                                                                        }
+                                                                                                        refetchCollectionsAction={
+                                                                                                            handleGetUserReportCollections
+                                                                                                        }
+                                                                                                    />
+                                                                                                </div>
+                                                                                                {isParametersEditing?.documentUID ===
+                                                                                                    report.documentUID && (
+                                                                                                    <ReportParameters
+                                                                                                        report={
+                                                                                                            isParametersEditing
+                                                                                                        }
+                                                                                                    />
+                                                                                                )}
+                                                                                            </React.Fragment>
                                                                                         )
                                                                                     )
                                                                                 )}
-                                                                                {isParametersEditing &&
-                                                                                    !isCollectionEditing && (
-                                                                                        <ReportParameters
-                                                                                            report={
-                                                                                                isParametersEditing
-                                                                                            }
-                                                                                        />
-                                                                                    )}
                                                                             </AccordionTab>
                                                                         );
                                                                     }
@@ -521,50 +527,57 @@ export default function Reports(): ReactElement {
                                                         ) : (
                                                             documents &&
                                                             documents.map((report) => (
-                                                                <div
-                                                                    className='reports__list-item reports__list-item--inner'
+                                                                <React.Fragment
                                                                     key={report.documentUID}
-                                                                    onClick={() => {
-                                                                        setIsParametersEditing(
-                                                                            report
-                                                                        );
-                                                                    }}
-                                                                    onDoubleClick={() => {
-                                                                        navigate(
-                                                                            `/dashboard/reports/${report.documentUID}`
-                                                                        );
-                                                                    }}
                                                                 >
-                                                                    <p
-                                                                        className={
-                                                                            reportSearch &&
-                                                                            report.name
-                                                                                .toLowerCase()
-                                                                                .includes(
-                                                                                    reportSearch.toLowerCase()
-                                                                                )
-                                                                                ? "searched-item"
-                                                                                : ""
-                                                                        }
+                                                                    <div
+                                                                        className='reports__list-item reports__list-item--inner'
+                                                                        key={report.documentUID}
+                                                                        onClick={() => {
+                                                                            setIsParametersEditing(
+                                                                                report
+                                                                            );
+                                                                        }}
+                                                                        onDoubleClick={() => {
+                                                                            navigate(
+                                                                                `/dashboard/reports/${report.documentUID}`
+                                                                            );
+                                                                        }}
                                                                     >
-                                                                        {report.name}
-                                                                    </p>
-                                                                    <ActionButtons
-                                                                        report={report}
-                                                                        collectionList={
-                                                                            reportCollections
-                                                                        }
-                                                                        refetchCollectionsAction={
-                                                                            handleGetUserReportCollections
-                                                                        }
-                                                                    />
-                                                                </div>
+                                                                        <p
+                                                                            className={
+                                                                                reportSearch &&
+                                                                                report.name
+                                                                                    .toLowerCase()
+                                                                                    .includes(
+                                                                                        reportSearch.toLowerCase()
+                                                                                    )
+                                                                                    ? "searched-item"
+                                                                                    : ""
+                                                                            }
+                                                                        >
+                                                                            {report.name}
+                                                                        </p>
+                                                                        <ActionButtons
+                                                                            report={report}
+                                                                            collectionList={
+                                                                                reportCollections
+                                                                            }
+                                                                            refetchCollectionsAction={
+                                                                                handleGetUserReportCollections
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                    {isParametersEditing?.documentUID ===
+                                                                        report.documentUID && (
+                                                                        <ReportParameters
+                                                                            report={
+                                                                                isParametersEditing
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                </React.Fragment>
                                                             ))
-                                                        )}
-                                                        {isParametersEditing && (
-                                                            <ReportParameters
-                                                                report={isParametersEditing}
-                                                            />
                                                         )}
                                                     </AccordionTab>
                                                 );
