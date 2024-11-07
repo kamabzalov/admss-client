@@ -346,12 +346,12 @@ export default function Reports(): ReactElement {
                                                                         return (
                                                                             <AccordionTab
                                                                                 key={itemUID}
-                                                                                disabled={
-                                                                                    !documents?.length
-                                                                                }
                                                                                 header={
                                                                                     <ReportsAccordionHeader
-                                                                                        title={name}
+                                                                                        title={
+                                                                                            name ||
+                                                                                            itemUID
+                                                                                        }
                                                                                         label={
                                                                                             documents?.some(
                                                                                                 (
