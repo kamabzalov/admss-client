@@ -86,7 +86,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={report.name || reportName}
+                            value={report?.name || reportName}
                             onChange={(e) => changeReport("name", e.target.value)}
                         />
                         <label className='float-label w-full'>Name</label>
