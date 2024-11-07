@@ -28,6 +28,12 @@ export const ReportColumnSelect = observer((): ReactElement => {
     const [dataSet, setDataSet] = useState<ReportServices | null>(null);
 
     useEffect(() => {
+        if (report?.columns) {
+            setSelectedValues(report.columns.filter(Boolean));
+        }
+    }, [report]);
+
+    useEffect(() => {
         const useruid = authUser?.useruid;
         if (dataSet && useruid)
             getReportColumns({ service: dataSet, useruid }).then((response) => {
