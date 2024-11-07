@@ -175,11 +175,13 @@ export const ActionButtons = ({
                     onClick={handleEditAccess}
                 />
             </div>
-            <EditAccessDialog
-                visible={editAccessActive}
-                onHide={() => setEditAccessActive(false)}
-                reportuid={report.documentUID}
-            />
+            {editAccessActive && (
+                <EditAccessDialog
+                    visible={editAccessActive}
+                    onHide={() => setEditAccessActive(false)}
+                    reportuid={report.documentUID}
+                />
+            )}
         </>
     );
 };

@@ -67,18 +67,13 @@ export default function Reports(): ReactElement {
                     .flatMap((collection) => collection.collections)
                     .filter(Boolean);
 
-                const mainCollectionDefaultsCount = response.flatMap(
-                    (collection) =>
-                        collection.documents?.filter((doc: ReportDocument) => !doc.isdefault) || []
-                ).length;
-
-                const customCollectionsDefaultsCount = customCollections.flatMap(
-                    (collection) =>
-                        collection.documents?.filter((doc: ReportDocument) => !doc.isdefault) || []
-                ).length;
+                const [customCollectionsDefaultsCount] = collectionsWithoutFavorite ?? [];
+                const [innerCollectionsDefaultsCount] =
+                    customCollectionsDefaultsCount?.collections ?? [];
 
                 setDefaultReportsCount(
-                    mainCollectionDefaultsCount + customCollectionsDefaultsCount
+                    (customCollectionsDefaultsCount?.documents?.length || 0) +
+                        (innerCollectionsDefaultsCount?.documents?.length || 0)
                 );
 
                 setReportCollections(collectionsWithoutFavorite);
@@ -195,6 +190,19 @@ export default function Reports(): ReactElement {
         setIsCollectionEditing(id);
 
         setCustomActiveIndex(index);
+    };
+
+    const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
+        if (event.target instanceof HTMLElement) {
+            if (!event.target.classList.contains("reports__list-item--inner")) return;
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        if (isParametersEditing?.itemUID === report.itemUID) {
+            setIsParametersEditing(null);
+        } else {
+            setIsParametersEditing(report);
+        }
     };
 
     return (
@@ -439,33 +447,27 @@ export default function Reports(): ReactElement {
                                                                                         ) => (
                                                                                             <React.Fragment
                                                                                                 key={
-                                                                                                    report.documentUID
+                                                                                                    report.itemUID
                                                                                                 }
                                                                                             >
                                                                                                 <div
                                                                                                     className='reports__list-item reports__list-item--inner'
                                                                                                     key={
-                                                                                                        report.documentUID
+                                                                                                        report.itemUID
                                                                                                     }
                                                                                                     onDoubleClick={() => {
                                                                                                         navigate(
                                                                                                             `/dashboard/reports/${report.documentUID}`
                                                                                                         );
                                                                                                     }}
-                                                                                                    onClick={() => {
-                                                                                                        if (
-                                                                                                            isParametersEditing?.documentUID ===
-                                                                                                            report.documentUID
-                                                                                                        ) {
-                                                                                                            setIsParametersEditing(
-                                                                                                                null
-                                                                                                            );
-                                                                                                        } else {
-                                                                                                            setIsParametersEditing(
-                                                                                                                report
-                                                                                                            );
-                                                                                                        }
-                                                                                                    }}
+                                                                                                    onClick={(
+                                                                                                        event
+                                                                                                    ) =>
+                                                                                                        handleOpenParameters(
+                                                                                                            event,
+                                                                                                            report
+                                                                                                        )
+                                                                                                    }
                                                                                                 >
                                                                                                     <p>
                                                                                                         {
@@ -540,25 +542,17 @@ export default function Reports(): ReactElement {
                                                             documents &&
                                                             documents.map((report) => (
                                                                 <React.Fragment
-                                                                    key={report.documentUID}
+                                                                    key={report.itemUID}
                                                                 >
                                                                     <div
                                                                         className='reports__list-item reports__list-item--inner'
-                                                                        key={report.documentUID}
-                                                                        onClick={() => {
-                                                                            if (
-                                                                                isParametersEditing?.documentUID ===
-                                                                                report.documentUID
-                                                                            ) {
-                                                                                setIsParametersEditing(
-                                                                                    null
-                                                                                );
-                                                                            } else {
-                                                                                setIsParametersEditing(
-                                                                                    report
-                                                                                );
-                                                                            }
-                                                                        }}
+                                                                        key={report.itemUID}
+                                                                        onClick={(event) =>
+                                                                            handleOpenParameters(
+                                                                                event,
+                                                                                report
+                                                                            )
+                                                                        }
                                                                         onDoubleClick={() => {
                                                                             navigate(
                                                                                 `/dashboard/reports/${report.documentUID}`
@@ -589,8 +583,8 @@ export default function Reports(): ReactElement {
                                                                             }
                                                                         />
                                                                     </div>
-                                                                    {isParametersEditing?.documentUID ===
-                                                                        report.documentUID && (
+                                                                    {isParametersEditing?.itemUID ===
+                                                                        report.itemUID && (
                                                                         <ReportParameters
                                                                             report={
                                                                                 isParametersEditing

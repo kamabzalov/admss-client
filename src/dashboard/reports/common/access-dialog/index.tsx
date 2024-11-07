@@ -96,15 +96,6 @@ export const EditAccessDialog = ({
     };
 
     useEffect(() => {
-        if (visible) {
-            handleGetReportAccessList();
-        }
-        return () => {
-            setIsButtonDisabled(true);
-        };
-    }, [visible, reportuid]);
-
-    useEffect(() => {
         let qry: string = search;
 
         if (selectedRole) {
