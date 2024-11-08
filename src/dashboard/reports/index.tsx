@@ -64,16 +64,17 @@ export default function Reports(): ReactElement {
                     (collection: ReportCollection) => collection.description !== "Favorites"
                 );
                 const customCollections = collectionsWithoutFavorite
-                    .flatMap((collection) => collection.collections)
-                    .filter(Boolean);
+                    ?.flatMap((collection) => collection.collections)
+                    ?.filter(Boolean);
 
                 const [customCollectionsDefaultsCount] = collectionsWithoutFavorite ?? [];
-                const [innerCollectionsDefaultsCount] =
-                    customCollectionsDefaultsCount?.collections ?? [];
-
+                const innerCollectionsDefaultsCount =
+                    customCollectionsDefaultsCount?.collections?.flatMap(
+                        (collection: ReportCollection) => collection.documents
+                    ) ?? [];
                 setDefaultReportsCount(
                     (customCollectionsDefaultsCount?.documents?.length || 0) +
-                        (innerCollectionsDefaultsCount?.documents?.length || 0)
+                        (innerCollectionsDefaultsCount?.length || 0)
                 );
 
                 setReportCollections(collectionsWithoutFavorite);
@@ -167,20 +168,6 @@ export default function Reports(): ReactElement {
         setActiveIndexes(e.index as number[]);
     };
 
-    const handleEditCollection = (
-        event: React.MouseEvent<HTMLElement>,
-        id: string,
-        index: number
-    ) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setIsCollectionEditing(id);
-
-        if (!activeIndexes.includes(index)) {
-            setActiveIndexes([...activeIndexes, index]);
-        }
-    };
-
     const handleCustomEditCollection = (
         event: React.MouseEvent<HTMLElement>,
         id: string,
@@ -253,7 +240,6 @@ export default function Reports(): ReactElement {
                                                 {
                                                     itemUID,
                                                     name,
-                                                    isfavorite,
                                                     documents,
                                                     userUID,
                                                 }: ReportCollection,
@@ -269,7 +255,6 @@ export default function Reports(): ReactElement {
                                                 return (
                                                     <AccordionTab
                                                         key={itemUID}
-                                                        disabled={!documents?.length}
                                                         header={
                                                             <ReportsAccordionHeader
                                                                 title={name}
@@ -293,25 +278,6 @@ export default function Reports(): ReactElement {
                                                                         : `(${
                                                                               documents?.length || 0
                                                                           } reports)`
-                                                                }
-                                                                actionButton={
-                                                                    userUID === authUser?.useruid &&
-                                                                    !isfavorite ? (
-                                                                        <Button
-                                                                            label='Edit'
-                                                                            className='reports-actions__button cursor-pointer'
-                                                                            outlined
-                                                                            onClick={(e) =>
-                                                                                handleEditCollection(
-                                                                                    e,
-                                                                                    itemUID,
-                                                                                    index
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <></>
-                                                                    )
                                                                 }
                                                             />
                                                         }
@@ -469,7 +435,18 @@ export default function Reports(): ReactElement {
                                                                                                         )
                                                                                                     }
                                                                                                 >
-                                                                                                    <p>
+                                                                                                    <p
+                                                                                                        className={
+                                                                                                            reportSearch &&
+                                                                                                            report.name
+                                                                                                                .toLowerCase()
+                                                                                                                .includes(
+                                                                                                                    reportSearch.toLowerCase()
+                                                                                                                )
+                                                                                                                ? "searched-item"
+                                                                                                                : ""
+                                                                                                        }
+                                                                                                    >
                                                                                                         {
                                                                                                             report.name
                                                                                                         }
@@ -504,42 +481,7 @@ export default function Reports(): ReactElement {
                                                                 )}
                                                             </Accordion>
                                                         )}
-                                                        {isCollectionEditing === itemUID &&
-                                                        userUID === authUser?.useruid ? (
-                                                            <div className='edit-collection p-panel'>
-                                                                <div className='p-panel-content relative'>
-                                                                    <CollectionPanelContent
-                                                                        handleClosePanel={() => {
-                                                                            setIsCollectionEditing(
-                                                                                null
-                                                                            );
-                                                                            handleGetUserReportCollections();
-                                                                        }}
-                                                                        collectionuid={itemUID}
-                                                                        collectionName={name}
-                                                                        collections={
-                                                                            reportCollections
-                                                                        }
-                                                                        selectedReports={
-                                                                            documents || []
-                                                                        }
-                                                                        setCollectionName={
-                                                                            setCollectionName
-                                                                        }
-                                                                        setSelectedReports={
-                                                                            setSelectedReports
-                                                                        }
-                                                                        handleCreateCollection={() =>
-                                                                            handleUpdateCollection(
-                                                                                itemUID,
-                                                                                name
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            documents &&
+                                                        {documents &&
                                                             documents.map((report) => (
                                                                 <React.Fragment
                                                                     key={report.itemUID}
@@ -592,8 +534,7 @@ export default function Reports(): ReactElement {
                                                                         />
                                                                     )}
                                                                 </React.Fragment>
-                                                            ))
-                                                        )}
+                                                            ))}
                                                     </AccordionTab>
                                                 );
                                             }
