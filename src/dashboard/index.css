@@ -562,3 +562,12 @@
         margin-left: var(--admss-app-aside-small-width);
     }
 }
+
+.p-dropdown-label {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 20px);
+    line-height: 1.5;
+}
