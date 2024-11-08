@@ -141,7 +141,7 @@ export const CollectionPanelContent = ({
                 <div className='col-8'>
                     <span className='p-float-label'>
                         <MultiSelect
-                            dataKey='itemUID'
+                            dataKey='documentUID'
                             filter
                             optionLabel='name'
                             options={collections.filter((collection) => collection.documents)}
