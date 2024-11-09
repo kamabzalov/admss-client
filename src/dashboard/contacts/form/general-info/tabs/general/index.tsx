@@ -100,13 +100,21 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
     useEffect(() => {
         if (shouldDisableNameFields) {
-            setSavedFirstName(contact.firstName);
-            setSavedMiddleName(contact.middleName);
-            setSavedLastName(contact.lastName);
-            setFieldValue("firstName", "");
-            setFieldValue("lastName", "");
-            changeContact("firstName", "");
-            changeContact("lastName", "");
+            if (contact.firstName) {
+                setSavedFirstName(contact.firstName);
+                setFieldValue("firstName", "");
+                changeContact("firstName", "");
+            }
+            if (contact.lastName) {
+                setSavedLastName(contact.lastName);
+                setFieldValue("lastName", "");
+                changeContact("lastName", "");
+            }
+            if (contact.middleName) {
+                setSavedMiddleName(contact.middleName);
+                setFieldValue("middleName", "");
+                changeContact("middleName", "");
+            }
         } else {
             if (!contact.firstName && savedFirstName) {
                 setFieldValue("firstName", savedFirstName);
@@ -121,7 +129,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 changeContact("middleName", savedMiddleName);
             }
         }
-    }, [shouldDisableNameFields, contact.businessName]);
+    }, [shouldDisableNameFields, contact.businessName, setFieldValue, changeContact]);
 
     useEffect(() => {
         if (shouldDisableBusinessName) {
@@ -258,7 +266,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    name={`Middle Name${!shouldDisableNameFields ? " (required)" : ""}`}
                     className='general-info__text-input w-full'
                     value={
                         (type === BUYER

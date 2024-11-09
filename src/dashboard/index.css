@@ -181,6 +181,18 @@
     margin-top: -16px;
     font-size: 12px;
 }
+.p-tooltip-target-wrapper:has(.p-inputtext:disabled) + .float-label {
+    position: absolute;
+    font-size: 18px;
+    pointer-events: none;
+    top: 50%;
+    left: 0.75rem;
+    color: var(--admss-app-medium-grey);
+    margin-top: -0.5rem;
+    transition-property: all;
+    transition-timing-function: ease;
+    line-height: 1;
+}
 
 .p-datatable-wrapper::-webkit-scrollbar {
     width: 12px;
