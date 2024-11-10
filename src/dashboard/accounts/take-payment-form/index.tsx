@@ -106,13 +106,19 @@ export const AccountTakePayment = (): ReactElement => {
                             activeIndex={activeIndex}
                             onTabChange={handleTabChange}
                         >
-                            <TabPanel header='QuickPay'>
+                            <TabPanel header='QuickPay' headerClassName='account-tab__header'>
                                 <AccountQuickPay />
                             </TabPanel>
-                            <TabPanel header='Pay Off Account'>
+                            <TabPanel
+                                header='Pay Off Account'
+                                headerClassName='account-tab__header'
+                            >
                                 <AccountPayOff />
                             </TabPanel>
-                            <TabPanel header='Balance Adjustment'>
+                            <TabPanel
+                                header='Balance Adjustment'
+                                headerClassName='account-tab__header'
+                            >
                                 <AccountBalanceAdjustment />
                             </TabPanel>
                         </TabView>

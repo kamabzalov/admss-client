@@ -51,6 +51,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                     detail: "Fee added successfully!",
                     life: TOAST_LIFETIME,
                 });
+                setAddFee(initialAddFee);
                 onHide();
             }
         });

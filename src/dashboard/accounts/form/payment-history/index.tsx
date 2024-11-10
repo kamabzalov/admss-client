@@ -47,7 +47,7 @@ const renderColumnsData: TableColumnsList[] = [
 ];
 
 enum ModalErrors {
-    TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TITLE_NO_RECEIPT = "Payment is not Selected!",
     TITLE_CONFIRM = "Are you sure?",
     TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
     TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
@@ -411,7 +411,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            header={controlColumnHeader}
+                            header={historyList.length ? controlColumnHeader : ""}
                             reorderable={false}
                             resizeable={false}
                             body={controlColumnBody}
