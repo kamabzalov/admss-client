@@ -13,6 +13,7 @@ import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
+import { InputMask } from "primereact/inputmask";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -133,10 +134,12 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                     />
                     <DialogIcon icon='search' />
                 </div>
-                <InputText
+                <InputMask
+                    type='tel'
+                    mask='999-999-9999'
                     placeholder='Phone Number'
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => setPhoneNumber(e.target?.value || "")}
                 />
                 <InputTextarea
                     placeholder='Description'

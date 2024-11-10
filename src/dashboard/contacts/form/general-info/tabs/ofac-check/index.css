@@ -21,8 +21,17 @@
 }
 
 .ofac-check__container {
-    width: 90%;
+    width: 98%;
     margin: 0 auto;
+}
+
+.ofac-info {
+    font-size: 16px;
+    line-height: 1;
+
+    .ofac-info__date {
+        padding-bottom: 20px;
+    }
 }
 
 .ofac-check__notice-section {
@@ -48,5 +57,20 @@
 
     &.ofac-check__title--warning {
         color: var(--admss-app-red);
+    }
+}
+
+.ofac-modal {
+    width: 456px;
+
+    .confirm-body {
+        padding: 0 50px;
+    }
+    .p-confirm-dialog-accept.p-button {
+        display: inline-flex;
+        padding: 0;
+        font-size: 20px;
+        height: 60px;
+        width: 130px;
     }
 }

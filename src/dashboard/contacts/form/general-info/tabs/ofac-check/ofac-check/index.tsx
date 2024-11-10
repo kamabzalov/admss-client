@@ -54,12 +54,12 @@ export const OFACCheckPassedLayout = () => {
 export const OFACCheckFailedLayout = ({ info }: { info: ContactOFAC }) => {
     return (
         <div className='ofac-check__container'>
-            <div className='mb-3'>
+            <div className='mb-3 ofac-info'>
                 <AdaptiveDivider />
-                <p>ADMSS, INC Standard OFAC Check</p>
-                <p>{info.created}</p>
-                <p>
-                    Checking: {info.lastname} {info.firstname}
+                <p className='ofac-info__title'>ADMSS, INC Standard OFAC Check</p>
+                <p className='ofac-info__date'>{info?.created}</p>
+                <p className='ofac-info__name'>
+                    Checking: {info?.lastname} {info?.firstname}
                 </p>
 
                 <AdaptiveDivider />
@@ -67,9 +67,9 @@ export const OFACCheckFailedLayout = ({ info }: { info: ContactOFAC }) => {
 
             <h4 className='ofac-check__title ofac-check__title--warning'>Match found!</h4>
 
-            <p>{info.details}</p>
-            <p>{info.dob}</p>
-            <p>{info.listid}</p>
+            <p>{info?.details}</p>
+            <p>{info?.dob}</p>
+            <p>{info?.listid}</p>
 
             <p>Instructions:</p>
             <AdaptiveDivider />

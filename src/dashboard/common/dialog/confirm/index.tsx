@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { ConfirmDialog, ConfirmDialogProps, confirmDialog } from "primereact/confirmdialog";
+import { useRef } from "react";
+import { ConfirmDialog, ConfirmDialogProps } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import "./index.css";
 
@@ -25,10 +25,6 @@ export const ConfirmModal = ({
 }: ConfirmModalProps) => {
     const toast = useRef<Toast>(null);
 
-    useEffect(() => {
-        visible && showTemplate();
-    }, [visible]);
-
     const accept = () => {
         confirmAction?.();
         onHide();
@@ -46,29 +42,30 @@ export const ConfirmModal = ({
         onHide();
     };
 
-    const showTemplate = () => {
-        confirmDialog({
-            header: (
-                <div className='confirm-header'>
-                    <i className={`pi ${icon ? icon : "pi-times-circle"} confirm-header__icon`} />
-                    <div className='confirm-header__title'>{title || "Are you sure?"}</div>
-                </div>
-            ),
-            message: (
-                <div className='text-center w-full confirm-body'>
-                    {bodyMessage || "Please confirm to proceed moving forward."}
-                </div>
-            ),
-            ...props,
-            accept,
-            reject,
-            onHide,
-        });
-    };
-
     return (
         <>
-            <ConfirmDialog focusOnShow {...props} visible={visible} onHide={onHide} />
+            <ConfirmDialog
+                header={
+                    <div className='confirm-header'>
+                        <i
+                            className={`pi ${icon ? icon : "pi-times-circle"} confirm-header__icon`}
+                        />
+                        <div className='confirm-header__title'>{title || "Are you sure?"}</div>
+                    </div>
+                }
+                message={
+                    <div className='text-center w-full confirm-body'>
+                        {bodyMessage || "Please confirm to proceed moving forward."}
+                    </div>
+                }
+                visible={visible}
+                onHide={onHide}
+                accept={accept}
+                reject={reject}
+                focusOnShow
+                draggable={false}
+                {...props}
+            />
             <Toast ref={toast} />
         </>
     );
