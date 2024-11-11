@@ -8,13 +8,15 @@ interface ReportParametersProps {
     handleClosePanel?: () => void;
 }
 
+const todayDate = new Date().toISOString().split("T")[0];
+
 export const ReportParameters = ({
     report,
     handleClosePanel,
 }: ReportParametersProps): ReactElement => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-    const [startDate, setStartDate] = useState<string | null>(null);
-    const [endDate, setEndDate] = useState<string | null>(null);
+    const [startDate, setStartDate] = useState<string>(todayDate);
+    const [endDate, setEndDate] = useState<string>(todayDate);
 
     useEffect(() => {
         if (!startDate || !endDate) {

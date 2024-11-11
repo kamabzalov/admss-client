@@ -60,7 +60,8 @@ export const ActionButtons = ({
                     } else {
                         const response = await moveReportToCollection(
                             collection.itemUID,
-                            report.documentUID
+                            report.documentUID,
+                            collection.itemUID
                         );
                         if (response?.status === Status.ERROR) {
                             toast.current?.show({
