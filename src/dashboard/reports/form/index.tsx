@@ -27,6 +27,22 @@ export const ReportForm = observer((): ReactElement => {
                 const collectionsWithoutFavorite = response.filter(
                     (collection: ReportCollection) => collection.description !== "Favorites"
                 );
+
+                const customReportsCollection = collectionsWithoutFavorite.find(
+                    (collection: ReportCollection) => collection.name === "Custom reports"
+                );
+
+                if (customReportsCollection) {
+                    const nestedDocuments = collectionsWithoutFavorite
+                        .flatMap((collection) => collection.collections || [])
+                        .flatMap((nestedCollection) => nestedCollection.documents || []);
+
+                    customReportsCollection.documents = [
+                        ...(customReportsCollection.documents || []),
+                        ...nestedDocuments,
+                    ];
+                }
+
                 setCollections(collectionsWithoutFavorite);
             } else {
                 setCollections([]);

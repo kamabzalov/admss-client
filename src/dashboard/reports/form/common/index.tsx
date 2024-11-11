@@ -106,6 +106,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
 
     const handleDeleteReport = () => {
         report?.itemuid &&
+            !report.isdefault &&
             deleteReportDocument(report.itemuid).then((response: BaseResponseError | undefined) => {
                 if (response?.status === Status.OK) {
                     navigate("/dashboard/reports");

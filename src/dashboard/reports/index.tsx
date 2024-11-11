@@ -70,8 +70,8 @@ export default function Reports(): ReactElement {
                 const [customCollectionsDefaultsCount] = collectionsWithoutFavorite ?? [];
                 const innerCollectionsDefaultsCount =
                     customCollectionsDefaultsCount?.collections?.flatMap(
-                        (collection: ReportCollection) => collection.documents
-                    ) ?? [];
+                        (collection: ReportCollection) => collection?.documents || []
+                    );
                 setDefaultReportsCount(
                     (customCollectionsDefaultsCount?.documents?.length || 0) +
                         (innerCollectionsDefaultsCount?.length || 0)
@@ -455,9 +455,16 @@ export default function Reports(): ReactElement {
                                                                                                         report={
                                                                                                             report
                                                                                                         }
-                                                                                                        collectionList={
-                                                                                                            reportCollections
-                                                                                                        }
+                                                                                                        collectionList={[
+                                                                                                            ...customCollections,
+                                                                                                            ...reportCollections,
+                                                                                                        ].filter(
+                                                                                                            (
+                                                                                                                collection
+                                                                                                            ) =>
+                                                                                                                collection.itemUID !==
+                                                                                                                itemUID
+                                                                                                        )}
                                                                                                         refetchCollectionsAction={
                                                                                                             handleGetUserReportCollections
                                                                                                         }
@@ -517,9 +524,14 @@ export default function Reports(): ReactElement {
                                                                         </p>
                                                                         <ActionButtons
                                                                             report={report}
-                                                                            collectionList={
-                                                                                reportCollections
-                                                                            }
+                                                                            collectionList={[
+                                                                                ...customCollections,
+                                                                                ...reportCollections,
+                                                                            ].filter(
+                                                                                (collection) =>
+                                                                                    collection.itemUID !==
+                                                                                    itemUID
+                                                                            )}
                                                                             refetchCollectionsAction={
                                                                                 handleGetUserReportCollections
                                                                             }
