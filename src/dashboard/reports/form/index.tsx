@@ -7,7 +7,7 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
@@ -22,9 +22,11 @@ export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
+    const { id } = useParams();
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
+    const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null); // State for selected tab
 
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
@@ -65,7 +67,10 @@ export const ReportForm = observer((): ReactElement => {
     }, [authUser]);
 
     const handleAccordionTabChange = (report: ReportDocument) => {
+        if (report.documentUID === id) return;
+        reportStore.report = report;
         reportStore.reportName = report.name;
+        setSelectedTabUID(report.itemUID); // Update selected tab UID
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
@@ -84,7 +89,7 @@ export const ReportForm = observer((): ReactElement => {
                 <div className='card report'>
                     <div className='card-header flex'>
                         <h2 className='report__title uppercase m-0'>
-                            {reportStore.report.itemuid ? "Edit" : "Create"} custom report
+                            {id ? "Edit" : "Create"} custom report
                         </h2>
                     </div>
                     <div className='card-content report__card grid'>
@@ -104,7 +109,11 @@ export const ReportForm = observer((): ReactElement => {
                                                 disabled={
                                                     !documents?.length && !nestedCollections?.length
                                                 }
-                                                className='report__accordion-tab'
+                                                className={`report__accordion-tab ${
+                                                    selectedTabUID === itemUID
+                                                        ? "report__list-item--selected"
+                                                        : ""
+                                                }`}
                                             >
                                                 {nestedCollections && (
                                                     <Accordion
@@ -120,20 +129,31 @@ export const ReportForm = observer((): ReactElement => {
                                                                         !nestedCollection.documents
                                                                             ?.length
                                                                     }
-                                                                    className='nested-accordion-tab'
+                                                                    className={`nested-accordion-tab ${
+                                                                        selectedTabUID ===
+                                                                        nestedCollection.itemUID
+                                                                            ? "report__list-item--selected"
+                                                                            : ""
+                                                                    }`}
                                                                 >
                                                                     {nestedCollection.documents &&
                                                                         nestedCollection.documents.map(
                                                                             (report) => (
                                                                                 <Button
-                                                                                    className='report__list-item w-full'
+                                                                                    className={`report__list-item w-full ${
+                                                                                        selectedTabUID ===
+                                                                                        report.itemUID
+                                                                                            ? "report__list-item--selected"
+                                                                                            : ""
+                                                                                    }`}
                                                                                     key={
                                                                                         report.itemUID
                                                                                     }
                                                                                     text
-                                                                                    onClick={() => {
-                                                                                        reportStore.report =
-                                                                                            report;
+                                                                                    onClick={(
+                                                                                        event
+                                                                                    ) => {
+                                                                                        event.preventDefault();
                                                                                         handleAccordionTabChange(
                                                                                             report
                                                                                         );
@@ -155,11 +175,15 @@ export const ReportForm = observer((): ReactElement => {
                                                 {documents &&
                                                     documents.map((report) => (
                                                         <Button
-                                                            className='report__list-item report-item w-full'
+                                                            className={`report__list-item report-item w-full ${
+                                                                selectedTabUID === report.itemUID
+                                                                    ? "report__list-item--selected"
+                                                                    : ""
+                                                            }`}
                                                             key={report.itemUID}
                                                             text
-                                                            onClick={() => {
-                                                                reportStore.report = report;
+                                                            onClick={(event) => {
+                                                                event.preventDefault();
                                                                 handleAccordionTabChange(report);
                                                             }}
                                                         >
