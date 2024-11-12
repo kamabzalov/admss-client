@@ -31,6 +31,7 @@
     background-color: var(--admss-app-white);
     margin: 0;
     padding: 10px;
+    padding-top: 0;
     border: none;
 }
 
@@ -214,6 +215,17 @@
     color: var(--admss-app-primary);
     padding-left: 40px;
     border-radius: 0;
+}
+.report__accordion-tab,
+.report-item__name {
+    font-family: Open Sans;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: justify;
+}
+
+.nested-accordion-tab {
+    padding-left: 20px;
 }
 
 .report__accordion-tab .report__list-item.p-button.p-button-text:hover {
