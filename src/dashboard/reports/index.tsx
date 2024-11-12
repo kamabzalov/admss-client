@@ -285,6 +285,7 @@ export default function Reports(): ReactElement {
                                                     >
                                                         {index === 1 && (
                                                             <Accordion
+                                                                multiple
                                                                 activeIndex={customActiveIndex}
                                                                 className='reports__accordion reports__accordion--inner'
                                                             >
