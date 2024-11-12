@@ -13,6 +13,11 @@ import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
 
+enum REPORT_TYPES {
+    FAVORITES = "Favorites",
+    CUSTOM = "Custom reports",
+}
+
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
@@ -25,25 +30,24 @@ export const ReportForm = observer((): ReactElement => {
         getUserReportCollectionsContent(useruid).then((response) => {
             if (Array.isArray(response)) {
                 const collectionsWithoutFavorite = response.filter(
-                    (collection: ReportCollection) => collection.description !== "Favorites"
+                    (collection: ReportCollection) =>
+                        collection.description !== REPORT_TYPES.FAVORITES
                 );
 
                 const customReportsCollection = collectionsWithoutFavorite.find(
-                    (collection: ReportCollection) => collection.name === "Custom reports"
+                    (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
                 );
 
                 if (customReportsCollection) {
-                    const nestedDocuments = collectionsWithoutFavorite
-                        .flatMap((collection) => collection.collections || [])
-                        .flatMap((nestedCollection) => nestedCollection.documents || []);
-
-                    customReportsCollection.documents = [
-                        ...(customReportsCollection.documents || []),
-                        ...nestedDocuments,
-                    ];
+                    setCollections([
+                        customReportsCollection,
+                        ...collectionsWithoutFavorite.filter(
+                            (collection) => collection.name !== REPORT_TYPES.CUSTOM
+                        ),
+                    ]);
+                } else {
+                    setCollections(collectionsWithoutFavorite);
                 }
-
-                setCollections(collectionsWithoutFavorite);
             } else {
                 setCollections([]);
             }
@@ -88,17 +92,70 @@ export const ReportForm = observer((): ReactElement => {
                             <Accordion multiple className='report__accordion'>
                                 {collections &&
                                     [...favoriteCollections, ...collections].map(
-                                        ({ itemUID, name, documents }: ReportCollection) => (
+                                        ({
+                                            itemUID,
+                                            name,
+                                            documents,
+                                            collections: nestedCollections,
+                                        }: ReportCollection) => (
                                             <AccordionTab
                                                 key={itemUID}
                                                 header={name}
-                                                disabled={!documents?.length}
+                                                disabled={
+                                                    !documents?.length && !nestedCollections?.length
+                                                }
                                                 className='report__accordion-tab'
                                             >
+                                                {nestedCollections && (
+                                                    <Accordion
+                                                        multiple
+                                                        className='nested-accordion'
+                                                    >
+                                                        {nestedCollections.map(
+                                                            (nestedCollection) => (
+                                                                <AccordionTab
+                                                                    key={nestedCollection.itemUID}
+                                                                    header={nestedCollection.name}
+                                                                    disabled={
+                                                                        !nestedCollection.documents
+                                                                            ?.length
+                                                                    }
+                                                                    className='nested-accordion-tab'
+                                                                >
+                                                                    {nestedCollection.documents &&
+                                                                        nestedCollection.documents.map(
+                                                                            (report) => (
+                                                                                <Button
+                                                                                    className='report__list-item w-full'
+                                                                                    key={
+                                                                                        report.itemUID
+                                                                                    }
+                                                                                    text
+                                                                                    onClick={() => {
+                                                                                        reportStore.report =
+                                                                                            report;
+                                                                                        handleAccordionTabChange(
+                                                                                            report
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <p className='report-item__name'>
+                                                                                        {
+                                                                                            report.name
+                                                                                        }
+                                                                                    </p>
+                                                                                </Button>
+                                                                            )
+                                                                        )}
+                                                                </AccordionTab>
+                                                            )
+                                                        )}
+                                                    </Accordion>
+                                                )}
                                                 {documents &&
                                                     documents.map((report) => (
                                                         <Button
-                                                            className='report__list-item w-full'
+                                                            className='report__list-item report-item w-full'
                                                             key={report.itemUID}
                                                             text
                                                             onClick={() => {
@@ -106,7 +163,9 @@ export const ReportForm = observer((): ReactElement => {
                                                                 handleAccordionTabChange(report);
                                                             }}
                                                         >
-                                                            <p>{report.name}</p>
+                                                            <p className='report-item__name'>
+                                                                {report.name}
+                                                            </p>
                                                         </Button>
                                                     ))}
                                             </AccordionTab>
