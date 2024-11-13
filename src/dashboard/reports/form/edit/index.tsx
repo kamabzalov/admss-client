@@ -34,6 +34,7 @@ export const ReportEditForm = observer((): ReactElement => {
                 }
             });
         return () => {
+            store.reportName = "";
             store.report = {};
         };
     }, [id]);
