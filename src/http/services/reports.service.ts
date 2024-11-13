@@ -253,7 +253,7 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    { itemUID, columns }: { itemUID: string; columns: Partial<ReportServiceColumns>[] }
+    { itemUID, columns }: { itemUID: string; columns?: Partial<ReportServiceColumns>[] }
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
