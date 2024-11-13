@@ -146,7 +146,7 @@ export const ActionButtons = ({
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
-                    tooltip='Add to Collection'
+                    tooltip='Move to Collection'
                     tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}
@@ -156,7 +156,7 @@ export const ActionButtons = ({
                     icon={`pi pi-${!!report.isfavorite ? "heart-fill" : "heart"}`}
                     outlined
                     onClick={handleChangeIsFavorite}
-                    tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    tooltip={!!report.isfavorite ? "Remove from Favorites" : "Move to Favorites"}
                     tooltipOptions={!!report.isfavorite ? { position: "left" } : undefined}
                 />
                 <Button
