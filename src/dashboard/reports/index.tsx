@@ -285,6 +285,7 @@ export default function Reports(): ReactElement {
                                                     >
                                                         {index === 1 && (
                                                             <Accordion
+                                                                multiple
                                                                 activeIndex={customActiveIndex}
                                                                 className='reports__accordion reports__accordion--inner'
                                                             >
@@ -346,13 +347,15 @@ export default function Reports(): ReactElement {
                                                                                                     outlined
                                                                                                     onClick={(
                                                                                                         e
-                                                                                                    ) =>
-                                                                                                        handleCustomEditCollection(
+                                                                                                    ) => {
+                                                                                                        e.preventDefault();
+                                                                                                        e.stopPropagation();
+                                                                                                        return handleCustomEditCollection(
                                                                                                             e,
                                                                                                             itemUID,
                                                                                                             idx
-                                                                                                        )
-                                                                                                    }
+                                                                                                        );
+                                                                                                    }}
                                                                                                 />
                                                                                             ) : (
                                                                                                 <>

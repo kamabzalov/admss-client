@@ -239,3 +239,9 @@
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
 }
+
+.report__accordion .report__list-item--selected {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
+    border-radius: 0;
+}
