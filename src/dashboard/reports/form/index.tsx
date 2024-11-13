@@ -26,7 +26,7 @@ export const ReportForm = observer((): ReactElement => {
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
-    const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null); // State for selected tab
+    const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
 
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
@@ -70,7 +70,7 @@ export const ReportForm = observer((): ReactElement => {
         if (report.documentUID === id) return;
         reportStore.report = report;
         reportStore.reportName = report.name;
-        setSelectedTabUID(report.itemUID); // Update selected tab UID
+        setSelectedTabUID(report.itemUID); 
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
