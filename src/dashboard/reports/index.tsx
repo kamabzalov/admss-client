@@ -347,13 +347,15 @@ export default function Reports(): ReactElement {
                                                                                                     outlined
                                                                                                     onClick={(
                                                                                                         e
-                                                                                                    ) =>
-                                                                                                        handleCustomEditCollection(
+                                                                                                    ) => {
+                                                                                                        e.preventDefault();
+                                                                                                        e.stopPropagation();
+                                                                                                        return handleCustomEditCollection(
                                                                                                             e,
                                                                                                             itemUID,
                                                                                                             idx
-                                                                                                        )
-                                                                                                    }
+                                                                                                        );
+                                                                                                    }}
                                                                                                 />
                                                                                             ) : (
                                                                                                 <>
