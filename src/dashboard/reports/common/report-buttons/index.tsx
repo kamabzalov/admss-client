@@ -16,11 +16,13 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 
 interface ActionButtonsProps {
     report: ReportDocument;
+    tooltip?: string;
     collectionList?: ReportCollection[];
     refetchCollectionsAction?: () => void;
 }
 
 export const ActionButtons = ({
+    tooltip,
     report,
     refetchCollectionsAction,
     collectionList,
@@ -146,7 +148,7 @@ export const ActionButtons = ({
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
-                    tooltip='Move to Collection'
+                    tooltip={tooltip  || 'Add to Collection'}
                     tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}
@@ -156,7 +158,7 @@ export const ActionButtons = ({
                     icon={`pi pi-${!!report.isfavorite ? "heart-fill" : "heart"}`}
                     outlined
                     onClick={handleChangeIsFavorite}
-                    tooltip={!!report.isfavorite ? "Remove from Favorites" : "Move to Favorites"}
+                    tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
                     tooltipOptions={!!report.isfavorite ? { position: "left" } : undefined}
                 />
                 <Button

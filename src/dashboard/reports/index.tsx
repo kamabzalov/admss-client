@@ -179,9 +179,11 @@ export default function Reports(): ReactElement {
                 event.target.classList.contains("reports-actions__button") ||
                 event.target.classList.contains("p-button-label")
             ) {
-                event.stopPropagation();
                 setCustomActiveIndex([index]);
                 setIsCollectionEditing(id);
+                setTimeout(() => {
+                    event.stopPropagation();
+                }, 0);
             } else {
                 return;
             }
@@ -537,6 +539,7 @@ export default function Reports(): ReactElement {
                                                                         </p>
                                                                         <ActionButtons
                                                                             report={report}
+                                                                            tooltip={name === "Favorites" ? "Add to Collection" : "Copy to Collection"}
                                                                             collectionList={[
                                                                                 ...customCollections,
                                                                                 ...reportCollections,
