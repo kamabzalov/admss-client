@@ -4,6 +4,11 @@
     border: 1px solid var(--admss-app-light-grey);
     padding: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .p-float-label {
+        flex: 1;
+    }
 }
 
 .account-notes .account__control {
@@ -78,4 +83,26 @@
 
 .add-note__time {
     margin-left: 10px;
+}
+
+.account__table.p-datatable {
+    .account-notes__table-action {
+        border-right: none;
+    }
+
+    .account-notes__table-action + td,
+    .account-notes__table-action + th {
+        border-left: 0;
+    }
+}
+
+.note-delete-dialog {
+    .p-dialog-footer .p-button {
+        width: 130px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        height: 60px;
+    }
 }

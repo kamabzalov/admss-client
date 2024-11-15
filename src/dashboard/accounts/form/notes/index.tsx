@@ -16,6 +16,7 @@ import { useStore } from "store/hooks";
 import { AccountNoteData } from "store/stores/account";
 import { makeShortReports } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -36,6 +37,8 @@ export const AccountNotes = observer((): ReactElement => {
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [dialogShow, setDialogShow] = useState<boolean>(false);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [selectedNote, setSelectedNote] = useState<AccountNote | null>(null);
 
     const handleGetNotes = () => {
         listAccountNotes(id!).then((res) => {
@@ -53,6 +56,7 @@ export const AccountNotes = observer((): ReactElement => {
     const handleDeleteNote = ({ itemuid }: AccountNote) => {
         // TODO: add API call to delete
         setNotesList(notesList.filter((item) => item.itemuid !== itemuid));
+        setModalVisible(false);
     };
 
     const rowExpansionTemplate = (data: AccountNote) => {
@@ -183,7 +187,10 @@ export const AccountNotes = observer((): ReactElement => {
                     <Button
                         className='account-notes__button'
                         outlined
-                        onClick={() => setDialogShow(true)}
+                        onClick={() => {
+                            setSelectedNote(null);
+                            setDialogShow(true);
+                        }}
                     >
                         Add Note
                     </Button>
@@ -208,18 +215,26 @@ export const AccountNotes = observer((): ReactElement => {
                                     height: "300px",
                                 },
                             },
+                            wrapper: {
+                                className: "thin-scrollbar",
+                            },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
+                            className='account-notes__table-action'
                             body={(options) => {
                                 return (
-                                    <div className={`flex gap-3 align-items-center `}>
+                                    <div className={`flex gap-3 align-items-center`}>
                                         <Button
                                             className='text account-notes__table-button'
                                             icon='icon adms-edit-item'
+                                            onClick={() => {
+                                                setSelectedNote(options);
+                                                setDialogShow(true);
+                                            }}
                                         />
                                         <Button
                                             className='text export-web__icon-button'
@@ -251,7 +266,7 @@ export const AccountNotes = observer((): ReactElement => {
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
-                            body={(options) => {
+                            body={(note) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
                                         <Button
@@ -260,7 +275,10 @@ export const AccountNotes = observer((): ReactElement => {
                                             className='account-notes__delete-button'
                                             icon='icon adms-trash-can'
                                             text
-                                            onClick={() => handleDeleteNote(options)}
+                                            onClick={() => {
+                                                setSelectedNote(note);
+                                                setModalVisible(true);
+                                            }}
                                         />
                                     </div>
                                 );
@@ -299,7 +317,25 @@ export const AccountNotes = observer((): ReactElement => {
                 action={handleGetNotes}
                 visible={dialogShow}
                 accountuid={id}
+                currentNote={selectedNote}
                 onHide={() => setDialogShow(false)}
+            />
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title='Are you sure?'
+                icon='pi-times-circle'
+                bodyMessage={
+                    "Do you really want to delete this note? This process cannot be undone."
+                }
+                confirmAction={() => {
+                    selectedNote && handleDeleteNote(selectedNote);
+                }}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='note-delete-dialog'
+                onHide={() => setModalVisible(false)}
             />
         </div>
     );

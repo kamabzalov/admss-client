@@ -202,6 +202,10 @@ export class AccountStore {
         this._isLoading = state;
     }
 
+    public set isAccountChanged(state: boolean) {
+        this._isAccountChanged = state;
+    }
+
     public clearAccount = () => {
         this._account = {} as AccountInfo;
         this._accountID = "";
