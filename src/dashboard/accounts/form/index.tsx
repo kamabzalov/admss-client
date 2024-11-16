@@ -17,6 +17,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
+import { NoticeAlert } from "./common";
 
 interface TabItem {
     tabName: string;
@@ -45,6 +46,8 @@ export const AccountsForm = observer((): ReactElement => {
     const {
         getAccount,
         isAccountChanged,
+        accountNote,
+        getNotes,
         account: { accountnumber, accountstatus },
         isLoading,
     } = store;
@@ -61,8 +64,14 @@ export const AccountsForm = observer((): ReactElement => {
                         life: TOAST_LIFETIME,
                     });
                     navigate(`/dashboard/accounts`);
+                } else {
+                    getNotes(id);
                 }
             });
+        return () => {
+            accountNote.note = "";
+            accountNote.alert = "";
+        };
     }, [id]);
 
     useEffect(() => {
@@ -105,6 +114,7 @@ export const AccountsForm = observer((): ReactElement => {
                                 </span>
                                 Overdue Status
                                 <span className='card-header-info__data'>54</span>
+                                {(accountNote.alert || accountNote.note) && <NoticeAlert />}
                             </div>
                         )}
                     </div>
