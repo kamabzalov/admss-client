@@ -164,3 +164,8 @@
 .take-payment__info .account-note:first-child {
     margin-bottom: 30px;
 }
+
+.p-tabview .p-tabview-nav li.p-highlight.account-tab__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
+}

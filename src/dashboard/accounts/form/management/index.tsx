@@ -239,7 +239,7 @@ export const AccountManagement = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            header={controlColumnHeader}
+                            header={activityList.length ? controlColumnHeader : ""}
                             reorderable={false}
                             resizeable={false}
                             body={controlColumnBody}

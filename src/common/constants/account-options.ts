@@ -3,29 +3,33 @@ import { TypeList } from "common/models";
 export const ACCOUNT_STATUS_LIST = [
     { name: "OK" },
     { name: "1-29 Days Overdue" },
-    { name: "30-60 Days Overdue" },
-    { name: "60-90 Days Overdue" },
-    { name: "90-150 Days Overdue" },
+    { name: "30-59 Days Overdue" },
+    { name: "60-89 Days Overdue" },
+    { name: "90-149 Days Overdue" },
     { name: "150+ Days Overdue" },
 ];
 
 export const ACCOUNT_ACTIVITY_LIST = ["All Activity", "Active data", "Deleted payments"];
 
-export const ACCOUNT_PAYMENT_METHODS: readonly Partial<TypeList>[] = [
-    { name: "Check" },
-    { name: "Cash" },
-    { name: "VISA" },
-    { name: "MC" },
-    { name: "Discovery" },
-    { name: "AMEX" },
-    { name: "Debit" },
-    { name: "ACH" },
-    { name: "Money Order" },
-    { name: "Western Union" },
-    { name: "Travel Check" },
-    { name: "Bank Check" },
-    { name: "Trade-In" },
-];
+export enum ACCOUNT_PAYMENT_METHODS_NAMES {
+    CHECK = "Check",
+    CASH = "Cash",
+    VISA = "VISA",
+    MC = "MC",
+    DISCOVERY = "Discovery",
+    AMEX = "AMEX",
+    DEBIT = "Debit",
+    ACH = "ACH",
+    MONEY_ORDER = "Money Order",
+    WESTERN_UNION = "Western Union",
+    TRAVEL_CHECK = "Travel Check",
+    BANK_CHECK = "Bank Check",
+    TRADE_IN = "Trade-In",
+}
+
+export const ACCOUNT_PAYMENT_METHODS: readonly Partial<TypeList>[] = Object.values(
+    ACCOUNT_PAYMENT_METHODS_NAMES
+).map((method) => ({ name: method }));
 
 export const ACCOUNT_FEE_TYPES: readonly Partial<TypeList>[] = [
     { name: "Other" },
@@ -89,4 +93,3 @@ export const ADJUSTMENT_TYPES: readonly string[] = [
     "ChargeOff",
     "Manual",
 ];
-

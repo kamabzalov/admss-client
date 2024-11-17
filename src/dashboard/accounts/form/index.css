@@ -14,7 +14,7 @@
 .account__tabs > .p-tabview-nav-container .p-tabview-nav {
     flex-direction: column;
     flex: 0 0;
-    width: 294px;
+    width: 342px;
     border: none;
     min-height: 527px;
 
@@ -80,10 +80,19 @@
     row-gap: 10px;
 }
 
-.account__table {
+.account__table.p-datatable {
     flex-grow: 1;
     height: 474px;
     min-height: 26vh;
+
+    .account__table-checkbox {
+        border-right: none;
+    }
+
+    .account__table-checkbox + td,
+    .account__table-checkbox + th {
+        border-left: 0;
+    }
 
     .p-datatable {
         height: 100%;

@@ -3,7 +3,7 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { addAccountPromise, listAccountPromises } from "http/services/accounts.service";
+import { listAccountPromises, updateAccountPromise } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
@@ -72,7 +72,7 @@ export const AccountPromiseToPay = (): ReactElement => {
             });
             const pstatus = ACCOUNT_PROMISE_STATUS.find((item) => item.name === status);
             promises.forEach(async (promise) => {
-                const res = await addAccountPromise(id, {
+                const res = await updateAccountPromise(promise.itemuid, {
                     ...promise,
                     pstatus: pstatus?.id,
                     pstatusname: status,
@@ -146,23 +146,25 @@ export const AccountPromiseToPay = (): ReactElement => {
         />
     );
 
+    const getPromiseStatusColor = (statusId: number): string => {
+        const status = ACCOUNT_PROMISE_STATUS.find((item) => item.id === statusId)?.name;
+        switch (status) {
+            case PAID_STATUS.LATE:
+                return PAID_COLOR.LATE;
+            case PAID_STATUS.BROKEN:
+                return PAID_COLOR.BROKEN;
+            case PAID_STATUS.OUTSTANDING:
+                return PAID_COLOR.OUTSTANDING;
+            default:
+                return PAID_COLOR.DISABLED;
+        }
+    };
+
     const controlColumnBody = (
         options: AccountPromise,
         { rowIndex }: ColumnBodyOptions
     ): ReactElement => {
-        let color = PAID_COLOR.DISABLED;
-        switch (options.status) {
-            case PAID_STATUS.LATE:
-                color = PAID_COLOR.LATE;
-                break;
-            case PAID_STATUS.BROKEN:
-                color = PAID_COLOR.BROKEN;
-                break;
-            case PAID_STATUS.OUTSTANDING:
-                color = PAID_COLOR.OUTSTANDING;
-                break;
-        }
-
+        const color = getPromiseStatusColor(options.pstatus);
         return (
             <div className={`flex gap-3 align-items-center`}>
                 <Checkbox
@@ -282,7 +284,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                         showGridlines
                         className='account-promise__table'
                         value={promiseList}
-                        emptyMessage='No activity yet.'
+                        emptyMessage='No promises added yet.'
                         reorderableColumns
                         resizableColumns
                         scrollable

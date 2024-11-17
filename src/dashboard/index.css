@@ -62,6 +62,8 @@
 
 .card-header-info {
     padding-left: 1.75rem;
+    display: flex;
+    align-items: center;
 }
 
 .card-header-info__data {
@@ -194,18 +196,18 @@
     line-height: 1;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar {
+.p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar {
     width: 12px;
     height: 12px;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-thumb {
+.p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-thumb {
     border: 0.2em solid var(--admss-app-light-blue);
     border-radius: 0.6em;
     width: 6px;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-button:single-button {
+.p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-button:single-button {
     background: var(--admss-app-light-blue);
     display: block;
     border-style: solid;
@@ -213,27 +215,35 @@
     width: 8px;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:decrement {
+.p-datatable-wrapper:not(
+        .thin-scrollbar
+    )::-webkit-scrollbar-button:single-button:vertical:decrement {
     border-width: 0 7px 7px 7px;
     border-color: transparent transparent var(--admss-app-primary) transparent;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:increment {
+.p-datatable-wrapper:not(
+        .thin-scrollbar
+    )::-webkit-scrollbar-button:single-button:vertical:increment {
     border-width: 7px 7px 0 7px;
     border-color: var(--admss-app-primary) transparent transparent transparent;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:decrement {
+.p-datatable-wrapper:not(
+        .thin-scrollbar
+    )::-webkit-scrollbar-button:single-button:horizontal:decrement {
     border-width: 7px 7px 7px 0;
     border-color: transparent var(--admss-app-primary) transparent transparent;
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:increment {
+.p-datatable-wrapper:not(
+        .thin-scrollbar
+    )::-webkit-scrollbar-button:single-button:horizontal:increment {
     border-width: 7px 0 7px 7px;
     border-color: transparent transparent transparent var(--admss-app-primary);
 }
 
-.p-datatable-wrapper::-webkit-scrollbar-track {
+.p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-track {
     background: var(--admss-app-light-blue);
 }
 

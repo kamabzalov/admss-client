@@ -20,6 +20,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const store = useStore().accountStore;
     const [insuranceEdit, setInsuranceEdit] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
     const {
         accountExtData: { Title_Received, Title_Num },
@@ -75,10 +76,12 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     };
 
     const handleChangeInsuranceEdit = () => {
+        setIsButtonDisabled(true);
         setInsuranceEdit((prevState) => !prevState);
     };
 
     const handleChangeInsurance = (field: keyof AccountInsurance, value: string) => {
+        setIsButtonDisabled(false);
         setInsuranceInfo((prev) => ({ ...prev!, [field]: value }));
     };
 
@@ -117,6 +120,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                                     name='account-insurance-policy'
                                     checked={!!insuranceInfo?.Insurance_Policy_Received}
                                     onClick={() => {
+                                        setIsButtonDisabled(false);
                                         setInsuranceInfo((prev) => ({
                                             ...prev!,
                                             Insurance_Policy_Received:
@@ -145,6 +149,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                                     name='account-insurance-title-received'
                                     checked={!!Title_Received}
                                     onClick={() => {
+                                        setIsButtonDisabled(false);
                                         changeAccountExtData(
                                             "Title_Received",
                                             !Title_Received ? 1 : 0
@@ -163,9 +168,10 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                                     id='account-insurance-title-num'
                                     className='insurance-info__input w-full'
                                     value={Title_Num}
-                                    onChange={(e) =>
-                                        changeAccountExtData("Title_Num", e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setIsButtonDisabled(false);
+                                        changeAccountExtData("Title_Num", e.target.value);
+                                    }}
                                 />
                                 <label className='float-label'>Title#</label>
                             </span>
@@ -173,7 +179,12 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                     </>
                 )}
                 <div className='insurance-info__footer'>
-                    <Button className='insurance-info__button' onClick={handleChangeInsuranceInfo}>
+                    <Button
+                        className='insurance-info__button'
+                        disabled={isButtonDisabled}
+                        severity={isButtonDisabled ? "secondary" : "success"}
+                        onClick={handleChangeInsuranceInfo}
+                    >
                         Save
                     </Button>
                 </div>

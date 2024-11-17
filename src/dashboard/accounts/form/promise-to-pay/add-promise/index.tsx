@@ -1,7 +1,7 @@
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
-import { TextInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { addAccountPromise } from "http/services/accounts.service";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -27,6 +27,8 @@ export const AddPromiseDialog = ({
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
     const [note, setNote] = useState<string>("");
+    const [amount, setAmount] = useState<number>(0);
+    const [paydate, setPaydate] = useState<number>(0);
     const toast = useToast();
     const currentTime = useMemo(
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
@@ -37,6 +39,8 @@ export const AddPromiseDialog = ({
         if (accountuid) {
             const res = await addAccountPromise(accountuid, {
                 username: noteTaker,
+                amount,
+                paydate,
                 notes: note,
             });
             if (res && res.status === Status.ERROR) {
@@ -54,6 +58,10 @@ export const AddPromiseDialog = ({
                     detail: "Promise added successfully!",
                     life: TOAST_LIFETIME,
                 });
+                setNoteTaker("");
+                setAmount(0);
+                setPaydate(0);
+                setNote("");
                 onHide();
             }
         }
@@ -77,7 +85,7 @@ export const AddPromiseDialog = ({
             buttonDisabled={isButtonDisabled}
             {...props}
         >
-            <div className='grid gap-3'>
+            <div className='grid row-gap-3'>
                 <div className='add-note__info m-3'>
                     <strong>Date & Time: </strong>
                     <span className='add-note__time'>{currentTime}</span>
@@ -88,6 +96,27 @@ export const AddPromiseDialog = ({
                     value={noteTaker}
                     onChange={({ target: { value } }) => setNoteTaker(value)}
                 />
+
+                <div className='col-6'>
+                    <DateInput
+                        name='Promise to Pay Date'
+                        date={paydate}
+                        onChange={({ target: { value } }) => {
+                            setPaydate(Number(value));
+                        }}
+                    />
+                </div>
+
+                <div className='col-6'>
+                    <CurrencyInput
+                        title='Amount'
+                        labelPosition='top'
+                        value={amount}
+                        onChange={({ value }) => {
+                            setAmount(Number(value));
+                        }}
+                    />
+                </div>
 
                 <div className='col-12'>
                     <span className='p-float-label'>

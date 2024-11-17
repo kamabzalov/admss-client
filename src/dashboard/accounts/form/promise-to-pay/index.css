@@ -7,7 +7,9 @@
     font-weight: 700;
 }
 
-.p-menu .p-menuitem-link .p-menuitem-icon {
+.p-menu .p-menuitem-link .p-menuitem-icon,
+.p-menu .p-menuitem-link .p-menuitem-icon:hover,
+.p-button-icon.pi-circle {
     &.pi-circle--red {
         color: var(--admss-app-red);
     }

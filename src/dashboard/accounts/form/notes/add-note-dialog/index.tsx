@@ -1,4 +1,5 @@
 import { ACCOUNT_NOTE_CONTACT_TYPE } from "common/constants/account-options";
+import { AccountNote } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
@@ -16,6 +17,7 @@ interface AddNoteDialogProps extends DialogProps {
     accountuid?: string;
     action: () => void;
     onHide: () => void;
+    currentNote?: AccountNote | null;
 }
 
 export const AddNoteDialog = ({
@@ -23,9 +25,11 @@ export const AddNoteDialog = ({
     onHide,
     action,
     accountuid,
+    currentNote,
     ...props
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
+    const store = useStore().accountStore;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -36,6 +40,21 @@ export const AddNoteDialog = ({
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
         []
     );
+
+    useEffect(() => {
+        if (currentNote) {
+            setIsButtonDisabled(true);
+            setNoteTaker(currentNote?.NoteBy);
+            setContactType(currentNote?.ContactMethod);
+            setNote(currentNote?.Note);
+        }
+        return () => {
+            setIsButtonDisabled(true);
+            setNoteTaker(authUser?.loginname || "");
+            setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+            setNote("");
+        };
+    }, [currentNote]);
 
     useEffect(() => {
         if (noteTaker && contactType && note) {
@@ -65,6 +84,8 @@ export const AddNoteDialog = ({
                         life: TOAST_LIFETIME,
                     });
                     setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+                    setIsButtonDisabled(true);
+                    store.isAccountChanged = true;
                     setNote("");
                     action();
                     onHide();
@@ -75,8 +96,8 @@ export const AddNoteDialog = ({
     return (
         <DashboardDialog
             className='add-note'
-            footer='Save'
-            header='Add Note'
+            footer={currentNote ? "Update" : "Save"}
+            header={currentNote ? "Edit Note" : "Add Note"}
             cancelButton
             visible={visible}
             onHide={onHide}

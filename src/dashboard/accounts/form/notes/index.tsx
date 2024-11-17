@@ -1,4 +1,3 @@
-import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 
 import "./index.css";
@@ -16,6 +15,8 @@ import { useStore } from "store/hooks";
 import { AccountNoteData } from "store/stores/account";
 import { makeShortReports } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { NoteEditor } from "dashboard/accounts/form/common";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -36,6 +37,8 @@ export const AccountNotes = observer((): ReactElement => {
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [dialogShow, setDialogShow] = useState<boolean>(false);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [selectedNote, setSelectedNote] = useState<AccountNote | null>(null);
 
     const handleGetNotes = () => {
         listAccountNotes(id!).then((res) => {
@@ -53,6 +56,7 @@ export const AccountNotes = observer((): ReactElement => {
     const handleDeleteNote = ({ itemuid }: AccountNote) => {
         // TODO: add API call to delete
         setNotesList(notesList.filter((item) => item.itemuid !== itemuid));
+        setModalVisible(false);
     };
 
     const rowExpansionTemplate = (data: AccountNote) => {
@@ -72,9 +76,9 @@ export const AccountNotes = observer((): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const handleSaveNote = (saveItem: keyof AccountNoteData) => {
+    const handleSaveNote = (saveItem: keyof AccountNoteData, value?: string) => {
         id &&
-            updateAccountNote(id, { [saveItem]: accountNote[saveItem] }).then((res) => {
+            updateAccountNote(id, { [saveItem]: value ?? accountNote[saveItem] }).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
@@ -138,52 +142,37 @@ export const AccountNotes = observer((): ReactElement => {
             <h3 className='account-notes__title account-title'>Notes</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
-                    <div className='account-note'>
-                        <span className='p-float-label'>
-                            <InputTextarea
-                                id='account-memo'
-                                value={accountNote.note}
-                                onChange={(e) =>
-                                    (store.accountNote = { ...accountNote, note: e.target.value })
-                                }
-                                className='account-note__input'
-                            />
-                            <label htmlFor='account-memo'>Account Memo</label>
-                        </span>
-                        <Button
-                            severity={!!accountNote.note ? "success" : "secondary"}
-                            className='account-note__button'
-                            label='Save'
-                            disabled={!accountNote.note}
-                            onClick={() => handleSaveNote("note")}
-                        />
-                    </div>
-                    <div className='account-note'>
-                        <span className='p-float-label'>
-                            <InputTextarea
-                                id='account-payment'
-                                value={accountNote.alert}
-                                onChange={(e) =>
-                                    (store.accountNote = { ...accountNote, alert: e.target.value })
-                                }
-                                className='account-note__input'
-                            />
-                            <label htmlFor='account-payment'>Payment Alert</label>
-                        </span>
-                        <Button
-                            severity={!!accountNote.alert ? "success" : "secondary"}
-                            className='account-note__button'
-                            disabled={!accountNote.alert}
-                            label='Save'
-                            onClick={() => handleSaveNote("alert")}
-                        />
-                    </div>
+                    <NoteEditor
+                        id='account-memo'
+                        value={accountNote.note}
+                        label='Account Memo'
+                        onSave={() => handleSaveNote("note")}
+                        onClear={() => {
+                            store.accountNote = { ...accountNote, note: "" };
+                            handleSaveNote("note", "");
+                        }}
+                        onChange={(value) => (store.accountNote = { ...accountNote, note: value })}
+                    />
+                    <NoteEditor
+                        id='account-payment'
+                        value={accountNote.alert}
+                        label='Payment Alert'
+                        onSave={() => handleSaveNote("alert")}
+                        onClear={() => {
+                            store.accountNote = { ...accountNote, alert: "" };
+                            handleSaveNote("alert", "");
+                        }}
+                        onChange={(value) => (store.accountNote = { ...accountNote, alert: value })}
+                    />
                 </div>
                 <div className='col-12 mt-5 flex justify-content-end'>
                     <Button
                         className='account-notes__button'
                         outlined
-                        onClick={() => setDialogShow(true)}
+                        onClick={() => {
+                            setSelectedNote(null);
+                            setDialogShow(true);
+                        }}
                     >
                         Add Note
                     </Button>
@@ -208,18 +197,26 @@ export const AccountNotes = observer((): ReactElement => {
                                     height: "300px",
                                 },
                             },
+                            wrapper: {
+                                className: "thin-scrollbar",
+                            },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
+                            className='account-notes__table-action'
                             body={(options) => {
                                 return (
-                                    <div className={`flex gap-3 align-items-center `}>
+                                    <div className={`flex gap-3 align-items-center`}>
                                         <Button
                                             className='text account-notes__table-button'
                                             icon='icon adms-edit-item'
+                                            onClick={() => {
+                                                setSelectedNote(options);
+                                                setDialogShow(true);
+                                            }}
                                         />
                                         <Button
                                             className='text export-web__icon-button'
@@ -251,7 +248,7 @@ export const AccountNotes = observer((): ReactElement => {
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
-                            body={(options) => {
+                            body={(note) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
                                         <Button
@@ -260,7 +257,10 @@ export const AccountNotes = observer((): ReactElement => {
                                             className='account-notes__delete-button'
                                             icon='icon adms-trash-can'
                                             text
-                                            onClick={() => handleDeleteNote(options)}
+                                            onClick={() => {
+                                                setSelectedNote(note);
+                                                setModalVisible(true);
+                                            }}
                                         />
                                     </div>
                                 );
@@ -299,7 +299,25 @@ export const AccountNotes = observer((): ReactElement => {
                 action={handleGetNotes}
                 visible={dialogShow}
                 accountuid={id}
+                currentNote={selectedNote}
                 onHide={() => setDialogShow(false)}
+            />
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title='Are you sure?'
+                icon='pi-times-circle'
+                bodyMessage={
+                    "Do you really want to delete this note? This process cannot be undone."
+                }
+                confirmAction={() => {
+                    selectedNote && handleDeleteNote(selectedNote);
+                }}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='note-delete-dialog'
+                onHide={() => setModalVisible(false)}
             />
         </div>
     );

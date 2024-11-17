@@ -12,6 +12,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { Button } from "primereact/button";
+import { DownPaymentDialog } from "./down-payment-dialog";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -44,6 +45,8 @@ export const AccountDownPayment = (): ReactElement => {
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
     const [modalAction, setModalAction] = useState<(() => void) | null>(null);
+    const [selectedPayments, setSelectedPayments] = useState<AccountDownPayments[]>([]);
+    const [downPaymentDialogActive, setDownPaymentDialogActive] = useState<boolean>(false);
 
     const getDownPayments = async () => {
         if (id) {
@@ -211,6 +214,28 @@ export const AccountDownPayment = (): ReactElement => {
         }
     };
 
+    const columnBody = (
+        field: keyof AccountDownPayments,
+        value: string | number,
+        rowIndex: number,
+        selectedRows: boolean[]
+    ) => {
+        const isSelected = selectedRows[rowIndex];
+        const formattedValue = field === "Amount" ? `$ ${value || "-"}` : value || "-";
+
+        return <div className={`${isSelected && "row--selected"}`}>{formattedValue}</div>;
+    };
+
+    const handlePayButtonClick = (payment: AccountDownPayments) => {
+        setSelectedPayments([payment]);
+        setDownPaymentDialogActive(true);
+    };
+
+    const handleTakePaymentButtonClick = () => {
+        setSelectedPayments(selectedRows.map((_, index) => paymentList[index]));
+        setDownPaymentDialogActive(true);
+    };
+
     return (
         <div className='down-payment account-card'>
             <h3 className='down-payment__title account-title'>Down Payment</h3>
@@ -244,6 +269,7 @@ export const AccountDownPayment = (): ReactElement => {
                         tooltipOptions={{
                             position: "bottom",
                         }}
+                        onClick={handleTakePaymentButtonClick}
                         outlined
                     />
                 </div>
@@ -268,6 +294,7 @@ export const AccountDownPayment = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
+                            className='account__table-checkbox'
                             header={controlColumnHeader}
                             body={controlColumnBody}
                             pt={{
@@ -284,13 +311,18 @@ export const AccountDownPayment = (): ReactElement => {
                                 header={header}
                                 alignHeader={"left"}
                                 key={field}
-                                body={({ [field]: value }, { rowIndex }) => (
-                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
-                                        {value || "-"}
-                                    </div>
-                                )}
+                                body={({ [field]: value }, { rowIndex }) =>
+                                    columnBody(field, value, rowIndex, selectedRows)
+                                }
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: 210,
+                                        },
+                                    },
+                                }}
                             />
                         ))}
 
@@ -298,10 +330,14 @@ export const AccountDownPayment = (): ReactElement => {
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
                             resizeable={false}
-                            body={() => {
+                            body={(payment: AccountDownPayments) => {
                                 return (
                                     <div className={`flex gap-3 align-items-center `}>
-                                        <Button className='down-payment__table-button' outlined>
+                                        <Button
+                                            className='down-payment__table-button'
+                                            outlined
+                                            onClick={() => handlePayButtonClick(payment)}
+                                        >
                                             Pay
                                         </Button>
                                     </div>
@@ -365,6 +401,11 @@ export const AccountDownPayment = (): ReactElement => {
                 acceptLabel={modalAction ? "Delete" : "Got it"}
                 className={`account-warning ${modalAction ? "account-warning--reject" : ""}`}
                 onHide={() => setModalVisible(false)}
+            />
+            <DownPaymentDialog
+                visible={downPaymentDialogActive}
+                onHide={() => setDownPaymentDialogActive(false)}
+                payments={selectedPayments}
             />
         </div>
     );
