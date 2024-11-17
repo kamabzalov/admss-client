@@ -1,4 +1,3 @@
-import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 
 import "./index.css";
@@ -17,6 +16,7 @@ import { AccountNoteData } from "store/stores/account";
 import { makeShortReports } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { NoteEditor } from "dashboard/accounts/form/common";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -76,9 +76,9 @@ export const AccountNotes = observer((): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const handleSaveNote = (saveItem: keyof AccountNoteData) => {
+    const handleSaveNote = (saveItem: keyof AccountNoteData, value?: string) => {
         id &&
-            updateAccountNote(id, { [saveItem]: accountNote[saveItem] }).then((res) => {
+            updateAccountNote(id, { [saveItem]: value ?? accountNote[saveItem] }).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
@@ -142,46 +142,28 @@ export const AccountNotes = observer((): ReactElement => {
             <h3 className='account-notes__title account-title'>Notes</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
-                    <div className='account-note'>
-                        <span className='p-float-label'>
-                            <InputTextarea
-                                id='account-memo'
-                                value={accountNote.note}
-                                onChange={(e) =>
-                                    (store.accountNote = { ...accountNote, note: e.target.value })
-                                }
-                                className='account-note__input'
-                            />
-                            <label htmlFor='account-memo'>Account Memo</label>
-                        </span>
-                        <Button
-                            severity={!!accountNote.note ? "success" : "secondary"}
-                            className='account-note__button'
-                            label='Save'
-                            disabled={!accountNote.note}
-                            onClick={() => handleSaveNote("note")}
-                        />
-                    </div>
-                    <div className='account-note'>
-                        <span className='p-float-label'>
-                            <InputTextarea
-                                id='account-payment'
-                                value={accountNote.alert}
-                                onChange={(e) =>
-                                    (store.accountNote = { ...accountNote, alert: e.target.value })
-                                }
-                                className='account-note__input'
-                            />
-                            <label htmlFor='account-payment'>Payment Alert</label>
-                        </span>
-                        <Button
-                            severity={!!accountNote.alert ? "success" : "secondary"}
-                            className='account-note__button'
-                            disabled={!accountNote.alert}
-                            label='Save'
-                            onClick={() => handleSaveNote("alert")}
-                        />
-                    </div>
+                    <NoteEditor
+                        id='account-memo'
+                        value={accountNote.note}
+                        label='Account Memo'
+                        onSave={() => handleSaveNote("note")}
+                        onClear={() => {
+                            store.accountNote = { ...accountNote, note: "" };
+                            handleSaveNote("note", "");
+                        }}
+                        onChange={(value) => (store.accountNote = { ...accountNote, note: value })}
+                    />
+                    <NoteEditor
+                        id='account-payment'
+                        value={accountNote.alert}
+                        label='Payment Alert'
+                        onSave={() => handleSaveNote("alert")}
+                        onClear={() => {
+                            store.accountNote = { ...accountNote, alert: "" };
+                            handleSaveNote("alert", "");
+                        }}
+                        onChange={(value) => (store.accountNote = { ...accountNote, alert: value })}
+                    />
                 </div>
                 <div className='col-12 mt-5 flex justify-content-end'>
                     <Button

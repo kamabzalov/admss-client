@@ -62,6 +62,8 @@
 
 .card-header-info {
     padding-left: 1.75rem;
+    display: flex;
+    align-items: center;
 }
 
 .card-header-info__data {
