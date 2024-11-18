@@ -33,11 +33,6 @@
     padding-left: 50px;
 }
 
-.reports__list-item--inner {
-    padding-left: 80px;
-    padding-right: 20px;
-}
-
 .reports .p-accordion-content {
     border-left: none;
     border-right: none;
@@ -145,6 +140,14 @@
     cursor: pointer;
     height: 60px;
     transition: background-color 0.3s;
+}
+
+.reports__list-item:not(.reports__list-item--inner) {
+    padding-left: 2.75rem;
+    padding-right: 1.25rem;
+}
+
+.reports__list-item--inner {
     padding-left: 4.25rem;
     padding-right: 1.25rem;
 }

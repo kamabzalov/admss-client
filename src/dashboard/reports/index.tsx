@@ -179,11 +179,9 @@ export default function Reports(): ReactElement {
                 event.target.classList.contains("reports-actions__button") ||
                 event.target.classList.contains("p-button-label")
             ) {
+                event.stopPropagation();
                 setCustomActiveIndex([index]);
                 setIsCollectionEditing(id);
-                setTimeout(() => {
-                    event.stopPropagation();
-                }, 0);
             } else {
                 return;
             }
@@ -509,7 +507,7 @@ export default function Reports(): ReactElement {
                                                                     key={report.itemUID}
                                                                 >
                                                                     <div
-                                                                        className='reports__list-item reports__list-item--inner'
+                                                                        className='reports__list-item'
                                                                         key={report.itemUID}
                                                                         onClick={(event) =>
                                                                             handleOpenParameters(
@@ -539,7 +537,13 @@ export default function Reports(): ReactElement {
                                                                         </p>
                                                                         <ActionButtons
                                                                             report={report}
-                                                                            tooltip={name === "Favorites" ? "Add to Collection" : "Copy to Collection"}
+                                                                            tooltip={
+                                                                                name === "Favorites"
+                                                                                    ? "Add to Collection"
+                                                                                    : !!report.isdefault
+                                                                                      ? "Copy to Collection"
+                                                                                      : "Move to Collection"
+                                                                            }
                                                                             collectionList={[
                                                                                 ...customCollections,
                                                                                 ...reportCollections,
