@@ -17,6 +17,7 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 interface ActionButtonsProps {
     report: ReportDocument;
     tooltip?: string;
+    currentCollectionUID?: string;
     collectionList?: ReportCollection[];
     refetchCollectionsAction?: () => void;
 }
@@ -24,6 +25,7 @@ interface ActionButtonsProps {
 export const ActionButtons = ({
     tooltip,
     report,
+    currentCollectionUID,
     refetchCollectionsAction,
     collectionList,
 }: ActionButtonsProps): ReactElement => {
@@ -60,8 +62,9 @@ export const ActionButtons = ({
                             setTimeout(() => setAddedToCollection(false), 2000);
                         }
                     } else {
+                        if (!currentCollectionUID) return;
                         const response = await moveReportToCollection(
-                            collection.itemUID,
+                            currentCollectionUID,
                             report.documentUID,
                             collection.itemUID
                         );
@@ -148,7 +151,7 @@ export const ActionButtons = ({
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
-                    tooltip={tooltip  || 'Add to Collection'}
+                    tooltip={tooltip || "Add to Collection"}
                     tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}
