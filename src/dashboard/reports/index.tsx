@@ -552,6 +552,9 @@ export default function Reports(): ReactElement {
                                                                                     collection.itemUID !==
                                                                                     itemUID
                                                                             )}
+                                                                            currentCollectionUID={
+                                                                                itemUID
+                                                                            }
                                                                             refetchCollectionsAction={
                                                                                 handleGetUserReportCollections
                                                                             }
