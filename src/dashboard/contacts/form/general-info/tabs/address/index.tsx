@@ -91,7 +91,9 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     }
                     className='w-full address-info__dropdown'
                     disabled={isControlDisabled}
-                    showClear
+                    showClear={
+                        !!(type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State)
+                    }
                 />
             </div>
 
@@ -190,6 +192,11 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
                     disabled={isSameAsMailing || isControlDisabled}
+                    showClear={
+                        !!(type === BUYER
+                            ? contact.mailState
+                            : contactExtData.CoBuyer_Mailing_State)
+                    }
                 />
             </div>
 
