@@ -470,7 +470,6 @@ export default function Reports(): ReactElement {
                                                                                                         }
                                                                                                         collectionList={[
                                                                                                             ...customCollections,
-                                                                                                            ...reportCollections,
                                                                                                         ].filter(
                                                                                                             (
                                                                                                                 collection
@@ -541,7 +540,8 @@ export default function Reports(): ReactElement {
                                                                         <ActionButtons
                                                                             report={report}
                                                                             tooltip={
-                                                                                !!report.isfavorite
+                                                                                !!report.isfavorite &&
+                                                                                !report.isdefault
                                                                                     ? "Add to Collection"
                                                                                     : !!report.isdefault
                                                                                       ? "Copy to Collection"
@@ -549,7 +549,6 @@ export default function Reports(): ReactElement {
                                                                             }
                                                                             collectionList={[
                                                                                 ...customCollections,
-                                                                                ...reportCollections,
                                                                             ].filter(
                                                                                 (collection) =>
                                                                                     collection.itemUID !==
