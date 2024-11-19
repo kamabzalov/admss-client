@@ -218,10 +218,11 @@ export const deleteContactBackDL = async (contactuid: string) => {
     }
 };
 
-export const checkContactOFAC = async (contactuid: string = "0") => {
+export const checkContactOFAC = async (contactuid: string = "0", contact: Contact) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
-            `contacts/${contactuid}/check `
+            `contacts/${contactuid}/check`,
+            { contact }
         );
 
         if (response.status === 200) {

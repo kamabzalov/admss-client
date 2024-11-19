@@ -25,7 +25,7 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
     const { id } = useParams();
     const toast = useToast();
     const store = useStore().contactStore;
-    const { contactOFAC, contact } = store;
+    const { contactOFAC, contact, contactFullInfo } = store;
     const [dialogShow, setDialogShow] = useState<boolean>(false);
 
     const isControlDisabled = useMemo(
@@ -34,7 +34,7 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
     );
 
     const handleOfacCheck = () => {
-        checkContactOFAC(id).then((response) => {
+        checkContactOFAC(id, contactFullInfo).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
