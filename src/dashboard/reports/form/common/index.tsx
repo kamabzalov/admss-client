@@ -51,15 +51,17 @@ export const ReportSelect = ({
 
 interface ReportFooterProps {
     onAction: () => void;
+    onRefetch?: () => void;
 }
 
-export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactElement => {
+export const ReportFooter = observer(({ onAction, onRefetch }: ReportFooterProps): ReactElement => {
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
     const { report, saveReport, isReportChanged } = reportStore;
     const toast = useToast();
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
     const [duplicateDialogVisible, setDuplicateDialogVisible] = useState<boolean>(false);
+    const [deleteDialogVisible, setDeleteDialogVisible] = useState<boolean>(false);
 
     const handleSaveReport = () => {
         if (!!report.isdefault) return;
@@ -109,8 +111,9 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
             !report.isdefault &&
             deleteReportDocument(report.itemuid).then((response: BaseResponseError | undefined) => {
                 if (response?.status === Status.OK) {
-                    navigate("/dashboard/reports");
+                    navigate("/dashboard/reports/create");
                     handleToastShow(Status.OK, "Custom report is successfully deleted!");
+                    onRefetch?.();
                 } else {
                     handleToastShow(Status.ERROR, response?.error!);
                 }
@@ -147,7 +150,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     <Button
                         className='report__icon-button'
                         icon='icon adms-trash-can'
-                        onClick={handleDeleteReport}
+                        onClick={() => setDeleteDialogVisible(true)}
                         outlined
                         severity='danger'
                         tooltip='Delete report'
@@ -197,6 +200,24 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     rejectLabel={"Cancel"}
                     acceptLabel={"Copy"}
                     onHide={() => setDuplicateDialogVisible(false)}
+                />
+            )}
+
+            {report.itemuid && (
+                <ConfirmModal
+                    visible={deleteDialogVisible}
+                    position='top'
+                    title='Are you sure?'
+                    icon='pi-exclamation-triangle'
+                    bodyMessage={`Are you sure you want to delete ${report.name} report?`}
+                    confirmAction={() => {
+                        handleDeleteReport();
+                        setDeleteDialogVisible(false);
+                    }}
+                    draggable={false}
+                    rejectLabel={"Cancel"}
+                    acceptLabel={"Delete"}
+                    onHide={() => setDeleteDialogVisible(false)}
                 />
             )}
         </>
