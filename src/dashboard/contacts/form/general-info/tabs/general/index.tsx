@@ -36,7 +36,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, changeContact, contactExtData, changeContactExtData } = store;
+    const { contact, contactExtData, contactFullInfo, changeContact, changeContactExtData } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -145,7 +145,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
 
     const handleOfacCheck = () => {
-        checkContactOFAC(id).then((response) => {
+        checkContactOFAC(id, contactFullInfo).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
@@ -249,7 +249,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         }
                     }}
                     onBlur={handleOfacCheck}
-                    name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    name={`First Name${!shouldDisableNameFields && type === BUYER ? " (required)" : ""}`}
                     tooltip={
                         isBusinessNameRequired
                             ? TOOLTIP_MESSAGE.ONLY_BUSINESS
@@ -266,7 +266,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Middle Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    name='Middle Name'
                     className='general-info__text-input w-full'
                     value={
                         (type === BUYER
@@ -295,7 +295,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    name={`Last Name${!shouldDisableNameFields && type === BUYER ? " (required)" : ""}`}
                     className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
                     value={
                         (type === BUYER ? contact.lastName : contactExtData.CoBuyer_Last_Name) || ""

@@ -100,6 +100,13 @@ export class ContactStore {
         return this._activeTab;
     }
 
+    public get contactFullInfo() {
+        return {
+            ...this._contact,
+            extdata: this.contactExtData,
+        };
+    }
+
     public getContact = async (itemuid: string) => {
         this._isLoading = true;
         try {
