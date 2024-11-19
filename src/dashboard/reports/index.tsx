@@ -481,6 +481,9 @@ export default function Reports(): ReactElement {
                                                                                                         refetchCollectionsAction={
                                                                                                             handleGetUserReportCollections
                                                                                                         }
+                                                                                                        currentCollectionUID={
+                                                                                                            itemUID
+                                                                                                        }
                                                                                                     />
                                                                                                 </div>
                                                                                                 {isParametersEditing?.documentUID ===
@@ -538,7 +541,7 @@ export default function Reports(): ReactElement {
                                                                         <ActionButtons
                                                                             report={report}
                                                                             tooltip={
-                                                                                name === "Favorites"
+                                                                                !!report.isfavorite
                                                                                     ? "Add to Collection"
                                                                                     : !!report.isdefault
                                                                                       ? "Copy to Collection"
