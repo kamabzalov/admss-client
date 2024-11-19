@@ -25,12 +25,12 @@ const STEP = "step";
 
 export type PartialContact = Pick<
     Contact,
-    "firstName" | "lastName" | "type" | "companyName" | "email1" | "email2" | "phone1" | "phone2"
+    "firstName" | "lastName" | "type" | "businessName" | "email1" | "email2" | "phone1" | "phone2"
 > &
     Pick<ContactExtData, "Buyer_Emp_Ext" | "Buyer_Emp_Phone">;
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
-    [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "companyName"],
+    [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "businessName"],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };
@@ -40,13 +40,17 @@ export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
     firstName: Yup.string()
         ?.trim()
-        .when("type", (type, schema) => {
-            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        .when("type", ([type], schema) => {
+            return !REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
+                ? schema.required("Data is required.")
+                : schema;
         }),
     lastName: Yup.string()
         ?.trim()
-        .when("type", (type, schema) => {
-            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        .when("type", ([type], schema) => {
+            return !REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
+                ? schema.required("Data is required.")
+                : schema;
         }),
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
@@ -63,7 +67,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
-    companyName: Yup.string()
+    businessName: Yup.string()
         ?.trim()
         .when("type", ([type]) => {
             return REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
@@ -213,17 +217,17 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isContactChanged]);
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         if (isContactChanged) {
+    //             event.preventDefault();
+    //         }
+    //     };
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [isContactChanged]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -239,6 +243,7 @@ export const ContactForm = observer((): ReactElement => {
 
     const handleSaveContactForm = () => {
         formikRef.current?.validateForm().then((errors) => {
+            // debugger;
             if (!Object.keys(errors).length) {
                 formikRef.current?.submitForm();
             } else {
@@ -334,7 +339,7 @@ export const ContactForm = observer((): ReactElement => {
                                     } ${contact?.lastName || ""}`}</span>
                                     Company name
                                     <span className='card-header-info__data'>
-                                        {contact?.companyName}
+                                        {contact?.businessName}
                                     </span>
                                 </div>
                             )}
@@ -411,7 +416,7 @@ export const ContactForm = observer((): ReactElement => {
                                                     firstName: contact?.firstName || "",
                                                     lastName: contact?.lastName || "",
                                                     type: contact?.type || 0,
-                                                    companyName: contact?.companyName || "",
+                                                    businessName: contact?.businessName || "",
                                                     email1: contact?.email1 || "",
                                                     email2: contact?.email2 || "",
                                                     phone1: contact?.phone1 || "",
