@@ -470,7 +470,6 @@ export default function Reports(): ReactElement {
                                                                                                         }
                                                                                                         collectionList={[
                                                                                                             ...customCollections,
-                                                                                                            ...reportCollections,
                                                                                                         ].filter(
                                                                                                             (
                                                                                                                 collection
@@ -538,10 +537,16 @@ export default function Reports(): ReactElement {
                                                                         >
                                                                             {report.name}
                                                                         </p>
+                                                                        {!!report.isNew && (
+                                                                            <div className='reports-accordion-header__label ml-2'>
+                                                                                New
+                                                                            </div>
+                                                                        )}
                                                                         <ActionButtons
                                                                             report={report}
                                                                             tooltip={
-                                                                                !!report.isfavorite
+                                                                                !!report.isfavorite &&
+                                                                                !report.isdefault
                                                                                     ? "Add to Collection"
                                                                                     : !!report.isdefault
                                                                                       ? "Copy to Collection"
@@ -549,7 +554,6 @@ export default function Reports(): ReactElement {
                                                                             }
                                                                             collectionList={[
                                                                                 ...customCollections,
-                                                                                ...reportCollections,
                                                                             ].filter(
                                                                                 (collection) =>
                                                                                     collection.itemUID !==

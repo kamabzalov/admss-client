@@ -239,7 +239,13 @@ export const ReportForm = observer((): ReactElement => {
                         </div>
                         <ReportEditForm />
                     </div>
-                    <ReportFooter onAction={handleSave} />
+                    <ReportFooter
+                        onAction={handleSave}
+                        onRefetch={() => {
+                            handleGetUserReportCollections(authUser!.useruid);
+                            setActiveIndex([1]);
+                        }}
+                    />
                 </div>
             </div>
         </div>
