@@ -537,9 +537,11 @@ export default function Reports(): ReactElement {
                                                                         >
                                                                             {report.name}
                                                                         </p>
-                                                                        <p className='reports-accordion-header__label reports-accordion-header__label-padding'>
-                                                                            {report.isNew ? "New" : ""}
-                                                                        </p>
+                                                                        {!!report.isNew && (
+                                                                            <div className='reports-accordion-header__label ml-2'>
+                                                                                New
+                                                                            </div>
+                                                                        )}
                                                                         <ActionButtons
                                                                             report={report}
                                                                             tooltip={
