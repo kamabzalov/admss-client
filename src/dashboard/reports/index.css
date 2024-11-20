@@ -222,6 +222,10 @@
     border: 1px solid var(--admss-app-warning-blue);
 }
 
+.reports-accordion-header__label-padding {
+    margin-left: 5px;
+}
+
 .p-dialog.edit-access {
     width: 690px;
 }
