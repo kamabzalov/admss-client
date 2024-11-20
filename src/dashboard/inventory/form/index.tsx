@@ -85,6 +85,8 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getWebCheckStatus,
         getInventoryExportWebHistory,
+        activeTab,
+        tabLength,
         inventory,
         isFormChanged,
         currentLocation,
@@ -293,6 +295,30 @@ export const InventoryForm = observer(() => {
             setConfirmQuitEditVisible(true);
         } else {
             performNavigation();
+        }
+    };
+
+    const handleOnBackClick = () => {
+        if (activeTab !== null && activeTab && activeTab > 0) {
+            store.activeTab = activeTab - 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev - 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
+        }
+    };
+
+    const handleOnNextClick = () => {
+        if (activeTab !== null && activeTab < tabLength - 1) {
+            store.activeTab = activeTab + 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev + 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
         }
     };
 
@@ -539,29 +565,14 @@ export const InventoryForm = observer(() => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-8 mr-3'>
                                 <Button
-                                    onClick={() => {
-                                        if (!stepActiveIndex) {
-                                            return navigate(memoRoute || "/dashboard/inventory");
-                                        }
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev - 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        });
-                                    }}
+                                    onClick={handleOnBackClick}
                                     className='uppercase px-6 inventory__button'
                                     outlined
                                 >
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() =>
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev + 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        })
-                                    }
+                                    onClick={handleOnNextClick}
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
                                         stepActiveIndex === deleteActiveIndex ||
