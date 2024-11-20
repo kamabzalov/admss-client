@@ -320,3 +320,32 @@
 .inventory-filter.p-multiselect {
     height: 50px;
 }
+
+.inventory-form__tabs .p-tabview-nav {
+    flex-direction: row;
+    flex: 0 0;
+    width: auto;
+    border: none;
+    min-height: auto;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+    text-transform: uppercase;
+    font-weight: 700;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+.inventory-form__tabs .p-tabview-panels {
+    flex: 1;
+    padding-top: 0;
+}
+
+.inventory-form__tabs .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.inventory-form__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    border-radius: 0;
+    border-bottom: 2px solid var(--admss-app-primary);
+}

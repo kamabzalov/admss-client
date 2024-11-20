@@ -99,6 +99,8 @@ export class InventoryStore {
     private _currentLocation: string = "";
     private _deleteReason: string = "";
     private _memoRoute: string = "";
+    private _activeTab: number | null = null;
+    protected _tabLength: number = 0;
 
     protected _isLoading: boolean = false;
     protected _isFormChanged: boolean = false;
@@ -180,6 +182,14 @@ export class InventoryStore {
 
     public get currentLocation() {
         return this._currentLocation;
+    }
+
+    public get activeTab() {
+        return this._activeTab;
+    }
+
+    public get tabLength() {
+        return this._tabLength;
     }
 
     public get deleteReason() {
@@ -679,6 +689,14 @@ export class InventoryStore {
 
     public set isFormChanged(state: boolean) {
         this._isFormChanged = state;
+    }
+
+    public set activeTab(state: number | null) {
+        this._activeTab = state;
+    }
+
+    public set tabLength(state: number) {
+        this._tabLength = state;
     }
 
     public set memoRoute(state: string) {

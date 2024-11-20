@@ -33,8 +33,6 @@ export const PurchasePayments = observer((): ReactElement => {
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -42,7 +40,6 @@ export const PurchasePayments = observer((): ReactElement => {
             getInventoryPayments(user.useruid);
             getAccountPaymentsList(user.useruid);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const renderColumnsData: TableColumnsList[] = [
