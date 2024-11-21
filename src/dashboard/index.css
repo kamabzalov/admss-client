@@ -284,6 +284,9 @@
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 700;
+    &.text-line__title--red {
+        color: var(--admss-app-red);
+    }
 }
 
 .vehicle__dropdown-icon {
