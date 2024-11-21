@@ -144,7 +144,7 @@ export const CollectionPanelContent = ({
                             dataKey='documentUID'
                             filter
                             optionLabel='name'
-                            options={collections.filter((collection) => collection.documents)}
+                            options={[...collections].filter((collection) => collection.documents)}
                             optionGroupChildren='documents'
                             optionGroupLabel='name'
                             className='w-full edit-collection__multiselect'

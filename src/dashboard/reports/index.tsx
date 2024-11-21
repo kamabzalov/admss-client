@@ -228,7 +228,7 @@ export default function Reports(): ReactElement {
                                 >
                                     <CollectionPanelContent
                                         collectionName={collectionName}
-                                        collections={reportCollections}
+                                        collections={[...customCollections, ...reportCollections]}
                                         selectedReports={newCollectionsReports}
                                         setCollectionName={setCollectionName}
                                         setSelectedReports={setNewCollectionsReports}
@@ -396,9 +396,10 @@ export default function Reports(): ReactElement {
                                                                                                 collectionName={
                                                                                                     name
                                                                                                 }
-                                                                                                collections={
-                                                                                                    reportCollections
-                                                                                                }
+                                                                                                collections={[
+                                                                                                    ...customCollections,
+                                                                                                    ...reportCollections,
+                                                                                                ]}
                                                                                                 selectedReports={
                                                                                                     documents ||
                                                                                                     []
@@ -469,6 +470,7 @@ export default function Reports(): ReactElement {
                                                                                                             report
                                                                                                         }
                                                                                                         collectionList={[
+                                                                                                            reportCollections[0],
                                                                                                             ...customCollections,
                                                                                                         ].filter(
                                                                                                             (
@@ -546,17 +548,18 @@ export default function Reports(): ReactElement {
                                                                             report={report}
                                                                             tooltip={
                                                                                 !!report.isfavorite &&
-                                                                                !report.isdefault
+                                                                                !!report.isdefault
                                                                                     ? "Add to Collection"
                                                                                     : !!report.isdefault
                                                                                       ? "Copy to Collection"
                                                                                       : "Move to Collection"
                                                                             }
                                                                             collectionList={[
+                                                                                reportCollections[0],
                                                                                 ...customCollections,
                                                                             ].filter(
                                                                                 (collection) =>
-                                                                                    collection.itemUID !==
+                                                                                    collection?.itemUID !==
                                                                                     itemUID
                                                                             )}
                                                                             currentCollectionUID={
