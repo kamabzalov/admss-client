@@ -78,7 +78,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
                     showClear={!!damSalvageState}
                     value={damSalvageState}
                     onChange={({ value }) =>
-                        changeInventoryExtData({ key: "damSalvageState", value })
+                        changeInventoryExtData({ key: "damSalvageState", value: value || "" })
                     }
                 />
             </div>
