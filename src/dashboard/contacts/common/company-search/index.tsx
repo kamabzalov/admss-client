@@ -51,6 +51,9 @@ export const CompanySearch = ({
     }, []);
 
     const handleCompanyInputChange = (searchValue: string): void => {
+        if (!searchValue.trim()) {
+            return;
+        }
         const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
         const params: QueryParams = {
             qry,

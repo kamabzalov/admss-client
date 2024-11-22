@@ -21,8 +21,8 @@ import { Inventory } from "common/models/inventory";
 import { InputMask } from "primereact/inputmask";
 
 const validationSchema = Yup.object().shape({
-    customerName: Yup.string().required("First Name is required"),
-    customerLastName: Yup.string().required("Last Name is required"),
+    customerName: Yup.string().trim().required("First Name is required"),
+    customerLastName: Yup.string().trim().required("Last Name is required"),
     homePhone: Yup.string().required("Phone Number is required"),
     dlNumber: Yup.string().required("Driver License Number is required"),
     dlState: Yup.string().required("DL’s State is required"),
@@ -539,12 +539,12 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     label='Add to contacts'
                                                     onClick={() => handleAddToContact(values)}
                                                     disabled={
-                                                        !values.customerName ||
-                                                        !values.customerLastName
+                                                        !values.customerName.trim() ||
+                                                        !values.customerLastName.trim()
                                                     }
                                                     severity={
-                                                        !values.customerName ||
-                                                        !values.customerLastName
+                                                        !values.customerName.trim() ||
+                                                        !values.customerLastName.trim()
                                                             ? "secondary"
                                                             : "success"
                                                     }
