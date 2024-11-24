@@ -376,17 +376,33 @@ export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps):
 };
 
 export const PhoneInput = ({ name, colWidth, ...props }: PhoneInputProps): ReactElement => {
+    const inputRef = useRef(null);
+
+    const handleCursorPosition = () => {
+        const input = inputRef.current as unknown as HTMLInputElement | null;
+
+        if (input) {
+            const value = input.value?.replace(/\D/g, "");
+            const firstEmptyPosition = value?.length;
+
+            input?.setSelectionRange &&
+                input.setSelectionRange(firstEmptyPosition, firstEmptyPosition);
+        }
+    };
+
     const content = (
         <span className='p-float-label relative'>
             <InputMask
                 type='tel'
+                ref={inputRef}
                 mask='999-999-9999'
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
+                onClick={handleCursorPosition}
+                id={name || "phoneId"}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 {...props}
             />
-
             <label className='float-label'>{name}</label>
         </span>
     );
