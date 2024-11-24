@@ -222,7 +222,7 @@ export const checkContactOFAC = async (contactuid: string = "0", contact: Contac
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `contacts/${contactuid}/check`,
-            { contact }
+            { ...contact }
         );
 
         if (response.status === 200) {

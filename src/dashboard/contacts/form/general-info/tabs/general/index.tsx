@@ -17,14 +17,8 @@ import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { BUYER_ID } from "dashboard/contacts/form/general-info";
 import { TextInput } from "dashboard/common/form/inputs";
-
-const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
-
-interface ContactsGeneralInfoProps {
-    type?: typeof BUYER | typeof CO_BUYER;
-}
 
 const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
@@ -32,11 +26,11 @@ const enum TOOLTIP_MESSAGE {
     ONLY_BUSINESS = "The type of contact you have selected requires entering only the business name",
 }
 
-export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {
+export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, contactFullInfo, changeContact, changeContactExtData } = store;
+    const { contact, contactFullInfo, changeContact } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,10 +75,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         return REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
     }, [contact.type]);
 
-    const isControlDisabled = useMemo(
-        () => type === CO_BUYER && contact.type !== BUYER_ID,
-        [type, contact.type]
-    );
+    const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -145,7 +136,10 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
 
     const handleOfacCheck = () => {
-        checkContactOFAC(id, contactFullInfo).then((response) => {
+        if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
+            return;
+        }
+        checkContactOFAC(id, { ...contactFullInfo }).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
@@ -207,49 +201,41 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     />
                 </div>
             </div>
-            {type === BUYER && (
-                <div className='col-12 grid'>
-                    <div className='col-4 relative'>
-                        <span className='p-float-label'>
-                            <Dropdown
-                                optionLabel='name'
-                                optionValue='id'
-                                value={contact.type || 0}
-                                filter
-                                options={typeList}
-                                onChange={(e) => {
-                                    store.contactType = e.value;
-                                    setFieldValue("type", e.value);
-                                    changeContact("type", e.value);
-                                }}
-                                className={`w-full general-info__dropdown ${
-                                    errors.type ? "p-invalid" : ""
-                                }`}
-                                showClear={contact.type >= 1}
-                            />
-                            <label className='float-label'>Type (required)</label>
-                        </span>
-                        <small className='p-error'>{errors.type}</small>
-                    </div>
+            <div className='col-12 grid'>
+                <div className='col-4 relative'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            optionLabel='name'
+                            optionValue='id'
+                            value={contact.type || 0}
+                            filter
+                            options={typeList}
+                            onChange={(e) => {
+                                store.contactType = e.value;
+                                setFieldValue("type", e.value);
+                                changeContact("type", e.value);
+                            }}
+                            className={`w-full general-info__dropdown ${
+                                errors.type ? "p-invalid" : ""
+                            }`}
+                            showClear={contact.type >= 1}
+                        />
+                        <label className='float-label'>Type (required)</label>
+                    </span>
+                    <small className='p-error'>{errors.type}</small>
                 </div>
-            )}
+            </div>
+
             <div className='col-4 relative'>
                 <TextInput
                     className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
-                    value={
-                        (type === BUYER ? contact.firstName : contactExtData.CoBuyer_First_Name) ||
-                        ""
-                    }
+                    value={contact.firstName || ""}
                     onChange={({ target: { value } }) => {
-                        if (type === BUYER) {
-                            setFieldValue("firstName", value);
-                            changeContact("firstName", value);
-                        } else {
-                            changeContactExtData("CoBuyer_First_Name", value);
-                        }
+                        setFieldValue("firstName", value);
+                        changeContact("firstName", value);
                     }}
                     onBlur={handleOfacCheck}
-                    name={`First Name${!shouldDisableNameFields && type === BUYER ? " (required)" : ""}`}
+                    name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
                     tooltip={
                         isBusinessNameRequired
                             ? TOOLTIP_MESSAGE.ONLY_BUSINESS
@@ -268,18 +254,10 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 <TextInput
                     name='Middle Name'
                     className='general-info__text-input w-full'
-                    value={
-                        (type === BUYER
-                            ? contact.middleName
-                            : contactExtData.CoBuyer_Middle_Name) || ""
-                    }
+                    value={contact.middleName || ""}
                     onChange={({ target: { value } }) => {
-                        if (type === BUYER) {
-                            changeContact("middleName", value);
-                            setFieldValue("middleName", value);
-                        } else {
-                            changeContactExtData("CoBuyer_Middle_Name", value);
-                        }
+                        changeContact("middleName", value);
+                        setFieldValue("middleName", value);
                     }}
                     tooltip={
                         isBusinessNameRequired
@@ -295,18 +273,12 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Last Name${!shouldDisableNameFields && type === BUYER ? " (required)" : ""}`}
+                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
                     className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
-                    value={
-                        (type === BUYER ? contact.lastName : contactExtData.CoBuyer_Last_Name) || ""
-                    }
+                    value={contact.lastName || ""}
                     onChange={({ target: { value } }) => {
-                        if (type === BUYER) {
-                            setFieldValue("lastName", value);
-                            changeContact("lastName", value);
-                        } else {
-                            changeContactExtData("CoBuyer_Last_Name", value);
-                        }
+                        setFieldValue("lastName", value);
+                        changeContact("lastName", value);
                     }}
                     onBlur={handleOfacCheck}
                     disabled={shouldDisableNameFields}
@@ -329,7 +301,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     className={`general-info__text-input w-full ${
                         errors.businessName ? "p-invalid" : ""
                     }`}
-                    value={savedBusinessName || contact.businessName}
+                    value={savedBusinessName || contact.businessName || ""}
                     onChange={({ target: { value } }) => {
                         changeContact("businessName", value);
                         setFieldValue("businessName", value);

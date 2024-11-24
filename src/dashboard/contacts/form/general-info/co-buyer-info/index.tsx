@@ -2,17 +2,17 @@ import { observer } from "mobx-react-lite";
 import { TabView, TabPanel } from "primereact/tabview";
 import { ReactElement, useEffect } from "react";
 import { ContactsAddressInfo } from "dashboard/contacts/form/general-info/tabs/address";
-import { ContactsGeneralInfo } from "dashboard/contacts/form/general-info/tabs/general";
 import { ContactsIdentificationInfo } from "dashboard/contacts/form/general-info/tabs/identification";
 import { ContactsOfacCheck } from "dashboard/contacts/form/general-info/tabs/ofac-check";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
+import { ContactsGeneralCoBuyerInfo } from "../tabs/general-cobuyer";
 
 const { CO_BUYER } = GENERAL_CONTACT_TYPE;
 
 const tabs = [
-    { header: "General", component: <ContactsGeneralInfo type={CO_BUYER} /> },
+    { header: "General", component: <ContactsGeneralCoBuyerInfo /> },
     { header: "Address", component: <ContactsAddressInfo type={CO_BUYER} /> },
     { header: "Identification", component: <ContactsIdentificationInfo type={CO_BUYER} /> },
     { header: "OFAC CHECK", component: <ContactsOfacCheck type={CO_BUYER} /> },
