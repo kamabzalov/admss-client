@@ -22,7 +22,7 @@ export type DLSide = DLSides.FRONT | DLSides.BACK;
 
 export class ContactStore {
     public rootStore: RootStore;
-    private _contact: Contact = {} as Contact;
+    private _contact: Contact = { type: 0 } as Contact;
     private _contactType: number = 0;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
