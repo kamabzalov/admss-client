@@ -370,3 +370,7 @@
         border-bottom: 2px solid var(--admss-app-main-blue);
     }
 }
+
+textarea {
+    cursor: pointer;
+}
