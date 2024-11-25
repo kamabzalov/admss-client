@@ -849,6 +849,9 @@ export default function Inventories({
                                                     if (field === "VIN") {
                                                         return data[field].toUpperCase();
                                                     }
+                                                    if (field === "Price") {
+                                                        return `$ ${data[field]}`;
+                                                    }
                                                     return data[field];
                                                 }}
                                                 pt={{
