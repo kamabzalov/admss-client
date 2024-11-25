@@ -211,9 +211,25 @@ export class InventoryStore {
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
+                const changedExtData = {
+                    ...extdata,
+                    fpReduxAmt: extdata?.fpReduxAmt && extdata.fpReduxAmt / 100,
+                    fpRemainBal: extdata?.fpRemainBal && extdata?.fpRemainBal / 100,
+                    csFee: extdata?.csFee && extdata?.csFee / 100,
+                    csReserveAmt: extdata?.csReserveAmt && extdata?.csReserveAmt / 100,
+                    csEarlyRemoval: extdata?.csEarlyRemoval && extdata?.csEarlyRemoval / 100,
+                    csListingFee: extdata?.csListingFee && extdata?.csListingFee / 100,
+                    csOwnerAskingPrice:
+                        extdata?.csOwnerAskingPrice && extdata?.csOwnerAskingPrice / 100,
+                    purPurchaseBuyerComm:
+                        extdata?.purPurchaseBuyerComm && extdata?.purPurchaseBuyerComm / 100,
+                    purPurchaseAmount:
+                        extdata?.purPurchaseAmount && extdata?.purPurchaseAmount / 100,
+                } as InventoryExtData;
+
                 this._inventoryOptions = options_info || [];
 
-                this._inventoryExtData = extdata || ({} as InventoryExtData);
+                this._inventoryExtData = changedExtData || ({} as InventoryExtData);
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
