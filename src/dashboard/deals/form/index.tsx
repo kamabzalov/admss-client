@@ -461,13 +461,14 @@ export const DealsForm = observer(() => {
                                                             summary: "Error",
                                                             detail: res.error,
                                                         });
+                                                    } else {
+                                                        navigate(`/dashboard/deals`);
+                                                        toast.current?.show({
+                                                            severity: "success",
+                                                            summary: "Success",
+                                                            detail: "Deal saved successfully",
+                                                        });
                                                     }
-                                                });
-                                                navigate(`/dashboard/deals`);
-                                                toast.current?.show({
-                                                    severity: "success",
-                                                    summary: "Success",
-                                                    detail: "Deal saved successfully",
                                                 });
                                             }}
                                         >

@@ -372,10 +372,18 @@ export const InventoryForm = observer(() => {
 
     const handleSubmit = async (id: string | undefined) => {
         setValidateOnMount(false);
-        await saveInventory(id).then(() => {
+        const response = await saveInventory(id);
+
+        if (response === Status.OK) {
             navigateAndClear();
             showToastMessage();
-        });
+        } else {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response,
+            });
+        }
     };
 
     return isLoading ? (

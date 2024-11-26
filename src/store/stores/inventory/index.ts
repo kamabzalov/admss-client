@@ -211,9 +211,25 @@ export class InventoryStore {
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
+                const changedExtData = {
+                    ...extdata,
+                    fpReduxAmt: extdata?.fpReduxAmt && extdata.fpReduxAmt / 100,
+                    fpRemainBal: extdata?.fpRemainBal && extdata?.fpRemainBal / 100,
+                    csFee: extdata?.csFee && extdata?.csFee / 100,
+                    csReserveAmt: extdata?.csReserveAmt && extdata?.csReserveAmt / 100,
+                    csEarlyRemoval: extdata?.csEarlyRemoval && extdata?.csEarlyRemoval / 100,
+                    csListingFee: extdata?.csListingFee && extdata?.csListingFee / 100,
+                    csOwnerAskingPrice:
+                        extdata?.csOwnerAskingPrice && extdata?.csOwnerAskingPrice / 100,
+                    purPurchaseBuyerComm:
+                        extdata?.purPurchaseBuyerComm && extdata?.purPurchaseBuyerComm / 100,
+                    purPurchaseAmount:
+                        extdata?.purPurchaseAmount && extdata?.purPurchaseAmount / 100,
+                } as InventoryExtData;
+
                 this._inventoryOptions = options_info || [];
 
-                this._inventoryExtData = extdata || ({} as InventoryExtData);
+                this._inventoryExtData = changedExtData || ({} as InventoryExtData);
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
@@ -384,47 +400,49 @@ export class InventoryStore {
         }
     );
 
-    public saveInventory = action(
-        async (inventoryuid: string = "0"): Promise<string | undefined> => {
-            try {
-                this._isLoading = true;
-                const inventoryData: Inventory = {
-                    ...this.inventory,
-                    extdata: {
-                        ...this.inventoryExtData,
-                        fpReduxAmt: this.inventoryExtData?.fpReduxAmt * 100,
-                        fpRemainBal: this.inventoryExtData?.fpRemainBal * 100,
-                        csFee: this.inventoryExtData?.csFee * 100,
-                        csReserveAmt: this.inventoryExtData?.csReserveAmt * 100,
-                        csEarlyRemoval: this.inventoryExtData?.csEarlyRemoval * 100,
-                        csListingFee: this.inventoryExtData?.csListingFee * 100,
-                        csOwnerAskingPrice: this.inventoryExtData?.csOwnerAskingPrice * 100,
-                        purPurchaseBuyerComm: this.inventoryExtData?.purPurchaseBuyerComm * 100,
-                        purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
-                    },
-                    options_info: this.inventoryOptions,
-                    Audit: this.inventoryAudit,
-                };
-                const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
-                const inventoryResponse = await setInventory(inventoryuid, inventoryData);
+    public saveInventory = action(async (inventoryuid: string = "0"): Promise<string> => {
+        try {
+            this._isLoading = true;
 
-                await Promise.all([inventoryResponse, webResponse]).then((response) => {
-                    inventoryuid !== "0" &&
-                        setInventoryWebCheck(inventoryuid, {
-                            enabled: !!this._exportWebActive ? 1 : 0,
-                        });
-                    return response.every((item) => item?.status === Status.OK)
-                        ? inventoryuid
-                        : undefined;
-                });
-            } catch (error) {
-                // TODO: add error handlers
-                return undefined;
-            } finally {
-                this._isLoading = false;
+            const inventoryData: Inventory = {
+                ...this.inventory,
+                extdata: {
+                    ...this.inventoryExtData,
+                    fpReduxAmt: (this.inventoryExtData?.fpReduxAmt || 0) * 100,
+                    fpRemainBal: (this.inventoryExtData?.fpRemainBal || 0) * 100,
+                    csFee: (this.inventoryExtData?.csFee || 0) * 100,
+                    csReserveAmt: (this.inventoryExtData?.csReserveAmt || 0) * 100,
+                    csEarlyRemoval: (this.inventoryExtData?.csEarlyRemoval || 0) * 100,
+                    csListingFee: (this.inventoryExtData?.csListingFee || 0) * 100,
+                    csOwnerAskingPrice: (this.inventoryExtData?.csOwnerAskingPrice || 0) * 100,
+                    purPurchaseBuyerComm: (this.inventoryExtData?.purPurchaseBuyerComm || 0) * 100,
+                    purPurchaseAmount: (this.inventoryExtData?.purPurchaseAmount || 0) * 100,
+                },
+                options_info: this.inventoryOptions,
+                Audit: this.inventoryAudit,
+            };
+
+            const [inventoryResponse, webResponse] = await Promise.all([
+                setInventory(inventoryuid, inventoryData),
+                setInventoryExportWeb(inventoryuid, this._exportWeb),
+            ]);
+
+            if (inventoryResponse?.status === Status.OK && webResponse?.status === Status.OK) {
+                if (inventoryuid !== "0") {
+                    await setInventoryWebCheck(inventoryuid, {
+                        enabled: !!this._exportWebActive ? 1 : 0,
+                    });
+                }
+                return Status.OK;
             }
+
+            return Status.ERROR;
+        } catch (error) {
+            return Status.ERROR;
+        } finally {
+            this._isLoading = false;
         }
-    );
+    });
 
     private saveInventoryMedia = action(
         async (mediaType: MediaType): Promise<Status | undefined> => {
