@@ -217,17 +217,17 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isContactChanged]);
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         if (isContactChanged) {
+    //             event.preventDefault();
+    //         }
+    //     };
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [isContactChanged]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -242,9 +242,22 @@ export const ContactForm = observer((): ReactElement => {
     }, [stepActiveIndex]);
 
     const handleSaveContactForm = () => {
-        formikRef.current?.validateForm().then((errors) => {
+        formikRef.current?.validateForm().then(async (errors) => {
             if (!Object.keys(errors).length) {
-                formikRef.current?.submitForm();
+                const response = await saveContact();
+                if (response === Status.OK) {
+                    if (memoRoute) {
+                        navigate(memoRoute);
+                        store.memoRoute = "";
+                    } else {
+                        navigate(`/dashboard/contacts`);
+                    }
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Contact saved successfully",
+                    });
+                }
             } else {
                 setValidateOnMount(true);
 
@@ -436,18 +449,6 @@ export const ContactForm = observer((): ReactElement => {
                                             validateOnMount={validateOnMount}
                                             onSubmit={() => {
                                                 setValidateOnMount(false);
-                                                saveContact();
-                                                if (memoRoute) {
-                                                    navigate(memoRoute);
-                                                    store.memoRoute = "";
-                                                } else {
-                                                    navigate(`/dashboard/contacts`);
-                                                }
-                                                toast.current?.show({
-                                                    severity: "success",
-                                                    summary: "Success",
-                                                    detail: "Contact saved successfully",
-                                                });
                                             }}
                                         >
                                             <Form name='contactForm' className='w-full'>

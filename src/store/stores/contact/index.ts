@@ -190,20 +190,20 @@ export class ContactStore {
         }
     };
 
-    public saveContact = action(async (): Promise<string | undefined> => {
+    public saveContact = action(async (): Promise<string> => {
         try {
             this._isLoading = true;
             let newProspect: Partial<ContactProspect>[] = [];
             if (this._contactProspect.length) {
                 const prospectFirst = this._contactProspect.find(
-                    (pros) => pros && pros.notes === this._contactExtData.PROSPECT1_ID
+                    (pros) => pros?.notes === this._contactExtData.PROSPECT1_ID
                 ) || { notes: this._contactExtData.PROSPECT1_ID };
                 const prospectSecond = this._contactProspect.find(
-                    (pros) => pros && pros.notes === this._contactExtData.PROSPECT2_ID
+                    (pros) => pros?.notes === this._contactExtData.PROSPECT2_ID
                 ) || { notes: this._contactExtData.PROSPECT2_ID };
-                const prevProspects = this._contactProspect;
-
-                newProspect = [...prevProspects, prospectFirst, prospectSecond].filter(Boolean);
+                newProspect = [...this._contactProspect, prospectFirst, prospectSecond].filter(
+                    Boolean
+                );
             }
 
             const contactData: Contact = {
@@ -217,18 +217,18 @@ export class ContactStore {
                 this.setImagesDL(this._contactID),
             ]);
 
-            if (
-                contactDataResponse &&
-                contactDataResponse.status === Status.OK &&
-                imagesResponse.status === Status.OK
-            ) {
-                return Status.OK;
+            let responseStatus = Status.ERROR;
+
+            if (contactDataResponse?.status === Status.OK) {
+                responseStatus = Status.OK;
+            }
+            if (this._contactID && imagesResponse?.status === Status.OK) {
+                responseStatus = Status.OK;
             }
 
-            return Status.ERROR;
+            return responseStatus;
         } catch (error) {
-            // TODO: add error handlers
-            return undefined;
+            return Status.ERROR;
         } finally {
             this._isLoading = false;
         }
