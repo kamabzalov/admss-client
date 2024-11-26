@@ -183,6 +183,7 @@
     margin-top: -16px;
     font-size: 12px;
 }
+
 .p-tooltip-target-wrapper:has(.p-inputtext:disabled) + .float-label {
     position: absolute;
     font-size: 18px;
@@ -194,6 +195,28 @@
     transition-property: all;
     transition-timing-function: ease;
     line-height: 1;
+}
+
+.p-tooltip-target-wrapper:has(.p-inputtext:focus) + .float-label,
+.p-tooltip-target-wrapper:has(.p-inputtext.p-filled) + .float-label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.p-tooltip-target-wrapper:not(:has(.p-inputtext:focus)) + .float-label {
+    position: absolute;
+    font-size: 18px;
+    pointer-events: none;
+    top: 50%;
+    left: 0.75rem;
+    color: var(--admss-app-medium-grey);
+    margin-top: -0.5rem;
+    line-height: 1;
+    transition: all 0.2s ease;
 }
 
 .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar {
