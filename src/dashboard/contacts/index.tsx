@@ -239,7 +239,7 @@ export const ContactsDataTable = ({
     };
 
     const renderFullName = (rowData: ContactUser) => {
-        return `${rowData.firstName} ${rowData.lastName}`;
+        return rowData.businessName || `${rowData.firstName} ${rowData.lastName}`;
     };
 
     const handleCreateContact = () => {

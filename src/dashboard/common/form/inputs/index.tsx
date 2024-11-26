@@ -333,7 +333,7 @@ export const TextInput = ({
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
-                value={value}
+                value={value.trim()}
                 onChange={(e) => {
                     props.onChange && props.onChange(e);
                     setValue(e.target.value);
