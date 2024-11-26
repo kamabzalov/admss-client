@@ -122,10 +122,6 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
-    const handleSave = () => {
-        navigate(`/dashboard/reports`);
-    };
-
     return (
         <div className='grid relative'>
             <Button
@@ -137,8 +133,17 @@ export const ReportForm = observer((): ReactElement => {
                 <div className='card report'>
                     <div className='card-header flex'>
                         <h2 className='report__title uppercase m-0'>
-                            {id ? "Edit" : "Create"} custom report
+                            {id ? "Edit" : "Create custom"} report
                         </h2>
+                        {id && (
+                            <Button
+                                outlined
+                                className='button-rounded ml-3'
+                                onClick={() => navigate("/dashboard/reports/create")}
+                            >
+                                Create new report
+                            </Button>
+                        )}
                     </div>
                     <div className='card-content report__card grid'>
                         <div className='col-4'>
@@ -240,7 +245,6 @@ export const ReportForm = observer((): ReactElement => {
                         <ReportEditForm />
                     </div>
                     <ReportFooter
-                        onAction={handleSave}
                         onRefetch={() => {
                             handleGetUserReportCollections(authUser!.useruid);
                             setActiveIndex([1]);

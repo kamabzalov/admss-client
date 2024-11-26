@@ -10,7 +10,7 @@ import {
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import { ReactElement, useState, useRef } from "react";
+import { ReactElement, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 
@@ -39,50 +39,72 @@ export const ActionButtons = ({
         setEditAccessActive(true);
     };
 
-    const items: MenuItem[] = [
-        {
-            items: collectionList?.map((collection) => ({
-                label: collection.name,
-                command: async () => {
-                    if (!!report.isdefault) {
-                        const response = await addReportToCollection(
-                            collection.itemUID,
-                            report.documentUID
-                        );
-                        if (response?.status === Status.ERROR) {
-                            toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: response?.error,
-                                life: TOAST_LIFETIME,
-                            });
-                        } else {
-                            setAddedToCollection(true);
-                            refetchCollectionsAction?.();
-                            setTimeout(() => setAddedToCollection(false), 2000);
-                        }
-                    } else {
-                        if (!currentCollectionUID) return;
-                        const response = await moveReportToCollection(
-                            currentCollectionUID,
-                            report.documentUID,
-                            collection.itemUID
-                        );
-                        if (response?.status === Status.ERROR) {
-                            toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: response?.error,
-                                life: TOAST_LIFETIME,
-                            });
-                        } else {
-                            refetchCollectionsAction?.();
-                        }
-                    }
-                },
-            })),
-        },
-    ];
+    const moveTooltipLabel = useMemo(() => {
+        switch (true) {
+            case !!report.isdefault:
+                return "Copy to collection";
+            case !report.isdefault:
+                return "Move to collection";
+            default:
+                return "Add to collection";
+        }
+    }, [report.isdefault, report.isfavorite]);
+
+    const items: MenuItem[] = collectionList?.length
+        ? [
+              {
+                  items: collectionList.map((collection) => ({
+                      label: collection.name,
+                      command: async () => {
+                          if (!!report.isdefault) {
+                              const response = await addReportToCollection(
+                                  collection.itemUID,
+                                  report.documentUID
+                              );
+                              if (response?.status === Status.ERROR) {
+                                  toast.current?.show({
+                                      severity: "error",
+                                      summary: Status.ERROR,
+                                      detail: response?.error,
+                                      life: TOAST_LIFETIME,
+                                  });
+                              } else {
+                                  setAddedToCollection(true);
+                                  refetchCollectionsAction?.();
+                                  setTimeout(() => setAddedToCollection(false), 2000);
+                              }
+                          } else {
+                              if (!currentCollectionUID) return;
+                              const response = await moveReportToCollection(
+                                  currentCollectionUID,
+                                  report.documentUID,
+                                  collection.itemUID
+                              );
+                              if (response?.status === Status.ERROR) {
+                                  toast.current?.show({
+                                      severity: "error",
+                                      summary: Status.ERROR,
+                                      detail: response?.error,
+                                      life: TOAST_LIFETIME,
+                                  });
+                              } else {
+                                  refetchCollectionsAction?.();
+                              }
+                          }
+                      },
+                  })),
+              },
+          ]
+        : [
+              {
+                  items: [
+                      {
+                          label: "No Available Collections",
+                          disabled: true,
+                      },
+                  ],
+              },
+          ];
 
     const handleChangeIsFavorite = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -151,7 +173,7 @@ export const ActionButtons = ({
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
-                    tooltip={tooltip || "Move to Collection"}
+                    tooltip={moveTooltipLabel}
                     tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}

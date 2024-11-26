@@ -208,7 +208,12 @@ export const ReportColumnSelect = observer((): ReactElement => {
             </div>
             <ReportSelect
                 header='Available'
-                values={availableValues}
+                values={availableValues.filter(
+                    (availableItem) =>
+                        !selectedValues.some(
+                            (selectedItem) => selectedItem.data === availableItem.data
+                        )
+                )}
                 currentItem={currentItem}
                 onItemClick={(item) => setCurrentItem(item)}
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}
