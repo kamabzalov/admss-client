@@ -202,7 +202,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-12 grid'>
-                <div className='col-4 relative'>
+                <div className='col-4 relative general-info__dropdown'>
                     <span className='p-float-label'>
                         <Dropdown
                             optionLabel='name'
