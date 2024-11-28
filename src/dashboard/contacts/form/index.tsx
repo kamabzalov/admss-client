@@ -257,6 +257,13 @@ export const ContactForm = observer((): ReactElement => {
                         summary: "Success",
                         detail: "Contact saved successfully",
                     });
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response || "Error while saving contact",
+                        life: TOAST_LIFETIME,
+                    });
                 }
             } else {
                 setValidateOnMount(true);

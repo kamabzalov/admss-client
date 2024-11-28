@@ -212,12 +212,18 @@ export class ContactStore {
                 prospect: newProspect as ContactProspect[],
             };
 
+            let responseStatus = Status.ERROR;
+
             const [contactDataResponse, imagesResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
                 this.setImagesDL(this._contactID),
             ]);
 
-            let responseStatus = Status.ERROR;
+            if (contactDataResponse?.status === Status.ERROR) {
+                throw new Error(contactDataResponse?.error);
+            }
+
+           
 
             if (contactDataResponse?.status === Status.OK) {
                 responseStatus = Status.OK;
@@ -228,7 +234,10 @@ export class ContactStore {
 
             return responseStatus;
         } catch (error) {
-            return Status.ERROR;
+            if (error instanceof Error) {
+                return error.message;
+            }
+            return String(error);
         } finally {
             this._isLoading = false;
         }
