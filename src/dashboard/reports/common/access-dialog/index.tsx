@@ -13,6 +13,7 @@ import { InputText } from "primereact/inputtext";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import "./index.css";
+import { useStore } from "store/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ReportAccess;
@@ -70,6 +71,8 @@ export const EditAccessDialog = ({
     onHide,
     reportuid,
 }: EditAccessDialogProps): ReactElement => {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const toast = useToast();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
     const [selectedRole, setSelectedRole] = useState<(ROLE | ACCESS)[]>([]);
@@ -88,7 +91,9 @@ export const EditAccessDialog = ({
             } else {
                 const { acl } = response as ReportACL;
                 if (Array.isArray(acl)) {
-                    const newAccessList = acl.filter(Boolean);
+                    const newAccessList = acl.filter(
+                        (item) => item && item?.useruid !== authUser?.useruid
+                    );
                     setAccessList(newAccessList);
                 }
             }
