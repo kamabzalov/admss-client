@@ -50,11 +50,10 @@ export const ReportSelect = ({
 };
 
 interface ReportFooterProps {
-    onAction: () => void;
     onRefetch?: () => void;
 }
 
-export const ReportFooter = observer(({ onAction, onRefetch }: ReportFooterProps): ReactElement => {
+export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactElement => {
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
     const { report, saveReport, isReportChanged } = reportStore;
@@ -67,13 +66,13 @@ export const ReportFooter = observer(({ onAction, onRefetch }: ReportFooterProps
         if (!!report.isdefault) return;
         saveReport(report?.itemuid).then((response: BaseResponseError | undefined) => {
             if (response?.status === Status.OK) {
-                onAction();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
-                    detail: "New custom report is successfully saved!",
+                    detail: "Custom report is successfully saved!",
                     life: TOAST_LIFETIME,
                 });
+                onRefetch?.();
             } else {
                 toast.current?.show({
                     severity: "error",

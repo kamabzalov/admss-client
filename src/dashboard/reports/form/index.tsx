@@ -122,10 +122,6 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
-    const handleSave = () => {
-        navigate(`/dashboard/reports`);
-    };
-
     return (
         <div className='grid relative'>
             <Button
@@ -249,7 +245,6 @@ export const ReportForm = observer((): ReactElement => {
                         <ReportEditForm />
                     </div>
                     <ReportFooter
-                        onAction={handleSave}
                         onRefetch={() => {
                             handleGetUserReportCollections(authUser!.useruid);
                             setActiveIndex([1]);

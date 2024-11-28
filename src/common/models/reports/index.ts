@@ -106,6 +106,17 @@ export interface ReportServiceColumns {
     width: number;
 }
 
+export interface ReportSetParams {
+    itemUID: string;
+    timestamp?: number;
+    from_date?: number;
+    to_date?: number;
+    type?: number;
+    data?: Record<string, unknown>[];
+    format?: Record<string, unknown>;
+    columns?: ReportsColumn[];
+}
+
 export enum ReportServices {
     INVENTORY = "inventory",
     CONTACTS = "contacts",
