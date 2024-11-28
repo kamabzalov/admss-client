@@ -217,6 +217,10 @@ export class ContactStore {
                 this.setImagesDL(this._contactID),
             ]);
 
+            if (contactDataResponse?.status === Status.ERROR) {
+                throw new Error(contactDataResponse?.error);
+            }
+
             let responseStatus = Status.ERROR;
 
             if (contactDataResponse?.status === Status.OK) {
@@ -228,7 +232,10 @@ export class ContactStore {
 
             return responseStatus;
         } catch (error) {
-            return Status.ERROR;
+            if (error instanceof Error) {
+                return error.message;
+            }
+            return String(error);
         } finally {
             this._isLoading = false;
         }
