@@ -69,9 +69,10 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
-                    detail: "New custom report is successfully saved!",
+                    detail: "Custom report is successfully saved!",
                     life: TOAST_LIFETIME,
                 });
+                onRefetch?.();
             } else {
                 toast.current?.show({
                     severity: "error",
