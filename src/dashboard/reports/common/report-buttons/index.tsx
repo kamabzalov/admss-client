@@ -40,15 +40,15 @@ export const ActionButtons = ({
     };
 
     const moveTooltipLabel = useMemo(() => {
-        switch (true) {
-            case !!report.isdefault:
+        switch (report.isdefault) {
+            case 1:
                 return "Copy to collection";
-            case !report.isdefault:
+            case 0:
                 return "Move to collection";
             default:
                 return "Add to collection";
         }
-    }, [report.isdefault, report.isfavorite]);
+    }, [report.isdefault]);
 
     const items: MenuItem[] = collectionList?.length
         ? [
