@@ -208,7 +208,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             optionLabel='name'
                             optionValue='id'
                             value={contact.type || 0}
-                            filter
                             options={typeList}
                             onChange={(e) => {
                                 store.contactType = e.value;
