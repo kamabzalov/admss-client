@@ -7,9 +7,9 @@ import { RootStore } from "store";
 export class ReportStore {
     public rootStore: RootStore;
     private _report: Partial<ReportInfo> = {} as ReportInfo;
+    private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
-    private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -29,12 +29,16 @@ export class ReportStore {
         return this._reportColumns;
     }
 
-    public get isReportChanged() {
-        return this._isReportChanged;
-    }
-
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public get isReportChanged() {
+        return (
+            JSON.stringify(this._report) !== JSON.stringify(this._initialReport) ||
+            JSON.stringify(this._reportColumns) !==
+                JSON.stringify(this._initialReport.columns || [])
+        );
     }
 
     public getReport = action(async (uid: string) => {
@@ -43,6 +47,7 @@ export class ReportStore {
             const response = await getReportInfo(uid);
             if (response?.status === Status.OK) {
                 this._report = response as ReportInfo;
+                this._initialReport = JSON.parse(JSON.stringify(response));
             } else {
                 const { error } = response as BaseResponseError;
                 throw new Error(error);
@@ -61,7 +66,6 @@ export class ReportStore {
     });
 
     public changeReport = action((key: keyof ReportInfo, value: string | number) => {
-        this._isReportChanged = true;
         this._report[key] = value as never;
     });
 
@@ -102,6 +106,7 @@ export class ReportStore {
                     });
 
                     if (response?.status === Status.OK) {
+                        this._initialReport = JSON.parse(JSON.stringify(this._report));
                         return response as ReportInfo;
                     } else {
                         const { error } = response as BaseResponseError;
@@ -138,11 +143,8 @@ export class ReportStore {
         this._reportColumns = state;
     }
 
-    public set isReportChanged(state: boolean) {
-        this._isReportChanged = state;
-    }
-
     public clearReport = () => {
         this._report = {} as ReportInfo;
+        this._initialReport = {} as ReportInfo;
     };
 }

@@ -67,7 +67,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
         setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
-        store.isReportChanged = true;
         setFrom(from.filter((i) => i !== item));
         setTo([...to, item]);
         setCurrentItem(null);
@@ -208,7 +207,12 @@ export const ReportColumnSelect = observer((): ReactElement => {
             </div>
             <ReportSelect
                 header='Available'
-                values={availableValues}
+                values={availableValues.filter(
+                    (availableItem) =>
+                        !selectedValues.some(
+                            (selectedItem) => selectedItem.data === availableItem.data
+                        )
+                )}
                 currentItem={currentItem}
                 onItemClick={(item) => setCurrentItem(item)}
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}

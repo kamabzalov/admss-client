@@ -190,7 +190,11 @@ export default function Reports(): ReactElement {
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
         if (event.target instanceof HTMLElement) {
-            if (!event.target.classList.contains("reports__list-item--inner")) return;
+            if (
+                !event.target.classList.contains("reports__list-item--inner") &&
+                !event.target.classList.contains("reports__list-item")
+            )
+                return;
         }
         event.stopPropagation();
         event.preventDefault();
@@ -246,12 +250,7 @@ export default function Reports(): ReactElement {
                                     {reportCollections &&
                                         [...favoriteCollections, ...reportCollections].map(
                                             (
-                                                {
-                                                    itemUID,
-                                                    name,
-                                                    documents,
-                                                    userUID,
-                                                }: ReportCollection,
+                                                { itemUID, name, documents }: ReportCollection,
                                                 index: number
                                             ) => {
                                                 const isContainsSearchedValue =
@@ -435,11 +434,6 @@ export default function Reports(): ReactElement {
                                                                                                     key={
                                                                                                         report.itemUID
                                                                                                     }
-                                                                                                    onDoubleClick={() => {
-                                                                                                        navigate(
-                                                                                                            `/dashboard/reports/${report.documentUID}`
-                                                                                                        );
-                                                                                                    }}
                                                                                                     onClick={(
                                                                                                         event
                                                                                                     ) =>
@@ -448,6 +442,11 @@ export default function Reports(): ReactElement {
                                                                                                             report
                                                                                                         )
                                                                                                     }
+                                                                                                    onDoubleClick={() => {
+                                                                                                        navigate(
+                                                                                                            `/dashboard/reports/${report.documentUID}`
+                                                                                                        );
+                                                                                                    }}
                                                                                                 >
                                                                                                     <p
                                                                                                         className={
@@ -465,6 +464,11 @@ export default function Reports(): ReactElement {
                                                                                                             report.name
                                                                                                         }
                                                                                                     </p>
+                                                                                                    {!!report.isNew && (
+                                                                                                        <div className='reports-accordion-header__label ml-2'>
+                                                                                                            New
+                                                                                                        </div>
+                                                                                                    )}
                                                                                                     <ActionButtons
                                                                                                         report={
                                                                                                             report
@@ -546,14 +550,6 @@ export default function Reports(): ReactElement {
                                                                         )}
                                                                         <ActionButtons
                                                                             report={report}
-                                                                            tooltip={
-                                                                                !!report.isfavorite &&
-                                                                                !!report.isdefault
-                                                                                    ? "Add to Collection"
-                                                                                    : !!report.isdefault
-                                                                                      ? "Copy to Collection"
-                                                                                      : "Move to Collection"
-                                                                            }
                                                                             collectionList={[
                                                                                 reportCollections[0],
                                                                                 ...customCollections,
@@ -570,8 +566,8 @@ export default function Reports(): ReactElement {
                                                                             }
                                                                         />
                                                                     </div>
-                                                                    {isParametersEditing?.itemUID ===
-                                                                        report.itemUID && (
+                                                                    {isParametersEditing?.documentUID ===
+                                                                        report.documentUID && (
                                                                         <ReportParameters
                                                                             report={
                                                                                 isParametersEditing
