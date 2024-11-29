@@ -202,7 +202,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-12 grid'>
-                <div className='col-4 relative'>
+                <div className='col-8 relative pr-0'>
                     <span className='p-float-label'>
                         <Dropdown
                             optionLabel='name'
@@ -301,7 +301,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     className={`general-info__text-input w-full ${
                         errors.businessName ? "p-invalid" : ""
                     }`}
-                    value={savedBusinessName || contact.businessName || ""}
+                    value={contact.businessName || ""}
                     onChange={({ target: { value } }) => {
                         changeContact("businessName", value);
                         setFieldValue("businessName", value);
