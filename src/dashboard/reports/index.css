@@ -176,6 +176,23 @@
     font-weight: 600;
 }
 
+.reports-actions__wrapper-empty {
+    width: 176px;
+    height: 40px;
+    transform: translateX(-176px) translateY(-40px);
+    .p-menu-list {
+        height: 40px;
+        .p-menuitem .p-menuitem-link {
+            padding: 0.75rem 0.5rem;
+            .p-menuitem-text {
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1;
+                color: var(--admss-app-medium-grey);
+            }
+        }
+    }
+}
 .edit-collection.p-panel .p-panel-content {
     border: 1px solid var(--admss-app-focus-green);
     border-radius: 5px;

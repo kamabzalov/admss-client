@@ -99,7 +99,7 @@ export const ActionButtons = ({
               {
                   items: [
                       {
-                          label: "No Available Collections",
+                          label: "No available collection.",
                           disabled: true,
                       },
                   ],
@@ -155,12 +155,15 @@ export const ActionButtons = ({
                     pt={{
                         root: {
                             style: {
-                                width: "240px",
+                                width: !collectionList?.length ? "176px" : "240px",
                                 maxHeight: "240px",
-                                overflowY: "auto",
+                                overflowY: !collectionList?.length ? "hidden" : "auto",
                                 overflowX: "hidden",
                                 paddingTop: 0,
                             },
+                            className: collectionList?.length
+                                ? "reports-actions__wrapper"
+                                : "reports-actions__wrapper-empty",
                         },
                         submenuHeader: {
                             className: "reports-actions__submenu-header",
