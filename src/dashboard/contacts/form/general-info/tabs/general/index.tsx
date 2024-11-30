@@ -202,13 +202,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-12 grid'>
-                <div className='col-4 relative general-info__dropdown'>
+                <div className='col-4 relative pr-0 pb-0'>
                     <span className='p-float-label'>
                         <Dropdown
                             optionLabel='name'
                             optionValue='id'
                             value={contact.type || 0}
-                            filter
                             options={typeList}
                             onChange={(e) => {
                                 store.contactType = e.value;
@@ -218,7 +217,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`w-full general-info__dropdown ${
                                 errors.type ? "p-invalid" : ""
                             }`}
-                            showClear={contact.type >= 1}
                         />
                         <label className='float-label'>Type (required)</label>
                     </span>
