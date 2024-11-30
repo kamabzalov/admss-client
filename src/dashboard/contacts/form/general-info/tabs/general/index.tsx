@@ -316,3 +316,4 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         </div>
     );
 });
+
