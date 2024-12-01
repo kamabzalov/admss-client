@@ -1,6 +1,6 @@
 import { FilterOptions } from "dashboard/common/filter";
 
-export const isObjectEmpty = (obj: Record<string, string | number>) =>
+export const isObjectValuesEmpty  = (obj: Record<string, string | number>) =>
     Object.values(obj).every((value) =>
         typeof value === "string" ? !value.trim().length : !value
     );
