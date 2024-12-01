@@ -1,7 +1,9 @@
 import { FilterOptions } from "dashboard/common/filter";
 
-export const isObjectEmpty = (obj: Record<string, string>) =>
-    Object.values(obj).every((value) => !value.trim().length);
+export const isObjectEmpty = (obj: Record<string, string | number>) =>
+    Object.values(obj).every((value) =>
+        typeof value === "string" ? !value.trim().length : !value
+    );
 
 export const filterParams = (obj: Record<string, string>): Record<string, string> => {
     return Object.fromEntries(

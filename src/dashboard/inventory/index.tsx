@@ -883,6 +883,7 @@ export default function Inventories({
                     onSearchClear={handleClearAdvancedSearchField}
                     onInputChange={handleSetAdvancedSearch}
                     fields={searchFields}
+                    searchForm='inventory'
                 />
             </div>
         </div>
