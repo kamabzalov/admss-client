@@ -40,7 +40,7 @@ import {
     createStringifyFilterQuery,
     createStringifySearchQuery,
     filterParams,
-    isObjectEmpty,
+    isObjectValuesEmpty,
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
@@ -301,7 +301,7 @@ export default function Inventories({
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = isObjectEmpty(newSearch);
+            const isAnyValueEmpty = isObjectValuesEmpty(newSearch);
 
             setButtonDisabled(isAnyValueEmpty);
 
@@ -332,7 +332,7 @@ export default function Inventories({
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
-            const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
             const params: QueryParams = {
                 ...(lazyState.sortOrder === 1 && { type: "asc" }),
                 ...(lazyState.sortOrder === -1 && { type: "desc" }),
