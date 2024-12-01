@@ -30,14 +30,14 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
-import { isObjectValuesEmpty  } from "common/helpers";
+import { isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
 }
 
 interface AdvancedSearch {
-    contactName: string;
+    username: string;
     type: number;
     phone1: string;
 }
@@ -271,7 +271,7 @@ export const ContactsDataTable = ({
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = isObjectValuesEmpty (newSearch);
+            const isAnyValueEmpty = isObjectValuesEmpty(newSearch);
 
             setButtonDisabled(isAnyValueEmpty);
 
@@ -304,9 +304,9 @@ export const ContactsDataTable = ({
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
-            key: "contactName",
+            key: "username",
             label: "Contact name",
-            value: advancedSearch?.contactName,
+            value: advancedSearch?.username,
             type: "text",
         },
 
