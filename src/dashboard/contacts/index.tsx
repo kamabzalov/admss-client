@@ -320,7 +320,6 @@ export const ContactsDataTable = ({
             await handleGetContactsList(params);
         } finally {
             setButtonDisabled(false);
-            setDialogVisible(false);
         }
     };
 
