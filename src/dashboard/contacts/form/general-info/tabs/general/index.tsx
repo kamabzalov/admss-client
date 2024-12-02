@@ -217,6 +217,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`w-full general-info__dropdown ${
                                 errors.type ? "p-invalid" : ""
                             }`}
+                            pt={{
+                                wrapper: {
+                                    style: { minHeight: "414px" },
+                                },
+                            }}
                         />
                         <label className='float-label'>Type (required)</label>
                     </span>
