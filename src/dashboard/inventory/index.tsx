@@ -20,7 +20,11 @@ import {
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
-import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
 import {
     getUserGroupList,
     getUserSettings,
@@ -884,7 +888,7 @@ export default function Inventories({
                     onSearchClear={handleClearAdvancedSearchField}
                     onInputChange={handleSetAdvancedSearch}
                     fields={searchFields}
-                    searchForm='inventory'
+                    searchForm={SEARCH_FORM_TYPE.INVENTORY}
                 />
             </div>
         </div>

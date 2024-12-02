@@ -14,6 +14,11 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 
+export enum SEARCH_FORM_TYPE {
+    CONTACTS,
+    INVENTORY,
+}
+
 export interface SearchField<T> {
     key: keyof T & string;
     label?: string;
@@ -24,7 +29,7 @@ interface AdvancedSearchDialogProps<T> extends DashboardDialogProps {
     onInputChange: (key: keyof T, value: string) => void;
     fields: SearchField<T>[];
     onSearchClear?: (key: keyof T) => void;
-    searchForm: "contacts" | "inventory";
+    searchForm: SEARCH_FORM_TYPE;
 }
 export const AdvancedSearchDialog = <T,>({
     visible,
@@ -44,7 +49,7 @@ export const AdvancedSearchDialog = <T,>({
     const autoMake = fields.find((field) => field.key === "Make")?.value;
 
     useEffect(() => {
-        if (searchForm === "inventory") {
+        if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
             getInventoryAutomakesList().then((list) => {
                 if (list) {
                     const upperCasedList = list.map((item) => ({
@@ -55,7 +60,7 @@ export const AdvancedSearchDialog = <T,>({
                 }
             });
         }
-        if (searchForm === "contacts") {
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
             getContactsTypeList("0").then((response) => {
                 if (response) {
                     const types = response as ContactType[];
@@ -132,7 +137,7 @@ export const AdvancedSearchDialog = <T,>({
                                     onChange={({ target }) => onInputChange(key, target.value)}
                                 />
                             )}
-                            {type === "dropdown" && searchForm === "inventory" && (
+                            {type === "dropdown" && searchForm === SEARCH_FORM_TYPE.INVENTORY && (
                                 <Dropdown
                                     className='w-full'
                                     optionLabel='name'
@@ -146,7 +151,7 @@ export const AdvancedSearchDialog = <T,>({
                                     onChange={({ target }) => onInputChange(key, target.value)}
                                 />
                             )}
-                            {type === "dropdown" && searchForm === "contacts" && (
+                            {type === "dropdown" && searchForm === SEARCH_FORM_TYPE.CONTACTS && (
                                 <Dropdown
                                     className='w-full'
                                     optionLabel='name'

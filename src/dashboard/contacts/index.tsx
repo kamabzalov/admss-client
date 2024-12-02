@@ -29,7 +29,11 @@ import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
-import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
@@ -513,7 +517,7 @@ export const ContactsDataTable = ({
                 onSearchClear={handleClearAdvancedSearchField}
                 onInputChange={handleSetAdvancedSearch}
                 fields={searchFields}
-                searchForm='contacts'
+                searchForm={SEARCH_FORM_TYPE.CONTACTS}
             />
         </div>
     );
