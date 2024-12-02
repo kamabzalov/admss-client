@@ -20,6 +20,16 @@ export const DashboardDialog = ({
     cancelButton,
     ...props
 }: DashboardDialogProps) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter") {
+            if (action && !buttonDisabled) {
+                action();
+            } else if (onHide) {
+                onHide();
+            }
+        }
+    };
+
     return (
         <Dialog
             draggable={false}
@@ -29,7 +39,9 @@ export const DashboardDialog = ({
             onHide={onHide}
             {...props}
         >
-            <div className='p-dialog-content-body'>{children}</div>
+            <div className='p-dialog-content-body' onKeyDown={handleKeyDown} tabIndex={0}>
+                {children}
+            </div>
 
             <div className='p-dialog-footer flex justify-content-center'>
                 {cancelButton && (

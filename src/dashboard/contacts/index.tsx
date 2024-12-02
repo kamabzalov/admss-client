@@ -30,13 +30,14 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
-import { isObjectValuesEmpty } from "common/helpers";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
 }
 
 interface AdvancedSearch {
+    [key: string]: string | number;
     username: string;
     type: number;
     phone1: string;
@@ -291,15 +292,32 @@ export const ContactsDataTable = ({
     };
 
     const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setIsLoading(true);
+        setButtonDisabled(true);
         setAdvancedSearch((prev) => {
             const updatedSearch = { ...prev };
             delete updatedSearch[key];
             return updatedSearch;
         });
 
-        const isAnyValueEmpty = Object.values(advancedSearch).every((val) => !val);
+        try {
+            setIsLoading(true);
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
 
-        setButtonDisabled(isAnyValueEmpty);
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            await handleGetContactsList(params);
+        } finally {
+            setButtonDisabled(false);
+            setDialogVisible(false);
+        }
     };
 
     const searchFields: SearchField<AdvancedSearch>[] = [

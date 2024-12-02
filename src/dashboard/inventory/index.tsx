@@ -343,6 +343,7 @@ export default function Inventories({
             await handleGetInventoryList(params);
         } finally {
             setButtonDisabled(false);
+            setDialogVisible(false);
         }
     };
 

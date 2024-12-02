@@ -5,15 +5,19 @@ export const isObjectValuesEmpty = (obj: Record<string, string | number>) =>
         typeof value === "string" ? !value.trim().length : !value
     );
 
-export const filterParams = (obj: Record<string, string>): Record<string, string> => {
+export const filterParams = (
+    obj: Record<string, string | number>
+): Record<string, string | number> => {
     return Object.fromEntries(
-        Object.entries(obj).filter(
-            ([_, value]) => typeof value === "string" && value.trim().length > 0
+        Object.entries(obj).filter(([_, value]) =>
+            typeof value === "string"
+                ? value.trim().length > 0
+                : value !== null && value !== undefined
         )
     );
 };
 
-export const createStringifySearchQuery = (obj: Record<string, string>): string => {
+export const createStringifySearchQuery = (obj: Record<string, string | number>): string => {
     const filteredObj = filterParams(obj);
 
     if (Object.keys(filteredObj).length === 0) {
@@ -28,16 +32,15 @@ export const createStringifySearchQuery = (obj: Record<string, string>): string 
 };
 
 export const createStringifyFilterQuery = (filterArray: FilterOptions[]): string => {
-    let qry: string = "";
-    filterArray.forEach((option, index) => {
-        const { column, value } = option;
-        if (value.includes("-")) {
-            const [wordFrom, wordTo] = value.split("-");
-            return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
-        }
-        qry += `${index > 0 ? "+" : ""}${value}.${column}`;
-    });
-    return qry;
+    return filterArray
+        .map(({ column, value }, index) => {
+            if (value.includes("-")) {
+                const [wordFrom, wordTo] = value.split("-");
+                return `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`;
+            }
+            return `${value.trim()}.${column}`;
+        })
+        .join("+");
 };
 
 export function debounce<T extends (...args: any[]) => any>(
