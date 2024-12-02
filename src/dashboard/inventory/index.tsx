@@ -284,12 +284,18 @@ export default function Inventories({
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
+            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+            const updatedParams = { ...params, qry: queryString };
             if (total) {
-                getInventoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
-                });
+                getInventoryList(authUser.useruid, { ...updatedParams, total: 1 }).then(
+                    (response) => {
+                        response &&
+                            !Array.isArray(response) &&
+                            setTotalRecords(response.total ?? 0);
+                    }
+                );
             }
-            getInventoryList(authUser.useruid, params).then((response) => {
+            getInventoryList(authUser.useruid, updatedParams).then((response) => {
                 if (Array.isArray(response) && response.length) {
                     setInventories(response);
                 } else {

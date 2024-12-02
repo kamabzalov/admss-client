@@ -148,12 +148,17 @@ export const ContactsDataTable = ({
 
     const handleGetContactsList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
+            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+            const updatedParams = { ...params, qry: queryString };
+
             if (total) {
-                getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    setTotalRecords(response?.total ?? 0);
-                });
+                getContactsAmount(authUser.useruid, { ...updatedParams, total: 1 }).then(
+                    (response) => {
+                        setTotalRecords(response?.total ?? 0);
+                    }
+                );
             }
-            getContacts(authUser.useruid, params).then((response) => {
+            getContacts(authUser.useruid, updatedParams).then((response) => {
                 if (Array.isArray(response) && response.length) {
                     setUserContacts(response);
                 } else {
