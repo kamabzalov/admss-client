@@ -22,6 +22,7 @@ import {
 import { ROWS_PER_PAGE } from "common/settings";
 import {
     AdvancedSearchDialog,
+    SEARCH_FIELD_TYPE,
     SEARCH_FORM_TYPE,
     SearchField,
 } from "dashboard/common/dialog/search";
@@ -538,22 +539,22 @@ export default function Inventories({
         {
             key: "StockNo",
             value: advancedSearch?.StockNo,
-            type: "text",
+            type: SEARCH_FIELD_TYPE.TEXT,
         },
         {
             key: "Make",
             value: advancedSearch?.Make,
-            type: "dropdown",
+            type: SEARCH_FIELD_TYPE.DROPDOWN,
         },
         {
             key: "Model",
             value: advancedSearch?.Model,
-            type: "dropdown",
+            type: SEARCH_FIELD_TYPE.DROPDOWN,
         },
         {
             key: "VIN",
             value: advancedSearch?.VIN,
-            type: "text",
+            type: SEARCH_FIELD_TYPE.TEXT,
         },
     ];
 
