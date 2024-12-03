@@ -20,7 +20,11 @@ import {
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
-import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
 import {
     getUserGroupList,
     getUserSettings,
@@ -40,7 +44,7 @@ import {
     createStringifyFilterQuery,
     createStringifySearchQuery,
     filterParams,
-    isObjectEmpty,
+    isObjectValuesEmpty,
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
@@ -280,12 +284,18 @@ export default function Inventories({
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
+            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+            const updatedParams = { ...params, qry: queryString };
             if (total) {
-                getInventoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
-                });
+                getInventoryList(authUser.useruid, { ...updatedParams, total: 1 }).then(
+                    (response) => {
+                        response &&
+                            !Array.isArray(response) &&
+                            setTotalRecords(response.total ?? 0);
+                    }
+                );
             }
-            getInventoryList(authUser.useruid, params).then((response) => {
+            getInventoryList(authUser.useruid, updatedParams).then((response) => {
                 if (Array.isArray(response) && response.length) {
                     setInventories(response);
                 } else {
@@ -301,7 +311,7 @@ export default function Inventories({
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = isObjectEmpty(newSearch);
+            const isAnyValueEmpty = isObjectValuesEmpty(newSearch);
 
             setButtonDisabled(isAnyValueEmpty);
 
@@ -332,7 +342,7 @@ export default function Inventories({
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
-            const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
             const params: QueryParams = {
                 ...(lazyState.sortOrder === 1 && { type: "asc" }),
                 ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -883,6 +893,7 @@ export default function Inventories({
                     onSearchClear={handleClearAdvancedSearchField}
                     onInputChange={handleSetAdvancedSearch}
                     fields={searchFields}
+                    searchForm={SEARCH_FORM_TYPE.INVENTORY}
                 />
             </div>
         </div>

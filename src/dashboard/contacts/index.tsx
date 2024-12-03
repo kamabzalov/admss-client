@@ -29,9 +29,22 @@ import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
+}
+
+interface AdvancedSearch {
+    [key: string]: string | number;
+    username: string;
+    type: number;
+    phone1: string;
 }
 
 interface ContactsDataTableProps {
@@ -70,6 +83,9 @@ export const ContactsDataTable = ({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const store = useStore().contactStore;
+    const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({} as AdvancedSearch);
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -130,6 +146,29 @@ export const ContactsDataTable = ({
         changeSettings({ table: event as TableState });
     };
 
+    const handleGetContactsList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+            const updatedParams = { ...params, qry: queryString };
+
+            if (total) {
+                getContactsAmount(authUser.useruid, { ...updatedParams, total: 1 }).then(
+                    (response) => {
+                        setTotalRecords(response?.total ?? 0);
+                    }
+                );
+            }
+            getContacts(authUser.useruid, updatedParams).then((response) => {
+                if (Array.isArray(response) && response.length) {
+                    setUserContacts(response);
+                } else {
+                    setUserContacts([]);
+                }
+                setIsLoading(false);
+            });
+        }
+    };
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -164,20 +203,8 @@ export const ContactsDataTable = ({
                 return;
             }
             setIsLoading(true);
-            getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                setTotalRecords(response?.total ?? 0);
-            });
-            getContacts(authUser.useruid, params)
-                .then((response) => {
-                    if (response?.length) {
-                        setUserContacts(response);
-                    } else {
-                        setUserContacts([]);
-                    }
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
+
+            handleGetContactsList(params);
         }
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
@@ -249,6 +276,80 @@ export const ContactsDataTable = ({
         navigate("/dashboard/contacts/create");
     };
 
+    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
+        setIsLoading(true);
+        setAdvancedSearch((prevSearch) => {
+            const newSearch = { ...prevSearch, [key]: value };
+
+            const isAnyValueEmpty = isObjectValuesEmpty(newSearch);
+
+            setButtonDisabled(isAnyValueEmpty);
+
+            return newSearch;
+        });
+        setIsLoading(false);
+    };
+
+    const handleAdvancedSearch = () => {
+        const searchQuery = Object.entries(advancedSearch)
+            .filter(([_, value]) => value)
+            .map(([key, value]) => `${value}.${key}`)
+            .join("+");
+
+        handleGetContactsList({ qry: searchQuery }, true);
+        setDialogVisible(false);
+    };
+
+    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setIsLoading(true);
+        setButtonDisabled(true);
+        setAdvancedSearch((prev) => {
+            const updatedSearch = { ...prev };
+            delete updatedSearch[key];
+            return updatedSearch;
+        });
+
+        try {
+            setIsLoading(true);
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
+
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            await handleGetContactsList(params);
+        } finally {
+            setButtonDisabled(false);
+        }
+    };
+
+    const searchFields: SearchField<AdvancedSearch>[] = [
+        {
+            key: "username",
+            label: "Contact name",
+            value: advancedSearch?.username,
+            type: "text",
+        },
+
+        {
+            key: "type",
+            label: "Contact type",
+            value: advancedSearch?.type?.toString(),
+            type: "dropdown",
+        },
+        {
+            key: "phone1",
+            label: "Phone number",
+            value: advancedSearch.phone1,
+            type: "text",
+        },
+    ];
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -307,6 +408,7 @@ export const ContactsDataTable = ({
                         label='Advanced search'
                         severity='success'
                         type='button'
+                        onClick={() => setDialogVisible(true)}
                     />
                     <span className='p-input-icon-right'>
                         <i className='pi pi-search' />
@@ -408,6 +510,19 @@ export const ContactsDataTable = ({
                     )}
                 </div>
             </div>
+            <AdvancedSearchDialog<AdvancedSearch>
+                visible={dialogVisible}
+                buttonDisabled={buttonDisabled}
+                onHide={() => {
+                    setButtonDisabled(true);
+                    setDialogVisible(false);
+                }}
+                action={handleAdvancedSearch}
+                onSearchClear={handleClearAdvancedSearchField}
+                onInputChange={handleSetAdvancedSearch}
+                fields={searchFields}
+                searchForm={SEARCH_FORM_TYPE.CONTACTS}
+            />
         </div>
     );
 };
