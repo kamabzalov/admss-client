@@ -3,3 +3,7 @@
  color: var(--admss-app-primary-main-green);
  border: 1px solid var(--admss-app-primary-main-green);
 }
+
+div.p-dialog-content-body > div > span:nth-child(2) > i {
+ margin-top: -9px;
+}

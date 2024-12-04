@@ -31,6 +31,7 @@ import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import {
     AdvancedSearchDialog,
+    SEARCH_FIELD_TYPE,
     SEARCH_FORM_TYPE,
     SearchField,
 } from "dashboard/common/dialog/search";
@@ -333,20 +334,20 @@ export const ContactsDataTable = ({
             key: "username",
             label: "Contact name",
             value: advancedSearch?.username,
-            type: "text",
+            type: SEARCH_FIELD_TYPE.TEXT,
         },
 
         {
             key: "type",
             label: "Contact type",
             value: advancedSearch?.type?.toString(),
-            type: "dropdown",
+            type: SEARCH_FIELD_TYPE.DROPDOWN,
         },
         {
             key: "phone1",
             label: "Phone number",
             value: advancedSearch.phone1,
-            type: "text",
+            type: SEARCH_FIELD_TYPE.NUMBER,
         },
     ];
 
