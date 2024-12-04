@@ -245,3 +245,30 @@
     background: var(--admss-app-light-blue);
     border-radius: 0;
 }
+
+.p-accordion.report__accordion {
+    .p-orderlist {
+        .p-orderlist-list {
+            min-height: auto;
+            .p-orderlist-item {
+                padding: 0;
+            }
+            .p-orderlist-item:not(.p-highlight):hover {
+                background-color: var(--admss-app-light-blue);
+            }
+            .p-orderlist-item.p-highlight {
+                padding: 0;
+                background-color: var(--admss-app-light-blue);
+                &:hover {
+                    background-color: var(--admss-app-light-blue);
+                }
+            }
+            border: none;
+            padding: 0;
+        }
+
+        .p-orderlist-controls {
+            display: none;
+        }
+    }
+}
