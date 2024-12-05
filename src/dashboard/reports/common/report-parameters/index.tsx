@@ -43,9 +43,6 @@ export const ReportParameters = ({
         if (authUser && authUser.useruid) {
             const response = await setReportDocumentTemplate(report.documentUID || "0", {
                 itemUID: report.documentUID || "0",
-                timestamp: Date.now(),
-                from_date: new Date(startDate).getTime(),
-                to_date: new Date(endDate).getTime(),
             }).then((response) => {
                 if (response && response.status === Status.ERROR) {
                     const { error } = response;
