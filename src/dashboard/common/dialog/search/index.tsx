@@ -15,6 +15,8 @@ import { ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 import { InputNumber } from "primereact/inputnumber";
 
+const INPUT_NUMBER_MAX_LENGTH = 10;
+
 export enum SEARCH_FORM_TYPE {
     CONTACTS,
     INVENTORY,
@@ -157,10 +159,16 @@ export const AdvancedSearchDialog = <T,>({
                                     type='tel'
                                     className='w-full'
                                     useGrouping={false}
+                                    maxLength={INPUT_NUMBER_MAX_LENGTH}
                                     value={Number(value) || null}
-                                    onChange={({ value }) =>
-                                        onInputChange(key, value?.toString() || "")
-                                    }
+                                    onChange={({ value }) => {
+                                        if (
+                                            value &&
+                                            value?.toString().length >= INPUT_NUMBER_MAX_LENGTH
+                                        )
+                                            return;
+                                        onInputChange(key, value?.toString() || "");
+                                    }}
                                 />
                             )}
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
