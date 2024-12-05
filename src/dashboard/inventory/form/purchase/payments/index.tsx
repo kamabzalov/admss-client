@@ -10,12 +10,14 @@ import { getAccountPaymentsList } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
+import { Checkbox } from "primereact/checkbox";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof InventoryPaymentBack;
+    body?: (rowData: InventoryPaymentBack) => ReactElement;
 }
 
-type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+type TableColumnsList = Pick<TableColumnProps, "header" | "field" | "body">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
@@ -47,7 +49,13 @@ export const PurchasePayments = observer((): ReactElement => {
 
     const renderColumnsData: TableColumnsList[] = [
         { field: "payPack", header: "Pack for this Vehicle" },
-        { field: "payDefaultExpAdded", header: "Default Expenses" },
+        {
+            field: "payDefaultExpAdded",
+            header: "Default Expenses",
+            body: (rowData: InventoryPaymentBack) => (
+                <Checkbox checked={!!rowData.payDefaultExpAdded} readOnly />
+            ),
+        },
         { field: "payPaid", header: "Paid" },
         { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
     ];
@@ -130,12 +138,18 @@ export const PurchasePayments = observer((): ReactElement => {
                         reorderableColumns
                         resizableColumns
                     >
-                        {renderColumnsData.map(({ field, header }) => (
+                        {renderColumnsData.map(({ field, header, body }) => (
                             <Column
                                 field={field}
                                 header={header}
                                 key={field}
                                 headerClassName='cursor-move'
+                                body={body}
+                                pt={{
+                                    headerContent: {
+                                        className: "justify-content-start",
+                                    },
+                                }}
                             />
                         ))}
                     </DataTable>
