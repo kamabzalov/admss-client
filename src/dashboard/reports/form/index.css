@@ -248,6 +248,9 @@
 
 .p-accordion.report__accordion {
     .p-orderlist {
+        .p-orderlist-droppoint-highlight {
+            background-color: var(--admss-app-light-blue);
+        }
         .p-orderlist-list {
             min-height: auto;
             .p-orderlist-item {

@@ -10,7 +10,6 @@ import {
     ReportInfo,
     ReportServiceColumns,
     ReportServices,
-    ReportSetParams,
     ReportsPostData,
 } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
@@ -254,12 +253,12 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    templateParams: ReportSetParams
+    { itemUID, columns }: { itemUID: string; columns?: Partial<ReportServiceColumns>[] }
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
             `reports/${documentuid}/template`,
-            templateParams,
+            { DocumentID: itemUID, columns },
             {
                 headers: {
                     Accept: "application/pdf",
@@ -374,6 +373,23 @@ export const addReportToCollection = async (collectionuid: string, reportuid: st
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while adding report to collection",
+            };
+        }
+    }
+};
+
+export const setReportOrder = async (collectionuid: string, reportuid: string, order: number) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/${reportuid}/order`,
+            { order }
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while changing report order",
             };
         }
     }
