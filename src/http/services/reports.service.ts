@@ -10,6 +10,7 @@ import {
     ReportInfo,
     ReportServiceColumns,
     ReportServices,
+    ReportSetParams,
     ReportsPostData,
 } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
@@ -253,12 +254,12 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    { itemUID, columns }: { itemUID: string; columns?: Partial<ReportServiceColumns>[] }
+    templateParams: ReportSetParams
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
             `reports/${documentuid}/template`,
-            { DocumentID: itemUID, columns },
+            templateParams,
             {
                 headers: {
                     Accept: "application/pdf",
