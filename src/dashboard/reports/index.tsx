@@ -22,6 +22,13 @@ import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 
+const EDIT_COLLECTION_CLASSES = ["reports-actions__button", "p-button-label"] as const;
+const OPEN_PARAMETERS_CLASSES = [
+    "reports__list-item--inner",
+    "reports__list-item",
+    "reports__list-name",
+] as const;
+
 export default function Reports(): ReactElement {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
@@ -174,30 +181,26 @@ export default function Reports(): ReactElement {
         id: string,
         index: number
     ) => {
-        if (event.target instanceof HTMLElement) {
-            if (
-                event.target.classList.contains("reports-actions__button") ||
-                event.target.classList.contains("p-button-label")
-            ) {
+        const target = event.target;
+        if (target instanceof HTMLElement) {
+            if (EDIT_COLLECTION_CLASSES.some((classes) => target.classList.contains(classes))) {
                 event.stopPropagation();
                 setCustomActiveIndex([index]);
                 setIsCollectionEditing(id);
-            } else {
-                return;
             }
         }
     };
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
-        if (event.target instanceof HTMLElement) {
-            if (
-                !event.target.classList.contains("reports__list-item--inner") &&
-                !event.target.classList.contains("reports__list-item")
-            )
+        const target = event.target;
+        if (target instanceof HTMLElement) {
+            if (!OPEN_PARAMETERS_CLASSES.some((classes) => target.classList.contains(classes))) {
                 return;
+            }
         }
         event.stopPropagation();
         event.preventDefault();
+
         if (isParametersEditing?.itemUID === report.itemUID) {
             setIsParametersEditing(null);
         } else {
@@ -457,7 +460,7 @@ export default function Reports(): ReactElement {
                                                                                                                     reportSearch.toLowerCase()
                                                                                                                 )
                                                                                                                 ? "searched-item"
-                                                                                                                : ""
+                                                                                                                : "reports__list-name"
                                                                                                         }
                                                                                                     >
                                                                                                         {
@@ -538,7 +541,7 @@ export default function Reports(): ReactElement {
                                                                                         reportSearch.toLowerCase()
                                                                                     )
                                                                                     ? "searched-item"
-                                                                                    : ""
+                                                                                    : "reports__list-name"
                                                                             }
                                                                         >
                                                                             {report.name}
