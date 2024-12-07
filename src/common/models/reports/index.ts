@@ -22,6 +22,7 @@ export interface ReportDocument {
     isfavorite: 0 | 1;
     isdefault: 0 | 1;
     itemUID: string;
+    order: number;
     name: string;
     updated: string;
 }
@@ -86,6 +87,7 @@ export interface ReportInfo extends BaseResponseError {
     ShowAverages: 0 | 1;
     ShowLineCount: 0 | 1;
     AskForStartAndEndDates: 0 | 1;
+    order: number;
     listid: 0 | 1;
     columns: ReportServiceColumns[];
 }
