@@ -480,7 +480,7 @@ export default function Inventories({
     };
 
     useEffect(() => {
-        if (!authUser || !serverSettings || locations.length === 0) return;
+        if (!authUser || !serverSettings || !locations.length) return;
 
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
