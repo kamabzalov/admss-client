@@ -167,9 +167,8 @@ export default function Inventories({
                         }
                         settings?.table &&
                             setLazyState({
-                                first: settings.table.first || initialDataTableQueries.first,
-                                rows: settings.table.rows || initialDataTableQueries.rows,
-                                page: settings.table.page || initialDataTableQueries.page,
+                                skip: settings.table.first || initialDataTableQueries.first,
+                                top: settings.table.rows || initialDataTableQueries.rows,
                                 column: settings.table.column || initialDataTableQueries.column,
                                 sortField:
                                     settings.table.sortField || initialDataTableQueries.sortField,
@@ -324,7 +323,10 @@ export default function Inventories({
     const handleAdvancedSearch = () => {
         setIsLoading(true);
         const searchParams = createStringifySearchQuery(advancedSearch);
-        handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
+        handleGetInventoryList(
+            { ...filterParams({ top: lazyState.first }), qry: searchParams },
+            true
+        );
         setDialogVisible(false);
         setIsLoading(false);
     };
@@ -478,6 +480,8 @@ export default function Inventories({
     };
 
     useEffect(() => {
+        if (!authUser || !serverSettings || locations.length === 0) return;
+
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
         }
@@ -533,6 +537,8 @@ export default function Inventories({
         selectedFilterOptions,
         currentLocation,
         selectedInventoryType,
+        authUser,
+        locations.length,
     ]);
 
     const searchFields: SearchField<AdvancedSearch>[] = [
