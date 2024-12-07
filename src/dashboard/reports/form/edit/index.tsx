@@ -44,6 +44,7 @@ export const ReportEditForm = observer((): ReactElement => {
         if (authUser && authUser.useruid) {
             const response = await setReportDocumentTemplate(id || "0", {
                 itemUID: id || "0",
+                timestamp: Date.now(),
                 columns: reportColumns,
             }).then((response) => {
                 if (response && response.status === Status.ERROR) {
