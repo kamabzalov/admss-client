@@ -47,6 +47,7 @@ interface DateInputProps extends CalendarProps {
     date?: number;
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
+    emptyDate?: boolean;
 }
 
 interface TextInputProps extends InputTextProps {
@@ -254,13 +255,14 @@ export const DateInput = ({
     value,
     checkbox,
     colWidth,
+    emptyDate,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!!date) {
+        if (!!date || !emptyDate) {
             const currentDate = new Date(Number(date));
             setInnerDate(currentDate);
         }
@@ -286,7 +288,7 @@ export const DateInput = ({
                 )}
                 <Calendar
                     inputId={name}
-                    value={innerDate}
+                    value={emptyDate ? null : innerDate}
                     disabled={checkbox && !isChecked}
                     className={`w-full date-item__calendar ${
                         checkbox && "date-item__calendar--checkbox"
