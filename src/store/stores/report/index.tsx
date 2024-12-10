@@ -7,6 +7,7 @@ import { RootStore } from "store";
 export class ReportStore {
     public rootStore: RootStore;
     private _report: Partial<ReportInfo> = {} as ReportInfo;
+    private _currentID: string = "";
     private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
@@ -19,6 +20,10 @@ export class ReportStore {
 
     public get report() {
         return this._report;
+    }
+
+    public get currentID() {
+        return this._currentID;
     }
 
     public get reportName() {
@@ -88,6 +93,7 @@ export class ReportStore {
                     ).then((response) => {
                         if (response?.status === Status.OK) {
                             uid = (response as ReportInfo).itemuid;
+                            this._currentID = uid;
                         } else {
                             const { error } = response as BaseResponseError;
                             throw new Error(error);
@@ -107,7 +113,7 @@ export class ReportStore {
 
                     if (response?.status === Status.OK) {
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
-                        return response as ReportInfo;
+                        return { ...response, itemuid: uid } as ReportInfo;
                     } else {
                         const { error } = response as BaseResponseError;
                         throw new Error(error);

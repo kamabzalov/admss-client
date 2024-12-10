@@ -559,7 +559,14 @@ export default function Reports(): ReactElement {
                                                                             ].filter(
                                                                                 (collection) =>
                                                                                     collection?.itemUID !==
-                                                                                    itemUID
+                                                                                        itemUID &&
+                                                                                    !report.collections?.some(
+                                                                                        (
+                                                                                            docCollection
+                                                                                        ) =>
+                                                                                            docCollection.collectionuid ===
+                                                                                            collection?.itemUID
+                                                                                    )
                                                                             )}
                                                                             currentCollectionUID={
                                                                                 itemUID
