@@ -304,7 +304,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     className={`general-info__text-input w-full ${
                         errors.businessName ? "p-invalid" : ""
                     }`}
-                    value={savedBusinessName || contact.businessName || ""}
+                    value={contact.businessName || ""}
                     onChange={({ target: { value } }) => {
                         changeContact("businessName", value);
                         setFieldValue("businessName", value);

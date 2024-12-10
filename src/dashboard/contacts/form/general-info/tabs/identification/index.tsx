@@ -24,6 +24,7 @@ import dlFrontImage from "assets/images/empty_front_dl.svg";
 import dlBackImage from "assets/images/empty_back_dl.svg";
 import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
+import { InputMask } from "primereact/inputmask";
 
 const SexList = [
     {
@@ -210,7 +211,11 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
-                                showClear
+                                showClear={
+                                    !!(type === BUYER
+                                        ? contactExtData.Buyer_DL_State
+                                        : contactExtData.CoBuyer_DL_State)
+                                }
                             />
                             <label className='float-label'>DL's State</label>
                         </span>
@@ -254,6 +259,7 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            emptyDate
                             disabled={isControlDisabled}
                         />
                     </div>
@@ -278,7 +284,11 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
-                                showClear
+                                showClear={
+                                    !!(type === BUYER
+                                        ? contactExtData.Buyer_Sex
+                                        : contactExtData.CoBuyer_Sex)
+                                }
                             />
                             <label className='float-label'>Sex</label>
                         </span>
@@ -286,7 +296,8 @@ export const ContactsIdentificationInfo = observer(
 
                     <div className='col-3'>
                         <span className='p-float-label'>
-                            <InputText
+                            <InputMask
+                                mask='999-99-9999'
                                 className='identification-info__text-input w-full'
                                 value={
                                     (type === BUYER
@@ -296,7 +307,7 @@ export const ContactsIdentificationInfo = observer(
                                 onChange={({ target: { value } }) => {
                                     changeContactExtData(
                                         type === BUYER ? "Buyer_SS_Number" : "CoBuyer_SS_Number",
-                                        value
+                                        String(value)
                                     );
                                 }}
                                 disabled={isControlDisabled}
@@ -322,6 +333,7 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            emptyDate
                             disabled={isControlDisabled}
                         />
                     </div>
