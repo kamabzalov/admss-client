@@ -2,6 +2,8 @@ import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
+    moveReportToCollection,
+    setReportOrder,
 } from "http/services/reports.service";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
@@ -12,6 +14,10 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
+import { OrderList } from "primereact/orderlist";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
@@ -24,10 +30,16 @@ export const ReportForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
+    const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
     const [activeIndex, setActiveIndex] = useState<number[]>(!id ? [1] : []);
+
+    const [draggedReport, setDraggedReport] = useState<{
+        report: ReportDocument;
+        sourceCollectionId: string;
+    } | null>(null);
 
     const handleGetUserReportCollections = async (useruid: string) => {
         const response = await getUserReportCollectionsContent(useruid);
@@ -122,6 +134,142 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
+    const listItemTemplate = (report: ReportDocument, collectionId: string) => {
+        return (
+            <Button
+                className={`report__list-item w-full ${
+                    selectedTabUID === report.documentUID ? "report__list-item--selected" : ""
+                }`}
+                key={report.itemUID}
+                text
+                draggable
+                onDragStart={(e: React.DragEvent<HTMLButtonElement>) =>
+                    handleDragStart(e, report, collectionId)
+                }
+                onClick={(event) => {
+                    event.preventDefault();
+                    handleAccordionTabChange(report);
+                }}
+            >
+                <p className='report-item__name'>{report.name}</p>
+            </Button>
+        );
+    };
+
+    const handleChangeReportOrder = async (
+        updatedReports: ReportDocument[],
+        collectionId: string
+    ) => {
+        const promises = updatedReports.map((report) => {
+            return setReportOrder(collectionId, report.documentUID, report.order);
+        });
+
+        const responses = await Promise.all(promises);
+
+        responses.forEach((response, index) => {
+            if (response && response.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail:
+                        response.error ||
+                        `Error while updating report order for "${updatedReports[index].name}"`,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
+
+        toast.current?.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Report order updated successfully!",
+            life: TOAST_LIFETIME,
+        });
+
+        handleGetUserReportCollections(authUser?.useruid!);
+    };
+
+    const handleChangeListOrder = async (
+        event: { value: ReportDocument[] },
+        collectionId: string
+    ) => {
+        const updatedReports = event.value.map((report, index) => {
+            return {
+                ...report,
+                order: index,
+            };
+        });
+
+        setCollections((prevCollections) =>
+            prevCollections.map((collection) => {
+                if (collection.itemUID === collectionId) {
+                    return { ...collection, documents: updatedReports };
+                }
+                return collection;
+            })
+        );
+
+        await handleChangeReportOrder(updatedReports, collectionId);
+    };
+
+    const handleDragStart = (
+        e: React.DragEvent,
+        report: ReportDocument,
+        sourceCollectionId: string
+    ) => {
+        setDraggedReport({ report, sourceCollectionId });
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const reportMove = async (
+        report: ReportDocument,
+        sourceCollectionId: string,
+        targetCollectionId: string
+    ) => {
+        const response = await moveReportToCollection(
+            sourceCollectionId,
+            report.documentUID,
+            targetCollectionId
+        );
+
+        if (response && response.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error || "Error while moving report to collection",
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Report moved successfully!",
+                life: TOAST_LIFETIME,
+            });
+            handleGetUserReportCollections(authUser?.useruid!);
+        }
+    };
+
+    const handleDrop = (
+        e: React.DragEvent<HTMLDivElement>,
+        targetCollection: Pick<ReportCollection, "itemUID" | "description">
+    ) => {
+        e.preventDefault();
+        if (!draggedReport || targetCollection.description === "Favorites") return;
+
+        const { report, sourceCollectionId } = draggedReport;
+        if (sourceCollectionId !== targetCollection.itemUID) {
+            reportMove(report, sourceCollectionId, targetCollection.itemUID);
+        }
+
+        setDraggedReport(null);
+    };
+
     return (
         <div className='grid relative'>
             <Button
@@ -158,11 +306,21 @@ export const ReportForm = observer((): ReactElement => {
                                         itemUID,
                                         name,
                                         documents,
+                                        description,
                                         collections: nestedCollections,
                                     }: ReportCollection) => (
                                         <AccordionTab
                                             key={itemUID}
-                                            header={name}
+                                            header={
+                                                <div
+                                                    onDragOver={handleDragOver}
+                                                    onDrop={(e) =>
+                                                        handleDrop(e, { itemUID, description })
+                                                    }
+                                                >
+                                                    {name}
+                                                </div>
+                                            }
                                             disabled={
                                                 !documents?.length && !nestedCollections?.length
                                             }
@@ -172,71 +330,87 @@ export const ReportForm = observer((): ReactElement => {
                                                     : ""
                                             }`}
                                         >
-                                            {nestedCollections && (
-                                                <Accordion multiple className='nested-accordion'>
-                                                    {nestedCollections.map((nestedCollection) => (
-                                                        <AccordionTab
-                                                            key={nestedCollection.itemUID}
-                                                            header={nestedCollection.name}
-                                                            disabled={
-                                                                !nestedCollection.documents?.length
-                                                            }
-                                                            className={`nested-accordion-tab ${
-                                                                selectedTabUID ===
-                                                                nestedCollection.itemUID
-                                                                    ? "report__list-item--selected"
-                                                                    : ""
-                                                            }`}
-                                                        >
-                                                            {nestedCollection.documents &&
-                                                                nestedCollection.documents.map(
-                                                                    (report) => (
-                                                                        <Button
-                                                                            className={`report__list-item w-full ${
-                                                                                selectedTabUID ===
-                                                                                report.documentUID
-                                                                                    ? "report__list-item--selected"
-                                                                                    : ""
-                                                                            }`}
-                                                                            key={report.itemUID}
-                                                                            text
-                                                                            onClick={(event) => {
-                                                                                event.preventDefault();
-                                                                                handleAccordionTabChange(
-                                                                                    report
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <p className='report-item__name'>
-                                                                                {report.name}
-                                                                            </p>
-                                                                        </Button>
-                                                                    )
-                                                                )}
-                                                        </AccordionTab>
-                                                    ))}
-                                                </Accordion>
-                                            )}
-                                            {documents &&
-                                                documents.map((report) => (
-                                                    <Button
-                                                        className={`report__list-item report-item w-full ${
-                                                            selectedTabUID === report.documentUID
-                                                                ? "report__list-item--selected"
-                                                                : ""
-                                                        }`}
-                                                        key={report.itemUID}
-                                                        text
-                                                        onClick={(event) => {
-                                                            event.preventDefault();
-                                                            handleAccordionTabChange(report);
-                                                        }}
+                                            <div className='report__list-wrapper'>
+                                                {nestedCollections && (
+                                                    <Accordion
+                                                        multiple
+                                                        className='nested-accordion'
                                                     >
-                                                        <p className='report-item__name'>
-                                                            {report.name}
-                                                        </p>
-                                                    </Button>
-                                                ))}
+                                                        {nestedCollections.map(
+                                                            (nestedCollection) => (
+                                                                <AccordionTab
+                                                                    key={nestedCollection.itemUID}
+                                                                    header={
+                                                                        <div
+                                                                            onDragOver={
+                                                                                handleDragOver
+                                                                            }
+                                                                            onDrop={(e) =>
+                                                                                handleDrop(e, {
+                                                                                    itemUID:
+                                                                                        nestedCollection.itemUID,
+                                                                                    description:
+                                                                                        nestedCollection.description,
+                                                                                })
+                                                                            }
+                                                                        >
+                                                                            {nestedCollection.name}
+                                                                        </div>
+                                                                    }
+                                                                    disabled={
+                                                                        !nestedCollection.documents
+                                                                            ?.length
+                                                                    }
+                                                                    className={`nested-accordion-tab ${
+                                                                        selectedTabUID ===
+                                                                        nestedCollection.itemUID
+                                                                            ? "report__list-item--selected"
+                                                                            : ""
+                                                                    }`}
+                                                                >
+                                                                    <div className='report__list-wrapper'>
+                                                                        {nestedCollection.documents && (
+                                                                            <OrderList
+                                                                                value={
+                                                                                    nestedCollection.documents
+                                                                                }
+                                                                                itemTemplate={(
+                                                                                    item
+                                                                                ) =>
+                                                                                    listItemTemplate(
+                                                                                        item,
+                                                                                        nestedCollection.itemUID
+                                                                                    )
+                                                                                }
+                                                                                dragdrop
+                                                                                onChange={(e) =>
+                                                                                    handleChangeListOrder(
+                                                                                        e,
+                                                                                        nestedCollection.itemUID
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                </AccordionTab>
+                                                            )
+                                                        )}
+                                                    </Accordion>
+                                                )}
+                                                {documents && (
+                                                    <OrderList
+                                                        key={itemUID}
+                                                        itemTemplate={(item) =>
+                                                            listItemTemplate(item, itemUID)
+                                                        }
+                                                        value={documents}
+                                                        dragdrop
+                                                        onChange={(e) =>
+                                                            handleChangeListOrder(e, itemUID)
+                                                        }
+                                                    />
+                                                )}
+                                            </div>
                                         </AccordionTab>
                                     )
                                 )}
