@@ -161,7 +161,7 @@ export const ReportForm = observer((): ReactElement => {
         collectionId: string
     ) => {
         const promises = updatedReports.map((report) => {
-            return setReportOrder(collectionId, report.itemUID, report.order);
+            return setReportOrder(collectionId, report.documentUID, report.order);
         });
 
         const responses = await Promise.all(promises);
@@ -185,6 +185,8 @@ export const ReportForm = observer((): ReactElement => {
             detail: "Report order updated successfully!",
             life: TOAST_LIFETIME,
         });
+
+        handleGetUserReportCollections(authUser?.useruid!);
     };
 
     const handleChangeListOrder = async (
@@ -253,42 +255,16 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCollectionId: string) => {
+    const handleDrop = (
+        e: React.DragEvent<HTMLDivElement>,
+        targetCollection: Pick<ReportCollection, "itemUID" | "description">
+    ) => {
         e.preventDefault();
-        if (!draggedReport) return;
+        if (!draggedReport || targetCollection.description === "Favorites") return;
 
         const { report, sourceCollectionId } = draggedReport;
-        if (sourceCollectionId === targetCollectionId) {
-        } else {
-            setCollections((prevCollections) => {
-                let updatedCollections = [...prevCollections];
-
-                updatedCollections = updatedCollections.map((collection) => {
-                    if (collection.itemUID === sourceCollectionId) {
-                        return {
-                            ...collection,
-                            documents: collection.documents?.filter(
-                                (doc) => doc.documentUID !== report.documentUID
-                            ),
-                        };
-                    }
-                    return collection;
-                });
-
-                updatedCollections = updatedCollections.map((collection) => {
-                    if (collection.itemUID === targetCollectionId) {
-                        return {
-                            ...collection,
-                            documents: [...(collection.documents || []), report],
-                        };
-                    }
-                    return collection;
-                });
-
-                return updatedCollections;
-            });
-
-            reportMove(report, sourceCollectionId, targetCollectionId);
+        if (sourceCollectionId !== targetCollection.itemUID) {
+            reportMove(report, sourceCollectionId, targetCollection.itemUID);
         }
 
         setDraggedReport(null);
@@ -330,6 +306,7 @@ export const ReportForm = observer((): ReactElement => {
                                         itemUID,
                                         name,
                                         documents,
+                                        description,
                                         collections: nestedCollections,
                                     }: ReportCollection) => (
                                         <AccordionTab
@@ -337,7 +314,9 @@ export const ReportForm = observer((): ReactElement => {
                                             header={
                                                 <div
                                                     onDragOver={handleDragOver}
-                                                    onDrop={(e) => handleDrop(e, itemUID)}
+                                                    onDrop={(e) =>
+                                                        handleDrop(e, { itemUID, description })
+                                                    }
                                                 >
                                                     {name}
                                                 </div>
@@ -367,10 +346,12 @@ export const ReportForm = observer((): ReactElement => {
                                                                                 handleDragOver
                                                                             }
                                                                             onDrop={(e) =>
-                                                                                handleDrop(
-                                                                                    e,
-                                                                                    nestedCollection.itemUID
-                                                                                )
+                                                                                handleDrop(e, {
+                                                                                    itemUID:
+                                                                                        nestedCollection.itemUID,
+                                                                                    description:
+                                                                                        nestedCollection.description,
+                                                                                })
                                                                             }
                                                                         >
                                                                             {nestedCollection.name}
