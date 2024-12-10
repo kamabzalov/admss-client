@@ -93,16 +93,18 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
         });
     };
 
-    const handleDuplicateReport = () => {
-        report?.itemuid &&
-            copyReportDocument(report.itemuid).then((response: BaseResponseError | undefined) => {
-                if (response?.status === Status.OK) {
-                    navigate("/dashboard/reports");
-                    handleToastShow(Status.OK, "Custom report is successfully copied!");
-                } else {
-                    handleToastShow(Status.ERROR, response?.error!);
-                }
-            });
+    const handleDuplicateReport = async () => {
+        if (report?.itemuid) {
+            const response = await copyReportDocument(report.itemuid);
+            if (response?.status === Status.OK) {
+                const { itemuid } = response as { status: Status.OK; itemuid: string };
+                navigate(`/dashboard/reports/${itemuid}`);
+                onRefetch?.();
+                handleToastShow(Status.OK, "Custom report is successfully copied!");
+            } else {
+                handleToastShow(Status.ERROR, response?.error!);
+            }
+        }
     };
 
     const handleDeleteReport = () => {

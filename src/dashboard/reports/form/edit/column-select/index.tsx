@@ -50,7 +50,14 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    setAvailableValues(response);
+                    setAvailableValues(
+                        response.filter(
+                            (availableItem: ReportServiceColumns) =>
+                                !selectedValues.some(
+                                    (selectedItem) => selectedItem.data === availableItem.data
+                                )
+                        )
+                    );
                 }
             });
     }, [dataSet, authUser?.useruid]);
@@ -207,12 +214,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
             </div>
             <ReportSelect
                 header='Available'
-                values={availableValues.filter(
-                    (availableItem) =>
-                        !selectedValues.some(
-                            (selectedItem) => selectedItem.data === availableItem.data
-                        )
-                )}
+                values={availableValues}
                 currentItem={currentItem}
                 onItemClick={(item) => setCurrentItem(item)}
                 onItemDoubleClick={(item) => handleItemDoubleClick(item)}

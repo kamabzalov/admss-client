@@ -6,56 +6,67 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
-import { useStore } from "store/hooks";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { getAccountPaymentsList, setAccountPayment } from "http/services/accounts.service";
-import { AccountPayment } from "common/models/accounts";
+import { getAccountPaymentsList } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
+import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
+import { InventoryPaymentBack } from "common/models/inventory";
+import { Checkbox } from "primereact/checkbox";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof AccountPayment;
+    field: keyof InventoryPaymentBack;
+    body?: (rowData: InventoryPaymentBack) => ReactElement;
 }
 
-type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+type TableColumnsList = Pick<TableColumnProps, "header" | "field" | "body">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
-    const store = useStore().inventoryStore;
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const {
-        inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
-        changeInventoryExtData,
-        getInventoryPayments,
-    } = store;
+    const [expensesList, setExpensesList] = useState<InventoryPaymentBack[]>([]);
+    const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
+    const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
+    const [paid, setPaid] = useState<0 | 1>(0);
+    const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
+    const [description, setDescription] = useState<string>("");
 
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
-
-    useEffect(() => {
-        if (user) {
-            getInventoryPayments(user.useruid);
-            getAccountPaymentsList(user.useruid);
+    const fetchInventoryPaymentBack = async () => {
+        if (id) {
+            const response = await getInventoryPaymentBack(id);
+            if (response) {
+                const expenses = response as InventoryPaymentBack;
+                setExpensesList([expenses]);
+                setPacksForVehicle(expenses.payPack);
+                setDefaultExpenses(expenses.payDefaultExpAdded);
+                setPaid(expenses.payPaid);
+                setSalesTaxPaid(expenses.paySalesTaxPaid);
+                setDescription(expenses.payRemarks);
+            }
         }
-    }, [user]);
+    };
+
+    useEffect(() => {
+        fetchInventoryPaymentBack();
+    }, [id]);
 
     const renderColumnsData: TableColumnsList[] = [
-        { field: "ACCT_NUM", header: "Pack for this Vehicle" },
-        { field: "Status", header: "Default Expenses" },
-        { field: "Amount", header: "Paid" },
-        { field: "PTPDate", header: "Sales Tax Paid" },
+        { field: "payPack", header: "Pack for this Vehicle" },
+        {
+            field: "payDefaultExpAdded",
+            header: "Default Expenses",
+            body: (rowData: InventoryPaymentBack) => (
+                <Checkbox checked={!!rowData.payDefaultExpAdded} readOnly />
+            ),
+        },
+        { field: "payPaid", header: "Paid" },
+        { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
     ];
 
     const handleSavePayment = () => {
-        setAccountPayment("0", {
-            inventoryuid: id,
-            payExpenses,
-            payPack: payPack * 100,
-            payPaid,
-            paySalesTaxPaid,
+        setInventoryPaymentBack(id || "0", {
+            payPack: packsForVehicle || 0,
+            payDefaultExpAdded: defaultExpenses || 0,
+            payPaid: paid || 0,
+            paySalesTaxPaid: salesTaxPaid || 0,
+            payRemarks: description,
         }).then(() => {
             if (id) {
                 getAccountPaymentsList(id);
@@ -70,48 +81,30 @@ export const PurchasePayments = observer((): ReactElement => {
                     <CurrencyInput
                         labelPosition='top'
                         title='Pack for this Vehicle'
-                        value={payPack}
+                        value={packsForVehicle}
                         onChange={({ value }) => {
-                            changeInventoryExtData({
-                                key: "payPack",
-                                value: Number(value),
-                            });
+                            setPacksForVehicle(Number(value));
                         }}
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!payExpenses}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "payExpenses",
-                                value: !!payExpenses ? 0 : 1,
-                            })
-                        }
+                        checked={!!defaultExpenses}
+                        onChange={() => setDefaultExpenses(!!defaultExpenses ? 0 : 1)}
                         name='Default Expenses'
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!payPaid}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "payPaid",
-                                value: !!payPaid ? 0 : 1,
-                            })
-                        }
+                        checked={!!paid}
+                        onChange={() => setPaid(!!paid ? 0 : 1)}
                         name='Paid'
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!paySalesTaxPaid}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "paySalesTaxPaid",
-                                value: !!paySalesTaxPaid ? 0 : 1,
-                            })
-                        }
+                        checked={!!salesTaxPaid}
+                        onChange={() => setSalesTaxPaid(!!salesTaxPaid ? 0 : 1)}
                         name='Sales Tax Paid'
                     />
                 </div>
@@ -120,7 +113,8 @@ export const PurchasePayments = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputTextarea
                             className='purchase-payments__text-area'
-                            //TODO: missed payment description data
+                            value={description}
+                            onChange={({ target: { value } }) => setDescription(value)}
                         />
                         <label className='float-label'>Description</label>
                     </span>
@@ -139,17 +133,23 @@ export const PurchasePayments = observer((): ReactElement => {
                     <DataTable
                         showGridlines
                         className='mt-6 purchase-payments__table'
-                        value={[]}
+                        value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
                     >
-                        {renderColumnsData.map(({ field, header }) => (
+                        {renderColumnsData.map(({ field, header, body }) => (
                             <Column
                                 field={field}
                                 header={header}
                                 key={field}
                                 headerClassName='cursor-move'
+                                body={body}
+                                pt={{
+                                    headerContent: {
+                                        className: "justify-content-start",
+                                    },
+                                }}
                             />
                         ))}
                     </DataTable>

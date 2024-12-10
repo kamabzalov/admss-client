@@ -387,3 +387,29 @@ export interface InventoryWebCheck extends BaseResponseError {
     message: string;
     enabled: 0 | 1;
 }
+
+export interface InventoryExpense extends BaseResponseError {
+    id: number;
+    created: string;
+    updated: string;
+    operationdate: string;
+    itemuid: string;
+    useruid: string;
+    contactuid: string;
+    comment: string;
+    type: number;
+    type_name: string;
+    amount: number;
+    amount_text: string;
+    notbillable: number;
+    description: string;
+    checknumber: string;
+}
+
+export interface InventoryPaymentBack extends BaseResponseError {
+    payPack: number;
+    payDefaultExpAdded: 0 | 1;
+    payPaid: 0 | 1;
+    paySalesTaxPaid: 0 | 1;
+    payRemarks: string;
+}

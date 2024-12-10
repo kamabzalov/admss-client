@@ -15,6 +15,7 @@ import {
     InventoryStockNumber,
     InventoryWebCheck,
     InventoryCheckVIN,
+    InventoryPaymentBack,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -131,6 +132,24 @@ export const getInventoryWebCheck = async (inventoryuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting inventory web check",
+            };
+        }
+    }
+};
+
+export const getInventoryPaymentBack = async (inventoryuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.get<InventoryPaymentBack>(
+            `inventory/${inventoryuid}/paymentpack`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on get inventory expense",
             };
         }
     }
@@ -313,6 +332,28 @@ export const setInventoryWebCheck = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error,
+            };
+        }
+    }
+};
+
+export const setInventoryPaymentBack = async (
+    inventoryuid: string,
+    inventoryPayment: Partial<InventoryPaymentBack>
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `inventory/${inventoryuid}/paymentpack`,
+            inventoryPayment
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on set inventory expense",
             };
         }
     }
