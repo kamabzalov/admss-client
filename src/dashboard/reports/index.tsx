@@ -22,8 +22,8 @@ import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 
-const EDIT_COLLECTION_CLASSES: readonly string[] = ["reports-actions__button", "p-button-label"];
-const OPEN_PARAMETERS_CLASSES: readonly string[] = [
+const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
+const OPEN_PARAMETERS_CLASSES: Readonly<string[]> = [
     "reports__list-item--inner",
     "reports__list-item",
     "reports__list-name",
