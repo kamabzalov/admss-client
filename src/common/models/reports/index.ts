@@ -40,6 +40,7 @@ export interface ReportCollection extends BaseResponseError {
     index: number;
     isfavorite: 0 | 1;
     itemUID: string;
+    order: number;
     name: string;
     updated: string;
     userUID: string;

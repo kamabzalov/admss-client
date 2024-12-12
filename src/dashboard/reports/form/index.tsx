@@ -2,8 +2,8 @@ import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
-    moveReportToCollection,
     setReportOrder,
+    moveReportToCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
@@ -13,11 +13,15 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
-import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
-import { Tree } from "primereact/tree";
+import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
+import { Status } from "common/models/base-response";
+
+interface TreeNodeEvent extends TreeNode {
+    type: string;
+}
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
@@ -51,11 +55,9 @@ export const ReportForm = observer((): ReactElement => {
             const collectionsWithoutFavorite = response.filter(
                 (collection: ReportCollection) => collection.description !== REPORT_TYPES.FAVORITES
             );
-
             const customReportsCollection = collectionsWithoutFavorite.find(
                 (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
             );
-
             if (customReportsCollection) {
                 setCollections([
                     customReportsCollection,
@@ -72,32 +74,32 @@ export const ReportForm = observer((): ReactElement => {
     };
 
     const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
-        return collectionsData.map((col) => {
-            const children: TreeNode[] = [];
-
-            if (col.collections && col.collections.length) {
-                children.push(...buildTreeNodes(col.collections));
-            }
-
-            if (col.documents && col.documents.length) {
-                children.push(
-                    ...col.documents.map((doc) => ({
-                        key: doc.itemUID,
-                        label: doc.name,
-                        type: "document",
-                        data: { document: doc, collectionId: col.itemUID },
-                    }))
-                );
-            }
-
-            return {
-                key: col.itemUID,
-                label: col.name,
-                type: "collection",
-                data: { collection: col },
-                children,
-            };
-        });
+        return collectionsData
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((col) => {
+                let children: TreeNode[] = [];
+                if (col.collections && col.collections.length) {
+                    children = children.concat(buildTreeNodes(col.collections));
+                }
+                if (col.documents && col.documents.length) {
+                    const docNodes = col.documents
+                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map((doc) => ({
+                            key: doc.itemUID,
+                            label: doc.name,
+                            type: "document",
+                            data: { document: doc, collectionId: col.itemUID, order: doc.order },
+                        }));
+                    children = children.concat(docNodes);
+                }
+                return {
+                    key: col.itemUID,
+                    label: col.name,
+                    type: "collection",
+                    data: { collection: col, order: col.order },
+                    children,
+                };
+            });
     };
 
     const allNodes = [
@@ -105,14 +107,16 @@ export const ReportForm = observer((): ReactElement => {
             key: collection.itemUID,
             label: collection.name,
             type: "collection",
-            data: { collection: collection },
+            data: { collection: collection, order: collection.order },
             children:
-                collection.documents?.map((doc) => ({
-                    key: doc.itemUID,
-                    label: doc.name,
-                    type: "document",
-                    data: { document: doc, collectionId: collection.itemUID },
-                })) || [],
+                collection.documents
+                    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map((doc) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
+                        type: "document",
+                        data: { document: doc, collectionId: collection.itemUID, order: doc.order },
+                    })) || [],
         })),
         ...buildTreeNodes(collections),
     ];
@@ -127,77 +131,134 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    const handleChangeReportOrder = async (
-        updatedReports: ReportDocument[],
-        collectionId: string
-    ) => {
-        const promises = updatedReports.map((report) => {
-            return setReportOrder(collectionId, report.itemUID, report.order);
-        });
+    const updateDocumentOrderInCollection = async (collectionId: string) => {
+        const collection = collections.find((col) => col.itemUID === collectionId);
+        if (!collection || !collection.documents) return;
+        const updatedReports = collection.documents.map((doc, index) => ({
+            ...doc,
+            order: index,
+        }));
+        setCollections((prev) =>
+            prev.map((col) =>
+                col.itemUID === collectionId ? { ...col, documents: updatedReports } : col
+            )
+        );
+    };
 
-        const responses = await Promise.all(promises);
-
-        responses.forEach((response, index) => {
-            if (response && response.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail:
-                        response.error ||
-                        `Error while updating report order for "${updatedReports[index].name}"`,
-                    life: TOAST_LIFETIME,
-                });
+    const convertTreeNodesToCollections = (
+        nodes: TreeNodeEvent[],
+        parentCollection?: ReportCollection
+    ): ReportCollection[] => {
+        return nodes.map((node, index) => {
+            const data = node.data || {};
+            const isCollection = node.type === "collection";
+            if (isCollection) {
+                const collectionData: ReportCollection = {
+                    ...data.collection,
+                    order: index,
+                    documents: [],
+                    collections: [],
+                };
+                if (node.children && node.children.length) {
+                    const docs: ReportDocument[] = [];
+                    const cols: ReportCollection[] = [];
+                    for (let i = 0; i < node.children.length; i++) {
+                        const child = node.children[i] as TreeNodeEvent;
+                        if (child.type === "document") {
+                            const docData = child.data || {};
+                            docs.push({
+                                ...docData.document,
+                                order: i,
+                            });
+                        } else if (child.type === "collection") {
+                            const subCols = convertTreeNodesToCollections([child], collectionData);
+                            cols.push(...subCols);
+                        }
+                    }
+                    collectionData.documents = docs;
+                    collectionData.collections = cols;
+                }
+                return collectionData;
+            } else {
+                return parentCollection!;
             }
-        });
-
-        toast.current?.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Report order updated successfully!",
-            life: TOAST_LIFETIME,
         });
     };
 
-    const handleDragDrop = async (event: any) => {
-        const dragType = event.dragNode.type;
-        const dropType = event.dropNode.type;
-        const dragData = event.dragNode.data;
-        const dropData = event.dropNode.data;
-
-        if (dragType === "document" && dropType === "collection") {
-            const sourceCollectionId = dragData.collectionId;
-            const targetCollectionId = dropData.collection.itemUID;
-
-            if (sourceCollectionId !== targetCollectionId) {
-                const report: ReportDocument = dragData.document;
-                const response = await moveReportToCollection(
-                    sourceCollectionId,
-                    report.documentUID,
-                    targetCollectionId
+    const handleDragDrop = async (event: TreeDragDropEvent) => {
+        const updatedNodes = event.value as TreeNode[];
+        const favoriteNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
+        const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
+        let newFavoriteCollections: ReportCollection[] = [];
+        let newCollections: ReportCollection[] = [];
+        if (favoriteNode) {
+            const favCols = convertTreeNodesToCollections([favoriteNode as TreeNodeEvent]);
+            if (favCols.length > 0) {
+                newFavoriteCollections = favCols;
+            }
+        }
+        const converted = convertTreeNodesToCollections(otherNodes as TreeNodeEvent[]);
+        newCollections = converted;
+        setFavoriteCollections(newFavoriteCollections);
+        setCollections(newCollections);
+        const dragNode = event.dragNode as TreeNodeEvent | undefined;
+        const dropNode = event.dropNode as TreeNodeEvent | undefined;
+        if (dragNode && dropNode) {
+            const dragData = dragNode.data;
+            const dropData = dropNode.data;
+            if (dragNode.type === "document" && dropNode.type === "document") {
+                const collectionId = dragData?.collectionId;
+                const currentCollectionsLength =
+                    collections.find((col) => col.itemUID === collectionId)?.collections?.length ||
+                    0;
+                const response = await setReportOrder(
+                    collectionId,
+                    dragData.document.documentUID,
+                    event.dropIndex - currentCollectionsLength
                 );
-                if (response && response.status === Status.ERROR) {
+                if (response?.error) {
                     toast.current?.show({
                         severity: "error",
-                        summary: Status.ERROR,
-                        detail: response.error || "Error while moving report to collection",
+                        summary: "Error",
+                        detail: response.error,
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Report moved successfully!",
-                        life: TOAST_LIFETIME,
-                    });
                     handleGetUserReportCollections(authUser?.useruid!);
                 }
+                if (collectionId && collectionId === dropData?.collectionId) {
+                    await updateDocumentOrderInCollection(collectionId);
+                }
             }
-        } else if (dragType === "document" && dropType === "document") {
-            debugger;
-        } else if (dragType === "collection" && dropType === "collection") {
-            debugger;
+            if (dragNode.type === "document" && dropNode.type === "collection") {
+                const sourceCollectionId = dragData.collectionId;
+                const targetCollectionId = dropData.collection.itemUID;
+                const reportId = dragData.document.documentUID;
+                if (sourceCollectionId !== targetCollectionId) {
+                    const response = await moveReportToCollection(
+                        sourceCollectionId,
+                        reportId,
+                        targetCollectionId
+                    );
+                    if (response && response.status === Status.ERROR) {
+                        toast.current?.show({
+                            severity: "error",
+                            summary: "Error",
+                            detail: response.error,
+                            life: TOAST_LIFETIME,
+                        });
+                    } else {
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Report moved successfully!",
+                            life: TOAST_LIFETIME,
+                        });
+                        handleGetUserReportCollections(authUser?.useruid!);
+                    }
+                }
+            }
         }
-        handleGetUserReportCollections(authUser?.useruid!);
     };
 
     return (
@@ -233,8 +294,7 @@ export const ReportForm = observer((): ReactElement => {
                                 nodeTemplate={(node) => (
                                     <Button
                                         onClick={() => handleSelection(node)}
-                                        className={`report__list-item w-full 
-                                        `}
+                                        className='report__list-item w-full'
                                         text
                                     >
                                         {node.label}
