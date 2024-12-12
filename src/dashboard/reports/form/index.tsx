@@ -5,7 +5,6 @@ import {
     moveReportToCollection,
     setReportOrder,
 } from "http/services/reports.service";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
@@ -14,10 +13,11 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
-import { OrderList } from "primereact/orderlist";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { Tree } from "primereact/tree";
+import { TreeNode } from "primereact/treenode";
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
@@ -33,13 +33,17 @@ export const ReportForm = observer((): ReactElement => {
     const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
-    const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
-    const [activeIndex, setActiveIndex] = useState<number[]>(!id ? [1] : []);
 
-    const [draggedReport, setDraggedReport] = useState<{
-        report: ReportDocument;
-        sourceCollectionId: string;
-    } | null>(null);
+    useEffect(() => {
+        if (authUser) {
+            handleGetUserReportCollections(authUser.useruid);
+            getUserFavoriteReportList(authUser.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
+        }
+    }, [authUser]);
 
     const handleGetUserReportCollections = async (useruid: string) => {
         const response = await getUserReportCollectionsContent(useruid);
@@ -67,93 +71,60 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
-            getUserFavoriteReportList(authUser.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
-                }
-            });
-        }
-    }, [authUser]);
+    const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
+        return collectionsData.map((col) => {
+            const children: TreeNode[] = [];
 
-    useEffect(() => {
-        if (id && collections) {
-            const allCollections = [...favoriteCollections, ...collections];
-
-            const findReportInCollections = (
-                targetId: string
-            ): { mainIndex: number; nestedIndex?: number } | null => {
-                const mainIndex = allCollections?.findIndex((collection) => {
-                    if (collection.documents?.some((doc) => doc.documentUID === targetId)) {
-                        return true;
-                    }
-
-                    return collection.collections?.some((nestedCollection) => {
-                        if (
-                            nestedCollection.documents?.some((doc) => doc.documentUID === targetId)
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    });
-                });
-
-                if (mainIndex !== -1) {
-                    const nestedIndex = allCollections[mainIndex]?.collections?.findIndex(
-                        (nestedCollection) =>
-                            nestedCollection?.documents?.some(
-                                (doc) => doc?.documentUID === targetId
-                            )
-                    );
-                    return { mainIndex, nestedIndex: nestedIndex !== -1 ? nestedIndex : undefined };
-                }
-
-                return null;
-            };
-
-            const foundIndices = findReportInCollections(id);
-
-            if (foundIndices) {
-                const { mainIndex } = foundIndices;
-
-                setActiveIndex([mainIndex]);
-                setSelectedTabUID(id);
-            } else {
-                setActiveIndex([1]);
+            if (col.collections && col.collections.length) {
+                children.push(...buildTreeNodes(col.collections));
             }
-        }
-    }, [id, collections, favoriteCollections]);
 
-    const handleAccordionTabChange = (report: ReportDocument) => {
-        if (report.documentUID === id) return;
-        reportStore.report = report;
-        reportStore.reportName = report.name;
-        setSelectedTabUID(report.itemUID);
-        navigate(`/dashboard/reports/${report.documentUID}`);
+            if (col.documents && col.documents.length) {
+                children.push(
+                    ...col.documents.map((doc) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
+                        type: "document",
+                        data: { document: doc, collectionId: col.itemUID },
+                    }))
+                );
+            }
+
+            return {
+                key: col.itemUID,
+                label: col.name,
+                type: "collection",
+                data: { collection: col },
+                children,
+            };
+        });
     };
 
-    const listItemTemplate = (report: ReportDocument, collectionId: string) => {
-        return (
-            <Button
-                className={`report__list-item w-full ${
-                    selectedTabUID === report.documentUID ? "report__list-item--selected" : ""
-                }`}
-                key={report.itemUID}
-                text
-                draggable
-                onDragStart={(e: React.DragEvent<HTMLButtonElement>) =>
-                    handleDragStart(e, report, collectionId)
-                }
-                onClick={(event) => {
-                    event.preventDefault();
-                    handleAccordionTabChange(report);
-                }}
-            >
-                <p className='report-item__name'>{report.name}</p>
-            </Button>
-        );
+    const allNodes = [
+        ...favoriteCollections.map((collection) => ({
+            key: collection.itemUID,
+            label: collection.name,
+            type: "collection",
+            data: { collection: collection },
+            children:
+                collection.documents?.map((doc) => ({
+                    key: doc.itemUID,
+                    label: doc.name,
+                    type: "document",
+                    data: { document: doc, collectionId: collection.itemUID },
+                })) || [],
+        })),
+        ...buildTreeNodes(collections),
+    ];
+
+    const handleSelection = (node: any) => {
+        const { type, data } = node;
+        if (type === "document") {
+            const doc: ReportDocument = data.document;
+            reportStore.report = doc as any;
+            reportStore.reportName = doc.name;
+            navigate(`/dashboard/reports/${doc.documentUID}`);
+        }
     };
 
     const handleChangeReportOrder = async (
@@ -161,7 +132,7 @@ export const ReportForm = observer((): ReactElement => {
         collectionId: string
     ) => {
         const promises = updatedReports.map((report) => {
-            return setReportOrder(collectionId, report.documentUID, report.order);
+            return setReportOrder(collectionId, report.itemUID, report.order);
         });
 
         const responses = await Promise.all(promises);
@@ -185,89 +156,48 @@ export const ReportForm = observer((): ReactElement => {
             detail: "Report order updated successfully!",
             life: TOAST_LIFETIME,
         });
-
-        handleGetUserReportCollections(authUser?.useruid!);
     };
 
-    const handleChangeListOrder = async (
-        event: { value: ReportDocument[] },
-        collectionId: string
-    ) => {
-        const updatedReports = event.value.map((report, index) => {
-            return {
-                ...report,
-                order: index,
-            };
-        });
+    const handleDragDrop = async (event: any) => {
+        const dragType = event.dragNode.type;
+        const dropType = event.dropNode.type;
+        const dragData = event.dragNode.data;
+        const dropData = event.dropNode.data;
 
-        setCollections((prevCollections) =>
-            prevCollections.map((collection) => {
-                if (collection.itemUID === collectionId) {
-                    return { ...collection, documents: updatedReports };
+        if (dragType === "document" && dropType === "collection") {
+            const sourceCollectionId = dragData.collectionId;
+            const targetCollectionId = dropData.collection.itemUID;
+
+            if (sourceCollectionId !== targetCollectionId) {
+                const report: ReportDocument = dragData.document;
+                const response = await moveReportToCollection(
+                    sourceCollectionId,
+                    report.documentUID,
+                    targetCollectionId
+                );
+                if (response && response.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error || "Error while moving report to collection",
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Report moved successfully!",
+                        life: TOAST_LIFETIME,
+                    });
+                    handleGetUserReportCollections(authUser?.useruid!);
                 }
-                return collection;
-            })
-        );
-
-        await handleChangeReportOrder(updatedReports, collectionId);
-    };
-
-    const handleDragStart = (
-        e: React.DragEvent,
-        report: ReportDocument,
-        sourceCollectionId: string
-    ) => {
-        setDraggedReport({ report, sourceCollectionId });
-        e.dataTransfer.effectAllowed = "move";
-    };
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-    };
-
-    const reportMove = async (
-        report: ReportDocument,
-        sourceCollectionId: string,
-        targetCollectionId: string
-    ) => {
-        const response = await moveReportToCollection(
-            sourceCollectionId,
-            report.documentUID,
-            targetCollectionId
-        );
-
-        if (response && response.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: response.error || "Error while moving report to collection",
-                life: TOAST_LIFETIME,
-            });
-        } else {
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Report moved successfully!",
-                life: TOAST_LIFETIME,
-            });
-            handleGetUserReportCollections(authUser?.useruid!);
+            }
+        } else if (dragType === "document" && dropType === "document") {
+            debugger;
+        } else if (dragType === "collection" && dropType === "collection") {
+            debugger;
         }
-    };
-
-    const handleDrop = (
-        e: React.DragEvent<HTMLDivElement>,
-        targetCollection: Pick<ReportCollection, "itemUID" | "description">
-    ) => {
-        e.preventDefault();
-        if (!draggedReport || targetCollection.description === "Favorites") return;
-
-        const { report, sourceCollectionId } = draggedReport;
-        if (sourceCollectionId !== targetCollection.itemUID) {
-            reportMove(report, sourceCollectionId, targetCollection.itemUID);
-        }
-
-        setDraggedReport(null);
+        handleGetUserReportCollections(authUser?.useruid!);
     };
 
     return (
@@ -295,133 +225,28 @@ export const ReportForm = observer((): ReactElement => {
                     </div>
                     <div className='card-content report__card grid'>
                         <div className='col-4'>
-                            <Accordion
-                                activeIndex={activeIndex}
-                                onTabChange={(e) => setActiveIndex(e.index as number[])}
-                                multiple
-                                className='report__accordion'
-                            >
-                                {[...favoriteCollections, ...collections].map(
-                                    ({
-                                        itemUID,
-                                        name,
-                                        documents,
-                                        description,
-                                        collections: nestedCollections,
-                                    }: ReportCollection) => (
-                                        <AccordionTab
-                                            key={itemUID}
-                                            header={
-                                                <div
-                                                    onDragOver={handleDragOver}
-                                                    onDrop={(e) =>
-                                                        handleDrop(e, { itemUID, description })
-                                                    }
-                                                >
-                                                    {name}
-                                                </div>
-                                            }
-                                            disabled={
-                                                !documents?.length && !nestedCollections?.length
-                                            }
-                                            className={`report__accordion-tab ${
-                                                selectedTabUID === itemUID
-                                                    ? "report__list-item--selected"
-                                                    : ""
-                                            }`}
-                                        >
-                                            <div className='report__list-wrapper'>
-                                                {nestedCollections && (
-                                                    <Accordion
-                                                        multiple
-                                                        className='nested-accordion'
-                                                    >
-                                                        {nestedCollections.map(
-                                                            (nestedCollection) => (
-                                                                <AccordionTab
-                                                                    key={nestedCollection.itemUID}
-                                                                    header={
-                                                                        <div
-                                                                            onDragOver={
-                                                                                handleDragOver
-                                                                            }
-                                                                            onDrop={(e) =>
-                                                                                handleDrop(e, {
-                                                                                    itemUID:
-                                                                                        nestedCollection.itemUID,
-                                                                                    description:
-                                                                                        nestedCollection.description,
-                                                                                })
-                                                                            }
-                                                                        >
-                                                                            {nestedCollection.name}
-                                                                        </div>
-                                                                    }
-                                                                    disabled={
-                                                                        !nestedCollection.documents
-                                                                            ?.length
-                                                                    }
-                                                                    className={`nested-accordion-tab ${
-                                                                        selectedTabUID ===
-                                                                        nestedCollection.itemUID
-                                                                            ? "report__list-item--selected"
-                                                                            : ""
-                                                                    }`}
-                                                                >
-                                                                    <div className='report__list-wrapper'>
-                                                                        {nestedCollection.documents && (
-                                                                            <OrderList
-                                                                                value={
-                                                                                    nestedCollection.documents
-                                                                                }
-                                                                                itemTemplate={(
-                                                                                    item
-                                                                                ) =>
-                                                                                    listItemTemplate(
-                                                                                        item,
-                                                                                        nestedCollection.itemUID
-                                                                                    )
-                                                                                }
-                                                                                dragdrop
-                                                                                onChange={(e) =>
-                                                                                    handleChangeListOrder(
-                                                                                        e,
-                                                                                        nestedCollection.itemUID
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                </AccordionTab>
-                                                            )
-                                                        )}
-                                                    </Accordion>
-                                                )}
-                                                {documents && (
-                                                    <OrderList
-                                                        key={itemUID}
-                                                        itemTemplate={(item) =>
-                                                            listItemTemplate(item, itemUID)
-                                                        }
-                                                        value={documents}
-                                                        dragdrop
-                                                        onChange={(e) =>
-                                                            handleChangeListOrder(e, itemUID)
-                                                        }
-                                                    />
-                                                )}
-                                            </div>
-                                        </AccordionTab>
-                                    )
+                            <Tree
+                                value={allNodes}
+                                dragdropScope='reports'
+                                onDragDrop={handleDragDrop}
+                                expandedKeys={{}}
+                                nodeTemplate={(node) => (
+                                    <Button
+                                        onClick={() => handleSelection(node)}
+                                        className={`report__list-item w-full 
+                                        `}
+                                        text
+                                    >
+                                        {node.label}
+                                    </Button>
                                 )}
-                            </Accordion>
+                            />
                         </div>
                         <ReportEditForm />
                     </div>
                     <ReportFooter
                         onRefetch={() => {
                             handleGetUserReportCollections(authUser!.useruid);
-                            setActiveIndex([1]);
                         }}
                     />
                 </div>

@@ -16,6 +16,10 @@ export interface ReportDocument {
     accessed: string;
     count: number;
     created: string;
+    collections?: {
+        collectionuid: string;
+        itemuid: string;
+    }[];
     documentUID: string;
     index: number;
     isNew: 0 | 1;
