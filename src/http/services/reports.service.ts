@@ -395,3 +395,20 @@ export const setReportOrder = async (collectionuid: string, reportuid: string, o
         }
     }
 };
+
+export const setCollectionOrder = async (collectionuid: string, order: number) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${collectionuid}/order`,
+            { order }
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while changing collection order",
+            };
+        }
+    }
+};

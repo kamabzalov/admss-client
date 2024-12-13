@@ -4,6 +4,7 @@ import {
     getUserReportCollectionsContent,
     setReportOrder,
     moveReportToCollection,
+    setCollectionOrder,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState, useCallback, useRef } from "react";
@@ -300,7 +301,7 @@ export const ReportForm = observer((): ReactElement => {
             const dragData = dragNode.data;
             const dropData = dropNode.data;
             if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.DOCUMENT) {
-                const collectionId = dragData?.collectionId;
+                const collectionId = dragData?.itemUID;
                 const currentCollectionsLength =
                     collections.find((col) => col.itemUID === collectionId)?.collections?.length ||
                     0;
@@ -317,12 +318,12 @@ export const ReportForm = observer((): ReactElement => {
                         life: TOAST_LIFETIME,
                     });
                 }
-                if (collectionId && collectionId === dropData?.collectionId) {
+                if (collectionId && collectionId === dropData?.itemUID) {
                     await updateDocumentOrderInCollection(collectionId);
                 }
             }
             if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.COLLECTION) {
-                const sourceCollectionId = dragData.collectionId;
+                const sourceCollectionId = dragData.itemUID;
                 const targetCollectionId = dropData.collection.itemUID;
                 const reportId = dragData.document.documentUID;
                 if (sourceCollectionId !== targetCollectionId) {
@@ -343,6 +344,30 @@ export const ReportForm = observer((): ReactElement => {
                             severity: "success",
                             summary: "Success",
                             detail: "Report moved successfully!",
+                            life: TOAST_LIFETIME,
+                        });
+                    }
+                }
+            }
+            if (
+                dragNode.type === NODE_TYPES.COLLECTION &&
+                dropNode.type === NODE_TYPES.COLLECTION
+            ) {
+                const sourceCollectionId = dragData.collection.itemUID;
+                if (sourceCollectionId) {
+                    const response = await setCollectionOrder(sourceCollectionId, event.dropIndex);
+                    if (response && response.status === Status.ERROR) {
+                        toast.current?.show({
+                            severity: "error",
+                            summary: "Error",
+                            detail: response.error,
+                            life: TOAST_LIFETIME,
+                        });
+                    } else {
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Collection moved successfully!",
                             life: TOAST_LIFETIME,
                         });
                     }
