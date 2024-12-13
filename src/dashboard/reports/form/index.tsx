@@ -6,7 +6,7 @@ import {
     moveReportToCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useCallback, useRef } from "react";
 import { useStore } from "store/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
@@ -28,6 +28,47 @@ enum REPORT_TYPES {
     CUSTOM = "Custom reports",
 }
 
+enum NODE_TYPES {
+    DOCUMENT = "document",
+    COLLECTION = "collection",
+}
+
+const NodeContent = ({
+    node,
+    isSelected,
+    onClick,
+    isTogglerVisible,
+}: {
+    node: TreeNodeEvent;
+    isSelected: boolean;
+    onClick: () => void;
+    isTogglerVisible?: boolean;
+}) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const parent = ref.current?.closest(".p-treenode-content");
+        if (parent) {
+            if (isTogglerVisible) {
+                parent.classList.add("report__list-item--toggler-visible");
+            }
+            if (isSelected) {
+                parent.classList.add("report__list-item--selected-container");
+            } else {
+                parent.classList.remove("report__list-item--selected-container");
+            }
+        }
+    }, [isSelected]);
+
+    return (
+        <div className='w-full' ref={ref}>
+            <Button onClick={onClick} className={`report__list-item w-full`} text>
+                {node.label}
+            </Button>
+        </div>
+    );
+};
+
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
@@ -37,6 +78,8 @@ export const ReportForm = observer((): ReactElement => {
     const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
+    const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
+    const expandedForId = useRef<string | null>(null);
 
     useEffect(() => {
         if (authUser) {
@@ -87,7 +130,7 @@ export const ReportForm = observer((): ReactElement => {
                         .map((doc) => ({
                             key: doc.itemUID,
                             label: doc.name,
-                            type: "document",
+                            type: NODE_TYPES.DOCUMENT,
                             data: { document: doc, collectionId: col.itemUID, order: doc.order },
                         }));
                     children = children.concat(docNodes);
@@ -95,7 +138,7 @@ export const ReportForm = observer((): ReactElement => {
                 return {
                     key: col.itemUID,
                     label: col.name,
-                    type: "collection",
+                    type: NODE_TYPES.COLLECTION,
                     data: { collection: col, order: col.order },
                     children,
                 };
@@ -106,7 +149,7 @@ export const ReportForm = observer((): ReactElement => {
         ...favoriteCollections.map((collection) => ({
             key: collection.itemUID,
             label: collection.name,
-            type: "collection",
+            type: NODE_TYPES.COLLECTION,
             data: { collection: collection, order: collection.order },
             children:
                 collection.documents
@@ -114,18 +157,67 @@ export const ReportForm = observer((): ReactElement => {
                     .map((doc) => ({
                         key: doc.itemUID,
                         label: doc.name,
-                        type: "document",
+                        type: NODE_TYPES.DOCUMENT,
                         data: { document: doc, collectionId: collection.itemUID, order: doc.order },
                     })) || [],
         })),
         ...buildTreeNodes(collections),
     ];
 
-    const handleSelection = (node: any) => {
-        const { type, data } = node;
-        if (type === "document") {
+    const findPathToDocument = useCallback(
+        (nodes: TreeNode[], docId: string, path: string[] = []): string[] | null => {
+            for (let node of nodes) {
+                const nodeData = node as TreeNodeEvent;
+                if (
+                    nodeData.type === NODE_TYPES.DOCUMENT &&
+                    nodeData.data.document?.documentUID === docId
+                ) {
+                    return path;
+                }
+
+                if (
+                    nodeData.type === NODE_TYPES.COLLECTION &&
+                    node.children &&
+                    node.children.length > 0
+                ) {
+                    const newPath = [...path, node.key as string];
+                    const result = findPathToDocument(node.children, docId, newPath);
+                    if (result) return result;
+                }
+            }
+            return null;
+        },
+        []
+    );
+
+    useEffect(() => {
+        if (id && allNodes.length > 0 && expandedForId.current !== id) {
+            const path = findPathToDocument(allNodes, id);
+            if (path) {
+                const newExpandedKeys: { [key: string]: boolean } = {};
+                path.forEach((key) => (newExpandedKeys[key] = true));
+                setExpandedKeys((prev) => ({ ...prev, ...newExpandedKeys }));
+                expandedForId.current = id;
+            }
+        }
+    }, [id, allNodes, findPathToDocument]);
+
+    const handleSelection = (node: TreeNode) => {
+        const { type, key, data } = node as TreeNodeEvent;
+        if (type === NODE_TYPES.COLLECTION) {
+            setExpandedKeys((prev) => {
+                const newKeys = { ...prev };
+                if (newKeys[key!]) {
+                    delete newKeys[key!];
+                } else {
+                    newKeys[key!] = true;
+                }
+                return newKeys;
+            });
+        }
+        if (type === NODE_TYPES.DOCUMENT && data.document) {
             const doc: ReportDocument = data.document;
-            reportStore.report = doc as any;
+            reportStore.report = doc;
             reportStore.reportName = doc.name;
             navigate(`/dashboard/reports/${doc.documentUID}`);
         }
@@ -151,7 +243,7 @@ export const ReportForm = observer((): ReactElement => {
     ): ReportCollection[] => {
         return nodes.map((node, index) => {
             const data = node.data || {};
-            const isCollection = node.type === "collection";
+            const isCollection = node.type === NODE_TYPES.COLLECTION;
             if (isCollection) {
                 const collectionData: ReportCollection = {
                     ...data.collection,
@@ -162,19 +254,19 @@ export const ReportForm = observer((): ReactElement => {
                 if (node.children && node.children.length) {
                     const docs: ReportDocument[] = [];
                     const cols: ReportCollection[] = [];
-                    for (let i = 0; i < node.children.length; i++) {
-                        const child = node.children[i] as TreeNodeEvent;
-                        if (child.type === "document") {
+                    node.children.forEach((children, i) => {
+                        const child = children as TreeNodeEvent;
+                        if (child.type === NODE_TYPES.DOCUMENT) {
                             const docData = child.data || {};
                             docs.push({
                                 ...docData.document,
                                 order: i,
                             });
-                        } else if (child.type === "collection") {
+                        } else if (child.type === NODE_TYPES.COLLECTION) {
                             const subCols = convertTreeNodesToCollections([child], collectionData);
                             cols.push(...subCols);
                         }
-                    }
+                    });
                     collectionData.documents = docs;
                     collectionData.collections = cols;
                 }
@@ -201,12 +293,13 @@ export const ReportForm = observer((): ReactElement => {
         newCollections = converted;
         setFavoriteCollections(newFavoriteCollections);
         setCollections(newCollections);
+
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
         if (dragNode && dropNode) {
             const dragData = dragNode.data;
             const dropData = dropNode.data;
-            if (dragNode.type === "document" && dropNode.type === "document") {
+            if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.DOCUMENT) {
                 const collectionId = dragData?.collectionId;
                 const currentCollectionsLength =
                     collections.find((col) => col.itemUID === collectionId)?.collections?.length ||
@@ -223,14 +316,12 @@ export const ReportForm = observer((): ReactElement => {
                         detail: response.error,
                         life: TOAST_LIFETIME,
                     });
-                } else {
-                    handleGetUserReportCollections(authUser?.useruid!);
                 }
                 if (collectionId && collectionId === dropData?.collectionId) {
                     await updateDocumentOrderInCollection(collectionId);
                 }
             }
-            if (dragNode.type === "document" && dropNode.type === "collection") {
+            if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.COLLECTION) {
                 const sourceCollectionId = dragData.collectionId;
                 const targetCollectionId = dropData.collection.itemUID;
                 const reportId = dragData.document.documentUID;
@@ -254,7 +345,6 @@ export const ReportForm = observer((): ReactElement => {
                             detail: "Report moved successfully!",
                             life: TOAST_LIFETIME,
                         });
-                        handleGetUserReportCollections(authUser?.useruid!);
                     }
                 }
             }
@@ -290,16 +380,24 @@ export const ReportForm = observer((): ReactElement => {
                                 value={allNodes}
                                 dragdropScope='reports'
                                 onDragDrop={handleDragDrop}
-                                expandedKeys={{}}
-                                nodeTemplate={(node) => (
-                                    <Button
-                                        onClick={() => handleSelection(node)}
-                                        className='report__list-item w-full'
-                                        text
-                                    >
-                                        {node.label}
-                                    </Button>
-                                )}
+                                expandedKeys={expandedKeys}
+                                onToggle={(e) => setExpandedKeys(e.value)}
+                                nodeTemplate={(node) => {
+                                    const nodeData = node as TreeNodeEvent;
+                                    const isSelected =
+                                        nodeData.type === NODE_TYPES.DOCUMENT &&
+                                        nodeData.data.document?.documentUID === id;
+                                    return (
+                                        <NodeContent
+                                            node={nodeData}
+                                            isSelected={isSelected}
+                                            onClick={() => handleSelection(node)}
+                                            isTogglerVisible={
+                                                nodeData.type === NODE_TYPES.COLLECTION
+                                            }
+                                        />
+                                    );
+                                }}
                             />
                         </div>
                         <ReportEditForm />

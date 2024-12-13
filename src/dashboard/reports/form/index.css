@@ -3,10 +3,28 @@
     .p-tree {
         height: 56vh;
         border: none;
+        .p-treenode-content {
+            &.report__list-item--toggler-visible {
+                .p-tree-toggler {
+                    visibility: visible;
+                }
+            }
+            &:hover {
+                background: var(--admss-app-light-blue);
+            }
+        }
+        .report__list-item--selected-container {
+            color: var(--admss-app-primary);
+            background: var(--admss-app-light-blue);
+            border-radius: 0;
+        }
     }
     .p-tree-container {
         height: 100%;
         border: none;
+        .p-treenode .p-treenode-content .p-tree-toggler:focus {
+            box-shadow: none;
+        }
     }
 }
 
@@ -20,52 +38,6 @@
     font-size: 20px;
     margin-bottom: 40px;
     font-weight: 700;
-}
-
-.report__accordion {
-    max-height: 70vh;
-    width: 454px;
-    overflow-y: scroll;
-}
-
-.report__accordion.p-accordion .p-accordion-header .p-accordion-header-link {
-    border: none;
-    background-color: var(--admss-app-white);
-    padding-bottom: 10px;
-    padding-top: 10px;
-}
-
-.report__accordion.p-accordion .p-accordion-content {
-    background-color: var(--admss-app-white);
-    margin: 0;
-    padding: 10px;
-    padding-top: 0;
-    border: none;
-}
-
-.reports__accordion--inner.p-accordion .p-accordion-content:has(.edit-collection) {
-    padding-top: 0px;
-}
-
-.report__accordion.p-accordion
-    .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
-    .p-accordion-header-link {
-    background-color: var(--admss-app-white);
-    border: none;
-    padding-bottom: 10px;
-    padding-top: 10px;
-}
-.report__accordion.p-accordion
-    .p-accordion-header:not(.p-disabled).p-highlight
-    .p-accordion-header-link {
-    background-color: var(--admss-app-white);
-    border: none;
-    padding-bottom: 10px;
-    padding-top: 10px;
-}
-
-.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
-    box-shadow: none;
 }
 
 .report-controls {
@@ -221,21 +193,11 @@
 
 .report__list-item.p-button.p-button-text {
     color: var(--admss-app-primary);
+    padding-left: 0;
     border-radius: 0;
 }
-.report__accordion-tab,
-.report-item__name {
-    font-family: Open Sans;
-    font-size: 18px;
-    font-weight: 600;
-    text-align: justify;
-}
 
-.nested-accordion-tab {
-    padding-left: 20px;
-}
-
-.report__accordion-tab .report__list-item.p-button.p-button-text:hover {
+.report__list-item.p-button.p-button-text:hover {
     background-color: var(--admss-app-light-blue);
 }
 
@@ -245,12 +207,6 @@
 
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
-}
-
-.report__accordion .report__list-item--selected {
-    color: var(--admss-app-primary);
-    background: var(--admss-app-light-blue);
-    border-radius: 0;
 }
 
 .p-accordion.report__accordion {
