@@ -301,7 +301,7 @@ export const ReportForm = observer((): ReactElement => {
             const dragData = dragNode.data;
             const dropData = dropNode.data;
             if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.DOCUMENT) {
-                const collectionId = dragData?.itemUID;
+                const collectionId = dragData?.collectionId;
                 const currentCollectionsLength =
                     collections.find((col) => col.itemUID === collectionId)?.collections?.length ||
                     0;
@@ -324,7 +324,7 @@ export const ReportForm = observer((): ReactElement => {
             }
             if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.COLLECTION) {
                 const sourceCollectionId = dragData.itemUID;
-                const targetCollectionId = dropData.collection.itemUID;
+                const targetCollectionId = dropData.collection.collectionId;
                 const reportId = dragData.document.documentUID;
                 if (sourceCollectionId !== targetCollectionId) {
                     const response = await moveReportToCollection(
