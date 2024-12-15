@@ -348,6 +348,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     getPromiseList();
                 }}
                 onHide={() => setAddPromiseVisible(false)}
+                statusList={Object.values(paymentItems).map((item) => item.label)}
                 visible={addPromiseVisible}
                 accountuid={id}
             />

@@ -8,6 +8,18 @@ import { useNavigate } from "react-router-dom";
 import { AppColors } from "common/models/css-variables";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 
+const formatPhoneNumber = (phone: string) => {
+    let digits = phone.replace(/\D/g, "");
+
+    if (digits.length === 11 && digits.startsWith("1")) {
+        return `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
+    } else if (digits.length === 10) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    } else {
+        return digits;
+    }
+};
+
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
@@ -47,8 +59,8 @@ export const AccountInformation = observer((): ReactElement => {
                         sectionTitle='Contact Information'
                         info={[
                             { title: "Full Name", value: buyerName || "" },
-                            { title: "Work Phone", value: buyerWorkPhone || "" },
-                            { title: "Mobile", value: buyerMobile || "" },
+                            { title: "Work Phone", value: formatPhoneNumber(buyerWorkPhone || "") },
+                            { title: "Mobile", value: formatPhoneNumber(buyerMobile || "") },
                             { title: "Co-Buyer", value: cobuyerName || "" },
                         ]}
                     />
