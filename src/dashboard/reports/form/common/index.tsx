@@ -64,7 +64,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
 
     const handleSaveReport = () => {
         if (!!report.isdefault) return;
-        saveReport(report?.itemuid).then((response: BaseResponseError | undefined) => {
+        saveReport(report?.itemuid).then((response) => {
             if (response?.status === Status.OK) {
                 toast.current?.show({
                     severity: "success",
@@ -72,6 +72,8 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                     detail: "Custom report is successfully saved!",
                     life: TOAST_LIFETIME,
                 });
+                const { itemuid } = response as { status: Status.OK; itemuid: string };
+                navigate(`/dashboard/reports/${itemuid}`);
                 onRefetch?.();
             } else {
                 toast.current?.show({

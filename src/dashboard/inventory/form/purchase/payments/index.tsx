@@ -6,10 +6,10 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
-import { getAccountPaymentsList } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
+import { Status } from "common/models/base-response";
 import { Checkbox } from "primereact/checkbox";
 
 interface TableColumnProps extends ColumnProps {
@@ -60,18 +60,15 @@ export const PurchasePayments = observer((): ReactElement => {
         { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
     ];
 
-    const handleSavePayment = () => {
-        setInventoryPaymentBack(id || "0", {
+    const handleSavePayment = async () => {
+        const response = await setInventoryPaymentBack(id || "0", {
             payPack: packsForVehicle || 0,
             payDefaultExpAdded: defaultExpenses || 0,
             payPaid: paid || 0,
             paySalesTaxPaid: salesTaxPaid || 0,
             payRemarks: description,
-        }).then(() => {
-            if (id) {
-                getAccountPaymentsList(id);
-            }
         });
+        if (response?.status === Status.OK) fetchInventoryPaymentBack();
     };
 
     return (
