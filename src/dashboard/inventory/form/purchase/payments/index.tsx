@@ -56,8 +56,20 @@ export const PurchasePayments = observer((): ReactElement => {
                 <Checkbox checked={!!rowData.payDefaultExpAdded} readOnly />
             ),
         },
-        { field: "payPaid", header: "Paid" },
-        { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
+        {
+            field: "payPaid",
+            header: "Paid",
+            body: (rowData: InventoryPaymentBack) => (
+                <Checkbox checked={!!rowData.payPaid} readOnly />
+            ),
+        },
+        {
+            field: "paySalesTaxPaid",
+            header: "Sales Tax Paid",
+            body: (rowData: InventoryPaymentBack) => (
+                <Checkbox checked={!!rowData.paySalesTaxPaid} readOnly />
+            ),
+        },
     ];
 
     const handleSavePayment = async () => {
