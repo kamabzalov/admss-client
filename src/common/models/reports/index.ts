@@ -38,6 +38,7 @@ export interface ReportCollection extends BaseResponseError {
     collections?: ReportCollection[];
     documents: ReportDocument[];
     index: number;
+    isdefault: 0 | 1;
     isfavorite: 0 | 1;
     itemUID: string;
     order: number;

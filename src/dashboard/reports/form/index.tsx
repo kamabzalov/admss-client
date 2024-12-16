@@ -24,6 +24,16 @@ interface TreeNodeEvent extends TreeNode {
     type: string;
 }
 
+export enum TOAST_MESSAGES {
+    SUCCESS = "Success",
+    ERROR = "Error",
+    DEFAULT_COLLECTION_MOVE_ERROR = "This default collection cannot be moved.",
+    CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
+    CANNOT_REARRANGE_IN_DEFAULT = "You cannot rearrange documents inside a default collection.",
+    REPORT_MOVED_SUCCESS = "Report moved successfully!",
+    COLLECTION_MOVED_SUCCESS = "Collection moved successfully!",
+}
+
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
     CUSTOM = "Custom reports",
@@ -59,7 +69,7 @@ const NodeContent = ({
                 parent.classList.remove("report__list-item--selected-container");
             }
         }
-    }, [isSelected]);
+    }, [isSelected, isTogglerVisible]);
 
     return (
         <div className='w-full' ref={ref}>
@@ -132,7 +142,11 @@ export const ReportForm = observer((): ReactElement => {
                             key: doc.itemUID,
                             label: doc.name,
                             type: NODE_TYPES.DOCUMENT,
-                            data: { document: doc, collectionId: col.itemUID, order: doc.order },
+                            data: {
+                                document: doc,
+                                collectionId: col.itemUID,
+                                order: doc.order,
+                            },
                         }));
                     children = children.concat(docNodes);
                 }
@@ -250,7 +264,7 @@ export const ReportForm = observer((): ReactElement => {
                     ...data.collection,
                     order: index,
                     documents: [],
-                    collections: [],
+                    collections: data.collection?.collections || [],
                 };
                 if (node.children && node.children.length) {
                     const docs: ReportDocument[] = [];
@@ -278,7 +292,77 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
+    const isDefaultCollection = (collectionId?: string): boolean => {
+        if (!collectionId) return false;
+        let collection = favoriteCollections.find((c) => c.itemUID === collectionId);
+        if (!collection) {
+            const findCollectionRecursive = (
+                cols: ReportCollection[]
+            ): ReportCollection | undefined => {
+                for (const col of cols) {
+                    if (col.itemUID === collectionId) {
+                        return col;
+                    }
+                    if (col.collections && !!col.collections.length) {
+                        const found = findCollectionRecursive(col.collections);
+                        if (found) return found;
+                    }
+                }
+                return undefined;
+            };
+            collection = findCollectionRecursive(collections);
+        }
+        return !!collection?.isdefault;
+    };
+
+    const showError = (detail: string) => {
+        toast.current?.show({
+            severity: "error",
+            summary: TOAST_MESSAGES.ERROR,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const showSuccess = (detail: string) => {
+        toast.current?.show({
+            severity: "success",
+            summary: TOAST_MESSAGES.SUCCESS,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
     const handleDragDrop = async (event: TreeDragDropEvent) => {
+        const dragNode = event.dragNode as TreeNodeEvent | undefined;
+        const dropNode = event.dropNode as TreeNodeEvent | undefined;
+
+        if (dragNode?.type === NODE_TYPES.COLLECTION && !!dragNode.data?.collection?.isdefault) {
+            showError(TOAST_MESSAGES.DEFAULT_COLLECTION_MOVE_ERROR);
+            return;
+        }
+
+        if (dropNode?.type === NODE_TYPES.COLLECTION && !!dropNode.data?.collection?.isdefault) {
+            showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
+            return;
+        }
+
+        if (dragNode?.type === NODE_TYPES.DOCUMENT) {
+            const dragCollectionId = dragNode.data?.collectionId;
+            if (isDefaultCollection(dragCollectionId)) {
+                showError(TOAST_MESSAGES.CANNOT_REARRANGE_IN_DEFAULT);
+                return;
+            }
+        }
+
+        if (dropNode?.type === NODE_TYPES.DOCUMENT) {
+            const dropCollectionId = dropNode.data?.collectionId;
+            if (isDefaultCollection(dropCollectionId)) {
+                showError(TOAST_MESSAGES.CANNOT_REARRANGE_IN_DEFAULT);
+                return;
+            }
+        }
+
         const updatedNodes = event.value as TreeNode[];
         const favoriteNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
         const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
@@ -295,8 +379,6 @@ export const ReportForm = observer((): ReactElement => {
         setFavoriteCollections(newFavoriteCollections);
         setCollections(newCollections);
 
-        const dragNode = event.dragNode as TreeNodeEvent | undefined;
-        const dropNode = event.dropNode as TreeNodeEvent | undefined;
         if (dragNode && dropNode) {
             const dragData = dragNode.data;
             const dropData = dropNode.data;
@@ -311,20 +393,15 @@ export const ReportForm = observer((): ReactElement => {
                     event.dropIndex - currentCollectionsLength
                 );
                 if (response?.error) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: response.error,
-                        life: TOAST_LIFETIME,
-                    });
+                    showError(response.error);
                 }
                 if (collectionId && collectionId === dropData?.itemUID) {
                     await updateDocumentOrderInCollection(collectionId);
                 }
             }
             if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.COLLECTION) {
-                const sourceCollectionId = dragData.itemUID;
-                const targetCollectionId = dropData.collection.collectionId;
+                const sourceCollectionId = dragData.collectionId;
+                const targetCollectionId = dropData.collection.itemUID;
                 const reportId = dragData.document.documentUID;
                 if (sourceCollectionId !== targetCollectionId) {
                     const response = await moveReportToCollection(
@@ -333,19 +410,9 @@ export const ReportForm = observer((): ReactElement => {
                         targetCollectionId
                     );
                     if (response && response.status === Status.ERROR) {
-                        toast.current?.show({
-                            severity: "error",
-                            summary: "Error",
-                            detail: response.error,
-                            life: TOAST_LIFETIME,
-                        });
+                        showError(response.error);
                     } else {
-                        toast.current?.show({
-                            severity: "success",
-                            summary: "Success",
-                            detail: "Report moved successfully!",
-                            life: TOAST_LIFETIME,
-                        });
+                        showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                     }
                 }
             }
@@ -357,19 +424,9 @@ export const ReportForm = observer((): ReactElement => {
                 if (sourceCollectionId) {
                     const response = await setCollectionOrder(sourceCollectionId, event.dropIndex);
                     if (response && response.status === Status.ERROR) {
-                        toast.current?.show({
-                            severity: "error",
-                            summary: "Error",
-                            detail: response.error,
-                            life: TOAST_LIFETIME,
-                        });
+                        showError(response.error);
                     } else {
-                        toast.current?.show({
-                            severity: "success",
-                            summary: "Success",
-                            detail: "Collection moved successfully!",
-                            life: TOAST_LIFETIME,
-                        });
+                        showSuccess(TOAST_MESSAGES.COLLECTION_MOVED_SUCCESS);
                     }
                 }
             }
