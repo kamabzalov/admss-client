@@ -173,7 +173,11 @@ export const ReportForm = observer((): ReactElement => {
                         key: doc.itemUID,
                         label: doc.name,
                         type: NODE_TYPES.DOCUMENT,
-                        data: { document: doc, collectionId: collection.itemUID, order: doc.order },
+                        data: {
+                            document: doc,
+                            collectionId: collection.itemUID,
+                            order: doc.order,
+                        },
                     })) || [],
         })),
         ...buildTreeNodes(collections),
@@ -336,13 +340,21 @@ export const ReportForm = observer((): ReactElement => {
     const handleDragDrop = async (event: TreeDragDropEvent) => {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
+        const dropIndex = event.dropIndex;
 
-        if (dragNode?.type === NODE_TYPES.COLLECTION && !!dragNode.data?.collection?.isdefault) {
+        if (
+            dragNode?.type === NODE_TYPES.COLLECTION &&
+            (!!dragNode.data?.collection?.isdefault || !!dragNode.data?.collection?.isfavorite)
+        ) {
             showError(TOAST_MESSAGES.DEFAULT_COLLECTION_MOVE_ERROR);
             return;
         }
 
-        if (dropNode?.type === NODE_TYPES.COLLECTION && !!dropNode.data?.collection?.isdefault) {
+        if (
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragNode?.type !== NODE_TYPES.DOCUMENT &&
+            (!!dropNode.data?.collection?.isdefault || !!dropNode.data?.collection?.isfavorite)
+        ) {
             showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
             return;
         }
@@ -379,55 +391,59 @@ export const ReportForm = observer((): ReactElement => {
         setFavoriteCollections(newFavoriteCollections);
         setCollections(newCollections);
 
-        if (dragNode && dropNode) {
-            const dragData = dragNode.data;
-            const dropData = dropNode.data;
-            if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.DOCUMENT) {
-                const collectionId = dragData?.collectionId;
-                const currentCollectionsLength =
-                    collections.find((col) => col.itemUID === collectionId)?.collections?.length ||
-                    0;
+        const dragData = dragNode?.data;
+        const dropData = dropNode?.data;
+
+        if (dragNode?.type === NODE_TYPES.DOCUMENT && dragData?.document) {
+            const collectionId = dragData.collectionId;
+            const currentCollectionsLength =
+                collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
+
+            if (collectionId && dragData.document.documentUID != null && dropIndex != null) {
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
-                    event.dropIndex - currentCollectionsLength
+                    dropIndex - currentCollectionsLength
                 );
                 if (response?.error) {
                     showError(response.error);
-                }
-                if (collectionId && collectionId === dropData?.itemUID) {
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                     await updateDocumentOrderInCollection(collectionId);
                 }
             }
-            if (dragNode.type === NODE_TYPES.DOCUMENT && dropNode.type === NODE_TYPES.COLLECTION) {
-                const sourceCollectionId = dragData.collectionId;
-                const targetCollectionId = dropData.collection.itemUID;
-                const reportId = dragData.document.documentUID;
-                if (sourceCollectionId !== targetCollectionId) {
-                    const response = await moveReportToCollection(
-                        sourceCollectionId,
-                        reportId,
-                        targetCollectionId
-                    );
-                    if (response && response.status === Status.ERROR) {
-                        showError(response.error);
-                    } else {
-                        showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
-                    }
+        }
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragData?.document
+        ) {
+            const sourceCollectionId = dragData.collectionId;
+            const targetCollectionId = dropData.collection.itemUID;
+            const reportId = dragData.document.documentUID;
+            if (sourceCollectionId !== targetCollectionId) {
+                const response = await moveReportToCollection(
+                    sourceCollectionId,
+                    reportId,
+                    targetCollectionId
+                );
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                 }
             }
-            if (
-                dragNode.type === NODE_TYPES.COLLECTION &&
-                dropNode.type === NODE_TYPES.COLLECTION
-            ) {
-                const sourceCollectionId = dragData.collection.itemUID;
-                if (sourceCollectionId) {
-                    const response = await setCollectionOrder(sourceCollectionId, event.dropIndex);
-                    if (response && response.status === Status.ERROR) {
-                        showError(response.error);
-                    } else {
-                        showSuccess(TOAST_MESSAGES.COLLECTION_MOVED_SUCCESS);
-                    }
+        }
+
+        if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
+            const sourceCollectionId = dragData.collection.itemUID;
+            if (sourceCollectionId) {
+                const response = await setCollectionOrder(sourceCollectionId, dropIndex);
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.COLLECTION_MOVED_SUCCESS);
                 }
             }
         }
