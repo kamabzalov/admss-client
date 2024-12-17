@@ -192,7 +192,11 @@
 }
 
 .report__list-item.p-button.p-button-text {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24.51px;
     color: var(--admss-app-primary);
+    font-family: Open Sans;
     padding-left: 0;
     border-radius: 0;
 }
