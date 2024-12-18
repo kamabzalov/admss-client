@@ -130,7 +130,12 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return true;
         }
     ),
-    Trade1_Mileage: Yup.string().required("Data is required."),
+    Trade1_Mileage: Yup.string()
+        .required("Data is required.")
+        .test("is-positive", "Mileage must be greater than 0", (value) => {
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0;
+        }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
         message: "Please enter a valid number.",
@@ -156,7 +161,12 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return true;
         }
     ),
-    Trade2_Mileage: Yup.string().required("Data is required."),
+    Trade2_Mileage: Yup.string()
+        .required("Data is required.")
+        .test("is-positive", "Mileage must be greater than 0", (value) => {
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0;
+        }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
         message: "Please enter a valid number.",

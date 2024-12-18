@@ -101,11 +101,16 @@ export const DealGeneralSale = observer((): ReactElement => {
     const handleGetCompanyInfo = (contact: ContactUser) => {
         setFieldValue(
             "contactinfo",
-            contact.companyName || `${contact.firstName} ${contact.lastName}`
+            contact.companyName ||
+                `${contact.firstName} ${contact.lastName}`.trim() ||
+                contact.userName
         );
         changeDeal({
             key: "contactinfo",
-            value: contact.companyName || `${contact.firstName} ${contact.lastName}`,
+            value:
+                contact.companyName ||
+                `${contact.firstName} ${contact.lastName}`.trim() ||
+                contact.userName,
         });
         changeDeal({
             key: "contactuid",
