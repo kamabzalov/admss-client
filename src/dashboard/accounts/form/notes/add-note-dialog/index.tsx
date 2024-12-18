@@ -62,35 +62,37 @@ export const AddNoteDialog = ({
         }
     }, [contactType, note, noteTaker]);
 
-    const handleAddNote = () => {
-        accountuid &&
-            addAccountNote(accountuid, {
-                NoteBy: noteTaker,
-                Note: note,
-                ContactMethod: contactType,
-            }).then((res) => {
-                if (res && res.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Note added successfully",
-                        life: TOAST_LIFETIME,
-                    });
-                    setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
-                    setIsButtonDisabled(true);
-                    store.isAccountChanged = true;
-                    setNote("");
-                    action();
-                    onHide();
-                }
+    const handleAddNote = async () => {
+        const payload: Partial<AccountNote> = {
+            NoteBy: noteTaker,
+            Note: note,
+            ContactMethod: contactType,
+        };
+        if (currentNote?.itemuid) {
+            payload.itemuid = currentNote.itemuid;
+        }
+        const response = await addAccountNote(accountuid!, payload);
+        if (response && response.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error,
+                life: TOAST_LIFETIME,
             });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Note added successfully",
+                life: TOAST_LIFETIME,
+            });
+            setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+            setIsButtonDisabled(true);
+            store.isAccountChanged = true;
+            setNote("");
+            action();
+            onHide();
+        }
     };
 
     return (

@@ -45,3 +45,11 @@
         }
     }
 }
+
+.add-promise {
+    flex: 0 0 660px;
+    .add-promise__textarea {
+        height: 116px;
+        resize: none;
+    }
+}
