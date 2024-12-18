@@ -15,7 +15,7 @@ import { ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 import { InputNumber } from "primereact/inputnumber";
 
-const INPUT_NUMBER_MAX_LENGTH = 10;
+const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
     CONTACTS,
@@ -169,6 +169,19 @@ export const AdvancedSearchDialog = <T,>({
                                             return;
                                         onInputChange(key, value?.toString() || "");
                                     }}
+                                    onPaste={(event) => {
+                                        const clipboardData = event.clipboardData;
+                                        const pastedData = clipboardData.getData("Text");
+
+                                        const sanitizedData = pastedData
+                                            .replace(/\D/g, "")
+                                            .slice(0, INPUT_NUMBER_MAX_LENGTH);
+
+                                        if (sanitizedData) {
+                                            event.preventDefault();
+                                            onInputChange(key, sanitizedData);
+                                        }
+                                    }}
                                 />
                             )}
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
@@ -197,13 +210,14 @@ export const AdvancedSearchDialog = <T,>({
                                         optionLabel='name'
                                         optionValue='id'
                                         value={
-                                            typeList.find((type) => type.name === selectedType)?.id
+                                            typeList?.find((type) => type?.name === selectedType)
+                                                ?.id
                                         }
                                         filter
-                                        options={typeList}
+                                        options={typeList || []}
                                         onChange={({ target }) => {
-                                            const selected = typeList.find(
-                                                (type) => type.id === target.value
+                                            const selected = typeList?.find(
+                                                (type) => type?.id === target.value
                                             );
                                             setSelectedType(selected?.name || "");
                                             onInputChange(key, target.value);
