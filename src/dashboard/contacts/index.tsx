@@ -294,7 +294,7 @@ export const ContactsDataTable = ({
     const handleAdvancedSearch = () => {
         const searchQuery = Object.entries(advancedSearch)
             .filter(([_, value]) => value)
-            .map(([key, value]) => `${value}.${key}`)
+            .map(([key, value]) => `${value}.${key.replace(/\d+/g, "")}`)
             .join("+");
 
         handleGetContactsList({ qry: searchQuery }, true);
