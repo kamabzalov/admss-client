@@ -279,8 +279,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     <InputNumber
                         className={`deal-trade__text-input w-full ${errors.Trade1_Mileage ? "p-invalid" : ""}`}
                         required
-                        value={values.Trade1_Mileage ? Number(values.Trade1_Mileage) : null}
-                        useGrouping={false}
+                        value={
+                            values.Trade1_Mileage
+                                ? parseFloat(values.Trade1_Mileage.replace(/[^0-9.]/g, ""))
+                                : null
+                        }
+                        useGrouping
                         min={0}
                         onChange={({ value }) => {
                             const valAsString = value?.toString() || "";

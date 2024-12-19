@@ -229,7 +229,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("datepurchase")}
                     className={`${errors.datepurchase && "p-invalid"}`}
                     name='Sale date (required)'
-                    date={Number(values.datepurchase)}
+                    date={new Date(values.datepurchase)}
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", Number(value));
                         changeDeal({ key: "datepurchase", value: Number(value) });
@@ -241,8 +241,8 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <DateInput
                     {...getFieldProps("dateeffective")}
                     className={`${errors.dateeffective && "p-invalid"}`}
-                    name='First operated (req.)'
-                    value={values.dateeffective}
+                    name='First operated (required)'
+                    date={new Date(values.dateeffective)}
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", Number(value));
                         changeDeal({ key: "dateeffective", value: Number(value) });
@@ -256,7 +256,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("inventorystatus")}
                         optionLabel='name'
                         optionValue='id'
-                        value={values.inventorystatus}
+                        value={
+                            values.inventorystatus !== undefined
+                                ? Number(values.inventorystatus)
+                                : null
+                        }
                         options={inventoryStatusesList}
                         onChange={(e) => {
                             setFieldValue("inventorystatus", e.value);
@@ -264,9 +268,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         }}
                         filter
                         required
-                        className={`w-full deal-sale__dropdown ${
-                            errors.inventorystatus && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
                     />
                     <label className='float-label'>New or Used (req.)</label>
                 </span>
