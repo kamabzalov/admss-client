@@ -62,7 +62,7 @@ export const NoticeAlert = observer(({ ...props }: NoticeAlertProps): ReactEleme
                 )}
                 {alert && (
                     <div className='notice-content'>
-                        <h4 className='notice-content__title'>Account Alert:</h4>
+                        <h4 className='notice-content__title'>Payment Alert:</h4>
                         <p className='notice-content__description'>{alert}</p>
                     </div>
                 )}

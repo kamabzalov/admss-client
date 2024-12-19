@@ -195,6 +195,7 @@ export class AccountStore {
     });
 
     public set accountNote(note: AccountNoteData) {
+        this._isAccountPaymentChanged = true;
         this._accountNote = note;
     }
 

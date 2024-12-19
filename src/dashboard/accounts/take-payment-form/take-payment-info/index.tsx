@@ -1,8 +1,6 @@
 import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
-import { Button } from "primereact/button";
 import { InfoSection } from "dashboard/accounts/form/information/info-section";
-import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { AccountNoteData } from "store/stores/account";
 import { Status } from "common/models/base-response";
@@ -11,6 +9,7 @@ import { updateAccountNote } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { TOAST_LIFETIME } from "common/settings";
 import { AppColors } from "common/models/css-variables";
+import { NoteEditor } from "dashboard/accounts/form/common";
 
 export const TakePaymentInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -111,46 +110,29 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 ]}
             />
 
-            <div className='account-note mt3'>
-                <span className='p-float-label'>
-                    <InputTextarea
-                        id='account-memo'
-                        value={accountNote.note}
-                        onChange={(e) =>
-                            (store.accountNote = { ...accountNote, note: e.target.value })
-                        }
-                        className='account-note__input'
-                    />
-                    <label htmlFor='account-memo'>Account Memo</label>
-                </span>
-                <Button
-                    severity={!!accountNote.note ? "success" : "secondary"}
-                    className='account-note__button'
-                    label='Save'
-                    disabled={!accountNote.note}
-                    onClick={() => handleSaveNote("note")}
-                />
-            </div>
-            <div className='account-note mt-3'>
-                <span className='p-float-label'>
-                    <InputTextarea
-                        id='account-payment'
-                        value={accountNote.alert}
-                        onChange={(e) =>
-                            (store.accountNote = { ...accountNote, alert: e.target.value })
-                        }
-                        className='account-note__input'
-                    />
-                    <label htmlFor='account-payment'>Payment Alert</label>
-                </span>
-                <Button
-                    severity={!!accountNote.alert ? "success" : "secondary"}
-                    className='account-note__button'
-                    disabled={!accountNote.alert}
-                    label='Save'
-                    onClick={() => handleSaveNote("alert")}
-                />
-            </div>
+            <NoteEditor
+                id='account-memo'
+                value={accountNote.note}
+                label='Account Memo'
+                onSave={() => handleSaveNote("note")}
+                onClear={() => {
+                    store.accountNote = { ...accountNote, note: "" };
+                    handleSaveNote("note");
+                }}
+                onChange={(value) => (store.accountNote = { ...accountNote, note: value })}
+            />
+            <NoteEditor
+                id='account-payment'
+                value={accountNote.alert}
+                className='mt-3'
+                label='Payment Alert'
+                onSave={() => handleSaveNote("alert")}
+                onClear={() => {
+                    store.accountNote = { ...accountNote, alert: "" };
+                    handleSaveNote("alert");
+                }}
+                onChange={(value) => (store.accountNote = { ...accountNote, alert: value })}
+            />
         </div>
     );
 });
