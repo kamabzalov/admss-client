@@ -44,7 +44,7 @@ type Range<
 > = T["length"] extends End ? never : T["length"] | Range<Start, End, [any, ...T]>;
 
 interface DateInputProps extends CalendarProps {
-    date?: number;
+    date?: number | Date;
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
     emptyDate?: boolean;
