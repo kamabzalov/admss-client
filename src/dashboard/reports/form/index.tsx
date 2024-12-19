@@ -27,11 +27,10 @@ interface TreeNodeEvent extends TreeNode {
 export enum TOAST_MESSAGES {
     SUCCESS = "Success",
     ERROR = "Error",
-    DEFAULT_COLLECTION_MOVE_ERROR = "This default collection cannot be moved.",
+    MOVE_INTO_DEFAULT_ERROR = "This document cannot be moved into a default collection.",
     CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
-    CANNOT_REARRANGE_IN_DEFAULT = "You cannot rearrange documents inside a default collection.",
     REPORT_MOVED_SUCCESS = "Report moved successfully!",
-    COLLECTION_MOVED_SUCCESS = "Collection moved successfully!",
+    COLLECTION_REORDERED_SUCCESS = "Collection re-ordered successfully!",
 }
 
 enum REPORT_TYPES {
@@ -296,29 +295,6 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
-    const isDefaultCollection = (collectionId?: string): boolean => {
-        if (!collectionId) return false;
-        let collection = favoriteCollections.find((c) => c.itemUID === collectionId);
-        if (!collection) {
-            const findCollectionRecursive = (
-                cols: ReportCollection[]
-            ): ReportCollection | undefined => {
-                for (const col of cols) {
-                    if (col.itemUID === collectionId) {
-                        return col;
-                    }
-                    if (col.collections && !!col.collections.length) {
-                        const found = findCollectionRecursive(col.collections);
-                        if (found) return found;
-                    }
-                }
-                return undefined;
-            };
-            collection = findCollectionRecursive(collections);
-        }
-        return !!collection?.isdefault;
-    };
-
     const showError = (detail: string) => {
         toast.current?.show({
             severity: "error",
@@ -343,10 +319,10 @@ export const ReportForm = observer((): ReactElement => {
         const dropIndex = event.dropIndex;
 
         if (
-            dragNode?.type === NODE_TYPES.COLLECTION &&
-            (!!dragNode.data?.collection?.isdefault || !!dragNode.data?.collection?.isfavorite)
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
         ) {
-            showError(TOAST_MESSAGES.DEFAULT_COLLECTION_MOVE_ERROR);
+            showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
             return;
         }
 
@@ -357,22 +333,6 @@ export const ReportForm = observer((): ReactElement => {
         ) {
             showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
             return;
-        }
-
-        if (dragNode?.type === NODE_TYPES.DOCUMENT) {
-            const dragCollectionId = dragNode.data?.collectionId;
-            if (isDefaultCollection(dragCollectionId)) {
-                showError(TOAST_MESSAGES.CANNOT_REARRANGE_IN_DEFAULT);
-                return;
-            }
-        }
-
-        if (dropNode?.type === NODE_TYPES.DOCUMENT) {
-            const dropCollectionId = dropNode.data?.collectionId;
-            if (isDefaultCollection(dropCollectionId)) {
-                showError(TOAST_MESSAGES.CANNOT_REARRANGE_IN_DEFAULT);
-                return;
-            }
         }
 
         const updatedNodes = event.value as TreeNode[];
@@ -394,7 +354,11 @@ export const ReportForm = observer((): ReactElement => {
         const dragData = dragNode?.data;
         const dropData = dropNode?.data;
 
-        if (dragNode?.type === NODE_TYPES.DOCUMENT && dragData?.document) {
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dragData?.document &&
+            dropNode?.type !== NODE_TYPES.COLLECTION
+        ) {
             const collectionId = dragData.collectionId;
             const currentCollectionsLength =
                 collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
@@ -443,7 +407,7 @@ export const ReportForm = observer((): ReactElement => {
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
                 } else {
-                    showSuccess(TOAST_MESSAGES.COLLECTION_MOVED_SUCCESS);
+                    showSuccess(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
                 }
             }
         }
