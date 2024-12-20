@@ -21,7 +21,7 @@ import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -29,6 +29,8 @@ export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
     const userStore = useStore().userStore;
     const toast = useToast();
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
 
     const { authUser } = userStore;
     const { deal, changeDeal, changeDealExtData } = store;
@@ -139,6 +141,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         setFieldValue("contactinfo", value);
                         changeDeal({ key: "contactinfo", value });
                     }}
+                    originalPath={currentPath}
                     value={values?.contactinfo}
                     getFullInfo={handleGetCompanyInfo}
                     name='Buyer Name (required)'
