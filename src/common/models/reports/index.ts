@@ -26,6 +26,7 @@ export interface ReportDocument {
     isfavorite: 0 | 1;
     isdefault: 0 | 1;
     itemUID: string;
+    order: number;
     name: string;
     updated: string;
 }
@@ -37,8 +38,10 @@ export interface ReportCollection extends BaseResponseError {
     collections?: ReportCollection[];
     documents: ReportDocument[];
     index: number;
+    isdefault: 0 | 1;
     isfavorite: 0 | 1;
     itemUID: string;
+    order: number;
     name: string;
     updated: string;
     userUID: string;
@@ -90,6 +93,7 @@ export interface ReportInfo extends BaseResponseError {
     ShowAverages: 0 | 1;
     ShowLineCount: 0 | 1;
     AskForStartAndEndDates: 0 | 1;
+    order: number;
     listid: 0 | 1;
     columns: ReportServiceColumns[];
 }

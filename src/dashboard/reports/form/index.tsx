@@ -2,21 +2,82 @@ import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
+    setReportOrder,
+    moveReportToCollection,
+    setCollectionOrder,
 } from "http/services/reports.service";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useCallback, useRef } from "react";
 import { useStore } from "store/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
+import { Tree, TreeDragDropEvent } from "primereact/tree";
+import { TreeNode } from "primereact/treenode";
+import { Status } from "common/models/base-response";
+
+interface TreeNodeEvent extends TreeNode {
+    type: string;
+}
+
+export enum TOAST_MESSAGES {
+    SUCCESS = "Success",
+    ERROR = "Error",
+    MOVE_INTO_DEFAULT_ERROR = "This document cannot be moved into a default collection.",
+    CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
+    REPORT_MOVED_SUCCESS = "Report moved successfully!",
+    COLLECTION_REORDERED_SUCCESS = "Collection re-ordered successfully!",
+}
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
     CUSTOM = "Custom reports",
 }
+
+enum NODE_TYPES {
+    DOCUMENT = "document",
+    COLLECTION = "collection",
+}
+
+const NodeContent = ({
+    node,
+    isSelected,
+    onClick,
+    isTogglerVisible,
+}: {
+    node: TreeNodeEvent;
+    isSelected: boolean;
+    onClick: () => void;
+    isTogglerVisible?: boolean;
+}) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const parent = ref.current?.closest(".p-treenode-content");
+        if (parent) {
+            if (isTogglerVisible) {
+                parent.classList.add("report__list-item--toggler-visible");
+            }
+            if (isSelected) {
+                parent.classList.add("report__list-item--selected-container");
+            } else {
+                parent.classList.remove("report__list-item--selected-container");
+            }
+        }
+    }, [isSelected, isTogglerVisible]);
+
+    return (
+        <div className='w-full' ref={ref}>
+            <Button onClick={onClick} className={`report__list-item w-full`} text>
+                {node.label}
+            </Button>
+        </div>
+    );
+};
 
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
@@ -24,10 +85,22 @@ export const ReportForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
+    const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
-    const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
-    const [activeIndex, setActiveIndex] = useState<number[]>(!id ? [1] : []);
+    const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
+    const expandedForId = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (authUser) {
+            handleGetUserReportCollections(authUser.useruid);
+            getUserFavoriteReportList(authUser.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
+        }
+    }, [authUser]);
 
     const handleGetUserReportCollections = async (useruid: string) => {
         const response = await getUserReportCollectionsContent(useruid);
@@ -35,11 +108,9 @@ export const ReportForm = observer((): ReactElement => {
             const collectionsWithoutFavorite = response.filter(
                 (collection: ReportCollection) => collection.description !== REPORT_TYPES.FAVORITES
             );
-
             const customReportsCollection = collectionsWithoutFavorite.find(
                 (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
             );
-
             if (customReportsCollection) {
                 setCollections([
                     customReportsCollection,
@@ -55,71 +126,291 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
-            getUserFavoriteReportList(authUser.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
+    const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
+        return collectionsData
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((col) => {
+                let children: TreeNode[] = [];
+                if (col.collections && col.collections.length) {
+                    children = children.concat(buildTreeNodes(col.collections));
                 }
+                if (col.documents && col.documents.length) {
+                    const docNodes = col.documents
+                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map((doc) => ({
+                            key: doc.itemUID,
+                            label: doc.name,
+                            type: NODE_TYPES.DOCUMENT,
+                            data: {
+                                document: doc,
+                                collectionId: col.itemUID,
+                                order: doc.order,
+                            },
+                        }));
+                    children = children.concat(docNodes);
+                }
+                return {
+                    key: col.itemUID,
+                    label: col.name,
+                    type: NODE_TYPES.COLLECTION,
+                    data: { collection: col, order: col.order },
+                    children,
+                };
             });
-        }
-    }, [authUser]);
+    };
 
-    useEffect(() => {
-        if (id && collections) {
-            const allCollections = [...favoriteCollections, ...collections];
+    const allNodes = [
+        ...favoriteCollections.map((collection) => ({
+            key: collection.itemUID,
+            label: collection.name,
+            type: NODE_TYPES.COLLECTION,
+            data: { collection: collection, order: collection.order },
+            children:
+                collection.documents
+                    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map((doc) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
+                        type: NODE_TYPES.DOCUMENT,
+                        data: {
+                            document: doc,
+                            collectionId: collection.itemUID,
+                            order: doc.order,
+                        },
+                    })) || [],
+        })),
+        ...buildTreeNodes(collections),
+    ];
 
-            const findReportInCollections = (
-                targetId: string
-            ): { mainIndex: number; nestedIndex?: number } | null => {
-                const mainIndex = allCollections?.findIndex((collection) => {
-                    if (collection.documents?.some((doc) => doc.documentUID === targetId)) {
-                        return true;
-                    }
-
-                    return collection.collections?.some((nestedCollection) => {
-                        if (
-                            nestedCollection.documents?.some((doc) => doc.documentUID === targetId)
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    });
-                });
-
-                if (mainIndex !== -1) {
-                    const nestedIndex = allCollections[mainIndex]?.collections?.findIndex(
-                        (nestedCollection) =>
-                            nestedCollection?.documents?.some(
-                                (doc) => doc?.documentUID === targetId
-                            )
-                    );
-                    return { mainIndex, nestedIndex: nestedIndex !== -1 ? nestedIndex : undefined };
+    const findPathToDocument = useCallback(
+        (nodes: TreeNode[], docId: string, path: string[] = []): string[] | null => {
+            for (let node of nodes) {
+                const nodeData = node as TreeNodeEvent;
+                if (
+                    nodeData.type === NODE_TYPES.DOCUMENT &&
+                    nodeData.data.document?.documentUID === docId
+                ) {
+                    return path;
                 }
 
-                return null;
-            };
+                if (
+                    nodeData.type === NODE_TYPES.COLLECTION &&
+                    node.children &&
+                    node.children.length > 0
+                ) {
+                    const newPath = [...path, node.key as string];
+                    const result = findPathToDocument(node.children, docId, newPath);
+                    if (result) return result;
+                }
+            }
+            return null;
+        },
+        []
+    );
 
-            const foundIndices = findReportInCollections(id);
-
-            if (foundIndices) {
-                const { mainIndex } = foundIndices;
-
-                setActiveIndex([mainIndex]);
-                setSelectedTabUID(id);
-            } else {
-                setActiveIndex([1]);
+    useEffect(() => {
+        if (id && allNodes.length > 0 && expandedForId.current !== id) {
+            const path = findPathToDocument(allNodes, id);
+            if (path) {
+                const newExpandedKeys: { [key: string]: boolean } = {};
+                path.forEach((key) => (newExpandedKeys[key] = true));
+                setExpandedKeys((prev) => ({ ...prev, ...newExpandedKeys }));
+                expandedForId.current = id;
             }
         }
-    }, [id, collections, favoriteCollections]);
+    }, [id, allNodes, findPathToDocument]);
 
-    const handleAccordionTabChange = (report: ReportDocument) => {
-        if (report.documentUID === id) return;
-        reportStore.report = report;
-        reportStore.reportName = report.name;
-        setSelectedTabUID(report.itemUID);
-        navigate(`/dashboard/reports/${report.documentUID}`);
+    const handleSelection = (node: TreeNode) => {
+        const { type, key, data } = node as TreeNodeEvent;
+        if (type === NODE_TYPES.COLLECTION) {
+            setExpandedKeys((prev) => {
+                const newKeys = { ...prev };
+                if (newKeys[key!]) {
+                    delete newKeys[key!];
+                } else {
+                    newKeys[key!] = true;
+                }
+                return newKeys;
+            });
+        }
+        if (type === NODE_TYPES.DOCUMENT && data.document) {
+            const doc: ReportDocument = data.document;
+            reportStore.report = doc;
+            reportStore.reportName = doc.name;
+            navigate(`/dashboard/reports/${doc.documentUID}`);
+        }
+    };
+
+    const updateDocumentOrderInCollection = async (collectionId: string) => {
+        const collection = collections.find((col) => col.itemUID === collectionId);
+        if (!collection || !collection.documents) return;
+        const updatedReports = collection.documents.map((doc, index) => ({
+            ...doc,
+            order: index,
+        }));
+        setCollections((prev) =>
+            prev.map((col) =>
+                col.itemUID === collectionId ? { ...col, documents: updatedReports } : col
+            )
+        );
+    };
+
+    const convertTreeNodesToCollections = (
+        nodes: TreeNodeEvent[],
+        parentCollection?: ReportCollection
+    ): ReportCollection[] => {
+        return nodes.map((node, index) => {
+            const data = node.data || {};
+            const isCollection = node.type === NODE_TYPES.COLLECTION;
+            if (isCollection) {
+                const collectionData: ReportCollection = {
+                    ...data.collection,
+                    order: index,
+                    documents: [],
+                    collections: data.collection?.collections || [],
+                };
+                if (node.children && node.children.length) {
+                    const docs: ReportDocument[] = [];
+                    const cols: ReportCollection[] = [];
+                    node.children.forEach((children, i) => {
+                        const child = children as TreeNodeEvent;
+                        if (child.type === NODE_TYPES.DOCUMENT) {
+                            const docData = child.data || {};
+                            docs.push({
+                                ...docData.document,
+                                order: i,
+                            });
+                        } else if (child.type === NODE_TYPES.COLLECTION) {
+                            const subCols = convertTreeNodesToCollections([child], collectionData);
+                            cols.push(...subCols);
+                        }
+                    });
+                    collectionData.documents = docs;
+                    collectionData.collections = cols;
+                }
+                return collectionData;
+            } else {
+                return parentCollection!;
+            }
+        });
+    };
+
+    const showError = (detail: string) => {
+        toast.current?.show({
+            severity: "error",
+            summary: TOAST_MESSAGES.ERROR,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const showSuccess = (detail: string) => {
+        toast.current?.show({
+            severity: "success",
+            summary: TOAST_MESSAGES.SUCCESS,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const handleDragDrop = async (event: TreeDragDropEvent) => {
+        const dragNode = event.dragNode as TreeNodeEvent | undefined;
+        const dropNode = event.dropNode as TreeNodeEvent | undefined;
+        const dropIndex = event.dropIndex;
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
+        ) {
+            showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
+            return;
+        }
+
+        if (
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragNode?.type !== NODE_TYPES.DOCUMENT &&
+            (!!dropNode.data?.collection?.isdefault || !!dropNode.data?.collection?.isfavorite)
+        ) {
+            showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
+            return;
+        }
+
+        const updatedNodes = event.value as TreeNode[];
+        const favoriteNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
+        const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
+        let newFavoriteCollections: ReportCollection[] = [];
+        let newCollections: ReportCollection[] = [];
+        if (favoriteNode) {
+            const favCols = convertTreeNodesToCollections([favoriteNode as TreeNodeEvent]);
+            if (favCols.length > 0) {
+                newFavoriteCollections = favCols;
+            }
+        }
+        const converted = convertTreeNodesToCollections(otherNodes as TreeNodeEvent[]);
+        newCollections = converted;
+        setFavoriteCollections(newFavoriteCollections);
+        setCollections(newCollections);
+
+        const dragData = dragNode?.data;
+        const dropData = dropNode?.data;
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dragData?.document &&
+            dropNode?.type !== NODE_TYPES.COLLECTION
+        ) {
+            const collectionId = dragData.collectionId;
+            const currentCollectionsLength =
+                collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
+
+            if (collectionId && dragData.document.documentUID != null && dropIndex != null) {
+                const response = await setReportOrder(
+                    collectionId,
+                    dragData.document.documentUID,
+                    dropIndex - currentCollectionsLength
+                );
+                if (response?.error) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    await updateDocumentOrderInCollection(collectionId);
+                }
+            }
+        }
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragData?.document
+        ) {
+            const sourceCollectionId = dragData.collectionId;
+            const targetCollectionId = dropData.collection.itemUID;
+            const reportId = dragData.document.documentUID;
+            if (sourceCollectionId !== targetCollectionId) {
+                const response = await moveReportToCollection(
+                    sourceCollectionId,
+                    reportId,
+                    targetCollectionId
+                );
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                }
+            }
+        }
+
+        if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
+            const sourceCollectionId = dragData.collection.itemUID;
+            if (sourceCollectionId) {
+                const response = await setCollectionOrder(sourceCollectionId, dropIndex);
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
+                }
+            }
+        }
     };
 
     return (
@@ -147,107 +438,35 @@ export const ReportForm = observer((): ReactElement => {
                     </div>
                     <div className='card-content report__card grid'>
                         <div className='col-4'>
-                            <Accordion
-                                activeIndex={activeIndex}
-                                onTabChange={(e) => setActiveIndex(e.index as number[])}
-                                multiple
-                                className='report__accordion'
-                            >
-                                {[...favoriteCollections, ...collections].map(
-                                    ({
-                                        itemUID,
-                                        name,
-                                        documents,
-                                        collections: nestedCollections,
-                                    }: ReportCollection) => (
-                                        <AccordionTab
-                                            key={itemUID}
-                                            header={name}
-                                            disabled={
-                                                !documents?.length && !nestedCollections?.length
+                            <Tree
+                                value={allNodes}
+                                dragdropScope='reports'
+                                onDragDrop={handleDragDrop}
+                                expandedKeys={expandedKeys}
+                                onToggle={(e) => setExpandedKeys(e.value)}
+                                nodeTemplate={(node) => {
+                                    const nodeData = node as TreeNodeEvent;
+                                    const isSelected =
+                                        nodeData.type === NODE_TYPES.DOCUMENT &&
+                                        nodeData.data.document?.documentUID === id;
+                                    return (
+                                        <NodeContent
+                                            node={nodeData}
+                                            isSelected={isSelected}
+                                            onClick={() => handleSelection(node)}
+                                            isTogglerVisible={
+                                                nodeData.type === NODE_TYPES.COLLECTION
                                             }
-                                            className={`report__accordion-tab ${
-                                                selectedTabUID === itemUID
-                                                    ? "report__list-item--selected"
-                                                    : ""
-                                            }`}
-                                        >
-                                            {nestedCollections && (
-                                                <Accordion multiple className='nested-accordion'>
-                                                    {nestedCollections.map((nestedCollection) => (
-                                                        <AccordionTab
-                                                            key={nestedCollection.itemUID}
-                                                            header={nestedCollection.name}
-                                                            disabled={
-                                                                !nestedCollection.documents?.length
-                                                            }
-                                                            className={`nested-accordion-tab ${
-                                                                selectedTabUID ===
-                                                                nestedCollection.itemUID
-                                                                    ? "report__list-item--selected"
-                                                                    : ""
-                                                            }`}
-                                                        >
-                                                            {nestedCollection.documents &&
-                                                                nestedCollection.documents.map(
-                                                                    (report) => (
-                                                                        <Button
-                                                                            className={`report__list-item w-full ${
-                                                                                selectedTabUID ===
-                                                                                report.documentUID
-                                                                                    ? "report__list-item--selected"
-                                                                                    : ""
-                                                                            }`}
-                                                                            key={report.itemUID}
-                                                                            text
-                                                                            onClick={(event) => {
-                                                                                event.preventDefault();
-                                                                                handleAccordionTabChange(
-                                                                                    report
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <p className='report-item__name'>
-                                                                                {report.name}
-                                                                            </p>
-                                                                        </Button>
-                                                                    )
-                                                                )}
-                                                        </AccordionTab>
-                                                    ))}
-                                                </Accordion>
-                                            )}
-                                            {documents &&
-                                                documents.map((report) => (
-                                                    <Button
-                                                        className={`report__list-item report-item w-full ${
-                                                            selectedTabUID === report.documentUID
-                                                                ? "report__list-item--selected"
-                                                                : ""
-                                                        }`}
-                                                        key={report.itemUID}
-                                                        text
-                                                        onClick={(event) => {
-                                                            event.preventDefault();
-                                                            handleAccordionTabChange(report);
-                                                        }}
-                                                    >
-                                                        <p className='report-item__name'>
-                                                            {report.name}
-                                                        </p>
-                                                    </Button>
-                                                ))}
-                                        </AccordionTab>
-                                    )
-                                )}
-                            </Accordion>
+                                        />
+                                    );
+                                }}
+                            />
                         </div>
                         <ReportEditForm />
                     </div>
                     <ReportFooter
                         onRefetch={() => {
                             handleGetUserReportCollections(authUser!.useruid);
-                            setActiveIndex([1]);
                         }}
                     />
                 </div>
