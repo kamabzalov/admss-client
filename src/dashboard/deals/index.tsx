@@ -24,6 +24,11 @@ import { Loader } from "dashboard/common/loader";
 import { MultiSelect } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -79,7 +84,15 @@ const FILTER_GROUP_LIST: DealsFilterGroup[] = [
     { name: "Other", options: DEALS_OTHER_LIST },
 ];
 
-export default function Deals() {
+interface AdvancedSearch {
+    [key: string]: string | number;
+    accountInfo: string;
+    VIN: string;
+    StockNo: string;
+    date: string;
+}
+
+export const Deals = () => {
     const [deals, setDeals] = useState<Deal[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -87,6 +100,36 @@ export default function Deals() {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
+    const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+
+    const searchFields = [
+        {
+            key: "customer",
+            label: "Customer",
+            value: advancedSearch["customer"],
+            type: "text",
+        },
+        {
+            key: "VIN",
+            label: "VIN",
+            value: advancedSearch["VIN"],
+            type: "text",
+        },
+        {
+            key: "StockNo",
+            label: "Stock#",
+            value: advancedSearch["StockNo"],
+            type: "text",
+        },
+        {
+            key: "date",
+            label: "Date",
+            value: advancedSearch["date"],
+            type: "date",
+        },
+    ];
 
     const navigate = useNavigate();
     const toast = useToast();
@@ -170,8 +213,6 @@ export default function Deals() {
 
     useEffect(() => {
         const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
             skip: lazyState.first,
@@ -195,6 +236,45 @@ export default function Deals() {
             });
         }
     }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
+
+    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
+        setAdvancedSearch((prevSearch) => {
+            const newSearch = { ...prevSearch, [key]: value };
+            const isAnyValueEmpty = Object.values(newSearch).every((v) => v === "");
+            setButtonDisabled(isAnyValueEmpty);
+            return newSearch;
+        });
+    };
+
+    const handleAdvancedSearch = () => {
+        const searchQuery = Object.entries(advancedSearch)
+            .filter(([_, value]) => value)
+            .map(([key, value]) => `${value}.${key}`)
+            .join("+");
+
+        const params: QueryParams = {
+            ...lazyState,
+            qry: searchQuery,
+        };
+        authUser &&
+            getDealsList(authUser?.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setDeals(response);
+                } else {
+                    setDeals([]);
+                }
+            });
+
+        setDialogVisible(false);
+    };
+
+    const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
+        setAdvancedSearch((prevSearch) => {
+            const updatedSearch = { ...prevSearch };
+            delete updatedSearch[key];
+            return updatedSearch;
+        });
+    };
 
     return (
         <div className='grid'>
@@ -265,6 +345,7 @@ export default function Deals() {
                                     label='Advanced search'
                                     severity='success'
                                     type='button'
+                                    onClick={() => setDialogVisible(true)}
                                 />
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
@@ -288,15 +369,12 @@ export default function Deals() {
                                         lazy
                                         paginator
                                         first={lazyState.first}
-                                        rows={lazyState.rows}
                                         rowsPerPageOptions={ROWS_PER_PAGE}
                                         totalRecords={totalRecords}
                                         onPage={pageChanged}
                                         onSort={sortData}
                                         reorderableColumns
                                         resizableColumns
-                                        sortOrder={lazyState.sortOrder}
-                                        sortField={lazyState.sortField}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onRowClick={({
                                             data: { dealuid },
@@ -320,6 +398,19 @@ export default function Deals() {
                     </div>
                 </div>
             </div>
+            <AdvancedSearchDialog<AdvancedSearch>
+                visible={dialogVisible}
+                buttonDisabled={buttonDisabled}
+                onHide={() => {
+                    setButtonDisabled(true);
+                    setDialogVisible(false);
+                }}
+                action={handleAdvancedSearch}
+                onSearchClear={handleClearAdvancedSearchField}
+                onInputChange={handleSetAdvancedSearch}
+                fields={searchFields as SearchField<AdvancedSearch>[]}
+                searchForm={SEARCH_FORM_TYPE.DEALS}
+            />
         </div>
     );
-}
+};

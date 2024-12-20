@@ -14,12 +14,14 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 import { InputNumber } from "primereact/inputnumber";
+import { DateInput } from "dashboard/common/form/inputs";
 
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
     CONTACTS,
     INVENTORY,
+    DEALS,
 }
 
 enum DROPDOWN_TYPE {
@@ -32,6 +34,7 @@ export enum SEARCH_FIELD_TYPE {
     TEXT = "text",
     NUMBER = "number",
     DROPDOWN = "dropdown",
+    DATE = "date",
 }
 
 export interface SearchField<T> {
@@ -224,6 +227,15 @@ export const AdvancedSearchDialog = <T,>({
                                         }}
                                     />
                                 )}
+                            {type === SEARCH_FIELD_TYPE.DATE && (
+                                <DateInput
+                                    className='w-full'
+                                    value={new Date(value ?? "")}
+                                    onChange={({ target }) =>
+                                        onInputChange(key, target.value as string)
+                                    }
+                                />
+                            )}
                             {value && onSearchClear && (
                                 <i
                                     className={`pi pi-times cursor-pointer search-dialog__clear ${
