@@ -18,6 +18,7 @@
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--admss-app-light-grey);
+    box-shadow: 0 0 3px 0 var(--admss-app-main-blue);
 }
 
 .take-payment__title {
@@ -109,6 +110,10 @@
         height: var(--input-regular);
         width: 66%;
         font-size: 14px;
+    }
+
+    .p-inputtext:not(:focus),
+    .p-inputnumber:not(:focus) {
         color: var(--admss-app-light-grey);
     }
 

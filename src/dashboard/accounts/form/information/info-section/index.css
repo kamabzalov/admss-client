@@ -25,6 +25,7 @@
 
 .info-section__detail-title {
     font-weight: 600;
+    width: 200px;
     padding-right: 10px;
     grid-column: 1;
 }
