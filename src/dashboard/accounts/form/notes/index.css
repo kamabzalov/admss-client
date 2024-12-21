@@ -3,7 +3,6 @@
     flex: 1 1 50%;
     border: 1px solid var(--admss-app-light-grey);
     padding: 0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     height: 120px;

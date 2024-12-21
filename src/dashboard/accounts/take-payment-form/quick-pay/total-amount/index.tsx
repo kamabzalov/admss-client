@@ -65,6 +65,9 @@ export const AccountTotalAmount = observer((): ReactElement => {
                     id='pmtMethod'
                     options={[...ACCOUNT_PAYMENT_METHODS]}
                     value={PaymentMethod}
+                    onChange={(e) => {
+                        changeAccountTakePayment("PaymentMethod", e.value);
+                    }}
                     optionValue='name'
                     optionLabel='name'
                 />

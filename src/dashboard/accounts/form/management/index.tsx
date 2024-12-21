@@ -208,7 +208,7 @@ export const AccountManagement = (): ReactElement => {
                 <div className='col-12 account__control'>
                     <Dropdown
                         className='account__dropdown'
-                        options={ACCOUNT_ACTIVITY_LIST}
+                        options={[...ACCOUNT_ACTIVITY_LIST]}
                         value={selectedActivity}
                         onChange={({ target: { value } }) => {
                             setSelectedActivity(value);

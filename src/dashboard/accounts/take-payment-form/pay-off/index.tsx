@@ -22,7 +22,7 @@ export const AccountPayOff = observer((): ReactElement => {
 
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Unearned Interest</label>
-                        <span className='take-payment__value'>
+                        <span className='take-payment__value ml-auto pr-4'>
                             $ {CashDealPayoff?.UnearnedInterest || "0.00"}
                         </span>
                     </div>

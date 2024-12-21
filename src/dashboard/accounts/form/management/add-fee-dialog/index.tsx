@@ -58,7 +58,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
     };
 
     const buttonDisabled = useMemo(() => {
-        return !addFee.type || !addFee.amount || !addFee.reason || !addFee.description;
+        return !addFee.amount || !addFee.reason;
     }, [addFee]);
 
     return (
@@ -115,7 +115,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                     className='add-fee__input'
                     value={addFee.amount}
                     onChange={({ value }) => setAddFee({ ...addFee, amount: value || 0 })}
-                    title='Principal'
+                    title='Principal (required)'
                     labelPosition='top'
                 />
             </div>
@@ -128,7 +128,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                         setAddFee({ ...addFee, reason: value });
                     }}
                 />
-                <label className='float-label'>Reason</label>
+                <label className='float-label'>Reason (required)</label>
             </span>
 
             <span className='p-float-label'>

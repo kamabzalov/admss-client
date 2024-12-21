@@ -22,6 +22,7 @@ import { AddNoteDialog } from "../notes/add-note-dialog";
 import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
+import { observer } from "mobx-react-lite";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -56,7 +57,7 @@ enum ModalErrors {
     TEXT_DELETE_PAYMENT = "Do you really want to delete this payment? This process cannot be undone.",
 }
 
-export const AccountPaymentHistory = (): ReactElement => {
+export const AccountPaymentHistory = observer((): ReactElement => {
     const { id } = useParams();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>(ACCOUNT_PAYMENT_STATUS_LIST[0]);
@@ -311,28 +312,35 @@ export const AccountPaymentHistory = (): ReactElement => {
         );
     };
 
-    const handleFilterActivity = () => {
-        if (id) {
-            listAccountHistory(id).then((res) => {
-                if (Array.isArray(res) && res.length) {
-                    switch (selectedPayment) {
-                        case ACCOUNT_PAYMENT_STATUS_LIST[1]:
-                            {
-                                const newList = res.filter(
-                                    (item) => Boolean(item.deleted) === true
-                                );
-                                setHistoryList(newList);
-                                setSelectedRows(Array(newList.length).fill(false));
-                            }
-                            break;
-                        default:
-                            setHistoryList(res);
-                            setSelectedRows(Array(res.length).fill(false));
-                    }
-                }
-            });
+    const handleFilterActivity = async () => {
+        if (!id) return;
+
+        const res = await listAccountHistory(id);
+        if (Array.isArray(res) && res.length) {
+            let filteredList = res;
+
+            switch (selectedPayment) {
+                case ACCOUNT_PAYMENT_STATUS_LIST[1]:
+                    filteredList = res.filter((item) => Boolean(item.deleted));
+                    break;
+                case ACCOUNT_PAYMENT_STATUS_LIST[2]:
+                    filteredList = res;
+                    break;
+                default:
+                    filteredList = res;
+            }
+
+            setHistoryList(filteredList);
+            setSelectedRows(Array(filteredList.length).fill(false));
+        } else {
+            setHistoryList([]);
+            setSelectedRows([]);
         }
     };
+
+    useEffect(() => {
+        handleFilterActivity();
+    }, [selectedPayment, id]);
 
     return (
         <div className='account-history account-card'>
@@ -345,7 +353,6 @@ export const AccountPaymentHistory = (): ReactElement => {
                         value={selectedPayment}
                         onChange={({ target: { value } }) => {
                             setSelectedPayment(value);
-                            handleFilterActivity();
                         }}
                     />
                     <MultiSelect
@@ -516,4 +523,4 @@ export const AccountPaymentHistory = (): ReactElement => {
             />
         </div>
     );
-};
+});

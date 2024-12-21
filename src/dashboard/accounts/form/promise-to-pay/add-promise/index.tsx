@@ -4,6 +4,7 @@ import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import { CurrencyInput, DateInput, TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { addAccountPromise } from "http/services/accounts.service";
+import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
@@ -11,6 +12,7 @@ import { useStore } from "store/hooks";
 interface AddPromiseDialogProps extends DashboardDialogProps {
     visible: boolean;
     accountuid?: string;
+    statusList: Readonly<string[]>;
     action: () => void;
     onHide: () => void;
 }
@@ -20,6 +22,7 @@ export const AddPromiseDialog = ({
     onHide,
     action,
     accountuid,
+    statusList,
     ...props
 }: AddPromiseDialogProps): ReactElement => {
     const userStore = useStore().userStore;
@@ -29,6 +32,7 @@ export const AddPromiseDialog = ({
     const [note, setNote] = useState<string>("");
     const [amount, setAmount] = useState<number>(0);
     const [paydate, setPaydate] = useState<number>(0);
+    const [status, setStatus] = useState<string>("");
     const toast = useToast();
     const currentTime = useMemo(
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
@@ -41,6 +45,7 @@ export const AddPromiseDialog = ({
                 username: noteTaker,
                 amount,
                 paydate,
+                status,
                 notes: note,
             });
             if (res && res.status === Status.ERROR) {
@@ -75,7 +80,7 @@ export const AddPromiseDialog = ({
 
     return (
         <DashboardDialog
-            className='add-note'
+            className='add-promise'
             footer='Save'
             header='Add Promise'
             cancelButton
@@ -121,11 +126,22 @@ export const AddPromiseDialog = ({
                 <div className='col-12'>
                     <span className='p-float-label'>
                         <InputTextarea
-                            className='w-full account-note__textarea'
+                            className='w-full add-promise__textarea'
                             value={note}
                             onChange={({ target: { value } }) => setNote(value)}
                         />
                         <label className='float-label'>Note</label>
+                    </span>
+                </div>
+                <div className='col-12'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            id='noteTaker'
+                            onChange={(e) => setStatus(e.value)}
+                            className='w-full'
+                            options={[...statusList]}
+                        />
+                        <label className='float-label'>Status</label>
                     </span>
                 </div>
             </div>

@@ -9,7 +9,11 @@ export const ACCOUNT_STATUS_LIST = [
     { name: "150+ Days Overdue" },
 ];
 
-export const ACCOUNT_ACTIVITY_LIST = ["All Activity", "Active data", "Deleted payments"];
+export const ACCOUNT_ACTIVITY_LIST: Readonly<string[]> = [
+    "All Activity",
+    "Active data",
+    "Deleted payments",
+];
 
 export enum ACCOUNT_PAYMENT_METHODS_NAMES {
     CHECK = "Check",
@@ -27,11 +31,11 @@ export enum ACCOUNT_PAYMENT_METHODS_NAMES {
     TRADE_IN = "Trade-In",
 }
 
-export const ACCOUNT_PAYMENT_METHODS: readonly Partial<TypeList>[] = Object.values(
+export const ACCOUNT_PAYMENT_METHODS: Readonly<Partial<TypeList>[]> = Object.values(
     ACCOUNT_PAYMENT_METHODS_NAMES
 ).map((method) => ({ name: method }));
 
-export const ACCOUNT_FEE_TYPES: readonly Partial<TypeList>[] = [
+export const ACCOUNT_FEE_TYPES: Readonly<Partial<TypeList>[]> = [
     { name: "Other" },
     { name: "Late Fee" },
     { name: "NSF Charge" },
@@ -44,7 +48,7 @@ export const ACCOUNT_FEE_TYPES: readonly Partial<TypeList>[] = [
     { name: "Interest" },
 ];
 
-export const ACCOUNT_PAYMENT_TYPES: readonly Partial<TypeList>[] = [
+export const ACCOUNT_PAYMENT_TYPES: Readonly<Partial<TypeList>[]> = [
     { name: "Fee" },
     { name: "Adjustment" },
     { name: "Down Payment" },
@@ -53,7 +57,7 @@ export const ACCOUNT_PAYMENT_TYPES: readonly Partial<TypeList>[] = [
     { name: "Payoff Payment" },
 ];
 
-export const ACCOUNT_PROMISE_STATUS: readonly TypeList[] = [
+export const ACCOUNT_PROMISE_STATUS: Readonly<TypeList[]> = [
     {
         name: "Default",
         id: 0,
@@ -76,7 +80,7 @@ export const ACCOUNT_PROMISE_STATUS: readonly TypeList[] = [
     },
 ];
 
-export const ACCOUNT_NOTE_CONTACT_TYPE: readonly string[] = [
+export const ACCOUNT_NOTE_CONTACT_TYPE: Readonly<string[]> = [
     "Phone",
     "In Person",
     "Mail",
@@ -84,9 +88,9 @@ export const ACCOUNT_NOTE_CONTACT_TYPE: readonly string[] = [
     "Fax",
 ];
 
-export const ACCOUNT_PAYMENT_STATUS_LIST: readonly string[] = ["All Payments", "Exclude Deleted"];
+export const ACCOUNT_PAYMENT_STATUS_LIST: Readonly<string[]> = ["All Payments", "Exclude Deleted"];
 
-export const ADJUSTMENT_TYPES: readonly string[] = [
+export const ADJUSTMENT_TYPES: Readonly<string[]> = [
     "Adjustment",
     "Refund",
     "WriteOff",
