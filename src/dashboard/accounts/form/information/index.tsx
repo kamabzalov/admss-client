@@ -7,18 +7,7 @@ import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { AppColors } from "common/models/css-variables";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
-
-const formatPhoneNumber = (phone: string) => {
-    let digits = phone.replace(/\D/g, "");
-
-    if (digits.length === 11 && digits.startsWith("1")) {
-        return `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
-    } else if (digits.length === 10) {
-        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
-    } else {
-        return digits;
-    }
-};
+import { formatPhoneNumber } from "common/helpers";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
