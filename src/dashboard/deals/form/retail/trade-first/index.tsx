@@ -245,7 +245,9 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             setFieldValue("Model", value);
                             changeDealExtData({ key: "Trade1_Model", value });
                         }}
-                        className={`deal-trade__dropdown w-full ${errors.Trade1_Model} ? "p-invalid" : ""}`}
+                        className={`deal-trade__dropdown w-full ${
+                            errors.Trade1_Model ? "p-invalid" : ""
+                        }`}
                     />
                     <label className='float-label'>Model (required)</label>
                 </span>
