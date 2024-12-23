@@ -15,6 +15,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -49,6 +50,7 @@ export const AccountPromiseToPay = (): ReactElement => {
     const [addPromiseVisible, setAddPromiseVisible] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
     const toast = useToast();
 
     const getPromiseList = async () => {
@@ -66,10 +68,8 @@ export const AccountPromiseToPay = (): ReactElement => {
     }, [id]);
 
     const handleChangePromiseStatus = (status: PAID_STATUS) => {
-        if (id && selectedRows.length) {
-            const promises = promiseList.filter((_, index) => {
-                return selectedRows[index];
-            });
+        if (id && selectedRows.some((isSelected) => isSelected)) {
+            const promises = promiseList.filter((_, index) => selectedRows[index]);
             const pstatus = ACCOUNT_PROMISE_STATUS.find((item) => item.name === status);
             promises.forEach(async (promise) => {
                 const res = await updateAccountPromise(promise.itemuid, {
@@ -88,6 +88,8 @@ export const AccountPromiseToPay = (): ReactElement => {
                     getPromiseList();
                 }
             });
+        } else {
+            setModalVisible(true);
         }
     };
 
@@ -341,6 +343,17 @@ export const AccountPromiseToPay = (): ReactElement => {
                     </div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                title='Promise is not Selected!'
+                icon='pi-exclamation-triangle'
+                bodyMessage='No promise has been selected for status change. Please select a promise and try again.'
+                confirmAction={() => setModalVisible(false)}
+                draggable={false}
+                acceptLabel='Got It'
+                className='promise-to-pay-warning'
+                onHide={() => setModalVisible(false)}
+            />
             <AddPromiseDialog
                 position='top'
                 action={() => {
@@ -348,6 +361,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     getPromiseList();
                 }}
                 onHide={() => setAddPromiseVisible(false)}
+                statusList={Object.values(paymentItems).map((item) => item.label)}
                 visible={addPromiseVisible}
                 accountuid={id}
             />
