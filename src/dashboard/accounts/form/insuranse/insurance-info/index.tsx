@@ -25,7 +25,6 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const {
         accountExtData: { Title_Received, Title_Num },
         changeAccountExtData,
-        saveAccount,
     } = store;
 
     const handleGetInsuranceHistory = async () => {
@@ -63,12 +62,17 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                             detail: res.error,
                             life: TOAST_LIFETIME,
                         });
-                    }
-                    if (res) {
+                    } else {
                         setInsuranceInfo(res as AccountInsurance);
-                        saveAccount();
                         handleGetInsuranceHistory().then(() => {
                             setInsuranceEdit(false);
+                            setIsButtonDisabled(true);
+                        });
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Insurance info updated successfully!",
+                            life: TOAST_LIFETIME,
                         });
                     }
                 });
@@ -180,6 +184,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                 )}
                 <div className='insurance-info__footer'>
                     <Button
+                        type='button'
                         className='insurance-info__button'
                         disabled={isButtonDisabled}
                         severity={isButtonDisabled ? "secondary" : "success"}

@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { AppColors } from "common/models/css-variables";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
+import { formatPhoneNumber } from "common/helpers";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
@@ -47,8 +48,8 @@ export const AccountInformation = observer((): ReactElement => {
                         sectionTitle='Contact Information'
                         info={[
                             { title: "Full Name", value: buyerName || "" },
-                            { title: "Work Phone", value: buyerWorkPhone || "" },
-                            { title: "Mobile", value: buyerMobile || "" },
+                            { title: "Work Phone", value: formatPhoneNumber(buyerWorkPhone || "") },
+                            { title: "Mobile", value: formatPhoneNumber(buyerMobile || "") },
                             { title: "Co-Buyer", value: cobuyerName || "" },
                         ]}
                     />

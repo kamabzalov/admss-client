@@ -176,6 +176,7 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
 
             <Button
                 className='total-paid__button'
+                type='button'
                 label='Calculate from Payment History'
                 onClick={handleCalcAmount}
                 outlined

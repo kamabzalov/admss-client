@@ -45,3 +45,31 @@
         }
     }
 }
+
+.add-promise {
+    flex: 0 0 660px;
+    .add-promise__textarea {
+        height: 116px;
+        resize: none;
+    }
+}
+
+.promise-to-pay-warning.p-confirm-dialog {
+    width: 506px;
+    height: 452px;
+
+    .p-confirm-dialog-accept.p-button {
+        display: inline-flex;
+        padding: 0;
+        width: 130px;
+        height: 60px;
+        .p-button-label {
+            white-space: nowrap;
+            font-size: 20px;
+        }
+    }
+
+    .p-confirm-dialog-reject {
+        display: none;
+    }
+}

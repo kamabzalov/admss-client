@@ -29,6 +29,12 @@
     grid-column: 1;
 }
 
+.take-payment__info {
+    .info-section__detail-title {
+        width: 200px;
+    }
+}
+
 .info-section__detail-value {
     grid-column: 2;
     text-align: left;
