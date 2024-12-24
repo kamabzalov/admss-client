@@ -106,6 +106,7 @@ export const AddPromiseDialog = ({
                     <DateInput
                         name='Promise to Pay Date'
                         date={paydate}
+                        emptyDate
                         onChange={({ target: { value } }) => {
                             setPaydate(Number(value));
                         }}
