@@ -25,9 +25,14 @@
 
 .info-section__detail-title {
     font-weight: 600;
-    width: 200px;
     padding-right: 10px;
     grid-column: 1;
+}
+
+.take-payment__info {
+    .info-section__detail-title {
+        width: 200px;
+    }
 }
 
 .info-section__detail-value {
