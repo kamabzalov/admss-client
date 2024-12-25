@@ -295,12 +295,12 @@ export const AccountDownPayment = (): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             className='account__table-checkbox'
-                            header={controlColumnHeader}
+                            header={paymentList.length ? controlColumnHeader : ""}
                             body={controlColumnBody}
                             pt={{
                                 root: {
                                     style: {
-                                        width: "60px",
+                                        width: paymentList.length ? "60px" : 0,
                                     },
                                 },
                             }}
