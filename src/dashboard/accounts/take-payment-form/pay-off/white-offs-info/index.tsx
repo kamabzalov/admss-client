@@ -20,21 +20,21 @@ export const WhiteOffsInfo = observer((): ReactElement => {
 
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Principal White Off:</label>
-                <span className='take-payment__value'>
+                <span className='take-payment__value ml-auto pr-4'>
                     $ {WriteOff?.PrincipalWriteOff || "0.00"}
                 </span>
             </div>
 
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Interest White Off:</label>
-                <span className='take-payment__value'>
+                <span className='take-payment__value ml-auto pr-4'>
                     $ {WriteOff?.InterestWriteOff || "0.00"}
                 </span>
             </div>
 
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Late Charge White Off:</label>
-                <span className='take-payment__value'>
+                <span className='take-payment__value ml-auto pr-4'>
                     $ {WriteOff?.LateChargeWriteOff || "0.00"}
                 </span>
             </div>
