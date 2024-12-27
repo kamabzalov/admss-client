@@ -84,6 +84,20 @@ const FILTER_GROUP_LIST: DealsFilterGroup[] = [
     { name: "Other", options: DEALS_OTHER_LIST },
 ];
 
+enum SEARCH_FORM_FIELDS {
+    CUSTOMER = "accountInfo",
+    VIN = "VIN",
+    STOCK_NO = "StockNo",
+    DATE = "date",
+}
+
+enum SEARCH_FORM_QUERY {
+    CUSTOMER = "contactinfo",
+    VIN = "inventoryinfo",
+    STOCK_NO = "inventoryinfo",
+    DATE = "dateeffective",
+}
+
 interface AdvancedSearch {
     [key: string]: string | number;
     accountInfo: string;
@@ -108,25 +122,25 @@ export const Deals = () => {
         {
             key: "customer",
             label: "Customer",
-            value: advancedSearch["customer"],
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.CUSTOMER],
             type: "text",
         },
         {
             key: "VIN",
             label: "VIN",
-            value: advancedSearch["VIN"],
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.VIN],
             type: "text",
         },
         {
             key: "StockNo",
             label: "Stock#",
-            value: advancedSearch["StockNo"],
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.STOCK_NO],
             type: "text",
         },
         {
             key: "date",
             label: "Date",
-            value: advancedSearch["date"],
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
             type: "date",
         },
     ];
@@ -249,7 +263,24 @@ export const Deals = () => {
     const handleAdvancedSearch = () => {
         const searchQuery = Object.entries(advancedSearch)
             .filter(([_, value]) => value)
-            .map(([key, value]) => `${value}.${key}`)
+            .map(([key, value]) => {
+                let keyName: string = key;
+                switch (key) {
+                    case SEARCH_FORM_FIELDS.CUSTOMER:
+                        keyName = SEARCH_FORM_QUERY.CUSTOMER;
+                        break;
+                    case SEARCH_FORM_FIELDS.VIN:
+                        keyName = SEARCH_FORM_QUERY.VIN;
+                        break;
+                    case SEARCH_FORM_FIELDS.STOCK_NO:
+                        keyName = SEARCH_FORM_QUERY.STOCK_NO;
+                        break;
+                    case SEARCH_FORM_FIELDS.DATE:
+                        keyName = SEARCH_FORM_QUERY.DATE;
+                        break;
+                }
+                return `${value}.${keyName}`;
+            })
             .join("+");
 
         const params: QueryParams = {
