@@ -627,3 +627,8 @@
     max-width: calc(100% - 20px);
     line-height: 1.5;
 }
+
+.row--deleted {
+    opacity: 0.5;
+    pointer-events: none;
+}
