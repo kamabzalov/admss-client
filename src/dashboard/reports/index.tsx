@@ -28,7 +28,11 @@ import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 import { TreeNodeEvent } from "common/models";
-import { convertTreeNodesToCollections } from "./common/drag-and-drop";
+import {
+    buildTreeNodes,
+    convertTreeNodesToCollections,
+    transformLabel,
+} from "./common/drag-and-drop";
 import "./index.css";
 
 const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
@@ -54,7 +58,6 @@ export default function Reports(): ReactElement {
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
-    const [defaultReportsCount, setDefaultReportsCount] = useState<number>(0);
 
     const getReportCollections = useCallback(async () => {
         const qry = reportSearch;
@@ -79,13 +82,6 @@ export default function Reports(): ReactElement {
             const customCols = collectionsWithoutFavorite
                 ?.flatMap((col) => col.collections)
                 ?.filter(Boolean);
-            const [firstCollection] = collectionsWithoutFavorite ?? [];
-            const nested = firstCollection?.collections?.flatMap(
-                (c: ReportCollection) => c?.documents || []
-            );
-            setDefaultReportsCount(
-                (firstCollection?.documents?.length || 0) + (nested?.length || 0)
-            );
             setReportCollections(collectionsWithoutFavorite);
             setCustomCollections(customCols);
         } else {
@@ -129,78 +125,10 @@ export default function Reports(): ReactElement {
         });
     };
 
-    const allNodes: TreeNode[] = [...favoriteCollections, ...reportCollections].map(
-        (collection: ReportCollection, index) => {
-            const { itemUID, name, documents } = collection;
-            let info = `(${documents?.length || 0} reports)`;
-            if (index === 1) {
-                info = `(${customCollections?.length || 0} collections / ${defaultReportsCount} reports)`;
-            }
-            const topLevelLabel = `${name} ${info}`;
-            const isEditingThis = isCollectionEditing === itemUID;
-            let children: TreeNode[] = [];
-            if (index === 1 && customCollections?.length) {
-                const customNodes = customCollections.map((custCol) => {
-                    const isEditingInner = isCollectionEditing === custCol.itemUID;
-                    const innerInfo = `(${custCol.documents?.length || 0} reports)`;
-                    const customLabel = `${custCol.name} ${innerInfo}`;
-                    const docNodes =
-                        custCol.documents?.map((doc) => ({
-                            key: doc.itemUID,
-                            label: doc.name,
-                            data: {
-                                type: NODE_TYPES.DOCUMENT,
-                                document: doc,
-                                collectionId: custCol.itemUID,
-                                order: doc.order,
-                                parentCollectionUID: custCol.itemUID,
-                            },
-                        })) || [];
-                    return {
-                        key: custCol.itemUID,
-                        label: customLabel,
-                        data: {
-                            type: NODE_TYPES.COLLECTION,
-                            collectionId: custCol.itemUID,
-                            order: custCol.order,
-                            collection: custCol,
-                            isEditing: isEditingInner,
-                        },
-                        children: docNodes,
-                    };
-                });
-                children = [...customNodes];
-            }
-            if (!isEditingThis) {
-                const docNodes =
-                    documents?.map((reportDoc) => ({
-                        key: reportDoc.itemUID,
-                        label: reportDoc.name,
-                        data: {
-                            type: NODE_TYPES.DOCUMENT,
-                            document: reportDoc,
-                            collectionId: itemUID,
-                            order: reportDoc.order,
-                            parentCollectionUID: itemUID,
-                        },
-                    })) || [];
-                children = [...children, ...docNodes];
-            }
-            return {
-                key: itemUID,
-                label: topLevelLabel,
-                data: {
-                    type: NODE_TYPES.COLLECTION,
-                    collectionId: itemUID,
-                    order: collection.order,
-                    parentCollectionUID: itemUID,
-                    collection,
-                    isEditing: isEditingThis,
-                },
-                children,
-            };
-        }
-    );
+    const allNodes: TreeNode[] = [
+        ...buildTreeNodes(favoriteCollections, true),
+        ...buildTreeNodes(reportCollections, true),
+    ];
 
     const handleCreateCollection = () => {
         if (!collectionName) return;
@@ -433,9 +361,9 @@ export default function Reports(): ReactElement {
                 currentCollection.name?.toLowerCase().includes(reportSearch.toLowerCase());
             return (
                 <div className='reports__list-item'>
-                    <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
-                        {node.label}
-                    </p>
+                    <div className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
+                        {typeof node.label === "string" ? transformLabel(node.label) : node.label}
+                    </div>
                     {hasNewDocs && <div className='reports-accordion-header__label ml-2'>New</div>}
                     {currentCollection.userUID === authUser?.useruid &&
                         !currentCollection.isfavorite && (
@@ -466,9 +394,9 @@ export default function Reports(): ReactElement {
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
                             {currentReport.name}
                         </p>
-                        {currentReport.isNew && (
+                        {currentReport.isNew ? (
                             <div className='reports-accordion-header__label ml-2'>New</div>
-                        )}
+                        ) : null}
                         <ActionButtons
                             report={currentReport}
                             collectionList={[reportCollections[0], ...customCollections].filter(
