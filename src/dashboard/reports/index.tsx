@@ -56,7 +56,7 @@ export default function Reports(): ReactElement {
 
     const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
-    const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
+    const [, setIsCollectionEditing] = useState<string | null>(null); 
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
 
     const getReportCollections = useCallback(async () => {
