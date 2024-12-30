@@ -28,7 +28,7 @@ import { Status } from "common/models/base-response";
 import { buildTreeNodes, convertTreeNodesToCollections } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
 
-const NodeContent = ({
+export const NodeContent = ({
     node,
     isSelected,
     onClick,

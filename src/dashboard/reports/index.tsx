@@ -56,7 +56,7 @@ export default function Reports(): ReactElement {
 
     const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
-    const [, setIsCollectionEditing] = useState<string | null>(null); 
+    const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
 
     const getReportCollections = useCallback(async () => {
@@ -322,35 +322,8 @@ export default function Reports(): ReactElement {
     const nodeTemplate = (node: TreeNode) => {
         const data = node.data || {};
         const nodeType = data.type;
-        const isEditing = data.isEditing;
-        if (nodeType === NODE_TYPES.COLLECTION && isEditing) {
-            const currentCollection: ReportCollection = data.collection;
-            return (
-                <div className='edit-collection p-panel'>
-                    <div className='p-panel-content relative'>
-                        <CollectionPanelContent
-                            handleClosePanel={() => {
-                                setIsCollectionEditing(null);
-                                handleGetUserReportCollections();
-                            }}
-                            collectionuid={currentCollection.itemUID}
-                            collectionName={currentCollection.name}
-                            collections={[...customCollections, ...reportCollections]}
-                            selectedReports={currentCollection.documents || []}
-                            setCollectionName={setCollectionName}
-                            setSelectedReports={setSelectedReports}
-                            handleCreateCollection={() =>
-                                handleUpdateCollection(
-                                    currentCollection.itemUID,
-                                    currentCollection.name
-                                )
-                            }
-                        />
-                    </div>
-                </div>
-            );
-        }
-        if (nodeType === NODE_TYPES.COLLECTION && !isEditing) {
+
+        if (nodeType === NODE_TYPES.COLLECTION) {
             const currentCollection: ReportCollection = data.collection;
             const handleEditClick = (ev: React.MouseEvent<HTMLElement>) => {
                 handleCustomEditCollection(ev, currentCollection.itemUID);
@@ -359,22 +332,52 @@ export default function Reports(): ReactElement {
             const isMatchedBySearch =
                 reportSearch &&
                 currentCollection.name?.toLowerCase().includes(reportSearch.toLowerCase());
+            const isEditing = currentCollection.itemUID === isCollectionEditing;
             return (
-                <div className='reports__list-item'>
-                    <div className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
-                        {typeof node.label === "string" ? transformLabel(node.label) : node.label}
+                <>
+                    <div className='reports__list-item'>
+                        <div className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
+                            {typeof node.label === "string"
+                                ? transformLabel(node.label)
+                                : node.label}
+                        </div>
+                        {hasNewDocs && <div className='reports-tree-header__label ml-2'>New</div>}
+                        {currentCollection.userUID === authUser?.useruid &&
+                            !currentCollection.isfavorite &&
+                            currentCollection.name !== REPORT_TYPES.CUSTOM && (
+                                <Button
+                                    label='Edit'
+                                    className='reports-actions__button cursor-pointer'
+                                    outlined
+                                    onClick={handleEditClick}
+                                />
+                            )}
                     </div>
-                    {hasNewDocs && <div className='reports-accordion-header__label ml-2'>New</div>}
-                    {currentCollection.userUID === authUser?.useruid &&
-                        !currentCollection.isfavorite && (
-                            <Button
-                                label='Edit'
-                                className='reports-actions__button cursor-pointer'
-                                outlined
-                                onClick={handleEditClick}
-                            />
-                        )}
-                </div>
+                    {isEditing && (
+                        <div className='edit-collection p-panel'>
+                            <div className='p-panel-content relative'>
+                                <CollectionPanelContent
+                                    handleClosePanel={() => {
+                                        setIsCollectionEditing(null);
+                                        handleGetUserReportCollections();
+                                    }}
+                                    collectionuid={currentCollection.itemUID}
+                                    collectionName={currentCollection.name}
+                                    collections={[...customCollections, ...reportCollections]}
+                                    selectedReports={currentCollection.documents || []}
+                                    setCollectionName={setCollectionName}
+                                    setSelectedReports={setSelectedReports}
+                                    handleCreateCollection={() =>
+                                        handleUpdateCollection(
+                                            currentCollection.itemUID,
+                                            currentCollection.name
+                                        )
+                                    }
+                                />
+                            </div>
+                        </div>
+                    )}
+                </>
             );
         }
         if (nodeType === NODE_TYPES.DOCUMENT) {
@@ -395,7 +398,7 @@ export default function Reports(): ReactElement {
                             {currentReport.name}
                         </p>
                         {currentReport.isNew ? (
-                            <div className='reports-accordion-header__label ml-2'>New</div>
+                            <div className='reports-tree-header__label ml-2'>New</div>
                         ) : null}
                         <ActionButtons
                             report={currentReport}
