@@ -167,8 +167,9 @@ export default function Inventories({
                         }
                         settings?.table &&
                             setLazyState({
-                                skip: settings.table.first || initialDataTableQueries.first,
-                                top: settings.table.rows || initialDataTableQueries.rows,
+                                first: settings.table.first || initialDataTableQueries.first,
+                                rows: settings.table.rows || initialDataTableQueries.rows,
+                                page: settings.table.page || initialDataTableQueries.page,
                                 column: settings.table.column || initialDataTableQueries.column,
                                 sortField:
                                     settings.table.sortField || initialDataTableQueries.sortField,
@@ -192,7 +193,7 @@ export default function Inventories({
                 })
                 .finally(() => setIsLoading(false));
         }
-    }, [authUser, locations, store]);
+    }, [authUser, locations, store, initialDataTableQueries]);
 
     const printTableData = async (print: boolean = false) => {
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
@@ -522,8 +523,8 @@ export default function Inventories({
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
-            skip: lazyState.first,
-            top: lazyState.rows,
+            skip: lazyState.skip || initialDataTableQueries.skip,
+            top: lazyState.top || initialDataTableQueries.top,
         };
 
         if (qry.length > 0) {

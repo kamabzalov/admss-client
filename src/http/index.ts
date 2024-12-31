@@ -44,7 +44,7 @@ export function createApiDashboardInstance(navigate: any) {
             const params: URLSearchParams = new URLSearchParams();
 
             for (const [key, value] of Object.entries(config.params)) {
-                if (value !== "") {
+                if (value !== "" && value !== null && value !== undefined) {
                     params.append(key, value as string);
                 }
             }
