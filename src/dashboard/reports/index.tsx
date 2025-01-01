@@ -60,12 +60,7 @@ export default function Reports(): ReactElement {
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
 
     const getReportCollections = useCallback(async () => {
-        const qry = reportSearch;
-        const params = { qry };
-        const response = await getUserReportCollectionsContent(
-            authUser!.useruid,
-            qry.length ? params : undefined
-        );
+        const response = await getUserReportCollectionsContent(authUser!.useruid);
         const { error } = response as BaseResponseError;
         if (error && toast.current) {
             toast.current.show({
@@ -87,7 +82,7 @@ export default function Reports(): ReactElement {
         } else {
             setReportCollections([]);
         }
-    }, [authUser, reportSearch, toast]);
+    }, [authUser, toast]);
 
     const getFavoriteReportCollections = useCallback(async () => {
         const response = await getUserFavoriteReportList(authUser!.useruid);
@@ -385,6 +380,7 @@ export default function Reports(): ReactElement {
             const isMatchedBySearch =
                 reportSearch &&
                 currentReport.name.toLowerCase().includes(reportSearch.toLowerCase());
+
             return (
                 <>
                     <div
