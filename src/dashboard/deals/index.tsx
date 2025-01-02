@@ -214,6 +214,14 @@ export const Deals = () => {
                 if (response && !error) {
                     const { total } = response as TotalDealsList;
                     setTotalRecords(total ?? 0);
+                    setLazyState({
+                        first: initialDataTableQueries.first,
+                        rows: initialDataTableQueries.rows,
+                        page: initialDataTableQueries.page,
+                        column: initialDataTableQueries.column,
+                        sortField: initialDataTableQueries.sortField,
+                        sortOrder: initialDataTableQueries.sortOrder,
+                    });
                 } else {
                     toast.current?.show({
                         severity: "error",
@@ -400,6 +408,7 @@ export const Deals = () => {
                                         lazy
                                         paginator
                                         first={lazyState.first}
+                                        rows={lazyState.rows}
                                         rowsPerPageOptions={ROWS_PER_PAGE}
                                         totalRecords={totalRecords}
                                         onPage={pageChanged}
