@@ -43,12 +43,14 @@ export interface SearchField<T> {
     value: string | undefined;
     type: SEARCH_FIELD_TYPE;
 }
+
 interface AdvancedSearchDialogProps<T> extends DashboardDialogProps {
     onInputChange: (key: keyof T, value: string) => void;
     fields: SearchField<T>[];
     onSearchClear?: (key: keyof T) => void;
     searchForm: SEARCH_FORM_TYPE;
 }
+
 export const AdvancedSearchDialog = <T,>({
     visible,
     buttonDisabled,
@@ -86,7 +88,7 @@ export const AdvancedSearchDialog = <T,>({
                 }
             });
         }
-    }, []);
+    }, [searchForm]);
 
     const handleSelectMake = useCallback(() => {
         if (!autoMake) return;
@@ -101,7 +103,9 @@ export const AdvancedSearchDialog = <T,>({
     }, [autoMake]);
 
     useEffect(() => {
-        if (autoMake) handleSelectMake();
+        if (autoMake) {
+            handleSelectMake();
+        }
     }, [handleSelectMake, autoMake]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
@@ -117,7 +121,6 @@ export const AdvancedSearchDialog = <T,>({
                 </div>
             );
         }
-
         return <span>{props.placeholder}</span>;
     };
 
@@ -146,8 +149,23 @@ export const AdvancedSearchDialog = <T,>({
             draggable
         >
             <div className='flex flex-column gap-4 pt-4'>
-                {fields &&
-                    fields.map(({ key, value, type, label }) => (
+                {fields.map(({ key, value, type, label }) => {
+                    if (type === SEARCH_FIELD_TYPE.DATE) {
+                        return (
+                            <DateInput
+                                key={key}
+                                className='w-full'
+                                date={Number(value)}
+                                emptyDate
+                                name={label}
+                                onChange={({ target }) => {
+                                    onInputChange(key, target.value as string);
+                                }}
+                            />
+                        );
+                    }
+
+                    return (
                         <span className='p-float-label p-input-icon-right' key={key}>
                             {type === SEARCH_FIELD_TYPE.TEXT && (
                                 <InputText
@@ -157,6 +175,7 @@ export const AdvancedSearchDialog = <T,>({
                                     onChange={({ target }) => onInputChange(key, target.value)}
                                 />
                             )}
+
                             {type === SEARCH_FIELD_TYPE.NUMBER && (
                                 <InputNumber
                                     type='tel'
@@ -164,13 +183,14 @@ export const AdvancedSearchDialog = <T,>({
                                     useGrouping={false}
                                     maxLength={INPUT_NUMBER_MAX_LENGTH}
                                     value={Number(value) || null}
-                                    onChange={({ value }) => {
+                                    onChange={({ value: newVal }) => {
                                         if (
-                                            value &&
-                                            value?.toString().length >= INPUT_NUMBER_MAX_LENGTH
-                                        )
+                                            newVal &&
+                                            newVal.toString().length >= INPUT_NUMBER_MAX_LENGTH
+                                        ) {
                                             return;
-                                        onInputChange(key, value?.toString() || "");
+                                        }
+                                        onInputChange(key, newVal?.toString() || "");
                                     }}
                                     onPaste={(event) => {
                                         const clipboardData = event.clipboardData;
@@ -187,6 +207,7 @@ export const AdvancedSearchDialog = <T,>({
                                     }}
                                 />
                             )}
+
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
                                 searchForm === SEARCH_FORM_TYPE.INVENTORY && (
                                     <Dropdown
@@ -206,6 +227,7 @@ export const AdvancedSearchDialog = <T,>({
                                         onChange={({ target }) => onInputChange(key, target.value)}
                                     />
                                 )}
+
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
                                 searchForm === SEARCH_FORM_TYPE.CONTACTS && (
                                     <Dropdown
@@ -213,43 +235,40 @@ export const AdvancedSearchDialog = <T,>({
                                         optionLabel='name'
                                         optionValue='id'
                                         value={
-                                            typeList?.find((type) => type?.name === selectedType)
-                                                ?.id
+                                            typeList.find(
+                                                (typeItem) => typeItem?.name === selectedType
+                                            )?.id
                                         }
                                         filter
                                         options={typeList || []}
                                         onChange={({ target }) => {
-                                            const selected = typeList?.find(
-                                                (type) => type?.id === target.value
+                                            const selected = typeList.find(
+                                                (typeItem) => typeItem?.id === target.value
                                             );
                                             setSelectedType(selected?.name || "");
                                             onInputChange(key, target.value);
                                         }}
                                     />
                                 )}
-                            {type === SEARCH_FIELD_TYPE.DATE && (
-                                <DateInput
-                                    className='w-full'
-                                    value={new Date(value ?? "")}
-                                    onChange={({ target }) =>
-                                        onInputChange(key, target.value as string)
-                                    }
-                                />
-                            )}
-                            {value && onSearchClear && (
+
+                            {value && type === SEARCH_FIELD_TYPE.DROPDOWN && onSearchClear && (
                                 <i
                                     className={`pi pi-times cursor-pointer search-dialog__clear ${
-                                        type === "dropdown" && "pr-4"
+                                        type === SEARCH_FIELD_TYPE.DROPDOWN && "pr-4"
                                     }`}
                                     onClick={() => {
-                                        if (key === DROPDOWN_TYPE.TYPE) setSelectedType("");
+                                        if (key === DROPDOWN_TYPE.TYPE) {
+                                            setSelectedType("");
+                                        }
                                         onSearchClear(key);
                                     }}
                                 />
                             )}
+
                             <label className='float-label'>{label || key}</label>
                         </span>
-                    ))}
+                    );
+                })}
             </div>
         </DashboardDialog>
     );
