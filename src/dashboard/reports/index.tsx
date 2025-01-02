@@ -1,26 +1,39 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState, useCallback } from "react";
 import {
     createReportCollection,
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
+    moveReportToCollection,
+    setCollectionOrder,
+    setReportOrder,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { Accordion, AccordionTab, AccordionTabChangeEvent } from "primereact/accordion";
-import "./index.css";
-import { BaseResponseError } from "common/models/base-response";
+import { Tree, TreeDragDropEvent } from "primereact/tree";
+import { TreeNode } from "primereact/treenode";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel } from "primereact/panel";
-import { ReportCollection, ReportDocument } from "common/models/reports";
+import {
+    NODE_TYPES,
+    REPORT_TYPES,
+    ReportCollection,
+    ReportDocument,
+    TOAST_MESSAGES,
+} from "common/models/reports";
 import { useStore } from "store/hooks";
 import { CollectionPanelContent } from "dashboard/reports/common/panel-content";
-import {
-    ReportsPanelHeader,
-    ReportsAccordionHeader,
-} from "dashboard/reports/common/report-headers";
+import { ReportsPanelHeader } from "dashboard/reports/common/report-headers";
 import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
+import { TreeNodeEvent } from "common/models";
+import {
+    buildTreeNodes,
+    convertTreeNodesToCollections,
+    transformLabel,
+} from "./common/drag-and-drop";
+import "./index.css";
 
 const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
 const OPEN_PARAMETERS_CLASSES: Readonly<string[]> = [
@@ -33,179 +46,372 @@ export default function Reports(): ReactElement {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
+    const toast = useToast();
+
     const [reportSearch, setReportSearch] = useState<string>("");
     const [reportCollections, setReportCollections] = useState<ReportCollection[]>([]);
     const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
+
     const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
-    const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
-    const [customActiveIndex, setCustomActiveIndex] = useState<number[]>([]);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
-    const [defaultReportsCount, setDefaultReportsCount] = useState<number>(0);
 
-    const toast = useToast();
+    const getReportCollections = useCallback(async () => {
+        const response = await getUserReportCollectionsContent(authUser!.useruid);
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        }
+        if (Array.isArray(response)) {
+            const collectionsWithoutFavorite = response.filter(
+                (c) => c.description !== "Favorites"
+            );
+            const customCols = collectionsWithoutFavorite
+                ?.flatMap((col) => col.collections)
+                ?.filter(Boolean);
+            setReportCollections(collectionsWithoutFavorite);
+            setCustomCollections(customCols);
+        } else {
+            setReportCollections([]);
+        }
+    }, [authUser, toast]);
 
-    const getReportCollections = () => {
-        const qry = reportSearch;
-        const params = {
-            qry,
-        };
-        return getUserReportCollectionsContent(
-            authUser!.useruid,
-            qry.length ? params : undefined
-        ).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                return toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-            if (Array.isArray(response)) {
-                const collectionsWithoutFavorite = response.filter(
-                    (collection: ReportCollection) => collection.description !== "Favorites"
-                );
-                const customCollections = collectionsWithoutFavorite
-                    ?.flatMap((collection) => collection.collections)
-                    ?.filter(Boolean);
+    const getFavoriteReportCollections = useCallback(async () => {
+        const response = await getUserFavoriteReportList(authUser!.useruid);
+        if (Array.isArray(response)) {
+            setFavoriteCollections(response);
+        }
+    }, [authUser]);
 
-                const [customCollectionsDefaultsCount] = collectionsWithoutFavorite ?? [];
-                const innerCollectionsDefaultsCount =
-                    customCollectionsDefaultsCount?.collections?.flatMap(
-                        (collection: ReportCollection) => collection?.documents || []
-                    );
-                setDefaultReportsCount(
-                    (customCollectionsDefaultsCount?.documents?.length || 0) +
-                        (innerCollectionsDefaultsCount?.length || 0)
-                );
-
-                setReportCollections(collectionsWithoutFavorite);
-                setCustomCollections(customCollections);
-            } else {
-                setReportCollections([]);
-            }
-        });
-    };
-
-    const getFavoriteReportCollections = () => {
-        return getUserFavoriteReportList(authUser!.useruid).then((response) => {
-            if (Array.isArray(response)) {
-                setFavoriteCollections(response);
-            }
-        });
-    };
-
-    const handleGetUserReportCollections = async () => {
+    const handleGetUserReportCollections = useCallback(async () => {
         await getFavoriteReportCollections();
         await getReportCollections();
-    };
+    }, [getFavoriteReportCollections, getReportCollections]);
 
     useEffect(() => {
         if (authUser) {
             handleGetUserReportCollections();
         }
-    }, [toast, authUser]);
+    }, [authUser, handleGetUserReportCollections]);
+
+    const showError = (detail: string) => {
+        toast.current?.show({
+            severity: "error",
+            summary: TOAST_MESSAGES.ERROR,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const showSuccess = (detail: string) => {
+        toast.current?.show({
+            severity: "success",
+            summary: TOAST_MESSAGES.SUCCESS,
+            detail,
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const allNodes: TreeNode[] = [
+        ...buildTreeNodes(favoriteCollections, true),
+        ...buildTreeNodes(reportCollections, true),
+    ];
 
     const handleCreateCollection = () => {
-        if (collectionName) {
-            createReportCollection(authUser!.useruid, {
-                name: collectionName,
-                documents: newCollectionsReports,
-            }).then((response) => {
-                const { error } = response as BaseResponseError;
-                if (error && toast.current) {
-                    toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    handleGetUserReportCollections();
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "New collection is successfully created!",
-                        life: TOAST_LIFETIME,
-                    });
-                    setCollectionName("");
-                    setNewCollectionsReports([]);
-                }
-            });
-        }
+        if (!collectionName) return;
+        createReportCollection(authUser!.useruid, {
+            name: collectionName,
+            documents: newCollectionsReports,
+        }).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                handleGetUserReportCollections();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "New collection is successfully created!",
+                    life: TOAST_LIFETIME,
+                });
+                setCollectionName("");
+                setNewCollectionsReports([]);
+            }
+        });
     };
 
-    const handleUpdateCollection = (itemuid: string, editCollectionName?: string) => {
-        if (collectionName || editCollectionName) {
-            createReportCollection(authUser!.useruid, {
-                name: collectionName || editCollectionName,
-                documents: selectedReports,
-                itemuid,
-            }).then((response) => {
-                const { error } = response as BaseResponseError;
-                if (error && toast.current) {
-                    toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    handleGetUserReportCollections();
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Collection is successfully updated!",
-                        life: TOAST_LIFETIME,
-                    });
-                    setCollectionName("");
-                    setSelectedReports([]);
-                    setIsCollectionEditing(null);
-                }
-            });
-        }
-    };
-
-    const handleTabChange = (e: AccordionTabChangeEvent, isCustomTab: boolean = false) => {
-        if (isCustomTab) return setCustomActiveIndex(e.index as number[]);
-        setActiveIndexes(e.index as number[]);
+    const handleUpdateCollection = (collectionUid: string, editCollectionName?: string) => {
+        const finalName = collectionName || editCollectionName;
+        if (!finalName) return;
+        createReportCollection(authUser!.useruid, {
+            name: finalName,
+            documents: selectedReports,
+            itemuid: collectionUid,
+        }).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                handleGetUserReportCollections();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Collection is successfully updated!",
+                    life: TOAST_LIFETIME,
+                });
+                setCollectionName("");
+                setSelectedReports([]);
+                setIsCollectionEditing(null);
+            }
+        });
     };
 
     const handleCustomEditCollection = (
         event: React.MouseEvent<HTMLElement>,
-        id: string,
-        index: number
+        collectionUid: string
     ) => {
-        const target = event.target;
-        if (target instanceof HTMLElement) {
-            if (EDIT_COLLECTION_CLASSES.some((classes) => target.classList.contains(classes))) {
-                event.stopPropagation();
-                setCustomActiveIndex([index]);
-                setIsCollectionEditing(id);
-            }
+        const target = event.target as HTMLElement;
+        if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
+            event.stopPropagation();
+            setIsCollectionEditing(collectionUid);
         }
     };
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
-        const target = event.target;
-        if (target instanceof HTMLElement) {
-            if (!OPEN_PARAMETERS_CLASSES.some((classes) => target.classList.contains(classes))) {
-                return;
-            }
+        const target = event.target as HTMLElement;
+        if (!OPEN_PARAMETERS_CLASSES.some((cls) => target.classList.contains(cls))) {
+            return;
         }
         event.stopPropagation();
         event.preventDefault();
-
         if (isParametersEditing?.itemUID === report.itemUID) {
             setIsParametersEditing(null);
         } else {
             setIsParametersEditing(report);
         }
+    };
+
+    const handleDragDrop = async (event: TreeDragDropEvent) => {
+        const dragNode = event.dragNode as TreeNodeEvent | undefined;
+        const dropNode = event.dropNode as TreeNodeEvent | undefined;
+        const dropIndex = event.dropIndex;
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
+        ) {
+            showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
+            return;
+        }
+        if (
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragNode?.type !== NODE_TYPES.DOCUMENT &&
+            (!!dropNode.data?.collection?.isdefault || !!dropNode.data?.collection?.isfavorite)
+        ) {
+            showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
+            return;
+        }
+        const updatedNodes = event.value as TreeNode[];
+        const favoritesNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
+        const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
+        let newFavoriteCols: ReportCollection[] = [];
+        let newCollections: ReportCollection[] = [];
+        if (favoritesNode) {
+            const favCols = convertTreeNodesToCollections([favoritesNode as TreeNodeEvent]);
+            if (favCols.length > 0) {
+                newFavoriteCols = favCols;
+            }
+        }
+        const converted = convertTreeNodesToCollections(otherNodes as TreeNodeEvent[]);
+        newCollections = converted;
+        setFavoriteCollections(newFavoriteCols);
+        setReportCollections(newCollections);
+        const dragData = dragNode?.data;
+        const dropData = dropNode?.data;
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dragData?.document &&
+            dropNode?.type !== NODE_TYPES.COLLECTION
+        ) {
+            const currentCollectionId = dragData.collectionId;
+            const currentCollLength =
+                reportCollections.find((coll) => coll.itemUID === currentCollectionId)?.collections
+                    ?.length || 0;
+            if (currentCollectionId && dragData.document.documentUID != null && dropIndex != null) {
+                const response = await setReportOrder(
+                    currentCollectionId,
+                    dragData.document.documentUID,
+                    dropIndex - currentCollLength
+                );
+                if (response?.error) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    await updateDocumentOrderInCollection(currentCollectionId);
+                }
+            }
+        }
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragData?.document
+        ) {
+            const sourceCollectionId = dragData.collectionId;
+            const targetCollectionId = dropData.collection.itemUID;
+            const reportId = dragData.document.documentUID;
+            if (sourceCollectionId && sourceCollectionId !== targetCollectionId) {
+                const response = await moveReportToCollection(
+                    sourceCollectionId,
+                    reportId,
+                    targetCollectionId
+                );
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                }
+            }
+        }
+        if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
+            const sourceCollectionId = dragData.collection.itemUID;
+            if (sourceCollectionId) {
+                const response = await setCollectionOrder(sourceCollectionId, dropIndex);
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error);
+                } else {
+                    showSuccess(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
+                }
+            }
+        }
+    };
+
+    const updateDocumentOrderInCollection = async (collectionUid: string) => {
+        const foundCollection = reportCollections.find((col) => col.itemUID === collectionUid);
+        if (!foundCollection || !foundCollection.documents) return;
+        const updatedDocs = foundCollection.documents.map((doc, idx) => ({
+            ...doc,
+            order: idx,
+        }));
+        setReportCollections((prev) =>
+            prev.map((c) => (c.itemUID === collectionUid ? { ...c, documents: updatedDocs } : c))
+        );
+    };
+
+    const nodeTemplate = (node: TreeNode) => {
+        const data = node.data || {};
+        const nodeType = data.type;
+
+        if (nodeType === NODE_TYPES.COLLECTION) {
+            const currentCollection: ReportCollection = data.collection;
+            const handleEditClick = (ev: React.MouseEvent<HTMLElement>) => {
+                handleCustomEditCollection(ev, currentCollection.itemUID);
+            };
+            const hasNewDocs = currentCollection.documents?.some((doc) => doc.isNew);
+            const isMatchedBySearch =
+                reportSearch &&
+                currentCollection.name?.toLowerCase().includes(reportSearch.toLowerCase());
+            const isEditing = currentCollection.itemUID === isCollectionEditing;
+            return (
+                <>
+                    <div className='reports__list-item'>
+                        <div className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
+                            {typeof node.label === "string"
+                                ? transformLabel(node.label)
+                                : node.label}
+                        </div>
+                        {hasNewDocs && <div className='reports-tree-header__label ml-2'>New</div>}
+                        {currentCollection.userUID === authUser?.useruid &&
+                            !currentCollection.isfavorite &&
+                            currentCollection.name !== REPORT_TYPES.CUSTOM && (
+                                <Button
+                                    label='Edit'
+                                    className='reports-actions__button cursor-pointer'
+                                    outlined
+                                    onClick={handleEditClick}
+                                />
+                            )}
+                    </div>
+                    {isEditing && (
+                        <div className='edit-collection p-panel'>
+                            <div className='p-panel-content relative'>
+                                <CollectionPanelContent
+                                    handleClosePanel={() => {
+                                        setIsCollectionEditing(null);
+                                        handleGetUserReportCollections();
+                                    }}
+                                    collectionuid={currentCollection.itemUID}
+                                    collectionName={currentCollection.name}
+                                    collections={[...customCollections, ...reportCollections]}
+                                    selectedReports={currentCollection.documents || []}
+                                    setCollectionName={setCollectionName}
+                                    setSelectedReports={setSelectedReports}
+                                    handleCreateCollection={() =>
+                                        handleUpdateCollection(
+                                            currentCollection.itemUID,
+                                            currentCollection.name
+                                        )
+                                    }
+                                />
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        }
+        if (nodeType === NODE_TYPES.DOCUMENT) {
+            const currentReport: ReportDocument = data.document;
+            const isMatchedBySearch =
+                reportSearch &&
+                currentReport.name.toLowerCase().includes(reportSearch.toLowerCase());
+
+            return (
+                <>
+                    <div
+                        className='reports__list-item reports__list-item--inner'
+                        onClick={(ev) => handleOpenParameters(ev, currentReport)}
+                        onDoubleClick={() => {
+                            navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                        }}
+                    >
+                        <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
+                            {currentReport.name}
+                        </p>
+                        {currentReport.isNew ? (
+                            <div className='reports-tree-header__label ml-2'>New</div>
+                        ) : null}
+                        <ActionButtons
+                            report={currentReport}
+                            collectionList={[reportCollections[0], ...customCollections].filter(
+                                (col) => col.itemUID !== data.parentCollectionUID
+                            )}
+                            refetchCollectionsAction={handleGetUserReportCollections}
+                            currentCollectionUID={data.parentCollectionUID}
+                        />
+                    </div>
+                    {isParametersEditing?.documentUID === currentReport.documentUID && (
+                        <ReportParameters report={isParametersEditing} />
+                    )}
+                </>
+            );
+        }
+        return <span>{node.label}</span>;
     };
 
     return (
@@ -244,353 +450,14 @@ export default function Reports(): ReactElement {
                                 </Panel>
                             </div>
                             <div className='col-12'>
-                                <Accordion
-                                    multiple
-                                    className='reports__accordion'
-                                    activeIndex={activeIndexes}
-                                    onTabChange={handleTabChange}
-                                >
-                                    {reportCollections &&
-                                        [...favoriteCollections, ...reportCollections].map(
-                                            (
-                                                { itemUID, name, documents }: ReportCollection,
-                                                index: number
-                                            ) => {
-                                                const isContainsSearchedValue =
-                                                    reportSearch &&
-                                                    documents?.some((report) =>
-                                                        report.name
-                                                            .toLowerCase()
-                                                            .includes(reportSearch.toLowerCase())
-                                                    );
-                                                return (
-                                                    <AccordionTab
-                                                        key={itemUID}
-                                                        header={
-                                                            <ReportsAccordionHeader
-                                                                title={name}
-                                                                label={
-                                                                    documents?.some(
-                                                                        (report) => report.isNew
-                                                                    )
-                                                                        ? "New"
-                                                                        : ""
-                                                                }
-                                                                selected={
-                                                                    isContainsSearchedValue || false
-                                                                }
-                                                                info={
-                                                                    index === 1
-                                                                        ? `(${
-                                                                              customCollections?.length ||
-                                                                              0
-                                                                          } collections / ${defaultReportsCount} reports)
-                                                                `
-                                                                        : `(${
-                                                                              documents?.length || 0
-                                                                          } reports)`
-                                                                }
-                                                            />
-                                                        }
-                                                        className='reports__accordion-tab opacity-100'
-                                                    >
-                                                        {index === 1 && (
-                                                            <Accordion
-                                                                multiple
-                                                                activeIndex={customActiveIndex}
-                                                                onTabChange={(event) =>
-                                                                    handleTabChange(event, true)
-                                                                }
-                                                                className='reports__accordion reports__accordion--inner'
-                                                            >
-                                                                {customCollections?.map(
-                                                                    (
-                                                                        {
-                                                                            itemUID,
-                                                                            name,
-                                                                            isfavorite,
-                                                                            documents,
-                                                                            userUID,
-                                                                        }: ReportCollection,
-                                                                        idx: number
-                                                                    ) => {
-                                                                        const isContainsSearchedValue =
-                                                                            reportSearch &&
-                                                                            documents?.some(
-                                                                                (report) =>
-                                                                                    report.name
-                                                                                        .toLowerCase()
-                                                                                        .includes(
-                                                                                            reportSearch.toLowerCase()
-                                                                                        )
-                                                                            );
-                                                                        return (
-                                                                            <AccordionTab
-                                                                                key={itemUID}
-                                                                                header={
-                                                                                    <ReportsAccordionHeader
-                                                                                        title={
-                                                                                            name ||
-                                                                                            itemUID
-                                                                                        }
-                                                                                        label={
-                                                                                            documents?.some(
-                                                                                                (
-                                                                                                    report
-                                                                                                ) =>
-                                                                                                    report.isNew
-                                                                                            )
-                                                                                                ? "New"
-                                                                                                : ""
-                                                                                        }
-                                                                                        selected={
-                                                                                            isContainsSearchedValue ||
-                                                                                            false
-                                                                                        }
-                                                                                        info={`(${
-                                                                                            documents?.length ||
-                                                                                            0
-                                                                                        } reports)`}
-                                                                                        actionButton={
-                                                                                            userUID ===
-                                                                                                authUser?.useruid &&
-                                                                                            !isfavorite ? (
-                                                                                                <Button
-                                                                                                    label='Edit'
-                                                                                                    className='reports-actions__button cursor-pointer'
-                                                                                                    outlined
-                                                                                                    onClick={(
-                                                                                                        e
-                                                                                                    ) =>
-                                                                                                        handleCustomEditCollection(
-                                                                                                            e,
-                                                                                                            itemUID,
-                                                                                                            idx
-                                                                                                        )
-                                                                                                    }
-                                                                                                />
-                                                                                            ) : (
-                                                                                                <>
-
-                                                                                                </>
-                                                                                            )
-                                                                                        }
-                                                                                    />
-                                                                                }
-                                                                                className='reports__accordion-tab opacity-100'
-                                                                            >
-                                                                                {isCollectionEditing ===
-                                                                                    itemUID &&
-                                                                                userUID ===
-                                                                                    authUser?.useruid ? (
-                                                                                    <div className='edit-collection p-panel'>
-                                                                                        <div className='p-panel-content relative'>
-                                                                                            <CollectionPanelContent
-                                                                                                handleClosePanel={() => {
-                                                                                                    setIsCollectionEditing(
-                                                                                                        null
-                                                                                                    );
-                                                                                                    handleGetUserReportCollections();
-                                                                                                }}
-                                                                                                collectionuid={
-                                                                                                    itemUID
-                                                                                                }
-                                                                                                collectionName={
-                                                                                                    name
-                                                                                                }
-                                                                                                collections={[
-                                                                                                    ...customCollections,
-                                                                                                    ...reportCollections,
-                                                                                                ]}
-                                                                                                selectedReports={
-                                                                                                    documents ||
-                                                                                                    []
-                                                                                                }
-                                                                                                setCollectionName={
-                                                                                                    setCollectionName
-                                                                                                }
-                                                                                                setSelectedReports={
-                                                                                                    setSelectedReports
-                                                                                                }
-                                                                                                handleCreateCollection={() =>
-                                                                                                    handleUpdateCollection(
-                                                                                                        itemUID,
-                                                                                                        name
-                                                                                                    )
-                                                                                                }
-                                                                                            />
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    documents &&
-                                                                                    documents.map(
-                                                                                        (
-                                                                                            report
-                                                                                        ) => (
-                                                                                            <React.Fragment
-                                                                                                key={
-                                                                                                    report.itemUID
-                                                                                                }
-                                                                                            >
-                                                                                                <div
-                                                                                                    className='reports__list-item reports__list-item--inner'
-                                                                                                    key={
-                                                                                                        report.itemUID
-                                                                                                    }
-                                                                                                    onClick={(
-                                                                                                        event
-                                                                                                    ) =>
-                                                                                                        handleOpenParameters(
-                                                                                                            event,
-                                                                                                            report
-                                                                                                        )
-                                                                                                    }
-                                                                                                    onDoubleClick={() => {
-                                                                                                        navigate(
-                                                                                                            `/dashboard/reports/${report.documentUID}`
-                                                                                                        );
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <p
-                                                                                                        className={
-                                                                                                            reportSearch &&
-                                                                                                            report.name
-                                                                                                                .toLowerCase()
-                                                                                                                .includes(
-                                                                                                                    reportSearch.toLowerCase()
-                                                                                                                )
-                                                                                                                ? "searched-item"
-                                                                                                                : "reports__list-name"
-                                                                                                        }
-                                                                                                    >
-                                                                                                        {
-                                                                                                            report.name
-                                                                                                        }
-                                                                                                    </p>
-                                                                                                    {!!report.isNew && (
-                                                                                                        <div className='reports-accordion-header__label ml-2'>
-                                                                                                            New
-                                                                                                        </div>
-                                                                                                    )}
-                                                                                                    <ActionButtons
-                                                                                                        report={
-                                                                                                            report
-                                                                                                        }
-                                                                                                        collectionList={[
-                                                                                                            reportCollections[0],
-                                                                                                            ...customCollections,
-                                                                                                        ].filter(
-                                                                                                            (
-                                                                                                                collection
-                                                                                                            ) =>
-                                                                                                                collection.itemUID !==
-                                                                                                                itemUID
-                                                                                                        )}
-                                                                                                        refetchCollectionsAction={
-                                                                                                            handleGetUserReportCollections
-                                                                                                        }
-                                                                                                        currentCollectionUID={
-                                                                                                            itemUID
-                                                                                                        }
-                                                                                                    />
-                                                                                                </div>
-                                                                                                {isParametersEditing?.documentUID ===
-                                                                                                    report.documentUID && (
-                                                                                                    <ReportParameters
-                                                                                                        report={
-                                                                                                            isParametersEditing
-                                                                                                        }
-                                                                                                    />
-                                                                                                )}
-                                                                                            </React.Fragment>
-                                                                                        )
-                                                                                    )
-                                                                                )}
-                                                                            </AccordionTab>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </Accordion>
-                                                        )}
-                                                        {documents &&
-                                                            documents.map((report) => (
-                                                                <React.Fragment
-                                                                    key={report.itemUID}
-                                                                >
-                                                                    <div
-                                                                        className='reports__list-item'
-                                                                        key={report.itemUID}
-                                                                        onClick={(event) =>
-                                                                            handleOpenParameters(
-                                                                                event,
-                                                                                report
-                                                                            )
-                                                                        }
-                                                                        onDoubleClick={() => {
-                                                                            navigate(
-                                                                                `/dashboard/reports/${report.documentUID}`
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <p
-                                                                            className={
-                                                                                reportSearch &&
-                                                                                report.name
-                                                                                    .toLowerCase()
-                                                                                    .includes(
-                                                                                        reportSearch.toLowerCase()
-                                                                                    )
-                                                                                    ? "searched-item"
-                                                                                    : "reports__list-name"
-                                                                            }
-                                                                        >
-                                                                            {report.name}
-                                                                        </p>
-                                                                        {!!report.isNew && (
-                                                                            <div className='reports-accordion-header__label ml-2'>
-                                                                                New
-                                                                            </div>
-                                                                        )}
-                                                                        <ActionButtons
-                                                                            report={report}
-                                                                            collectionList={[
-                                                                                reportCollections[0],
-                                                                                ...customCollections,
-                                                                            ].filter(
-                                                                                (collection) =>
-                                                                                    collection?.itemUID !==
-                                                                                        itemUID &&
-                                                                                    !report.collections?.some(
-                                                                                        (
-                                                                                            docCollection
-                                                                                        ) =>
-                                                                                            docCollection.collectionuid ===
-                                                                                            collection?.itemUID
-                                                                                    )
-                                                                            )}
-                                                                            currentCollectionUID={
-                                                                                itemUID
-                                                                            }
-                                                                            refetchCollectionsAction={
-                                                                                handleGetUserReportCollections
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                    {isParametersEditing?.documentUID ===
-                                                                        report.documentUID && (
-                                                                        <ReportParameters
-                                                                            report={
-                                                                                isParametersEditing
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                </React.Fragment>
-                                                            ))}
-                                                    </AccordionTab>
-                                                );
-                                            }
-                                        )}
-                                </Accordion>
+                                <Tree
+                                    className='reports__tree'
+                                    dragdropScope='reports'
+                                    onDragDrop={handleDragDrop}
+                                    value={allNodes}
+                                    nodeTemplate={nodeTemplate}
+                                    filter={false}
+                                />
                             </div>
                         </div>
                     </div>

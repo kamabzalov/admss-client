@@ -1,4 +1,10 @@
-import { ReportCollection, ReportDocument } from "common/models/reports";
+import {
+    NODE_TYPES,
+    REPORT_TYPES,
+    ReportCollection,
+    ReportDocument,
+    TOAST_MESSAGES,
+} from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
@@ -19,31 +25,10 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
+import { buildTreeNodes, convertTreeNodesToCollections } from "../common/drag-and-drop";
+import { TreeNodeEvent } from "common/models";
 
-interface TreeNodeEvent extends TreeNode {
-    type: string;
-}
-
-export enum TOAST_MESSAGES {
-    SUCCESS = "Success",
-    ERROR = "Error",
-    MOVE_INTO_DEFAULT_ERROR = "This document cannot be moved into a default collection.",
-    CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
-    REPORT_MOVED_SUCCESS = "Report moved successfully!",
-    COLLECTION_REORDERED_SUCCESS = "Collection re-ordered successfully!",
-}
-
-enum REPORT_TYPES {
-    FAVORITES = "Favorites",
-    CUSTOM = "Custom reports",
-}
-
-enum NODE_TYPES {
-    DOCUMENT = "document",
-    COLLECTION = "collection",
-}
-
-const NodeContent = ({
+export const NodeContent = ({
     node,
     isSelected,
     onClick,
@@ -124,39 +109,6 @@ export const ReportForm = observer((): ReactElement => {
         } else {
             setCollections([]);
         }
-    };
-
-    const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
-        return collectionsData
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((col) => {
-                let children: TreeNode[] = [];
-                if (col.collections && col.collections.length) {
-                    children = children.concat(buildTreeNodes(col.collections));
-                }
-                if (col.documents && col.documents.length) {
-                    const docNodes = col.documents
-                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                        .map((doc) => ({
-                            key: doc.itemUID,
-                            label: doc.name,
-                            type: NODE_TYPES.DOCUMENT,
-                            data: {
-                                document: doc,
-                                collectionId: col.itemUID,
-                                order: doc.order,
-                            },
-                        }));
-                    children = children.concat(docNodes);
-                }
-                return {
-                    key: col.itemUID,
-                    label: col.name,
-                    type: NODE_TYPES.COLLECTION,
-                    data: { collection: col, order: col.order },
-                    children,
-                };
-            });
     };
 
     const allNodes = [
@@ -253,46 +205,6 @@ export const ReportForm = observer((): ReactElement => {
                 col.itemUID === collectionId ? { ...col, documents: updatedReports } : col
             )
         );
-    };
-
-    const convertTreeNodesToCollections = (
-        nodes: TreeNodeEvent[],
-        parentCollection?: ReportCollection
-    ): ReportCollection[] => {
-        return nodes.map((node, index) => {
-            const data = node.data || {};
-            const isCollection = node.type === NODE_TYPES.COLLECTION;
-            if (isCollection) {
-                const collectionData: ReportCollection = {
-                    ...data.collection,
-                    order: index,
-                    documents: [],
-                    collections: data.collection?.collections || [],
-                };
-                if (node.children && node.children.length) {
-                    const docs: ReportDocument[] = [];
-                    const cols: ReportCollection[] = [];
-                    node.children.forEach((children, i) => {
-                        const child = children as TreeNodeEvent;
-                        if (child.type === NODE_TYPES.DOCUMENT) {
-                            const docData = child.data || {};
-                            docs.push({
-                                ...docData.document,
-                                order: i,
-                            });
-                        } else if (child.type === NODE_TYPES.COLLECTION) {
-                            const subCols = convertTreeNodesToCollections([child], collectionData);
-                            cols.push(...subCols);
-                        }
-                    });
-                    collectionData.documents = docs;
-                    collectionData.collections = cols;
-                }
-                return collectionData;
-            } else {
-                return parentCollection!;
-            }
-        });
     };
 
     const showError = (detail: string) => {

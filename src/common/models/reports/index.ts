@@ -131,3 +131,22 @@ export enum ReportServices {
     DEALS = "deals",
     ACCOUNTS = "accounts",
 }
+
+export enum TOAST_MESSAGES {
+    SUCCESS = "Success",
+    ERROR = "Error",
+    MOVE_INTO_DEFAULT_ERROR = "This document cannot be moved into a default collection.",
+    CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
+    REPORT_MOVED_SUCCESS = "Report moved successfully!",
+    COLLECTION_REORDERED_SUCCESS = "Collection re-ordered successfully!",
+}
+
+export enum REPORT_TYPES {
+    FAVORITES = "Favorites",
+    CUSTOM = "Custom reports",
+}
+
+export enum NODE_TYPES {
+    DOCUMENT = "document",
+    COLLECTION = "collection",
+}
