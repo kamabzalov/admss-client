@@ -28,6 +28,7 @@ export const AccountTakePayment = observer((): ReactElement => {
         getAccountPaymentsInfo,
         getDrawers,
         getAccount,
+        prevPath,
     } = store;
 
     useEffect(() => {
@@ -82,7 +83,7 @@ export const AccountTakePayment = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                onClick={() => navigate(prevPath || `/dashboard/accounts/${id}`)}
             />
             <div className='col-12'>
                 <div className='card account'>
