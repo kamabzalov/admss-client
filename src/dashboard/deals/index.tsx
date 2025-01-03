@@ -120,25 +120,25 @@ export const Deals = () => {
 
     const searchFields = [
         {
-            key: "customer",
+            key: SEARCH_FORM_FIELDS.CUSTOMER,
             label: "Customer",
             value: advancedSearch?.[SEARCH_FORM_FIELDS.CUSTOMER],
             type: "text",
         },
         {
-            key: "VIN",
+            key: SEARCH_FORM_FIELDS.VIN,
             label: "VIN",
             value: advancedSearch?.[SEARCH_FORM_FIELDS.VIN],
             type: "text",
         },
         {
-            key: "StockNo",
+            key: SEARCH_FORM_FIELDS.STOCK_NO,
             label: "Stock#",
             value: advancedSearch?.[SEARCH_FORM_FIELDS.STOCK_NO],
             type: "text",
         },
         {
-            key: "date",
+            key: SEARCH_FORM_FIELDS.DATE,
             label: "Date",
             value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
             type: "date",
@@ -285,6 +285,7 @@ export const Deals = () => {
                         break;
                     case SEARCH_FORM_FIELDS.DATE:
                         keyName = SEARCH_FORM_QUERY.DATE;
+                        value = new Date(value).getTime();
                         break;
                 }
                 return `${value}.${keyName}`;
