@@ -3,7 +3,11 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { listAccountPromises, updateAccountPromise } from "http/services/accounts.service";
+import {
+    deleteAccountPromise,
+    listAccountPromises,
+    updateAccountPromise,
+} from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
@@ -16,6 +20,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { observer } from "mobx-react-lite";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -42,7 +47,7 @@ enum PAID_COLOR {
     DISABLED = "grey",
 }
 
-export const AccountPromiseToPay = (): ReactElement => {
+export const AccountPromiseToPay = observer((): ReactElement => {
     const { id } = useParams();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -51,6 +56,7 @@ export const AccountPromiseToPay = (): ReactElement => {
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [currentPromise, setCurrentPromise] = useState<AccountPromise | null>(null);
     const toast = useToast();
 
     const getPromiseList = async () => {
@@ -97,12 +103,31 @@ export const AccountPromiseToPay = (): ReactElement => {
         {
             label: "Edit Promise",
             icon: `icon adms-edit-item`,
-            command: () => {},
+            command: () => {
+                setAddPromiseVisible(true);
+            },
         },
         {
             label: "Delete Promise",
             icon: `pi pi-times`,
-            command: () => {},
+            command: () => {
+                selectedRows.forEach(async (isSelected, index) => {
+                    if (isSelected) {
+                        const promise = promiseList[index];
+                        const res = await deleteAccountPromise(promise.itemuid);
+                        if (res && res.status === Status.ERROR) {
+                            return toast.current?.show({
+                                severity: "error",
+                                summary: Status.ERROR,
+                                detail: res.error,
+                                life: TOAST_LIFETIME,
+                            });
+                        } else {
+                            getPromiseList();
+                        }
+                    }
+                });
+            },
         },
     ];
 
@@ -172,6 +197,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                 <Checkbox
                     checked={selectedRows[rowIndex]}
                     onClick={() => {
+                        setCurrentPromise(options);
                         setSelectedRows(
                             selectedRows.map((state, index) =>
                                 index === rowIndex ? !state : state
@@ -183,7 +209,10 @@ export const AccountPromiseToPay = (): ReactElement => {
                     className='text export-web__icon-button'
                     icon='pi pi-angle-down'
                     disabled={!options.notes}
-                    onClick={() => handleRowExpansionClick(options)}
+                    onClick={() => {
+                        setCurrentPromise(options);
+                        handleRowExpansionClick(options);
+                    }}
                 />
                 <Button icon={`pi pi-circle pi-circle--${color}`} text />
             </div>
@@ -293,6 +322,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                        rowClassName={(data) => (!!data.deleted ? "row--deleted" : "")}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
@@ -314,7 +344,9 @@ export const AccountPromiseToPay = (): ReactElement => {
                                 alignHeader={"left"}
                                 key={field}
                                 body={({ [field]: value }, { rowIndex }) => (
-                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                    <div
+                                        className={`${selectedRows[rowIndex] ? "row--selected" : ""}`}
+                                    >
                                         {value || "-"}
                                     </div>
                                 )}
@@ -360,6 +392,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     setAddPromiseVisible(false);
                     getPromiseList();
                 }}
+                currentPromise={currentPromise}
                 onHide={() => setAddPromiseVisible(false)}
                 statusList={Object.values(paymentItems).map((item) => item.label)}
                 visible={addPromiseVisible}
@@ -367,4 +400,4 @@ export const AccountPromiseToPay = (): ReactElement => {
             />
         </div>
     );
-};
+});

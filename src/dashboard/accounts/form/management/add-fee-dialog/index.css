@@ -1,6 +1,11 @@
 .dialog__add-fee {
     width: 660px;
     min-height: 40vh;
+
+    .p-inputtext:not(:focus),
+    .p-inputnumber:not(:focus) {
+        color: var(--admss-app-light-grey);
+    }
 }
 
 .dialog__add-fee .p-button {
@@ -37,10 +42,6 @@
 .add-fee__input {
     display: inline-flex;
     flex: 1 1 100%;
-
-    .p-inputnumber-input {
-        color: var(--admss-app-light-grey);
-    }
 }
 
 .add-fee__area {

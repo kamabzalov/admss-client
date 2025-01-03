@@ -117,6 +117,15 @@ export const CurrencyInput = ({
     labelPosition = "left",
     ...props
 }: CurrencyInputProps): ReactElement => {
+    const inputRef = useRef<null | any>(null);
+
+    const handleFocus = () => {
+        const realInput = inputRef.current?.inputRef?.current;
+        if (realInput) {
+            realInput.setSelectionRange(0, 0);
+        }
+    };
+
     return (
         <div
             key={name}
@@ -128,10 +137,12 @@ export const CurrencyInput = ({
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
+                    ref={inputRef}
                     minFractionDigits={2}
                     maxFractionDigits={2}
                     min={0}
                     locale='en-US'
+                    onFocus={handleFocus}
                     value={value || 0}
                     {...props}
                 />

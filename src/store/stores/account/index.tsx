@@ -36,6 +36,7 @@ export class AccountStore {
     private _accountTakePayment: Partial<AccountUpdateTakePayment> = {} as AccountUpdateTakePayment;
     private _isAccountChanged: boolean = false;
     private _isAccountPaymentChanged: boolean = false;
+    private _prevPath: string | null = null;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -77,6 +78,10 @@ export class AccountStore {
 
     public get isAccountPaymentChanged() {
         return this._isAccountPaymentChanged;
+    }
+
+    public get prevPath() {
+        return this._prevPath;
     }
 
     public get isLoading() {
@@ -207,9 +212,14 @@ export class AccountStore {
         this._isAccountChanged = state;
     }
 
+    public set prevPath(path: string | null) {
+        this._prevPath = path;
+    }
+
     public clearAccount = () => {
         this._account = {} as AccountInfo;
         this._accountID = "";
+        this._prevPath = null;
         this._accountExtData = {} as AccountExtData;
     };
 }
