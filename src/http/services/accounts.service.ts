@@ -881,6 +881,22 @@ export const addAccountPromise = async (
     }
 };
 
+export const deleteAccountPromise = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${itemuid}/deletepromise`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting promise",
+            };
+        }
+    }
+};
+
 export const updateAccountPromise = async (
     promiseuid: string,
     promiseData: Partial<AccountPromise>
