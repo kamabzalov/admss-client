@@ -105,6 +105,7 @@
         height: var(--input-regular);
         width: 66%;
     }
+
     .p-inputtext,
     .p-inputnumber {
         height: var(--input-regular);
@@ -112,9 +113,18 @@
         font-size: 14px;
     }
 
-    .p-inputtext:not(:focus),
-    .p-inputnumber:not(:focus) {
+    .take-payment__input .p-inputtext,
+    .take-payment__input .p-inputnumber,
+    .take-payment__input--small .p-inputtext,
+    .take-payment__input--small .p-inputnumber {
         color: var(--admss-app-light-grey);
+    }
+
+    .take-payment__input.input-change .p-inputtext,
+    .take-payment__input.input-change .p-inputnumber,
+    .take-payment__input--small.input-change .p-inputtext,
+    .take-payment__input--small.input-change .p-inputnumber {
+        color: var(--admss-app-primary);
     }
 
     .currency-item .p-inputnumber {
