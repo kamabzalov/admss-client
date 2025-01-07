@@ -155,6 +155,7 @@ export const AdvancedSearchDialog = <T,>({
                             <DateInput
                                 key={key}
                                 className='w-full'
+                                value={value}
                                 date={Number(value)}
                                 emptyDate
                                 name={label}
