@@ -39,11 +39,11 @@ export const PayOffInfo = observer((): ReactElement => {
                     className={`take-payment__input ${
                         fieldChanged["PaymentDate"] ? "input-change" : ""
                     }`}
-                    date={PaymentDate}
+                    date={PaymentDate ? new Date(PaymentDate).getTime() : undefined}
                     emptyDate
                     onChange={({ target: { value } }) => {
                         markFieldChanged("PaymentDate");
-                        changeAccountTakePayment("PaymentDate", String(value));
+                        changeAccountTakePayment("PaymentDate", value ? String(value) : "");
                     }}
                 />
             </div>
