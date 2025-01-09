@@ -4,7 +4,11 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
-import { listAccountNotes, updateAccountNote } from "http/services/accounts.service";
+import {
+    deleteAccountNote,
+    listAccountNotes,
+    updateAccountNote,
+} from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountNote } from "common/models/accounts";
 import { AddNoteDialog } from "./add-note-dialog";
@@ -40,10 +44,10 @@ export const AccountNotes = observer((): ReactElement => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [selectedNote, setSelectedNote] = useState<AccountNote | null>(null);
 
-    const handleGetNotes = () => {
-        listAccountNotes(id!).then((res) => {
-            if (Array.isArray(res) && res.length) setNotesList(res);
-        });
+    const handleGetNotes = async () => {
+        const res = await listAccountNotes(id!);
+
+        if (Array.isArray(res)) setNotesList(res);
     };
 
     useEffect(() => {
@@ -53,10 +57,19 @@ export const AccountNotes = observer((): ReactElement => {
         }
     }, [id]);
 
-    const handleDeleteNote = ({ itemuid }: AccountNote) => {
-        // TODO: add API call to delete
-        setNotesList(notesList.filter((item) => item.itemuid !== itemuid));
-        setModalVisible(false);
+    const handleDeleteNote = async ({ itemuid }: AccountNote) => {
+        const res = await deleteAccountNote(itemuid);
+        if (res?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: res.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            setModalVisible(false);
+            handleGetNotes();
+        }
     };
 
     const rowExpansionTemplate = (data: AccountNote) => {
@@ -144,7 +157,7 @@ export const AccountNotes = observer((): ReactElement => {
                 <div className='col-12 account__control'>
                     <NoteEditor
                         id='account-memo'
-                        value={accountNote.note}
+                        value={accountNote?.note}
                         label='Account Memo'
                         onSave={() => handleSaveNote("note")}
                         onClear={() => {
@@ -155,7 +168,7 @@ export const AccountNotes = observer((): ReactElement => {
                     />
                     <NoteEditor
                         id='account-payment'
-                        value={accountNote.alert}
+                        value={accountNote?.alert}
                         label='Payment Alert'
                         onSave={() => handleSaveNote("alert")}
                         onClear={() => {

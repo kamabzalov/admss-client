@@ -54,6 +54,10 @@ export const AccountsForm = observer((): ReactElement => {
     const [activeTab, setActiveTab] = useState<number>(0);
 
     useEffect(() => {
+        store.prevPath = `${location.pathname}${location.search}`;
+    }, [location.pathname, location.search, store]);
+
+    useEffect(() => {
         id &&
             getAccount(id).then((response) => {
                 if (response?.status === Status.ERROR) {

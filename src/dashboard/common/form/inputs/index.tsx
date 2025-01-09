@@ -44,7 +44,7 @@ type Range<
 > = T["length"] extends End ? never : T["length"] | Range<Start, End, [any, ...T]>;
 
 interface DateInputProps extends CalendarProps {
-    date?: number;
+    date?: number | Date | string;
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
     emptyDate?: boolean;
@@ -117,6 +117,15 @@ export const CurrencyInput = ({
     labelPosition = "left",
     ...props
 }: CurrencyInputProps): ReactElement => {
+    const inputRef = useRef<null | any>(null);
+
+    const handleFocus = () => {
+        const realInput = inputRef.current?.inputRef?.current;
+        if (realInput) {
+            realInput.setSelectionRange(0, 0);
+        }
+    };
+
     return (
         <div
             key={name}
@@ -128,10 +137,12 @@ export const CurrencyInput = ({
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
+                    ref={inputRef}
                     minFractionDigits={2}
                     maxFractionDigits={2}
                     min={0}
                     locale='en-US'
+                    onFocus={handleFocus}
                     value={value || 0}
                     {...props}
                 />
@@ -258,24 +269,32 @@ export const DateInput = ({
     emptyDate,
     ...props
 }: DateInputProps): ReactElement => {
-    const [innerDate, setInnerDate] = useState<Date>(new Date());
+    const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!!date || !emptyDate) {
-            const currentDate = new Date(Number(date));
-            setInnerDate(currentDate);
+        if (date !== undefined && date !== null && date !== "") {
+            setInnerDate(new Date(Number(date)));
+        } else if (!emptyDate) {
+            setInnerDate(new Date());
+        } else {
+            setInnerDate(null);
         }
-    }, [date]);
+    }, [date, emptyDate]);
 
-    const dateToNumber = (selectedDate: Date) => setInnerDate(selectedDate);
+    const handleDateChange = (selected: Date | null) => {
+        setInnerDate(selected);
+    };
 
     const content = (
         <div
             key={name}
             className='flex align-items-center justify-content-between date-item relative'
         >
-            <label htmlFor={name} className='date-item__label label-top'>
+            <label
+                htmlFor={name}
+                className={`date-item__label ${date ? "" : "date-item__label--empty"} label-top`}
+            >
                 {name}
             </label>
             <div className='date-item__input w-full flex'>
@@ -288,12 +307,10 @@ export const DateInput = ({
                 )}
                 <Calendar
                     inputId={name}
-                    value={emptyDate ? null : innerDate}
+                    value={checkbox && !isChecked ? null : innerDate}
                     disabled={checkbox && !isChecked}
-                    className={`w-full date-item__calendar ${
-                        checkbox && "date-item__calendar--checkbox"
-                    }`}
-                    onChange={(e) => dateToNumber(e.value as Date)}
+                    className={`w-full date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
+                    onChange={(e) => handleDateChange(e.value as Date | null)}
                     {...props}
                 />
                 <div className='date-item__icon input-icon input-icon-right'>

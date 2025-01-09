@@ -99,9 +99,9 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     dealtype: Yup.number().required("Data is required."),
     dealstatus: Yup.number().required("Data is required."),
     saletype: Yup.number().required("Data is required."),
-    datepurchase: Yup.string().required("Data is required."),
-    dateeffective: Yup.string().required("Data is required."),
-    inventorystatus: Yup.number().required("Data is required."),
+    datepurchase: Yup.string().trim().required("Data is required."),
+    dateeffective: Yup.string().trim().required("Data is required."),
+    inventorystatus: Yup.number().nullable().required("Data is required."),
     HowFoundOut: Yup.string().required("Data is required."),
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
@@ -130,7 +130,12 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return true;
         }
     ),
-    Trade1_Mileage: Yup.string().required("Data is required."),
+    Trade1_Mileage: Yup.string()
+        .required("Data is required.")
+        .test("is-positive", "Mileage must be greater than 0", (value) => {
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0;
+        }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
         message: "Please enter a valid number.",
@@ -156,7 +161,12 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return true;
         }
     ),
-    Trade2_Mileage: Yup.string().required("Data is required."),
+    Trade2_Mileage: Yup.string()
+        .required("Data is required.")
+        .test("is-positive", "Mileage must be greater than 0", (value) => {
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0;
+        }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
     Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
         message: "Please enter a valid number.",
@@ -417,7 +427,7 @@ export const DealsForm = observer(() => {
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase || DATE_NOW,
                                                     dateeffective: deal.dateeffective || DATE_NOW,
-                                                    inventorystatus: deal.inventorystatus || "",
+                                                    inventorystatus: deal.inventorystatus || 0,
                                                     accountInfo: deal.accountInfo || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
                                                     SaleID: dealExtData?.SaleID || "",

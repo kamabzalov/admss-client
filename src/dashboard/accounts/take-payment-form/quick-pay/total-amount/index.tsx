@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 
@@ -15,6 +15,8 @@ export const AccountTotalAmount = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().accountStore;
     const toast = useToast();
+    const [fieldChanged, setFieldChanged] = useState<Record<string, boolean>>({});
+
     const {
         accountTakePayment: {
             PaymentDate,
@@ -46,16 +48,23 @@ export const AccountTotalAmount = observer((): ReactElement => {
         }
     };
 
+    const markFieldChanged = (field: string) => {
+        setFieldChanged((prev) => ({ ...prev, [field]: true }));
+    };
+
     return (
         <div className='take-payment__card'>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Payment Date</label>
                 <DateInput
-                    className='take-payment__input'
+                    className={`take-payment__input ${
+                        fieldChanged["PaymentDate"] ? "input-change" : ""
+                    }`}
                     date={PaymentDate}
-                    onChange={(e) =>
-                        changeAccountTakePayment("PaymentDate", e.target.value as string)
-                    }
+                    onChange={(e) => {
+                        markFieldChanged("PaymentDate");
+                        changeAccountTakePayment("PaymentDate", e.target.value as string);
+                    }}
                 />
             </div>
 
@@ -63,8 +72,15 @@ export const AccountTotalAmount = observer((): ReactElement => {
                 <label className='take-payment__label'>Pmt Method</label>
                 <Dropdown
                     id='pmtMethod'
+                    className={`take-payment__input ${
+                        fieldChanged["PaymentMethod"] ? "input-change" : ""
+                    }`}
                     options={[...ACCOUNT_PAYMENT_METHODS]}
                     value={PaymentMethod}
+                    onChange={(e) => {
+                        markFieldChanged("PaymentMethod");
+                        changeAccountTakePayment("PaymentMethod", e.value);
+                    }}
                     optionValue='name'
                     optionLabel='name'
                 />
@@ -74,8 +90,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
                 <label className='take-payment__label'>Check#</label>
                 <InputText
                     id='checkNumber'
+                    className={`take-payment__input ${
+                        fieldChanged["CheckNumber"] ? "input-change" : ""
+                    }`}
                     value={CheckNumber}
                     onChange={(e) => {
+                        markFieldChanged("CheckNumber");
                         changeAccountTakePayment("CheckNumber", e.target.value);
                     }}
                 />
@@ -87,9 +107,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
                 <h3 className='quick-pay__title color-green'>Total Amount Paid:</h3>
                 <div className='quick-pay__input'>
                     <CurrencyInput
-                        className='quick-pay__total-input'
+                        className={`quick-pay__total-input ${
+                            fieldChanged["TotalAmount"] ? "input-change" : ""
+                        }`}
                         value={TotalAmount}
                         onChange={({ value }) => {
+                            markFieldChanged("TotalAmount");
                             changeAccountTakePayment("TotalAmount", value as number);
                         }}
                     />
@@ -108,8 +131,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
             <div className='take-payment__item color-dusty-blue'>
                 <label className='take-payment__label'>Down/ Pickup:</label>
                 <CurrencyInput
+                    className={`take-payment__input ${
+                        fieldChanged["BreakdownDownPayment"] ? "input-change" : ""
+                    }`}
                     value={BreakdownDownPayment}
                     onChange={({ value }) => {
+                        markFieldChanged("BreakdownDownPayment");
                         changeAccountTakePayment("BreakdownDownPayment", value as number);
                     }}
                 />
@@ -117,8 +144,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
             <div className='take-payment__item color-red'>
                 <label className='take-payment__label'>Fees:</label>
                 <CurrencyInput
+                    className={`take-payment__input ${
+                        fieldChanged["BreakdownFees"] ? "input-change" : ""
+                    }`}
                     value={BreakdownFees}
                     onChange={({ value }) => {
+                        markFieldChanged("BreakdownFees");
                         changeAccountTakePayment("BreakdownFees", value as number);
                     }}
                 />
@@ -126,8 +157,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
             <div className='take-payment__item color-green'>
                 <label className='take-payment__label'>Direct to Principal:</label>
                 <CurrencyInput
+                    className={`take-payment__input ${
+                        fieldChanged["BreakdownPrincipal"] ? "input-change" : ""
+                    }`}
                     value={BreakdownPrincipal}
                     onChange={({ value }) => {
+                        markFieldChanged("BreakdownPrincipal");
                         changeAccountTakePayment("BreakdownPrincipal", value as number);
                     }}
                 />
@@ -135,8 +170,12 @@ export const AccountTotalAmount = observer((): ReactElement => {
             <div className='take-payment__item color-green'>
                 <label className='take-payment__label'>Contract Payment:</label>
                 <CurrencyInput
+                    className={`take-payment__input ${
+                        fieldChanged["BreakdownContractPayment"] ? "input-change" : ""
+                    }`}
                     value={BreakdownContractPayment}
                     onChange={({ value }) => {
+                        markFieldChanged("BreakdownContractPayment");
                         changeAccountTakePayment("BreakdownContractPayment", value as number);
                     }}
                 />

@@ -18,6 +18,7 @@
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--admss-app-light-grey);
+    box-shadow: 0 0 3px 0 var(--admss-app-main-blue);
 }
 
 .take-payment__title {
@@ -104,12 +105,26 @@
         height: var(--input-regular);
         width: 66%;
     }
+
     .p-inputtext,
     .p-inputnumber {
         height: var(--input-regular);
         width: 66%;
         font-size: 14px;
+    }
+
+    .take-payment__input .p-inputtext,
+    .take-payment__input .p-inputnumber,
+    .take-payment__input--small .p-inputtext,
+    .take-payment__input--small .p-inputnumber {
         color: var(--admss-app-light-grey);
+    }
+
+    .take-payment__input.input-change .p-inputtext,
+    .take-payment__input.input-change .p-inputnumber,
+    .take-payment__input--small.input-change .p-inputtext,
+    .take-payment__input--small.input-change .p-inputnumber {
+        color: var(--admss-app-primary);
     }
 
     .currency-item .p-inputnumber {
