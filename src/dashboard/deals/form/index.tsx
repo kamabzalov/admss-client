@@ -116,10 +116,9 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
         .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
         .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
         .required("Data is required."),
-    Trade1_Year: Yup.string().test(
-        "is-valid-year",
-        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-        function (value) {
+    Trade1_Year: Yup.string()
+        .required("Data is required.")
+        .test("is-valid-year", `Must be between ${MIN_YEAR} and ${MAX_YEAR}`, function (value) {
             const year = Number(value);
             if (year < MIN_YEAR) {
                 return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
@@ -128,8 +127,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
                 return this.createError({ message: `Must be less than ${MAX_YEAR}` });
             }
             return true;
-        }
-    ),
+        }),
     Trade1_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
@@ -147,10 +145,9 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
         .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
         .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
         .required("Data is required."),
-    Trade2_Year: Yup.string().test(
-        "is-valid-year",
-        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-        function (value) {
+    Trade2_Year: Yup.string()
+        .required("Data is required.")
+        .test("is-valid-year", `Must be between ${MIN_YEAR} and ${MAX_YEAR}`, function (value) {
             const year = Number(value);
             if (year < MIN_YEAR) {
                 return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
@@ -159,8 +156,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
                 return this.createError({ message: `Must be less than ${MAX_YEAR}` });
             }
             return true;
-        }
-    ),
+        }),
     Trade2_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
