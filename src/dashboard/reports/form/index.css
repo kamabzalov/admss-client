@@ -3,6 +3,9 @@
     .p-tree {
         height: 56vh;
         border: none;
+        .p-treenode {
+            padding: 0;
+        }
         .p-treenode-content {
             &.report__list-item--toggler-visible {
                 .p-tree-toggler {
@@ -213,32 +216,3 @@
     box-shadow: none;
 }
 
-.p-accordion.report__accordion {
-    .p-orderlist {
-        .p-orderlist-droppoint-highlight {
-            background-color: var(--admss-app-light-blue);
-        }
-        .p-orderlist-list {
-            min-height: auto;
-            .p-orderlist-item {
-                padding: 0;
-            }
-            .p-orderlist-item:not(.p-highlight):hover {
-                background-color: var(--admss-app-light-blue);
-            }
-            .p-orderlist-item.p-highlight {
-                padding: 0;
-                background-color: var(--admss-app-light-blue);
-                &:hover {
-                    background-color: var(--admss-app-light-blue);
-                }
-            }
-            border: none;
-            padding: 0;
-        }
-
-        .p-orderlist-controls {
-            display: none;
-        }
-    }
-}

@@ -139,6 +139,7 @@ export enum TOAST_MESSAGES {
     CANNOT_MOVE_INTO_DEFAULT_COLLECTION = "You cannot move anything into this default collection.",
     REPORT_MOVED_SUCCESS = "Report moved successfully!",
     COLLECTION_REORDERED_SUCCESS = "Collection re-ordered successfully!",
+    ERROR_CANNOT_MOVE_FROM_DEFAULT_COLLECTION = "Report cannot be moved from a default collection.",
 }
 
 export enum REPORT_TYPES {
@@ -150,3 +151,4 @@ export enum NODE_TYPES {
     DOCUMENT = "document",
     COLLECTION = "collection",
 }
+
