@@ -6,7 +6,9 @@ export interface DatatableQueries {
 
 export const initialDataTableQueries: DatatableQueries = {
     first: 0,
+    skip: 0,
     rows: ROWS_PER_PAGE[0],
+    top: ROWS_PER_PAGE[0],
     page: 1,
     column: "",
     sortField: "",

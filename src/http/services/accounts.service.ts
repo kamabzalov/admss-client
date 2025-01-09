@@ -570,6 +570,22 @@ export const updateAccountNote = async (itemuid: string, noteData: Partial<Accou
     }
 };
 
+export const deleteAccountNote = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${itemuid}/deletenote`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting note",
+            };
+        }
+    }
+};
+
 export const setOrUpdateMemo = async (itemuid: string, memoData: any) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
@@ -860,6 +876,22 @@ export const addAccountPromise = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while adding promise",
+            };
+        }
+    }
+};
+
+export const deleteAccountPromise = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${itemuid}/deletepromise`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting promise",
             };
         }
     }

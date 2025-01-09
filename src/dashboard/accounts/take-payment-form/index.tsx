@@ -7,6 +7,7 @@ import { AccountQuickPay } from "./quick-pay";
 import { AccountPayOff } from "./pay-off";
 import { AccountBalanceAdjustment } from "./balance-adjustment";
 import "./index.css";
+import { observer } from "mobx-react-lite";
 
 export enum AccountTakePaymentTabs {
     QUICK_PAY = "quick-pay",
@@ -14,7 +15,7 @@ export enum AccountTakePaymentTabs {
     BALANCE_ADJUSTMENT = "balance-adjustment",
 }
 
-export const AccountTakePayment = (): ReactElement => {
+export const AccountTakePayment = observer((): ReactElement => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -27,6 +28,7 @@ export const AccountTakePayment = (): ReactElement => {
         getAccountPaymentsInfo,
         getDrawers,
         getAccount,
+        prevPath,
     } = store;
 
     useEffect(() => {
@@ -81,7 +83,7 @@ export const AccountTakePayment = (): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate(`/dashboard/accounts/${id}`)}
+                onClick={() => navigate(prevPath || `/dashboard/accounts/${id}`)}
             />
             <div className='col-12'>
                 <div className='card account'>
@@ -145,4 +147,4 @@ export const AccountTakePayment = (): ReactElement => {
             </div>
         </div>
     );
-};
+});

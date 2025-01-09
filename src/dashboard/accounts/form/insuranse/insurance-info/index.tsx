@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getAccountInsurance, updateAccountInsurance } from "http/services/accounts.service";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
@@ -15,6 +15,7 @@ import { Loader } from "dashboard/common/loader";
 
 export const AccountInsuranceInfo = observer((): ReactElement => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const toast = useToast();
     const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
     const store = useStore().accountStore;
@@ -25,7 +26,6 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const {
         accountExtData: { Title_Received, Title_Num },
         changeAccountExtData,
-        saveAccount,
     } = store;
 
     const handleGetInsuranceHistory = async () => {
@@ -63,12 +63,17 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                             detail: res.error,
                             life: TOAST_LIFETIME,
                         });
-                    }
-                    if (res) {
+                    } else {
                         setInsuranceInfo(res as AccountInsurance);
-                        saveAccount();
                         handleGetInsuranceHistory().then(() => {
                             setInsuranceEdit(false);
+                            setIsButtonDisabled(true);
+                        });
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Insurance info updated successfully!",
+                            life: TOAST_LIFETIME,
                         });
                     }
                 });
@@ -76,8 +81,16 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     };
 
     const handleChangeInsuranceEdit = () => {
-        setIsButtonDisabled(true);
-        setInsuranceEdit((prevState) => !prevState);
+        if (!insuranceInfo?.Insurance_userUID) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Insurance userUID is required",
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            navigate(`/dashboard/contacts/${insuranceInfo?.Insurance_userUID}`);
+        }
     };
 
     const handleChangeInsurance = (field: keyof AccountInsurance, value: string) => {
@@ -180,6 +193,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                 )}
                 <div className='insurance-info__footer'>
                     <Button
+                        type='button'
                         className='insurance-info__button'
                         disabled={isButtonDisabled}
                         severity={isButtonDisabled ? "secondary" : "success"}

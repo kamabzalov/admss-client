@@ -277,18 +277,21 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
-                        className={`deal-trade__text-input w-full ${
-                            errors.Trade1_Mileage ? "p-invalid" : ""
-                        }`}
+                        className={`deal-trade__text-input w-full ${errors.Trade1_Mileage ? "p-invalid" : ""}`}
                         required
-                        value={parseFloat(values?.Trade1_Mileage) || 0}
-                        useGrouping={false}
+                        value={
+                            values.Trade1_Mileage
+                                ? parseFloat(values.Trade1_Mileage.replace(/[^0-9.]/g, ""))
+                                : null
+                        }
+                        useGrouping
                         min={0}
                         onChange={({ value }) => {
-                            setFieldValue("Trade1_Mileage", value);
+                            const valAsString = value?.toString() || "";
+                            setFieldValue("Trade1_Mileage", valAsString);
                             changeDealExtData({
                                 key: "Trade1_Mileage",
-                                value: value ? String(value) : "0",
+                                value: valAsString,
                             });
                         }}
                     />

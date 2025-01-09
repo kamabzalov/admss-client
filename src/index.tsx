@@ -9,7 +9,7 @@ import Accounts from "dashboard/accounts";
 import { AccountsForm } from "dashboard/accounts/form";
 import Contacts from "dashboard/contacts";
 import { ContactForm } from "dashboard/contacts/form";
-import Deals from "dashboard/deals";
+import { Deals } from "dashboard/deals";
 import { DealsForm } from "dashboard/deals/form";
 import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";

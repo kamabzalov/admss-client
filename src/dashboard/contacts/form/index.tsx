@@ -39,18 +39,35 @@ export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
     firstName: Yup.string()
-        ?.trim()
-        .when("type", ([type], schema) => {
-            return !REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
-                ? schema.required("Data is required.")
-                : schema;
+        .trim()
+        .test("firstNameRequired", "Data is required.", function (value) {
+            const { type, businessName } = this.parent;
+            if (!REQUIRED_COMPANY_TYPE_INDEXES.includes(type) && !businessName?.trim()) {
+                return !!value?.trim();
+            }
+            return true;
         }),
     lastName: Yup.string()
-        ?.trim()
-        .when("type", ([type], schema) => {
-            return !REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
-                ? schema.required("Data is required.")
-                : schema;
+        .trim()
+        .test("lastNameRequired", "Data is required.", function (value) {
+            const { type, businessName } = this.parent;
+            if (!REQUIRED_COMPANY_TYPE_INDEXES.includes(type) && !businessName?.trim()) {
+                return !!value?.trim();
+            }
+            return true;
+        }),
+    businessName: Yup.string()
+        .trim()
+        .test("businessNameRequired", "Data is required.", function (value) {
+            const { type, firstName, lastName } = this.parent;
+            if (
+                REQUIRED_COMPANY_TYPE_INDEXES.includes(type) &&
+                !firstName?.trim() &&
+                !lastName?.trim()
+            ) {
+                return !!value?.trim();
+            }
+            return true;
         }),
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
@@ -66,13 +83,6 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         .matches(/^[\d]{10,13}$/, {
             message: "Invalid phone number.",
             excludeEmptyString: false,
-        }),
-    businessName: Yup.string()
-        ?.trim()
-        .when("type", ([type]) => {
-            return REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
-                ? Yup.string()?.trim().required("Data is required.")
-                : Yup.string()?.trim();
         }),
     Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
     Buyer_Emp_Phone: Yup.string()

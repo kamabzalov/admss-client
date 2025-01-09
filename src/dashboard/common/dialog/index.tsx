@@ -49,6 +49,7 @@ export const DashboardDialog = ({
                             {cancelButton && (
                                 <Button
                                     label='Cancel'
+                                    type='button'
                                     className='dialog__cancel-button'
                                     onClick={onHide}
                                     severity='danger'

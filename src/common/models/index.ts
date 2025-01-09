@@ -1,3 +1,5 @@
+import { TreeNode } from "primereact/treenode";
+
 export interface TypeList {
     id: number;
     name: string;
@@ -11,4 +13,8 @@ export interface PrintForm {
     state: string;
     type: string;
     version: string;
+}
+
+export interface TreeNodeEvent extends TreeNode {
+    type: string;
 }
