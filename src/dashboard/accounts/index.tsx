@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 
@@ -21,6 +21,12 @@ import "./index.css";
 import { useNavigate } from "react-router-dom";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
+import { observer } from "mobx-react-lite";
+import {
+    AdvancedSearchDialog,
+    SEARCH_FORM_TYPE,
+    SearchField,
+} from "dashboard/common/dialog/search";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountnumber", header: "Account" },
@@ -29,14 +35,51 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "created", header: "Date" },
 ];
 
-export default function Accounts() {
+enum SEARCH_FORM_FIELDS {
+    ACCOUNT = "Account#",
+    DATE = "Date",
+}
+
+enum SEARCH_FORM_QUERY {
+    ACCOUNT = "accountnumber",
+    DATE = "dateeffective",
+}
+
+interface AdvancedSearch {
+    [key: string]: string | number;
+    accountInfo: string;
+    VIN: string;
+    StockNo: string;
+    date: string;
+}
+
+export const Accounts = observer((): ReactElement => {
     const [accounts, setAccounts] = useState<any[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
     const navigate = useNavigate();
+
+    const searchFields = [
+        {
+            key: SEARCH_FORM_FIELDS.ACCOUNT,
+            label: SEARCH_FORM_FIELDS.ACCOUNT,
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.ACCOUNT],
+            type: "text",
+        },
+
+        {
+            key: SEARCH_FORM_FIELDS.DATE,
+            label: SEARCH_FORM_FIELDS.DATE,
+            value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
+            type: "date",
+        },
+    ];
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -110,8 +153,6 @@ export default function Accounts() {
 
     useEffect(() => {
         const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
             skip: lazyState.first,
@@ -127,6 +168,59 @@ export default function Accounts() {
             });
         }
     }, [lazyState, authUser, globalSearch]);
+
+    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
+        setAdvancedSearch((prevSearch) => {
+            const newSearch = { ...prevSearch, [key]: value };
+            const isAnyValueEmpty = Object.values(newSearch).every((v) => v === "");
+            setButtonDisabled(isAnyValueEmpty);
+            return newSearch;
+        });
+    };
+
+    const handleAdvancedSearch = () => {
+        const searchQuery = Object.entries(advancedSearch)
+            .filter(([_, value]) => value)
+            .map(([key, value]) => {
+                let keyName: string = key;
+                switch (key) {
+                    case SEARCH_FORM_FIELDS.ACCOUNT:
+                        keyName = SEARCH_FORM_QUERY.ACCOUNT;
+                        break;
+
+                    case SEARCH_FORM_FIELDS.DATE:
+                        keyName = SEARCH_FORM_QUERY.DATE;
+                        value = new Date(value).getTime();
+                        break;
+                }
+                return `${value}.${keyName}`;
+            })
+            .join("+");
+
+        const params: QueryParams = {
+            top: lazyState.first,
+            skip: lazyState.skip,
+            qry: searchQuery,
+        };
+        authUser &&
+            getAccountsList(authUser?.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setAccounts(response);
+                } else {
+                    setAccounts([]);
+                }
+            });
+
+        setDialogVisible(false);
+    };
+
+    const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
+        setAdvancedSearch((prevSearch) => {
+            const updatedSearch = { ...prevSearch };
+            delete updatedSearch[key];
+            return updatedSearch;
+        });
+    };
 
     return (
         <div className='grid'>
@@ -161,6 +255,7 @@ export default function Accounts() {
                                     label='Advanced search'
                                     severity='success'
                                     type='button'
+                                    onClick={() => setDialogVisible(true)}
                                 />
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
@@ -216,6 +311,19 @@ export default function Accounts() {
                     </div>
                 </div>
             </div>
+            <AdvancedSearchDialog<AdvancedSearch>
+                visible={dialogVisible}
+                buttonDisabled={buttonDisabled}
+                onHide={() => {
+                    setButtonDisabled(true);
+                    setDialogVisible(false);
+                }}
+                action={handleAdvancedSearch}
+                onSearchClear={handleClearAdvancedSearchField}
+                onInputChange={handleSetAdvancedSearch}
+                fields={searchFields as SearchField<AdvancedSearch>[]}
+                searchForm={SEARCH_FORM_TYPE.ACCOUNTS}
+            />
         </div>
     );
-}
+});

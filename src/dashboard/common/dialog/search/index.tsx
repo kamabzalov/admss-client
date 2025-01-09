@@ -22,6 +22,7 @@ export enum SEARCH_FORM_TYPE {
     CONTACTS,
     INVENTORY,
     DEALS,
+    ACCOUNTS,
 }
 
 enum DROPDOWN_TYPE {
