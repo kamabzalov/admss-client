@@ -6,6 +6,7 @@
         .p-treenode {
             padding: 0;
         }
+
         .p-treenode-content {
             &.report__list-item--toggler-visible {
                 .p-tree-toggler {
@@ -25,6 +26,9 @@
     .p-tree-container {
         height: 100%;
         border: none;
+        .p-treenode .p-treenode-content.p-treenode-dragover {
+            background: var(--admss-app-light-blue);
+        }
         .p-treenode .p-treenode-content .p-tree-toggler:focus {
             box-shadow: none;
         }
