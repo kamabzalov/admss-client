@@ -13,27 +13,29 @@ import {
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { centsToDollars, formatCurrency } from "common/helpers";
 
 interface TotalPaidDialogProps extends DashboardDialogProps {}
 type TotalPaidInfo = Pick<
     AccountUpdateTotalInfo,
-    "PrincipalPaid" | "InterestPaid" | "ExtraPrincipalPayments" | "TotalPaid"
+    "PrincipalPaid" | "InterestPaid" | "ExtraPrincipalPmts" | "TotalPaid"
 >;
 
 const initialTotalPaid: TotalPaidInfo = {
     PrincipalPaid: 0,
     InterestPaid: 0,
-    ExtraPrincipalPayments: 0,
+    ExtraPrincipalPmts: 0,
     TotalPaid: 0,
 };
 
-export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProps) => {
+export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
     const { id } = useParams();
     const toast = useToast();
-    const [totalPaid, setTotalPaid] = useState<TotalPaidInfo>(initialTotalPaid);
+    const [originalAmount, setOriginalAmount] = useState<TotalPaidInfo>(initialTotalPaid);
     const [newAmount, setNewAmount] = useState<TotalPaidInfo>(initialTotalPaid);
+    const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
 
-    useEffect(() => {
+    const fetchOriginalAmount = () => {
         if (id) {
             getAccountOriginalAmount(id).then((res) => {
                 if (res?.status === Status.ERROR) {
@@ -44,11 +46,19 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    setTotalPaid(res as TotalPaidInfo);
+                    setOriginalAmount(res as TotalPaidInfo);
+                    setNewAmount(res as TotalPaidInfo);
                 }
             });
         }
-    }, [id]);
+    };
+
+    useEffect(() => {
+        if (visible) {
+            fetchOriginalAmount();
+            setIsSubmitEnabled(false);
+        }
+    }, [visible]);
 
     const handleCalcAmount = () => {
         if (id) {
@@ -61,7 +71,8 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    setTotalPaid(res as TotalPaidInfo);
+                    setOriginalAmount(res as TotalPaidInfo);
+                    setIsSubmitEnabled(true);
                 }
             });
         }
@@ -69,11 +80,12 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
 
     const handleSaveTotalPaid = () => {
         const amountData: Partial<TotalPaidInfo> = {
-            PrincipalPaid: newAmount.PrincipalPaid,
-            InterestPaid: newAmount.InterestPaid,
-            ExtraPrincipalPayments: newAmount.ExtraPrincipalPayments,
+            PrincipalPaid: centsToDollars(newAmount.PrincipalPaid),
+            InterestPaid: centsToDollars(newAmount.InterestPaid),
+            ExtraPrincipalPmts: centsToDollars(newAmount.ExtraPrincipalPmts),
         };
-        id &&
+
+        if (id) {
             updateAccountTotal(id, amountData).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
@@ -92,6 +104,11 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                     onHide();
                 }
             });
+        }
+    };
+
+    const handleCancel = () => {
+        setNewAmount(originalAmount);
         onHide();
     };
 
@@ -102,8 +119,9 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
             footer='Save'
             header='Total Paid'
             visible={visible}
-            onHide={onHide}
+            onHide={handleCancel}
             action={handleSaveTotalPaid}
+            buttonDisabled={!isSubmitEnabled}
             cancelButton
         >
             <div className='splitter my-3'>
@@ -115,22 +133,26 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                 <div className='total-paid__item'>
                     <label className='total-paid__label'>Principal Paid:</label>
                     <span className='total-paid__value'>
-                        {totalPaid?.PrincipalPaid || "$ 0.00"}
+                        {formatCurrency(originalAmount?.PrincipalPaid || 0)}
                     </span>
                 </div>
                 <div className='total-paid__item'>
                     <label className='total-paid__label'>Interest Paid:</label>
-                    <span className='total-paid__value'>{totalPaid?.InterestPaid || "$ 0.00"}</span>
+                    <span className='total-paid__value'>
+                        {formatCurrency(originalAmount?.InterestPaid || 0)}
+                    </span>
                 </div>
                 <div className='total-paid__item'>
                     <label className='total-paid__label'>Extra Principal Payments:</label>
                     <span className='total-paid__value'>
-                        {totalPaid?.ExtraPrincipalPayments || "$ 0.00"}
+                        {formatCurrency(originalAmount?.ExtraPrincipalPmts || 0)}
                     </span>
                 </div>
                 <div className='total-paid__item'>
                     <label className='total-paid__label'>Total Paid:</label>
-                    <span className='total-paid__value'>{totalPaid?.TotalPaid || "$ 0.00"}</span>
+                    <span className='total-paid__value'>
+                        {formatCurrency(originalAmount?.TotalPaid || 0)}
+                    </span>
                 </div>
             </div>
 
@@ -160,9 +182,9 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
                 />
                 <CurrencyInput
                     className='total-paid__input'
-                    value={newAmount?.ExtraPrincipalPayments}
+                    value={newAmount?.ExtraPrincipalPmts}
                     onChange={({ value }) =>
-                        setNewAmount({ ...newAmount, ExtraPrincipalPayments: value || 0 })
+                        setNewAmount({ ...newAmount, ExtraPrincipalPmts: value || 0 })
                     }
                     title='Extra Principal'
                     labelPosition='top'
@@ -171,7 +193,9 @@ export const TotalPaidDialog = ({ onHide, action, visible }: TotalPaidDialogProp
 
             <div className='total-paid__item'>
                 <label className='total-paid__label'>Total Paid:</label>
-                <span className='total-paid__value'>$ 0.00</span>
+                <span className='total-paid__value'>
+                    {formatCurrency(newAmount?.TotalPaid || 0)}
+                </span>
             </div>
 
             <Button
