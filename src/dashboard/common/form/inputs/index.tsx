@@ -293,7 +293,7 @@ export const DateInput = ({
         >
             <label
                 htmlFor={name}
-                className={`date-item__label ${date ? "" : "date-item__label--empty"} label-top`}
+                className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top`}
             >
                 {name}
             </label>
