@@ -1,31 +1,45 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList } from "http/services/contacts-service";
+import { Contact, ContactOFAC, ContactType } from "common/models/contact";
+import {
+    checkContactOFAC,
+    getContactsTypeList,
+    scanContactDL,
+} from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
+import { Checkbox } from "primereact/checkbox";
+import { Button } from "primereact/button";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { BUYER_ID } from "dashboard/contacts/form/general-info";
+import { TextInput } from "dashboard/common/form/inputs";
 
-const titleList = [
-    {
-        name: "Mr.",
-    },
-    {
-        name: "Mrs.",
-    },
-];
+const enum TOOLTIP_MESSAGE {
+    PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
+    BUSINESS = "You can input either a person or a business name. If you entered a personal data but intended to enter business name, clear the personal data fields, and the field for entering business name will become active.",
+    ONLY_BUSINESS = "The type of contact you have selected requires entering only the business name",
+}
 
 export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, changeContact, changeContactExtData } = store;
+    const { contact, contactFullInfo, contactType, changeContact } = store;
+    const toast = useToast();
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { errors, values, setFieldValue } = useFormikContext<Contact>();
 
-    const { errors, setFieldValue } = useFormikContext<Contact>();
+    const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
+    const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
+    const [savedMiddleName, setSavedMiddleName] = useState<string>(contact.middleName || "");
+    const [savedBusinessName, setSavedBusinessName] = useState<string>(contact.businessName || "");
 
     useEffect(() => {
         getContactsTypeList(id || "0").then((response) => {
@@ -36,110 +50,280 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         });
     }, [id]);
 
+    const handleScanDL = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            scanContactDL(file).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+            event.target.value = "";
+        }
+    };
+
+    const isBusinessNameRequired = useMemo(() => {
+        return REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
+    }, [contact.type]);
+
+    const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
+
+    const shouldDisableNameFields = useMemo(() => {
+        return (
+            isBusinessNameRequired || (!!values.businessName && values.businessName.trim() !== "")
+        );
+    }, [isBusinessNameRequired, values.businessName]);
+
+    const shouldDisableBusinessName = useMemo(() => {
+        return (
+            !isBusinessNameRequired && (!!contact.firstName?.trim() || !!contact.lastName?.trim())
+        );
+    }, [isBusinessNameRequired, contact.firstName, contact.lastName]);
+
+    useEffect(() => {
+        if (shouldDisableNameFields) {
+            if (contact.firstName) {
+                setSavedFirstName(contact.firstName);
+                setFieldValue("firstName", "");
+                changeContact("firstName", "");
+            }
+            if (contact.lastName) {
+                setSavedLastName(contact.lastName);
+                setFieldValue("lastName", "");
+                changeContact("lastName", "");
+            }
+            if (contact.middleName) {
+                setSavedMiddleName(contact.middleName);
+                setFieldValue("middleName", "");
+                changeContact("middleName", "");
+            }
+        } else {
+            if (!contact.firstName && savedFirstName) {
+                setFieldValue("firstName", savedFirstName);
+                changeContact("firstName", savedFirstName);
+            }
+            if (!contact.lastName && savedLastName) {
+                setFieldValue("lastName", savedLastName);
+                changeContact("lastName", savedLastName);
+            }
+            if (!contact.middleName && savedMiddleName) {
+                setFieldValue("middleName", savedMiddleName);
+                changeContact("middleName", savedMiddleName);
+            }
+        }
+    }, [shouldDisableNameFields, contact.businessName, setFieldValue, changeContact]);
+
+    useEffect(() => {
+        if (shouldDisableBusinessName) {
+            setSavedBusinessName(contact.businessName);
+            setFieldValue("businessName", "");
+            changeContact("businessName", "");
+        } else {
+            if (!contact.businessName && savedBusinessName) {
+                setFieldValue("businessName", savedBusinessName);
+                changeContact("businessName", savedBusinessName);
+            }
+        }
+    }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
+
+    const handleOfacCheck = () => {
+        if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
+            return;
+        }
+        checkContactOFAC(id, { ...contactFullInfo }).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                store.contactOFAC = response as ContactOFAC;
+            }
+        });
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
-            <div className='col-4'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        filter
-                        placeholder='Title'
-                        value={contactExtData.Buyer_Salutation || ""}
-                        options={titleList}
-                        onChange={({ target: { value } }) => {
-                            changeContactExtData("Buyer_Salutation", value);
-                        }}
-                        className='w-full general-info__dropdown'
-                    />
-                    <label className='float-label'>Title</label>
-                </span>
+            <div className='col-12 grid'>
+                <div className='col-4 relative pr-0 pb-0'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            optionLabel='name'
+                            optionValue='id'
+                            value={contact.type || 0}
+                            options={typeList}
+                            onChange={(e) => {
+                                store.contactType = e.value;
+                                setFieldValue("type", e.value);
+                                changeContact("type", e.value);
+                            }}
+                            className={`w-full general-info__dropdown ${
+                                errors.type ? "p-invalid" : ""
+                            }`}
+                            pt={{
+                                wrapper: {
+                                    style: { minHeight: "414px" },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Type (required)</label>
+                    </span>
+                    <small className='p-error'>{errors.type}</small>
+                </div>
             </div>
+            {!isControlDisabled && (
+                <>
+                    <div className='col-3'>
+                        <Button
+                            type='button'
+                            label='Scan driver license'
+                            className='general-info__button'
+                            tooltip='Data received from the DL’s backside will fill in related fields'
+                            disabled={isControlDisabled}
+                            outlined
+                            onClick={handleScanDL}
+                        />
+                        <input
+                            type='file'
+                            accept='image/*'
+                            style={{ display: "none" }}
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                        />
+                    </div>
+                    <div className='col-9'>
+                        <div className='general-info-overwrite pb-3'>
+                            <Checkbox
+                                checked={allowOverwrite}
+                                disabled={isControlDisabled}
+                                inputId='general-info-overwrite'
+                                className='general-info-overwrite__checkbox'
+                                onChange={() => setAllowOverwrite(!allowOverwrite)}
+                            />
+                            <label
+                                htmlFor='general-info-overwrite'
+                                className='general-info-overwrite__label'
+                            >
+                                Overwrite data
+                            </label>
+                            <Button
+                                text
+                                tooltip='Data received from the DL’s backside will overwrite user-entered data'
+                                icon='icon adms-help'
+                                outlined
+                                type='button'
+                                className='general-info-overwrite__icon'
+                                tooltipOptions={{
+                                    className: "overwrite-tooltip",
+                                }}
+                            />
+                        </div>
+                    </div>
+                </>
+            )}
+            {!isControlDisabled && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+                <>
+                    <div className='col-4 relative'>
+                        <TextInput
+                            className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
+                            value={contact.firstName || ""}
+                            onChange={({ target: { value } }) => {
+                                setFieldValue("firstName", value);
+                                changeContact("firstName", value);
+                            }}
+                            onBlur={handleOfacCheck}
+                            name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                            tooltip={
+                                isBusinessNameRequired
+                                    ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                    : shouldDisableNameFields
+                                      ? TOOLTIP_MESSAGE.PERSON
+                                      : ""
+                            }
+                            disabled={shouldDisableNameFields}
+                            clearButton
+                        />
 
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
+                        <small className='p-error'>{errors.firstName}</small>
+                    </div>
+
+                    <div className='col-4 relative'>
+                        <TextInput
+                            name='Middle Name'
+                            className='general-info__text-input w-full'
+                            value={contact.middleName || ""}
+                            onChange={({ target: { value } }) => {
+                                changeContact("middleName", value);
+                                setFieldValue("middleName", value);
+                            }}
+                            tooltip={
+                                isBusinessNameRequired
+                                    ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                    : shouldDisableNameFields
+                                      ? TOOLTIP_MESSAGE.PERSON
+                                      : ""
+                            }
+                            disabled={shouldDisableNameFields}
+                            clearButton
+                        />
+                    </div>
+
+                    <div className='col-4 relative'>
+                        <TextInput
+                            name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                            className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
+                            value={contact.lastName || ""}
+                            onChange={({ target: { value } }) => {
+                                setFieldValue("lastName", value);
+                                changeContact("lastName", value);
+                            }}
+                            onBlur={handleOfacCheck}
+                            disabled={shouldDisableNameFields}
+                            tooltip={
+                                isBusinessNameRequired
+                                    ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                    : shouldDisableNameFields
+                                      ? TOOLTIP_MESSAGE.PERSON
+                                      : ""
+                            }
+                            clearButton
+                        />
+
+                        <small className='p-error'>{errors.lastName}</small>
+                    </div>
+                </>
+            )}
+            {!!contactType && (
+                <div className='col-4 relative'>
+                    <TextInput
+                        name={`Business Name${!shouldDisableBusinessName ? " (required)" : ""}`}
                         className={`general-info__text-input w-full ${
-                            errors.firstName ? "p-invalid" : ""
+                            errors.businessName ? "p-invalid" : ""
                         }`}
-                        value={contact.firstName || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("firstName", value);
-                            changeContact("firstName", value);
-                        }}
-                    />
-                    <label className='float-label'>First Name (required)</label>
-                </span>
-                <small className='p-error'>{errors.firstName}</small>
-            </div>
-
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.lastName ? "p-invalid" : ""
-                        }`}
-                        value={contact.lastName || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("lastName", value);
-                            changeContact("lastName", value);
-                        }}
-                    />
-                    <label className='float-label'>Last Name (required)</label>
-                </span>
-                <small className='p-error'>{errors.lastName}</small>
-            </div>
-
-            <div className='col-4'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='general-info__text-input w-full'
                         value={contact.businessName || ""}
-                        onChange={({ target: { value } }) => changeContact("businessName", value)}
-                    />
-                    <label className='float-label'>Business Name</label>
-                </span>
-            </div>
-
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        value={contact.type || 0}
-                        filter
-                        options={typeList}
-                        onChange={(e) => {
-                            setFieldValue("type", e.value);
-                            changeContact("type", e.value);
-                        }}
-                        className={`w-full general-info__dropdown ${
-                            errors.type ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Type (required)</label>
-                </span>
-                <small className='p-error'>{errors.type}</small>
-            </div>
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.companyName ? "p-invalid" : ""
-                        }`}
-                        value={contact.companyName || ""}
                         onChange={({ target: { value } }) => {
-                            setFieldValue("companyName", value);
-                            changeContact("companyName", value);
+                            changeContact("businessName", value);
+                            setFieldValue("businessName", value);
                         }}
+                        disabled={!!shouldDisableBusinessName}
+                        tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
+                        clearButton
                     />
-                    <label className='float-label'>
-                        Company Name
-                        {REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
-                    </label>
-                </span>
-                <small className='p-error'>{errors.companyName}</small>
-            </div>
+
+                    <small className='p-error'>{errors.businessName}</small>
+                </div>
+            )}
         </div>
     );
 });
