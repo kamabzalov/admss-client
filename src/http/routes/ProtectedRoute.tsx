@@ -65,3 +65,4 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
 });
 
 export default ProtectedRoute;
+
