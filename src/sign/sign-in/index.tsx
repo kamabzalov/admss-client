@@ -104,11 +104,7 @@ export default function SignIn() {
 
                                 <InputText
                                     placeholder='Password'
-                                    className={`sign__input ${
-                                        formik.touched.password && formik.errors.password
-                                            ? "p-invalid"
-                                            : ""
-                                    }`}
+                                    className={`sign__input ${formik.touched.password && formik.errors.password ? "p-invalid" : ""}`}
                                     id='password'
                                     type={!passwordVisible ? "password" : "text"}
                                     onChange={formik.handleChange}
