@@ -26,4 +26,4 @@ export enum AppColors {
     DARKEST_BLUE = "darkest-blue",
     DEEP_BLUE = "deep-blue",
     WARNING_BLUE = "warning-blue",
-   }
+}
