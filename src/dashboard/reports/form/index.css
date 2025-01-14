@@ -206,6 +206,7 @@
     color: var(--admss-app-primary);
     padding-left: 0;
     border-radius: 0;
+    text-align: left;
 }
 
 .report__list-item.p-button.p-button-text:hover {
