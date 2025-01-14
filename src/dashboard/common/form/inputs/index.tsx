@@ -273,7 +273,7 @@ export const DateInput = ({
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
-        if (date !== undefined && date !== null && date !== "") {
+        if (date !== undefined && date !== null && !isNaN(Number(date))) {
             setInnerDate(new Date(Number(date)));
         } else if (!emptyDate) {
             setInnerDate(new Date());
