@@ -77,6 +77,18 @@
     align-items: center;
 }
 
+.date-item__clear-button.p-button {
+    position: absolute;
+    right: 50px;
+    border: none;
+    color: var(--admss-app-primary);
+    background-color: transparent;
+    &:hover:enabled {
+        background-color: transparent;
+        color: var(--admss-app-medium-grey);
+    }
+}
+
 .date-item__checkbox {
     display: flex;
     align-items: center;
