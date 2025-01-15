@@ -553,7 +553,7 @@ export interface AccountUpdateTotalInfo {
     accountuid: string;
     PrincipalPaid: number;
     InterestPaid: number;
-    ExtraPrincipalPayments: number;
+    ExtraPrincipalPmts: number;
     TotalPaid: number;
 }
 

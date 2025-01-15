@@ -38,7 +38,9 @@ export const AddPromiseDialog = observer(
         );
         const [note, setNote] = useState<string>(currentPromise?.notes || "");
         const [amount, setAmount] = useState<number>(currentPromise?.amount || 0);
-        const [paydate, setPaydate] = useState<number>(currentPromise?.paydate || 0);
+        const [paydate, setPaydate] = useState<number>(
+            currentPromise?.paydate || new Date().getTime()
+        );
         const [status, setStatus] = useState<string>(currentPromise?.pstatus.toString() || "");
         const toast = useToast();
         const currentTime = useMemo(
@@ -118,6 +120,7 @@ export const AddPromiseDialog = observer(
                     <div className='col-6'>
                         <DateInput
                             name='Promise to Pay Date'
+                            value={new Date(currentPromise?.paydate || paydate)}
                             date={currentPromise?.paydate || paydate}
                             emptyDate
                             onChange={({ target: { value } }) => {

@@ -58,6 +58,9 @@ export const AccountPromiseToPay = observer((): ReactElement => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [currentPromise, setCurrentPromise] = useState<AccountPromise | null>(null);
     const toast = useToast();
+    const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
+    const [confirmText, setConfirmText] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
 
     const getPromiseList = async () => {
         if (id) {
@@ -99,6 +102,40 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         }
     };
 
+    const handleDeletePromises = async () => {
+        try {
+            const promisesToDelete = promiseList.filter((_, index) => selectedRows[index]);
+            const deleteRequests = promisesToDelete.map((promise) =>
+                deleteAccountPromise(promise.itemuid)
+            );
+
+            await Promise.all(deleteRequests);
+
+            const updatedList = promiseList.filter(
+                (promise) => !promisesToDelete.some((item) => item.itemuid === promise.itemuid)
+            );
+            setPromiseList(updatedList);
+
+            toast.current?.show({
+                severity: "success",
+                summary: "Deleted",
+                detail: "Selected promises have been deleted.",
+                life: TOAST_LIFETIME,
+            });
+
+            getPromiseList();
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to delete promises. Please try again.",
+                life: TOAST_LIFETIME,
+            });
+        } finally {
+            setConfirmVisible(false);
+        }
+    };
+
     const promiseItems = [
         {
             label: "Edit Promise",
@@ -111,22 +148,18 @@ export const AccountPromiseToPay = observer((): ReactElement => {
             label: "Delete Promise",
             icon: `pi pi-times`,
             command: () => {
-                selectedRows.forEach(async (isSelected, index) => {
-                    if (isSelected) {
-                        const promise = promiseList[index];
-                        const res = await deleteAccountPromise(promise.itemuid);
-                        if (res && res.status === Status.ERROR) {
-                            return toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: res.error,
-                                life: TOAST_LIFETIME,
-                            });
-                        } else {
-                            getPromiseList();
-                        }
-                    }
-                });
+                if (!selectedRows.some((isSelected) => isSelected)) {
+                    toast.current?.show({
+                        severity: "warn",
+                        summary: "No promise selected",
+                        detail: "Please select a promise to delete.",
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    setConfirmText("Are you sure you want to delete the selected promises?");
+                    setConfirmAction(() => handleDeletePromises);
+                    setConfirmVisible(true);
+                }
             },
         },
     ];
@@ -397,6 +430,21 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                 statusList={Object.values(paymentItems).map((item) => item.label)}
                 visible={addPromiseVisible}
                 accountuid={id}
+            />
+            <ConfirmModal
+                visible={confirmVisible}
+                title='Confirm Deletion'
+                bodyMessage={confirmText}
+                icon='pi pi-exclamation-triangle'
+                acceptLabel='Delete'
+                rejectLabel='Cancel'
+                draggable={false}
+                className='promise-confirm-dialog'
+                confirmAction={() => {
+                    confirmAction?.();
+                    setConfirmVisible(false);
+                }}
+                onHide={() => setConfirmVisible(false)}
             />
         </div>
     );
