@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import {
     DataTable,
@@ -7,13 +6,11 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { TotalDealsList, getDealsList } from "http/services/deals.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +26,8 @@ import {
     SEARCH_FORM_TYPE,
     SearchField,
 } from "dashboard/common/dialog/search";
+import { useStore } from "store/hooks";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -108,7 +107,8 @@ interface AdvancedSearch {
 
 export const Deals = () => {
     const [deals, setDeals] = useState<Deal[]>([]);
-    const [authUser, setUser] = useState<AuthUser | null>(null);
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
@@ -176,7 +176,7 @@ export const Deals = () => {
                 columns,
                 format: "",
             };
-            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+            await makeShortReports(authUser?.useruid, JSONreport).then((response) => {
                 const url = new Blob([response], { type: "application/pdf" });
                 let link = document.createElement("a");
                 link.href = window.URL.createObjectURL(url);
@@ -205,32 +205,39 @@ export const Deals = () => {
         setLazyState(event);
     };
 
+    const handleGetDealsList = async (params: QueryParams) => {
+        getDealsList(authUser!.useruid, params).then((response) => {
+            if (Array.isArray(response)) {
+                setDeals(response);
+                setIsLoading(false);
+            } else {
+                setDeals([]);
+            }
+        });
+    };
+
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            setUser(authUser);
-            getDealsList(authUser.useruid, { total: 1 }).then((response) => {
-                const { error } = response as BaseResponseError;
-                if (response && !error) {
-                    const { total } = response as TotalDealsList;
-                    setTotalRecords(total ?? 0);
-                    setLazyState({
-                        first: initialDataTableQueries.first,
-                        rows: initialDataTableQueries.rows,
-                        page: initialDataTableQueries.page,
-                        column: initialDataTableQueries.column,
-                        sortField: initialDataTableQueries.sortField,
-                        sortOrder: initialDataTableQueries.sortOrder,
-                    });
-                } else {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                    });
-                }
-            });
-        }
+        getDealsList(authUser!.useruid, { total: 1 }).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (response && !error) {
+                const { total } = response as TotalDealsList;
+                setTotalRecords(total ?? 0);
+                setLazyState({
+                    first: initialDataTableQueries.first,
+                    rows: initialDataTableQueries.rows,
+                    page: initialDataTableQueries.page,
+                    column: initialDataTableQueries.column,
+                    sortField: initialDataTableQueries.sortField,
+                    sortOrder: initialDataTableQueries.sortOrder,
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                });
+            }
+        });
     }, [toast]);
 
     useEffect(() => {
@@ -248,15 +255,7 @@ export const Deals = () => {
             qry += selectedFilters;
             params.qry = qry;
         }
-        if (authUser) {
-            getDealsList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setDeals(response);
-                } else {
-                    setDeals([]);
-                }
-            });
-        }
+        handleGetDealsList(params);
     }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
     const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
@@ -293,7 +292,8 @@ export const Deals = () => {
             .join("+");
 
         const params: QueryParams = {
-            ...lazyState,
+            skip: lazyState.first,
+            top: lazyState.rows,
             qry: searchQuery,
         };
         authUser &&
@@ -308,12 +308,32 @@ export const Deals = () => {
         setDialogVisible(false);
     };
 
-    const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
-        setAdvancedSearch((prevSearch) => {
-            const updatedSearch = { ...prevSearch };
+    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setIsLoading(true);
+        setButtonDisabled(true);
+        setAdvancedSearch((prev) => {
+            const updatedSearch = { ...prev };
             delete updatedSearch[key];
             return updatedSearch;
         });
+
+        try {
+            setIsLoading(true);
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
+
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            await handleGetDealsList(params);
+        } finally {
+            setButtonDisabled(false);
+        }
     };
 
     return (
