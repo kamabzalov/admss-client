@@ -31,13 +31,6 @@ export const ConfirmModal = ({
     };
 
     const reject = () => {
-        toast.current &&
-            toast.current.show({
-                severity: "warn",
-                summary: "Rejected",
-                detail: "You have rejected",
-                life: 3000,
-            });
         rejectAction?.();
         onHide();
     };

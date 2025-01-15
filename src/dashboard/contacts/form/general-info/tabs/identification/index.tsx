@@ -252,6 +252,11 @@ export const ContactsIdentificationInfo = observer(
                                     ? contactExtData.Buyer_DL_Exp_Date
                                     : contactExtData.CoBuyer_DL_Exp_Date) || ""
                             }
+                            date={
+                                type === BUYER
+                                    ? contactExtData.Buyer_DL_Exp_Date
+                                    : contactExtData.CoBuyer_DL_Exp_Date
+                            }
                             onChange={({ target: { value } }) =>
                                 changeContactExtData(
                                     type === BUYER ? "Buyer_DL_Exp_Date" : "CoBuyer_DL_Exp_Date",
@@ -323,6 +328,11 @@ export const ContactsIdentificationInfo = observer(
                                 (type === BUYER
                                     ? contactExtData.Buyer_Date_Of_Birth
                                     : contactExtData.CoBuyer_Date_Of_Birth) || ""
+                            }
+                            date={
+                                type === BUYER
+                                    ? contactExtData.Buyer_Date_Of_Birth
+                                    : contactExtData.CoBuyer_Date_Of_Birth
                             }
                             onChange={({ target: { value } }) =>
                                 changeContactExtData(

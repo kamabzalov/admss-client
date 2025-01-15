@@ -4,21 +4,18 @@ import {
     getContactsAmount,
     getContactsTypeList,
 } from "http/services/contacts-service";
-import { AuthUser } from "http/services/auth.service";
 import {
     DataTable,
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { getKeyValue } from "services/local-storage.service";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -74,7 +71,6 @@ export const ContactsDataTable = ({
 }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
-    const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
@@ -84,6 +80,8 @@ export const ContactsDataTable = ({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const store = useStore().contactStore;
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({} as AdvancedSearch);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
@@ -171,22 +169,18 @@ export const ContactsDataTable = ({
     };
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            setUser(authUser);
-            getContactsTypeList("0").then((response) => {
-                if (response) {
-                    const types = response as ContactType[];
-                    if (types?.length) {
-                        if (contactCategory) {
-                            const category = types?.find((item) => item.name === contactCategory);
-                            setSelectedCategory(category ?? null);
-                        }
-                        setCategories(types);
+        getContactsTypeList("0").then((response) => {
+            if (response) {
+                const types = response as ContactType[];
+                if (types?.length) {
+                    if (contactCategory) {
+                        const category = types?.find((item) => item.name === contactCategory);
+                        setSelectedCategory(category ?? null);
                     }
+                    setCategories(types);
                 }
-            });
-        }
+            }
+        });
     }, [contactCategory]);
 
     useEffect(() => {
@@ -205,7 +199,7 @@ export const ContactsDataTable = ({
             }
             setIsLoading(true);
 
-            handleGetContactsList(params);
+            handleGetContactsList(params, true);
         }
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
@@ -302,7 +296,6 @@ export const ContactsDataTable = ({
     };
 
     const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
-        setIsLoading(true);
         setButtonDisabled(true);
         setAdvancedSearch((prev) => {
             const updatedSearch = { ...prev };
@@ -311,7 +304,6 @@ export const ContactsDataTable = ({
         });
 
         try {
-            setIsLoading(true);
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
