@@ -309,7 +309,6 @@ export const Deals = () => {
     };
 
     const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
-        setIsLoading(true);
         setButtonDisabled(true);
         setAdvancedSearch((prev) => {
             const updatedSearch = { ...prev };
@@ -318,7 +317,6 @@ export const Deals = () => {
         });
 
         try {
-            setIsLoading(true);
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
