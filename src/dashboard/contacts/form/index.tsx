@@ -135,7 +135,6 @@ export const ContactForm = observer((): ReactElement => {
         deleteReason,
         isLoading,
         activeTab,
-        tabLength,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
@@ -150,6 +149,7 @@ export const ContactForm = observer((): ReactElement => {
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const stepsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         let contactsSections = [ContactInfoData];
@@ -241,15 +241,18 @@ export const ContactForm = observer((): ReactElement => {
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
-            if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
+            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+        });
+        if (stepsRef.current) {
+            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
+            if (activeStep) {
+                activeStep.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
                 });
             }
-        });
-    }, [stepActiveIndex]);
+        }
+    }, [stepActiveIndex, stepsRef.current]);
 
     const handleSaveContactForm = () => {
         formikRef.current?.validateForm().then(async (errors) => {
@@ -298,27 +301,19 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     const handleOnBackClick = () => {
-        if (activeTab !== null && activeTab && activeTab > 0) {
-            store.activeTab = activeTab - 1;
-        } else {
-            setStepActiveIndex((prev) => {
-                const newStep = prev - 1;
-                navigate(getUrl(newStep));
-                return newStep;
-            });
-        }
+        setStepActiveIndex((prev) => {
+            const newStep = prev - 1;
+            navigate(getUrl(newStep));
+            return newStep;
+        });
     };
 
     const handleOnNextClick = () => {
-        if (activeTab !== null && activeTab < tabLength - 1) {
-            store.activeTab = activeTab + 1;
-        } else {
-            setStepActiveIndex((prev) => {
-                const newStep = prev + 1;
-                navigate(getUrl(newStep));
-                return newStep;
-            });
-        }
+        setStepActiveIndex((prev) => {
+            const newStep = prev + 1;
+            navigate(getUrl(newStep));
+            return newStep;
+        });
     };
 
     const stepAccordionHeader = (section: ContactSection) => {
@@ -375,7 +370,7 @@ export const ContactForm = observer((): ReactElement => {
                         </div>
                         <div className='card-content contact__card'>
                             <div className='grid flex-nowrap card-content__wrapper'>
-                                <div className='p-0'>
+                                <div className='p-0' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
