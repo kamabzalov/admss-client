@@ -277,14 +277,16 @@ export const DateInput = ({
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
-        if (date !== undefined && date !== null && !isNaN(Number(date))) {
+        if (date !== undefined && date !== null && !isNaN(Number(date)) && Number(date) !== 0) {
             setInnerDate(new Date(Number(date)));
+        } else if (value !== undefined && value !== null && value !== "" && !isNaN(Number(value))) {
+            setInnerDate(new Date(Number(value)));
         } else if (!emptyDate) {
             setInnerDate(new Date());
         } else {
             setInnerDate(null);
         }
-    }, [date, emptyDate]);
+    }, [date, value, emptyDate]);
 
     const handleDateChange = (selected: Date | null) => {
         setInnerDate(selected);
@@ -298,11 +300,15 @@ export const DateInput = ({
     const content = (
         <div
             key={name}
-            className='flex align-items-center justify-content-between date-item relative'
+            className={`flex align-items-center justify-content-between date-item relative ${
+                innerDate ? "date-item--filled" : "date-item--empty"
+            }`}
         >
             <label
                 htmlFor={name}
-                className={`date-item__label ${date ? "" : "date-item__label--empty"} label-top`}
+                className={`date-item__label ${
+                    innerDate ? "" : "date-item__label--empty"
+                } label-top`}
             >
                 {name}
             </label>
@@ -329,6 +335,7 @@ export const DateInput = ({
                         icon='pi pi-times'
                         onClick={handleClearDate}
                         text
+                        tooltip='Clear date'
                         tooltipOptions={{ position: "top" }}
                     />
                 )}
