@@ -59,6 +59,8 @@ export const ContactsProspecting = observer((): ReactElement => {
                 <DateInput
                     placeholder='Contact till...'
                     date={contactExtData.created}
+                    value={contactExtData.created ? contactExtData.created.toString() : undefined}
+                    emptyDate
                     name='Contact till'
                     showTime
                     hourFormat='12'
