@@ -222,7 +222,6 @@ export class DealStore {
 
     public getPrintList = action(async (dealuid = this._dealID) => {
         try {
-            this._isLoading = true;
             const response = await getDealPrintForms(dealuid);
             if (response) {
                 const { error, status, ...printCollection } = response;

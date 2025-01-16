@@ -287,6 +287,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <DateInput
                     name='Warn Overdue After X Days'
                     date={deal.warnOverdueDays}
+                    emptyDate
                     onChange={({ value }) =>
                         changeDeal({ key: "warnOverdueDays", value: Number(value) })
                     }
