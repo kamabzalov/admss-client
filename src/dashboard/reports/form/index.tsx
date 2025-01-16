@@ -382,10 +382,11 @@ export const ReportForm = observer((): ReactElement => {
                 draggable={false}
                 position='top'
                 className='contact-delete-dialog'
-                bodyMessage='Do you really want to return to previous page? 
-                This process cannot be undone.'
+                title='Quit Editing?'
+                icon='pi-exclamation-triangle'
+                bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
                 rejectLabel='Cancel'
-                acceptLabel='Delete'
+                acceptLabel='Confirm'
                 confirmAction={() => handleReturnPreviousPage()}
                 onHide={() => setConfirmActive(false)}
             />
