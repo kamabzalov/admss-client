@@ -7,11 +7,17 @@ import { AccordionDealItems, Deals, DealsItem, DealsSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { DealGeneralInfo } from "./general-info";
-import { DealBHPH, DealDismantleForm, DealLHPH, DealRetail, DealWholeSale } from "./retail";
+import { DealGeneralInfo } from "dashboard/deals/form/general-info";
+import {
+    DealBHPH,
+    DealDismantleForm,
+    DealLHPH,
+    DealRetail,
+    DealWholeSale,
+} from "dashboard/deals/form/retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
-import { PrintDealForms } from "./print-forms";
+import { PrintDealForms } from "dashboard/deals/form/print-forms";
 import { Form, Formik, FormikProps } from "formik";
 import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
@@ -226,7 +232,7 @@ export const DealsForm = observer(() => {
     }, [stepActiveIndex, stepsRef.current]);
 
     useEffect(() => {
-        if (stepActiveIndex === printActiveIndex) {
+        if (stepActiveIndex === printActiveIndex && id) {
             getPrintList(id);
         }
     }, [stepActiveIndex, printActiveIndex]);

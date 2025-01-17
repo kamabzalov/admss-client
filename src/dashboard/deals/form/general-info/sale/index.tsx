@@ -299,7 +299,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("accountInfo")}
                         className='w-full deal-sale__text-input'
                         disabled={!!id}
-                        value={deal.accountInfo}
+                        value={deal.accountInfo || ""}
                         onChange={({ target: { value } }) => {
                             if (id) return;
                             setFieldValue("accountInfo", value);
