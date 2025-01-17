@@ -159,8 +159,6 @@ export const AdvancedSearchDialog = <T,>({
                                 value={value}
                                 date={Number(value)}
                                 emptyDate
-                                clearButton
-                                onClearAction={onSearchClear ? () => onSearchClear(key) : undefined}
                                 name={label}
                                 onChange={({ target }) => {
                                     onInputChange(key, target.value as string);
@@ -255,7 +253,7 @@ export const AdvancedSearchDialog = <T,>({
                                     />
                                 )}
 
-                            {value && onSearchClear && (
+                            {value && type === SEARCH_FIELD_TYPE.DROPDOWN && onSearchClear && (
                                 <i
                                     className={`pi pi-times cursor-pointer search-dialog__clear ${
                                         type === SEARCH_FIELD_TYPE.DROPDOWN && "pr-4"
