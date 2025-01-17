@@ -5,6 +5,13 @@
         border: none;
         .p-treenode {
             padding: 0;
+            .p-treenode-droppoint {
+                border: none;
+                margin: 0;
+                &.p-treenode-droppoint-active {
+                    background: var(--admss-app-light-blue);
+                }
+            }
         }
 
         .p-treenode-content {
@@ -206,6 +213,7 @@
     color: var(--admss-app-primary);
     padding-left: 0;
     border-radius: 0;
+    text-align: left;
 }
 
 .report__list-item.p-button.p-button-text:hover {
@@ -219,4 +227,3 @@
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
 }
-

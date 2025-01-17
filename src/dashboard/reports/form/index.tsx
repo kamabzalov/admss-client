@@ -27,6 +27,7 @@ import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
 import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 export const NodeContent = ({
     node,
@@ -75,6 +76,7 @@ export const ReportForm = observer((): ReactElement => {
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
+    const [confirmActive, setConfirmActive] = useState<boolean>(false);
 
     const getCollections = async () => {
         if (authUser) {
@@ -313,12 +315,16 @@ export const ReportForm = observer((): ReactElement => {
         getCollections();
     };
 
+    const handleReturnPreviousPage = () => {
+        navigate("/dashboard/reports");
+    };
+
     return (
         <div className='grid relative'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate("/dashboard/reports")}
+                onClick={() => setConfirmActive(true)}
             />
             <div className='col-12'>
                 <div className='card report'>
@@ -371,6 +377,19 @@ export const ReportForm = observer((): ReactElement => {
                     />
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                draggable={false}
+                position='top'
+                className='contact-delete-dialog'
+                title='Quit Editing?'
+                icon='pi-exclamation-triangle'
+                bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
+                rejectLabel='Cancel'
+                acceptLabel='Confirm'
+                confirmAction={() => handleReturnPreviousPage()}
+                onHide={() => setConfirmActive(false)}
+            />
         </div>
     );
 });
