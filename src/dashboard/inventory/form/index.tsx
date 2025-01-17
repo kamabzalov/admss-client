@@ -299,15 +299,11 @@ export const InventoryForm = observer(() => {
     };
 
     const handleOnBackClick = () => {
-        if (activeTab !== null && activeTab && activeTab > 0) {
-            store.activeTab = activeTab - 1;
-        } else {
-            setStepActiveIndex((prev) => {
-                const newStep = prev - 1;
-                navigate(getUrl(newStep));
-                return newStep;
-            });
-        }
+        setStepActiveIndex((prev) => {
+            const newStep = prev - 1;
+            navigate(getUrl(newStep));
+            return newStep;
+        });
     };
 
     const handleOnNextClick = () => {
@@ -575,6 +571,8 @@ export const InventoryForm = observer(() => {
                                 <Button
                                     onClick={handleOnBackClick}
                                     className='uppercase px-6 inventory__button'
+                                    disabled={stepActiveIndex <= 0}
+                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
                                     outlined
                                 >
                                     Back
