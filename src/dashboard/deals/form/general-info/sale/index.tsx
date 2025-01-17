@@ -287,6 +287,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <DateInput
                     name='Warn Overdue After X Days'
                     date={deal.warnOverdueDays}
+                    emptyDate
                     onChange={({ value }) =>
                         changeDeal({ key: "warnOverdueDays", value: Number(value) })
                     }
@@ -298,7 +299,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("accountInfo")}
                         className='w-full deal-sale__text-input'
                         disabled={!!id}
-                        value={deal.accountInfo}
+                        value={deal.accountInfo || ""}
                         onChange={({ target: { value } }) => {
                             if (id) return;
                             setFieldValue("accountInfo", value);
