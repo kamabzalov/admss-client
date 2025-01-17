@@ -18,13 +18,13 @@ import { centsToDollars, formatCurrency } from "common/helpers";
 interface TotalPaidDialogProps extends DashboardDialogProps {}
 type TotalPaidInfo = Pick<
     AccountUpdateTotalInfo,
-    "PrincipalPaid" | "InterestPaid" | "ExtraPrincipalPmts" | "TotalPaid"
+    "PrincipalPaid" | "InterestPaid" | "ExtraPrincipalPayments" | "TotalPaid"
 >;
 
 const initialTotalPaid: TotalPaidInfo = {
     PrincipalPaid: 0,
     InterestPaid: 0,
-    ExtraPrincipalPmts: 0,
+    ExtraPrincipalPayments: 0,
     TotalPaid: 0,
 };
 
@@ -82,7 +82,7 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
         const amountData: Partial<TotalPaidInfo> = {
             PrincipalPaid: centsToDollars(newAmount.PrincipalPaid),
             InterestPaid: centsToDollars(newAmount.InterestPaid),
-            ExtraPrincipalPmts: centsToDollars(newAmount.ExtraPrincipalPmts),
+            ExtraPrincipalPayments: centsToDollars(newAmount.ExtraPrincipalPayments),
         };
 
         if (id) {
@@ -145,7 +145,7 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
                 <div className='total-paid__item'>
                     <label className='total-paid__label'>Extra Principal Payments:</label>
                     <span className='total-paid__value'>
-                        {formatCurrency(originalAmount?.ExtraPrincipalPmts || 0)}
+                        {formatCurrency(originalAmount?.ExtraPrincipalPayments || 0)}
                     </span>
                 </div>
                 <div className='total-paid__item'>
@@ -182,9 +182,9 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
                 />
                 <CurrencyInput
                     className='total-paid__input'
-                    value={newAmount?.ExtraPrincipalPmts}
+                    value={newAmount?.ExtraPrincipalPayments}
                     onChange={({ value }) =>
-                        setNewAmount({ ...newAmount, ExtraPrincipalPmts: value || 0 })
+                        setNewAmount({ ...newAmount, ExtraPrincipalPayments: value || 0 })
                     }
                     title='Extra Principal'
                     labelPosition='top'
