@@ -1,3 +1,5 @@
+import { isAxiosError } from "axios";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 
 import { authorizedUserApiInstance } from "http/index";
@@ -49,17 +51,26 @@ export const getTasksByUserId = async (uid: string, params?: QueryParams): Promi
 };
 
 export const createTask = async (
-    taskData: Record<string, string | number>,
+    taskData: Record<string, string | number | Date>,
     taskuid?: string | undefined
 ) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `tasks/${taskuid || 0}`,
             taskData
         );
-        return request.data;
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error ||
+                    `Error while ${taskuid ? "update" : "create"} task`,
+            };
+        }
     }
 };
 
