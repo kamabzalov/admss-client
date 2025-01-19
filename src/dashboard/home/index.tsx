@@ -23,7 +23,7 @@ export const Home = (): ReactElement => {
     const [date] = useState(null);
 
     return (
-        <div className='grid home'>
+        <div className='grid home-page'>
             <div className='col-12'>
                 <div className='card'>
                     <div className='card-header'>

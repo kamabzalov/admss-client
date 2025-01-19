@@ -1,158 +1,140 @@
-import { DialogProps } from "primereact/dialog";
-import "./index.css";
-import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Dropdown } from "primereact/dropdown";
-import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
+import { useEffect, useRef, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import { DashboardDialog } from "dashboard/common/dialog";
+import { Task, TaskStatus, getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
+import { AddTaskDialog } from "./add-task-dialog";
+import { Checkbox } from "primereact/checkbox";
+import { Toast } from "primereact/toast";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { useToast } from "dashboard/common/toast";
-import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
-import { DateInput } from "dashboard/common/form/inputs";
-import { InputMask } from "primereact/inputmask";
+import { TaskSummaryDialog } from "./task-summary";
 
-const DialogIcon = ({ icon }: { icon: "search" | string }) => {
-    return (
-        <span className='p-inputgroup-addon'>
-            <i className={`adms-${icon}`} />
-        </span>
-    );
-};
+import "./index.css";
+import { Button } from "primereact/button";
 
-interface AddTaskDialogProps extends DialogProps {
-    currentTask?: Task;
-}
+export const Tasks = () => {
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
+    const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
+    const [checkboxDisabled, setCheckboxDisabled] = useState<boolean>(false);
+    const [currentTask, setCurrentTask] = useState<Task | null>(null);
+    const [checkboxStates, setCheckboxStates] = useState<{ [key: string]: boolean }>({});
 
-export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
-    const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
-    const [startDate, setStartDate] = useState<Date>(
-        currentTask?.created ? new Date(currentTask.created) : new Date()
-    );
-    const [dueDate, setDueDate] = useState<Date>(
-        currentTask?.deadline ? new Date(currentTask.deadline) : new Date()
-    );
-    const [account, setAccount] = useState<string>(currentTask?.accountname || "");
-    const [deal, setDeal] = useState<string>(currentTask?.dealname || "");
-    const [contact, setContact] = useState<string>(currentTask?.contactname || "");
-    const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
-    const [description, setDescription] = useState<string>(currentTask?.description || "");
-    const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
-    const toast = useToast();
+    const toast = useRef<Toast>(null);
+
+    const authUser: AuthUser = getKeyValue(LS_APP_USER);
+
+    const getTasks = () =>
+        getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser && visible) {
-            getTasksUserList(authUser.useruid).then((response) => {
-                if (response) setAssignToData(response);
-            });
+        if (authUser) {
+            getTasks();
         }
-    }, [visible]);
+    }, []);
 
-    const handleSaveTaskData = async () => {
-        const taskData: Record<string, string | number | Date> = {
-            assignTo,
-            startDate,
-            dueDate,
-            account,
-            deal,
-            contact,
-            phoneNumber,
-            description,
-        };
-
-        const response = await createTask(taskData);
-
-        if (response && response?.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: response.error,
-                life: TOAST_LIFETIME,
-            });
-        }
-        onHide();
+    const handleEditTask = (task: Task) => {
+        setCurrentTask(task);
+        setShowEditTaskDialog(true);
     };
 
+    const handleTaskStatusChange = (taskuid: string) => {
+        setCheckboxStates((prevStates) => ({
+            ...prevStates,
+            [taskuid]: true,
+        }));
+        setCheckboxDisabled(true);
+
+        setTaskStatus(taskuid, TaskStatus.COMPLETED)
+            .then((res) => {
+                if (res.status === "OK" && toast.current != null) {
+                    toast.current.show({
+                        severity: "info",
+                        summary: "Confirmed",
+                        detail: "The task marked as completed",
+                        life: 3000,
+                    });
+                    getTasks();
+                }
+            })
+            .finally(() => {
+                setCheckboxStates((prevStates) => ({
+                    ...prevStates,
+                    [taskuid]: false,
+                }));
+                setCheckboxDisabled(false);
+            });
+    };
+
+    const isLoggedUserTask = (): boolean =>
+        !!currentTask &&
+        (currentTask.parentuid === authUser.useruid || currentTask.useruid === authUser.useruid);
+
     return (
-        <DashboardDialog
-            position='top'
-            onHide={onHide}
-            visible={visible}
-            header={header}
-            className={"dialog__add-task "}
-            footer='Save'
-            action={handleSaveTaskData}
-        >
-            <>
-                {assignToData && (
-                    <Dropdown
-                        placeholder='Assign to'
-                        value={assignTo}
-                        options={assignToData}
-                        optionLabel={"username"}
-                        className='flex align-items-center'
-                        onChange={(e) => setAssignTo(e.value)}
+        <>
+            <div className='tasks-header flex justify-content-between align-items-center'>
+                <h2 className='card-content__title uppercase m-0'>
+                    Tasks
+                    <span className={`tasks-count ${!tasks.length ? "empty-list" : ""}`}>
+                        ({tasks.length})
+                    </span>
+                </h2>
+                <Button
+                    icon='pi pi-plus'
+                    className='add-task-control'
+                    onClick={() => setShowAddTaskDialog(true)}
+                />
+            </div>
+            <ul className='list-none ml-0 pl-0'>
+                {tasks.length ? (
+                    tasks.map((task) => {
+                        return (
+                            <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
+                                <Checkbox
+                                    name='task'
+                                    disabled={checkboxDisabled}
+                                    checked={checkboxStates[task.itemuid] || false}
+                                    onChange={() => handleTaskStatusChange(task.itemuid)}
+                                />
+                                <label
+                                    className='ml-2 cursor-pointer'
+                                    onClick={() => handleEditTask(task)}
+                                >
+                                    {task.taskname ||
+                                        `${task.description} ${
+                                            task.username ?? `- ${task.username}`
+                                        }`}
+                                </label>
+                            </li>
+                        );
+                    })
+                ) : (
+                    <li className='mb-2 empty-list'>No tasks yet.</li>
+                )}
+            </ul>
+            <div className='hidden'>
+                <AddTaskDialog
+                    visible={showAddTaskDialog}
+                    onHide={() => setShowAddTaskDialog(false)}
+                    header='Add Task'
+                />
+                {isLoggedUserTask() ? (
+                    <AddTaskDialog
+                        visible={showEditTaskDialog}
+                        onHide={() => setShowEditTaskDialog(false)}
+                        currentTask={currentTask as Task}
+                        header='Edit Task'
+                    />
+                ) : (
+                    <TaskSummaryDialog
+                        visible={showEditTaskDialog}
+                        onHide={() => setShowEditTaskDialog(false)}
+                        currentTask={currentTask as Task}
+                        header='Task summary'
                     />
                 )}
-                <div className='flex flex-column md:flex-row column-gap-3'>
-                    <div className='p-inputgroup'>
-                        <DateInput
-                            placeholder='Start Date'
-                            value={startDate}
-                            date={startDate}
-                            onChange={(e) => setStartDate(e.value as Date)}
-                        />
-                    </div>
-                    <div className='p-inputgroup'>
-                        <DateInput
-                            placeholder='Due Date'
-                            value={dueDate}
-                            onChange={(e) => setDueDate(e.value as Date)}
-                        />
-                    </div>
-                </div>
-                <div className='p-inputgroup flex-1'>
-                    <InputText
-                        placeholder='Account'
-                        value={account}
-                        onChange={(e) => setAccount(e.target.value)}
-                    />
-                    <DialogIcon icon='search' />
-                </div>
-                <div className='p-inputgroup flex-1'>
-                    <InputText
-                        placeholder='Deal'
-                        value={deal}
-                        onChange={(e) => setDeal(e.target.value)}
-                    />
-                    <DialogIcon icon='search' />
-                </div>
-                <div className='p-inputgroup flex-1'>
-                    <InputText
-                        placeholder='Contact'
-                        value={contact}
-                        onChange={(e) => setContact(e.target.value)}
-                    />
-                    <DialogIcon icon='search' />
-                </div>
-                <InputMask
-                    type='tel'
-                    mask='999-999-9999'
-                    placeholder='Phone Number'
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target?.value || "")}
-                />
-                <InputTextarea
-                    placeholder='Description'
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className='p-dialog-description'
-                />
-            </>
-        </DashboardDialog>
+            </div>
+
+            <Toast ref={toast} />
+        </>
     );
 };
