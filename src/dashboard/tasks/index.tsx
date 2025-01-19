@@ -8,6 +8,9 @@ import { Toast } from "primereact/toast";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { TaskSummaryDialog } from "./task-summary";
 
+import "./index.css";
+import { Button } from "primereact/button";
+
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
@@ -68,9 +71,21 @@ export const Tasks = () => {
 
     return (
         <>
-            <h2 className='card-content__title uppercase'>Tasks</h2>
+            <div className='tasks-header flex justify-content-between align-items-center'>
+                <h2 className='card-content__title uppercase m-0'>
+                    Tasks
+                    <span className={`tasks-count ${!tasks.length ? "empty-list" : ""}`}>
+                        ({tasks.length})
+                    </span>
+                </h2>
+                <Button
+                    icon='pi pi-plus'
+                    className='add-task-control'
+                    onClick={() => setShowAddTaskDialog(true)}
+                />
+            </div>
             <ul className='list-none ml-0 pl-0'>
-                {tasks &&
+                {tasks.length ? (
                     tasks.map((task) => {
                         return (
                             <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
@@ -91,15 +106,11 @@ export const Tasks = () => {
                                 </label>
                             </li>
                         );
-                    })}
+                    })
+                ) : (
+                    <li className='mb-2 empty-list'>No tasks yet.</li>
+                )}
             </ul>
-            <span
-                className='add-task-control font-semibold cursor-pointer'
-                onClick={() => setShowAddTaskDialog(true)}
-            >
-                <i className='pi pi-plus add-task-control__icon'></i>
-                Add new task
-            </span>
             <div className='hidden'>
                 <AddTaskDialog
                     visible={showAddTaskDialog}

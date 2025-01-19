@@ -1,0 +1,29 @@
+.empty-list,
+.tasks-count.empty-list {
+    color: var(--admss-app-medium-grey);
+}
+
+.tasks-count {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--admss-app-main-blue);
+    margin-left: 6px;
+}
+
+.tasks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-right: 40px;
+}
+
+.add-task-control.p-button {
+    background-color: var(--admss-app-primary-main-green);
+    border-color: var(--admss-app-primary-main-green);
+    color: var(--admss-app-white);
+    .p-button-icon {
+        font-size: 20px;
+        font-weight: 900;
+    }
+}
