@@ -29,8 +29,12 @@ interface AddTaskDialogProps extends DialogProps {
 
 export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
     const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
-    const [startDate, setStartDate] = useState<Date | null>((currentTask?.created as any) || null);
-    const [dueDate, setDueDate] = useState<Date | null>((currentTask?.deadline as any) || null);
+    const [startDate, setStartDate] = useState<Date>(
+        currentTask?.created ? new Date(currentTask.created) : new Date()
+    );
+    const [dueDate, setDueDate] = useState<Date>(
+        currentTask?.deadline ? new Date(currentTask.deadline) : new Date()
+    );
     const [account, setAccount] = useState<string>(currentTask?.accountname || "");
     const [deal, setDeal] = useState<string>(currentTask?.dealname || "");
     const [contact, setContact] = useState<string>(currentTask?.contactname || "");
@@ -49,7 +53,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     }, [visible]);
 
     const handleSaveTaskData = async () => {
-        const taskData: any = {
+        const taskData: Record<string, string | number | Date> = {
             assignTo,
             startDate,
             dueDate,
@@ -62,7 +66,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
 
         const response = await createTask(taskData);
 
-        if (response.status === Status.ERROR) {
+        if (response && response?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
                 summary: Status.ERROR,
@@ -99,6 +103,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                         <DateInput
                             placeholder='Start Date'
                             value={startDate}
+                            date={startDate}
                             onChange={(e) => setStartDate(e.value as Date)}
                         />
                     </div>
