@@ -3,18 +3,15 @@ import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
-import {
-    ListData,
-    MakesListData,
-    getAutoMakeModelList,
-    getInventoryAutomakesList,
-} from "http/services/inventory-service";
+import { getAutoMakeModelList, getInventoryAutomakesList } from "http/services/inventory-service";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 import { InputNumber } from "primereact/inputnumber";
 import { DateInput } from "dashboard/common/form/inputs";
+import { ListData } from "common/models";
+import { MakesListData } from "common/models/inventory";
 
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
