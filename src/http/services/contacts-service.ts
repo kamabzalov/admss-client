@@ -9,7 +9,7 @@ import {
 } from "common/models/contact";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { isAxiosError } from "axios";
-import { ListData } from "./inventory-service";
+import { ListData } from "common/models";
 
 export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
