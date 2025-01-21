@@ -7,7 +7,6 @@ import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
-import { ListData } from "http/services/inventory-service";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
 import {
@@ -23,6 +22,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { ListData } from "common/models";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);

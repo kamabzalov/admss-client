@@ -1,8 +1,8 @@
 import { Expenses, ExpensesSetResponse, ExpensesTotal } from "common/models/expenses";
 import { authorizedUserApiInstance } from "http/index";
-import { ListData } from "./inventory-service";
 import { BaseResponse, Status } from "common/models/base-response";
 import { Contact } from "common/models/contact";
+import { ListData } from "common/models";
 
 interface ExpensesListTypes extends BaseResponse {
     contact_types: ListData[];

@@ -1,7 +1,7 @@
 import { Inventory } from "common/models/inventory";
+import { ListData } from "common/models";
 import { useFormikContext } from "formik";
 import {
-    ListData,
     getInventoryTransmissionTypesList,
     getInventoryFuelTypesList,
     getInventoryDrivelineList,

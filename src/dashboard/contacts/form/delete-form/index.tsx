@@ -1,7 +1,7 @@
+import { ListData } from "common/models";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
 import { deleteContact, getContactDeleteReasonsList } from "http/services/contacts-service";
-import { ListData } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";

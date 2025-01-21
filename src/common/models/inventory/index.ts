@@ -1,6 +1,14 @@
-import { PrintForm } from "..";
-import { BaseResponse, BaseResponseError, Status } from "../base-response";
-import { ContentType } from "../enums";
+import { ListData, PrintForm } from "common/models";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import { ContentType } from "common/models/enums";
+
+export interface LocationsListData {
+    locations: InventoryLocations[];
+    status: Status;
+}
+
+export type MakesListData = ListData & { logo: string };
+export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
 export interface InventoryExtData {
     bgAsIs: number;
@@ -412,4 +420,9 @@ export interface InventoryPaymentBack extends BaseResponseError {
     payPaid: 0 | 1;
     paySalesTaxPaid: 0 | 1;
     payRemarks: string;
+}
+
+export interface InventoryOptions extends BaseResponseError {
+    options_list: OptionsListData[];
+    value: number;
 }
