@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { AxiosResponse, isAxiosError } from "axios";
+import { ListData } from "common/models";
 import { BaseResponse, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
     EndpointType,
-    InventoryOptionsInfo,
     InventorySetResponse,
     InventoryWebInfo,
     InventoryExportWebHistory,
     InventoryPrintForm,
-    InventoryLocations,
     InventoryStockNumber,
     InventoryWebCheck,
     InventoryCheckVIN,
     InventoryPaymentBack,
+    InventoryOptions,
+    LocationsListData,
+    MakesListData,
+    OptionsListData,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -60,20 +63,6 @@ export const fetchInventoryList = async <T>(
         // TODO: add error handler
     }
 };
-
-export type ListData = {
-    index?: number;
-    id?: number;
-    name: string;
-};
-
-export interface LocationsListData {
-    locations: InventoryLocations[];
-    status: Status;
-}
-
-export type MakesListData = ListData & { logo: string };
-export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
 export const getInventoryOptionsList = async (): Promise<OptionsListData[] | undefined> =>
     await fetchInventoryList<OptionsListData[]>("options");
@@ -132,6 +121,38 @@ export const getInventoryWebCheck = async (inventoryuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting inventory web check",
+            };
+        }
+    }
+};
+
+export const getInventoryOptions = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryOptions>(
+            `inventory/${inventoryuid}/options`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting inventory options",
+            };
+        }
+    }
+};
+
+export const getInventoryGroupOptions = async (groupuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryOptions>(
+            `inventory/${groupuid}/groupoptions`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting inventory group options",
             };
         }
     }

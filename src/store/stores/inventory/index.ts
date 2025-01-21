@@ -73,6 +73,7 @@ export class InventoryStore {
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryPayments: AccountPayment = {} as AccountPayment;
     private _inventoryAudit: Audit = initialAuditState as Audit;
+    private _inventoryGroupID: string = "";
 
     private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
@@ -120,6 +121,10 @@ export class InventoryStore {
     public get inventoryAudit() {
         return this._inventoryAudit;
     }
+    public get inventoryGroupID() {
+        return this._inventoryGroupID;
+    }
+
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
@@ -685,6 +690,10 @@ export class InventoryStore {
         this._exportWebActive = state;
     }
 
+    public set inventoryGroupID(state: string) {
+        this._inventoryGroupID = state;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
@@ -735,6 +744,7 @@ export class InventoryStore {
     public clearInventory = () => {
         this._inventory = {} as Inventory;
         this._inventoryAudit = initialAuditState as Audit;
+        this._inventoryGroupID = "";
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._exportWeb = {} as InventoryWebInfo;
