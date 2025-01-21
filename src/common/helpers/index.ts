@@ -76,3 +76,30 @@ export const formatPhoneNumber = (phone: string): string => {
         return digits;
     }
 };
+
+interface FormatCurrencyOptions {
+    digitsAfterDecimal?: number;
+}
+
+export const formatCurrency = (
+    value: string | number,
+    options: FormatCurrencyOptions = {}
+): string => {
+    const { digitsAfterDecimal = 2 } = options;
+
+    if (typeof value === "string") {
+        value = Number(value);
+    }
+
+    const formattedValue = value
+        .toFixed(digitsAfterDecimal)
+        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+
+    return `$ ${formattedValue}`;
+};
+
+export const centsToDollars = (cents: number): number => {
+    const dollars = cents * 100;
+
+    return Number(dollars.toFixed(2));
+};
