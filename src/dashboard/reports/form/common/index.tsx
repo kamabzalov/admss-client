@@ -7,7 +7,7 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { ReactElement, useState } from "react";
+import { ReactElement, RefObject, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
 
@@ -17,6 +17,7 @@ interface ReportSelectProps {
     currentItem: ReportServiceColumns | null;
     onItemClick: (item: ReportServiceColumns) => void;
     onItemDoubleClick?: (item: ReportServiceColumns) => void;
+    containerRef?: RefObject<HTMLDivElement>;
 }
 
 export const ReportSelect = ({
@@ -25,9 +26,10 @@ export const ReportSelect = ({
     currentItem,
     onItemClick,
     onItemDoubleClick,
+    containerRef,
 }: ReportSelectProps): ReactElement => {
     return (
-        <div className='report-select'>
+        <div className='report-select' ref={containerRef} style={{ overflowY: "auto" }}>
             <span className='report-select__header'>{header}</span>
             <ul className='report-select__list'>
                 {values.map((value) => (
