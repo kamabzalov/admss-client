@@ -56,7 +56,7 @@ export const createTask = async (
 ) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
-            `tasks/${taskuid || 0}`,
+            `tasks/${taskuid || 0}/set`,
             taskData
         );
         if (response.data.status === Status.OK) {
