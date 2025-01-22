@@ -53,6 +53,7 @@ export const PrintDealForms = observer((): ReactElement => {
                         );
                     }
 
+                    store.accordionActiveIndex = 0;
                     store.isLoading = false;
                 }, 3000);
             } catch (error) {
@@ -161,28 +162,28 @@ export const PrintDealForms = observer((): ReactElement => {
                 </Accordion>
                 <div className='deal-print__control'>
                     <Button
+                        type='button'
                         className='p-button deal-print__button'
                         onClick={() => handlePrintSelectedForms(true)}
                         severity={isButtonDisabled ? "secondary" : "success"}
                         disabled={isButtonDisabled}
-                        type='button'
                     >
                         Print
                     </Button>
                     <Button
+                        type='button'
                         className='p-button deal-print__button'
                         onClick={() => handlePrintSelectedForms()}
                         disabled={isButtonDisabled}
                         severity={isButtonDisabled ? "secondary" : "success"}
-                        type='button'
                     >
                         Download
                     </Button>
                     <Button
+                        type='button'
                         className='p-button deal-print__button'
                         outlined
                         onClick={() => setSelectedPrints(null)}
-                        type='button'
                     >
                         Clear all
                     </Button>

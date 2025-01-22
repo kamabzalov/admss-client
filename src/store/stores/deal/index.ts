@@ -35,6 +35,7 @@ export class DealStore {
     private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
+    private _accordionActiveIndex: number | number[] = [];
     protected _isLoading = false;
     protected _isFormChanged = false;
 
@@ -82,8 +83,8 @@ export class DealStore {
         return this._isFormChanged;
     }
 
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
+    public get accordionActiveIndex() {
+        return this._accordionActiveIndex;
     }
 
     public getDeal = async (itemuid: string) => {
@@ -248,6 +249,14 @@ export class DealStore {
 
     public set dealType(type: number) {
         this._dealType = type;
+    }
+
+    public set accordionActiveIndex(index: number | number[]) {
+        this._accordionActiveIndex = index;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
     }
 
     public clearDeal = () => {

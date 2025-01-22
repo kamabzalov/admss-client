@@ -197,6 +197,7 @@ export const DealsForm = observer(() => {
         deal,
         dealType,
         dealExtData,
+        accordionActiveIndex,
         getDeal,
         getPrintList,
         saveDeal,
@@ -206,19 +207,18 @@ export const DealsForm = observer(() => {
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const stepsRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
-    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
-            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+            if (stepActiveIndex >= step) store.accordionActiveIndex = [index];
         });
         if (stepsRef.current) {
             const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
@@ -242,19 +242,22 @@ export const DealsForm = observer(() => {
         return `/dashboard/deals/${currentPath}?step=${activeIndex + 1}`;
     };
 
-    useEffect(() => {
-        id &&
-            getDeal(id).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: (response?.error as string) || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(`/dashboard/deals`);
-                }
+    const handleGetDeal = async () => {
+        const response = await getDeal(id!);
+
+        if (response?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: (response?.error as string) || "",
+                life: TOAST_LIFETIME,
             });
+            navigate(`/dashboard/deals`);
+        }
+    };
+
+    useEffect(() => {
+        handleGetDeal();
         return () => clearDeal();
     }, [id]);
 
@@ -292,12 +295,16 @@ export const DealsForm = observer(() => {
     }, [dealType]);
 
     useEffect(() => {
-        accordionSteps.forEach((step) => {
-            if (step - 1 < stepActiveIndex) {
-                if (stepActiveIndex === printActiveIndex) return setAccordionActiveIndex([]);
-            }
-        });
-    }, [stepActiveIndex]);
+        if (stepActiveIndex === printActiveIndex) {
+            store.accordionActiveIndex = [];
+        } else {
+            accordionSteps.forEach((step, index) => {
+                if (stepActiveIndex >= step) {
+                    store.accordionActiveIndex = [index];
+                }
+            });
+        }
+    }, [stepActiveIndex, printActiveIndex, accordionSteps]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
@@ -354,7 +361,9 @@ export const DealsForm = observer(() => {
                                 <div className='p-0 card-content__wrapper' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
+                                        onTabChange={(e) => {
+                                            store.accordionActiveIndex = e.index;
+                                        }}
                                         className='deal__accordion'
                                         multiple
                                     >
