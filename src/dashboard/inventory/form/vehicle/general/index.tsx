@@ -3,8 +3,6 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
-    ListData,
-    MakesListData,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
@@ -17,7 +15,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
-import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
+import { Audit, Inventory, InventoryLocations, MakesListData } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
@@ -26,6 +24,7 @@ import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
+import { ListData } from "common/models";
 
 const EQUIPMENT = "equipment";
 
@@ -71,6 +70,17 @@ export const VehicleGeneral = observer((): ReactElement => {
         });
     }, []);
 
+    const handleGetInventoryGroupFullInfo = (groupName: string) => {
+        if (groupName) {
+            const activeGroup = groupClassList.find(
+                (group) => group.description === inventory.GroupClassName
+            );
+            if (activeGroup) {
+                store.inventoryGroupID = activeGroup.itemuid;
+            }
+        }
+    };
+
     useEffect(() => {
         if (authUser) {
             getInventoryLocations(authUser.useruid).then((list) => {
@@ -81,6 +91,9 @@ export const VehicleGeneral = observer((): ReactElement => {
             getUserGroupActiveList(authUser.useruid).then((list) => {
                 if (list && Array.isArray(list)) {
                     setGroupClassList(list);
+                    if (list.some((group) => group.description === inventory.GroupClassName)) {
+                        handleGetInventoryGroupFullInfo(inventory.GroupClassName);
+                    }
                 }
             });
         }
@@ -296,6 +309,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                                 key: "GroupClassName",
                                 value,
                             });
+                            handleGetInventoryGroupFullInfo(value);
                         }}
                         placeholder='Group class'
                         className={`w-full vehicle-general__dropdown ${

@@ -3,8 +3,6 @@ import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 import {
-    ListData,
-    MakesListData,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryBodyTypesList,
@@ -21,6 +19,8 @@ import { useStore } from "store/hooks";
 import { PartialDeal } from "dashboard/deals/form";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
+import { MakesListData } from "common/models/inventory";
+import { ListData } from "common/models";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;

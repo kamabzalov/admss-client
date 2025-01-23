@@ -5,6 +5,10 @@ export interface TypeList {
     name: string;
 }
 
+export interface ListData extends TypeList {
+    index?: number;
+}
+
 export interface PrintForm {
     description: string;
     index: number;
