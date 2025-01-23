@@ -1,8 +1,20 @@
+.reports {
+    min-height: 986px;
+}
+
 .p-tree.reports__tree {
     display: flex;
     flex-direction: column;
     padding: 0;
     border: none;
+
+    & .p-treenode-content:has(.reports-accordion-header__info) {
+        .p-tree-toggler {
+            visibility: visible;
+
+        }
+    }
+
 
     .p-treenode-children {
         padding: 0;
@@ -11,13 +23,16 @@
     .p-treenode-content {
         border: 1px solid var(--admss-app-primary-main-green);
         height: 56px;
+
         &:has(.edit-collection),
         &:has(.report-parameters) {
             flex-wrap: wrap;
             margin-bottom: 254px;
+
             .p-tree-toggler {
                 display: none;
             }
+
             .reports__list-item {
                 padding-left: 2.5rem;
                 width: 100%;
@@ -50,9 +65,10 @@
     }
 
     .p-treenode-leaf {
-        .p-treenode-content {
+        .p-treenode-content:has(.reports__list-item--inner) {
             border: none;
         }
+
         .reports__list-name {
             font-weight: 400;
         }
@@ -79,6 +95,7 @@
     height: 50px;
     gap: 10px;
 }
+
 .reports-header__button .p-button-icon,
 .reports-actions .p-button-icon-only .p-button-icon {
     font-size: 12px;
@@ -139,10 +156,13 @@
     width: 176px;
     height: 40px;
     transform: translateX(-176px) translateY(-40px);
+
     .p-menu-list {
         height: 40px;
+
         .p-menuitem .p-menuitem-link {
             padding: 0.75rem 0.5rem;
+
             .p-menuitem-text {
                 font-size: 14px;
                 font-weight: 400;
@@ -173,6 +193,7 @@
     display: inline-flex;
     align-items: center;
 }
+
 .edit-access .p-multiselect .p-multiselect-token {
     background: var(--admss-app-primary-main-green);
     color: var(--admss-app-white);
@@ -202,6 +223,7 @@
 
 .p-dialog.edit-access {
     width: 690px;
+
     .p-dialog-content-body {
         height: 618px;
     }
@@ -235,6 +257,7 @@
 .p-panel-content .close-button {
     top: 10px;
 }
+
 .reports-header .close-button {
     top: 90px;
 }

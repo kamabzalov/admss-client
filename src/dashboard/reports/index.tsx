@@ -387,7 +387,7 @@ export default function Reports(): ReactElement {
                         className='reports__list-item reports__list-item--inner'
                         onClick={(ev) => handleOpenParameters(ev, currentReport)}
                         onDoubleClick={() => {
-                            navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                            navigate(`/dashboard/reports/${currentReport.virtualUID}`);
                         }}
                     >
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
@@ -415,51 +415,46 @@ export default function Reports(): ReactElement {
     };
 
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card reports'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Reports</h2>
+        <div className='card reports'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Reports</h2>
+            </div>
+            <div className='card-content'>
+                <div className='grid'>
+                    <div className='col-12'>
+                        <Panel
+                            headerTemplate={(options) =>
+                                ReportsPanelHeader({
+                                    options,
+                                    navigatePath: "create",
+                                    state: reportSearch,
+                                    isConfirm: !!selectedReports.length || !!collectionName.length,
+                                    setStateAction: setReportSearch,
+                                })
+                            }
+                            className='edit-collection w-full'
+                            collapsed
+                            toggleable
+                        >
+                            <CollectionPanelContent
+                                collectionName={collectionName}
+                                collections={[...customCollections, ...reportCollections]}
+                                selectedReports={newCollectionsReports}
+                                setCollectionName={setCollectionName}
+                                setSelectedReports={setNewCollectionsReports}
+                                handleCreateCollection={handleCreateCollection}
+                            />
+                        </Panel>
                     </div>
-                    <div className='card-content'>
-                        <div className='grid'>
-                            <div className='col-12'>
-                                <Panel
-                                    headerTemplate={(options) =>
-                                        ReportsPanelHeader({
-                                            options,
-                                            navigatePath: "create",
-                                            state: reportSearch,
-                                            isConfirm:
-                                                !!selectedReports.length || !!collectionName.length,
-                                            setStateAction: setReportSearch,
-                                        })
-                                    }
-                                    className='edit-collection w-full'
-                                    collapsed
-                                    toggleable
-                                >
-                                    <CollectionPanelContent
-                                        collectionName={collectionName}
-                                        collections={[...customCollections, ...reportCollections]}
-                                        selectedReports={newCollectionsReports}
-                                        setCollectionName={setCollectionName}
-                                        setSelectedReports={setNewCollectionsReports}
-                                        handleCreateCollection={handleCreateCollection}
-                                    />
-                                </Panel>
-                            </div>
-                            <div className='col-12'>
-                                <Tree
-                                    className='reports__tree'
-                                    dragdropScope='reports'
-                                    onDragDrop={handleDragDrop}
-                                    value={allNodes}
-                                    nodeTemplate={nodeTemplate}
-                                    filter={false}
-                                />
-                            </div>
-                        </div>
+                    <div className='col-12'>
+                        <Tree
+                            className='reports__tree'
+                            dragdropScope='reports'
+                            onDragDrop={handleDragDrop}
+                            value={allNodes}
+                            nodeTemplate={nodeTemplate}
+                            filter={false}
+                        />
                     </div>
                 </div>
             </div>

@@ -29,6 +29,7 @@ export interface ReportDocument {
     order: number;
     name: string;
     updated: string;
+    virtualUID: string;
 }
 
 export interface ReportCollection extends BaseResponseError {
@@ -151,4 +152,3 @@ export enum NODE_TYPES {
     DOCUMENT = "document",
     COLLECTION = "collection",
 }
-
