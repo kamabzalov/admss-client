@@ -24,6 +24,15 @@ const initialDataSetsData: Record<ReportServices, ReportServiceColumns[]> = {
     [ReportServices.ACCOUNTS]: [],
 };
 
+enum MOVE_DIRECTION {
+    LEFT = "left",
+    RIGHT = "right",
+    TOP = "top",
+    BOTTOM = "bottom",
+    UP = "up",
+    DOWN = "down",
+}
+
 export const ReportColumnSelect = observer((): ReactElement => {
     const store = useStore().reportStore;
     const { report } = store;
@@ -127,30 +136,46 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
     const changeOrder = (
         item: ReportServiceColumns,
-        direction: "up" | "down" | "top" | "bottom",
+        direction:
+            | MOVE_DIRECTION.UP
+            | MOVE_DIRECTION.DOWN
+            | MOVE_DIRECTION.TOP
+            | MOVE_DIRECTION.BOTTOM,
         list: ReportServiceColumns[],
         setList: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         const index = list.indexOf(item);
         if (index === -1) return;
         const newList = [...list];
-        if (direction === "up" && index > 0) {
+        if (direction === MOVE_DIRECTION.UP && index > 0) {
             newList.splice(index - 1, 0, newList.splice(index, 1)[0]);
-        } else if (direction === "down" && index < list.length - 1) {
+        } else if (direction === MOVE_DIRECTION.DOWN && index < list.length - 1) {
             newList.splice(index + 1, 0, newList.splice(index, 1)[0]);
-        } else if (direction === "top") {
+        } else if (direction === MOVE_DIRECTION.TOP) {
             newList.splice(0, 0, newList.splice(index, 1)[0]);
-        } else if (direction === "bottom") {
+        } else if (direction === MOVE_DIRECTION.BOTTOM) {
             newList.push(newList.splice(index, 1)[0]);
         }
         setList(newList);
         if (list === availableValues) {
-            if (direction === "top") scrollToTop(availableRef);
-            if (direction === "bottom") scrollToBottom(availableRef);
+            switch (direction) {
+                case MOVE_DIRECTION.TOP:
+                    scrollToTop(availableRef);
+                    break;
+                case MOVE_DIRECTION.BOTTOM:
+                    scrollToBottom(availableRef);
+                    break;
+            }
         }
         if (list === selectedValues) {
-            if (direction === "top") scrollToTop(selectedRef);
-            if (direction === "bottom") scrollToBottom(selectedRef);
+            switch (direction) {
+                case MOVE_DIRECTION.TOP:
+                    scrollToTop(selectedRef);
+                    break;
+                case MOVE_DIRECTION.BOTTOM:
+                    scrollToBottom(selectedRef);
+                    break;
+            }
         }
     };
 
@@ -195,27 +220,42 @@ export const ReportColumnSelect = observer((): ReactElement => {
             </div>
             <div className='report-control'>
                 {ControlButton(
-                    "up",
+                    MOVE_DIRECTION.UP,
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "up", availableValues, setAvailableValues),
-                    "Up",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.UP,
+                            availableValues,
+                            setAvailableValues
+                        ),
+                    MOVE_DIRECTION.UP,
                     availableValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
                 {ControlButton(
                     "double-up",
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "top", availableValues, setAvailableValues),
-                    "Top",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.TOP,
+                            availableValues,
+                            setAvailableValues
+                        ),
+                    MOVE_DIRECTION.TOP,
                     availableValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
                 {ControlButton(
-                    "down",
+                    MOVE_DIRECTION.DOWN,
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "down", availableValues, setAvailableValues),
-                    "Down",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.DOWN,
+                            availableValues,
+                            setAvailableValues
+                        ),
+                    MOVE_DIRECTION.DOWN,
                     availableValues.findIndex((i) => i === currentItem) ===
                         availableValues.length - 1 || !currentItem
                 )}
@@ -223,8 +263,13 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "double-down",
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "bottom", availableValues, setAvailableValues),
-                    "Bottom",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.BOTTOM,
+                            availableValues,
+                            setAvailableValues
+                        ),
+                    MOVE_DIRECTION.BOTTOM,
                     availableValues.findIndex((i) => i === currentItem) ===
                         availableValues.length - 1 || !currentItem
                 )}
@@ -247,7 +292,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
             />
             <div className='report-control'>
                 {ControlButton(
-                    "right",
+                    MOVE_DIRECTION.RIGHT,
                     () =>
                         currentItem &&
                         moveItem(
@@ -273,7 +318,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     !availableValues.length
                 )}
                 {ControlButton(
-                    "left",
+                    MOVE_DIRECTION.LEFT,
                     () =>
                         currentItem &&
                         moveItem(
@@ -317,27 +362,42 @@ export const ReportColumnSelect = observer((): ReactElement => {
             />
             <div className='report-control'>
                 {ControlButton(
-                    "up",
+                    MOVE_DIRECTION.UP,
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "up", selectedValues, setSelectedValues),
-                    "Up",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.UP,
+                            selectedValues,
+                            setSelectedValues
+                        ),
+                    MOVE_DIRECTION.UP,
                     selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
                 {ControlButton(
                     "double-up",
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "top", selectedValues, setSelectedValues),
-                    "Top",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.TOP,
+                            selectedValues,
+                            setSelectedValues
+                        ),
+                    MOVE_DIRECTION.TOP,
                     selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
                 {ControlButton(
-                    "down",
+                    MOVE_DIRECTION.DOWN,
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "down", selectedValues, setSelectedValues),
-                    "Down",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.DOWN,
+                            selectedValues,
+                            setSelectedValues
+                        ),
+                    MOVE_DIRECTION.DOWN,
                     selectedValues.findIndex((i) => i === currentItem) ===
                         selectedValues.length - 1 || !currentItem
                 )}
@@ -345,8 +405,13 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "double-down",
                     () =>
                         currentItem &&
-                        changeOrder(currentItem, "bottom", selectedValues, setSelectedValues),
-                    "Bottom",
+                        changeOrder(
+                            currentItem,
+                            MOVE_DIRECTION.BOTTOM,
+                            selectedValues,
+                            setSelectedValues
+                        ),
+                    MOVE_DIRECTION.BOTTOM,
                     selectedValues.findIndex((i) => i === currentItem) ===
                         selectedValues.length - 1 || !currentItem
                 )}
