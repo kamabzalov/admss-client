@@ -68,6 +68,7 @@ export const NodeContent = ({
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
+    const { isReportChanged } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
@@ -146,7 +147,7 @@ export const ReportForm = observer((): ReactElement => {
                 const nodeData = node as TreeNodeEvent;
                 if (
                     nodeData.type === NODE_TYPES.DOCUMENT &&
-                    nodeData.data.document?.documentUID === docId
+                    nodeData.data.document?.virtualUID === docId
                 ) {
                     return path;
                 }
@@ -195,7 +196,7 @@ export const ReportForm = observer((): ReactElement => {
             const doc: ReportDocument = data.document;
             reportStore.report = doc;
             reportStore.reportName = doc.name;
-            navigate(`/dashboard/reports/${doc.documentUID}`);
+            navigate(`/dashboard/reports/${doc.virtualUID}`);
         }
     };
 
@@ -267,7 +268,7 @@ export const ReportForm = observer((): ReactElement => {
             if (dropIndex !== undefined) {
                 const response = await setReportOrder(
                     collectionId,
-                    dragData.document.documentUID,
+                    dragData.document.virtualUID,
                     dropIndex - currentCollectionsLength
                 );
                 if (response?.error) {
@@ -285,7 +286,7 @@ export const ReportForm = observer((): ReactElement => {
         ) {
             const sourceCollectionId = dragData.collectionId;
             const targetCollectionId = dropData.collection.itemUID;
-            const reportId = dragData.document.documentUID;
+            const reportId = dragData.document.virtualUID;
             if (sourceCollectionId !== targetCollectionId) {
                 const response = await moveReportToCollection(
                     sourceCollectionId,
@@ -315,8 +316,16 @@ export const ReportForm = observer((): ReactElement => {
         getCollections();
     };
 
-    const handleReturnPreviousPage = () => {
+    const navigateToReports = () => {
         navigate("/dashboard/reports");
+    };
+
+    const handleCloseClick = () => {
+        if (isReportChanged) {
+            setConfirmActive(true);
+        } else {
+            navigateToReports();
+        }
     };
 
     return (
@@ -324,7 +333,7 @@ export const ReportForm = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => setConfirmActive(true)}
+                onClick={handleCloseClick}
             />
             <div className='col-12'>
                 <div className='card report'>
@@ -354,7 +363,7 @@ export const ReportForm = observer((): ReactElement => {
                                     const nodeData = node as TreeNodeEvent;
                                     const isSelected =
                                         nodeData.type === NODE_TYPES.DOCUMENT &&
-                                        nodeData.data.document?.documentUID === id;
+                                        nodeData.data.document?.virtualUID === id;
                                     return (
                                         <NodeContent
                                             node={nodeData}
@@ -387,7 +396,7 @@ export const ReportForm = observer((): ReactElement => {
                 bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'
-                confirmAction={() => handleReturnPreviousPage()}
+                confirmAction={navigateToReports}
                 onHide={() => setConfirmActive(false)}
             />
         </div>
