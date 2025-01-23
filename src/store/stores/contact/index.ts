@@ -117,7 +117,7 @@ export class ContactStore {
                 const { extdata, ...contact } = response as Contact;
 
                 this._contactID = contact.contactuid;
-
+                this.contactType = contact.type;
                 this._contact = contact || ({} as Contact);
                 this._contactExtData = extdata || ({} as ContactExtData);
                 this._contactProspect = this._contact?.prospect || [];

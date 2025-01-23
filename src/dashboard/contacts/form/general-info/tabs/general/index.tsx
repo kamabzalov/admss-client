@@ -173,7 +173,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             }`}
                             pt={{
                                 wrapper: {
-                                    style: { minHeight: "414px" },
+                                    style: { height: "auto", maxHeight: "none" },
                                 },
                             }}
                         />
@@ -182,7 +182,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <small className='p-error'>{errors.type}</small>
                 </div>
             </div>
-            {!isControlDisabled && (
+            {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
                 <>
                     <div className='col-3'>
                         <Button
@@ -232,7 +232,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     </div>
                 </>
             )}
-            {!isControlDisabled && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+            {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
                 <>
                     <div className='col-4 relative'>
                         <TextInput
