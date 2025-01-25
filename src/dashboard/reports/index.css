@@ -1,5 +1,6 @@
-.reports {
-    min-height: 986px;
+.reports.card {
+    height: 986px;
+    overflow-y: auto;
 }
 
 .p-tree.reports__tree {
