@@ -182,7 +182,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <small className='p-error'>{errors.type}</small>
                 </div>
             </div>
-            {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+            {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
                     <div className='col-3'>
                         <Button
@@ -231,8 +231,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         </div>
                     </div>
                 </>
-            )}
-            {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+            ) : null}
+            {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
                     <div className='col-4 relative'>
                         <TextInput
@@ -303,7 +303,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         <small className='p-error'>{errors.lastName}</small>
                     </div>
                 </>
-            )}
+            ) : null}
             {!!contactType && (
                 <div className='col-4 relative'>
                     <TextInput
