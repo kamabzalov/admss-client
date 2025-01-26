@@ -94,30 +94,30 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             if (contact.firstName) {
                 setSavedFirstName(contact.firstName);
                 setFieldValue("firstName", "");
-                changeContact("firstName", "");
+                changeContact("firstName", "", false);
             }
             if (contact.lastName) {
                 setSavedLastName(contact.lastName);
                 setFieldValue("lastName", "");
-                changeContact("lastName", "");
+                changeContact("lastName", "", false);
             }
             if (contact.middleName) {
                 setSavedMiddleName(contact.middleName);
                 setFieldValue("middleName", "");
-                changeContact("middleName", "");
+                changeContact("middleName", "", false);
             }
         } else {
             if (!contact.firstName && savedFirstName) {
                 setFieldValue("firstName", savedFirstName);
-                changeContact("firstName", savedFirstName);
+                changeContact("firstName", savedFirstName, false);
             }
             if (!contact.lastName && savedLastName) {
                 setFieldValue("lastName", savedLastName);
-                changeContact("lastName", savedLastName);
+                changeContact("lastName", savedLastName, false);
             }
             if (!contact.middleName && savedMiddleName) {
                 setFieldValue("middleName", savedMiddleName);
-                changeContact("middleName", savedMiddleName);
+                changeContact("middleName", savedMiddleName, false);
             }
         }
     }, [shouldDisableNameFields, contact.businessName, setFieldValue, changeContact]);
@@ -126,11 +126,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         if (shouldDisableBusinessName) {
             setSavedBusinessName(contact.businessName);
             setFieldValue("businessName", "");
-            changeContact("businessName", "");
+            changeContact("businessName", "", false);
         } else {
             if (!contact.businessName && savedBusinessName) {
                 setFieldValue("businessName", savedBusinessName);
-                changeContact("businessName", savedBusinessName);
+                changeContact("businessName", savedBusinessName, false);
             }
         }
     }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
@@ -182,7 +182,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <small className='p-error'>{errors.type}</small>
                 </div>
             </div>
-            {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+            {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
                     <div className='col-3'>
                         <Button
@@ -231,8 +231,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         </div>
                     </div>
                 </>
-            )}
-            {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) && (
+            ) : null}
+            {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
                     <div className='col-4 relative'>
                         <TextInput
@@ -303,7 +303,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         <small className='p-error'>{errors.lastName}</small>
                     </div>
                 </>
-            )}
+            ) : null}
             {!!contactType && (
                 <div className='col-4 relative'>
                     <TextInput

@@ -150,8 +150,14 @@ export class ContactStore {
     };
 
     public changeContact = action(
-        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) => {
-            this._isContactChanged = true;
+        (
+            key: keyof Omit<Contact, "extdata">,
+            value: string | number | string[],
+            isContactChanged: boolean = true
+        ) => {
+            if (isContactChanged) {
+                this._isContactChanged = true;
+            }
             this._contact[key] = value as never;
         }
     );
