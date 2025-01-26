@@ -94,30 +94,30 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             if (contact.firstName) {
                 setSavedFirstName(contact.firstName);
                 setFieldValue("firstName", "");
-                changeContact("firstName", "");
+                changeContact("firstName", "", false);
             }
             if (contact.lastName) {
                 setSavedLastName(contact.lastName);
                 setFieldValue("lastName", "");
-                changeContact("lastName", "");
+                changeContact("lastName", "", false);
             }
             if (contact.middleName) {
                 setSavedMiddleName(contact.middleName);
                 setFieldValue("middleName", "");
-                changeContact("middleName", "");
+                changeContact("middleName", "", false);
             }
         } else {
             if (!contact.firstName && savedFirstName) {
                 setFieldValue("firstName", savedFirstName);
-                changeContact("firstName", savedFirstName);
+                changeContact("firstName", savedFirstName, false);
             }
             if (!contact.lastName && savedLastName) {
                 setFieldValue("lastName", savedLastName);
-                changeContact("lastName", savedLastName);
+                changeContact("lastName", savedLastName, false);
             }
             if (!contact.middleName && savedMiddleName) {
                 setFieldValue("middleName", savedMiddleName);
-                changeContact("middleName", savedMiddleName);
+                changeContact("middleName", savedMiddleName, false);
             }
         }
     }, [shouldDisableNameFields, contact.businessName, setFieldValue, changeContact]);
