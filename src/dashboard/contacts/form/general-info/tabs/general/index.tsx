@@ -126,11 +126,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         if (shouldDisableBusinessName) {
             setSavedBusinessName(contact.businessName);
             setFieldValue("businessName", "");
-            changeContact("businessName", "");
+            changeContact("businessName", "", false);
         } else {
             if (!contact.businessName && savedBusinessName) {
                 setFieldValue("businessName", savedBusinessName);
-                changeContact("businessName", savedBusinessName);
+                changeContact("businessName", savedBusinessName, false);
             }
         }
     }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
