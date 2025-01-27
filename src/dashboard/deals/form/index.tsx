@@ -243,16 +243,18 @@ export const DealsForm = observer(() => {
     };
 
     const handleGetDeal = async () => {
-        const response = await getDeal(id!);
+        if (id) {
+            const response = await getDeal(id);
 
-        if (response?.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: (response?.error as string) || "",
-                life: TOAST_LIFETIME,
-            });
-            navigate(`/dashboard/deals`);
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: (response?.error as string) || "",
+                    life: TOAST_LIFETIME,
+                });
+                navigate(`/dashboard/deals`);
+            }
         }
     };
 
