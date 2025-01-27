@@ -9,7 +9,7 @@ import {
     HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
-import { isAxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -274,19 +274,39 @@ export const getDealPrintForms = async (dealuid: string) => {
     }
 };
 
-export const getDealPrintFormTemplate = async (dealuid: string, templateuid: string) => {
+export const getDealPrintFormTemplate = async (
+    dealuid: string,
+    templateuid: string
+): Promise<Blob | BaseResponseError> => {
+    const printErrorMessage = "Error while getting deal print form template";
     try {
-        const request = await authorizedUserApiInstance.get<any>(
-            `print/${dealuid}/${templateuid}/dealform `,
+        const request = await authorizedUserApiInstance.get<Blob>(
+            `print/${dealuid}/${templateuid}/dealform`,
             {
                 responseType: "blob",
             }
         );
+
+        const contentType = request.headers["content-type"];
+        if (contentType.includes("application/json")) {
+            const textResponse = await request.data.text();
+            const errorResponse: BaseResponseError = JSON.parse(textResponse);
+            return errorResponse;
+        }
+
         return request.data;
     } catch (error) {
+        if (error instanceof AxiosError && error.response) {
+            debugger;
+            return {
+                status: Status.ERROR,
+                error: error.response.data?.message || printErrorMessage,
+            };
+        }
+
         return {
             status: Status.ERROR,
-            error: "Error while getting deal print form template",
+            error: printErrorMessage,
         };
     }
 };
