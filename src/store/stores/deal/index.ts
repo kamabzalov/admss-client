@@ -88,7 +88,6 @@ export class DealStore {
     }
 
     public getDeal = async (itemuid: string) => {
-        if (!itemuid) return;
         this._isLoading = true;
         this._dealErrorMessage = "";
         try {
