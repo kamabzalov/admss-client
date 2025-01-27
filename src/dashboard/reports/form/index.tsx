@@ -68,7 +68,7 @@ export const NodeContent = ({
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { isReportChanged } = reportStore;
+    const { isReportChanged, clearReport } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
@@ -92,6 +92,9 @@ export const ReportForm = observer((): ReactElement => {
 
     useEffect(() => {
         getCollections();
+        return () => {
+            clearReport();
+        };
     }, [authUser]);
 
     const handleGetUserReportCollections = async (useruid: string) => {

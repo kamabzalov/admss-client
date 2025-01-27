@@ -11,6 +11,7 @@ export class ReportStore {
     private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
+    private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -38,12 +39,16 @@ export class ReportStore {
         return this._isLoading;
     }
 
-    public get isReportChanged() {
-        return (
-            JSON.stringify(this._report) !== JSON.stringify(this._initialReport) ||
-            JSON.stringify(this._reportColumns) !==
-                JSON.stringify(this._initialReport.columns || [])
-        );
+    public get isReportChanged(): boolean {
+        return this._isReportChanged;
+    }
+
+    private checkIsReportChanged() {
+        const isSameReport = JSON.stringify(this._report) === JSON.stringify(this._initialReport);
+        const isSameColumns =
+            JSON.stringify(this._reportColumns) ===
+            JSON.stringify(this._initialReport.columns || []);
+        this._isReportChanged = !(isSameReport && isSameColumns);
     }
 
     public getReport = action(async (uid: string) => {
@@ -72,6 +77,7 @@ export class ReportStore {
 
     public changeReport = action((key: keyof ReportInfo, value: string | number) => {
         this._report[key] = value as never;
+        this.checkIsReportChanged();
     });
 
     public saveReport = action(
@@ -151,6 +157,9 @@ export class ReportStore {
 
     public clearReport = () => {
         this._report = {} as ReportInfo;
+        this._currentID = "";
+        this._initialReport = {} as ReportInfo;
+        this._isReportChanged = false;
         this._initialReport = {} as ReportInfo;
     };
 }

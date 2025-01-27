@@ -387,7 +387,7 @@ export default function Reports(): ReactElement {
                         className='reports__list-item reports__list-item--inner'
                         onClick={(ev) => handleOpenParameters(ev, currentReport)}
                         onDoubleClick={() => {
-                            navigate(`/dashboard/reports/${currentReport.virtualUID}`);
+                            navigate(`/dashboard/reports/${currentReport.documentUID}`);
                         }}
                     >
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
