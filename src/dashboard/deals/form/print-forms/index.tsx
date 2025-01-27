@@ -30,37 +30,43 @@ export const PrintDealForms = observer((): ReactElement => {
     }, [selectedPrints]);
 
     const handlePrintForm = async (templateuid: string, print: boolean = false) => {
+        const errorMessage = "Error while printing form";
         if (id) {
             try {
-                store.isLoading = true;
                 const response = await getDealPrintFormTemplate(id, templateuid);
-                if (!response) {
-                    throw new Error("Server not responding");
-                }
-                setIsButtonDisabled(true);
-                setTimeout(() => {
-                    const url = new Blob([response], { type: "application/pdf" });
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(url);
-                    if (!print) {
-                        link.download = `deal_print_form_${templateuid}.pdf`;
-                        link.click();
-                    } else {
-                        window.open(
-                            link.href,
-                            "_blank",
-                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                        );
-                    }
 
-                    store.accordionActiveIndex = 0;
-                    store.isLoading = false;
-                }, 3000);
+                if ("error" in response) {
+                    throw new Error(response.error);
+                }
+
+                if (response instanceof Blob) {
+                    setIsButtonDisabled(true);
+                    setTimeout(() => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        const link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        if (!print) {
+                            link.download = `deal_print_form_${templateuid}.pdf`;
+                            link.click();
+                        } else {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+
+                        store.accordionActiveIndex = 0;
+                        store.isLoading = false;
+                    }, 3000);
+                } else {
+                    throw new Error(errorMessage);
+                }
             } catch (error) {
                 toast.current?.show({
                     severity: "error",
                     summary: "Error",
-                    detail: "Error while printing form",
+                    detail: error instanceof Error ? error.message : errorMessage,
                     life: TOAST_LIFETIME,
                 });
             } finally {
@@ -109,6 +115,7 @@ export const PrintDealForms = observer((): ReactElement => {
                 <p>{item.name}</p>
                 <div className='flex gap-3 ml-auto'>
                     <Button
+                        type='button'
                         className='p-button deal-print__action-button'
                         outlined
                         onClick={() => handlePrintForm(item.itemuid, true)}
@@ -116,6 +123,7 @@ export const PrintDealForms = observer((): ReactElement => {
                         Print
                     </Button>
                     <Button
+                        type='button'
                         className='p-button deal-print__action-button'
                         outlined
                         onClick={() => handlePrintForm(item.itemuid)}
