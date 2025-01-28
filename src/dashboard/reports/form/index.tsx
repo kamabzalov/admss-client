@@ -271,7 +271,7 @@ export const ReportForm = observer((): ReactElement => {
             if (dropIndex !== undefined) {
                 const response = await setReportOrder(
                     collectionId,
-                    dragData.document.virtualUID,
+                    dragData.document.documentUID,
                     dropIndex - currentCollectionsLength
                 );
                 if (response?.error) {
