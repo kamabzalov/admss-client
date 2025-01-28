@@ -61,13 +61,18 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
         return !addFee.amount || !addFee.reason;
     }, [addFee]);
 
+    const handleOnCloseClick = () => {
+        setAddFee(initialAddFee);
+        onHide();
+    };
+
     return (
         <DashboardDialog
             className='dialog__add-fee add-fee'
             footer='Save'
             header='Add Fee'
             visible={visible}
-            onHide={onHide}
+            onHide={handleOnCloseClick}
             action={handleSaveAddFee}
             buttonDisabled={buttonDisabled}
             cancelButton

@@ -93,6 +93,11 @@ export const AddPromiseDialog = observer(
             }
         }, [note, noteTaker]);
 
+        const handleOnClose = () => {
+            setNoteTaker(currentPromise?.username || authUser?.loginname || "");
+            onHide();
+        };
+
         return (
             <DashboardDialog
                 className='add-promise'
@@ -100,7 +105,7 @@ export const AddPromiseDialog = observer(
                 header='Add Promise'
                 cancelButton
                 visible={visible}
-                onHide={onHide}
+                onHide={handleOnClose}
                 action={handleAddPromise}
                 buttonDisabled={isButtonDisabled}
                 {...props}
