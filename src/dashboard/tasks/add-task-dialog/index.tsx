@@ -1,115 +1,158 @@
-import {
-    ACCOUNT_PAYMENT_METHODS,
-    ACCOUNT_PAYMENT_METHODS_NAMES,
-} from "common/constants/account-options";
-import { AccountDownPayments } from "common/models/accounts";
-import { TOAST_LIFETIME } from "common/settings";
-import { DashboardDialog } from "dashboard/common/dialog";
-import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { useToast } from "dashboard/common/toast";
 import { DialogProps } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
-import { ReactElement, useEffect, useMemo, useState } from "react";
-import { useStore } from "store/hooks";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
+import { useEffect, useState } from "react";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Dropdown } from "primereact/dropdown";
+import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { DashboardDialog } from "dashboard/common/dialog";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
+import { DateInput } from "dashboard/common/form/inputs";
+import { InputMask } from "primereact/inputmask";
 
-interface DownPaymentDialogProps extends DialogProps {
-    visible: boolean;
-    onHide: () => void;
-    payments: AccountDownPayments[];
+const DialogIcon = ({ icon }: { icon: "search" | string }) => {
+    return (
+        <span className='p-inputgroup-addon'>
+            <i className={`adms-${icon}`} />
+        </span>
+    );
+};
+
+interface AddTaskDialogProps extends DialogProps {
+    currentTask?: Task;
 }
 
-export const DownPaymentDialog = ({
-    visible,
-    onHide,
-    ...props
-}: DownPaymentDialogProps): ReactElement => {
-    const toast = useToast();
-    const store = useStore().accountStore;
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const currentTime = useMemo(
-        () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-        []
+export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
+    const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
+    const [startDate, setStartDate] = useState<Date>(
+        currentTask?.created ? new Date(currentTask.created) : new Date()
     );
-    const [paymentDate, setPaymentDate] = useState<string>(currentTime);
-    const [paymentType, setPaymentType] = useState<ACCOUNT_PAYMENT_METHODS_NAMES | null>(null);
-    const [checkNumber, setCheckNumber] = useState<string>("");
-    const [amount, setAmount] = useState<number>(0);
+    const [dueDate, setDueDate] = useState<Date>(
+        currentTask?.deadline ? new Date(currentTask.deadline) : new Date()
+    );
+    const [account, setAccount] = useState<string>(currentTask?.accountname || "");
+    const [deal, setDeal] = useState<string>(currentTask?.dealname || "");
+    const [contact, setContact] = useState<string>(currentTask?.contactname || "");
+    const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
+    const [description, setDescription] = useState<string>(currentTask?.description || "");
+    const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
+    const toast = useToast();
 
     useEffect(() => {
-        if (paymentDate && paymentType && amount) {
-            setIsButtonDisabled(false);
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser && visible) {
+            getTasksUserList(authUser.useruid).then((response) => {
+                if (response) setAssignToData(response);
+            });
         }
-    }, [amount, paymentDate, paymentType]);
+    }, [visible]);
 
-    const isCheckNumberActive = useMemo(
-        () => paymentType === ACCOUNT_PAYMENT_METHODS_NAMES.CHECK,
-        [paymentType, amount]
-    );
+    const handleSaveTaskData = async () => {
+        const taskData: Record<string, string | number | Date> = {
+            assignTo,
+            startDate,
+            dueDate,
+            account,
+            deal,
+            contact,
+            phoneNumber,
+            description,
+        };
 
-    const handleDownPayment = () => {
-        if (!authUser) return;
-        toast.current?.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Payment paid successfully!",
-            life: TOAST_LIFETIME,
-        });
-        store.isAccountChanged = true;
+        const response = await createTask(taskData);
+
+        if (response && response?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+        }
         onHide();
     };
 
     return (
         <DashboardDialog
-            className='payment-dialog'
-            footer='Apply'
-            header='Down Payment'
-            cancelButton
-            visible={visible}
+            position='top'
             onHide={onHide}
-            action={handleDownPayment}
-            buttonDisabled={isButtonDisabled}
-            {...props}
+            visible={visible}
+            header={header}
+            className={"dialog__add-task "}
+            footer='Save'
+            action={handleSaveTaskData}
         >
-            <div className='flex flex-column gap-4 pt-3'>
-                <DateInput
-                    name='Payment Date'
-                    date={paymentDate}
-                    value={paymentDate}
-                    emptyDate
-                    onChange={(e) => setPaymentDate(e.target.value as string)}
-                />
-                <span className='p-float-label'>
+            <>
+                {assignToData && (
                     <Dropdown
-                        options={[...ACCOUNT_PAYMENT_METHODS]}
-                        value={paymentType}
-                        onChange={(e) => setPaymentType(e.value)}
-                        optionValue='name'
-                        optionLabel='name'
-                        className='w-full payment-dialog__dropdown'
+                        placeholder='Assign to'
+                        value={assignTo}
+                        options={assignToData}
+                        optionLabel={"username"}
+                        className='flex align-items-center'
+                        onChange={(e) => setAssignTo(e.value)}
                     />
-                    <label className='float-label'>Payment Type</label>
-                </span>
-                {isCheckNumberActive && (
-                    <span className='p-float-label'>
-                        <InputText
-                            value={checkNumber}
-                            onChange={({ target: { value } }) => setCheckNumber(value)}
-                            className='payment-dialog__text-input w-full'
-                        />
-                        <label className='float-label'>Check#</label>
-                    </span>
                 )}
-                <CurrencyInput
-                    value={amount}
-                    title='Amount'
-                    labelPosition='top'
-                    onChange={({ value }) => setAmount(value as number)}
+                <div className='flex flex-column md:flex-row column-gap-3'>
+                    <div className='p-inputgroup'>
+                        <DateInput
+                            placeholder='Start Date'
+                            value={startDate}
+                            date={startDate}
+                            onChange={(e) => setStartDate(e.value as Date)}
+                        />
+                    </div>
+                    <div className='p-inputgroup'>
+                        <DateInput
+                            placeholder='Due Date'
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.value as Date)}
+                        />
+                    </div>
+                </div>
+                <div className='p-inputgroup flex-1'>
+                    <InputText
+                        placeholder='Account'
+                        value={account}
+                        onChange={(e) => setAccount(e.target.value)}
+                    />
+                    <DialogIcon icon='search' />
+                </div>
+                <div className='p-inputgroup flex-1'>
+                    <InputText
+                        placeholder='Deal'
+                        value={deal}
+                        onChange={(e) => setDeal(e.target.value)}
+                    />
+                    <DialogIcon icon='search' />
+                </div>
+                <div className='p-inputgroup flex-1'>
+                    <InputText
+                        placeholder='Contact'
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value)}
+                    />
+                    <DialogIcon icon='search' />
+                </div>
+                <InputMask
+                    type='tel'
+                    mask='999-999-9999'
+                    placeholder='Phone Number'
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target?.value || "")}
                 />
-            </div>
+                <InputTextarea
+                    placeholder='Description'
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className='p-dialog-description'
+                />
+            </>
         </DashboardDialog>
     );
 };
