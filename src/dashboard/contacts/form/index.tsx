@@ -135,6 +135,7 @@ export const ContactForm = observer((): ReactElement => {
         deleteReason,
         isLoading,
         activeTab,
+        tabLength,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
@@ -301,19 +302,27 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     const handleOnBackClick = () => {
-        setStepActiveIndex((prev) => {
-            const newStep = prev - 1;
-            navigate(getUrl(newStep));
-            return newStep;
-        });
+        if (activeTab !== null && activeTab && activeTab > 0) {
+            store.activeTab = activeTab - 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev - 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
+        }
     };
 
     const handleOnNextClick = () => {
-        setStepActiveIndex((prev) => {
-            const newStep = prev + 1;
-            navigate(getUrl(newStep));
-            return newStep;
-        });
+        if (activeTab !== null && activeTab < tabLength - 1) {
+            store.activeTab = activeTab + 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev + 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
+        }
     };
 
     const stepAccordionHeader = (section: ContactSection) => {
