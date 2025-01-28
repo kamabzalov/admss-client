@@ -86,6 +86,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             className={"dialog__add-task "}
             footer='Save'
             action={handleSaveTaskData}
+            buttonDisabled={!description.trim()}
         >
             <>
                 {assignToData && (
@@ -147,7 +148,8 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                     onChange={(e) => setPhoneNumber(e.target?.value || "")}
                 />
                 <InputTextarea
-                    placeholder='Description'
+                    placeholder='Description (required)'
+                    required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className='p-dialog-description'
