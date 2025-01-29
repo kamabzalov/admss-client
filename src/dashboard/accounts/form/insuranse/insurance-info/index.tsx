@@ -19,7 +19,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
     const toast = useToast();
     const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
     const store = useStore().accountStore;
-    const [insuranceEdit, setInsuranceEdit] = useState<boolean>(false);
+    const [insuranceEdit, setInsuranceEdit] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
@@ -66,7 +66,7 @@ export const AccountInsuranceInfo = observer((): ReactElement => {
                     } else {
                         setInsuranceInfo(res as AccountInsurance);
                         handleGetInsuranceHistory().then(() => {
-                            setInsuranceEdit(false);
+                            setInsuranceEdit(true);
                             setIsButtonDisabled(true);
                         });
                         toast.current?.show({

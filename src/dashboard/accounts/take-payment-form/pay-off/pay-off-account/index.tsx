@@ -31,7 +31,7 @@ export const PayOffInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className='take-payment__card'>
+        <div className='take-payment__card pay-off'>
             <h3 className='take-payment__title'>Pay Off Account</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Payment Date</label>

@@ -97,6 +97,7 @@
 .insurance-info--splitter {
     border-right: 1px solid var(--admss-app-light-grey);
     margin-right: 30px;
+    padding-right: 30px;
 }
 
 .insurance-field__label--thin {

@@ -77,7 +77,9 @@ export const DownPaymentDialog = ({
             <div className='flex flex-column gap-4 pt-3'>
                 <DateInput
                     name='Payment Date'
+                    date={paymentDate}
                     value={paymentDate}
+                    emptyDate
                     onChange={(e) => setPaymentDate(e.target.value as string)}
                 />
                 <span className='p-float-label'>

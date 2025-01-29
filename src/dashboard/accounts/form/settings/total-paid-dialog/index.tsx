@@ -16,6 +16,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { centsToDollars, formatCurrency } from "common/helpers";
 
 interface TotalPaidDialogProps extends DashboardDialogProps {}
+
 type TotalPaidInfo = Pick<
     AccountUpdateTotalInfo,
     "PrincipalPaid" | "InterestPaid" | "ExtraPrincipalPayments" | "TotalPaid"
@@ -35,21 +36,20 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
     const [newAmount, setNewAmount] = useState<TotalPaidInfo>(initialTotalPaid);
     const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
 
-    const fetchOriginalAmount = () => {
+    const fetchOriginalAmount = async () => {
         if (id) {
-            getAccountOriginalAmount(id).then((res) => {
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    setOriginalAmount(res as TotalPaidInfo);
-                    setNewAmount(res as TotalPaidInfo);
-                }
-            });
+            const res = await getAccountOriginalAmount(id);
+            if (res?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: res.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                setOriginalAmount(res as TotalPaidInfo);
+                setNewAmount(res as TotalPaidInfo);
+            }
         }
     };
 
@@ -60,55 +60,76 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
         }
     }, [visible]);
 
-    const handleCalcAmount = () => {
-        if (id) {
-            calcAccountFromHistory(id).then((res) => {
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    setOriginalAmount(res as TotalPaidInfo);
-                    setIsSubmitEnabled(true);
-                }
-            });
-        }
-    };
-
-    const handleSaveTotalPaid = () => {
+    const handleSaveTotalPaid = async (closeDialog = false, originalValues?: boolean) => {
+        if (!id) return;
         const amountData: Partial<TotalPaidInfo> = {
             PrincipalPaid: centsToDollars(newAmount.PrincipalPaid),
             InterestPaid: centsToDollars(newAmount.InterestPaid),
             ExtraPrincipalPayments: centsToDollars(newAmount.ExtraPrincipalPayments),
         };
 
-        if (id) {
-            updateAccountTotal(id, amountData).then((res) => {
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Total paid updated successfully",
-                        life: TOAST_LIFETIME,
-                    });
-                    onHide();
-                }
+        const response = await updateAccountTotal(id, originalValues ? originalAmount : amountData);
+        if (response?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+            return response;
+        } else {
+            if (closeDialog) {
+                onHide();
+            }
+            return response;
+        }
+    };
+
+    const handleCalcAmount = async () => {
+        if (!id) return;
+        const resSave = await handleSaveTotalPaid(false);
+        if (resSave?.status === Status.ERROR) {
+            return;
+        }
+        try {
+            const resCalc = await calcAccountFromHistory(id);
+            if (resCalc?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: resCalc.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                setOriginalAmount(resCalc as TotalPaidInfo);
+                setIsSubmitEnabled(true);
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Amount recalculated from history",
+                    life: TOAST_LIFETIME,
+                });
+            }
+        } catch (error: any) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: error.message || "Error while calculating total paid",
+                life: TOAST_LIFETIME,
             });
         }
     };
 
-    const handleCancel = () => {
-        setNewAmount(originalAmount);
+    const handleDialogSave = async () => {
+        await handleSaveTotalPaid(true);
+    };
+
+    const handleCancel = async () => {
+        const changedData = JSON.stringify(newAmount) !== JSON.stringify(originalAmount);
+
+        if (changedData) {
+            await handleSaveTotalPaid(true, true);
+        }
         onHide();
     };
 
@@ -120,7 +141,7 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
             header='Total Paid'
             visible={visible}
             onHide={handleCancel}
-            action={handleSaveTotalPaid}
+            action={handleDialogSave}
             buttonDisabled={!isSubmitEnabled}
             cancelButton
         >
