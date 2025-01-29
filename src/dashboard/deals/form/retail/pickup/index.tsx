@@ -8,6 +8,8 @@ import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 
+const EMPTY_PAYMENT_LENGTH = 7;
+
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().dealStore;
@@ -17,12 +19,16 @@ export const DealRetailPickup = observer((): ReactElement => {
     const [totalPayments, setTotalPayments] = useState(0);
 
     useEffect(() => {
-        if (id) {
-            getPickupPayments(id);
-            getDealPaymentsTotal(id).then(
-                (data) => typeof data === "number" && setTotalPayments(data)
-            );
-        }
+        const fetchData = async () => {
+            if (id) {
+                await getPickupPayments(id);
+                const data = await getDealPaymentsTotal(id);
+                if (typeof data === "number") {
+                    setTotalPayments(data);
+                }
+            }
+        };
+        fetchData();
     }, [id]);
 
     useEffect(() => {
@@ -35,6 +41,15 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
     }, [toast, dealErrorMessage]);
 
+    const displayedPayments = dealPickupPayments.length
+        ? dealPickupPayments
+        : Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
+              itemuid: `empty-${index}`,
+              paydate: "",
+              amount: 0,
+              paid: 0,
+          }));
+
     return (
         <div className='grid deal-retail-pickup'>
             <div className='col-12 pickup-header'>
@@ -43,7 +58,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                 <div className='pickup-header__item'>Paid</div>
             </div>
             <div className='pickup-body col-12'>
-                {dealPickupPayments.map((payment) => (
+                {displayedPayments.map((payment) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
                             <DateInput
