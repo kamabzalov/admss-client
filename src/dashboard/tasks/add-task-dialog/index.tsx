@@ -41,6 +41,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
     const [description, setDescription] = useState<string>(currentTask?.description || "");
     const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
+    const [dateError, setDateError] = useState<string>("");
     const toast = useToast();
 
     useEffect(() => {
@@ -52,7 +53,30 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
         }
     }, [visible]);
 
+    const validateDates = (start: Date, due: Date) => {
+        if (start > due) {
+            setDateError("Start Date cannot be later than Due Date");
+            return false;
+        }
+        setDateError("");
+        return true;
+    };
+
+    const handleStartDateChange = (date: Date) => {
+        if (validateDates(date, dueDate)) {
+            setStartDate(date);
+        }
+    };
+
+    const handleDueDateChange = (date: Date) => {
+        if (validateDates(startDate, date)) {
+            setDueDate(date);
+        }
+    };
+
     const handleSaveTaskData = async () => {
+        if (!validateDates(startDate, dueDate)) return;
+
         const taskData: Record<string, string | number | Date> = {
             assignTo,
             startDate,
@@ -83,10 +107,10 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             onHide={onHide}
             visible={visible}
             header={header}
-            className={"dialog__add-task "}
+            className={"dialog__add-task"}
             footer='Save'
             action={handleSaveTaskData}
-            buttonDisabled={!description.trim()}
+            buttonDisabled={!description.trim() || !!dateError}
         >
             <>
                 {assignToData && (
@@ -99,26 +123,32 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                         onChange={(e) => setAssignTo(e.value)}
                     />
                 )}
-                <div className='flex flex-column md:flex-row column-gap-3'>
+                <div className='flex flex-column md:flex-row column-gap-3 relative'>
                     <div className='p-inputgroup'>
                         <DateInput
                             placeholder='Start Date'
                             value={startDate}
                             date={startDate}
-                            onChange={(e) => setStartDate(e.value as Date)}
+                            showTime
+                            hourFormat='12'
+                            onChange={(e) => handleStartDateChange(e.value as Date)}
                         />
                     </div>
                     <div className='p-inputgroup'>
                         <DateInput
                             placeholder='Due Date'
                             value={dueDate}
-                            onChange={(e) => setDueDate(e.value as Date)}
+                            date={dueDate}
+                            showTime
+                            hourFormat='12'
+                            onChange={(e) => handleDueDateChange(e.value as Date)}
                         />
                     </div>
+                    {dateError && <small className='p-error'>{dateError}</small>}
                 </div>
                 <div className='p-inputgroup flex-1'>
                     <InputText
-                        placeholder='Account'
+                        placeholder='Account (optional)'
                         value={account}
                         onChange={(e) => setAccount(e.target.value)}
                     />
@@ -126,7 +156,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                 </div>
                 <div className='p-inputgroup flex-1'>
                     <InputText
-                        placeholder='Deal'
+                        placeholder='Deal (optional)'
                         value={deal}
                         onChange={(e) => setDeal(e.target.value)}
                     />
@@ -143,7 +173,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                 <InputMask
                     type='tel'
                     mask='999-999-9999'
-                    placeholder='Phone Number'
+                    placeholder='Phone Number (optional)'
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target?.value || "")}
                 />

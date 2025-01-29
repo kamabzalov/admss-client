@@ -275,6 +275,7 @@ export const DateInput = ({
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
+    const calendarRef = useRef<Calendar>(null);
 
     useEffect(() => {
         if (date !== undefined && date !== null && !isNaN(Number(date)) && Number(date) !== 0) {
@@ -295,6 +296,12 @@ export const DateInput = ({
     const handleClearDate = () => {
         setInnerDate(null);
         onClearAction?.();
+    };
+
+    const openCalendar = () => {
+        if (calendarRef.current) {
+            calendarRef.current.show();
+        }
     };
 
     const content = (
@@ -319,6 +326,7 @@ export const DateInput = ({
                     />
                 )}
                 <Calendar
+                    ref={calendarRef}
                     inputId={name}
                     value={checkbox && !isChecked ? null : innerDate}
                     disabled={checkbox && !isChecked}
@@ -337,7 +345,7 @@ export const DateInput = ({
                         tooltipOptions={{ position: "top" }}
                     />
                 )}
-                <div className='date-item__icon input-icon input-icon-right'>
+                <div className='date-item__icon input-icon input-icon-right' onClick={openCalendar}>
                     <i className='adms-calendar' />
                 </div>
             </div>
