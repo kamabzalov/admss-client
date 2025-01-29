@@ -30,6 +30,8 @@ export const InsuranceInfoField = ({
                 id='account-insurance-title-num'
                 className='insurance-info__input w-full'
                 value={value}
+                name={label}
+                date={Number(value) || new Date()}
                 onChange={handleDateChange}
             />
         ) : (
