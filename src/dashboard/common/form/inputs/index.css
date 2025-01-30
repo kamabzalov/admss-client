@@ -65,12 +65,13 @@
 }
 
 .date-item__label.date-item__label--empty,
-.date-item__label + .date-item__input .p-inputtext:enabled:focus {
+.date-item__label+.date-item__input .p-inputtext:enabled:focus {
     top: 1.7rem;
     left: 12px;
     z-index: 1;
     font-size: 18px;
 }
+
 
 .date-item__input .p-inputtext {
     border-radius: 5px 0 0 5px;
@@ -79,6 +80,13 @@
 .date-item__input {
     display: flex;
     align-items: center;
+
+    input:last-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+
 }
 
 .date-item__clear-button.p-button {
@@ -87,6 +95,7 @@
     border: none;
     color: var(--admss-app-primary);
     background-color: transparent;
+
     &:hover:enabled {
         background-color: transparent;
         color: var(--admss-app-medium-grey);
@@ -107,7 +116,9 @@
 
 .date-item__input .date-item__icon {
     height: 50px;
+    cursor: pointer;
 }
+
 
 .date-item__calendar--checkbox {
     width: 55%;
@@ -142,6 +153,7 @@
     border: none;
     border-left: 1px solid var(--admss-app-light-grey);
 }
+
 .bordered-checkbox .p-inputgroup-addon .p-checkbox-box {
     border-color: var(--admss-app-light-grey);
 }
@@ -180,6 +192,7 @@
     position: absolute;
     right: 0;
     border: none;
+
     &:hover:enabled {
         color: var(--admss-app-light-grey);
         background-color: transparent;

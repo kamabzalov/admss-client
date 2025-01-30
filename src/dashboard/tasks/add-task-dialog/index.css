@@ -1,5 +1,9 @@
 .dialog__add-task {
     width: 660px;
+
+    .p-error {
+        top: 46px;
+    }
 }
 
 .p-dialog .p-dialog-description {
