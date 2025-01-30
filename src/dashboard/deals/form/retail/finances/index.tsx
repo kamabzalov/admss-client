@@ -49,7 +49,7 @@ export const DealRetailFinances = observer((): ReactElement => {
             </div>
             <div className='col-6 finances-column'>
                 <div className='finances-item'>
-                    <label className='finances-item__label bold'>Cash Price</label>
+                    <label className='finances-item__label finances-item--bold'>Cash Price</label>
                     <CurrencyInput
                         className='finances-item__input'
                         value={Number(dealFinances.CashPrice) || 0}
