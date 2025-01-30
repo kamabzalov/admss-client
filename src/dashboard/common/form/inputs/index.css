@@ -28,21 +28,70 @@
     border: 1px solid var(--admss-app-light-grey);
 }
 
-.radio .radio-item__input {
-    order: 2;
-    border-left: 1px solid var(--admss-app-light-grey);
-    height: 100%;
-    background-color: var(--admss-app-lightest-grey);
-    padding: 0 10px;
-}
+.radio {
 
-.radio .radio-item__label {
-    padding-left: 10px;
-    order: 1;
-}
+    .p-radiobutton.p-component.p-radiobutton-checked {
+        display: inline-flex;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        align-items: center;
+    }
 
-.radio .p-radiobutton-checked .p-radiobutton-box.p-highlight {
-    border: var(--admss-app-dark-green) solid 4px;
+    .p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
+        border-color: var(--admss-app-dark-green);
+        border-width: 4px;
+    }
+
+
+    .radio-item__input {
+        order: 2;
+        border-left: 1px solid var(--admss-app-light-grey);
+        width: 48px;
+        height: 48px;
+        background-color: var(--admss-app-lightest-grey);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .radio-item__label {
+        padding-left: 10px;
+        order: 1;
+    }
+
+    .p-radiobutton-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--admss-app-light-grey);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+
+        &:hover {
+            border-color: var(--admss-app-medium-grey);
+        }
+    }
+
+    .p-radiobutton-box .p-radiobutton-icon {
+        width: 10px;
+        height: 10px;
+        background-color: transparent;
+        border-radius: 50%;
+    }
+
+    .p-radiobutton-checked .p-radiobutton-box.p-highlight {
+        background-color: var(--admss-app-dark-green);
+        border-color: var(--admss-app-dark-green);
+        box-shadow: none;
+    }
+
+
+    .p-radiobutton-checked .p-radiobutton-box.p-highlight .p-radiobutton-icon {
+        background-color: var(--admss-app-white);
+    }
 }
 
 .currency-item__input,
@@ -65,12 +114,13 @@
 }
 
 .date-item__label.date-item__label--empty,
-.date-item__label + .date-item__input .p-inputtext:enabled:focus {
+.date-item__label+.date-item__input .p-inputtext:enabled:focus {
     top: 1.7rem;
     left: 12px;
     z-index: 1;
     font-size: 18px;
 }
+
 
 .date-item__input .p-inputtext {
     border-radius: 5px 0 0 5px;
@@ -79,6 +129,13 @@
 .date-item__input {
     display: flex;
     align-items: center;
+
+    input:last-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+
 }
 
 .date-item__clear-button.p-button {
@@ -87,6 +144,7 @@
     border: none;
     color: var(--admss-app-primary);
     background-color: transparent;
+
     &:hover:enabled {
         background-color: transparent;
         color: var(--admss-app-medium-grey);
@@ -107,7 +165,9 @@
 
 .date-item__input .date-item__icon {
     height: 50px;
+    cursor: pointer;
 }
+
 
 .date-item__calendar--checkbox {
     width: 55%;
@@ -142,6 +202,7 @@
     border: none;
     border-left: 1px solid var(--admss-app-light-grey);
 }
+
 .bordered-checkbox .p-inputgroup-addon .p-checkbox-box {
     border-color: var(--admss-app-light-grey);
 }
@@ -180,6 +241,7 @@
     position: absolute;
     right: 0;
     border: none;
+
     &:hover:enabled {
         color: var(--admss-app-light-grey);
         background-color: transparent;
