@@ -1,6 +1,14 @@
-.finances__button {
+.finances__button.p-button {
     font-size: 24px;
+    font-weight: 700;
+    width: 245px;
+    padding: 0;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .finances-column {
     display: flex;
     flex-direction: column;
@@ -17,6 +25,11 @@
 
 .finances-item:first-child {
     border-top: 1px solid var(--admss-app-light-grey);
+}
+
+.finances-item--bold {
+    font-weight: 700;
+    font-size: 16px;
 }
 
 .finances-item--sum {
