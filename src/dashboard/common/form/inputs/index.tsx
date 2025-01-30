@@ -16,7 +16,7 @@ interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
     disabled?: boolean;
-    initialValue?: string | number;
+    initialValue?: string | number | null;
     onChange?: (value: string | number) => void;
 }
 
@@ -72,7 +72,7 @@ export const DashboardRadio = ({
     disabled,
     onChange,
 }: DashboardRadioProps): ReactElement => {
-    const [radioValue, setRadioValue] = useState<string | number>("" || 0);
+    const [radioValue, setRadioValue] = useState<string | number>("");
 
     const handleRadioChange = (e: RadioButtonChangeEvent) => {
         const value = e.value as string | number;
