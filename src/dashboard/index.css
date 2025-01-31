@@ -32,6 +32,10 @@
     background: #fff;
     box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.8);
     padding: 25px 30px;
+
+    .p-button.p-button-success:enabled:focus {
+        box-shadow: none;
+    }
 }
 
 .card-header {
