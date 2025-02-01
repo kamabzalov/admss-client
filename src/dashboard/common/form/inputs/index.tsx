@@ -304,12 +304,14 @@ export const DateInput = ({
                 innerDate ? "date-item--filled" : "date-item--empty"
             }`}
         >
-            <label
-                htmlFor={name}
-                className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top`}
-            >
-                {name}
-            </label>
+            {!isChecked && (
+                <label
+                    htmlFor={name}
+                    className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
+                >
+                    {name}
+                </label>
+            )}
             <div className='date-item__input w-full flex relative'>
                 {checkbox && (
                     <Checkbox

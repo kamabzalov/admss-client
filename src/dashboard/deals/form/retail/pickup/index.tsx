@@ -64,6 +64,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                             <DateInput
                                 checkbox
                                 value={payment.paydate}
+                                name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
                                 onChange={() => {
                                     changeDealPickupPayments(payment.itemuid, {
                                         key: "paydate",
