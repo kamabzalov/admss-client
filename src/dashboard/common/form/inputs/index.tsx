@@ -16,7 +16,7 @@ interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
     disabled?: boolean;
-    initialValue?: string | number;
+    initialValue?: string | number | null;
     onChange?: (value: string | number) => void;
 }
 
@@ -72,42 +72,46 @@ export const DashboardRadio = ({
     disabled,
     onChange,
 }: DashboardRadioProps): ReactElement => {
-    const [radioValue, setRadioValue] = useState<string | number>("" || 0);
+    const [radioValue, setRadioValue] = useState<string>("");
 
     const handleRadioChange = (e: RadioButtonChangeEvent) => {
-        const value = e.value as string | number;
-        setRadioValue(value);
-        onChange && onChange(value);
+        const valueAsString = String(e.value);
+        setRadioValue(valueAsString);
+        onChange?.(valueAsString);
     };
 
     useEffect(() => {
-        initialValue && setRadioValue(initialValue);
+        if (initialValue !== undefined && initialValue !== null) {
+            setRadioValue(String(initialValue));
+        }
     }, [initialValue]);
 
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
-            {radioArray.map(({ name, title, value }) => (
-                <div
-                    key={name}
-                    className='flex align-items-center justify-content-between radio__item radio-item border-round'
-                    style={style}
-                >
-                    <div className='radio-item__input flex align-items-center justify-content-center'>
-                        <RadioButton
-                            inputId={name}
-                            name={name}
-                            disabled={disabled}
-                            value={value}
-                            onChange={handleRadioChange}
-                            checked={radioValue === value}
-                        />
+            {radioArray.map(({ name, title, value }) => {
+                const valueAsString = String(value);
+                return (
+                    <div
+                        key={name}
+                        className='flex align-items-center justify-content-between radio__item radio-item border-round'
+                        style={style}
+                    >
+                        <div className='radio-item__input flex align-items-center justify-content-center'>
+                            <RadioButton
+                                inputId={name}
+                                name={name}
+                                disabled={disabled}
+                                value={valueAsString}
+                                onChange={handleRadioChange}
+                                checked={radioValue === valueAsString}
+                            />
+                        </div>
+                        <label htmlFor={name} className='radio-item__label'>
+                            {title}
+                        </label>
                     </div>
-
-                    <label htmlFor={name} className='radio-item__label'>
-                        {title}
-                    </label>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };
