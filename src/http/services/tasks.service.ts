@@ -83,6 +83,20 @@ export const getTasksUserList = async (useruid: string) => {
     }
 };
 
+export const getTasksSubUserList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<TaskUser[]>(
+            `user/${useruid || 0}/subusers`
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting tasks sub user list",
+        };
+    }
+};
+
 export const deleteTask = async (taskIndex: number) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`tasks/${taskIndex}/delete`);

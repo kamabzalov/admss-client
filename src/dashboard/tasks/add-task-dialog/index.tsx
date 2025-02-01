@@ -4,16 +4,14 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
-import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
+import { Task, TaskUser, createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputMask } from "primereact/inputmask";
+import { useStore } from "store/hooks";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -28,6 +26,8 @@ interface AddTaskDialogProps extends DialogProps {
 }
 
 export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
     const [startDate, setStartDate] = useState<Date>(
         currentTask?.created ? new Date(currentTask.created) : new Date()
@@ -45,10 +45,9 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     const toast = useToast();
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser && visible) {
-            getTasksUserList(authUser.useruid).then((response) => {
-                if (response) setAssignToData(response);
+            getTasksSubUserList(authUser.useruid).then((response) => {
+                if (response && Array.isArray(response)) setAssignToData(response);
             });
         }
     }, [visible]);
