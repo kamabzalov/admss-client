@@ -17,9 +17,7 @@
 
 .contact__accordion .p-accordion-header .p-accordion-header-link,
 .contact__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
-.contact__accordion
-    .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
-    .p-accordion-header-link,
+.contact__accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
 .contact__accordion .p-accordion-header.p-highlight .p-accordion-header-link[aria-expanded="true"] {
     border: none;
     background: white;
@@ -105,7 +103,7 @@
 
 .contact-form__tabs .p-tabview-panels {
     flex: 1;
-    padding-top: 0;
+    padding: 0;
 }
 
 .contact-form__tabs .p-tabview-nav-container a.p-tabview-nav-link {
@@ -173,6 +171,7 @@
 .form-nav__button--danger {
     background-color: var(--admss-app-red);
     border: none;
+
     &:hover:enabled {
         background-color: var(--admss-app-deep-red);
     }
@@ -181,6 +180,7 @@
 .contact-delete-dialog {
     width: 456px;
     height: 450px;
+
     .p-dialog-footer .p-button {
         display: inline-flex;
         align-items: center;

@@ -66,14 +66,24 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 export const formatPhoneNumber = (phone: string): string => {
-    let digits = phone.replace(/\D/g, "");
+    const digits = phone.replace(/\D/g, "");
 
     if (digits.length === 11 && digits.startsWith("1")) {
         return `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
     } else if (digits.length === 10) {
         return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
     } else {
-        return digits;
+        let formatted = "";
+        if (digits.length > 0) {
+            formatted = digits.slice(0, 3);
+        }
+        if (digits.length > 3) {
+            formatted += "-" + digits.slice(3, 6);
+        }
+        if (digits.length > 6) {
+            formatted += "-" + digits.slice(6, 10);
+        }
+        return formatted;
     }
 };
 
