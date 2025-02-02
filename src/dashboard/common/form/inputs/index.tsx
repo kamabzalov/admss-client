@@ -75,9 +75,8 @@ export const DashboardRadio = ({
     const [radioValue, setRadioValue] = useState<string>("");
 
     const handleRadioChange = (e: RadioButtonChangeEvent) => {
-        const valueAsString = String(e.value);
-        setRadioValue(valueAsString);
-        onChange?.(valueAsString);
+        setRadioValue(String(e.value));
+        onChange?.(String(e.value));
     };
 
     useEffect(() => {
@@ -89,7 +88,6 @@ export const DashboardRadio = ({
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
             {radioArray.map(({ name, title, value }) => {
-                const valueAsString = String(value);
                 return (
                     <div
                         key={name}
@@ -101,9 +99,9 @@ export const DashboardRadio = ({
                                 inputId={name}
                                 name={name}
                                 disabled={disabled}
-                                value={valueAsString}
+                                value={String(value)}
                                 onChange={handleRadioChange}
-                                checked={radioValue === valueAsString}
+                                checked={radioValue === String(value)}
                             />
                         </div>
                         <label htmlFor={name} className='radio-item__label'>
@@ -315,12 +313,14 @@ export const DateInput = ({
                 innerDate ? "date-item--filled" : "date-item--empty"
             }`}
         >
-            <label
-                htmlFor={name}
-                className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top`}
-            >
-                {name}
-            </label>
+            {!isChecked && (
+                <label
+                    htmlFor={name}
+                    className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
+                >
+                    {name}
+                </label>
+            )}
             <div className='date-item__input w-full flex relative'>
                 {checkbox && (
                     <Checkbox
