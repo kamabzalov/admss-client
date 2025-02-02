@@ -44,7 +44,6 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                             changeDealExtData({ key: "OdomDigits", value: e.value });
                         }}
                         options={[5, 6, 7, 8]}
-                        filter
                         required
                         className={`'w-full deal-odometer__dropdown' ${
                             errors.OdomDigits ? "p-invalid" : ""

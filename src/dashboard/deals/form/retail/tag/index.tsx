@@ -53,7 +53,7 @@ export const DealRetailTag = observer((): ReactElement => {
                         }
                     }}
                     initialValue={
-                        !Title_Only && !Title_and_License ? undefined : Title_Only === 1 ? "0" : "1"
+                        !Title_Only && !Title_and_License ? "1" : Title_Only === 1 ? "0" : "1"
                     }
                     style={{ width: `${95 / tagTopRadio.length}%` }}
                 />
@@ -99,6 +99,7 @@ export const DealRetailTag = observer((): ReactElement => {
                 <DateInput
                     name='Issue Date'
                     date={Number(Transferred_Expiration_Date)}
+                    emptyDate
                     disabled={!Title_and_License}
                     onChange={({ value }) =>
                         changeDealExtData({
@@ -117,7 +118,7 @@ export const DealRetailTag = observer((): ReactElement => {
                     style={{ width: `100%` }}
                     disabled={!Title_and_License}
                     initialValue={
-                        Plate_Transferred === 1 ? "0" : Exchanged_Plates === 1 ? "1" : "2"
+                        Plate_Transferred === 1 ? "0" : Exchanged_Plates === 1 ? "1" : null
                     }
                     onChange={(value) => {
                         changeDealExtData({ key: "Plate_Transferred", value: 0 });
@@ -187,6 +188,7 @@ export const DealRetailTag = observer((): ReactElement => {
                     name='Expiration Date'
                     date={Number(Plate_Issue_Date)}
                     disabled={!Title_and_License}
+                    emptyDate
                     onChange={({ value }) =>
                         changeDealExtData({
                             key: "Plate_Issue_Date",
@@ -216,6 +218,7 @@ export const DealRetailTag = observer((): ReactElement => {
                     name='Date'
                     date={TempTagDate}
                     disabled={!Title_and_License}
+                    emptyDate
                     onChange={({ value }) =>
                         changeDealExtData({ key: "TempTagDate", value: Number(value) })
                     }

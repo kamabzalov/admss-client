@@ -172,7 +172,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("dealtype")}
                         optionLabel='name'
                         optionValue='id'
-                        filter
                         required
                         options={dealTypesList}
                         value={values.dealtype}
@@ -199,7 +198,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                             changeDeal({ key: "dealstatus", value: e.value });
                         }}
                         options={dealStatusesList}
-                        filter
                         required
                         className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
                     />
@@ -213,7 +211,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("saletype")}
                         optionLabel='name'
                         optionValue='id'
-                        filter
                         required
                         options={saleTypesList}
                         value={values.saletype}
@@ -269,7 +266,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                             setFieldValue("inventorystatus", e.value);
                             changeDeal({ key: "inventorystatus", value: e.value });
                         }}
-                        filter
                         required
                         className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
                     />
@@ -326,7 +322,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                             changeDealExtData({ key: "HowFoundOut", value: e.value });
                         }}
                         editable
-                        filter
                         className={`w-full deal-sale__dropdown ${
                             errors.HowFoundOut && "p-invalid"
                         }`}
