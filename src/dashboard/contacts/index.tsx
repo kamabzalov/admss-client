@@ -32,7 +32,7 @@ import {
     SEARCH_FORM_TYPE,
     SearchField,
 } from "dashboard/common/dialog/search";
-import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
+import { createStringifySearchQuery, formatPhoneNumber, isObjectValuesEmpty } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
@@ -343,6 +343,18 @@ export const ContactsDataTable = ({
         },
     ];
 
+    const bodyDataRender = (field: keyof ContactUser | "fullName") => {
+        switch (field) {
+            case "fullName":
+                return renderFullName;
+            case "phone1":
+            case "phone2":
+                return (rowData: ContactUser) => formatPhoneNumber(rowData[field]);
+            default:
+                return undefined;
+        }
+    };
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -485,7 +497,7 @@ export const ContactsDataTable = ({
                                     key={field}
                                     sortable
                                     headerClassName='cursor-move'
-                                    body={field === "fullName" ? renderFullName : undefined}
+                                    body={bodyDataRender(field)}
                                     pt={{
                                         root: {
                                             style: {
