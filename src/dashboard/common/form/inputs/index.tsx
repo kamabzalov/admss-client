@@ -75,9 +75,8 @@ export const DashboardRadio = ({
     const [radioValue, setRadioValue] = useState<string>("");
 
     const handleRadioChange = (e: RadioButtonChangeEvent) => {
-        const valueAsString = String(e.value);
-        setRadioValue(valueAsString);
-        onChange?.(valueAsString);
+        setRadioValue(String(e.value));
+        onChange?.(String(e.value));
     };
 
     useEffect(() => {
@@ -89,7 +88,6 @@ export const DashboardRadio = ({
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
             {radioArray.map(({ name, title, value }) => {
-                const valueAsString = String(value);
                 return (
                     <div
                         key={name}
@@ -101,9 +99,9 @@ export const DashboardRadio = ({
                                 inputId={name}
                                 name={name}
                                 disabled={disabled}
-                                value={valueAsString}
+                                value={String(value)}
                                 onChange={handleRadioChange}
-                                checked={radioValue === valueAsString}
+                                checked={radioValue === String(value)}
                             />
                         </div>
                         <label htmlFor={name} className='radio-item__label'>
@@ -279,6 +277,7 @@ export const DateInput = ({
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
+    const calendarRef = useRef<Calendar>(null);
 
     useEffect(() => {
         if (date !== undefined && date !== null && !isNaN(Number(date)) && Number(date) !== 0) {
@@ -299,6 +298,12 @@ export const DateInput = ({
     const handleClearDate = () => {
         setInnerDate(null);
         onClearAction?.();
+    };
+
+    const openCalendar = () => {
+        if (calendarRef.current) {
+            calendarRef.current.show();
+        }
     };
 
     const content = (
@@ -325,6 +330,7 @@ export const DateInput = ({
                     />
                 )}
                 <Calendar
+                    ref={calendarRef}
                     inputId={name}
                     value={checkbox && !isChecked ? null : innerDate}
                     disabled={checkbox && !isChecked}
@@ -343,7 +349,7 @@ export const DateInput = ({
                         tooltipOptions={{ position: "top" }}
                     />
                 )}
-                <div className='date-item__icon input-icon input-icon-right'>
+                <div className='date-item__icon input-icon input-icon-right' onClick={openCalendar}>
                     <i className='adms-calendar' />
                 </div>
             </div>
