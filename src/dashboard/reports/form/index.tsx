@@ -199,7 +199,7 @@ export const ReportForm = observer((): ReactElement => {
             const doc: ReportDocument = data.document;
             reportStore.report = doc;
             reportStore.reportName = doc.name;
-            navigate(`/dashboard/reports/${doc.virtualUID}`);
+            navigate(`/dashboard/reports/${doc.documentUID}`);
         }
     };
 
