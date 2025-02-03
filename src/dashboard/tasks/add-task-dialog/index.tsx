@@ -97,10 +97,17 @@ export const AddTaskDialog = ({
         const response = await createTask(taskData);
 
         if (response && response?.status === Status.ERROR) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: Status.ERROR,
                 detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Task created successfully!",
                 life: TOAST_LIFETIME,
             });
         }
