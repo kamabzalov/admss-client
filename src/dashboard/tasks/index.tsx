@@ -11,6 +11,8 @@ import { TaskSummaryDialog } from "./task-summary";
 import "./index.css";
 import { Button } from "primereact/button";
 
+const SHOW_TASK_COUNT = 5;
+
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
@@ -23,8 +25,12 @@ export const Tasks = () => {
 
     const authUser: AuthUser = getKeyValue(LS_APP_USER);
 
-    const getTasks = () =>
-        getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
+    const getTasks = async () => {
+        const res = await getTasksByUserId(authUser.useruid, { top: SHOW_TASK_COUNT });
+        if (res && Array.isArray(res)) {
+            setTasks(res);
+        }
+    };
 
     useEffect(() => {
         if (authUser) {
@@ -115,6 +121,7 @@ export const Tasks = () => {
                 <AddTaskDialog
                     visible={showAddTaskDialog}
                     onHide={() => setShowAddTaskDialog(false)}
+                    onAction={getTasks}
                     header='Add Task'
                 />
                 {isLoggedUserTask() ? (
