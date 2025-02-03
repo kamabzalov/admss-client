@@ -190,7 +190,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             label='Scan driver license'
                             className='general-info__button'
                             tooltip='Data received from the DL’s backside will fill in related fields'
-                            disabled={isControlDisabled}
                             outlined
                             onClick={handleScanDL}
                         />

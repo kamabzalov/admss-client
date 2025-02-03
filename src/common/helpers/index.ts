@@ -69,14 +69,22 @@ export const formatPhoneNumber = (phone: string): string => {
     const digits = phone.replace(/\D/g, "");
     let formatted = "";
 
-    if (digits.length && digits.length <= 3) {
-        formatted = digits.slice(0, 3);
-    }
-    if (digits.length > 3 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}`;
-    }
-    if (digits.length > 6) {
-        formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+    switch (true) {
+        case digits.length === 11 && digits.startsWith("1"):
+            formatted = `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
+            break;
+        case digits.length === 10:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+            break;
+        case digits.length > 6:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+            break;
+        case digits.length > 3:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}`;
+            break;
+        case digits.length > 0:
+            formatted = digits.slice(0, 3);
+            break;
     }
 
     return formatted;
