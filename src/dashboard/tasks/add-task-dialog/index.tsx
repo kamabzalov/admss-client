@@ -23,9 +23,16 @@ const DialogIcon = ({ icon }: { icon: "search" | string }) => {
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
+    onAction?: () => void;
 }
 
-export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
+export const AddTaskDialog = ({
+    visible,
+    onHide,
+    header,
+    currentTask,
+    onAction,
+}: AddTaskDialogProps) => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
@@ -54,7 +61,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
 
     const validateDates = (start: Date, due: Date) => {
         if (start > due) {
-            setDateError("Start Date cannot be later than Due Date");
+            setDateError("Start Date must be before Due Date");
             return false;
         }
         setDateError("");
@@ -90,14 +97,22 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
         const response = await createTask(taskData);
 
         if (response && response?.status === Status.ERROR) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: Status.ERROR,
                 detail: response.error,
                 life: TOAST_LIFETIME,
             });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Task created successfully!",
+                life: TOAST_LIFETIME,
+            });
         }
         onHide();
+        onAction?.();
     };
 
     return (

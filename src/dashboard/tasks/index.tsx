@@ -23,8 +23,12 @@ export const Tasks = () => {
 
     const authUser: AuthUser = getKeyValue(LS_APP_USER);
 
-    const getTasks = () =>
-        getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
+    const getTasks = async (taskCount = 5) => {
+        const res = await getTasksByUserId(authUser.useruid, { top: taskCount });
+        if (res && Array.isArray(res)) {
+            setTasks(res);
+        }
+    };
 
     useEffect(() => {
         if (authUser) {
@@ -115,6 +119,7 @@ export const Tasks = () => {
                 <AddTaskDialog
                     visible={showAddTaskDialog}
                     onHide={() => setShowAddTaskDialog(false)}
+                    onAction={getTasks}
                     header='Add Task'
                 />
                 {isLoggedUserTask() ? (
