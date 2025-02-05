@@ -1,32 +1,34 @@
 import { useEffect, useRef, useState } from "react";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
 import { Task, TaskStatus, getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { TaskSummaryDialog } from "./task-summary";
 
 import "./index.css";
 import { Button } from "primereact/button";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
+const DEFAULT_TASK_COUNT = 4;
 
-export const Tasks = () => {
+export const Tasks = observer(() => {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
     const [checkboxDisabled, setCheckboxDisabled] = useState<boolean>(false);
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
     const [checkboxStates, setCheckboxStates] = useState<{ [key: string]: boolean }>({});
+    const [allTasksCount, setAllTasksCount] = useState<number>(0);
 
     const toast = useRef<Toast>(null);
 
-    const authUser: AuthUser = getKeyValue(LS_APP_USER);
-
-    const getTasks = async (taskCount = 5) => {
-        const res = await getTasksByUserId(authUser.useruid, { top: taskCount });
+    const getTasks = async (taskCount = DEFAULT_TASK_COUNT) => {
+        const res = await getTasksByUserId(authUser!.useruid);
         if (res && Array.isArray(res)) {
-            setTasks(res);
+            setTasks(res.splice(0, taskCount));
+            setAllTasksCount(res.length);
         }
     };
 
@@ -41,45 +43,49 @@ export const Tasks = () => {
         setShowEditTaskDialog(true);
     };
 
-    const handleTaskStatusChange = (taskuid: string) => {
+    const handleTaskStatusChange = async (taskuid: string) => {
         setCheckboxStates((prevStates) => ({
             ...prevStates,
             [taskuid]: true,
         }));
         setCheckboxDisabled(true);
 
-        setTaskStatus(taskuid, TaskStatus.COMPLETED)
-            .then((res) => {
-                if (res.status === "OK" && toast.current != null) {
-                    toast.current.show({
-                        severity: "info",
-                        summary: "Confirmed",
-                        detail: "The task marked as completed",
-                        life: 3000,
-                    });
-                    getTasks();
-                }
-            })
-            .finally(() => {
-                setCheckboxStates((prevStates) => ({
-                    ...prevStates,
-                    [taskuid]: false,
-                }));
-                setCheckboxDisabled(false);
+        const response = await setTaskStatus(taskuid, TaskStatus.COMPLETED);
+        if (response?.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response.error,
+                life: 3000,
             });
+        } else {
+            toast.current?.show({
+                severity: "info",
+                summary: "Confirmed",
+                detail: "The task marked as completed",
+                life: 3000,
+            });
+            getTasks();
+        }
+
+        setCheckboxStates((prevStates) => ({
+            ...prevStates,
+            [taskuid]: false,
+        }));
+        setCheckboxDisabled(false);
     };
 
     const isLoggedUserTask = (): boolean =>
         !!currentTask &&
-        (currentTask.parentuid === authUser.useruid || currentTask.useruid === authUser.useruid);
+        (currentTask.parentuid === authUser!.useruid || currentTask.useruid === authUser!.useruid);
 
     return (
-        <>
+        <div className='tasks'>
             <div className='tasks-header flex justify-content-between align-items-center'>
                 <h2 className='card-content__title uppercase m-0'>
                     Tasks
                     <span className={`tasks-count ${!tasks.length ? "empty-list" : ""}`}>
-                        ({tasks.length})
+                        ({allTasksCount})
                     </span>
                 </h2>
                 <Button
@@ -114,6 +120,13 @@ export const Tasks = () => {
                 ) : (
                     <li className='mb-2 empty-list'>No tasks yet.</li>
                 )}
+                {allTasksCount > DEFAULT_TASK_COUNT && (
+                    <li className='p-0'>
+                        <Button className='tasks__button messages-more' text>
+                            View more...
+                        </Button>
+                    </li>
+                )}
             </ul>
             <div className='hidden'>
                 <AddTaskDialog
@@ -140,6 +153,6 @@ export const Tasks = () => {
             </div>
 
             <Toast ref={toast} />
-        </>
+        </div>
     );
-};
+});

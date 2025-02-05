@@ -1,3 +1,14 @@
+.tasks {
+    .tasks__button.messages-more.p-button {
+        color: var(--admss-app-main-blue);
+        padding-left: 0;
+
+        &:enabled:hover {
+            color: var(--admss-app-medium-blue);
+        }
+    }
+}
+
 .empty-list,
 .tasks-count.empty-list {
     color: var(--admss-app-medium-grey);
@@ -22,6 +33,7 @@
     background-color: var(--admss-app-primary-main-green);
     border-color: var(--admss-app-primary-main-green);
     color: var(--admss-app-white);
+
     .p-button-icon {
         font-size: 20px;
         font-weight: 900;
