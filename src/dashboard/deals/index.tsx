@@ -28,6 +28,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
+import { observer } from "mobx-react-lite";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -105,371 +106,404 @@ interface AdvancedSearch {
     date: string;
 }
 
-export const Deals = () => {
-    const [deals, setDeals] = useState<Deal[]>([]);
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
-    const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [globalSearch, setGlobalSearch] = useState<string>("");
-    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
-    const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+interface DealsDataTableProps {
+    onRowClick?: (dealName: string) => void;
+    originalPath?: string;
+    returnedField?: keyof Deal;
+    getFullInfo?: (deal: Deal) => void;
+}
 
-    const searchFields = [
-        {
-            key: SEARCH_FORM_FIELDS.CUSTOMER,
-            label: "Customer",
-            value: advancedSearch?.[SEARCH_FORM_FIELDS.CUSTOMER],
-            type: "text",
-        },
-        {
-            key: SEARCH_FORM_FIELDS.VIN,
-            label: "VIN",
-            value: advancedSearch?.[SEARCH_FORM_FIELDS.VIN],
-            type: "text",
-        },
-        {
-            key: SEARCH_FORM_FIELDS.STOCK_NO,
-            label: "Stock#",
-            value: advancedSearch?.[SEARCH_FORM_FIELDS.STOCK_NO],
-            type: "text",
-        },
-        {
-            key: SEARCH_FORM_FIELDS.DATE,
-            label: "Date",
-            value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
-            type: "date",
-        },
-    ];
+export const DealsDataTable = observer(
+    ({ onRowClick, originalPath, returnedField, getFullInfo }: DealsDataTableProps) => {
+        const [deals, setDeals] = useState<Deal[]>([]);
+        const store = useStore().dealStore;
+        const userStore = useStore().userStore;
+        const { authUser } = userStore;
+        const [totalRecords, setTotalRecords] = useState<number>(0);
+        const [globalSearch, setGlobalSearch] = useState<string>("");
+        const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+        const [isLoading, setIsLoading] = useState<boolean>(false);
+        const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
+        const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
+        const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+        const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
-    const navigate = useNavigate();
-    const toast = useToast();
+        const searchFields = [
+            {
+                key: SEARCH_FORM_FIELDS.CUSTOMER,
+                label: "Customer",
+                value: advancedSearch?.[SEARCH_FORM_FIELDS.CUSTOMER],
+                type: "text",
+            },
+            {
+                key: SEARCH_FORM_FIELDS.VIN,
+                label: "VIN",
+                value: advancedSearch?.[SEARCH_FORM_FIELDS.VIN],
+                type: "text",
+            },
+            {
+                key: SEARCH_FORM_FIELDS.STOCK_NO,
+                label: "Stock#",
+                value: advancedSearch?.[SEARCH_FORM_FIELDS.STOCK_NO],
+                type: "text",
+            },
+            {
+                key: SEARCH_FORM_FIELDS.DATE,
+                label: "Date",
+                value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
+                type: "date",
+            },
+        ];
 
-    const printTableData = async (print: boolean = false) => {
-        setIsLoading(true);
-        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
-            name: column.header as string,
-            data: column.field as string,
-        }));
-        const date = new Date();
-        const name = `deals_${
-            date.getMonth() + 1
-        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const navigate = useNavigate();
+        const toast = useToast();
 
-        if (authUser) {
-            const data = deals.map((item) => {
-                const filteredItem: Record<string, any> = {};
-                columns.forEach((column) => {
-                    if (item.hasOwnProperty(column.data)) {
-                        filteredItem[column.data] = item[column.data as keyof typeof item];
+        const printTableData = async (print: boolean = false) => {
+            setIsLoading(true);
+            const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+                name: column.header as string,
+                data: column.field as string,
+            }));
+            const date = new Date();
+            const name = `deals_${
+                date.getMonth() + 1
+            }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+            if (authUser) {
+                const data = deals.map((item) => {
+                    const filteredItem: Record<string, any> = {};
+                    columns.forEach((column) => {
+                        if (item.hasOwnProperty(column.data)) {
+                            filteredItem[column.data] = item[column.data as keyof typeof item];
+                        }
+                    });
+                    return filteredItem;
+                });
+                const JSONreport = {
+                    name,
+                    itemUID: "0",
+                    data,
+                    columns,
+                    format: "",
+                };
+                await makeShortReports(authUser?.useruid, JSONreport).then((response) => {
+                    const url = new Blob([response], { type: "application/pdf" });
+                    let link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(url);
+                    if (!print) {
+                        link.download = `Report-${name}.pdf`;
+                        link.click();
+                    }
+
+                    if (print) {
+                        window.open(
+                            link.href,
+                            "_blank",
+                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                        );
                     }
                 });
-                return filteredItem;
-            });
-            const JSONreport = {
-                name,
-                itemUID: "0",
-                data,
-                columns,
-                format: "",
-            };
-            await makeShortReports(authUser?.useruid, JSONreport).then((response) => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!print) {
-                    link.download = `Report-${name}.pdf`;
-                    link.click();
-                }
-
-                if (print) {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
-                }
-            });
-        }
-        setIsLoading(false);
-    };
-
-    const pageChanged = (event: DataTablePageEvent) => {
-        setLazyState(event);
-    };
-
-    const sortData = (event: DataTableSortEvent) => {
-        setLazyState(event);
-    };
-
-    const handleGetDealsList = async (params: QueryParams) => {
-        getDealsList(authUser!.useruid, params).then((response) => {
-            if (Array.isArray(response)) {
-                setDeals(response);
-                setIsLoading(false);
-            } else {
-                setDeals([]);
             }
-        });
-    };
-
-    useEffect(() => {
-        getDealsList(authUser!.useruid, { total: 1 }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (response && !error) {
-                const { total } = response as TotalDealsList;
-                setTotalRecords(total ?? 0);
-                setLazyState({
-                    first: initialDataTableQueries.first,
-                    rows: initialDataTableQueries.rows,
-                    page: initialDataTableQueries.page,
-                    column: initialDataTableQueries.column,
-                    sortField: initialDataTableQueries.sortField,
-                    sortOrder: initialDataTableQueries.sortOrder,
-                });
-            } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                });
-            }
-        });
-    }, [toast]);
-
-    useEffect(() => {
-        const params: QueryParams = {
-            ...(globalSearch && { qry: globalSearch }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            skip: lazyState.first,
-            top: lazyState.rows,
+            setIsLoading(false);
         };
-        let qry: string = "";
-        const selectedFilters: string = [...dealSelectedGroup]
-            .filter((item) => item && item !== "allTypes" && item !== "allStatuses")
-            .join("+");
-        if (selectedFilters.length) {
-            qry += selectedFilters;
-            params.qry = qry;
-        }
-        handleGetDealsList(params);
-    }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
-    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
-        setAdvancedSearch((prevSearch) => {
-            const newSearch = { ...prevSearch, [key]: value };
-            const isAnyValueEmpty = Object.values(newSearch).every((v) => v === "");
-            setButtonDisabled(isAnyValueEmpty);
-            return newSearch;
-        });
-    };
-
-    const handleAdvancedSearch = () => {
-        const searchQuery = Object.entries(advancedSearch)
-            .filter(([_, value]) => value)
-            .map(([key, value]) => {
-                let keyName: string = key;
-                switch (key) {
-                    case SEARCH_FORM_FIELDS.CUSTOMER:
-                        keyName = SEARCH_FORM_QUERY.CUSTOMER;
-                        break;
-                    case SEARCH_FORM_FIELDS.VIN:
-                        keyName = SEARCH_FORM_QUERY.VIN;
-                        break;
-                    case SEARCH_FORM_FIELDS.STOCK_NO:
-                        keyName = SEARCH_FORM_QUERY.STOCK_NO;
-                        break;
-                    case SEARCH_FORM_FIELDS.DATE:
-                        keyName = SEARCH_FORM_QUERY.DATE;
-                        value = new Date(value).getTime();
-                        break;
-                }
-                return `${value}.${keyName}`;
-            })
-            .join("+");
-
-        const params: QueryParams = {
-            skip: lazyState.first,
-            top: lazyState.rows,
-            qry: searchQuery,
+        const pageChanged = (event: DataTablePageEvent) => {
+            setLazyState(event);
         };
-        authUser &&
-            getDealsList(authUser?.useruid, params).then((response) => {
+
+        const sortData = (event: DataTableSortEvent) => {
+            setLazyState(event);
+        };
+
+        const handleGetDealsList = async (params: QueryParams) => {
+            getDealsList(authUser!.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
                     setDeals(response);
+                    setIsLoading(false);
                 } else {
                     setDeals([]);
                 }
             });
+        };
 
-        setDialogVisible(false);
-    };
+        useEffect(() => {
+            getDealsList(authUser!.useruid, { total: 1 }).then((response) => {
+                const { error } = response as BaseResponseError;
+                if (response && !error) {
+                    const { total } = response as TotalDealsList;
+                    setTotalRecords(total ?? 0);
+                    setLazyState({
+                        first: initialDataTableQueries.first,
+                        rows: initialDataTableQueries.rows,
+                        page: initialDataTableQueries.page,
+                        column: initialDataTableQueries.column,
+                        sortField: initialDataTableQueries.sortField,
+                        sortOrder: initialDataTableQueries.sortOrder,
+                    });
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                    });
+                }
+            });
+        }, [toast]);
 
-    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
-        setButtonDisabled(true);
-        setAdvancedSearch((prev) => {
-            const updatedSearch = { ...prev };
-            delete updatedSearch[key];
-            return updatedSearch;
-        });
-
-        try {
-            const updatedSearch = { ...advancedSearch };
-            delete updatedSearch[key];
-
-            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
+        useEffect(() => {
             const params: QueryParams = {
-                ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
+                ...(globalSearch && { qry: globalSearch }),
+                ...(lazyState.sortField && { column: lazyState.sortField }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
-            await handleGetDealsList(params);
-        } finally {
-            setButtonDisabled(false);
-        }
-    };
+            let qry: string = "";
+            const selectedFilters: string = [...dealSelectedGroup]
+                .filter((item) => item && item !== "allTypes" && item !== "allStatuses")
+                .join("+");
+            if (selectedFilters.length) {
+                qry += selectedFilters;
+                params.qry = qry;
+            }
+            handleGetDealsList(params);
+        }, [lazyState, authUser, globalSearch, dealSelectedGroup]);
 
+        const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
+            setAdvancedSearch((prevSearch) => {
+                const newSearch = { ...prevSearch, [key]: value };
+                const isAnyValueEmpty = Object.values(newSearch).every((v) => v === "");
+                setButtonDisabled(isAnyValueEmpty);
+                return newSearch;
+            });
+        };
+
+        const handleAdvancedSearch = () => {
+            const searchQuery = Object.entries(advancedSearch)
+                .filter(([_, value]) => value)
+                .map(([key, value]) => {
+                    let keyName: string = key;
+                    switch (key) {
+                        case SEARCH_FORM_FIELDS.CUSTOMER:
+                            keyName = SEARCH_FORM_QUERY.CUSTOMER;
+                            break;
+                        case SEARCH_FORM_FIELDS.VIN:
+                            keyName = SEARCH_FORM_QUERY.VIN;
+                            break;
+                        case SEARCH_FORM_FIELDS.STOCK_NO:
+                            keyName = SEARCH_FORM_QUERY.STOCK_NO;
+                            break;
+                        case SEARCH_FORM_FIELDS.DATE:
+                            keyName = SEARCH_FORM_QUERY.DATE;
+                            value = new Date(value).getTime();
+                            break;
+                    }
+                    return `${value}.${keyName}`;
+                })
+                .join("+");
+
+            const params: QueryParams = {
+                skip: lazyState.first,
+                top: lazyState.rows,
+                qry: searchQuery,
+            };
+            authUser &&
+                getDealsList(authUser?.useruid, params).then((response) => {
+                    if (Array.isArray(response)) {
+                        setDeals(response);
+                    } else {
+                        setDeals([]);
+                    }
+                });
+
+            setDialogVisible(false);
+        };
+
+        const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+            if (getFullInfo) {
+                getFullInfo(data as Deal);
+            }
+            if (onRowClick) {
+                const value = returnedField ? data[returnedField] : data.contactinfo;
+                onRowClick(value);
+            } else {
+                navigate(data.dealuid);
+            }
+        };
+
+        const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+            setButtonDisabled(true);
+            setAdvancedSearch((prev) => {
+                const updatedSearch = { ...prev };
+                delete updatedSearch[key];
+                return updatedSearch;
+            });
+
+            try {
+                const updatedSearch = { ...advancedSearch };
+                delete updatedSearch[key];
+
+                const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
+                const params: QueryParams = {
+                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                    ...(!isAdvancedSearchEmpty && {
+                        qry: createStringifySearchQuery(updatedSearch),
+                    }),
+                    skip: lazyState.first,
+                    top: lazyState.rows,
+                };
+                await handleGetDealsList(params);
+            } finally {
+                setButtonDisabled(false);
+            }
+        };
+
+        const handleCreateDeal = () => {
+            if (originalPath) {
+                store.memoRoute = originalPath;
+            }
+            navigate("/dashboard/deals/create");
+        };
+
+        return (
+            <div className='card-content'>
+                <div className='grid datatable-controls'>
+                    <div className='col-2'>
+                        <span className='p-float-label'>
+                            <MultiSelect
+                                optionValue='value'
+                                optionLabel='name'
+                                value={dealSelectedGroup}
+                                options={FILTER_GROUP_LIST}
+                                optionGroupLabel='name'
+                                optionGroupChildren='options'
+                                panelHeaderTemplate={<></>}
+                                display='chip'
+                                className='deals__dropdown'
+                                onChange={(e) => {
+                                    e.stopPropagation();
+                                    setDealSelectedGroup(e.value);
+                                }}
+                                pt={{
+                                    wrapper: {
+                                        style: {
+                                            maxHeight: "625px",
+                                        },
+                                    },
+                                }}
+                            />
+                            <label className='float-label'>Filter</label>
+                        </span>
+                    </div>
+
+                    <div className='col-4'>
+                        <div className='contact-top-controls'>
+                            <Button
+                                className='contact-top-controls__button'
+                                icon='pi pi-plus-circle'
+                                severity='success'
+                                type='button'
+                                tooltip='Add new deal'
+                                onClick={handleCreateDeal}
+                            />
+                            <Button
+                                severity='success'
+                                type='button'
+                                icon='icon adms-print'
+                                tooltip='Print deals form'
+                                onClick={() => printTableData(true)}
+                            />
+                            <Button
+                                severity='success'
+                                type='button'
+                                icon='icon adms-blank'
+                                tooltip='Download deals form'
+                                onClick={() => printTableData()}
+                            />
+                        </div>
+                    </div>
+                    <div className='col-6 text-right flex flex-nowrap'>
+                        <Button
+                            className='contact-top-controls__button m-r-20px ml-auto'
+                            label='Advanced search'
+                            severity='success'
+                            type='button'
+                            onClick={() => setDialogVisible(true)}
+                        />
+                        <span className='p-input-icon-right'>
+                            <i className='pi pi-search' />
+                            <InputText
+                                value={globalSearch}
+                                onChange={(e) => setGlobalSearch(e.target.value)}
+                            />
+                        </span>
+                    </div>
+                </div>
+                <div className='grid'>
+                    <div className='col-12'>
+                        {isLoading ? (
+                            <div className='dashboard-loader__wrapper'>
+                                <Loader overlay />
+                            </div>
+                        ) : (
+                            <DataTable
+                                showGridlines
+                                value={deals}
+                                lazy
+                                paginator
+                                first={lazyState.first}
+                                rows={lazyState.rows}
+                                rowsPerPageOptions={ROWS_PER_PAGE}
+                                totalRecords={totalRecords}
+                                onPage={pageChanged}
+                                onSort={sortData}
+                                reorderableColumns
+                                resizableColumns
+                                rowClassName={() => "hover:text-primary cursor-pointer"}
+                                onRowClick={handleOnRowClick}
+                            >
+                                {renderColumnsData.map(({ field, header }) => (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        headerClassName='cursor-move'
+                                    />
+                                ))}
+                            </DataTable>
+                        )}
+                    </div>
+                </div>
+                <AdvancedSearchDialog<AdvancedSearch>
+                    visible={dialogVisible}
+                    buttonDisabled={buttonDisabled}
+                    onHide={() => {
+                        setButtonDisabled(true);
+                        setDialogVisible(false);
+                    }}
+                    action={handleAdvancedSearch}
+                    onSearchClear={handleClearAdvancedSearchField}
+                    onInputChange={handleSetAdvancedSearch}
+                    fields={searchFields as SearchField<AdvancedSearch>[]}
+                    searchForm={SEARCH_FORM_TYPE.DEALS}
+                />
+            </div>
+        );
+    }
+);
+
+export const Deals = () => {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card deals'>
+                <div className='card'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Deals</h2>
                     </div>
-                    <div className='card-content'>
-                        <div className='grid datatable-controls'>
-                            <div className='col-2'>
-                                <span className='p-float-label'>
-                                    <MultiSelect
-                                        optionValue='value'
-                                        optionLabel='name'
-                                        value={dealSelectedGroup}
-                                        options={FILTER_GROUP_LIST}
-                                        optionGroupLabel='name'
-                                        optionGroupChildren='options'
-                                        panelHeaderTemplate={<></>}
-                                        display='chip'
-                                        className='deals__dropdown'
-                                        onChange={(e) => {
-                                            e.stopPropagation();
-                                            setDealSelectedGroup(e.value);
-                                        }}
-                                        pt={{
-                                            wrapper: {
-                                                style: {
-                                                    maxHeight: "625px",
-                                                },
-                                            },
-                                        }}
-                                    />
-                                    <label className='float-label'>Filter</label>
-                                </span>
-                            </div>
-
-                            <div className='col-4'>
-                                <div className='contact-top-controls'>
-                                    <Button
-                                        className='contact-top-controls__button'
-                                        icon='pi pi-plus-circle'
-                                        severity='success'
-                                        type='button'
-                                        tooltip='Add new deal'
-                                        onClick={() => navigate("create")}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='icon adms-print'
-                                        tooltip='Print deals form'
-                                        onClick={() => printTableData(true)}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='icon adms-blank'
-                                        tooltip='Download deals form'
-                                        onClick={() => printTableData()}
-                                    />
-                                </div>
-                            </div>
-                            <div className='col-6 text-right flex flex-nowrap'>
-                                <Button
-                                    className='contact-top-controls__button m-r-20px ml-auto'
-                                    label='Advanced search'
-                                    severity='success'
-                                    type='button'
-                                    onClick={() => setDialogVisible(true)}
-                                />
-                                <span className='p-input-icon-right'>
-                                    <i className='pi pi-search' />
-                                    <InputText
-                                        value={globalSearch}
-                                        onChange={(e) => setGlobalSearch(e.target.value)}
-                                    />
-                                </span>
-                            </div>
-                        </div>
-                        <div className='grid'>
-                            <div className='col-12'>
-                                {isLoading ? (
-                                    <div className='dashboard-loader__wrapper'>
-                                        <Loader overlay />
-                                    </div>
-                                ) : (
-                                    <DataTable
-                                        showGridlines
-                                        value={deals}
-                                        lazy
-                                        paginator
-                                        first={lazyState.first}
-                                        rows={lazyState.rows}
-                                        rowsPerPageOptions={ROWS_PER_PAGE}
-                                        totalRecords={totalRecords}
-                                        onPage={pageChanged}
-                                        onSort={sortData}
-                                        reorderableColumns
-                                        resizableColumns
-                                        rowClassName={() => "hover:text-primary cursor-pointer"}
-                                        onRowClick={({
-                                            data: { dealuid },
-                                        }: DataTableRowClickEvent) => {
-                                            navigate(dealuid);
-                                        }}
-                                    >
-                                        {renderColumnsData.map(({ field, header }) => (
-                                            <Column
-                                                field={field}
-                                                header={header}
-                                                key={field}
-                                                sortable
-                                                headerClassName='cursor-move'
-                                            />
-                                        ))}
-                                    </DataTable>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <DealsDataTable />
                 </div>
             </div>
-            <AdvancedSearchDialog<AdvancedSearch>
-                visible={dialogVisible}
-                buttonDisabled={buttonDisabled}
-                onHide={() => {
-                    setButtonDisabled(true);
-                    setDialogVisible(false);
-                }}
-                action={handleAdvancedSearch}
-                onSearchClear={handleClearAdvancedSearchField}
-                onInputChange={handleSetAdvancedSearch}
-                fields={searchFields as SearchField<AdvancedSearch>[]}
-                searchForm={SEARCH_FORM_TYPE.DEALS}
-            />
         </div>
     );
 };

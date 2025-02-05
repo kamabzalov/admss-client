@@ -108,11 +108,19 @@ export const deleteTask = async (taskIndex: number) => {
 
 export const setTaskStatus = async (taskuid: string, taskStatus: TaskStatus) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid || 0}/status`, {
-            status: taskStatus,
-        });
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `tasks/${taskuid || 0}/status`,
+            {
+                status: taskStatus,
+            }
+        );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || `Error while set task status to ${taskStatus}`,
+            };
+        }
     }
 };

@@ -36,6 +36,7 @@ export class DealStore {
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
     private _accordionActiveIndex: number | number[] = [];
+    private _memoRoute: string = "";
     protected _isLoading = false;
     protected _isFormChanged = false;
 
@@ -77,6 +78,10 @@ export class DealStore {
 
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public get memoRoute() {
+        return this._memoRoute;
     }
 
     public get isFormChanged() {
@@ -257,6 +262,10 @@ export class DealStore {
 
     public set isLoading(state: boolean) {
         this._isLoading = state;
+    }
+
+    public set memoRoute(state: string) {
+        this._memoRoute = state;
     }
 
     public clearDeal = () => {
