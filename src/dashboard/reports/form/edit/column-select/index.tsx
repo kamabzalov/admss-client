@@ -144,7 +144,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
         switch (direction) {
             case MOVE_DIRECTION.UP:
-                if (index > 0) {
+                if (index) {
                     newList.splice(index - 1, 0, newList.splice(index, 1)[0]);
                 }
                 break;
