@@ -150,7 +150,7 @@ export const ReportForm = observer((): ReactElement => {
                 const nodeData = node as TreeNodeEvent;
                 if (
                     nodeData.type === NODE_TYPES.DOCUMENT &&
-                    nodeData.data.document?.virtualUID === docId
+                    nodeData.data.document?.documentUID === docId
                 ) {
                     return path;
                 }
@@ -289,7 +289,7 @@ export const ReportForm = observer((): ReactElement => {
         ) {
             const sourceCollectionId = dragData.collectionId;
             const targetCollectionId = dropData.collection.itemUID;
-            const reportId = dragData.document.virtualUID;
+            const reportId = dragData.document.documentUID;
             if (sourceCollectionId !== targetCollectionId) {
                 const response = await moveReportToCollection(
                     sourceCollectionId,
@@ -366,7 +366,7 @@ export const ReportForm = observer((): ReactElement => {
                                     const nodeData = node as TreeNodeEvent;
                                     const isSelected =
                                         nodeData.type === NODE_TYPES.DOCUMENT &&
-                                        nodeData.data.document?.virtualUID === id;
+                                        nodeData.data.document?.documentUID === id;
                                     return (
                                         <NodeContent
                                             node={nodeData}

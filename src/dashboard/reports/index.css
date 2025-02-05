@@ -19,6 +19,10 @@
 
     .p-treenode-children {
         padding: 0;
+
+        .p-treenode-children {
+            padding-left: 1.25rem;
+        }
     }
 
     .p-treenode-content {
@@ -67,6 +71,7 @@
 
     .p-treenode-leaf {
         .p-treenode-content:has(.reports__list-item--inner) {
+
             border: none;
         }
 
@@ -74,6 +79,7 @@
             font-weight: 400;
         }
     }
+
 }
 
 .reports-header {
@@ -118,6 +124,7 @@
     cursor: pointer;
     height: 60px;
     transition: background-color 0.3s;
+
 }
 
 .reports__list-item:not(.reports__list-item--inner) {
@@ -125,7 +132,6 @@
 }
 
 .reports__list-item--inner {
-    padding-left: 1.25rem;
     padding-right: 1.25rem;
 }
 
