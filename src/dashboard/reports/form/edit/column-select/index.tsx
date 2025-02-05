@@ -104,12 +104,10 @@ export const ReportColumnSelect = observer((): ReactElement => {
     };
 
     const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
-        if (ref.current) {
-            ref.current.scrollTo({
-                top: ref.current.scrollHeight,
-                behavior: "smooth",
-            });
-        }
+        ref.current?.scrollTo({
+            top: ref.current.scrollHeight,
+            behavior: "smooth",
+        });
     };
 
     const moveItem = (
@@ -136,47 +134,49 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
     const changeOrder = (
         item: ReportServiceColumns,
-        direction:
-            | MOVE_DIRECTION.UP
-            | MOVE_DIRECTION.DOWN
-            | MOVE_DIRECTION.TOP
-            | MOVE_DIRECTION.BOTTOM,
+        direction: MOVE_DIRECTION,
         list: ReportServiceColumns[],
         setList: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
     ) => {
         const index = list.indexOf(item);
         if (index === -1) return;
         const newList = [...list];
-        if (direction === MOVE_DIRECTION.UP && index > 0) {
-            newList.splice(index - 1, 0, newList.splice(index, 1)[0]);
-        } else if (direction === MOVE_DIRECTION.DOWN && index < list.length - 1) {
-            newList.splice(index + 1, 0, newList.splice(index, 1)[0]);
-        } else if (direction === MOVE_DIRECTION.TOP) {
-            newList.splice(0, 0, newList.splice(index, 1)[0]);
-        } else if (direction === MOVE_DIRECTION.BOTTOM) {
-            newList.push(newList.splice(index, 1)[0]);
+
+        switch (direction) {
+            case MOVE_DIRECTION.UP:
+                if (index > 0) {
+                    newList.splice(index - 1, 0, newList.splice(index, 1)[0]);
+                }
+                break;
+
+            case MOVE_DIRECTION.DOWN:
+                if (index < newList.length - 1) {
+                    newList.splice(index + 1, 0, newList.splice(index, 1)[0]);
+                }
+                break;
+
+            case MOVE_DIRECTION.TOP:
+                newList.unshift(newList.splice(index, 1)[0]);
+                scrollToTop(list === availableValues ? availableRef : selectedRef);
+                break;
+
+            case MOVE_DIRECTION.BOTTOM:
+                newList.push(newList.splice(index, 1)[0]);
+                scrollToBottom(list === availableValues ? availableRef : selectedRef);
+                break;
+
+            default:
+                return;
         }
+
         setList(newList);
-        if (list === availableValues) {
-            switch (direction) {
-                case MOVE_DIRECTION.TOP:
-                    scrollToTop(availableRef);
-                    break;
-                case MOVE_DIRECTION.BOTTOM:
-                    scrollToBottom(availableRef);
-                    break;
-            }
-        }
-        if (list === selectedValues) {
-            switch (direction) {
-                case MOVE_DIRECTION.TOP:
-                    scrollToTop(selectedRef);
-                    break;
-                case MOVE_DIRECTION.BOTTOM:
-                    scrollToBottom(selectedRef);
-                    break;
-            }
-        }
+
+        setTimeout(() => {
+            document.querySelector(".report-select__item.selected")?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+            });
+        }, 50);
     };
 
     const ControlButton = (
