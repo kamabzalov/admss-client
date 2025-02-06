@@ -68,6 +68,8 @@ export const AccountTakePayment = observer((): ReactElement => {
             default:
                 newTab = AccountTakePaymentTabs.QUICK_PAY;
         }
+        store.accountNote.note = "";
+        store.accountNote.alert = "";
         setSearchParams({ tab: newTab });
     };
 
