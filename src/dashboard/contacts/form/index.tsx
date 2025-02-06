@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -228,17 +227,17 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isContactChanged]);
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         if (isContactChanged) {
+    //             event.preventDefault();
+    //         }
+    //     };
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [isContactChanged]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
