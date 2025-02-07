@@ -2,11 +2,11 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { Dropdown } from "primereact/dropdown";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { TERM_MONTH_LIST } from "common/constants/contract-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 enum WarrantyTerm {
     MILES = "Miles",
@@ -69,8 +69,7 @@ export const DealRetailProducts = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
-                        filter
+                    <ComboBox
                         options={[WarrantyTerm.MONTH, WarrantyTerm.MILES]}
                         value={Warranty_Miles}
                         onChange={({ value }) =>
@@ -84,14 +83,13 @@ export const DealRetailProducts = observer((): ReactElement => {
             {Warranty_Miles === WarrantyTerm.MONTH && (
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <Dropdown
+                        <ComboBox
                             editable
                             options={[...TERM_MONTH_LIST]}
                             value={Warranty_Term}
                             onChange={({ value }) =>
                                 changeDealExtData({ key: "Warranty_Term", value })
                             }
-                            filter
                             className='w-full deal-products__dropdown'
                         />
                         <label className='float-label'>Duration</label>

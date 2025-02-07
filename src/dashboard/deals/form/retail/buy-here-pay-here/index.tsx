@@ -8,11 +8,11 @@ import {
     DateInput,
     PercentInput,
 } from "dashboard/common/form/inputs";
-import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
 import { Checkbox } from "primereact/checkbox";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealBuyHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -68,7 +68,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         value={Con_Pmt_Freq}
@@ -76,7 +76,6 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
                         options={[...PAYMENT_FREQUENCY_LIST]}
-                        filter
                         required
                         className='w-full deal-sale__dropdown'
                     />
@@ -85,14 +84,13 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         value={Con_Term}
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
                         options={[...TERM_MONTH_LIST]}
                         editable
-                        filter
                         required
                         className='w-full deal-sale__dropdown'
                     />
@@ -133,6 +131,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 <DateInput
                     name='First Payment Due'
                     date={Con_First_Pmt_Date}
+                    emptyDate
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({ key: "Con_First_Pmt_Date", value: Number(value) })
@@ -143,6 +142,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 <DateInput
                     name='Final Payment Due'
                     date={Con_Final_Pmt_Date}
+                    emptyDate
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({ key: "Con_Final_Pmt_Date", value: Number(value) })
@@ -196,7 +196,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         value={Con_Interest_Method}
                         editable
                         onChange={({ target: { value } }) =>
@@ -234,6 +234,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 <DateInput
                     name='Effective Date'
                     date={Number(dateeffective)}
+                    emptyDate
                     onChange={({ value }) =>
                         changeDeal({ key: "dateeffective", value: Number(value) })
                     }
