@@ -11,13 +11,14 @@ export const DealRetailCharges = observer((): ReactElement => {
         changeDealExtData,
     } = store;
     return (
-        <div className='grid deal-retail-charges row-gap-2'>
+        <div className='grid deal-insurance-charges row-gap-2'>
             <div className='col-3'>
                 <CurrencyInput
                     value={Ins_IA}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Ins_IA", value: value || 0 });
                     }}
+                    className={`deal-insurance-charges__currency-input ${!Ins_IA ? "deal-insurance-charges__currency-input--grey" : ""}`}
                     labelPosition='top'
                     title='Credit Life'
                 />
@@ -29,6 +30,7 @@ export const DealRetailCharges = observer((): ReactElement => {
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Ins_AH", value: value || 0 });
                     }}
+                    className={`deal-insurance-charges__currency-input ${!Ins_AH ? "deal-insurance-charges__currency-input--grey" : ""}`}
                     title='A&H/ Disability'
                 />
             </div>
@@ -38,6 +40,7 @@ export const DealRetailCharges = observer((): ReactElement => {
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Ins_MR", value: value || 0 });
                     }}
+                    className={`deal-insurance-charges__currency-input ${!Ins_MR ? "deal-insurance-charges__currency-input--grey" : ""}`}
                     labelPosition='top'
                     title='VSI'
                 />

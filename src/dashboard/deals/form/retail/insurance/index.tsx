@@ -33,7 +33,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
         changeDealExtData,
     } = store;
     return (
-        <div className='grid deal-retail-insurance row-gap-2'>
+        <div className='grid deal-insurance row-gap-2'>
             <div className='col-6'>
                 <CompanySearch
                     value={Insurance_Company}
@@ -77,6 +77,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     date={Insurance_Eff_Date}
+                    emptyDate
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({ key: "Insurance_Eff_Date", value: Number(value) })
@@ -87,6 +88,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     date={Insurance_Exp_Date}
+                    emptyDate
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({ key: "Insurance_Exp_Date", value: Number(value) })
@@ -157,6 +159,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     min={MIN_LIMIT}
                     max={MAX_LIMIT}
                     value={Ins_Comp_Deduct}
+                    className={`deal-insurance__currency-input ${!Ins_Comp_Deduct ? "deal-insurance__currency-input--grey" : ""}`}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Ins_Comp_Deduct", value: Number(value) });
                     }}
@@ -169,53 +172,56 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     min={MIN_LIMIT}
                     max={MAX_LIMIT}
                     value={Ins_Col_Deduct}
+                    className={`deal-insurance__currency-input ${!Ins_Col_Deduct ? "deal-insurance__currency-input--grey" : ""}`}
                     onChange={({ value }) => {
                         changeDealExtData({ key: "Ins_Col_Deduct", value: Number(value) });
                     }}
                     title='Coverage Collision'
                 />
             </div>
-            <div className='col-2'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        value={Ins_Liab_Limit1}
-                        min={MIN_LIMIT}
-                        max={MAX_LIMIT}
-                        onChange={({ value }) => {
-                            changeDealExtData({ key: "Ins_Liab_Limit1", value: Number(value) });
-                        }}
-                        className='deal-insurance__text-input w-full'
-                    />
-                    <label className='float-label'>Liability Row</label>
-                </span>
-            </div>
-            <div className='col-2'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        value={Ins_Liab_Limit2}
-                        min={MIN_LIMIT}
-                        max={MAX_LIMIT}
-                        onChange={({ value }) => {
-                            changeDealExtData({ key: "Ins_Liab_Limit2", value: Number(value) });
-                        }}
-                        className='deal-insurance__text-input w-full'
-                    />
-                    <label className='float-label'>Liability Row</label>
-                </span>
-            </div>
-            <div className='col-2'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        value={Ins_Prop_Limit}
-                        min={MIN_LIMIT}
-                        max={MAX_LIMIT}
-                        onChange={({ value }) => {
-                            changeDealExtData({ key: "Ins_Prop_Limit", value: Number(value) });
-                        }}
-                        className='deal-insurance__text-input w-full'
-                    />
-                    <label className='float-label'>Liability Row</label>
-                </span>
+            <div className='col-6'>
+                <div className='deal-insurance__liability'>
+                    <span className='p-float-label deal-insurance__liability-item'>
+                        <InputNumber
+                            value={Ins_Liab_Limit1}
+                            min={MIN_LIMIT}
+                            max={MAX_LIMIT}
+                            onChange={({ value }) => {
+                                changeDealExtData({ key: "Ins_Liab_Limit1", value: Number(value) });
+                            }}
+                            className='deal-insurance__text-input w-full'
+                        />
+                        <label className='float-label'>Liability Row</label>
+                    </span>
+
+                    <div className='deal-insurance__divider-vertical' />
+
+                    <span className='p-float-label deal-insurance__liability-item'>
+                        <InputNumber
+                            value={Ins_Liab_Limit2}
+                            min={MIN_LIMIT}
+                            max={MAX_LIMIT}
+                            onChange={({ value }) => {
+                                changeDealExtData({ key: "Ins_Liab_Limit2", value: Number(value) });
+                            }}
+                            className='deal-insurance__text-input w-full'
+                        />
+                    </span>
+
+                    <div className='deal-insurance__divider-vertical' />
+
+                    <span className='p-float-label deal-insurance__liability-item'>
+                        <InputNumber
+                            value={Ins_Prop_Limit}
+                            min={MIN_LIMIT}
+                            max={MAX_LIMIT}
+                            onChange={({ value }) => {
+                                changeDealExtData({ key: "Ins_Prop_Limit", value: Number(value) });
+                            }}
+                            className='deal-insurance__text-input w-full'
+                        />
+                    </span>
+                </div>
             </div>
 
             <div className='col-12'>
