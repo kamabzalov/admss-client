@@ -3,9 +3,7 @@ import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
-import { STATES_LIST } from "common/constants/states";
-import { DateInput } from "dashboard/common/form/inputs";
+import { DateInput, StateDropdown } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
@@ -76,20 +74,14 @@ export const DealRetailLiens = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='id'
-                        optionValue='id'
-                        options={STATES_LIST}
-                        value={First_Lien_State}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "First_Lien_State", value })
-                        }
-                        filter
-                        className='w-full deal-liens__dropdown'
-                    />
-                    <label className='float-label'>State</label>
-                </span>
+                <StateDropdown
+                    value={First_Lien_State}
+                    name='State'
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "First_Lien_State", value })
+                    }
+                    className='w-full deal-liens__dropdown'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>

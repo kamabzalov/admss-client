@@ -3,10 +3,10 @@ import { ReactElement } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 import { CurrencyInput, DateInput, PercentInput } from "dashboard/common/form/inputs";
-import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealRetailContract = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -59,7 +59,7 @@ export const DealRetailContract = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         value={Con_Pmt_Freq}
@@ -67,7 +67,6 @@ export const DealRetailContract = observer((): ReactElement => {
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
                         options={[...PAYMENT_FREQUENCY_LIST]}
-                        filter
                         required
                         className='w-full deal-sale__dropdown'
                     />
@@ -76,14 +75,13 @@ export const DealRetailContract = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         value={Con_Term}
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
                         options={[...TERM_MONTH_LIST]}
                         editable
-                        filter
                         required
                         className='w-full deal-sale__dropdown'
                     />

@@ -2,11 +2,11 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { Checkbox } from "primereact/checkbox";
 import { useStore } from "store/hooks";
 import { Deal, DealExtData } from "common/models/deals";
 import { useFormikContext } from "formik";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealGeneralOdometer = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -36,7 +36,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("OdomDigits")}
                         value={values.OdomDigits}
                         onChange={(e) => {

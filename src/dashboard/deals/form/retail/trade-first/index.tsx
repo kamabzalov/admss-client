@@ -8,7 +8,7 @@ import {
     getInventoryBodyTypesList,
     getInventoryExteriorColorsList,
 } from "http/services/inventory-service";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
@@ -21,6 +21,7 @@ import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -209,11 +210,10 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={values.Trade1_Make}
-                        filter
                         required
                         options={automakesList}
                         onChange={({ value }) => {
@@ -234,11 +234,10 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={values.Trade1_Model}
-                        filter={!!automakesModelList.length}
                         editable={!automakesModelList.length}
                         options={automakesModelList}
                         onChange={({ value }) => {
@@ -304,11 +303,10 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={Trade1_Color}
-                        filter
                         options={colorList}
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Trade1_Color", value })
@@ -321,7 +319,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={Trade1_BodyStyle}
@@ -330,7 +328,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         }}
                         editable
                         options={bodyTypeList}
-                        filter
                         className='w-full deal-trade__dropdown'
                     />
                     <label className='float-label'>Body Style</label>
