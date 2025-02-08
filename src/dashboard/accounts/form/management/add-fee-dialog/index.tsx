@@ -33,6 +33,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
     const { id } = useParams();
     const [addFee, setAddFee] = useState<AddFeeInfo>(initialAddFee);
     const toast = useToast();
+    const [changedFields, setChangedFields] = useState<Record<string, boolean>>({});
 
     const handleSaveAddFee = () => {
         addAccountFee(id!, addFee).then((res) => {
@@ -52,6 +53,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                     life: TOAST_LIFETIME,
                 });
                 setAddFee(initialAddFee);
+                setChangedFields({});
                 onHide();
             }
         });
@@ -63,7 +65,13 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
 
     const handleOnCloseClick = () => {
         setAddFee(initialAddFee);
+        setChangedFields({});
         onHide();
+    };
+
+    const handleInputChange = (field: keyof AddFeeInfo, value: any) => {
+        setAddFee((prev) => ({ ...prev, [field]: value }));
+        setChangedFields((prev) => ({ ...prev, [field]: true }));
     };
 
     return (
@@ -79,34 +87,26 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
         >
             <span className='p-float-label'>
                 <Dropdown
-                    className='w-full'
+                    className={`w-full ${changedFields.type ? "" : "input--grey"}`}
                     value={addFee.type}
                     onChange={({ value }) => {
+                        handleInputChange("type", value);
                         if (value !== "Other") {
-                            setAddFee({ ...addFee, type: value, other: "" });
-                        } else {
-                            setAddFee({ ...addFee, type: value });
+                            handleInputChange("other", "");
                         }
                     }}
                     options={[...ACCOUNT_FEE_TYPES]}
                     optionLabel='name'
                     optionValue='name'
-                    pt={{
-                        wrapper: {
-                            style: { minHeight: "235px" },
-                        },
-                    }}
                 />
                 <label className='float-label'>Type</label>
             </span>
             <span className='p-float-label'>
                 <InputText
-                    className='w-full'
+                    className={`w-full ${changedFields.other ? "" : "input--grey"}`}
                     disabled={addFee.type !== "Other"}
                     value={addFee.other}
-                    onChange={({ target: { value } }) => {
-                        setAddFee({ ...addFee, other: value });
-                    }}
+                    onChange={({ target: { value } }) => handleInputChange("other", value)}
                 />
                 <label className='float-label'>Other</label>
             </span>
@@ -117,9 +117,10 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
 
             <div className='add-fee__control'>
                 <CurrencyInput
-                    className='add-fee__input'
+                    className={`add-fee__input ${changedFields.amount ? "" : "input--grey"}`}
                     value={addFee.amount}
-                    onChange={({ value }) => setAddFee({ ...addFee, amount: value || 0 })}
+                    onFocus={() => setChangedFields((prev) => ({ ...prev, amount: true }))}
+                    onChange={({ value }) => handleInputChange("amount", value || 0)}
                     title='Principal (required)'
                     labelPosition='top'
                 />
@@ -127,22 +128,18 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
 
             <span className='p-float-label'>
                 <InputText
-                    className='w-full'
+                    className={`w-full ${changedFields.reason ? "" : "input--grey"}`}
                     value={addFee.reason}
-                    onChange={({ target: { value } }) => {
-                        setAddFee({ ...addFee, reason: value });
-                    }}
+                    onChange={({ target: { value } }) => handleInputChange("reason", value)}
                 />
                 <label className='float-label'>Reason (required)</label>
             </span>
 
             <span className='p-float-label'>
                 <InputTextarea
-                    className='w-full add-fee__area'
+                    className={`w-full add-fee__area ${changedFields.description ? "" : "input--grey"}`}
                     value={addFee.description}
-                    onChange={({ target: { value } }) => {
-                        setAddFee({ ...addFee, description: value });
-                    }}
+                    onChange={({ target: { value } }) => handleInputChange("description", value)}
                 />
                 <label className='float-label'>Description</label>
             </span>

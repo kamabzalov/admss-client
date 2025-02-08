@@ -2,9 +2,14 @@
     width: 660px;
     min-height: 40vh;
 
-    .p-inputtext:not(:focus),
-    .p-inputnumber:not(:focus) {
+    .input--grey {
         color: var(--admss-app-light-grey);
+    }
+
+    .p-inputtext:not(.input--grey),
+    .p-inputnumber:not(.input--grey),
+    .p-textarea:not(.input--grey) {
+        color: var(--admss-app-black);
     }
 }
 

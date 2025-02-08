@@ -115,6 +115,7 @@ export const NoteEditor = ({
 
     useEffect(() => {
         value || setInitialValue(value);
+        return () => setInitialValue("");
     }, [value]);
 
     const hasChanges = value !== initialValue;

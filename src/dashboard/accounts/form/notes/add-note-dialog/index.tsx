@@ -33,7 +33,7 @@ export const AddNoteDialog = ({
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
+    const [noteTaker, setNoteTaker] = useState<string>(authUser!.loginname);
     const [contactType, setContactType] = useState(ACCOUNT_NOTE_CONTACT_TYPE[0]);
     const [note, setNote] = useState<string>("");
     const currentTime = useMemo(
@@ -42,19 +42,19 @@ export const AddNoteDialog = ({
     );
 
     useEffect(() => {
-        if (currentNote) {
+        if (visible) {
+            if (currentNote) {
+                setNoteTaker(currentNote.NoteBy);
+                setContactType(currentNote.ContactMethod);
+                setNote(currentNote.Note);
+            } else {
+                setNoteTaker(authUser?.loginname || "");
+                setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+                setNote("");
+            }
             setIsButtonDisabled(true);
-            setNoteTaker(currentNote?.NoteBy);
-            setContactType(currentNote?.ContactMethod);
-            setNote(currentNote?.Note);
         }
-        return () => {
-            setIsButtonDisabled(true);
-            setNoteTaker(authUser?.loginname || "");
-            setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
-            setNote("");
-        };
-    }, [currentNote]);
+    }, [visible, currentNote, authUser?.loginname]);
 
     useEffect(() => {
         if (noteTaker && contactType && note) {

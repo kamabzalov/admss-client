@@ -6,7 +6,7 @@ import { AccountUpdateTotalInfo } from "common/models/accounts";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-    calcAccountFromHistory,
+    calcUserDataTotalPaid,
     getAccountOriginalAmount,
     updateAccountTotal,
 } from "http/services/accounts.service";
@@ -60,7 +60,7 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
         }
     }, [visible]);
 
-    const handleSaveTotalPaid = async (closeDialog = false, originalValues?: boolean) => {
+    const handleSaveTotalPaid = async (closeDialog = false) => {
         if (!id) return;
         const amountData: Partial<TotalPaidInfo> = {
             PrincipalPaid: centsToDollars(newAmount.PrincipalPaid),
@@ -68,7 +68,7 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
             ExtraPrincipalPayments: centsToDollars(newAmount.ExtraPrincipalPayments),
         };
 
-        const response = await updateAccountTotal(id, originalValues ? originalAmount : amountData);
+        const response = await updateAccountTotal(id, amountData);
         if (response?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
@@ -87,12 +87,8 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
 
     const handleCalcAmount = async () => {
         if (!id) return;
-        const resSave = await handleSaveTotalPaid(false);
-        if (resSave?.status === Status.ERROR) {
-            return;
-        }
         try {
-            const resCalc = await calcAccountFromHistory(id);
+            const resCalc = await calcUserDataTotalPaid(id, newAmount);
             if (resCalc?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
@@ -125,11 +121,6 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
     };
 
     const handleCancel = async () => {
-        const changedData = JSON.stringify(newAmount) !== JSON.stringify(originalAmount);
-
-        if (changedData) {
-            await handleSaveTotalPaid(true, true);
-        }
         onHide();
     };
 
