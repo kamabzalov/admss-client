@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -279,6 +278,18 @@ export const InventoryForm = observer(() => {
             }
         }
     }, [accordionSteps, stepActiveIndex]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (isFormChanged) {
+                event.preventDefault();
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isFormChanged]);
 
     const handleCloseClick = () => {
         const performNavigation = () => {

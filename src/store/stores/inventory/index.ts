@@ -750,6 +750,7 @@ export class InventoryStore {
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
+        this._isFormChanged = false;
         this._formErrorMessage = "";
         this._deleteReason = "";
         this.clearMedia();
