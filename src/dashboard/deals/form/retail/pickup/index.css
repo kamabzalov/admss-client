@@ -50,4 +50,10 @@
     .pickup-body {
         padding-top: 0;
     }
+
+    .pickup-input.pickup-input--grey {
+        .p-inputtext {
+            color: var(--admss-app-medium-grey);
+        }
+    }
 }
