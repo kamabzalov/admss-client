@@ -9,6 +9,7 @@ import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
 import { InputMask, InputMaskProps } from "primereact/inputmask";
+import { useCursorToStart } from "common/hooks";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -120,20 +121,16 @@ export const CurrencyInput = ({
     title,
     labelPosition = "left",
     ...props
-}: CurrencyInputProps): ReactElement => {
-    const inputRef = useRef<null | any>(null);
+}: CurrencyInputProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const handleFocus = () => {
-        const realInput = inputRef.current?.inputRef?.current;
-        if (realInput) {
-            realInput.setSelectionRange(0, 0);
-        }
-    };
+    useCursorToStart(containerRef);
 
     return (
         <div
             key={name}
-            className={"flex align-items-center justify-content-between currency-item relative"}
+            className='flex align-items-center justify-content-between currency-item relative'
+            ref={containerRef}
         >
             <label className={`currency-item__label ${labelPosition === "top" && "label-top"}`}>
                 {title}
@@ -141,12 +138,10 @@ export const CurrencyInput = ({
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
-                    ref={inputRef}
                     minFractionDigits={2}
                     maxFractionDigits={2}
                     min={0}
                     locale='en-US'
-                    onFocus={handleFocus}
                     value={value || 0}
                     {...props}
                 />

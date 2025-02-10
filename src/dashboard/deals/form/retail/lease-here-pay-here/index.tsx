@@ -2,12 +2,12 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import { InputText } from "primereact/inputtext";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
 import { Checkbox } from "primereact/checkbox";
 import { LateFeeInput } from "./late-fee";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealLeaseHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -66,7 +66,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         value={Con_Pmt_Freq}
@@ -74,7 +74,6 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
                         options={[...PAYMENT_FREQUENCY_LIST]}
-                        filter
                         required
                         className='w-full deal-lease__dropdown'
                     />
@@ -83,14 +82,13 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         value={Con_Term}
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
                         options={[...TERM_MONTH_LIST]}
                         editable
-                        filter
                         required
                         className='w-full deal-lease__dropdown'
                     />

@@ -916,3 +916,22 @@ export const updateAccountPromise = async (
         }
     }
 };
+
+export const calcUserDataTotalPaid = async (
+    accountuid: string,
+    totalInfo: Partial<AccountUpdateTotalInfo>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<
+            BaseResponseError | AccountUpdateTotalInfo
+        >(`accounts/${accountuid}/calcfromhistory`, totalInfo);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while calculating user data total paid",
+            };
+        }
+    }
+};

@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { Dropdown } from "primereact/dropdown";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
@@ -22,6 +21,7 @@ import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
 import { useLocation, useParams } from "react-router-dom";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -168,7 +168,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("dealtype")}
                         optionLabel='name'
                         optionValue='id'
@@ -188,7 +188,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("dealstatus")}
                         optionLabel='name'
                         optionValue='id'
@@ -207,7 +207,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("saletype")}
                         optionLabel='name'
                         optionValue='id'
@@ -252,7 +252,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("inventorystatus")}
                         optionLabel='name'
                         optionValue='id'
@@ -310,7 +310,7 @@ export const DealGeneralSale = observer((): ReactElement => {
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("HowFoundOut")}
                         required
                         optionLabel='description'
