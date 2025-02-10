@@ -7,6 +7,7 @@ import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
+import { DealPickupPayment } from "common/models/deals";
 
 const EMPTY_PAYMENT_LENGTH = 7;
 
@@ -17,6 +18,7 @@ export const DealRetailPickup = observer((): ReactElement => {
     const { dealPickupPayments, getPickupPayments, changeDealPickupPayments, dealErrorMessage } =
         store;
     const [totalPayments, setTotalPayments] = useState(0);
+    const [localPayments, setLocalPayments] = useState<DealPickupPayment[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,14 +43,27 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
     }, [toast, dealErrorMessage]);
 
-    const displayedPayments = dealPickupPayments.length
-        ? dealPickupPayments
-        : Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
-              itemuid: `empty-${index}`,
-              paydate: "",
-              amount: 0,
-              paid: 0,
-          }));
+    useEffect(() => {
+        if (dealPickupPayments.length) {
+            setLocalPayments(dealPickupPayments);
+        } else {
+            setLocalPayments(
+                Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
+                    itemuid: `empty-${index}`,
+                    paydate: "",
+                    amount: 0,
+                    paid: 0,
+                })) as DealPickupPayment[]
+            );
+        }
+    }, [dealPickupPayments]);
+
+    const handleChange = (itemuid: string, key: keyof DealPickupPayment, value: any) => {
+        setLocalPayments((prev: DealPickupPayment[]) =>
+            prev.map((p: DealPickupPayment) => (p.itemuid === itemuid ? { ...p, [key]: value } : p))
+        );
+        changeDealPickupPayments(itemuid, { key, value });
+    };
 
     return (
         <div className='grid deal-retail-pickup'>
@@ -58,19 +73,21 @@ export const DealRetailPickup = observer((): ReactElement => {
                 <div className='pickup-header__item'>Paid</div>
             </div>
             <div className='pickup-body col-12'>
-                {displayedPayments.map((payment) => (
+                {localPayments.map((payment: DealPickupPayment) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
                             <DateInput
                                 checkbox
                                 value={payment.paydate}
                                 name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
-                                onChange={() => {
-                                    changeDealPickupPayments(payment.itemuid, {
-                                        key: "paydate",
-                                        value: payment.paydate,
-                                    });
-                                }}
+                                onChange={(e) =>
+                                    handleChange(payment.itemuid, "paydate", e.value || "")
+                                }
+                                className={
+                                    payment.paydate
+                                        ? "pickup-input"
+                                        : "pickup-input pickup-input--grey"
+                                }
                             />
                         </div>
                         <div className='pickup-row__item'>
@@ -78,23 +95,22 @@ export const DealRetailPickup = observer((): ReactElement => {
                                 <CurrencyInput
                                     placeholder='0.00'
                                     value={payment.amount}
-                                    onChange={({ value }) => {
-                                        changeDealPickupPayments(payment.itemuid, {
-                                            key: "amount",
-                                            value: Number(value),
-                                        });
-                                    }}
+                                    onChange={({ value }) =>
+                                        handleChange(payment.itemuid, "amount", Number(value) || 0)
+                                    }
+                                    className={
+                                        payment.amount > 0
+                                            ? "pickup-input"
+                                            : "pickup-input pickup-input--grey"
+                                    }
                                 />
                             </div>
                         </div>
                         <div className='pickup-row__item'>
                             <Checkbox
                                 checked={!!payment.paid}
-                                onChange={() =>
-                                    changeDealPickupPayments(payment.itemuid, {
-                                        key: "paid",
-                                        value: !payment.paid ? 1 : 0,
-                                    })
+                                onChange={(e) =>
+                                    handleChange(payment.itemuid, "paid", e.checked ? 1 : 0)
                                 }
                             />
                         </div>
