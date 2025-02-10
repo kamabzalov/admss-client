@@ -20,6 +20,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ContactMediaData } from "./media-data";
 import { DeleteForm } from "./delete-form";
+import { truncateText } from "common/helpers";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -365,14 +366,25 @@ export const ContactForm = observer((): ReactElement => {
                             </h2>
                             {id && (
                                 <div className='card-header-info'>
-                                    Full Name
-                                    <span className='card-header-info__data'>{`${
-                                        contact!.firstName || ""
-                                    } ${contact?.lastName || ""}`}</span>
-                                    Company name
-                                    <span className='card-header-info__data'>
-                                        {contact?.businessName}
-                                    </span>
+                                    {(contact.firstName || contact.lastName) && (
+                                        <>
+                                            Full Name
+                                            <span className='card-header-info__data'>
+                                                {truncateText(
+                                                    `${contact.firstName || ""} ${contact.lastName || ""}`
+                                                )}
+                                            </span>
+                                        </>
+                                    )}
+
+                                    {contact?.businessName && (
+                                        <>
+                                            Company name
+                                            <span className='card-header-info__data'>
+                                                {truncateText(contact.businessName)}
+                                            </span>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>
