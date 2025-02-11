@@ -324,6 +324,7 @@ export interface ContactUser extends Contact {
     created: string;
     dluidback: string;
     dluidfront: string;
+    fullAddress: string;
     email1: string;
     email2: string;
     firstName: string;
