@@ -57,7 +57,7 @@ const renderColumnsData: TableColumnProps[] = [
     { field: "fullName", header: "Name" },
     { field: "phone1", header: "Work Phone" },
     { field: "phone2", header: "Home Phone" },
-    { field: "streetAddress", header: "Address" },
+    { field: "fullAddress", header: "Address" },
     { field: "email1", header: "Email" },
     { field: "created", header: "Created" },
 ];
