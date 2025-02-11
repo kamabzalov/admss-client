@@ -100,8 +100,8 @@ export const AddTaskDialog = ({
 
         const taskData: Partial<PostDataTask> = {
             useruid: assignTo,
-            startdate: startDate.toDateString(),
-            deadline: dueDate.toDateString(),
+            startdate: startDate.toString(),
+            deadline: dueDate.toString(),
             accountuid: account,
             dealuid: deal,
             contactuid: contact,
