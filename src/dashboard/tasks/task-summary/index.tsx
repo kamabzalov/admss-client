@@ -1,7 +1,7 @@
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { Task } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { Task } from "common/models/tasks";
 
 interface TaskSummaryDialogProps extends DialogProps {
     currentTask?: Task;

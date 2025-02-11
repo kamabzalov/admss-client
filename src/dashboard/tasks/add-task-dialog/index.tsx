@@ -3,7 +3,7 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
-import { Task, TaskUser, createTask, getTasksSubUserList } from "http/services/tasks.service";
+import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
@@ -14,6 +14,7 @@ import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
+import { PostDataTask, Task, TaskUser } from "common/models/tasks";
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
@@ -50,8 +51,28 @@ export const AddTaskDialog = ({
             getTasksSubUserList(authUser.useruid).then((response) => {
                 if (response && Array.isArray(response)) setAssignToData(response);
             });
+            setAssignTo(currentTask?.accountuid || "");
+            setStartDate(currentTask?.created ? new Date(currentTask.created) : new Date());
+            setDueDate(currentTask?.deadline ? new Date(currentTask.deadline) : new Date());
+            setAccount(currentTask?.accountname || currentTask?.accountuid || "");
+            setDeal(currentTask?.dealname || currentTask?.dealuid || "");
+            setContact(currentTask?.contactname || currentTask?.contactuid || "");
+            setPhoneNumber(currentTask?.phone || "");
+            setDescription(currentTask?.description || "");
         }
-    }, [visible]);
+        return () => {
+            setAssignToData(null);
+            setAssignTo("");
+            setStartDate(new Date());
+            setDueDate(new Date());
+            setAccount("");
+            setDeal("");
+            setContact("");
+            setPhoneNumber("");
+            setDescription("");
+            setDateError("");
+        };
+    }, [visible, currentTask]);
 
     const validateDates = (start: Date, due: Date) => {
         if (start > due) {
@@ -77,18 +98,16 @@ export const AddTaskDialog = ({
     const handleSaveTaskData = async () => {
         if (!validateDates(startDate, dueDate)) return;
 
-        const taskData: Record<string, string | number | Date> = {
-            assignTo,
-            startDate,
-            dueDate,
-            account,
-            deal,
-            contact,
-            phoneNumber,
+        const taskData: Partial<PostDataTask> = {
+            deadline: dueDate.toDateString(),
+            accountuid: account,
+            dealuid: deal,
+            contactuid: contact,
+            phone: phoneNumber,
             description,
         };
 
-        const response = await createTask(taskData);
+        const response = await createTask(taskData, currentTask?.itemuid);
 
         if (response && response?.status === Status.ERROR) {
             return toast.current?.show({
@@ -134,9 +153,9 @@ export const AddTaskDialog = ({
                 <div className='flex flex-column md:flex-row column-gap-3 relative'>
                     <div className='p-inputgroup'>
                         <DateInput
-                            placeholder='Start Date'
                             value={startDate}
                             date={startDate}
+                            name='Start Date'
                             showTime
                             hourFormat='12'
                             onChange={(e) => handleStartDateChange(e.value as Date)}
@@ -144,9 +163,9 @@ export const AddTaskDialog = ({
                     </div>
                     <div className='p-inputgroup'>
                         <DateInput
-                            placeholder='Due Date'
                             value={dueDate}
                             date={dueDate}
+                            name='Due Date'
                             showTime
                             hourFormat='12'
                             onChange={(e) => handleDueDateChange(e.value as Date)}

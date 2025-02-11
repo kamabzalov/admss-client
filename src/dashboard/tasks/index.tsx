@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Task, TaskStatus, getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
+import { getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
 import { TaskSummaryDialog } from "./task-summary";
-
 import "./index.css";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { Task, TaskStatus } from "common/models/tasks";
+
 const DEFAULT_TASK_COUNT = 4;
 
 export const Tasks = observer(() => {
@@ -27,7 +28,7 @@ export const Tasks = observer(() => {
     const getTasks = async (taskCount = DEFAULT_TASK_COUNT) => {
         const res = await getTasksByUserId(authUser!.useruid);
         if (res && Array.isArray(res)) {
-            setTasks(res.splice(0, taskCount));
+            setTasks(res.slice(0, taskCount));
             setAllTasksCount(res.length);
         }
     };
@@ -40,7 +41,7 @@ export const Tasks = observer(() => {
 
     const handleEditTask = (task: Task) => {
         setCurrentTask(task);
-        setShowEditTaskDialog(true);
+        setTimeout(() => setShowEditTaskDialog(true), 0);
     };
 
     const handleTaskStatusChange = async (taskuid: string) => {
@@ -140,6 +141,7 @@ export const Tasks = observer(() => {
                         visible={showEditTaskDialog}
                         onHide={() => setShowEditTaskDialog(false)}
                         currentTask={currentTask as Task}
+                        onAction={getTasks}
                         header='Edit Task'
                     />
                 ) : (
