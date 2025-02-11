@@ -21,6 +21,7 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { ContactMediaData } from "./media-data";
 import { DeleteForm } from "./delete-form";
 import { truncateText } from "common/helpers";
+import { Tooltip } from "primereact/tooltip";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -366,10 +367,16 @@ export const ContactForm = observer((): ReactElement => {
                             </h2>
                             {id && (
                                 <div className='card-header-info'>
+                                    <Tooltip target='.tooltip-target' />
+
                                     {(contact.firstName || contact.lastName) && (
                                         <>
                                             Full Name
-                                            <span className='card-header-info__data'>
+                                            <span
+                                                className='card-header-info__data tooltip-target'
+                                                data-pr-tooltip={`${contact.firstName || ""} ${contact.lastName || ""}`}
+                                                data-pr-position='top'
+                                            >
                                                 {truncateText(
                                                     `${contact.firstName || ""} ${contact.lastName || ""}`
                                                 )}
@@ -380,7 +387,11 @@ export const ContactForm = observer((): ReactElement => {
                                     {contact?.businessName && (
                                         <>
                                             Company name
-                                            <span className='card-header-info__data'>
+                                            <span
+                                                className='card-header-info__data tooltip-target'
+                                                data-pr-tooltip={contact.businessName}
+                                                data-pr-position='top'
+                                            >
                                                 {truncateText(contact.businessName)}
                                             </span>
                                         </>
