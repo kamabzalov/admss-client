@@ -21,6 +21,7 @@ export interface Task {
     itemuid: string;
     parentuid: string;
     phone: string;
+    startdate: string;
     task_status: TaskStatus;
     taskname: string;
     updated: string;
@@ -40,6 +41,7 @@ export interface PostDataTask extends BaseResponseError {
     index: number;
     created: string;
     updated: string;
+    startdate: string;
     deadline: string;
     task_status: TaskStatus;
     itemuid: string;

@@ -30,9 +30,9 @@ export const AddTaskDialog = ({
 }: AddTaskDialogProps) => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
-    const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
+    const [assignTo, setAssignTo] = useState<string>(currentTask?.useruid || "");
     const [startDate, setStartDate] = useState<Date>(
-        currentTask?.created ? new Date(currentTask.created) : new Date()
+        currentTask?.startdate ? new Date(currentTask.startdate) : new Date()
     );
     const [dueDate, setDueDate] = useState<Date>(
         currentTask?.deadline ? new Date(currentTask.deadline) : new Date()
@@ -51,8 +51,8 @@ export const AddTaskDialog = ({
             getTasksSubUserList(authUser.useruid).then((response) => {
                 if (response && Array.isArray(response)) setAssignToData(response);
             });
-            setAssignTo(currentTask?.accountuid || "");
-            setStartDate(currentTask?.created ? new Date(currentTask.created) : new Date());
+            setAssignTo(currentTask?.useruid || "");
+            setStartDate(currentTask?.startdate ? new Date(currentTask.startdate) : new Date());
             setDueDate(currentTask?.deadline ? new Date(currentTask.deadline) : new Date());
             setAccount(currentTask?.accountname || currentTask?.accountuid || "");
             setDeal(currentTask?.dealname || currentTask?.dealuid || "");
@@ -99,6 +99,8 @@ export const AddTaskDialog = ({
         if (!validateDates(startDate, dueDate)) return;
 
         const taskData: Partial<PostDataTask> = {
+            useruid: assignTo,
+            startdate: startDate.toDateString(),
             deadline: dueDate.toDateString(),
             accountuid: account,
             dealuid: deal,
@@ -140,16 +142,18 @@ export const AddTaskDialog = ({
             buttonDisabled={!description.trim() || !!dateError}
         >
             <>
-                {assignToData && (
-                    <Dropdown
-                        placeholder='Assign to'
-                        value={assignTo}
-                        options={assignToData}
-                        optionLabel={"username"}
-                        className='flex align-items-center'
-                        onChange={(e) => setAssignTo(e.value)}
-                    />
-                )}
+                <Dropdown
+                    placeholder='Assign to'
+                    value={assignTo}
+                    options={assignToData || []}
+                    optionLabel={"username"}
+                    optionValue={"useruid"}
+                    className='flex align-items-center'
+                    onChange={(e) => {
+                        return setAssignTo(e.value.username);
+                    }}
+                />
+
                 <div className='flex flex-column md:flex-row column-gap-3 relative'>
                     <div className='p-inputgroup'>
                         <DateInput
