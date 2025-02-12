@@ -15,6 +15,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
+import { formatDateForServer } from "common/helpers";
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
@@ -100,8 +101,8 @@ export const AddTaskDialog = ({
 
         const taskData: Partial<PostDataTask> = {
             useruid: assignTo,
-            startdate: startDate.toString(),
-            deadline: dueDate.toString(),
+            startdate: formatDateForServer(startDate),
+            deadline: formatDateForServer(dueDate),
             accountuid: account,
             dealuid: deal,
             contactuid: contact,
@@ -162,7 +163,9 @@ export const AddTaskDialog = ({
                             name='Start Date'
                             showTime
                             hourFormat='12'
-                            onChange={(e) => handleStartDateChange(e.value as Date)}
+                            onChange={(e) => {
+                                return handleStartDateChange(e.value as Date);
+                            }}
                         />
                     </div>
                     <div className='p-inputgroup'>

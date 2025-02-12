@@ -122,3 +122,17 @@ export const setCursorToStart = (element: HTMLInputElement | null) => {
         setTimeout(() => element.setSelectionRange(0, 0), 0);
     }
 };
+
+export const formatDateForServer = (date: Date): string => {
+    const pad = (num: number) => num.toString().padStart(2, "0");
+
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+};
