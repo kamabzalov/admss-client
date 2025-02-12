@@ -58,9 +58,11 @@ export const ContactsIdentificationInfo = observer(
             frontSideDL,
             backSideDL,
             getImagesDL,
+            getCoBuyerContact,
             removeImagesDL,
             frontSideDLurl,
             backSideDLurl,
+
             isLoading,
         } = store;
         const toast = useToast();
@@ -77,6 +79,12 @@ export const ContactsIdentificationInfo = observer(
         );
 
         useEffect(() => {
+            if (type === CO_BUYER && contact.extdata?.itemuid) {
+                getCoBuyerContact(contact.extdata?.itemuid);
+            }
+        }, [type]);
+
+        useEffect(() => {
             if (frontSideDL.size) {
                 store.frontSideDLurl = URL.createObjectURL(frontSideDL);
             }
@@ -86,12 +94,17 @@ export const ContactsIdentificationInfo = observer(
             }
         }, []);
 
-        const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
+        const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide, isCoBuyer: boolean) => {
+            store.isContactChanged = true;
             if (side === DLSides.FRONT) {
-                store.frontSideDL = e.files[0];
+                isCoBuyer
+                    ? (store.coBuyerFrontSideDL = e.files[0])
+                    : (store.frontSideDL = e.files[0]);
             }
             if (side === DLSides.BACK) {
-                store.backSideDL = e.files[0];
+                isCoBuyer
+                    ? (store.coBuyerBackSideDL = e.files[0])
+                    : (store.backSideDL = e.files[0]);
             }
         };
 
@@ -375,7 +388,9 @@ export const ContactsIdentificationInfo = observer(
                                         itemTemplate(file as File, DLSides.FRONT)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.FRONT)}
-                                    onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
+                                    onSelect={(event) =>
+                                        onTemplateSelect(event, DLSides.FRONT, type !== BUYER)
+                                    }
                                     progressBarTemplate={<></>}
                                     className='contact-upload'
                                 />
@@ -404,7 +419,9 @@ export const ContactsIdentificationInfo = observer(
                                         itemTemplate(file as File, DLSides.BACK)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.BACK)}
-                                    onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
+                                    onSelect={(event) =>
+                                        onTemplateSelect(event, DLSides.BACK, type !== BUYER)
+                                    }
                                     className='contact-upload'
                                     progressBarTemplate={<></>}
                                 />
