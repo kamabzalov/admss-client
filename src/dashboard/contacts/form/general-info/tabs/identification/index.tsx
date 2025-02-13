@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
@@ -16,7 +15,6 @@ import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
-import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
@@ -25,6 +23,7 @@ import dlBackImage from "assets/images/empty_back_dl.svg";
 import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 const SexList = [
     {
@@ -58,6 +57,7 @@ export const ContactsIdentificationInfo = observer(
             frontSideDL,
             backSideDL,
             getImagesDL,
+            getCoBuyerContact,
             removeImagesDL,
             frontSideDLurl,
             backSideDLurl,
@@ -66,6 +66,7 @@ export const ContactsIdentificationInfo = observer(
         const toast = useToast();
         const fileUploadFrontRef = useRef<FileUpload>(null);
         const fileUploadBackRef = useRef<FileUpload>(null);
+        const prevCoBuyerUID = useRef<string>("");
 
         useEffect(() => {
             getImagesDL();
@@ -77,6 +78,16 @@ export const ContactsIdentificationInfo = observer(
         );
 
         useEffect(() => {
+            if (type !== CO_BUYER) return;
+
+            if (!contact.cobuyeruid || contact.cobuyeruid === prevCoBuyerUID.current) return;
+
+            prevCoBuyerUID.current = contact.cobuyeruid;
+
+            getCoBuyerContact();
+        }, [type, contact.cobuyeruid, getCoBuyerContact]);
+
+        useEffect(() => {
             if (frontSideDL.size) {
                 store.frontSideDLurl = URL.createObjectURL(frontSideDL);
             }
@@ -86,12 +97,17 @@ export const ContactsIdentificationInfo = observer(
             }
         }, []);
 
-        const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
+        const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide, isCoBuyer: boolean) => {
+            store.isContactChanged = true;
             if (side === DLSides.FRONT) {
-                store.frontSideDL = e.files[0];
+                isCoBuyer
+                    ? (store.coBuyerFrontSideDL = e.files[0])
+                    : (store.frontSideDL = e.files[0]);
             }
             if (side === DLSides.BACK) {
-                store.backSideDL = e.files[0];
+                isCoBuyer
+                    ? (store.coBuyerBackSideDL = e.files[0])
+                    : (store.backSideDL = e.files[0]);
             }
         };
 
@@ -107,7 +123,7 @@ export const ContactsIdentificationInfo = observer(
             }
 
             if (withRequest) {
-                removeImagesDL(side).then((response) => {
+                removeImagesDL(side, type === CO_BUYER).then((response) => {
                     if (response?.status === Status.ERROR) {
                         const { error, status } = response as BaseResponseError;
                         toast.current?.show({
@@ -375,7 +391,9 @@ export const ContactsIdentificationInfo = observer(
                                         itemTemplate(file as File, DLSides.FRONT)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.FRONT)}
-                                    onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
+                                    onSelect={(event) =>
+                                        onTemplateSelect(event, DLSides.FRONT, type !== BUYER)
+                                    }
                                     progressBarTemplate={<></>}
                                     className='contact-upload'
                                 />
@@ -404,7 +422,9 @@ export const ContactsIdentificationInfo = observer(
                                         itemTemplate(file as File, DLSides.BACK)
                                     }
                                     emptyTemplate={emptyTemplate(DLSides.BACK)}
-                                    onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
+                                    onSelect={(event) =>
+                                        onTemplateSelect(event, DLSides.BACK, type !== BUYER)
+                                    }
                                     className='contact-upload'
                                     progressBarTemplate={<></>}
                                 />
