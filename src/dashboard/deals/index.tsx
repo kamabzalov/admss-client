@@ -66,7 +66,6 @@ const DEALS_TYPE_LIST: DealsFilterOptions[] = [
 const DEALS_OTHER_LIST: DealsFilterOptions[] = [
     { name: "All incomplete", value: "0.DealComplete" },
     { name: "Dead or Deleted", value: "6.DealStatus" },
-    { name: "Manager's review", value: "1.managerReview" },
     { name: "Deals not yet sent to RFC", value: "0.RFCSent" },
 ];
 
@@ -76,6 +75,7 @@ const DEALS_STATUS_LIST: DealsFilterOptions[] = [
     { name: "Quotes", value: "0.DealStatus" },
     { name: "Pending", value: "1.DealStatus" },
     { name: "Sold, Not finalized", value: "2.DealStatus" },
+    { name: "Manager's review", value: "1.managerReview" },
 ];
 
 const FILTER_GROUP_LIST: DealsFilterGroup[] = [
