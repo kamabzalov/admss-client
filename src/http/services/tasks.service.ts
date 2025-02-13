@@ -1,44 +1,9 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
+import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
 import { authorizedUserApiInstance } from "http/index";
-
-export enum TaskStatus {
-    COMPLETED = "Completed",
-    STARTED = "Started",
-    DEFAULT = "Default",
-}
-
-export interface Task {
-    accountname: string;
-    accountnumber: string;
-    accountuid: string;
-    contactname: string;
-    contactuid: string;
-    created: string;
-    deadline: string;
-    dealname: string;
-    dealuid: string;
-    description: string;
-    index: number;
-    itemuid: string;
-    parentuid: string;
-    phone: string;
-    task_status: TaskStatus;
-    taskname: string;
-    updated: string;
-    username: string;
-    useruid: string;
-}
-
-export interface TaskUser {
-    created: string;
-    createdbyuid: string;
-    updated: string;
-    username: string;
-    useruid: string;
-}
 
 export const getTasksByUserId = async (uid: string, params?: QueryParams): Promise<Task[]> => {
     const response = await authorizedUserApiInstance
@@ -50,10 +15,7 @@ export const getTasksByUserId = async (uid: string, params?: QueryParams): Promi
     return response;
 };
 
-export const createTask = async (
-    taskData: Record<string, string | number | Date>,
-    taskuid?: string | undefined
-) => {
+export const createTask = async (taskData: Partial<PostDataTask>, taskuid?: string | undefined) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `tasks/${taskuid || 0}/set`,
@@ -79,7 +41,12 @@ export const getTasksUserList = async (useruid: string) => {
         const request = await authorizedUserApiInstance.get<TaskUser[]>(`user/${useruid}/users`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting tasks user list",
+            };
+        }
     }
 };
 
@@ -99,10 +66,17 @@ export const getTasksSubUserList = async (useruid: string) => {
 
 export const deleteTask = async (taskIndex: number) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskIndex}/delete`);
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `tasks/${taskIndex}/delete`
+        );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting task",
+            };
+        }
     }
 };
 
