@@ -1,5 +1,4 @@
 import { DialogProps } from "primereact/dialog";
-import "./index.css";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
@@ -16,11 +15,23 @@ import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
 import { formatDateForServer } from "common/helpers";
+import "./index.css";
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
     onAction?: () => void;
 }
+
+const initializeTaskState = (task?: Task, reset: boolean = false) => ({
+    assignTo: reset ? "" : task?.useruid || "",
+    startDate: reset ? new Date() : task?.startdate ? new Date(task.startdate) : new Date(),
+    dueDate: reset ? new Date() : task?.deadline ? new Date(task.deadline) : new Date(),
+    account: reset ? "" : task?.accountname || task?.accountuid || "",
+    deal: reset ? "" : task?.dealname || task?.dealuid || "",
+    contact: reset ? "" : task?.contactname || task?.contactuid || "",
+    phoneNumber: reset ? "" : task?.phone || "",
+    description: reset ? "" : task?.description || "",
+});
 
 export const AddTaskDialog = ({
     visible,
@@ -31,49 +42,28 @@ export const AddTaskDialog = ({
 }: AddTaskDialogProps) => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
-    const [assignTo, setAssignTo] = useState<string>(currentTask?.useruid || "");
-    const [startDate, setStartDate] = useState<Date>(
-        currentTask?.startdate ? new Date(currentTask.startdate) : new Date()
-    );
-    const [dueDate, setDueDate] = useState<Date>(
-        currentTask?.deadline ? new Date(currentTask.deadline) : new Date()
-    );
-    const [account, setAccount] = useState<string>(currentTask?.accountname || "");
-    const [deal, setDeal] = useState<string>(currentTask?.dealname || "");
-    const [contact, setContact] = useState<string>(currentTask?.contactname || "");
-    const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
-    const [description, setDescription] = useState<string>(currentTask?.description || "");
+    const toast = useToast();
+
+    const [taskState, setTaskState] = useState(() => initializeTaskState(currentTask));
     const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
     const [dateError, setDateError] = useState<string>("");
-    const toast = useToast();
 
     useEffect(() => {
         if (authUser && visible) {
             getTasksSubUserList(authUser.useruid).then((response) => {
                 if (response && Array.isArray(response)) setAssignToData(response);
             });
-            setAssignTo(currentTask?.useruid || "");
-            setStartDate(currentTask?.startdate ? new Date(currentTask.startdate) : new Date());
-            setDueDate(currentTask?.deadline ? new Date(currentTask.deadline) : new Date());
-            setAccount(currentTask?.accountname || currentTask?.accountuid || "");
-            setDeal(currentTask?.dealname || currentTask?.dealuid || "");
-            setContact(currentTask?.contactname || currentTask?.contactuid || "");
-            setPhoneNumber(currentTask?.phone || "");
-            setDescription(currentTask?.description || "");
+            setTaskState(initializeTaskState(currentTask));
         }
-        return () => {
-            setAssignToData(null);
-            setAssignTo("");
-            setStartDate(new Date());
-            setDueDate(new Date());
-            setAccount("");
-            setDeal("");
-            setContact("");
-            setPhoneNumber("");
-            setDescription("");
-            setDateError("");
-        };
     }, [visible, currentTask]);
+
+    useEffect(() => {
+        if (!visible) {
+            setTaskState(initializeTaskState(undefined, true));
+            setDateError("");
+            setAssignToData(null);
+        }
+    }, [visible]);
 
     const validateDates = (start: Date, due: Date) => {
         if (start > due) {
@@ -84,36 +74,37 @@ export const AddTaskDialog = ({
         return true;
     };
 
-    const handleStartDateChange = (date: Date) => {
-        if (validateDates(date, dueDate)) {
-            setStartDate(date);
+    const handleDateChange = (key: "startDate" | "dueDate", date: Date) => {
+        if (
+            (key === "startDate" && validateDates(date, taskState.dueDate)) ||
+            (key === "dueDate" && validateDates(taskState.startDate, date))
+        ) {
+            setTaskState((prev) => ({ ...prev, [key]: date }));
         }
     };
 
-    const handleDueDateChange = (date: Date) => {
-        if (validateDates(startDate, date)) {
-            setDueDate(date);
-        }
+    const handleInputChange = (key: keyof typeof taskState, value: string) => {
+        setTaskState((prev) => ({ ...prev, [key]: value }));
     };
 
     const handleSaveTaskData = async () => {
-        if (!validateDates(startDate, dueDate)) return;
+        if (!validateDates(taskState.startDate, taskState.dueDate)) return;
 
         const taskData: Partial<PostDataTask> = {
-            useruid: assignTo,
-            startdate: formatDateForServer(startDate),
-            deadline: formatDateForServer(dueDate),
-            accountuid: account,
-            dealuid: deal,
-            contactuid: contact,
-            phone: phoneNumber,
-            description,
+            useruid: taskState.assignTo,
+            startdate: formatDateForServer(taskState.startDate),
+            deadline: formatDateForServer(taskState.dueDate),
+            accountuid: taskState.account,
+            dealuid: taskState.deal,
+            contactuid: taskState.contact,
+            phone: taskState.phoneNumber,
+            description: taskState.description,
         };
 
         const response = await createTask(taskData, currentTask?.itemuid);
 
-        if (response && response?.status === Status.ERROR) {
-            return toast.current?.show({
+        if (response?.status === Status.ERROR) {
+            toast.current?.show({
                 severity: "error",
                 summary: Status.ERROR,
                 detail: response.error,
@@ -126,9 +117,9 @@ export const AddTaskDialog = ({
                 detail: "Task created successfully!",
                 life: TOAST_LIFETIME,
             });
+            onHide();
+            onAction?.();
         }
-        onHide();
-        onAction?.();
     };
 
     return (
@@ -140,79 +131,77 @@ export const AddTaskDialog = ({
             className={"dialog__add-task"}
             footer='Save'
             action={handleSaveTaskData}
-            buttonDisabled={!description.trim() || !!dateError}
+            buttonDisabled={!taskState.description.trim() || !!dateError}
         >
             <>
                 <Dropdown
                     placeholder='Assign to'
-                    value={assignTo}
+                    value={taskState.assignTo}
                     options={assignToData || []}
-                    optionLabel={"username"}
-                    optionValue={"useruid"}
+                    optionLabel='username'
+                    optionValue='useruid'
                     className='flex align-items-center'
                     onChange={(e) => {
-                        return setAssignTo(e.value.username);
+                        return handleInputChange("assignTo", e.value);
                     }}
                 />
 
                 <div className='flex flex-column md:flex-row column-gap-3 relative'>
                     <div className='p-inputgroup'>
                         <DateInput
-                            value={startDate}
-                            date={startDate}
+                            value={taskState.startDate}
+                            date={taskState.startDate}
                             name='Start Date'
                             showTime
                             hourFormat='12'
-                            onChange={(e) => {
-                                return handleStartDateChange(e.value as Date);
-                            }}
+                            onChange={(e) => handleDateChange("startDate", e.value as Date)}
                         />
                     </div>
                     <div className='p-inputgroup'>
                         <DateInput
-                            value={dueDate}
-                            date={dueDate}
+                            value={taskState.dueDate}
+                            date={taskState.dueDate}
                             name='Due Date'
                             showTime
                             hourFormat='12'
-                            onChange={(e) => handleDueDateChange(e.value as Date)}
+                            onChange={(e) => handleDateChange("dueDate", e.value as Date)}
                         />
                     </div>
                     {dateError && <small className='p-error'>{dateError}</small>}
                 </div>
 
                 <AccountSearch
-                    value={account}
-                    onChange={(e) => setAccount(e.target.value)}
-                    onRowClick={(value) => setAccount(value)}
+                    value={taskState.account}
+                    onChange={(e) => handleInputChange("account", e.target.value)}
+                    onRowClick={(value) => handleInputChange("account", value)}
                     name='Account (optional)'
                 />
 
                 <DealSearch
-                    value={deal}
-                    onChange={(e) => setDeal(e.target.value)}
-                    onRowClick={(value) => setDeal(value)}
+                    value={taskState.deal}
+                    onChange={(e) => handleInputChange("deal", e.target.value)}
+                    onRowClick={(value) => handleInputChange("deal", value)}
                     name='Deal (optional)'
                 />
 
                 <CompanySearch
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                    onRowClick={(value) => setContact(value)}
+                    value={taskState.contact}
+                    onChange={(e) => handleInputChange("contact", e.target.value)}
+                    onRowClick={(value) => handleInputChange("contact", value)}
                     name='Contact'
                 />
                 <InputMask
                     type='tel'
                     mask='999-999-9999'
                     placeholder='Phone Number (optional)'
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target?.value || "")}
+                    value={taskState.phoneNumber}
+                    onChange={(e) => handleInputChange("phoneNumber", e.target?.value || "")}
                 />
                 <InputTextarea
                     placeholder='Description (required)'
                     required
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={taskState.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
                     className='p-dialog-description'
                 />
             </>
