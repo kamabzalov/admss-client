@@ -158,55 +158,45 @@ export class ContactStore {
         }
     };
 
-    public getCoBuyerContact = async (itemuid: string) => {
-        this._isLoading = true;
+    public getCoBuyerContact = async () => {
+        if (!this._contact.cobuyeruid) return;
         try {
-            const response = await getContactInfo(itemuid);
-            if (response && response.status === Status.ERROR) {
-                throw response.error;
-            } else {
-                this._cobayerContact = response as Contact;
-            }
+            const response = await getContactInfo(this._contact.cobuyeruid);
+            if (response?.status === Status.ERROR) throw response.error;
+            this._cobayerContact = response as Contact;
         } catch (error) {
-            return {
-                status: Status.ERROR,
-                error,
-            };
+            return { status: Status.ERROR, error };
         } finally {
             this._isLoading = false;
         }
     };
 
     public getImagesDL = (isCoBuyer?: boolean): void => {
+        const uid = isCoBuyer ? this._contact.cobuyeruid : this._contactID;
+        if (!uid) return;
+
         if (isCoBuyer) {
-            if (this._cobayerContact.dluidfront) {
-                getInventoryMediaItem(this._cobayerContact.dluidfront).then((res) => {
-                    if (res) {
-                        this._coBuyerFrontSideDLurl = res;
-                    }
+            if (this._contact.dluidfront) {
+                getInventoryMediaItem(this._contact.dluidfront).then((res) => {
+                    if (res) this._coBuyerFrontSideDLurl = res;
                 });
             }
-            if (this._cobayerContact.dluidback) {
-                getInventoryMediaItem(this._cobayerContact.dluidback).then((res) => {
-                    if (res) {
-                        this._coBuyerBackSideDLurl = res;
-                    }
+            if (this._contact.dluidback) {
+                getInventoryMediaItem(this._contact.dluidback).then((res) => {
+                    if (res) this._coBuyerBackSideDLurl = res;
                 });
             }
             return;
         }
+
         if (this._contact.dluidfront) {
             getInventoryMediaItem(this._contact.dluidfront).then((res) => {
-                if (res) {
-                    this._frontSiteDLurl = res;
-                }
+                if (res) this._frontSiteDLurl = res;
             });
         }
         if (this._contact.dluidback) {
             getInventoryMediaItem(this._contact.dluidback).then((res) => {
-                if (res) {
-                    this._backSiteDLurl = res;
-                }
+                if (res) this._backSiteDLurl = res;
             });
         }
     };
@@ -228,58 +218,6 @@ export class ContactStore {
         this._isContactChanged = true;
         this._contactExtData[key] = value as never;
     });
-
-    private setImagesDL = async (contactuid: string): Promise<any> => {
-        this._isLoading = true;
-        try {
-            //@ts-ignore
-            for (const [index, file] of [this._frontSiteDL, this._backSiteDL].entries()) {
-                if (file.size) {
-                    const formData = new FormData();
-                    formData.append("file", file);
-
-                    const createMediaResponse = (await createMediaItemRecord(
-                        MediaType.mtPhoto
-                    )) as CreateMediaItemRecordResponse;
-                    if (!createMediaResponse || createMediaResponse.status !== Status.OK) {
-                        return {
-                            status: Status.ERROR,
-                            error: createMediaResponse?.error,
-                        };
-                    }
-
-                    const uploadMediaResponse = (await uploadInventoryMedia(
-                        createMediaResponse.itemUID as string,
-                        formData
-                    )) as InventorySetResponse;
-                    if (!uploadMediaResponse || uploadMediaResponse.status !== Status.OK) {
-                        return {
-                            status: Status.ERROR,
-                            error: uploadMediaResponse?.error,
-                        };
-                    }
-
-                    const updateDLResponse = await setContactDL(contactuid, {
-                        [!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
-                    });
-                    if (!updateDLResponse || updateDLResponse.status !== Status.OK) {
-                        return {
-                            status: Status.ERROR,
-                            error: updateDLResponse?.error,
-                        };
-                    }
-                }
-            }
-            return { status: Status.OK };
-        } catch (error) {
-            return {
-                status: Status.ERROR,
-                error: error instanceof Error ? error.message : String(error),
-            };
-        } finally {
-            this._isLoading = false;
-        }
-    };
 
     public saveContact = action(async (): Promise<string> => {
         try {
@@ -323,6 +261,119 @@ export class ContactStore {
             this._isLoading = false;
         }
     });
+
+    private setImagesDL = async (contactuid: string, isCoBuyer = false): Promise<any> => {
+        this._isLoading = true;
+        try {
+            const frontFile = isCoBuyer ? this._coBuyerFrontSideDL : this._frontSiteDL;
+            const backFile = isCoBuyer ? this._coBuyerBackSideDL : this._backSiteDL;
+
+            if (frontFile.size) {
+                const formData = new FormData();
+                formData.append("file", frontFile);
+                const createMediaResponse = (await createMediaItemRecord(
+                    MediaType.mtPhoto
+                )) as CreateMediaItemRecordResponse;
+                if (!createMediaResponse || createMediaResponse.status !== Status.OK) {
+                    throw createMediaResponse?.error || "Failed to create media record (front)";
+                }
+                const uploadMediaResponse = (await uploadInventoryMedia(
+                    createMediaResponse.itemUID as string,
+                    formData
+                )) as InventorySetResponse;
+                if (!uploadMediaResponse || uploadMediaResponse.status !== Status.OK) {
+                    throw uploadMediaResponse?.error || "Failed to upload front media file";
+                }
+                const updateDLResponse = await setContactDL(contactuid, {
+                    dluidfront: uploadMediaResponse.itemuid,
+                });
+                if (!updateDLResponse || updateDLResponse.status !== Status.OK) {
+                    throw updateDLResponse?.error || "Failed to update contact front DL UID";
+                }
+            }
+
+            if (backFile.size) {
+                const formData = new FormData();
+                formData.append("file", backFile);
+                const createMediaResponse = (await createMediaItemRecord(
+                    MediaType.mtPhoto
+                )) as CreateMediaItemRecordResponse;
+                if (!createMediaResponse || createMediaResponse.status !== Status.OK) {
+                    throw createMediaResponse?.error || "Failed to create media record (back)";
+                }
+                const uploadMediaResponse = (await uploadInventoryMedia(
+                    createMediaResponse.itemUID as string,
+                    formData
+                )) as InventorySetResponse;
+                if (!uploadMediaResponse || uploadMediaResponse.status !== Status.OK) {
+                    throw uploadMediaResponse?.error || "Failed to upload back media file";
+                }
+                const updateDLResponse = await setContactDL(contactuid, {
+                    dluidback: uploadMediaResponse.itemuid,
+                });
+                if (!updateDLResponse || updateDLResponse.status !== Status.OK) {
+                    throw updateDLResponse?.error || "Failed to update contact back DL UID";
+                }
+            }
+
+            return { status: Status.OK };
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error: error instanceof Error ? error.message : String(error),
+            };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public removeImagesDL = async (side: DLSide, isCoBuyer: boolean = false) => {
+        this._isLoading = true;
+        try {
+            const uid = isCoBuyer ? this._contact.cobuyeruid : this._contact.contactuid;
+            if (!uid) return { status: Status.ERROR, error: "Missing contact ID" };
+
+            let response;
+            if (side === DLSides.FRONT) {
+                if (isCoBuyer) {
+                    if (this.coBuyerFrontSideDL) {
+                        response = await deleteContactFrontDL(uid);
+                        if (response?.status === Status.ERROR)
+                            return { status: response.status, error: response.error };
+                    }
+                    this._cobayerContact.dluidfront = "";
+                } else {
+                    if (this.frontSideDL) {
+                        response = await deleteContactFrontDL(uid);
+                        if (response?.status === Status.ERROR)
+                            return { status: response.status, error: response.error };
+                    }
+                    this._contact.dluidfront = "";
+                }
+            } else {
+                if (isCoBuyer) {
+                    if (this.coBuyerBackSideDL) {
+                        response = await deleteContactBackDL(uid);
+                        if (response?.status === Status.ERROR)
+                            return { status: response.status, error: response.error };
+                    }
+                    this._cobayerContact.dluidback = "";
+                } else {
+                    if (this.backSideDL) {
+                        response = await deleteContactBackDL(uid);
+                        if (response?.status === Status.ERROR)
+                            return { status: response.status, error: response.error };
+                    }
+                    this._contact.dluidback = "";
+                }
+            }
+            return { status: Status.OK };
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
 
     public set contactType(state: number) {
         this._contactType = state;
@@ -375,39 +426,6 @@ export class ContactStore {
     public set memoRoute(state: string) {
         this._memoRoute = state;
     }
-
-    public removeImagesDL = async (side: DLSide, isCoBuyer: boolean = false): Promise<any> => {
-        this._isLoading = true;
-        try {
-            if (side === DLSides.FRONT) {
-                const response = isCoBuyer
-                    ? await deleteContactFrontDL(this._cobayerContact.contactuid)
-                    : await deleteContactFrontDL(this._contactID);
-
-                if (response?.status === Status.ERROR) {
-                    return { status: response.status, error: response.error };
-                }
-                isCoBuyer ? (this._coBuyerFrontSideDLurl = "") : (this._frontSiteDLurl = "");
-            }
-
-            if (side === DLSides.BACK) {
-                const response = isCoBuyer
-                    ? await deleteContactBackDL(this._cobayerContact.contactuid)
-                    : await deleteContactBackDL(this._contactID);
-
-                if (response?.status === Status.ERROR) {
-                    return { status: response.status, error: response.error };
-                }
-                isCoBuyer ? (this._coBuyerBackSideDLurl = "") : (this._backSiteDLurl = "");
-            }
-
-            return Status.OK;
-        } catch (error) {
-            return { status: Status.ERROR, error };
-        } finally {
-            this._isLoading = false;
-        }
-    };
 
     public set tabLength(state: number) {
         this._tabLength = state;

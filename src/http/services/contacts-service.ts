@@ -5,6 +5,7 @@ import {
     ContactUser,
     ContactsCategories,
     SalespersonsList,
+    SetContactResponse,
     TotalUsers,
 } from "common/models/contact";
 import { BaseResponseError, Status } from "common/models/base-response";
@@ -99,7 +100,7 @@ export const setContact = async (
     contactData: Partial<Contact>
 ): Promise<BaseResponseError | undefined> => {
     try {
-        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+        const response = await authorizedUserApiInstance.post<SetContactResponse>(
             `contacts/${contactuid || 0}/set`,
             contactData
         );

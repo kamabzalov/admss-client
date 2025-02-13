@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
@@ -16,7 +15,6 @@ import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
-import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
@@ -25,6 +23,7 @@ import dlBackImage from "assets/images/empty_back_dl.svg";
 import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 const SexList = [
     {
@@ -62,12 +61,12 @@ export const ContactsIdentificationInfo = observer(
             removeImagesDL,
             frontSideDLurl,
             backSideDLurl,
-
             isLoading,
         } = store;
         const toast = useToast();
         const fileUploadFrontRef = useRef<FileUpload>(null);
         const fileUploadBackRef = useRef<FileUpload>(null);
+        const prevCoBuyerUID = useRef<string>("");
 
         useEffect(() => {
             getImagesDL();
@@ -79,10 +78,14 @@ export const ContactsIdentificationInfo = observer(
         );
 
         useEffect(() => {
-            if (type === CO_BUYER && contact.extdata?.itemuid) {
-                getCoBuyerContact(contact.extdata?.itemuid);
-            }
-        }, [type]);
+            if (type !== CO_BUYER) return;
+
+            if (!contact.cobuyeruid || contact.cobuyeruid === prevCoBuyerUID.current) return;
+
+            prevCoBuyerUID.current = contact.cobuyeruid;
+
+            getCoBuyerContact();
+        }, [type, contact.cobuyeruid, getCoBuyerContact]);
 
         useEffect(() => {
             if (frontSideDL.size) {
@@ -120,7 +123,7 @@ export const ContactsIdentificationInfo = observer(
             }
 
             if (withRequest) {
-                removeImagesDL(side).then((response) => {
+                removeImagesDL(side, type === CO_BUYER).then((response) => {
                     if (response?.status === Status.ERROR) {
                         const { error, status } = response as BaseResponseError;
                         toast.current?.show({
