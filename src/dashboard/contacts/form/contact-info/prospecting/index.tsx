@@ -57,9 +57,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <DateInput
-                    placeholder='Contact till...'
-                    date={contactExtData.created}
-                    value={contactExtData.created ? contactExtData.created.toString() : undefined}
+                    date={new Date(contactExtData.created)}
                     emptyDate
                     name='Contact till'
                     showTime

@@ -19,7 +19,7 @@ export const VehicleOptions = observer((): ReactElement => {
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
-        if (response?.error) {
+        if (response?.error && !Array.isArray(response)) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
@@ -27,8 +27,8 @@ export const VehicleOptions = observer((): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } else {
-            const { options_list } = response as InventoryOptions;
-            setOptions(options_list?.filter(Boolean));
+            const options = response as unknown as OptionsListData[];
+            setOptions(options?.filter(Boolean));
         }
     };
 
@@ -62,31 +62,29 @@ export const VehicleOptions = observer((): ReactElement => {
     }, [id, inventoryGroupID]);
 
     return (
-        <>
-            <div className='grid flex-column vehicle-options'>
-                {!id && !inventoryGroupID && (
-                    <p className='vehicle-options__title'>
-                        Select inventory group first for getting options
-                    </p>
-                )}
+        <div className='grid flex-column vehicle-options'>
+            {!id && !inventoryGroupID && (
+                <p className='vehicle-options__title'>
+                    Select inventory group first for getting options
+                </p>
+            )}
 
-                {!id && inventoryGroupID && !options?.length && (
-                    <p className='vehicle-options__title'>Inventory group has no options</p>
-                )}
-                {options?.map(({ name, index }) => (
-                    <div key={index} className='vehicle-options__checkbox flex align-items-center'>
-                        <Checkbox
-                            inputId={name}
-                            name={name}
-                            onChange={() => changeInventoryOptions(name)}
-                            checked={inventoryOptions.includes(name)}
-                        />
-                        <label htmlFor={name} className='ml-2'>
-                            {name}
-                        </label>
-                    </div>
-                ))}
-            </div>
-        </>
+            {!id && inventoryGroupID && !options?.length && (
+                <p className='vehicle-options__title'>Inventory group has no options</p>
+            )}
+            {options?.map(({ name, index }) => (
+                <div key={index} className='vehicle-options__checkbox flex align-items-center'>
+                    <Checkbox
+                        inputId={name}
+                        name={name}
+                        onChange={() => changeInventoryOptions(name)}
+                        checked={inventoryOptions.includes(name)}
+                    />
+                    <label htmlFor={name} className='ml-2'>
+                        {name}
+                    </label>
+                </div>
+            ))}
+        </div>
     );
 });

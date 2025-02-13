@@ -311,7 +311,7 @@ export const DateInput = ({
             {!isChecked && (
                 <label
                     htmlFor={name}
-                    className={`date-item__label ${date || value ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
+                    className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
                 >
                     {name}
                 </label>

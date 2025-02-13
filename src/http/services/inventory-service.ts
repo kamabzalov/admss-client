@@ -2,7 +2,7 @@
 
 import { AxiosResponse, isAxiosError } from "axios";
 import { ListData } from "common/models";
-import { BaseResponse, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
@@ -144,7 +144,7 @@ export const getInventoryOptions = async (inventoryuid: string) => {
 
 export const getInventoryGroupOptions = async (groupuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<InventoryOptions>(
+        const request = await authorizedUserApiInstance.get<OptionsListData & BaseResponseError>(
             `inventory/${groupuid}/groupoptions`
         );
         return request.data;
@@ -379,4 +379,3 @@ export const setInventoryPaymentBack = async (
         }
     }
 };
-
