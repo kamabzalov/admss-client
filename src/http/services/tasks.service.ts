@@ -5,14 +5,23 @@ import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
 import { authorizedUserApiInstance } from "http/index";
 
-export const getTasksByUserId = async (uid: string, params?: QueryParams): Promise<Task[]> => {
-    const response = await authorizedUserApiInstance
-        .get(`tasks/${uid}/listcurrent`, {
-            params,
-        })
-        .then((response) => response.data)
-        .catch((err) => err.response.data);
-    return response;
+export const getTasksByUserId = async (uid: string, params?: QueryParams) => {
+    try {
+        const response = await authorizedUserApiInstance
+            .get<Task[] & BaseResponseError>(`tasks/${uid}/listcurrent`, {
+                params,
+            })
+            .then((response) => response.data)
+            .catch((err) => err.response.data);
+        return response;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting tasks",
+            };
+        }
+    }
 };
 
 export const createTask = async (taskData: Partial<PostDataTask>, taskuid?: string | undefined) => {

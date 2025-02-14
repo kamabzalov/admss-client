@@ -102,3 +102,11 @@
 .sidebar-nav__item:hover .sidebar-nav__icon.reports {
     background-image: url("assets/images/icons/sidebar/reports_onHover.svg");
 }
+
+.sidebar-nav__icon.tasks {
+    background-image: url("assets/images/icons/sidebar/reports_normal.svg");
+}
+
+.sidebar-nav__item:hover .sidebar-nav__icon.tasks {
+    background-image: url("assets/images/icons/sidebar/reports_onHover.svg");
+}
