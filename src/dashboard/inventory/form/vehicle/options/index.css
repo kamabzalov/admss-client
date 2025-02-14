@@ -32,7 +32,7 @@
 
     position: absolute;
     right: 0;
-    top: -50px;
+    top: -58px;
 
     &:hover:enabled {
         background-color: transparent;

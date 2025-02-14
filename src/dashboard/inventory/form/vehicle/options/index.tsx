@@ -15,7 +15,7 @@ export const VehicleOptions = observer((): ReactElement => {
     const toast = useToast();
     const { id } = useParams();
     const navigate = useNavigate();
-    const { inventory, inventoryGroupID, inventoryOptions, changeInventoryOptions } = store;
+    const { inventoryGroupID, inventoryOptions, changeInventoryOptions } = store;
     const [options, setOptions] = useState<OptionsListData[]>([]);
 
     const handleGetInventoryOptionsGroupList = async () => {
