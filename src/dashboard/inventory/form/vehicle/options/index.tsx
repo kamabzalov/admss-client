@@ -82,19 +82,21 @@ export const VehicleOptions = observer((): ReactElement => {
             {!id && inventoryGroupID && !options?.length && (
                 <p className='vehicle-options__title'>Inventory group has no options</p>
             )}
-            {options?.map(({ name, index }) => (
-                <div key={index} className='vehicle-options__checkbox flex align-items-center'>
-                    <Checkbox
-                        inputId={name}
-                        name={name}
-                        onChange={() => changeInventoryOptions(name)}
-                        checked={inventoryOptions.includes(name)}
-                    />
-                    <label htmlFor={name} className='ml-2'>
-                        {name}
-                    </label>
-                </div>
-            ))}
+            <div className='vehicle-options__list'>
+                {options?.map(({ name, index }) => (
+                    <div key={index} className='vehicle-options__checkbox flex align-items-center'>
+                        <Checkbox
+                            inputId={name}
+                            name={name}
+                            onChange={() => changeInventoryOptions(name)}
+                            checked={inventoryOptions.includes(name)}
+                        />
+                        <label htmlFor={name} className='ml-2'>
+                            {name}
+                        </label>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 });
