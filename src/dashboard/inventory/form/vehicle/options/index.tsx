@@ -7,14 +7,15 @@ import { observer } from "mobx-react-lite";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { InventoryOptions, OptionsListData } from "common/models/inventory";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "primereact/button";
 
 export const VehicleOptions = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const toast = useToast();
     const { id } = useParams();
-
-    const { inventory, inventoryGroupID, inventoryOptions, changeInventoryOptions } = store;
+    const navigate = useNavigate();
+    const { inventoryGroupID, inventoryOptions, changeInventoryOptions } = store;
     const [options, setOptions] = useState<OptionsListData[]>([]);
 
     const handleGetInventoryOptionsGroupList = async () => {
@@ -33,7 +34,8 @@ export const VehicleOptions = observer((): ReactElement => {
     };
 
     const handleGetInventoryOptionsList = async () => {
-        const response = await getInventoryOptions(inventory.itemuid);
+        if (!id) return;
+        const response = await getInventoryOptions(id);
         if (response?.error) {
             toast.current?.show({
                 severity: "error",
@@ -63,6 +65,14 @@ export const VehicleOptions = observer((): ReactElement => {
 
     return (
         <div className='grid flex-column vehicle-options'>
+            <Button
+                label='Edit options'
+                type='button'
+                className='p-button vehicle-options__button'
+                onClick={() => {
+                    navigate(`/dashboard/settings`);
+                }}
+            />
             {!id && !inventoryGroupID && (
                 <p className='vehicle-options__title'>
                     Select inventory group first for getting options
@@ -72,19 +82,21 @@ export const VehicleOptions = observer((): ReactElement => {
             {!id && inventoryGroupID && !options?.length && (
                 <p className='vehicle-options__title'>Inventory group has no options</p>
             )}
-            {options?.map(({ name, index }) => (
-                <div key={index} className='vehicle-options__checkbox flex align-items-center'>
-                    <Checkbox
-                        inputId={name}
-                        name={name}
-                        onChange={() => changeInventoryOptions(name)}
-                        checked={inventoryOptions.includes(name)}
-                    />
-                    <label htmlFor={name} className='ml-2'>
-                        {name}
-                    </label>
-                </div>
-            ))}
+            <div className='vehicle-options__list'>
+                {options?.map(({ name, index }) => (
+                    <div key={index} className='vehicle-options__checkbox flex align-items-center'>
+                        <Checkbox
+                            inputId={name}
+                            name={name}
+                            onChange={() => changeInventoryOptions(name)}
+                            checked={inventoryOptions.includes(name)}
+                        />
+                        <label htmlFor={name} className='ml-2'>
+                            {name}
+                        </label>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 });
