@@ -9,13 +9,11 @@ import {
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnProps } from "primereact/column";
+import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
-import { makeShortReports } from "http/services/reports.service";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
-import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
 import {
@@ -27,15 +25,24 @@ import { useStore } from "store/hooks";
 import { Task } from "common/models/tasks";
 import { getTasksByUserId } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
+import { FilterOptions, filterOptions } from "dashboard/common/filter";
+import {
+    MultiSelect,
+    MultiSelectChangeEvent,
+    MultiSelectPanelHeaderTemplateEvent,
+} from "primereact/multiselect";
+import { TableColumnsList, tasksFilterOptions } from "dashboard/tasks/common";
+import { Checkbox } from "primereact/checkbox";
+import { BorderedCheckbox } from "dashboard/common/form/inputs";
 
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "useruid", header: "Assigned To" },
-    { field: "startdate", header: "Start Date" },
-    { field: "deadline", header: "Due Date" },
-    { field: "phone", header: "Phone number" },
-    { field: "accountuid", header: "Account" },
-    { field: "dealuid", header: "Deal" },
-    { field: "contactuid", header: "Contact" },
+const renderColumnsData: TableColumnsList[] = [
+    { field: "useruid", header: "Assigned To", checked: true },
+    { field: "startdate", header: "Start Date", checked: true },
+    { field: "deadline", header: "Due Date", checked: true },
+    { field: "phone", header: "Phone number", checked: false },
+    { field: "accountuid", header: "Account", checked: true },
+    { field: "dealuid", header: "Deal", checked: true },
+    { field: "contactuid", header: "Contact", checked: false },
 ];
 
 enum SEARCH_FORM_FIELDS {
@@ -63,6 +70,7 @@ interface TasksDataTableProps {
 export const TasksDataTable = observer(
     ({ onRowClick, returnedField, getFullInfo }: TasksDataTableProps): ReactElement => {
         const toast = useToast();
+        const navigate = useNavigate();
         const userStore = useStore().userStore;
         const [tasks, setTasks] = useState<Task[]>([]);
         const { authUser } = userStore;
@@ -71,9 +79,14 @@ export const TasksDataTable = observer(
         const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-        const [isLoading, setIsLoading] = useState<boolean>(false);
+        const [isLoading] = useState<boolean>(false);
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(() =>
+            renderColumnsData.filter((col) => col.checked)
+        );
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-        const navigate = useNavigate();
+        const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
+        const [, setSelectedFilterOptions] = useState<FilterOptions[] | null>(null);
+        const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
 
         const handleGetTasks = async (params?: QueryParams) => {
             const responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
@@ -90,7 +103,7 @@ export const TasksDataTable = observer(
                 const { total } = responseTotal;
                 setTotalRecords(total ?? 0);
             }
-            if (response && !Array.isArray(response)) {
+            if (response && Array.isArray(response)) {
                 setTasks(response);
             }
         };
@@ -114,55 +127,6 @@ export const TasksDataTable = observer(
                 type: "text",
             },
         ];
-
-        const printTableData = async (print: boolean = false) => {
-            setIsLoading(true);
-            const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
-                name: column.header as string,
-                data: column.field as string,
-            }));
-            const date = new Date();
-            const name = `tasks_${
-                date.getMonth() + 1
-            }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-
-            if (authUser) {
-                const data = tasks.map((item) => {
-                    const filteredItem: Record<string, any> = {};
-                    columns.forEach((column) => {
-                        if (item.hasOwnProperty(column.data)) {
-                            filteredItem[column.data] = item[column.data as keyof typeof item];
-                        }
-                    });
-                    return filteredItem;
-                });
-                const JSONreport = {
-                    name,
-                    itemUID: "0",
-                    data,
-                    columns,
-                    format: "",
-                };
-                await makeShortReports(authUser.useruid, JSONreport).then((response) => {
-                    const url = new Blob([response], { type: "application/pdf" });
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(url);
-                    if (!print) {
-                        link.download = `Report-${name}.pdf`;
-                        link.click();
-                    }
-
-                    if (print) {
-                        window.open(
-                            link.href,
-                            "_blank",
-                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                        );
-                    }
-                });
-            }
-            setIsLoading(false);
-        };
 
         const pageChanged = (event: DataTablePageEvent) => {
             setLazyState(event);
@@ -242,42 +206,167 @@ export const TasksDataTable = observer(
             });
         };
 
+        const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
+            return (
+                <div className='dropdown-header flex pb-1'>
+                    <label className='cursor-pointer dropdown-header__label'>
+                        <Checkbox
+                            checked={
+                                filterOptions.filter((option) => !option.disabled).length ===
+                                selectedFilter.length
+                            }
+                            onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                setSelectedFilter(
+                                    isChecked
+                                        ? filterOptions.map((option) => ({ value: option.value }))
+                                        : []
+                                );
+                                const selectedOptions = isChecked ? filterOptions : [];
+                                setSelectedFilterOptions(
+                                    selectedOptions.filter((option) => !option.disabled)
+                                );
+                            }}
+                            className='dropdown-header__checkbox mr-2'
+                        />
+                        Select All
+                    </label>
+                    <button
+                        className='p-multiselect-close p-link'
+                        onClick={(e) => {
+                            setSelectedFilter([]);
+                            setSelectedFilterOptions([]);
+                            evt.onCloseClick(e);
+                        }}
+                    >
+                        <i className='pi pi-times' />
+                    </button>
+                </div>
+            );
+        };
+
+        const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
+            return (
+                <div className='dropdown-header flex pb-1'>
+                    <label className='cursor-pointer dropdown-header__label'>
+                        <Checkbox
+                            onChange={() => {
+                                if (renderColumnsData.length === activeColumns.length) {
+                                    setActiveColumns(
+                                        renderColumnsData.filter(({ checked }) => checked)
+                                    );
+                                } else {
+                                    setActiveColumns(renderColumnsData);
+                                }
+                            }}
+                            checked={renderColumnsData.length === activeColumns.length}
+                            className='dropdown-header__checkbox mr-2'
+                        />
+                        Select All
+                    </label>
+                    <button
+                        className='p-multiselect-close p-link'
+                        onClick={(e) => {
+                            setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
+                            onCloseClick(e);
+                        }}
+                    >
+                        <i className='pi pi-times' />
+                    </button>
+                </div>
+            );
+        };
+
         return (
-            <div className='card-content'>
+            <div className='card-content tasks'>
                 <div className='grid datatable-controls'>
-                    <div className='col-6'>
-                        <div className='contact-top-controls'>
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-print'
-                                tooltip='Print tasks form'
-                                onClick={() => printTableData(true)}
+                    <div className='col-6 p-0 flex gap-3'>
+                        <span className='p-input-icon-right tasks-search'>
+                            <i className='pi pi-search' />
+                            <InputText
+                                value={globalSearch}
+                                placeholder='Search'
+                                onChange={(e) => setGlobalSearch(e.target.value)}
                             />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-blank'
-                                tooltip='Download tasks form'
-                                onClick={() => printTableData()}
-                            />
-                        </div>
-                    </div>
-                    <div className='col-6 text-right'>
+                        </span>
                         <Button
-                            className='contact-top-controls__button m-r-20px'
+                            className='tasks__search-button'
                             label='Advanced search'
                             severity='success'
                             type='button'
                             onClick={() => setDialogVisible(true)}
                         />
-                        <span className='p-input-icon-right'>
-                            <i className='pi pi-search' />
-                            <InputText
-                                value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
-                            />
-                        </span>
+
+                        <Button
+                            severity='success'
+                            className='tasks__add-button'
+                            type='button'
+                            icon='icon adms-add-item'
+                            tooltip='Add task'
+                            onClick={() => setDialogVisible(true)}
+                        />
+                    </div>
+                    <div className='col-6 p-0 flex gap-3'>
+                        <MultiSelect
+                            optionValue='value'
+                            optionLabel='label'
+                            options={tasksFilterOptions}
+                            value={selectedFilter}
+                            onChange={({ value }: MultiSelectChangeEvent) => {
+                                const selectedOptions = filterOptions.filter((option) =>
+                                    value.includes(option.value)
+                                );
+                                setSelectedFilterOptions(selectedOptions);
+                            }}
+                            placeholder='Filter'
+                            className='pb-0 flex align-items-center tasks-filter'
+                            display='chip'
+                            selectedItemsLabel='Clear Filter'
+                            panelHeaderTemplate={dropdownFilterHeaderPanel}
+                            pt={{
+                                header: {
+                                    className: "tasks-filter__header",
+                                },
+                                wrapper: {
+                                    className: "tasks-filter__wrapper",
+                                    style: {
+                                        maxHeight: "230px",
+                                    },
+                                },
+                            }}
+                        />
+
+                        <BorderedCheckbox
+                            checked={myTasksOnly}
+                            onChange={(e) => {
+                                setMyTasksOnly(!!e.target.checked);
+                            }}
+                            name='My tasks only'
+                        />
+                        <MultiSelect
+                            options={renderColumnsData}
+                            value={activeColumns}
+                            optionLabel='header'
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+
+                                setActiveColumns(value);
+                            }}
+                            panelHeaderTemplate={dropdownHeaderPanel}
+                            className='pb-0 h-full flex align-items-center tasks-filter'
+                            display='chip'
+                            pt={{
+                                header: {
+                                    className: "tasks-filter__header",
+                                },
+                                wrapper: {
+                                    className: "tasks-filter__wrapper",
+                                    style: {
+                                        maxHeight: "230px",
+                                    },
+                                },
+                            }}
+                        />
                     </div>
                 </div>
                 <div className='grid'>

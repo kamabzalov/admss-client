@@ -1,9 +1,15 @@
-import { BaseResponseError } from "../base-response";
+import { BaseResponseError } from "common/models/base-response";
 
 export enum TaskStatus {
-    COMPLETED = "Completed",
-    STARTED = "Started",
     DEFAULT = "Default",
+    STARTED = "Started",
+    IN_PROGRESS = "In Progress",
+    CANCELLED = "Cancelled",
+    POSTPONED = "Postponed",
+    PAUSED = "Paused",
+    COMPLETED = "Completed",
+    OUTDATED = "Outdated",
+    DELETED = "Deleted",
 }
 
 export interface Task {
