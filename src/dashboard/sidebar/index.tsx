@@ -67,6 +67,13 @@ export const Sidebar = observer((): ReactElement => {
                                 <span>Export to Web</span>
                             </Link>
                         </li>
+                        <li className='sidebar-nav__item'>
+                            <Link to='/dashboard/tasks' className='sidebar-nav__link'>
+                                {/* TODO: change icon */}
+                                <div className='sidebar-nav__icon tasks'></div>
+                                <span>Tasks</span>
+                            </Link>
+                        </li>
                     </>
                 )}
             </ul>

@@ -1,10 +1,10 @@
-import "./index.css";
 import { Calendar } from "primereact/calendar";
 import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Tasks } from "dashboard/tasks";
+import { TasksWidget } from "dashboard/tasks/widget";
 import { useStore } from "store/hooks";
-import { RecentMessages } from "./recent-messages";
+import { RecentMessages } from "dashboard/home/recent-messages";
+import "./index.css";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -86,7 +86,7 @@ export const Home = (): ReactElement => {
                     <div className='card-content'>
                         <div className='grid justify-content-between'>
                             <div className='col-12 md:col-9'>
-                                <Tasks />
+                                <TasksWidget />
                             </div>
                             <div className='col-12 md:col-3 md:text-right task-calendar p-0'>
                                 <Calendar className='task-calendar__input' value={date} inline />
