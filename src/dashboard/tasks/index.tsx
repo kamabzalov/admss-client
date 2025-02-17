@@ -1,11 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-
 import {
     DataTable,
     DataTablePageEvent,
-    DataTableRowClickEvent,
     DataTableSortEvent,
+    DataTableValue,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -13,7 +12,6 @@ import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
 import "./index.css";
-import { useNavigate } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
 import {
@@ -31,9 +29,10 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { TableColumnsList, tasksFilterOptions } from "dashboard/tasks/common";
+import { TableColumnsList } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
+import { AddTaskDialog } from "./add-task-dialog";
 
 const renderColumnsData: TableColumnsList[] = [
     { field: "useruid", header: "Assigned To", checked: true },
@@ -61,6 +60,48 @@ interface AdvancedSearch {
     date: string;
 }
 
+interface TasksFilterOptions {
+    name: string;
+    value?: string;
+}
+
+const TASKS_STATUS_LIST: TasksFilterOptions[] = [
+    { name: "Select all" },
+    { name: "Default", value: "utsDefault.status" },
+    {
+        name: "Started",
+        value: "utsStarted.status",
+    },
+    {
+        name: "In Progress",
+        value: "utsInProgress.status",
+    },
+    {
+        name: "Cancelled",
+        value: "utsCancelled.status",
+    },
+    {
+        name: "Postponed",
+        value: "utsPostPoned.status",
+    },
+    {
+        name: "Paused",
+        value: "utsPaused.status",
+    },
+    {
+        name: "Completed",
+        value: "utsCompleted.status",
+    },
+    {
+        name: "Outdated",
+        value: "utsOutdated.status",
+    },
+    {
+        name: "Deleted",
+        value: "utsDeleted.status",
+    },
+];
+
 interface TasksDataTableProps {
     onRowClick?: (accountName: string) => void;
     returnedField?: keyof Task;
@@ -70,7 +111,6 @@ interface TasksDataTableProps {
 export const TasksDataTable = observer(
     ({ onRowClick, returnedField, getFullInfo }: TasksDataTableProps): ReactElement => {
         const toast = useToast();
-        const navigate = useNavigate();
         const userStore = useStore().userStore;
         const [tasks, setTasks] = useState<Task[]>([]);
         const { authUser } = userStore;
@@ -85,8 +125,12 @@ export const TasksDataTable = observer(
         );
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
         const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
-        const [, setSelectedFilterOptions] = useState<FilterOptions[] | null>(null);
+        const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[]>([]);
         const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+        const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+        const [showTaskDialog, setShowTaskDialog] = useState<boolean>(false);
+        const [currentTask, setCurrentTask] = useState<Task | null>(null);
+        const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
 
         const handleGetTasks = async (params?: QueryParams) => {
             const responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
@@ -119,7 +163,6 @@ export const TasksDataTable = observer(
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.CREATION_DATE],
                 type: "date",
             },
-
             {
                 key: SEARCH_FORM_FIELDS.DESCRIPTION,
                 label: SEARCH_FORM_FIELDS.DESCRIPTION,
@@ -135,7 +178,6 @@ export const TasksDataTable = observer(
         const sortData = (event: DataTableSortEvent) => {
             setLazyState(event);
         };
-
         useEffect(() => {
             const params: QueryParams = {
                 ...(globalSearch && { qry: globalSearch }),
@@ -143,10 +185,19 @@ export const TasksDataTable = observer(
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
-            if (authUser) {
-                handleGetTasks(params);
+
+            let qry: string = "";
+            const selectedFiltersQuery: string = [...selectedStatusFilters]
+                .filter((item) => item && item !== "allStatuses")
+                .join("+");
+
+            if (selectedFiltersQuery.length) {
+                qry += selectedFiltersQuery;
+                params.qry = qry;
             }
-        }, [lazyState, authUser, globalSearch]);
+
+            handleGetTasks(params);
+        }, [lazyState, authUser, globalSearch, selectedStatusFilters]);
 
         const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
             setAdvancedSearch((prevSearch) => {
@@ -186,18 +237,6 @@ export const TasksDataTable = observer(
             setDialogVisible(false);
         };
 
-        const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
-            if (getFullInfo) {
-                getFullInfo(data as Task);
-            }
-            if (onRowClick) {
-                const value = returnedField ? data[returnedField] : data.name;
-                onRowClick(value);
-            } else {
-                navigate(data.accountuid);
-            }
-        };
-
         const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
             setAdvancedSearch((prevSearch) => {
                 const updatedSearch = { ...prevSearch };
@@ -222,9 +261,10 @@ export const TasksDataTable = observer(
                                         ? filterOptions.map((option) => ({ value: option.value }))
                                         : []
                                 );
-                                const selectedOptions = isChecked ? filterOptions : [];
                                 setSelectedFilterOptions(
-                                    selectedOptions.filter((option) => !option.disabled)
+                                    isChecked
+                                        ? filterOptions.filter((option) => !option.disabled)
+                                        : []
                                 );
                             }}
                             className='dropdown-header__checkbox mr-2'
@@ -277,6 +317,36 @@ export const TasksDataTable = observer(
             );
         };
 
+        const handleCreateTask = () => {
+            setCurrentTask(null);
+            setShowTaskDialog(true);
+        };
+
+        const handleEditTask = (task: Task) => {
+            setCurrentTask(task);
+            setShowTaskDialog(true);
+        };
+
+        const handleRowExpansion = (task: Task) => {
+            setExpandedRows((prev) =>
+                prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
+            );
+        };
+
+        const rowExpansionTemplate = (task: Task) => {
+            return (
+                <div className='expanded-row'>
+                    <div className='expanded-row__label'>Description: </div>
+                    <div className='expanded-row__text'>{task.description || ""}</div>
+                </div>
+            );
+        };
+
+        const filteredTasks = tasks.filter((task) => {
+            if (selectedFilterOptions.length === 0) return true;
+            return selectedFilterOptions.some((option) => option.value === task.task_status);
+        });
+
         return (
             <div className='card-content tasks'>
                 <div className='grid datatable-controls'>
@@ -303,20 +373,18 @@ export const TasksDataTable = observer(
                             type='button'
                             icon='icon adms-add-item'
                             tooltip='Add task'
-                            onClick={() => setDialogVisible(true)}
+                            onClick={() => handleCreateTask()}
                         />
                     </div>
                     <div className='col-6 p-0 flex gap-3'>
                         <MultiSelect
                             optionValue='value'
-                            optionLabel='label'
-                            options={tasksFilterOptions}
-                            value={selectedFilter}
-                            onChange={({ value }: MultiSelectChangeEvent) => {
-                                const selectedOptions = filterOptions.filter((option) =>
-                                    value.includes(option.value)
-                                );
-                                setSelectedFilterOptions(selectedOptions);
+                            optionLabel='name'
+                            value={selectedStatusFilters}
+                            options={TASKS_STATUS_LIST}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                setSelectedStatusFilters(e.value);
                             }}
                             placeholder='Filter'
                             className='pb-0 flex align-items-center tasks-filter'
@@ -349,7 +417,6 @@ export const TasksDataTable = observer(
                             optionLabel='header'
                             onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                                 stopPropagation();
-
                                 setActiveColumns(value);
                             }}
                             panelHeaderTemplate={dropdownHeaderPanel}
@@ -378,7 +445,7 @@ export const TasksDataTable = observer(
                         ) : (
                             <DataTable
                                 showGridlines
-                                value={tasks}
+                                value={filteredTasks}
                                 lazy
                                 paginator
                                 first={lazyState.first}
@@ -392,14 +459,50 @@ export const TasksDataTable = observer(
                                 sortOrder={lazyState.sortOrder}
                                 sortField={lazyState.sortField}
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
-                                onRowClick={handleOnRowClick}
+                                expandedRows={expandedRows}
+                                onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
+                                rowExpansionTemplate={rowExpansionTemplate}
                             >
-                                {renderColumnsData.map(({ field, header }) => (
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={(task) => {
+                                        return (
+                                            <div className={`flex gap-3 align-items-center`}>
+                                                <Button
+                                                    className='text export-web__icon-button'
+                                                    icon='icon adms-edit-item'
+                                                    onClick={() => handleEditTask(task)}
+                                                />
+                                                <Button
+                                                    className='text export-web__icon-button'
+                                                    icon='pi pi-angle-down'
+                                                    onClick={() => handleRowExpansion(task)}
+                                                />
+                                            </div>
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "100px",
+                                            },
+                                        },
+                                    }}
+                                />
+                                {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}
                                         key={field}
                                         sortable
+                                        body={(data) => {
+                                            let value: string | number;
+                                            value = data[field];
+
+                                            return <div>{value}</div>;
+                                        }}
                                         headerClassName='cursor-move'
                                     />
                                 ))}
@@ -407,6 +510,13 @@ export const TasksDataTable = observer(
                         )}
                     </div>
                 </div>
+                <AddTaskDialog
+                    visible={showTaskDialog}
+                    onHide={() => setShowTaskDialog(false)}
+                    currentTask={currentTask as Task}
+                    onAction={handleGetTasks}
+                    header={currentTask ? "Edit Task" : "Add Task"}
+                />
                 <AdvancedSearchDialog<AdvancedSearch>
                     visible={dialogVisible}
                     buttonDisabled={buttonDisabled}
