@@ -136,3 +136,10 @@ export const formatDateForServer = (date: Date): string => {
 
     return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
 };
+
+export const validateDates = (start: string, due: string): { isValid: boolean; error?: string } => {
+    if (new Date(start) > new Date(due)) {
+        return { isValid: false, error: "Start Date must be before Due Date" };
+    }
+    return { isValid: true };
+};
