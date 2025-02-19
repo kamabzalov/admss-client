@@ -67,38 +67,38 @@ interface TasksFilterOptions {
 
 const TASKS_STATUS_LIST: TasksFilterOptions[] = [
     { name: "Select all" },
-    { name: "Default", value: "utsDefault.status" },
+    { name: "Default", value: "0.status" },
     {
         name: "Started",
-        value: "utsStarted.status",
+        value: "1.status",
     },
     {
         name: "In Progress",
-        value: "utsInProgress.status",
+        value: "2.status",
     },
     {
         name: "Cancelled",
-        value: "utsCancelled.status",
+        value: "3.status",
     },
     {
         name: "Postponed",
-        value: "utsPostPoned.status",
+        value: "4.status",
     },
     {
         name: "Paused",
-        value: "utsPaused.status",
+        value: "5.status",
     },
     {
         name: "Completed",
-        value: "utsCompleted.status",
+        value: "6.status",
     },
     {
         name: "Outdated",
-        value: "utsOutdated.status",
+        value: "7.status",
     },
     {
         name: "Deleted",
-        value: "utsDeleted.status",
+        value: "8.status",
     },
 ];
 
