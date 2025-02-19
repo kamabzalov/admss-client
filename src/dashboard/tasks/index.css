@@ -45,3 +45,23 @@
     flex: 0 1 13.5%;
   }
 }
+
+.task-status--started {
+  border-color: var(--admss-app-warning-green);
+  color: var(--admss-app-warning-green);
+}
+
+.task-status--in-progress {
+  border-color: var(--admss-app-warning-blue);
+  color: var(--admss-app-warning-blue);
+}
+
+.task-status--paused {
+  border-color: var(--admss-app-status-yellow);
+  color: var(--admss-app-status-yellow);
+}
+
+.task-status--postponed {
+  border-color: var(--admss-app-warning-yellow);
+  color: var(--admss-app-warning-yellow);
+}
