@@ -5,7 +5,10 @@ import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
 import { authorizedUserApiInstance } from "http/index";
 
-export const getTasksByUserId = async (uid: string, params?: QueryParams): Promise<Task[]> => {
+export const getTasksByUserId = async (
+    uid: string,
+    params?: QueryParams
+): Promise<Task[] | { total: number }> => {
     const response = await authorizedUserApiInstance
         .get(`tasks/${uid}/listcurrent`, {
             params,
