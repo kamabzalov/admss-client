@@ -16,6 +16,7 @@ export interface Task {
     accountname: string;
     accountnumber: string;
     accountuid: string;
+    assignedto: string;
     contactname: string;
     contactuid: string;
     created: string;

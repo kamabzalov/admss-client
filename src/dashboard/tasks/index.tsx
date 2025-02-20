@@ -35,7 +35,7 @@ import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "./add-task-dialog";
 
 const alwaysActiveColumns: TableColumnsList[] = [
-    { field: "useruid", header: "Assigned To", checked: true },
+    { field: "assignedto", header: "Assigned To", checked: true },
     { field: "startdate", header: "Start Date", checked: true },
     { field: "deadline", header: "Due Date", checked: true },
     { field: "phone", header: "Phone number", checked: true },
@@ -153,10 +153,6 @@ export const TasksDataTable = observer(
             }
         };
 
-        useEffect(() => {
-            handleGetTasks();
-        }, []);
-
         const searchFields = [
             {
                 key: SEARCH_FORM_FIELDS.CREATION_DATE,
@@ -217,11 +213,11 @@ export const TasksDataTable = observer(
                     switch (key) {
                         case SEARCH_FORM_FIELDS.CREATION_DATE:
                             keyName = SEARCH_FORM_QUERY.CREATION_DATE;
+                            value = new Date(value).getTime();
                             break;
 
                         case SEARCH_FORM_FIELDS.DESCRIPTION:
                             keyName = SEARCH_FORM_QUERY.DESCRIPTION;
-                            value = new Date(value).getTime();
                             break;
                     }
                     return `${value}.${keyName}`;

@@ -11,11 +11,13 @@ import { TaskSummaryDialog } from "dashboard/tasks/task-summary";
 import "./index.css";
 import { renderTaskStatus } from "dashboard/tasks/common";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_TASK_COUNT = 4;
 
 export const TasksWidget = observer(() => {
     const [tasks, setTasks] = useState<Task[]>([]);
+    const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
@@ -135,7 +137,11 @@ export const TasksWidget = observer(() => {
                 )}
                 {allTasksCount > DEFAULT_TASK_COUNT && (
                     <li className='p-0'>
-                        <Button className='tasks-widget__button messages-more' text>
+                        <Button
+                            className='tasks-widget__button messages-more'
+                            onClick={() => navigate("/dashboard/tasks")}
+                            text
+                        >
                             View more...
                         </Button>
                     </li>
