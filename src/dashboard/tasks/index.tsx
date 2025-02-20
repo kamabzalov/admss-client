@@ -34,14 +34,18 @@ import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "./add-task-dialog";
 
-const renderColumnsData: TableColumnsList[] = [
+const alwaysActiveColumns: TableColumnsList[] = [
     { field: "useruid", header: "Assigned To", checked: true },
     { field: "startdate", header: "Start Date", checked: true },
     { field: "deadline", header: "Due Date", checked: true },
-    { field: "phone", header: "Phone number", checked: false },
-    { field: "accountuid", header: "Account", checked: true },
-    { field: "dealuid", header: "Deal", checked: true },
-    { field: "contactuid", header: "Contact", checked: false },
+    { field: "phone", header: "Phone number", checked: true },
+    { field: "created", header: "Created", checked: true },
+];
+
+const selectableColumns: TableColumnsList[] = [
+    { field: "accountname", header: "Account", checked: false, isSelectable: true },
+    { field: "dealname", header: "Deal", checked: false, isSelectable: true },
+    { field: "contactname", header: "Contact", checked: false, isSelectable: true },
 ];
 
 enum SEARCH_FORM_FIELDS {
@@ -66,7 +70,6 @@ interface TasksFilterOptions {
 }
 
 const TASKS_STATUS_LIST: TasksFilterOptions[] = [
-    { name: "Select all" },
     { name: "Default", value: "0.status" },
     {
         name: "Started",
@@ -120,9 +123,7 @@ export const TasksDataTable = observer(
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading] = useState<boolean>(false);
-        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(() =>
-            renderColumnsData.filter((col) => col.checked)
-        );
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
         const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
         const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[]>([]);
@@ -291,15 +292,15 @@ export const TasksDataTable = observer(
                     <label className='cursor-pointer dropdown-header__label'>
                         <Checkbox
                             onChange={() => {
-                                if (renderColumnsData.length === activeColumns.length) {
+                                if (selectableColumns.length === activeColumns.length) {
                                     setActiveColumns(
-                                        renderColumnsData.filter(({ checked }) => checked)
+                                        selectableColumns.filter(({ checked }) => checked)
                                     );
                                 } else {
-                                    setActiveColumns(renderColumnsData);
+                                    setActiveColumns(selectableColumns);
                                 }
                             }}
-                            checked={renderColumnsData.length === activeColumns.length}
+                            checked={selectableColumns.length === activeColumns.length}
                             className='dropdown-header__checkbox mr-2'
                         />
                         Select All
@@ -307,7 +308,7 @@ export const TasksDataTable = observer(
                     <button
                         className='p-multiselect-close p-link'
                         onClick={(e) => {
-                            setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
+                            setActiveColumns(selectableColumns.filter(({ checked }) => checked));
                             onCloseClick(e);
                         }}
                     >
@@ -319,11 +320,6 @@ export const TasksDataTable = observer(
 
         const handleCreateTask = () => {
             setCurrentTask(null);
-            setShowTaskDialog(true);
-        };
-
-        const handleEditTask = (task: Task) => {
-            setCurrentTask(task);
             setShowTaskDialog(true);
         };
 
@@ -412,7 +408,7 @@ export const TasksDataTable = observer(
                             name='My tasks only'
                         />
                         <MultiSelect
-                            options={renderColumnsData}
+                            options={selectableColumns}
                             value={activeColumns}
                             optionLabel='header'
                             onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
@@ -458,7 +454,6 @@ export const TasksDataTable = observer(
                                 resizableColumns
                                 sortOrder={lazyState.sortOrder}
                                 sortField={lazyState.sortField}
-                                rowClassName={() => "hover:text-primary cursor-pointer"}
                                 expandedRows={expandedRows}
                                 onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
                                 rowExpansionTemplate={rowExpansionTemplate}
@@ -473,7 +468,6 @@ export const TasksDataTable = observer(
                                                 <Button
                                                     className='text export-web__icon-button'
                                                     icon='icon adms-edit-item'
-                                                    onClick={() => handleEditTask(task)}
                                                 />
                                                 <Button
                                                     className='text export-web__icon-button'
@@ -491,6 +485,21 @@ export const TasksDataTable = observer(
                                         },
                                     }}
                                 />
+                                {alwaysActiveColumns.map(({ field, header }) => (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        body={(data) => {
+                                            let value: string | number;
+                                            value = data[field];
+                                            return <div>{value}</div>;
+                                        }}
+                                        headerClassName='cursor-move'
+                                    />
+                                ))}
+
                                 {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
@@ -500,7 +509,6 @@ export const TasksDataTable = observer(
                                         body={(data) => {
                                             let value: string | number;
                                             value = data[field];
-
                                             return <div>{value}</div>;
                                         }}
                                         headerClassName='cursor-move'

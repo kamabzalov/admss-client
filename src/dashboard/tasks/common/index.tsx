@@ -7,7 +7,9 @@ export interface TableColumnProps extends ColumnProps {
     field: keyof Task;
 }
 
-export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
+type TableColumnsListExtend = { checked?: boolean; isSelectable?: boolean };
+
+export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & TableColumnsListExtend;
 
 export const tasksFilterOptions: FilterOptions[] = [
     { label: "Default", value: "default", column: "status" },
