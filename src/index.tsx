@@ -23,6 +23,7 @@ import { ExportToWeb } from "dashboard/export-web";
 import { ReportForm } from "dashboard/reports/form";
 import { PrintForTestDrive } from "dashboard/test-drive";
 import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
+import { Tasks } from "dashboard/tasks";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -135,6 +136,15 @@ const AppRouter = (): ReactElement => {
                                     <ExportToWeb />
                                 </ProtectedRoute>
                             ),
+                        },
+                        {
+                            path: "tasks",
+                            element: (
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <Outlet />
+                                </ProtectedRoute>
+                            ),
+                            children: [{ path: "", element: <Tasks /> }],
                         },
                     ],
                 },

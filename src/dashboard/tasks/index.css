@@ -1,41 +1,67 @@
 .tasks {
-    .tasks__button.messages-more.p-button {
-        color: var(--admss-app-main-blue);
-        padding-left: 0;
 
-        &:enabled:hover {
-            color: var(--admss-app-medium-blue);
-        }
+  .tasks-search,
+  .tasks-search .p-inputtext,
+  .tasks__search-button {
+    width: 200px;
+    height: 50px;
+
+    .pi.pi-search {
+      color: var(--admss-app-medium-grey);
     }
-}
+  }
 
-.empty-list,
-.tasks-count.empty-list {
-    color: var(--admss-app-medium-grey);
-}
-
-.tasks-count {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--admss-app-main-blue);
-    margin-left: 6px;
-}
-
-.tasks-header {
-    display: flex;
-    justify-content: space-between;
+  .tasks__add-button {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-right: 40px;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .tasks-filter {
+    &.p-multiselect {
+      width: 230px;
+    }
+
+    .tasks-filter__wrapper .p-multiselect-item.p-disabled {
+      font-weight: 900;
+    }
+
+    .tasks-filter__wrapper .p-multiselect-item.p-disabled .p-checkbox {
+      display: none;
+    }
+
+    .p-multiselect-panel .tasks-filter__header.p-multiselect-header {
+      background-color: transparent;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  .expanded-row__label {
+    flex: 0 1 13.5%;
+  }
 }
 
-.add-task-control.p-button {
-    background-color: var(--admss-app-primary-main-green);
-    border-color: var(--admss-app-primary-main-green);
-    color: var(--admss-app-white);
+.task-status--started {
+  border-color: var(--admss-app-warning-green);
+  color: var(--admss-app-warning-green);
+}
 
-    .p-button-icon {
-        font-size: 20px;
-        font-weight: 900;
-    }
+.task-status--in-progress {
+  border-color: var(--admss-app-warning-blue);
+  color: var(--admss-app-warning-blue);
+}
+
+.task-status--paused {
+  border-color: var(--admss-app-status-yellow);
+  color: var(--admss-app-status-yellow);
+}
+
+.task-status--postponed {
+  border-color: var(--admss-app-warning-yellow);
+  color: var(--admss-app-warning-yellow);
 }
