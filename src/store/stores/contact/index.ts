@@ -176,13 +176,13 @@ export class ContactStore {
         if (!uid) return;
 
         if (isCoBuyer) {
-            if (this._contact.dluidfront) {
-                getInventoryMediaItem(this._contact.dluidfront).then((res) => {
+            if (this._cobayerContact.dluidfront) {
+                getInventoryMediaItem(this._cobayerContact.dluidfront).then((res) => {
                     if (res) this._coBuyerFrontSideDLurl = res;
                 });
             }
-            if (this._contact.dluidback) {
-                getInventoryMediaItem(this._contact.dluidback).then((res) => {
+            if (this._cobayerContact.dluidback) {
+                getInventoryMediaItem(this._cobayerContact.dluidback).then((res) => {
                     if (res) this._coBuyerBackSideDLurl = res;
                 });
             }
@@ -222,17 +222,14 @@ export class ContactStore {
     public saveContact = action(async (): Promise<string> => {
         try {
             this._isLoading = true;
-
             let newProspect: Partial<ContactProspect>[] = [];
             if (this._contactProspect.length) {
                 const prospectFirst = this._contactProspect.find(
                     (pros) => pros?.notes === this._contactExtData.PROSPECT1_ID
                 ) || { notes: this._contactExtData.PROSPECT1_ID };
-
                 const prospectSecond = this._contactProspect.find(
                     (pros) => pros?.notes === this._contactExtData.PROSPECT2_ID
                 ) || { notes: this._contactExtData.PROSPECT2_ID };
-
                 newProspect = [...this._contactProspect, prospectFirst, prospectSecond].filter(
                     Boolean
                 );
@@ -244,19 +241,30 @@ export class ContactStore {
                 prospect: newProspect as ContactProspect[],
             };
 
-            const imagesResponse = await this.setImagesDL(this._contactID);
-            if (imagesResponse.status === Status.ERROR) {
-                return imagesResponse.error;
+            const [contactDataResponse, imagesResponse] = await Promise.all([
+                setContact(this._contactID, contactData),
+                this.setImagesDL(this._contactID),
+            ]);
+
+            if (contactDataResponse?.status === Status.ERROR) {
+                throw new Error(contactDataResponse?.error);
             }
 
-            const contactDataResponse = await setContact(this._contactID, contactData);
-            if (contactDataResponse?.status === Status.ERROR && contactDataResponse?.error) {
-                return contactDataResponse.error;
+            let responseStatus = Status.ERROR;
+
+            if (contactDataResponse?.status === Status.OK) {
+                responseStatus = Status.OK;
+            }
+            if (this._contactID && imagesResponse?.status === Status.OK) {
+                responseStatus = Status.OK;
             }
 
-            return Status.OK;
+            return responseStatus;
         } catch (error) {
-            return error instanceof Error ? error.message : String(error);
+            if (error instanceof Error) {
+                return error.message;
+            }
+            return String(error);
         } finally {
             this._isLoading = false;
         }
