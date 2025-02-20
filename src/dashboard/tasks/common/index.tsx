@@ -46,5 +46,26 @@ export const renderTaskStatus = (task_status: TaskStatus) => {
                     className='tasks-widget__chip task-status--postponed'
                 />
             );
+        case TaskStatus.STARTED:
+            return (
+                <Chip
+                    label={TaskStatus.STARTED}
+                    className='tasks-widget__chip task-status--started'
+                />
+            );
+        case TaskStatus.COMPLETED:
+            return (
+                <Chip
+                    label={TaskStatus.COMPLETED}
+                    className='tasks-widget__chip task-status--completed'
+                />
+            );
+        case TaskStatus.CANCELLED:
+            return (
+                <Chip
+                    label={TaskStatus.CANCELLED}
+                    className='tasks-widget__chip task-status--cancelled'
+                />
+            );
     }
 };
