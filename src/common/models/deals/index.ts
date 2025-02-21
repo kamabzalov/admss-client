@@ -13,6 +13,7 @@ export interface Deal {
     datepurchase: string;
     dealstatus: number;
     dealtype: number;
+    dealuid: string;
     differentSeller: 0 | 1;
     differentSellerInfo: string;
     differentSellerUID: string;

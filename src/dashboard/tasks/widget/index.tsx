@@ -31,10 +31,12 @@ export const TasksWidget = observer(() => {
     const toast = useRef<Toast>(null);
 
     const getTasks = async (taskCount = DEFAULT_TASK_COUNT) => {
-        const res = await getTasksByUserId(authUser!.useruid);
+        const totalCount = await getTasksByUserId(authUser!.useruid, { total: 1 });
+        if (totalCount && !Array.isArray(totalCount)) setAllTasksCount(totalCount?.total);
+
+        const res = await getTasksByUserId(authUser!.useruid, { top: taskCount });
         if (res && Array.isArray(res)) {
-            setTasks(res.slice(0, taskCount));
-            setAllTasksCount(res.length);
+            setTasks(res);
         }
     };
 
