@@ -47,8 +47,8 @@
 }
 
 .task-status--started {
-  border-color: var(--admss-app-warning-green);
-  color: var(--admss-app-warning-green);
+  border-color: var(--admss-app-status-blue);
+  color: var(--admss-app-status-blue);
 }
 
 .task-status--in-progress {
@@ -64,4 +64,14 @@
 .task-status--postponed {
   border-color: var(--admss-app-warning-yellow);
   color: var(--admss-app-warning-yellow);
+}
+
+.task-status--completed {
+  border-color: var(--admss-app-warning-green);
+  color: var(--admss-app-warning-green);
+}
+
+.task-status--cancelled {
+  border-color: var(--admss-app-red);
+  color: var(--admss-app-red);
 }

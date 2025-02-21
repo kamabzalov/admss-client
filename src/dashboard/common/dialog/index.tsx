@@ -39,7 +39,7 @@ export const DashboardDialog = ({
             {...props}
         >
             <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-                {({ isSubmitting }) => (
+                {() => (
                     <Form>
                         <div className='p-dialog-content-body' tabIndex={0}>
                             {children}
@@ -60,7 +60,7 @@ export const DashboardDialog = ({
                                 <Button
                                     type='submit'
                                     label={`${footer}`}
-                                    disabled={buttonDisabled || isSubmitting}
+                                    disabled={buttonDisabled}
                                 />
                             )}
                         </div>
