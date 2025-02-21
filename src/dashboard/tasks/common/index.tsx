@@ -67,5 +67,12 @@ export const renderTaskStatus = (task_status: TaskStatus) => {
                     className='tasks-widget__chip task-status--cancelled'
                 />
             );
+        default:
+            return (
+                <Chip
+                    label={TaskStatus.DEFAULT}
+                    className='tasks-widget__chip task-status--default'
+                />
+            );
     }
 };
