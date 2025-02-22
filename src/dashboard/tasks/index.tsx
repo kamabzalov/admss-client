@@ -21,7 +21,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { Task } from "common/models/tasks";
-import { getTasksByUserId } from "http/services/tasks.service";
+import { getAllTasks, getTasksByUserId } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
 import {
     MultiSelect,
@@ -32,6 +32,7 @@ import { TableColumnsList } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "./add-task-dialog";
+import { TotalListCount } from "common/models/base-response";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -124,21 +125,28 @@ export const TasksDataTable = observer(
         const [isLoading] = useState<boolean>(false);
         const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-        const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
         const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
         const [showTaskDialog, setShowTaskDialog] = useState<boolean>(false);
         const [currentTask, setCurrentTask] = useState<Task | null>(null);
         const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
+        const [onlyCurrentUserTasks, setOnlyCurrentUserTasks] = useState<boolean>(false);
 
         const handleGetTasks = async (params?: QueryParams) => {
-            const responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
-            const response = await getTasksByUserId(authUser!.useruid, params);
+            let responseTotal: TotalListCount = {} as TotalListCount;
+            let response = [];
+            if (onlyCurrentUserTasks) {
+                responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
+                response = await getTasksByUserId(authUser!.useruid, params);
+            } else {
+                responseTotal = await getAllTasks(authUser!.useruid, { total: 1 });
+                response = await getAllTasks(authUser!.useruid, params);
+            }
 
-            if (responseTotal.error || response.error) {
+            if (responseTotal?.error || response?.error) {
                 toast.current?.show({
                     severity: "error",
                     summary: "Error",
-                    detail: responseTotal.error || response.error,
+                    detail: responseTotal?.error || response?.error,
                 });
             }
             if (responseTotal && !Array.isArray(responseTotal)) {
@@ -191,7 +199,7 @@ export const TasksDataTable = observer(
             }
 
             handleGetTasks(params);
-        }, [lazyState, authUser, globalSearch, selectedStatusFilters]);
+        }, [lazyState, authUser, globalSearch, selectedStatusFilters, onlyCurrentUserTasks]);
 
         const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
             setAdvancedSearch((prevSearch) => {
@@ -384,9 +392,9 @@ export const TasksDataTable = observer(
                         />
 
                         <BorderedCheckbox
-                            checked={myTasksOnly}
+                            checked={onlyCurrentUserTasks}
                             onChange={(e) => {
-                                setMyTasksOnly(!!e.target.checked);
+                                setOnlyCurrentUserTasks(!!e.target.checked);
                             }}
                             name='My tasks only'
                         />
