@@ -21,7 +21,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { Task } from "common/models/tasks";
-import { getAllTasks, getTasksByUserId } from "http/services/tasks.service";
+import { getAllTasks, getCurrentUserTasks } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
 import {
     MultiSelect,
@@ -135,8 +135,8 @@ export const TasksDataTable = observer(
             let responseTotal: TotalListCount = {} as TotalListCount;
             let response = [];
             if (onlyCurrentUserTasks) {
-                responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
-                response = await getTasksByUserId(authUser!.useruid, params);
+                responseTotal = await getCurrentUserTasks(authUser!.useruid, { total: 1 });
+                response = await getCurrentUserTasks(authUser!.useruid, params);
             } else {
                 responseTotal = await getAllTasks(authUser!.useruid, { total: 1 });
                 response = await getAllTasks(authUser!.useruid, params);

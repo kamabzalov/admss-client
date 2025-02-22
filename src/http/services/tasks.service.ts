@@ -24,7 +24,7 @@ export const getAllTasks = async (useruid: string, params?: QueryParams) => {
     }
 };
 
-export const getTasksByUserId = async (useruid: string, params?: QueryParams) => {
+export const getCurrentUserTasks = async (useruid: string, params?: QueryParams) => {
     try {
         const response = await authorizedUserApiInstance
             .get<Task[] & BaseResponseError>(`tasks/${useruid}/listcurrent`, {
