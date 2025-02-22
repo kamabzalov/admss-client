@@ -55,8 +55,11 @@ export interface PostDataTask extends BaseResponseError {
     parentuid: string;
     useruid: string;
     dealuid: string;
+    dealname: string;
     accountuid: string;
+    accountname: string;
     contactuid: string;
+    contactname: string;
     phone: string;
     description: string;
 }

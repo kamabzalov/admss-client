@@ -12,6 +12,7 @@
 
 .inventory__card-content {
     border-right: 2px solid var(--admss-app-light-blue);
+    overflow-y: hidden;
 }
 
 .inventory__accordion {
@@ -26,12 +27,8 @@
 
 .inventory__accordion .p-accordion-header .p-accordion-header-link,
 .inventory__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
-.inventory__accordion
-    .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
-    .p-accordion-header-link,
-.inventory__accordion
-    .p-accordion-header.p-highlight
-    .p-accordion-header-link[aria-expanded="true"] {
+.inventory__accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
+.inventory__accordion .p-accordion-header.p-highlight .p-accordion-header-link[aria-expanded="true"] {
     border: none;
     background: white;
     box-shadow: none;
@@ -59,10 +56,7 @@
     position: relative;
 }
 
-.vertical-step-menu.p-steps
-    .p-steps-item:not(:last-child)
-    .p-menuitem-link.vertical-nav
-    .p-steps-number::before {
+.vertical-step-menu.p-steps .p-steps-item:not(:last-child) .p-menuitem-link.vertical-nav .p-steps-number::before {
     content: "";
     position: absolute;
     top: 11px;
@@ -71,10 +65,7 @@
     background: #ccc;
 }
 
-.vertical-step-menu.p-steps
-    .p-steps-item:not(:first-child)
-    .p-menuitem-link.vertical-nav
-    .p-steps-number::after {
+.vertical-step-menu.p-steps .p-steps-item:not(:first-child) .p-menuitem-link.vertical-nav .p-steps-number::after {
     content: "";
     position: absolute;
     bottom: 11px;
@@ -83,21 +74,12 @@
     background: #ccc;
 }
 
-.vertical-step-menu.p-steps
-    .p-steps-item:not(:last-child)
-    .p-menuitem-link.vertical-nav
-    .p-steps-number--green::before,
-.vertical-step-menu.p-steps
-    .p-steps-item:not(:first-child)
-    .p-menuitem-link.vertical-nav
-    .p-steps-number--green::after {
+.vertical-step-menu.p-steps .p-steps-item:not(:last-child) .p-menuitem-link.vertical-nav .p-steps-number--green::before,
+.vertical-step-menu.p-steps .p-steps-item:not(:first-child) .p-menuitem-link.vertical-nav .p-steps-number--green::after {
     background-color: var(--admss-app-primary-main-green);
 }
 
-.vertical-step-menu.p-steps
-    .p-steps-item[aria-selected="true"]
-    .p-menuitem-link.vertical-nav
-    .p-steps-number::before {
+.vertical-step-menu.p-steps .p-steps-item[aria-selected="true"] .p-menuitem-link.vertical-nav .p-steps-number::before {
     background-color: #ccc;
 }
 
@@ -120,10 +102,7 @@
     border-radius: 5px 0 0 5px;
 }
 
-.vertical-step-menu
-    .p-steps-item.p-highlight.p-steps-current
-    .p-menuitem-link.vertical-nav
-    .p-steps-number {
+.vertical-step-menu .p-steps-item.p-highlight.p-steps-current .p-menuitem-link.vertical-nav .p-steps-number {
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
@@ -244,6 +223,7 @@
 .inventory-location {
     width: 200px;
 }
+
 .inventory-location .p-button {
     display: inline-flex;
     align-items: center;
@@ -299,12 +279,12 @@
     width: 233px;
 }
 
-.inventory-form .p-datatable .p-datatable-thead > tr > th {
+.inventory-form .p-datatable .p-datatable-thead>tr>th {
     border: none;
     padding: 10px;
 }
 
-.inventory-form .p-datatable .p-datatable-tbody > tr > td {
+.inventory-form .p-datatable .p-datatable-tbody>tr>td {
     padding: 8px 10px;
 }
 
@@ -316,7 +296,7 @@
     width: 200px;
 }
 
-.inventory-top-controls__search.p-input-icon-right > .p-inputtext {
+.inventory-top-controls__search.p-input-icon-right>.p-inputtext {
     width: 200px;
     padding-right: 0;
 }
@@ -358,19 +338,13 @@
     .p-tabview-nav-container .p-tabview-nav-content .p-tabview-nav .p-tabview-nav-link {
         font-weight: 700;
     }
+
     .p-tabview-panels:has(.vehicle-inspections) {
         padding: 0px;
     }
-    .p-tabview-nav-container
-        .p-tabview-nav-content
-        .p-tabview-nav
-        li.p-highlight
-        .p-tabview-nav-link {
+
+    .p-tabview-nav-container .p-tabview-nav-content .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         color: var(--admss-app-main-blue);
         border-bottom: 2px solid var(--admss-app-main-blue);
     }
-}
-
-textarea {
-    cursor: pointer;
 }
