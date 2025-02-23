@@ -521,7 +521,7 @@ export const TasksDataTable = observer(
                                         pt={{
                                             root: {
                                                 style: {
-                                                    borderLeft: index === 0 ? "none" : "",
+                                                    borderLeft: !index ? "none" : "",
                                                 },
                                             },
                                         }}
