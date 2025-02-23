@@ -12,6 +12,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { DateInput } from "dashboard/common/form/inputs";
 import { ListData } from "common/models";
 import { MakesListData } from "common/models/inventory";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
@@ -33,6 +34,7 @@ export enum SEARCH_FIELD_TYPE {
     NUMBER = "number",
     DROPDOWN = "dropdown",
     DATE = "date",
+    TEXT_AREA = "textarea",
 }
 
 export interface SearchField<T> {
@@ -252,6 +254,19 @@ export const AdvancedSearchDialog = <T,>({
                                     />
                                 )}
 
+                            {type === SEARCH_FIELD_TYPE.TEXT_AREA && (
+                                <InputTextarea
+                                    className='w-full'
+                                    value={value ?? ""}
+                                    onChange={({ target }) => onInputChange(key, target.value)}
+                                    pt={{
+                                        root: {
+                                            style: { resize: "none", height: "140px" },
+                                        },
+                                    }}
+                                />
+                            )}
+
                             {value && onSearchClear && (
                                 <i
                                     className={`pi pi-times cursor-pointer search-dialog__clear ${
@@ -274,4 +289,3 @@ export const AdvancedSearchDialog = <T,>({
         </DashboardDialog>
     );
 };
-
