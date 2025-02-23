@@ -214,6 +214,11 @@ export class ContactStore {
         }
     );
 
+    public changeCobuyerContact = action(
+        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) =>
+            (this._cobayerContact[key] = value as never)
+    );
+
     public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
         this._isContactChanged = true;
         this._contactExtData[key] = value as never;
@@ -222,6 +227,7 @@ export class ContactStore {
     public saveContact = action(async (): Promise<string> => {
         try {
             this._isLoading = true;
+
             let newProspect: Partial<ContactProspect>[] = [];
             if (this._contactProspect.length) {
                 const prospectFirst = this._contactProspect.find(
@@ -241,7 +247,7 @@ export class ContactStore {
                 prospect: newProspect as ContactProspect[],
             };
 
-            const [contactDataResponse, imagesResponse] = await Promise.all([
+            const [contactDataResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
                 this.setImagesDL(this._contactID),
             ]);
@@ -250,16 +256,23 @@ export class ContactStore {
                 throw new Error(contactDataResponse?.error);
             }
 
-            let responseStatus = Status.ERROR;
+            if (this._contact.cobuyeruid) {
+                const coBuyerContactData: Contact = {
+                    ...this.coBuyerContact,
+                    extdata: this.contactExtData,
+                };
 
-            if (contactDataResponse?.status === Status.OK) {
-                responseStatus = Status.OK;
-            }
-            if (this._contactID && imagesResponse?.status === Status.OK) {
-                responseStatus = Status.OK;
+                const [coBuyerContactDataResponse] = await Promise.all([
+                    setContact(this._contact.cobuyeruid, coBuyerContactData),
+                    this.setImagesDL(this._contact.cobuyeruid, true),
+                ]);
+
+                if (coBuyerContactDataResponse?.status === Status.ERROR) {
+                    throw new Error(coBuyerContactDataResponse?.error);
+                }
             }
 
-            return responseStatus;
+            return Status.OK;
         } catch (error) {
             if (error instanceof Error) {
                 return error.message;
