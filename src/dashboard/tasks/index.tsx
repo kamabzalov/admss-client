@@ -33,6 +33,7 @@ import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "./add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -180,10 +181,13 @@ export const TasksDataTable = observer(
         const sortData = (event: DataTableSortEvent) => {
             setLazyState(event);
         };
+
         useEffect(() => {
             const params: QueryParams = {
                 ...(globalSearch && { qry: globalSearch }),
                 ...(lazyState.sortField && { column: lazyState.sortField }),
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
@@ -239,12 +243,32 @@ export const TasksDataTable = observer(
             setDialogVisible(false);
         };
 
-        const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
-            setAdvancedSearch((prevSearch) => {
-                const updatedSearch = { ...prevSearch };
+        const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+            setButtonDisabled(true);
+            setAdvancedSearch((prev) => {
+                const updatedSearch = { ...prev };
                 delete updatedSearch[key];
                 return updatedSearch;
             });
+
+            try {
+                const updatedSearch = { ...advancedSearch };
+                delete updatedSearch[key];
+
+                const isAdvancedSearchEmpty = isObjectValuesEmpty(updatedSearch);
+                const params: QueryParams = {
+                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                    ...(!isAdvancedSearchEmpty && {
+                        qry: createStringifySearchQuery(updatedSearch),
+                    }),
+                    skip: lazyState.first,
+                    top: lazyState.rows,
+                };
+                await handleGetTasks(params);
+            } finally {
+                setButtonDisabled(false);
+            }
         };
 
         const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
