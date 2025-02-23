@@ -53,6 +53,7 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
         coBuyerFrontSideDLurl,
         coBuyerBackSideDLurl,
         isLoading,
+        removeCoBuyerImagesDL,
     } = store;
     const toast = useToast();
     const coBuyerFileUploadFrontRef = useRef<FileUpload>(null);
@@ -95,7 +96,7 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
         }
 
         if (withRequest) {
-            store.removeImagesDL(side, true).then((response) => {
+            removeCoBuyerImagesDL(side).then((response) => {
                 if (response?.status === Status.ERROR) {
                     const { error, status } = response as BaseResponseError;
                     toast.current?.show({

@@ -1,5 +1,5 @@
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import { CreateMediaItemRecordResponse, InventorySetResponse } from "common/models/inventory";
@@ -250,6 +250,7 @@ export class ContactStore {
             const [contactDataResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
                 this.setImagesDL(this._contactID),
+                this.setCoBuyerImagesDL(this._contactID),
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
@@ -264,7 +265,8 @@ export class ContactStore {
 
                 const [coBuyerContactDataResponse] = await Promise.all([
                     setContact(this._contact.cobuyeruid, coBuyerContactData),
-                    this.setImagesDL(this._contact.cobuyeruid, true),
+                    this.setImagesDL(this._contact.cobuyeruid),
+                    this.setCoBuyerImagesDL(this._contact.cobuyeruid),
                 ]);
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
@@ -283,112 +285,113 @@ export class ContactStore {
         }
     });
 
-    private setImagesDL = async (contactuid: string, isCoBuyer = false): Promise<any> => {
+    private setImagesDL = async (contactuid: string): Promise<any> => {
         this._isLoading = true;
         try {
-            const frontFile = isCoBuyer ? this._coBuyerFrontSideDL : this._frontSiteDL;
-            const backFile = isCoBuyer ? this._coBuyerBackSideDL : this._backSiteDL;
+            [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
+                if (file.size) {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-            if (frontFile.size) {
-                const formData = new FormData();
-                formData.append("file", frontFile);
-                const createMediaResponse = (await createMediaItemRecord(
-                    MediaType.mtPhoto
-                )) as CreateMediaItemRecordResponse;
-                if (!createMediaResponse || createMediaResponse.status !== Status.OK) {
-                    throw createMediaResponse?.error || "Failed to create media record (front)";
+                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
+                    const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
+                        const { itemuid } = uploadMediaResponse as InventorySetResponse;
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await setContactDL(contactuid, {
+                                [!index ? "dluidfront" : "dluidback"]: itemuid,
+                            });
+                        }
+                    }
                 }
-                const uploadMediaResponse = (await uploadInventoryMedia(
-                    createMediaResponse.itemUID as string,
-                    formData
-                )) as InventorySetResponse;
-                if (!uploadMediaResponse || uploadMediaResponse.status !== Status.OK) {
-                    throw uploadMediaResponse?.error || "Failed to upload front media file";
-                }
-                const updateDLResponse = await setContactDL(contactuid, {
-                    dluidfront: uploadMediaResponse.itemuid,
-                });
-                if (!updateDLResponse || updateDLResponse.status !== Status.OK) {
-                    throw updateDLResponse?.error || "Failed to update contact front DL UID";
-                }
-            }
-
-            if (backFile.size) {
-                const formData = new FormData();
-                formData.append("file", backFile);
-                const createMediaResponse = (await createMediaItemRecord(
-                    MediaType.mtPhoto
-                )) as CreateMediaItemRecordResponse;
-                if (!createMediaResponse || createMediaResponse.status !== Status.OK) {
-                    throw createMediaResponse?.error || "Failed to create media record (back)";
-                }
-                const uploadMediaResponse = (await uploadInventoryMedia(
-                    createMediaResponse.itemUID as string,
-                    formData
-                )) as InventorySetResponse;
-                if (!uploadMediaResponse || uploadMediaResponse.status !== Status.OK) {
-                    throw uploadMediaResponse?.error || "Failed to upload back media file";
-                }
-                const updateDLResponse = await setContactDL(contactuid, {
-                    dluidback: uploadMediaResponse.itemuid,
-                });
-                if (!updateDLResponse || updateDLResponse.status !== Status.OK) {
-                    throw updateDLResponse?.error || "Failed to update contact back DL UID";
-                }
-            }
-
-            return { status: Status.OK };
+            });
         } catch (error) {
-            return {
-                status: Status.ERROR,
-                error: error instanceof Error ? error.message : String(error),
-            };
+            return { status: Status.ERROR, error };
         } finally {
             this._isLoading = false;
         }
     };
 
-    public removeImagesDL = async (side: DLSide, isCoBuyer: boolean = false) => {
+    private setCoBuyerImagesDL = async (contactuid: string): Promise<any> => {
         this._isLoading = true;
         try {
-            const uid = isCoBuyer ? this._contact.cobuyeruid : this._contact.contactuid;
-            if (!uid) return { status: Status.ERROR, error: "Missing contact ID" };
+            [this._coBuyerFrontSideDL, this._coBuyerBackSideDL].forEach(async (file, index) => {
+                if (file.size) {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-            let response;
+                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
+                    const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
+                        const { itemuid } = uploadMediaResponse as InventorySetResponse;
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await setContactDL(contactuid, {
+                                [!index ? "dluidfront" : "dluidback"]: itemuid,
+                            });
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public removeImagesDL = async (side: DLSide): Promise<any> => {
+        this._isLoading = true;
+        try {
             if (side === DLSides.FRONT) {
-                if (isCoBuyer) {
-                    if (this.coBuyerFrontSideDL) {
-                        response = await deleteContactFrontDL(uid);
-                        if (response?.status === Status.ERROR)
-                            return { status: response.status, error: response.error };
-                    }
-                    this._cobayerContact.dluidfront = "";
-                } else {
-                    if (this.frontSideDL) {
-                        response = await deleteContactFrontDL(uid);
-                        if (response?.status === Status.ERROR)
-                            return { status: response.status, error: response.error };
-                    }
-                    this._contact.dluidfront = "";
+                const response = await deleteContactFrontDL(this._contactID);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
                 }
-            } else {
-                if (isCoBuyer) {
-                    if (this.coBuyerBackSideDL) {
-                        response = await deleteContactBackDL(uid);
-                        if (response?.status === Status.ERROR)
-                            return { status: response.status, error: response.error };
-                    }
-                    this._cobayerContact.dluidback = "";
-                } else {
-                    if (this.backSideDL) {
-                        response = await deleteContactBackDL(uid);
-                        if (response?.status === Status.ERROR)
-                            return { status: response.status, error: response.error };
-                    }
-                    this._contact.dluidback = "";
-                }
+                this._frontSiteDLurl = "";
             }
-            return { status: Status.OK };
+
+            if (side === DLSides.BACK) {
+                const response = await deleteContactBackDL(this._contactID);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
+                this._backSiteDLurl = "";
+            }
+
+            return Status.OK;
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public removeCoBuyerImagesDL = async (side: DLSide): Promise<any> => {
+        this._isLoading = true;
+        try {
+            if (side === DLSides.FRONT) {
+                const response = await deleteContactFrontDL(this._cobayerContact.useruid);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
+                this._coBuyerFrontSideDLurl = "";
+            }
+
+            if (side === DLSides.BACK) {
+                const response = await deleteContactFrontDL(this._cobayerContact.useruid);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
+                this._coBuyerBackSideDLurl = "";
+            }
+
+            return Status.OK;
         } catch (error) {
             return { status: Status.ERROR, error };
         } finally {
