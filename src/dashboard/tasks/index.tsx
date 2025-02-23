@@ -343,6 +343,11 @@ export const TasksDataTable = observer(
             setShowTaskDialog(true);
         };
 
+        const handleEditTask = (task: Task) => {
+            setCurrentTask(task);
+            setShowTaskDialog(true);
+        };
+
         const handleRowExpansion = (task: Task) => {
             setExpandedRows((prev) =>
                 prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
@@ -483,6 +488,7 @@ export const TasksDataTable = observer(
                                                 <Button
                                                     className='text export-web__icon-button'
                                                     icon='icon adms-edit-item'
+                                                    onClick={() => handleEditTask(task)}
                                                 />
                                                 <Button
                                                     className='text export-web__icon-button'
