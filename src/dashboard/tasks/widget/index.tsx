@@ -31,12 +31,26 @@ export const TasksWidget = observer(() => {
     const toast = useRef<Toast>(null);
 
     const getTasks = async (taskCount = DEFAULT_TASK_COUNT) => {
-        const totalCount = await getCurrentUserTasks(authUser!.useruid, { total: 1 });
-        if (totalCount && !Array.isArray(totalCount)) setAllTasksCount(totalCount?.total);
+        try {
+            const [totalCountResponse, tasksResponse] = await Promise.all([
+                getCurrentUserTasks(authUser!.useruid, { total: 1 }),
+                getCurrentUserTasks(authUser!.useruid, { top: taskCount }),
+            ]);
 
-        const res = await getCurrentUserTasks(authUser!.useruid, { top: taskCount });
-        if (res && Array.isArray(res)) {
-            setTasks(res);
+            if (totalCountResponse && !Array.isArray(totalCountResponse)) {
+                setAllTasksCount(totalCountResponse.total);
+            }
+
+            if (tasksResponse && Array.isArray(tasksResponse)) {
+                setTasks(tasksResponse);
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: error as string,
+                life: 3000,
+            });
         }
     };
 
