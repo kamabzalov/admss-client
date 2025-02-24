@@ -2,6 +2,7 @@ import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
+import { CreateMediaItemRecordResponse, InventorySetResponse } from "common/models/inventory";
 import {
     deleteContactFrontDL,
     deleteContactBackDL,
@@ -23,6 +24,7 @@ export type DLSide = DLSides.FRONT | DLSides.BACK;
 export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = { type: 0 } as Contact;
+    private _coBayerContact: Contact = { type: 0 } as Contact;
     private _contactType: number = 0;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
@@ -33,6 +35,10 @@ export class ContactStore {
     private _backSiteDLurl: string = "";
     private _frontSiteDL: File = {} as File;
     private _backSiteDL: File = {} as File;
+    private _coBuyerFrontSideDL: File = {} as File;
+    private _coBuyerBackSideDL: File = {} as File;
+    private _coBuyerFrontSideDLurl: string = "";
+    private _coBuyerBackSideDLurl: string = "";
     private _isContactChanged: boolean = false;
     private _memoRoute: string = "";
     private _deleteReason: string = "";
@@ -46,6 +52,10 @@ export class ContactStore {
 
     public get contact() {
         return this._contact;
+    }
+
+    public get coBuyerContact() {
+        return this._coBayerContact;
     }
 
     public get contactType() {
@@ -70,6 +80,22 @@ export class ContactStore {
 
     public get backSideDLurl() {
         return this._backSiteDLurl;
+    }
+
+    public get coBuyerFrontSideDL() {
+        return this._coBuyerFrontSideDL;
+    }
+
+    public get coBuyerBackSideDL() {
+        return this._coBuyerBackSideDL;
+    }
+
+    public get coBuyerFrontSideDLurl() {
+        return this._coBuyerFrontSideDLurl;
+    }
+
+    public get coBuyerBackSideDLurl() {
+        return this._coBuyerBackSideDLurl;
     }
 
     public get isContactChanged() {
@@ -122,6 +148,7 @@ export class ContactStore {
                 this._contactExtData = extdata || ({} as ContactExtData);
                 this._contactProspect = this._contact?.prospect || [];
             }
+            if (this._contact.cobuyeruid) await this.getCoBuyerContact();
         } catch (error) {
             return {
                 status: Status.ERROR,
@@ -132,19 +159,45 @@ export class ContactStore {
         }
     };
 
-    public getImagesDL = (): void => {
+    public getCoBuyerContact = async () => {
+        if (!this._contact.cobuyeruid) return;
+        try {
+            const response = await getContactInfo(this._contact.cobuyeruid);
+            if (response?.status === Status.ERROR) throw response.error;
+            this._coBayerContact = response as Contact;
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getImagesDL = (isCoBuyer?: boolean): void => {
+        const uid = isCoBuyer ? this._contact.cobuyeruid : this._contactID;
+        if (!uid) return;
+
+        if (isCoBuyer) {
+            if (this._coBayerContact.dluidfront) {
+                getInventoryMediaItem(this._coBayerContact.dluidfront).then((res) => {
+                    if (res) this._coBuyerFrontSideDLurl = res;
+                });
+            }
+            if (this._coBayerContact.dluidback) {
+                getInventoryMediaItem(this._coBayerContact.dluidback).then((res) => {
+                    if (res) this._coBuyerBackSideDLurl = res;
+                });
+            }
+            return;
+        }
+
         if (this._contact.dluidfront) {
             getInventoryMediaItem(this._contact.dluidfront).then((res) => {
-                if (res) {
-                    this._frontSiteDLurl = res;
-                }
+                if (res) this._frontSiteDLurl = res;
             });
         }
         if (this._contact.dluidback) {
             getInventoryMediaItem(this._contact.dluidback).then((res) => {
-                if (res) {
-                    this._backSiteDLurl = res;
-                }
+                if (res) this._backSiteDLurl = res;
             });
         }
     };
@@ -162,43 +215,21 @@ export class ContactStore {
         }
     );
 
+    public changeCobuyerContact = action(
+        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) => {
+            return (this._coBayerContact[key] = value as never);
+        }
+    );
+
     public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
         this._isContactChanged = true;
         this._contactExtData[key] = value as never;
     });
 
-    private setImagesDL = async (contactuid: string): Promise<any> => {
-        this._isLoading = true;
-        try {
-            [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
-                if (file.size) {
-                    const formData = new FormData();
-                    formData.append("file", file);
-
-                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
-                    if (createMediaResponse?.status === Status.OK) {
-                        const uploadMediaResponse = await uploadInventoryMedia(
-                            createMediaResponse.itemUID,
-                            formData
-                        );
-                        if (uploadMediaResponse?.status === Status.OK) {
-                            await setContactDL(contactuid, {
-                                [!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
-                            });
-                        }
-                    }
-                }
-            });
-        } catch (error) {
-            // TODO: add error handler
-        } finally {
-            this._isLoading = false;
-        }
-    };
-
     public saveContact = action(async (): Promise<string> => {
         try {
             this._isLoading = true;
+
             let newProspect: Partial<ContactProspect>[] = [];
             if (this._contactProspect.length) {
                 const prospectFirst = this._contactProspect.find(
@@ -218,25 +249,34 @@ export class ContactStore {
                 prospect: newProspect as ContactProspect[],
             };
 
-            const [contactDataResponse, imagesResponse] = await Promise.all([
+            const [contactDataResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
                 this.setImagesDL(this._contactID),
+                this.setCoBuyerImagesDL(this._contactID),
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
                 throw new Error(contactDataResponse?.error);
             }
 
-            let responseStatus = Status.ERROR;
+            if (this._contact.cobuyeruid) {
+                const coBuyerContactData: Contact = {
+                    ...this.coBuyerContact,
+                    extdata: this.contactExtData,
+                };
 
-            if (contactDataResponse?.status === Status.OK) {
-                responseStatus = Status.OK;
-            }
-            if (this._contactID && imagesResponse?.status === Status.OK) {
-                responseStatus = Status.OK;
+                const [coBuyerContactDataResponse] = await Promise.all([
+                    setContact(this._contact.cobuyeruid, coBuyerContactData),
+                    this.setImagesDL(this._contact.cobuyeruid),
+                    this.setCoBuyerImagesDL(this._contact.cobuyeruid),
+                ]);
+
+                if (coBuyerContactDataResponse?.status === Status.ERROR) {
+                    throw new Error(coBuyerContactDataResponse?.error);
+                }
             }
 
-            return responseStatus;
+            return Status.OK;
         } catch (error) {
             if (error instanceof Error) {
                 return error.message;
@@ -247,41 +287,61 @@ export class ContactStore {
         }
     });
 
-    public set contactType(state: number) {
-        this._contactType = state;
-    }
+    private setImagesDL = async (contactuid: string): Promise<any> => {
+        this._isLoading = true;
+        try {
+            [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
+                if (file.size) {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-    public set frontSideDL(file: File) {
-        this._frontSiteDL = file;
-    }
+                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
+                    const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
+                        const { itemuid } = uploadMediaResponse as InventorySetResponse;
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await setContactDL(contactuid, {
+                                [!index ? "dluidfront" : "dluidback"]: itemuid,
+                            });
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
 
-    public set backSideDL(file: File) {
-        this._backSiteDL = file;
-    }
+    private setCoBuyerImagesDL = async (contactuid: string): Promise<any> => {
+        this._isLoading = true;
+        try {
+            [this._coBuyerFrontSideDL, this._coBuyerBackSideDL].forEach(async (file, index) => {
+                if (file.size) {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-    public set frontSideDLurl(url: string) {
-        this._frontSiteDLurl = url;
-    }
-
-    public set backSideDLurl(url: string) {
-        this._backSiteDLurl = url;
-    }
-
-    public set contactOFAC(state: ContactOFAC) {
-        this._contactOFAC = state;
-    }
-
-    public set deleteReason(state: string) {
-        this._deleteReason = state;
-    }
-
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
-    }
-
-    public set memoRoute(state: string) {
-        this._memoRoute = state;
-    }
+                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
+                    const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
+                        const { itemuid } = uploadMediaResponse as InventorySetResponse;
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await setContactDL(contactuid, {
+                                [!index ? "dluidfront" : "dluidback"]: itemuid,
+                            });
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
 
     public removeImagesDL = async (side: DLSide): Promise<any> => {
         this._isLoading = true;
@@ -312,6 +372,87 @@ export class ContactStore {
         }
     };
 
+    public removeCoBuyerImagesDL = async (side: DLSide): Promise<any> => {
+        this._isLoading = true;
+        try {
+            if (side === DLSides.FRONT) {
+                const response = await deleteContactFrontDL(this._coBayerContact.contactuid);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
+                this._coBuyerFrontSideDLurl = "";
+            }
+
+            if (side === DLSides.BACK) {
+                const response = await deleteContactFrontDL(this._coBayerContact.contactuid);
+                if (response?.status === Status.ERROR) {
+                    const { error, status } = response as BaseResponseError;
+                    return { status, error };
+                }
+                this._coBuyerBackSideDLurl = "";
+            }
+
+            return Status.OK;
+        } catch (error) {
+            return { status: Status.ERROR, error };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public set contactType(state: number) {
+        this._contactType = state;
+    }
+
+    public set frontSideDL(file: File) {
+        this._frontSiteDL = file;
+    }
+
+    public set backSideDL(file: File) {
+        this._backSiteDL = file;
+    }
+
+    public set frontSideDLurl(url: string) {
+        this._frontSiteDLurl = url;
+    }
+
+    public set backSideDLurl(url: string) {
+        this._backSiteDLurl = url;
+    }
+
+    public set coBuyerFrontSideDL(file: File) {
+        this._coBuyerFrontSideDL = file;
+    }
+
+    public set coBuyerBackSideDL(file: File) {
+        this._coBuyerBackSideDL = file;
+    }
+
+    public set coBuyerFrontSideDLurl(url: string) {
+        this._coBuyerFrontSideDLurl = url;
+    }
+
+    public set coBuyerBackSideDLurl(url: string) {
+        this._coBuyerBackSideDLurl = url;
+    }
+
+    public set contactOFAC(state: ContactOFAC) {
+        this._contactOFAC = state;
+    }
+
+    public set deleteReason(state: string) {
+        this._deleteReason = state;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
+
+    public set memoRoute(state: string) {
+        this._memoRoute = state;
+    }
+
     public set tabLength(state: number) {
         this._tabLength = state;
     }
@@ -320,15 +461,24 @@ export class ContactStore {
         this._activeTab = state;
     }
 
+    public set isContactChanged(state: boolean) {
+        this._isContactChanged = state;
+    }
+
     public clearContact = () => {
         this._contact = {} as Contact;
+        this._coBayerContact = {} as Contact;
         this._isContactChanged = false;
         this._contactID = "";
         this._contactType = 0;
         this._frontSiteDLurl = "";
         this._backSiteDLurl = "";
+        this._coBuyerFrontSideDLurl = "";
+        this._coBuyerBackSideDLurl = "";
         this._frontSiteDL = {} as File;
         this._backSiteDL = {} as File;
+        this._coBuyerFrontSideDL = {} as File;
+        this._coBuyerBackSideDL = {} as File;
         this._contactExtData = {} as ContactExtData;
         this._deleteReason = "";
     };

@@ -14,7 +14,7 @@ const { BUYER } = GENERAL_CONTACT_TYPE;
 const tabs = [
     { header: "General", component: <ContactsGeneralInfo /> },
     { header: "Address", component: <ContactsAddressInfo type={BUYER} /> },
-    { header: "Identification", component: <ContactsIdentificationInfo type={BUYER} /> },
+    { header: "Identification", component: <ContactsIdentificationInfo /> },
     { header: "OFAC CHECK", component: <ContactsOfacCheck type={BUYER} /> },
 ];
 

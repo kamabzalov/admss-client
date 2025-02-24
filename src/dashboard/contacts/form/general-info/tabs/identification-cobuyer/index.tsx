@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
-import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
     FileUpload,
@@ -24,6 +23,7 @@ import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
+import "./index.css";
 
 const SexList = [
     {
@@ -39,63 +39,64 @@ enum DLSides {
     BACK = "back",
 }
 
-export const ContactsIdentificationInfo = observer((): ReactElement => {
+export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
     const {
         contact,
         contactExtData,
-        changeContact,
+        changeCobuyerContact,
         changeContactExtData,
-        frontSideDL,
-        backSideDL,
+        coBuyerFrontSideDL,
+        coBuyerBackSideDL,
         getImagesDL,
-        frontSideDLurl,
-        backSideDLurl,
+        coBuyerFrontSideDLurl,
+        coBuyerBackSideDLurl,
         isLoading,
+        removeCoBuyerImagesDL,
     } = store;
     const toast = useToast();
-    const fileUploadFrontRef = useRef<FileUpload>(null);
-    const fileUploadBackRef = useRef<FileUpload>(null);
+    const coBuyerFileUploadFrontRef = useRef<FileUpload>(null);
+    const coBuyerFileUploadBackRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        getImagesDL();
+        getImagesDL(true);
     }, [contact]);
 
     const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
 
     useEffect(() => {
-        if (frontSideDL.size) {
-            store.frontSideDLurl = URL.createObjectURL(frontSideDL);
+        if (coBuyerFrontSideDL.size) {
+            store.coBuyerFrontSideDLurl = URL.createObjectURL(coBuyerFrontSideDL);
         }
 
-        if (backSideDL.size) {
-            store.backSideDLurl = URL.createObjectURL(backSideDL);
+        if (coBuyerBackSideDL.size) {
+            store.coBuyerBackSideDLurl = URL.createObjectURL(coBuyerBackSideDL);
         }
     }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
         store.isContactChanged = true;
         if (side === DLSides.FRONT) {
-            store.frontSideDL = e.files[0];
+            store.coBuyerFrontSideDL = e.files[0];
         } else {
-            store.backSideDL = e.files[0];
+            store.coBuyerBackSideDL = e.files[0];
         }
     };
 
     const handleDeleteImage = (side: DLSide, withRequest?: boolean) => {
         if (side === DLSides.FRONT) {
-            fileUploadFrontRef.current?.clear();
-            store.frontSideDL = {} as File;
-            changeContact("dluidfront", "");
+            coBuyerFileUploadFrontRef.current?.clear();
+            store.coBuyerFrontSideDL = {} as File;
+            changeCobuyerContact("dluidfront", "");
         } else {
-            fileUploadBackRef.current?.clear();
-            store.backSideDL = {} as File;
-            changeContact("dluidback", "");
+            coBuyerFileUploadBackRef.current?.clear();
+            store.coBuyerBackSideDL = {} as File;
+            changeCobuyerContact("dluidback", "");
         }
 
         if (withRequest) {
-            store.removeImagesDL(side).then((response) => {
+            removeCoBuyerImagesDL(side).then((response) => {
                 if (response?.status === Status.ERROR) {
                     const { error, status } = response as BaseResponseError;
                     toast.current?.show({
@@ -141,7 +142,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     };
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions, side: DLSide) => {
-        const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
+        const { size } = side === DLSides.FRONT ? coBuyerFrontSideDL : coBuyerBackSideDL;
         return (
             <div className={`col-6 dl-header ${size ? "dl-header__active" : "mr-1"}`}>
                 {chooseButton}
@@ -182,14 +183,14 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             optionLabel='label'
                             optionValue='id'
                             filter
-                            value={contactExtData.Buyer_DL_State || ""}
+                            value={contactExtData.CoBuyer_DL_State || ""}
                             options={STATES_LIST}
                             onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_DL_State", value)
+                                changeContactExtData("CoBuyer_DL_State", value)
                             }
                             className='w-full identification-info__dropdown'
                             disabled={isControlDisabled}
-                            showClear={!!contactExtData.Buyer_DL_State}
+                            showClear={!!contactExtData.CoBuyer_DL_State}
                         />
                         <label className='float-label'>DL's State</label>
                     </span>
@@ -199,9 +200,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='identification-info__text-input w-full'
-                            value={contactExtData.Buyer_Driver_License_Num || ""}
+                            value={contactExtData.CoBuyer_Driver_License_Num || ""}
                             onChange={({ target: { value } }) => {
-                                changeContactExtData("Buyer_Driver_License_Num", value);
+                                changeContactExtData("CoBuyer_Driver_License_Num", value);
                             }}
                             disabled={isControlDisabled}
                         />
@@ -212,10 +213,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3 mr-2'>
                     <DateInput
                         name="DL's exp. date"
-                        value={contactExtData.Buyer_DL_Exp_Date || ""}
-                        date={contactExtData.Buyer_DL_Exp_Date}
+                        value={contactExtData.CoBuyer_DL_Exp_Date || ""}
+                        date={contactExtData.CoBuyer_DL_Exp_Date}
                         onChange={({ target: { value } }) =>
-                            changeContactExtData("Buyer_DL_Exp_Date", Date.parse(String(value)))
+                            changeContactExtData("CoBuyer_DL_Exp_Date", Date.parse(String(value)))
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
@@ -229,14 +230,14 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             optionLabel='name'
                             optionValue='name'
                             filter
-                            value={contactExtData.Buyer_Sex || ""}
+                            value={contactExtData.CoBuyer_Sex || ""}
                             options={SexList}
                             onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_Sex", value)
+                                changeContactExtData("CoBuyer_Sex", value)
                             }
                             className='w-full identification-info__dropdown'
                             disabled={isControlDisabled}
-                            showClear={!!contactExtData.Buyer_Sex}
+                            showClear={!!contactExtData.CoBuyer_Sex}
                         />
                         <label className='float-label'>Sex</label>
                     </span>
@@ -247,9 +248,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         <InputMask
                             mask='999-99-9999'
                             className='identification-info__text-input w-full'
-                            value={contactExtData.Buyer_SS_Number || ""}
+                            value={contactExtData.CoBuyer_SS_Number || ""}
                             onChange={({ target: { value } }) => {
-                                changeContactExtData("Buyer_SS_Number", String(value));
+                                changeContactExtData("CoBuyer_SS_Number", String(value));
                             }}
                             disabled={isControlDisabled}
                         />
@@ -260,10 +261,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3'>
                     <DateInput
                         name='Date of Birth'
-                        value={contactExtData.Buyer_Date_Of_Birth || ""}
-                        date={contactExtData.Buyer_Date_Of_Birth}
+                        value={contactExtData.CoBuyer_Date_Of_Birth || ""}
+                        date={contactExtData.CoBuyer_Date_Of_Birth}
                         onChange={({ target: { value } }) =>
-                            changeContactExtData("Buyer_Date_Of_Birth", Date.parse(String(value)))
+                            changeContactExtData("CoBuyer_Date_Of_Birth", Date.parse(String(value)))
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
@@ -277,17 +278,17 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
                     <div
                         className={`col-6 identification-dl ${
-                            frontSideDL.size ? "identification-dl__active" : ""
+                            coBuyerFrontSideDL.size ? "identification-dl__active" : ""
                         }`}
                     >
                         <div className='identification-dl__title'>Frontside</div>
-                        {frontSideDLurl && isLoading ? (
+                        {coBuyerFrontSideDLurl && isLoading ? (
                             <Loader size='large' />
-                        ) : frontSideDLurl ? (
-                            itemTemplate(frontSideDLurl, DLSides.FRONT)
+                        ) : coBuyerFrontSideDLurl ? (
+                            itemTemplate(coBuyerFrontSideDLurl, DLSides.FRONT)
                         ) : (
                             <FileUpload
-                                ref={fileUploadFrontRef}
+                                ref={coBuyerFileUploadFrontRef}
                                 accept='image/*'
                                 headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
                                 chooseLabel='Choose from files'
@@ -304,17 +305,17 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     </div>
                     <div
                         className={`col-6 identification-dl ${
-                            backSideDL.size ? "identification-dl__active" : ""
+                            coBuyerBackSideDL.size ? "identification-dl__active" : ""
                         }`}
                     >
                         <div className='identification-dl__title'>Backside</div>
-                        {backSideDLurl && isLoading ? (
+                        {coBuyerBackSideDLurl && isLoading ? (
                             <Loader size='large' />
-                        ) : backSideDLurl ? (
-                            itemTemplate(backSideDLurl, DLSides.BACK)
+                        ) : coBuyerBackSideDLurl ? (
+                            itemTemplate(coBuyerBackSideDLurl, DLSides.BACK)
                         ) : (
                             <FileUpload
-                                ref={fileUploadBackRef}
+                                ref={coBuyerFileUploadBackRef}
                                 accept='image/*'
                                 headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
                                 chooseLabel='Choose from files'
