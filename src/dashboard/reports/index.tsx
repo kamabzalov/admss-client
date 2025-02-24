@@ -28,11 +28,7 @@ import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 import { TreeNodeEvent } from "common/models";
-import {
-    buildTreeNodes,
-    convertTreeNodesToCollections,
-    transformLabel,
-} from "./common/drag-and-drop";
+import { buildTreeNodes, transformLabel } from "./common/drag-and-drop";
 import "./index.css";
 
 const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
@@ -42,7 +38,7 @@ const OPEN_PARAMETERS_CLASSES: Readonly<string[]> = [
     "reports__list-name",
 ];
 
-export default function Reports(): ReactElement {
+export const Reports = (): ReactElement => {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -213,13 +209,28 @@ export default function Reports(): ReactElement {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
         const dropIndex = event.dropIndex;
+
+        if (!dropNode) return;
+
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dragNode?.data?.collectionId !== dropNode?.data?.collection?.itemUID &&
             (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
         ) {
             showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
             return;
         }
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragNode?.data?.document?.isdefault &&
+            dragNode?.data?.collectionId !== dropNode?.data?.collection?.itemUID
+        ) {
+            showError(TOAST_MESSAGES.ERROR_CANNOT_MOVE_FROM_DEFAULT_COLLECTION);
+            return;
+        }
+
         if (
             dropNode?.type === NODE_TYPES.COLLECTION &&
             dragNode?.type !== NODE_TYPES.DOCUMENT &&
@@ -228,46 +239,35 @@ export default function Reports(): ReactElement {
             showError(TOAST_MESSAGES.CANNOT_MOVE_INTO_DEFAULT_COLLECTION);
             return;
         }
-        const updatedNodes = event.value as TreeNode[];
-        const favoritesNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
-        const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
-        let newFavoriteCols: ReportCollection[] = [];
-        let newCollections: ReportCollection[] = [];
-        if (favoritesNode) {
-            const favCols = convertTreeNodesToCollections([favoritesNode as TreeNodeEvent]);
-            if (favCols.length > 0) {
-                newFavoriteCols = favCols;
-            }
-        }
-        const converted = convertTreeNodesToCollections(otherNodes as TreeNodeEvent[]);
-        newCollections = converted;
-        setFavoriteCollections(newFavoriteCols);
-        setReportCollections(newCollections);
+
         const dragData = dragNode?.data;
         const dropData = dropNode?.data;
+
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
             dragData?.document &&
-            dropNode?.type !== NODE_TYPES.COLLECTION
+            dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
-            const currentCollectionId = dragData.collectionId;
-            const currentCollLength =
-                reportCollections.find((coll) => coll.itemUID === currentCollectionId)?.collections
+            const collectionId = dragData.collectionId;
+            const currentCollectionsLength =
+                reportCollections.find((col) => col.itemUID === collectionId)?.collections
                     ?.length || 0;
-            if (currentCollectionId && dragData.document.documentUID != null && dropIndex != null) {
+
+            if (dropIndex !== undefined && collectionId && dragData.document.documentUID != null) {
                 const response = await setReportOrder(
-                    currentCollectionId,
+                    collectionId,
                     dragData.document.documentUID,
-                    dropIndex - currentCollLength
+                    dropIndex - currentCollectionsLength
                 );
                 if (response?.error) {
                     showError(response.error);
                 } else {
                     showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
-                    await updateDocumentOrderInCollection(currentCollectionId);
+                    await updateDocumentOrderInCollection(collectionId);
                 }
             }
         }
+
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
             dropNode?.type === NODE_TYPES.COLLECTION &&
@@ -289,6 +289,7 @@ export default function Reports(): ReactElement {
                 }
             }
         }
+
         if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
             const sourceCollectionId = dragData.collection.itemUID;
             if (sourceCollectionId) {
@@ -300,6 +301,8 @@ export default function Reports(): ReactElement {
                 }
             }
         }
+
+        await handleGetUserReportCollections();
     };
 
     const updateDocumentOrderInCollection = async (collectionUid: string) => {
@@ -460,4 +463,4 @@ export default function Reports(): ReactElement {
             </div>
         </div>
     );
-}
+};

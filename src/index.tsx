@@ -18,7 +18,7 @@ import { NotFound } from "not-found";
 import SignIn from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
-import Reports from "dashboard/reports";
+import { Reports } from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
 import { ReportForm } from "dashboard/reports/form";
 import { PrintForTestDrive } from "dashboard/test-drive";
