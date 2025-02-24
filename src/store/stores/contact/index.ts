@@ -24,7 +24,7 @@ export type DLSide = DLSides.FRONT | DLSides.BACK;
 export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = { type: 0 } as Contact;
-    private _cobayerContact: Contact = { type: 0 } as Contact;
+    private _coBayerContact: Contact = { type: 0 } as Contact;
     private _contactType: number = 0;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
@@ -55,7 +55,7 @@ export class ContactStore {
     }
 
     public get coBuyerContact() {
-        return this._cobayerContact;
+        return this._coBayerContact;
     }
 
     public get contactType() {
@@ -148,6 +148,7 @@ export class ContactStore {
                 this._contactExtData = extdata || ({} as ContactExtData);
                 this._contactProspect = this._contact?.prospect || [];
             }
+            if (this._contact.cobuyeruid) await this.getCoBuyerContact();
         } catch (error) {
             return {
                 status: Status.ERROR,
@@ -163,7 +164,7 @@ export class ContactStore {
         try {
             const response = await getContactInfo(this._contact.cobuyeruid);
             if (response?.status === Status.ERROR) throw response.error;
-            this._cobayerContact = response as Contact;
+            this._coBayerContact = response as Contact;
         } catch (error) {
             return { status: Status.ERROR, error };
         } finally {
@@ -176,13 +177,13 @@ export class ContactStore {
         if (!uid) return;
 
         if (isCoBuyer) {
-            if (this._cobayerContact.dluidfront) {
-                getInventoryMediaItem(this._cobayerContact.dluidfront).then((res) => {
+            if (this._coBayerContact.dluidfront) {
+                getInventoryMediaItem(this._coBayerContact.dluidfront).then((res) => {
                     if (res) this._coBuyerFrontSideDLurl = res;
                 });
             }
-            if (this._cobayerContact.dluidback) {
-                getInventoryMediaItem(this._cobayerContact.dluidback).then((res) => {
+            if (this._coBayerContact.dluidback) {
+                getInventoryMediaItem(this._coBayerContact.dluidback).then((res) => {
                     if (res) this._coBuyerBackSideDLurl = res;
                 });
             }
@@ -215,8 +216,9 @@ export class ContactStore {
     );
 
     public changeCobuyerContact = action(
-        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) =>
-            (this._cobayerContact[key] = value as never)
+        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) => {
+            return (this._coBayerContact[key] = value as never);
+        }
     );
 
     public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
@@ -374,7 +376,7 @@ export class ContactStore {
         this._isLoading = true;
         try {
             if (side === DLSides.FRONT) {
-                const response = await deleteContactFrontDL(this._cobayerContact.useruid);
+                const response = await deleteContactFrontDL(this._coBayerContact.contactuid);
                 if (response?.status === Status.ERROR) {
                     const { error, status } = response as BaseResponseError;
                     return { status, error };
@@ -383,7 +385,7 @@ export class ContactStore {
             }
 
             if (side === DLSides.BACK) {
-                const response = await deleteContactFrontDL(this._cobayerContact.useruid);
+                const response = await deleteContactFrontDL(this._coBayerContact.contactuid);
                 if (response?.status === Status.ERROR) {
                     const { error, status } = response as BaseResponseError;
                     return { status, error };
@@ -465,7 +467,7 @@ export class ContactStore {
 
     public clearContact = () => {
         this._contact = {} as Contact;
-        this._cobayerContact = {} as Contact;
+        this._coBayerContact = {} as Contact;
         this._isContactChanged = false;
         this._contactID = "";
         this._contactType = 0;
