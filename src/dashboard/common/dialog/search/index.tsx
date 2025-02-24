@@ -34,7 +34,7 @@ export enum SEARCH_FIELD_TYPE {
     NUMBER = "number",
     DROPDOWN = "dropdown",
     DATE = "date",
-    TEXT_AREA = "textarea",
+    TEXTAREA = "textarea",
 }
 
 export interface SearchField<T> {
@@ -254,7 +254,7 @@ export const AdvancedSearchDialog = <T,>({
                                     />
                                 )}
 
-                            {type === SEARCH_FIELD_TYPE.TEXT_AREA && (
+                            {type === SEARCH_FIELD_TYPE.TEXTAREA && (
                                 <InputTextarea
                                     className='w-full'
                                     value={value ?? ""}
