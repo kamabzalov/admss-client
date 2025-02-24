@@ -21,9 +21,8 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { Task } from "common/models/tasks";
-import { getTasksByUserId } from "http/services/tasks.service";
+import { getAllTasks, getCurrentUserTasks } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
-import { FilterOptions, filterOptions } from "dashboard/common/filter";
 import {
     MultiSelect,
     MultiSelectChangeEvent,
@@ -33,6 +32,8 @@ import { TableColumnsList } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "./add-task-dialog";
+import { TotalListCount } from "common/models/base-response";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -50,7 +51,7 @@ const selectableColumns: TableColumnsList[] = [
 
 enum SEARCH_FORM_FIELDS {
     CREATION_DATE = "Creation Date",
-    DESCRIPTION = "Description",
+    DESCRIPTION = "Description (keywords)",
 }
 
 enum SEARCH_FORM_QUERY {
@@ -125,23 +126,28 @@ export const TasksDataTable = observer(
         const [isLoading] = useState<boolean>(false);
         const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-        const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
-        const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[]>([]);
-        const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
         const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
         const [showTaskDialog, setShowTaskDialog] = useState<boolean>(false);
         const [currentTask, setCurrentTask] = useState<Task | null>(null);
         const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
+        const [onlyCurrentUserTasks, setOnlyCurrentUserTasks] = useState<boolean>(false);
 
         const handleGetTasks = async (params?: QueryParams) => {
-            const responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
-            const response = await getTasksByUserId(authUser!.useruid, params);
+            let responseTotal: TotalListCount = {} as TotalListCount;
+            let response = [];
+            if (onlyCurrentUserTasks) {
+                responseTotal = await getCurrentUserTasks(authUser!.useruid, { total: 1 });
+                response = await getCurrentUserTasks(authUser!.useruid, params);
+            } else {
+                responseTotal = await getAllTasks(authUser!.useruid, { total: 1 });
+                response = await getAllTasks(authUser!.useruid, params);
+            }
 
-            if (responseTotal.error || response.error) {
+            if (responseTotal?.error || response?.error) {
                 toast.current?.show({
                     severity: "error",
                     summary: "Error",
-                    detail: responseTotal.error || response.error,
+                    detail: responseTotal?.error || response?.error,
                 });
             }
             if (responseTotal && !Array.isArray(responseTotal)) {
@@ -164,7 +170,7 @@ export const TasksDataTable = observer(
                 key: SEARCH_FORM_FIELDS.DESCRIPTION,
                 label: SEARCH_FORM_FIELDS.DESCRIPTION,
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.DESCRIPTION],
-                type: "text",
+                type: "textarea",
             },
         ];
 
@@ -175,10 +181,13 @@ export const TasksDataTable = observer(
         const sortData = (event: DataTableSortEvent) => {
             setLazyState(event);
         };
+
         useEffect(() => {
             const params: QueryParams = {
                 ...(globalSearch && { qry: globalSearch }),
                 ...(lazyState.sortField && { column: lazyState.sortField }),
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
@@ -194,7 +203,7 @@ export const TasksDataTable = observer(
             }
 
             handleGetTasks(params);
-        }, [lazyState, authUser, globalSearch, selectedStatusFilters]);
+        }, [lazyState, authUser, globalSearch, selectedStatusFilters, onlyCurrentUserTasks]);
 
         const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
             setAdvancedSearch((prevSearch) => {
@@ -234,35 +243,51 @@ export const TasksDataTable = observer(
             setDialogVisible(false);
         };
 
-        const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
-            setAdvancedSearch((prevSearch) => {
-                const updatedSearch = { ...prevSearch };
+        const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+            setButtonDisabled(true);
+            setAdvancedSearch((prev) => {
+                const updatedSearch = { ...prev };
                 delete updatedSearch[key];
                 return updatedSearch;
             });
+
+            try {
+                const updatedSearch = { ...advancedSearch };
+                delete updatedSearch[key];
+
+                const isAdvancedSearchEmpty = isObjectValuesEmpty(updatedSearch);
+                const params: QueryParams = {
+                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                    ...(!isAdvancedSearchEmpty && {
+                        qry: createStringifySearchQuery(updatedSearch),
+                    }),
+                    skip: lazyState.first,
+                    top: lazyState.rows,
+                };
+                await handleGetTasks(params);
+            } finally {
+                setButtonDisabled(false);
+            }
         };
 
         const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
+            const allStatusesSelected = selectedStatusFilters.length === TASKS_STATUS_LIST.length;
+
             return (
                 <div className='dropdown-header flex pb-1'>
                     <label className='cursor-pointer dropdown-header__label'>
                         <Checkbox
-                            checked={
-                                filterOptions.filter((option) => !option.disabled).length ===
-                                selectedFilter.length
-                            }
+                            checked={allStatusesSelected}
                             onChange={(e) => {
                                 const isChecked = e.target.checked;
-                                setSelectedFilter(
-                                    isChecked
-                                        ? filterOptions.map((option) => ({ value: option.value }))
-                                        : []
-                                );
-                                setSelectedFilterOptions(
-                                    isChecked
-                                        ? filterOptions.filter((option) => !option.disabled)
-                                        : []
-                                );
+                                if (isChecked) {
+                                    setSelectedStatusFilters(
+                                        TASKS_STATUS_LIST.map((status) => status.value || "")
+                                    );
+                                } else {
+                                    setSelectedStatusFilters([]);
+                                }
                             }}
                             className='dropdown-header__checkbox mr-2'
                         />
@@ -271,8 +296,7 @@ export const TasksDataTable = observer(
                     <button
                         className='p-multiselect-close p-link'
                         onClick={(e) => {
-                            setSelectedFilter([]);
-                            setSelectedFilterOptions([]);
+                            setSelectedStatusFilters([]);
                             evt.onCloseClick(e);
                         }}
                     >
@@ -319,6 +343,11 @@ export const TasksDataTable = observer(
             setShowTaskDialog(true);
         };
 
+        const handleEditTask = (task: Task) => {
+            setCurrentTask(task);
+            setShowTaskDialog(true);
+        };
+
         const handleRowExpansion = (task: Task) => {
             setExpandedRows((prev) =>
                 prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
@@ -333,11 +362,6 @@ export const TasksDataTable = observer(
                 </div>
             );
         };
-
-        const filteredTasks = tasks.filter((task) => {
-            if (selectedFilterOptions.length === 0) return true;
-            return selectedFilterOptions.some((option) => option.value === task.task_status);
-        });
 
         return (
             <div className='card-content tasks'>
@@ -378,7 +402,7 @@ export const TasksDataTable = observer(
                                 e.stopPropagation();
                                 setSelectedStatusFilters(e.value);
                             }}
-                            placeholder='Filter'
+                            placeholder='Status'
                             className='pb-0 flex align-items-center tasks-filter'
                             display='chip'
                             selectedItemsLabel='Clear Filter'
@@ -397,9 +421,9 @@ export const TasksDataTable = observer(
                         />
 
                         <BorderedCheckbox
-                            checked={myTasksOnly}
+                            checked={onlyCurrentUserTasks}
                             onChange={(e) => {
-                                setMyTasksOnly(!!e.target.checked);
+                                setOnlyCurrentUserTasks(!!e.target.checked);
                             }}
                             name='My tasks only'
                         />
@@ -437,7 +461,7 @@ export const TasksDataTable = observer(
                         ) : (
                             <DataTable
                                 showGridlines
-                                value={filteredTasks}
+                                value={tasks}
                                 lazy
                                 paginator
                                 first={lazyState.first}
@@ -464,6 +488,7 @@ export const TasksDataTable = observer(
                                                 <Button
                                                     className='text export-web__icon-button'
                                                     icon='icon adms-edit-item'
+                                                    onClick={() => handleEditTask(task)}
                                                 />
                                                 <Button
                                                     className='text export-web__icon-button'
@@ -476,12 +501,12 @@ export const TasksDataTable = observer(
                                     pt={{
                                         root: {
                                             style: {
-                                                width: "100px",
+                                                width: "80px",
                                             },
                                         },
                                     }}
                                 />
-                                {alwaysActiveColumns.map(({ field, header }) => (
+                                {alwaysActiveColumns.map(({ field, header }, index) => (
                                     <Column
                                         field={field}
                                         header={header}
@@ -493,6 +518,13 @@ export const TasksDataTable = observer(
                                             return <div>{value}</div>;
                                         }}
                                         headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: {
+                                                    borderLeft: !index ? "none" : "",
+                                                },
+                                            },
+                                        }}
                                     />
                                 ))}
 
