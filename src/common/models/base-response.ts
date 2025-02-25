@@ -9,6 +9,7 @@ export interface BaseResponse {
 
 export interface BaseResponseError extends BaseResponse {
     error?: string;
+    errorField?: string;
     message?: string;
 }
 
