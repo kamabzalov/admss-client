@@ -226,7 +226,7 @@ export class ContactStore {
         this._contactExtData[key] = value as never;
     });
 
-    public saveContact = action(async (): Promise<string> => {
+    public saveContact = action(async (): Promise<BaseResponseError> => {
         try {
             this._isLoading = true;
 
@@ -257,7 +257,7 @@ export class ContactStore {
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
-                throw new Error(contactDataResponse?.error);
+                throw contactDataResponse;
             }
 
             if (this._contact.cobuyeruid) {
@@ -274,16 +274,13 @@ export class ContactStore {
                 ]);
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
-                    throw new Error(coBuyerContactDataResponse?.error);
+                    throw coBuyerContactDataResponse;
                 }
             }
 
-            return Status.OK;
+            return { status: Status.OK };
         } catch (error) {
-            if (error instanceof Error) {
-                return error.message;
-            }
-            return String(error);
+            return error as BaseResponseError;
         } finally {
             this._isLoading = false;
         }
