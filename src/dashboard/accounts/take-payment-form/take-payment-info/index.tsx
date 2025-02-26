@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoSection } from "dashboard/accounts/form/information/info-section";
 import { useStore } from "store/hooks";
@@ -6,7 +6,7 @@ import { AccountNoteData } from "store/stores/account";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { updateAccountNote } from "http/services/accounts.service";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { TOAST_LIFETIME } from "common/settings";
 import { AppColors } from "common/models/css-variables";
 import { NoteEditor } from "dashboard/accounts/form/common";
@@ -16,13 +16,21 @@ export const TakePaymentInfo = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
         accountNote,
+        getNotes,
         accountPaymentsInfo: { CurrentStatus, CollectionDetails },
     } = store;
     const toast = useToast();
+    const location = useLocation();
 
-    const handleSaveNote = (saveItem: keyof AccountNoteData) => {
+    useEffect(() => {
+        if (id) {
+            getNotes(id);
+        }
+    }, [id, location.pathname]);
+
+    const handleSaveNote = (saveItem: keyof AccountNoteData, value: string) => {
         id &&
-            updateAccountNote(id, { [saveItem]: accountNote[saveItem] }).then((res) => {
+            updateAccountNote(id, { [saveItem]: value }).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
@@ -114,10 +122,10 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 id='account-memo'
                 value={accountNote.note}
                 label='Account Memo'
-                onSave={() => handleSaveNote("note")}
+                onSave={() => handleSaveNote("note", accountNote.note)}
                 onClear={() => {
                     store.accountNote = { ...accountNote, note: "" };
-                    handleSaveNote("note");
+                    handleSaveNote("note", "");
                 }}
                 onChange={(value) => (store.accountNote = { ...accountNote, note: value })}
             />
@@ -126,10 +134,10 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 value={accountNote.alert}
                 className='mt-4'
                 label='Payment Alert'
-                onSave={() => handleSaveNote("alert")}
+                onSave={() => handleSaveNote("alert", accountNote.alert)}
                 onClear={() => {
                     store.accountNote = { ...accountNote, alert: "" };
-                    handleSaveNote("alert");
+                    handleSaveNote("alert", "");
                 }}
                 onChange={(value) => (store.accountNote = { ...accountNote, alert: value })}
             />

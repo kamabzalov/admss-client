@@ -121,7 +121,6 @@ export class AccountStore {
     public getAccountPaymentsInfo = async (accountuid: string) => {
         this._isLoading = true;
         try {
-            this.getNotes(accountuid);
             const response = await getPaymentInfo(accountuid);
             if (response) {
                 this._accountPaymentsInfo = response || ({} as AccountDetails);
