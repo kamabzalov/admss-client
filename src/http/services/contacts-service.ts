@@ -114,6 +114,7 @@ export const setContact = async (
                     error.response?.data.info ||
                     error.response?.data.error ||
                     "Error while setting contact",
+                errorField: error.response?.data.errorField,
             };
         }
     }

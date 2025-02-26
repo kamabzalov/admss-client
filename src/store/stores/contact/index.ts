@@ -226,7 +226,7 @@ export class ContactStore {
         this._contactExtData[key] = value as never;
     });
 
-    public saveContact = action(async (): Promise<string> => {
+    public saveContact = action(async (): Promise<BaseResponseError> => {
         try {
             this._isLoading = true;
 
@@ -251,12 +251,13 @@ export class ContactStore {
 
             const [contactDataResponse] = await Promise.all([
                 setContact(this._contactID, contactData),
-                this.setImagesDL(this._contactID),
-                this.setCoBuyerImagesDL(this._contactID),
+                this._frontSiteDL.size || this._backSiteDL.size
+                    ? this.setImagesDL(this._contactID)
+                    : Promise.resolve(),
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
-                throw new Error(contactDataResponse?.error);
+                throw contactDataResponse;
             }
 
             if (this._contact.cobuyeruid) {
@@ -267,21 +268,19 @@ export class ContactStore {
 
                 const [coBuyerContactDataResponse] = await Promise.all([
                     setContact(this._contact.cobuyeruid, coBuyerContactData),
-                    this.setImagesDL(this._contact.cobuyeruid),
-                    this.setCoBuyerImagesDL(this._contact.cobuyeruid),
+                    this._coBuyerFrontSideDL.size || this._coBuyerBackSideDL.size
+                        ? this.setCoBuyerImagesDL(this._contact.cobuyeruid)
+                        : Promise.resolve(),
                 ]);
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
-                    throw new Error(coBuyerContactDataResponse?.error);
+                    throw coBuyerContactDataResponse;
                 }
             }
 
-            return Status.OK;
+            return { status: Status.OK };
         } catch (error) {
-            if (error instanceof Error) {
-                return error.message;
-            }
-            return String(error);
+            return error as BaseResponseError;
         } finally {
             this._isLoading = false;
         }
@@ -290,7 +289,9 @@ export class ContactStore {
     private setImagesDL = async (contactuid: string): Promise<any> => {
         this._isLoading = true;
         try {
-            [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
+            const filesToUpload = [this._frontSiteDL, this._backSiteDL];
+            for (let index = 0; index < filesToUpload.length; index++) {
+                const file = filesToUpload[index];
                 if (file.size) {
                     const formData = new FormData();
                     formData.append("file", file);
@@ -307,7 +308,7 @@ export class ContactStore {
                         }
                     }
                 }
-            });
+            }
         } catch (error) {
             return { status: Status.ERROR, error };
         } finally {
@@ -318,7 +319,9 @@ export class ContactStore {
     private setCoBuyerImagesDL = async (contactuid: string): Promise<any> => {
         this._isLoading = true;
         try {
-            [this._coBuyerFrontSideDL, this._coBuyerBackSideDL].forEach(async (file, index) => {
+            const filesToUpload = [this._coBuyerFrontSideDL, this._coBuyerBackSideDL];
+            for (let index = 0; index < filesToUpload.length; index++) {
+                const file = filesToUpload[index];
                 if (file.size) {
                     const formData = new FormData();
                     formData.append("file", file);
@@ -335,7 +338,7 @@ export class ContactStore {
                         }
                     }
                 }
-            });
+            }
         } catch (error) {
             return { status: Status.ERROR, error };
         } finally {

@@ -389,6 +389,13 @@ export const TextInput = ({
                     setValue(e.target.value);
                 }}
                 {...props}
+                pt={{
+                    root: {
+                        style: {
+                            paddingRight: clearButton ? "40px" : "",
+                        },
+                    },
+                }}
             />
             {clearButton && value && (
                 <Button

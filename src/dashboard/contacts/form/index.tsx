@@ -15,7 +15,7 @@ import { Contact, ContactExtData } from "common/models/contact";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ContactMediaData } from "./media-data";
@@ -260,7 +260,7 @@ export const ContactForm = observer((): ReactElement => {
         formikRef.current?.validateForm().then(async (errors) => {
             if (!Object.keys(errors).length) {
                 const response = await saveContact();
-                if (response === Status.OK) {
+                if (response && response.status === Status.OK) {
                     if (memoRoute) {
                         navigate(memoRoute);
                         store.memoRoute = "";
@@ -273,10 +273,21 @@ export const ContactForm = observer((): ReactElement => {
                         detail: "Contact saved successfully",
                     });
                 } else {
+                    const { errorField } = response as BaseResponseError;
+                    if (
+                        errorField &&
+                        Object.keys(tabFields).some((key) =>
+                            tabFields[key as ContactAccordionItems]?.includes(
+                                errorField as keyof PartialContact
+                            )
+                        )
+                    ) {
+                        formikRef.current?.setErrors({ [errorField]: response.error });
+                    }
                     toast.current?.show({
                         severity: "error",
                         summary: Status.ERROR,
-                        detail: response || "Error while saving contact",
+                        detail: response.error || "Error while saving contact",
                         life: TOAST_LIFETIME,
                     });
                 }
