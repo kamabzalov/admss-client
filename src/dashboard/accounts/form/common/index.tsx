@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { Tooltip } from "primereact/tooltip";
 
 import "./index.css";
@@ -102,71 +102,82 @@ interface NoteEditorProps {
     className?: string;
 }
 
-export const NoteEditor = ({
-    id,
-    value,
-    label,
-    onSave,
-    onClear,
-    onChange,
-    className,
-}: NoteEditorProps): ReactElement => {
-    const [initialValue, setInitialValue] = useState<string>(value);
+interface NoteEditorProps {
+    id: string;
+    value: string;
+    label: string;
+    onSave: () => void;
+    onClear: () => void;
+    onChange: (value: string) => void;
+    className?: string;
+}
 
-    useEffect(() => {
-        value || setInitialValue(value);
-        return () => setInitialValue("");
-    }, [value]);
+interface NoteEditorProps {
+    id: string;
+    value: string;
+    label: string;
+    onSave: () => void;
+    onClear: () => void;
+    onChange: (value: string) => void;
+    className?: string;
+}
 
-    const hasChanges = value !== initialValue;
-    const handleClear = () => {
-        onClear();
-        setInitialValue("");
-    };
+export const NoteEditor = observer(
+    ({ id, value, label, onSave, onClear, onChange, className }: NoteEditorProps): ReactElement => {
+        const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    return (
-        <div className={`account-note ${className || ""}`}>
-            <span className='p-float-label'>
-                <InputTextarea
-                    id={id}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className='account-note__input'
-                />
-                <label htmlFor={id}>{label}</label>
-            </span>
-            {initialValue ? (
-                <div className='account-note__buttons'>
-                    <Button
-                        className='account-note__button'
-                        label='Clear'
-                        outlined
-                        onClick={handleClear}
+        const handleClear = () => {
+            onClear();
+            setIsEditing(false);
+        };
+
+        return (
+            <div className={`account-note ${className || ""}`}>
+                <span className='p-float-label'>
+                    <InputTextarea
+                        id={id}
+                        value={value}
+                        onChange={(e) => {
+                            setIsEditing(true);
+                            onChange(e.target.value);
+                        }}
+                        className='account-note__input'
                     />
+                    <label htmlFor={id}>{label}</label>
+                </span>
+                {value === "" && !isEditing ? (
                     <Button
+                        severity={value ? "success" : "secondary"}
                         className='account-note__button'
-                        label='Update'
-                        outlined
-                        disabled={!hasChanges}
-                        severity={hasChanges ? "success" : "secondary"}
+                        label='Save'
+                        disabled={!value}
                         onClick={() => {
                             onSave();
-                            setInitialValue(value);
+                            setIsEditing(false);
                         }}
                     />
-                </div>
-            ) : (
-                <Button
-                    severity={value ? "success" : "secondary"}
-                    className='account-note__button'
-                    label='Save'
-                    disabled={!value}
-                    onClick={() => {
-                        onSave();
-                        setInitialValue(value);
-                    }}
-                />
-            )}
-        </div>
-    );
-};
+                ) : (
+                    <div className='account-note__buttons'>
+                        <Button
+                            className='account-note__button'
+                            label='Clear'
+                            outlined
+                            onClick={handleClear}
+                        />
+                        <Button
+                            className='account-note__button'
+                            label='Update'
+                            outlined
+                            disabled={!isEditing}
+                            severity={isEditing ? "success" : "secondary"}
+                            onClick={() => {
+                                onSave();
+                                setIsEditing(false);
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
+        );
+    }
+);
