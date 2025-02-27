@@ -208,7 +208,7 @@ export const Reports = (): ReactElement => {
     const handleDragDrop = async (event: TreeDragDropEvent) => {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
-        const dropIndex = event.dropIndex;
+        const dropIndex = event.dropIndex - 1 < 0 ? 0 : event.dropIndex - 1;
 
         if (!dropNode) return;
 
