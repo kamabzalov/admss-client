@@ -73,10 +73,4 @@ react – библиотека React
 
 react-dom – рендеринг React-компонентов
 
-react-scripts – инструменты для Create
-
-React App
-
-Производительность:
-
-web-vitals – метрики веб-производительности
+react-scripts – инструменты 
