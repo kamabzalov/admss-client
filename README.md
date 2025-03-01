@@ -9,6 +9,7 @@ Cписок содержит зависимости для проекта.
 @testing-library/user-event – имитация пользовательских действий
 
 @types/jest – типы для Jest
+
 Типизация:
 
 @types/node – типы для Node.js
