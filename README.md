@@ -20,8 +20,6 @@
 
 @types/react-dom – типы для ReactDOM
 
-typescript – TypeScript
-
 Работа с HTTP:
 
 axios – HTTP-клиент для запросов
