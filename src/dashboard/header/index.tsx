@@ -119,7 +119,7 @@ export const Header = observer((): ReactElement => {
                     <div className='header__menu'>
                         <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
                         <img
-                            className='header-user-menu__toggle'
+                            className='header__icon'
                             onClick={(event) => menuRight?.current?.toggle(event)}
                             src={userCabinet}
                             alt='User cabinet'
