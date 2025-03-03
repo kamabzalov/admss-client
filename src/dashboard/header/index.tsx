@@ -107,7 +107,7 @@ export const Header = observer((): ReactElement => {
     if (menuRight) {
         return (
             <header className='header'>
-                <img src={logo} alt='Logotype ADMSS' className='header__logo' />
+                <img src={logo} alt='ADMSS' className='header__logo' />
 
                 <div className='header__content'>
                     <div className='header__info'>
