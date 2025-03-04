@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import logo from "assets/images/logo_with_title.svg";
+import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useLocation, useNavigate } from "react-router-dom";
