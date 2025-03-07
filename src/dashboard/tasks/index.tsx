@@ -20,7 +20,7 @@ import {
     SearchField,
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
-import { Task } from "common/models/tasks";
+import { AdvancedSearch, SEARCH_FORM_FIELDS, SEARCH_FORM_QUERY, Task } from "common/models/tasks";
 import { getAllTasks, getCurrentUserTasks } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
 import {
@@ -28,10 +28,10 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { TableColumnsList } from "dashboard/tasks/common";
+import { TableColumnsList, TASKS_STATUS_LIST } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
-import { AddTaskDialog } from "./add-task-dialog";
+import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
@@ -47,63 +47,6 @@ const selectableColumns: TableColumnsList[] = [
     { field: "accountname", header: "Account", checked: false, isSelectable: true },
     { field: "dealname", header: "Deal", checked: false, isSelectable: true },
     { field: "contactname", header: "Contact", checked: false, isSelectable: true },
-];
-
-enum SEARCH_FORM_FIELDS {
-    CREATION_DATE = "Creation Date",
-    DESCRIPTION = "Description (keywords)",
-}
-
-enum SEARCH_FORM_QUERY {
-    CREATION_DATE = "date",
-    DESCRIPTION = "description",
-}
-
-interface AdvancedSearch {
-    [key: string]: string | number;
-    info: string;
-    date: string;
-}
-
-interface TasksFilterOptions {
-    name: string;
-    value?: string;
-}
-
-const TASKS_STATUS_LIST: TasksFilterOptions[] = [
-    { name: "Default", value: "0.status" },
-    {
-        name: "Started",
-        value: "1.status",
-    },
-    {
-        name: "In Progress",
-        value: "2.status",
-    },
-    {
-        name: "Cancelled",
-        value: "3.status",
-    },
-    {
-        name: "Postponed",
-        value: "4.status",
-    },
-    {
-        name: "Paused",
-        value: "5.status",
-    },
-    {
-        name: "Completed",
-        value: "6.status",
-    },
-    {
-        name: "Outdated",
-        value: "7.status",
-    },
-    {
-        name: "Deleted",
-        value: "8.status",
-    },
 ];
 
 export const TasksDataTable = observer((): ReactElement => {

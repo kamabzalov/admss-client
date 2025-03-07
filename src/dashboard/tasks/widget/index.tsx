@@ -144,7 +144,7 @@ export const TasksWidget = observer(() => {
                                             task.username ?? `- ${task.username}`
                                         }`}
                                 </label>
-                                {renderTaskStatus(task.task_status)}
+                                {renderTaskStatus(task.statuscode)}
                             </li>
                         );
                     })
