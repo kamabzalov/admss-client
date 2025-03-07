@@ -8,6 +8,7 @@
     "jsxBracketSameLine": false,
     "arrowParens": "always",
     "endOfLine": "auto",
+    "insertFinalNewline": true,
     "jsxSingleQuote": true,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",

@@ -31,6 +31,7 @@ export interface Task {
     startdate: string;
     task_status: TaskStatus;
     taskname: string;
+    statuscode: number;
     updated: string;
     username: string;
     useruid: string;
@@ -50,6 +51,7 @@ export interface PostDataTask extends BaseResponseError {
     updated: string;
     startdate: string;
     deadline: string;
+    statuscode: number;
     task_status: TaskStatus;
     itemuid: string;
     parentuid: string;
@@ -62,4 +64,20 @@ export interface PostDataTask extends BaseResponseError {
     contactname: string;
     phone: string;
     description: string;
+}
+
+export enum SEARCH_FORM_FIELDS {
+    CREATION_DATE = "Creation Date",
+    DESCRIPTION = "Description (keywords)",
+}
+
+export enum SEARCH_FORM_QUERY {
+    CREATION_DATE = "date",
+    DESCRIPTION = "description",
+}
+
+export interface AdvancedSearch {
+    [key: string]: string | number;
+    info: string;
+    date: string;
 }
