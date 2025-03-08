@@ -48,8 +48,11 @@
     --admss-app-statuses-cancelled: #de0000;
     --admss-app-statuses-outdated: #5f5f5f;
     --admss-app-statuses-deleted: #000000;
-    --admss-app-aside-small-width: 130px;
+    --admss-app-aside-collapsed-width: 84px;
+    --admss-app-aside-expanded-width: 200px;
     --admss-app-dialog-border-radius: 15px;
+    --admss-app-content-top-margin: 50px;
+    --admss-app-header-height: 108px;
 }
 
 ::placeholder {
