@@ -1,9 +1,9 @@
 .sidebar {
     position: fixed;
-    padding-top: 40px;
+    padding-top: var(--admss-app-content-top-margin);
     left: 0;
-    width: var(--admss-app-aside-small-width);
-    top: 150px;
+    width: var(--admss-app-aside-expanded-width);
+    top: var(--admss-app-header-height);
     height: 100vh;
     background: var(--admss-app-main-blue);
 }
