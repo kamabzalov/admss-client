@@ -657,7 +657,13 @@
 
 @media screen and (min-width: 992px) {
     .main {
-        margin-left: var(--admss-app-aside-expanded-width);
+        transition: margin-left 0.3s ease;
+        &.main--expanded {
+            margin-left: calc(var(--admss-app-aside-collapsed-width) - 36px);
+        }
+        &.main--collapsed {
+            margin-left: calc(var(--admss-app-aside-expanded-width) - 36px);
+        }
     }
 }
 

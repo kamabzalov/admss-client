@@ -18,7 +18,7 @@ import { CONTACT_SUPPORT, HELP_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { authUser } = store;
+    const { authUser, settings } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -106,8 +106,14 @@ export const Header = observer((): ReactElement => {
 
     if (menuRight) {
         return (
-            <header className='header'>
-                <img src={logo} alt='ADMSS' className='header__logo header__logo--expanded' />
+            <header
+                className={`header ${settings.isSidebarCollapsed ? "header--collapsed" : "header--expanded"}`}
+            >
+                <img
+                    src={logo}
+                    alt='ADMSS'
+                    className={`header__logo ${settings.isSidebarCollapsed ? "header__logo--collapsed" : "header__logo--expanded"}`}
+                />
 
                 <div className='header__content'>
                     <div className='header__info'>

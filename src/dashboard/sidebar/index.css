@@ -1,11 +1,39 @@
 .sidebar {
+    --toggler-size: 25px;
+    --icons-size: 40px;
     position: fixed;
     padding-top: var(--admss-app-content-top-margin);
     left: 0;
     width: var(--admss-app-aside-expanded-width);
+    transition: width 0.3s ease;
     top: var(--admss-app-header-height);
     height: 100vh;
     background: var(--admss-app-main-blue);
+    z-index: 999;
+
+    &.collapsed {
+        width: var(--admss-app-aside-collapsed-width, 84px);
+    }
+}
+
+.sidebar-toggle.p-button.p-button-icon-only.p-button-rounded {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 15px;
+    width: var(--toggler-size);
+    height: var(--toggler-size);
+    right: calc(var(--toggler-size) / -2);
+    background-color: var(--admss-app-main-blue);
+    border: 1px solid var(--admss-app-white);
+    cursor: pointer;
+    .p-button-icon {
+        font-size: 13px;
+    }
+    &:focus {
+        box-shadow: none;
+    }
 }
 
 .sidebar-nav {
@@ -14,7 +42,7 @@
     list-style: none;
     display: inline-flex;
     flex-direction: column;
-    color: #fff;
+    color: var(--admss-app-white);
     width: 100%;
 }
 
@@ -25,7 +53,6 @@
     align-items: center;
     height: 90px;
     cursor: pointer;
-    padding: 8px 0;
 }
 
 .sidebar-nav__item:hover {
@@ -36,11 +63,12 @@
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    color: #fff;
+    justify-content: center;
+    color: var(--admss-app-white);
     text-decoration: none;
     font-weight: 700;
+    font-size: 14px;
     width: 100%;
-    height: 100%;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__link {
@@ -48,15 +76,20 @@
 }
 
 .sidebar-nav__icon {
-    width: 40px;
-    height: 40px;
     margin-bottom: 5px;
+    background-position: center;
     background-size: 100%;
     background-repeat: no-repeat;
 }
 
 .sidebar-nav__icon.home {
+    width: 49px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/home_normal.svg");
+}
+.sidebar.collapsed .sidebar-nav__icon.home {
+    width: 42px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.home {
@@ -64,7 +97,14 @@
 }
 
 .sidebar-nav__icon.inventory {
+    width: 66px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/inventory_normal.svg");
+}
+
+.sidebar.collapsed .sidebar-nav__icon.inventory {
+    width: 56px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.inventory {
@@ -72,7 +112,14 @@
 }
 
 .sidebar-nav__icon.contacts {
+    width: 40px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/contacts_normal.svg");
+}
+
+.sidebar.collapsed .sidebar-nav__icon.contacts {
+    width: 34px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.contacts {
@@ -80,7 +127,14 @@
 }
 
 .sidebar-nav__icon.deals {
+    width: 45px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/deals_normal.svg");
+}
+
+.sidebar.collapsed .sidebar-nav__icon.deals {
+    width: 38px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.deals {
@@ -88,7 +142,14 @@
 }
 
 .sidebar-nav__icon.accounts {
+    width: 51px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/accounts_normal.svg");
+}
+
+.sidebar.collapsed .sidebar-nav__icon.accounts {
+    width: 43px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.accounts {
@@ -96,7 +157,14 @@
 }
 
 .sidebar-nav__icon.reports {
+    width: 35px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/reports_normal.svg");
+}
+
+.sidebar.collapsed .sidebar-nav__icon.reports {
+    width: 30px;
+    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.reports {
@@ -104,6 +172,8 @@
 }
 
 .sidebar-nav__icon.tasks {
+    width: 35px;
+    height: 47px;
     background-image: url("assets/images/icons/sidebar/reports_normal.svg");
 }
 

@@ -16,6 +16,9 @@ export const Dashboard = observer((): ReactElement => {
     const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
 
+    const store = useStore().userStore;
+    const { authUser, settings } = store;
+
     useEffect(() => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
         if (storedUser) {
@@ -26,9 +29,6 @@ export const Dashboard = observer((): ReactElement => {
         }
     }, []);
 
-    const store = useStore().userStore;
-    const { authUser } = store;
-
     if (!user || !authUser) {
         return <Loader overlay />;
     }
@@ -38,7 +38,9 @@ export const Dashboard = observer((): ReactElement => {
             <Suspense fallback={<Loader overlay />}>
                 <Header />
                 <Sidebar />
-                <main className='main'>
+                <main
+                    className={`main ${settings.isSidebarCollapsed ? "main--expanded" : "main--collapsed"}`}
+                >
                     <div className='container'>
                         <Outlet />
                     </div>

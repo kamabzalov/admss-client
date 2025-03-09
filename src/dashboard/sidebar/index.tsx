@@ -1,13 +1,16 @@
-import { Link } from "react-router-dom";
 import "./index.css";
+import { Link } from "react-router-dom";
 import { useState, useEffect, ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { Button } from "primereact/button";
+import { Tooltip } from "primereact/tooltip";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { authUser } = store;
+    const { authUser, settings } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
+
     useEffect(() => {
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;
@@ -19,61 +22,49 @@ export const Sidebar = observer((): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
 
+    const renderNavItem = (to: string, iconClass: string, label: string): ReactElement => {
+        const itemId = `nav-item-${to.replace(/\//g, "-")}`;
+        return (
+            <li className='sidebar-nav__item'>
+                {settings.isSidebarCollapsed && (
+                    <Tooltip target={`#${itemId}`} content={label} position='right' />
+                )}
+                <Link to={to} id={itemId} className='sidebar-nav__link'>
+                    <div className={`sidebar-nav__icon ${iconClass}`}></div>
+                    {!settings.isSidebarCollapsed && <span>{label}</span>}
+                </Link>
+            </li>
+        );
+    };
+
     return (
-        <aside className='sidebar hidden lg:block'>
+        <aside
+            className={`sidebar hidden lg:block ${settings.isSidebarCollapsed ? "collapsed" : ""}`}
+        >
+            <Button
+                className='sidebar-toggle'
+                onClick={() => settings.toggleSidebar()}
+                rounded
+                icon='pi pi-angle-left'
+                aria-label={`${settings.isSidebarCollapsed ? "Expand" : "Collapse"} sidebar`}
+                tooltip={`${settings.isSidebarCollapsed ? "Expand" : "Collapse"} sidebar`}
+                pt={{
+                    icon: {
+                        className: `${settings.isSidebarCollapsed ? "pi pi-angle-right" : "pi pi-angle-left"}`,
+                    },
+                }}
+            />
             <ul className='sidebar-nav'>
-                <li className='sidebar-nav__item'>
-                    <Link to='/dashboard' className='sidebar-nav__link'>
-                        <div className='sidebar-nav__icon home'></div>
-                        <span>Home</span>
-                    </Link>
-                </li>
-                <li className='sidebar-nav__item'>
-                    <Link to='/dashboard/inventory' className='sidebar-nav__link'>
-                        <div className='sidebar-nav__icon inventory'></div>
-                        <span>Inventory</span>
-                    </Link>
-                </li>
+                {renderNavItem("/dashboard", "home", "Home")}
+                {renderNavItem("/dashboard/inventory", "inventory", "Inventory")}
                 {isSalesPerson || (
                     <>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/contacts' className='sidebar-nav__link'>
-                                <div className='sidebar-nav__icon contacts'></div>
-                                <span>Contacts</span>
-                            </Link>
-                        </li>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/deals' className='sidebar-nav__link'>
-                                <div className='sidebar-nav__icon deals'></div>
-                                <span>Deals</span>
-                            </Link>
-                        </li>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/accounts' className='sidebar-nav__link'>
-                                <div className='sidebar-nav__icon accounts'></div>
-                                <span>Accounts</span>
-                            </Link>
-                        </li>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/reports' className='sidebar-nav__link'>
-                                <div className='sidebar-nav__icon reports'></div>
-                                <span>Reports</span>
-                            </Link>
-                        </li>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/export-web' className='sidebar-nav__link'>
-                                {/* TODO: change icon */}
-                                <div className='sidebar-nav__icon reports'></div>
-                                <span>Export to Web</span>
-                            </Link>
-                        </li>
-                        <li className='sidebar-nav__item'>
-                            <Link to='/dashboard/tasks' className='sidebar-nav__link'>
-                                {/* TODO: change icon */}
-                                <div className='sidebar-nav__icon tasks'></div>
-                                <span>Tasks</span>
-                            </Link>
-                        </li>
+                        {renderNavItem("/dashboard/contacts", "contacts", "Contacts")}
+                        {renderNavItem("/dashboard/deals", "deals", "Deals")}
+                        {renderNavItem("/dashboard/accounts", "accounts", "Accounts")}
+                        {renderNavItem("/dashboard/reports", "reports", "Reports")}
+                        {renderNavItem("/dashboard/export-web", "reports", "Export to Web")}
+                        {renderNavItem("/dashboard/tasks", "tasks", "Tasks")}
                     </>
                 )}
             </ul>
