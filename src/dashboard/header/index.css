@@ -6,20 +6,28 @@
     height: var(--admss-app-header-height);
     background: var(--admss-app-white-blue);
     border-bottom: 5px solid var(--admss-app-main-blue);
-    padding: 15px 40px;
+    &.header--collapsed {
+        padding: 15px 20px;
+        padding-right: 40px;
+    }
+    &.header--expanded {
+        padding: 15px 40px;
+    }
     display: flex;
     align-items: center;
 }
 
 .header__logo {
+    transition: all 0.3s ease;
     &.header__logo--expanded {
         margin: 0 20px;
+        margin-right: 120px;
         height: 88px;
         width: 76px;
     }
 
     &.header__logo--collapsed {
-        margin-right: 20px;
+        margin-right: 88px;
         height: 41px;
         width: 47px;
     }
@@ -28,7 +36,6 @@
 .header__content {
     width: 100%;
     display: flex;
-    padding-left: 100px;
     justify-content: space-between;
 }
 
