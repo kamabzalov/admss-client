@@ -14,14 +14,14 @@
 .header__logo {
     &.header__logo--expanded {
         margin: 0 20px;
-        height: 88px;
-        width: 76px;
+        width: 88px;
+        height: 76px;
     }
 
     &.header__logo--collapsed {
         margin-right: 20px;
-        height: 41px;
-        width: 47px;
+        width: 41px;
+        height: 47px;
     }
 }
 
@@ -36,17 +36,17 @@
     font-weight: 700;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 23px;
 }
 
 .header__name {
-    font-size: 28px;
-    line-height: 38px;
+    font-size: 24px;
+    line-height: 100%;
 }
 
 .header__location {
     font-size: 18px;
-    line-height: 24px;
+    line-height: 100%;
 }
 
 .header-dealer-info {
