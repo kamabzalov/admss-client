@@ -28,8 +28,8 @@
 
     &.header__logo--collapsed {
         margin-right: 88px;
-        height: 41px;
         width: 47px;
+        height: 41px;
     }
 }
 
