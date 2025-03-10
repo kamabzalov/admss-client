@@ -44,6 +44,7 @@
     flex-direction: column;
     color: var(--admss-app-white);
     width: 100%;
+    gap: 30px;
 }
 
 .sidebar-nav__item {
