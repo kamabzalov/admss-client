@@ -5,14 +5,12 @@
     --admss-app-base-font-size: 18px;
 
     --admss-app-aside-collapsed-width: 84px;
-    --admss-app-aside-expanded-width: 200px;
+    --admss-app-aside-expanded-width: 201px;
     --admss-app-content-top-margin: 50px;
     --admss-app-header-height: 108px;
     --admss-app-dialog-border-radius: 15px;
-    --admss-app-container-width-default: 100%;
-    --admss-app-container-width-lg: 824px;
-    --admss-app-container-width-xl: 1250px;
-    --admss-app-container-width-xxl: 1560px;
+    --admss-app-container-width: 91vw;
+    --admss-app-container-width-collapsed: 1539px;
     --admss-app-container-width-expanded: 1670px;
 
     --admss-app-main-blue: #295dc2;
@@ -89,7 +87,7 @@ body {
 }
 
 .container {
-    width: var(--admss-app-container-width-default);
+    width: var(--admss-app-container-width-collapsed);
     margin: auto;
 }
 
@@ -105,23 +103,11 @@ body {
     background: var(--admss-app-medium-blue);
 }
 
-@media screen and (min-width: 992px) {
-    .container {
-        width: var(--admss-app-container-width-lg);
-    }
+.main.main--collapsed .container {
+    width: calc(var(--admss-app-container-width) - var(--admss-app-aside-expanded-width));
+    max-width: var(--admss-app-container-width-collapsed);
 }
-
-@media screen and (min-width: 1400px) {
-    .container {
-        width: var(--admss-app-container-width-xl);
-    }
-}
-
-@media screen and (min-width: 1600px) {
-    .container {
-        width: var(--admss-app-container-width-xxl);
-    }
-    .main.main--expanded .container {
-        width: var(--admss-app-container-width-expanded);
-    }
+.main.main--expanded .container {
+    width: calc(var(--admss-app-container-width) - var(--admss-app-aside-collapsed-width));
+    max-width: var(--admss-app-container-width-expanded);
 }
