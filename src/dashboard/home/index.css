@@ -140,7 +140,7 @@
     .p-datepicker-calendar {
         thead th,
         tbody td {
-            padding: 0;
+            padding: 0px;
             width: 45px;
         }
 
@@ -149,7 +149,7 @@
             display: inline-flex;
             height: 30px;
             width: 30px;
-            margin: 0;
+            margin: 0px;
         }
     }
 }
