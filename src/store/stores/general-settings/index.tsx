@@ -1,19 +1,44 @@
 import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
-import { GeneralSettings } from "common/models/general-settings";
+import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { CreateMediaItemRecordResponse } from "common/models/inventory";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
-import { getUserGeneralSettings, updateUserGeneralSettings } from "http/services/settings.service";
+import {
+    getPostProcessing,
+    getUserGeneralSettings,
+    updatePostProcessing,
+    updateUserGeneralSettings,
+} from "http/services/settings.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
+
+type TextBlock = Partial<WatermarkPostProcessing>;
+
+const initialPostProcessing: TextBlock[] = [
+    {
+        id: 0,
+        ppPattern: "",
+        fontColor: 0,
+        bkColor: 0,
+        fontSize: 0,
+        posX: 0,
+        posY: 0,
+        ppText: "",
+        fontName: "",
+        useruid: "",
+    },
+];
 
 export class GeneralSettingsStore {
     public rootStore: RootStore;
     private _settings: GeneralSettings = {} as GeneralSettings;
     private _settingsID: string = "";
     private _watermarkImage: File | null = null;
+    private _postProcessing: WatermarkPostProcessing[] =
+        initialPostProcessing as WatermarkPostProcessing[];
     protected _isLoading = false;
     private _isSettingsChanged: boolean = false;
+    private _isPostProcessingChanged: boolean = false;
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
@@ -33,6 +58,10 @@ export class GeneralSettingsStore {
 
     public get watermarkImage() {
         return this._watermarkImage;
+    }
+
+    public get postProcessing() {
+        return this._postProcessing;
     }
 
     public get isLoading() {
@@ -69,6 +98,49 @@ export class GeneralSettingsStore {
         }
     };
 
+    public getPostProcessing = async () => {
+        this._isLoading = true;
+        try {
+            const useruid = this.rootStore.userStore.authUser?.useruid;
+            if (!useruid) return { status: Status.ERROR, error: "User UID is not available" };
+            const postProcessing = await getPostProcessing(useruid);
+            if (postProcessing && postProcessing.error) {
+                return {
+                    status: Status.ERROR,
+                    error: postProcessing.error,
+                };
+            } else {
+                if (!postProcessing && Array.isArray(postProcessing)) return;
+                const response = postProcessing as unknown as WatermarkPostProcessing[];
+                this._postProcessing = response;
+                this._isPostProcessingChanged = false;
+            }
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public savePostProcessing = async () => {
+        try {
+            const useruid = this.rootStore.userStore.authUser?.useruid;
+            if (!useruid) return { status: Status.ERROR, error: "User UID is not available" };
+            await updatePostProcessing(useruid, this._postProcessing as any);
+            this._isPostProcessingChanged = false;
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
     public changeSettings = action(
         (
             key: keyof GeneralSettings,
@@ -82,7 +154,16 @@ export class GeneralSettingsStore {
         }
     );
 
+    public changePostProcessing = action((state: Partial<WatermarkPostProcessing>[]) => {
+        this._isSettingsChanged = true;
+        this._isPostProcessingChanged = true;
+        this._postProcessing = state as WatermarkPostProcessing[];
+    });
+
     private setWatermarkImage = async (): Promise<any> => {
+        if (!this._watermarkImage) {
+            return { status: Status.OK };
+        }
         this._isLoading = true;
         try {
             if (this._watermarkImage && this._watermarkImage.size) {
@@ -109,7 +190,12 @@ export class GeneralSettingsStore {
     public saveSettings = action(async (): Promise<BaseResponseError> => {
         try {
             this._isLoading = true;
-            await this.setWatermarkImage();
+            if (this._isPostProcessingChanged) {
+                await this.savePostProcessing();
+            }
+            if (this._watermarkImage !== null) {
+                await this.setWatermarkImage();
+            }
             updateUserGeneralSettings({
                 ...this._settings,
             });
@@ -149,6 +235,7 @@ export class GeneralSettingsStore {
     public clearSettings = () => {
         this._settings = {} as GeneralSettings;
         this._isSettingsChanged = false;
+        this._isPostProcessingChanged = false;
         this._settingsID = "";
     };
 }

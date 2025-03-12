@@ -46,3 +46,20 @@ export interface GeneralSettings extends BaseResponseError {
     logoopacity: number;
     exportService: number;
 }
+
+export interface WatermarkPostProcessing extends BaseResponseError {
+    id: number;
+    created: string;
+    updated: string;
+    deleted: string;
+    useruid: string;
+    itemuid: string;
+    posX: number;
+    posY: number;
+    fontSize: number;
+    fontColor: number;
+    bkColor: number;
+    fontName: string;
+    ppText: string;
+    ppPattern: string;
+}

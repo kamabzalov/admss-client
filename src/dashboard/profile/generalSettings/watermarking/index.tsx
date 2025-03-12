@@ -2,194 +2,175 @@ import "./index.css";
 import { useEffect, useRef, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { FileUpload, FileUploadHeaderTemplateOptions } from "primereact/fileupload";
-import { MediaLimits } from "common/models";
-import { Tag } from "primereact/tag";
+import { FileUpload } from "primereact/fileupload";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { getWatermark } from "http/services/settings.service";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
-import { GeneralSettings } from "common/models/general-settings";
+import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-
-const limitations: MediaLimits = {
-    formats: ["PNG", "JPEG"],
-    maxResolution: "1200x1200",
-    maxSize: 2,
-};
+import {
+    limitations,
+    chooseTemplate,
+    itemTemplate,
+    emptyTemplate,
+} from "dashboard/profile/generalSettings/watermarking/common";
 
 type LogoSettings = Partial<Pick<GeneralSettings, "logoenabled" | "logoposX" | "logoposY">>;
-type TextBlock = {
-    text: string;
-    fontName: string;
-    fontSize: number | string;
-    posX: number;
-    posY: number;
-};
-
-const mockTextBlock: TextBlock[] = [
-    {
-        text: "text",
-        fontName: "Arial",
-        fontSize: 12,
-        posX: 40,
-        posY: 40,
-    },
-];
 
 export const SettingsWatermarking = observer(() => {
     const store = useStore().generalSettingsStore;
-    const { settings } = store;
+    const { settings, postProcessing, getPostProcessing, changePostProcessing } = store;
     const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
     const [logoSettings, setLogoSettings] = useState<LogoSettings>({ logoenabled: 0 });
-    const [textBlocks, setTextBlocks] = useState<TextBlock[]>(mockTextBlock);
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
 
-    const renderTextBlocks = () => {
-        const header = (blockIndex: number) => {
-            return (
-                <div className='flex align-items-center justify-content-between w-full'>
-                    {`TEXT BLOCK ${blockIndex + 1}`}
-                    <div className='watermarking__accordion-header-buttons'>
-                        <Button
-                            label='Clear'
-                            text
-                            className='watermarking__clear-button'
-                            disabled={textBlocks[blockIndex].text.length === 0}
-                            severity={
-                                textBlocks[blockIndex].text.length === 0 ? "secondary" : "success"
-                            }
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setTextBlocks((prev) => {
-                                    const newTextBlocks = [...prev];
-                                    newTextBlocks[blockIndex] = {
-                                        text: "",
-                                        fontName: "",
-                                        fontSize: 0,
-                                        posX: 0,
-                                        posY: 0,
-                                    };
-                                    return newTextBlocks;
-                                });
-                            }}
-                        />
-                        <Button
-                            icon='icon adms-close'
-                            className='watermarking__remove-button'
-                            text
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setTextBlocks(textBlocks.filter((_, i) => i !== blockIndex));
-                            }}
-                        />
-                    </div>
-                </div>
-            );
-        };
+    useEffect(() => {
+        getPostProcessing();
+        if (settings.logomediauid) {
+            handleGetWatermark();
+        }
+    }, []);
 
-        return textBlocks.map((block, index) => (
+    const handleDeletePostProcessing = (index: number) => {
+        const newTextBlocks = postProcessing.filter((_, i) => i !== index);
+        changePostProcessing(newTextBlocks);
+    };
+
+    const handleUpdatePostProcessing = (index: number) => {
+        const newTextBlocks = [...postProcessing];
+        newTextBlocks[index] = {
+            id: postProcessing[index]?.id || 0,
+            ppText: "",
+            fontName: "",
+            fontSize: 0,
+            posX: 0,
+            posY: 0,
+            ppPattern: "",
+            fontColor: 0,
+            bkColor: 0,
+            useruid: postProcessing[index]?.useruid || "",
+        } as WatermarkPostProcessing;
+        changePostProcessing(newTextBlocks);
+    };
+
+    const handleCreateNewPostProcessing = () => {
+        const newTextBlock: Partial<WatermarkPostProcessing> = {
+            id: postProcessing.length,
+            ppText: "",
+            fontName: "",
+            fontSize: 0,
+            posX: 0,
+            posY: 0,
+            ppPattern: "",
+            fontColor: 0,
+            bkColor: 0,
+            useruid: "",
+        };
+        changePostProcessing([...postProcessing, newTextBlock]);
+    };
+
+    const renderTextBlocks = () => {
+        const header = (blockIndex: number) => (
+            <div className='flex align-items-center justify-content-between w-full'>
+                {`TEXT BLOCK ${blockIndex + 1}`}
+                <div className='watermarking__accordion-header-buttons'>
+                    <Button
+                        label='Clear'
+                        text
+                        className='watermarking__clear-button'
+                        disabled={!postProcessing[blockIndex]?.ppText?.length}
+                        severity={
+                            !postProcessing[blockIndex]?.ppText?.length ? "secondary" : "success"
+                        }
+                        onClick={() => handleUpdatePostProcessing(blockIndex)}
+                    />
+                    <Button
+                        icon='icon adms-close'
+                        className='watermarking__remove-button'
+                        text
+                        onClick={() => handleDeletePostProcessing(blockIndex)}
+                    />
+                </div>
+            </div>
+        );
+
+        return postProcessing.map((block, index) => (
             <AccordionTab
                 header={header(index)}
                 key={index}
                 className='watermarking__accordion-tab'
                 contentClassName='watermarking__accordion-content'
             >
-                <p className='grid gap-3 mt-0'>
+                <div className='grid gap-3 mt-0'>
                     <span className='col-12 p-0 p-float-label watermarking__textarea'>
                         <InputTextarea
-                            value={block.text}
-                            onChange={(e) =>
-                                setTextBlocks((prev) => {
-                                    const newTextBlocks = [...prev];
-                                    newTextBlocks[index] = { ...block, text: e.target.value };
-                                    return newTextBlocks;
-                                })
-                            }
+                            value={block.ppText || ""}
+                            onChange={(e) => {
+                                const newTextBlocks = [...postProcessing];
+                                newTextBlocks[index] = { ...block, ppText: e.target.value };
+                                changePostProcessing(newTextBlocks);
+                            }}
                         />
                         <label className='float-label'>Text</label>
                     </span>
                     <div className='col-12 p-0 flex align-items-center justify-content-between'>
                         <span className='p-float-label watermarking__font-input'>
                             <InputText
-                                value={block.fontName}
-                                onChange={(e) =>
-                                    setTextBlocks((prev) => {
-                                        const newTextBlocks = [...prev];
-                                        newTextBlocks[index] = {
-                                            ...block,
-                                            fontName: e.target.value,
-                                        };
-                                        return newTextBlocks;
-                                    })
-                                }
+                                value={block.fontName || ""}
+                                onChange={(e) => {
+                                    const newTextBlocks = [...postProcessing];
+                                    newTextBlocks[index] = { ...block, fontName: e.target.value };
+                                    changePostProcessing(newTextBlocks);
+                                }}
                             />
                             <label className='float-label'>Font name</label>
                         </span>
                         <span className='p-float-label watermarking__input'>
                             <InputNumber
-                                value={Number(block.fontSize)}
-                                onChange={(e) =>
-                                    setTextBlocks((prev) => {
-                                        const newTextBlocks = [...prev];
-                                        newTextBlocks[index] = {
-                                            ...block,
-                                            fontSize: Number(e.value),
-                                        };
-                                        return newTextBlocks;
-                                    })
-                                }
+                                value={Number(block.fontSize) || 0}
+                                onChange={(e) => {
+                                    const newTextBlocks = [...postProcessing];
+                                    newTextBlocks[index] = {
+                                        ...block,
+                                        fontSize: Number(e.value) || 0,
+                                    };
+                                    changePostProcessing(newTextBlocks);
+                                }}
                             />
                             <label className='float-label'>Font size</label>
                         </span>
                         <span className='p-float-label watermarking__input'>
                             <InputNumber
-                                value={block.posX}
-                                onChange={(e) =>
-                                    setTextBlocks((prev) => {
-                                        const newTextBlocks = [...prev];
-                                        newTextBlocks[index] = { ...block, posX: Number(e.value) };
-                                        return newTextBlocks;
-                                    })
-                                }
+                                value={block.posX || 0}
+                                onChange={(e) => {
+                                    const newTextBlocks = [...postProcessing];
+                                    newTextBlocks[index] = { ...block, posX: Number(e.value) || 0 };
+                                    changePostProcessing(newTextBlocks);
+                                }}
                             />
                             <label className='float-label'>PosX</label>
                         </span>
                         <span className='p-float-label watermarking__input'>
                             <InputNumber
-                                value={block.posY}
-                                onChange={(e) =>
-                                    setTextBlocks((prev) => {
-                                        const newTextBlocks = [...prev];
-                                        newTextBlocks[index] = { ...block, posY: Number(e.value) };
-                                        return newTextBlocks;
-                                    })
-                                }
+                                value={block.posY || 0}
+                                onChange={(e) => {
+                                    const newTextBlocks = [...postProcessing];
+                                    newTextBlocks[index] = { ...block, posY: Number(e.value) || 0 };
+                                    changePostProcessing(newTextBlocks);
+                                }}
                             />
                             <label className='float-label'>PosY</label>
                         </span>
                     </div>
-                </p>
+                </div>
             </AccordionTab>
         ));
-    };
-
-    const handleAddTextBlock = () => {
-        setTextBlocks([
-            ...textBlocks,
-            {
-                text: "",
-                fontName: "",
-                fontSize: 0,
-                posX: 0,
-                posY: 0,
-            },
-        ]);
     };
 
     const handleGetWatermark = async () => {
@@ -210,69 +191,6 @@ export const SettingsWatermarking = observer(() => {
                 logoposY,
             });
         }
-    };
-
-    useEffect(() => {
-        handleGetWatermark();
-    }, [settings]);
-
-    const itemTemplate = (inFile: object) => {
-        const file = inFile as File;
-        return (
-            <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center w-full'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={"100%"}
-                        height={"100%"}
-                        className='presentation__image'
-                    />
-                </div>
-                <Button
-                    type='button'
-                    icon='pi pi-times'
-                    className='p-button presentation__remove-button'
-                    onClick={() => fileUploadRef.current?.clear()}
-                />
-            </div>
-        );
-    };
-
-    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => (
-        <>
-            <div className='image-choose'>{chooseButton}</div>
-            <div className='upload-info'>
-                <span className='media__upload-text-info'>
-                    Max resolution: {limitations.maxResolution}px
-                </span>
-                <span className='media__upload-text-info'>
-                    Max size is {limitations.maxSize} Mb
-                </span>
-                <div className='media__upload-formats'>
-                    {limitations.formats.map((format) => (
-                        <Tag key={format} className='media__upload-tag' value={format} />
-                    ))}
-                </div>
-            </div>
-        </>
-    );
-
-    const emptyTemplate = () => {
-        return (
-            <div className='empty-template'>
-                <div className='flex align-items-center justify-content-center flex-column h-full'>
-                    <i className='adms-upload media__upload-icon' />
-                    <span className=' media__upload-icon-label'>Drag and drop image here</span>
-                </div>
-                <div className='media__upload-splitter h-full'>
-                    <div className='media__line' />
-                    <span>or</span>
-                    <div className='media__line' />
-                </div>
-            </div>
-        );
     };
 
     return (
@@ -321,11 +239,15 @@ export const SettingsWatermarking = observer(() => {
                         chooseOptions={{
                             icon: <></>,
                         }}
+                        onRemove={() => {
+                            store.watermarkImage = null;
+                            store.changeSettings("logomediauid", "", true);
+                        }}
                         headerTemplate={chooseTemplate}
                         onSelect={(event) => {
                             store.watermarkImage = event.files[0];
                         }}
-                        itemTemplate={itemTemplate}
+                        itemTemplate={(file, options) => itemTemplate(file, options, fileUploadRef)}
                         emptyTemplate={emptyTemplate}
                         progressBarTemplate={<></>}
                         className='col-12'
@@ -377,7 +299,7 @@ export const SettingsWatermarking = observer(() => {
                     <Button
                         icon='pi pi-plus'
                         className='watermarking__add-button'
-                        onClick={handleAddTextBlock}
+                        onClick={handleCreateNewPostProcessing}
                         label='Add new block'
                         outlined
                         type='button'

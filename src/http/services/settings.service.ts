@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { Status } from "common/models/base-response";
-import { GeneralSettings } from "common/models/general-settings";
+import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUserGeneralSettings = async () => {
@@ -57,6 +57,42 @@ export const updateWatermark = async (mediauid: string, body?: any) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating watermark",
+            };
+        }
+    }
+};
+
+export const getPostProcessing = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<WatermarkPostProcessing>(
+            `user/${useruid}/postprocessing`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting postprocessing",
+            };
+        }
+    }
+};
+
+export const updatePostProcessing = async (
+    useruid: string,
+    body?: Partial<WatermarkPostProcessing>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `user/${useruid}/postprocessing`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating postprocessing",
             };
         }
     }
