@@ -19,12 +19,17 @@ class Settings {
     public toggleSidebar() {
         this._isSidebarCollapsed = !this._isSidebarCollapsed;
     }
+
+    public set isSidebarCollapsed(value: boolean) {
+        this._isSidebarCollapsed = value;
+    }
 }
 
 export class UserStore {
     public rootStore: RootStore;
     private _storedUser: AuthUser | null = getKeyValue(LS_APP_USER);
     public settings: Settings = new Settings();
+    private _isSettingsLoaded: boolean = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -33,6 +38,10 @@ export class UserStore {
 
     public get authUser() {
         return this._storedUser;
+    }
+
+    public get isSettingsLoaded(): boolean {
+        return this._isSettingsLoaded;
     }
 
     public set storedUser(user: AuthUser | null) {
@@ -51,5 +60,8 @@ export class UserStore {
         if (this._storedUser) {
             this._storedUser = { ...this._storedUser, permissions };
         }
+    }
+    public set isSettingsLoaded(value: boolean) {
+        this._isSettingsLoaded = value;
     }
 }

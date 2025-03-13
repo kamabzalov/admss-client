@@ -17,7 +17,7 @@ export const Dashboard = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
 
     const store = useStore().userStore;
-    const { authUser, settings } = store;
+    const { authUser, settings, isSettingsLoaded } = store;
 
     useEffect(() => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -38,13 +38,17 @@ export const Dashboard = observer((): ReactElement => {
             <Suspense fallback={<Loader overlay />}>
                 <Header />
                 <Sidebar />
-                <main
-                    className={`main ${settings.isSidebarCollapsed ? "main--expanded" : "main--collapsed"}`}
-                >
-                    <div className='container'>
-                        <Outlet />
-                    </div>
-                </main>
+                {isSettingsLoaded ? (
+                    <main
+                        className={`main ${settings.isSidebarCollapsed ? "main--expanded" : "main--collapsed"}`}
+                    >
+                        <div className='container'>
+                            <Outlet />
+                        </div>
+                    </main>
+                ) : (
+                    <></>
+                )}
             </Suspense>
         </ToastProvider>
     );
