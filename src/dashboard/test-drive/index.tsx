@@ -457,14 +457,16 @@ export const PrintForTestDrive = (): ReactElement => {
                                                         contactCategory={
                                                             ContactTypeNameList.DEALERS
                                                         }
-                                                        onRowClick={(value) =>
+                                                        getFullInfo={(contact) => {
                                                             handleChange({
                                                                 target: {
                                                                     name: "dealersName",
-                                                                    value,
+                                                                    value:
+                                                                        contact.userName ||
+                                                                        contact.businessName,
                                                                 },
-                                                            })
-                                                        }
+                                                            });
+                                                        }}
                                                         onBlur={handleBlur}
                                                     />
                                                     {errors.dealersName && touched.dealersName && (
