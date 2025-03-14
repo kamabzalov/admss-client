@@ -76,10 +76,10 @@ export const TasksDataTable = observer((): ReactElement => {
         let responseTotal: TotalListCount = {} as TotalListCount;
         let response = [];
         if (onlyCurrentUserTasks) {
-            responseTotal = await getCurrentUserTasks(authUser!.useruid, { total: 1 });
+            responseTotal = await getCurrentUserTasks(authUser!.useruid, { ...params, total: 1 });
             response = await getCurrentUserTasks(authUser!.useruid, params);
         } else {
-            responseTotal = await getAllTasks(authUser!.useruid, { total: 1 });
+            responseTotal = await getAllTasks(authUser!.useruid, { ...params, total: 1 });
             response = await getAllTasks(authUser!.useruid, params);
         }
 
@@ -175,8 +175,8 @@ export const TasksDataTable = observer((): ReactElement => {
             .join("+");
 
         const params: QueryParams = {
-            top: lazyState.first,
-            skip: lazyState.skip,
+            top: lazyState.rows,
+            skip: lazyState.first,
             qry: searchQuery,
         };
         authUser && handleGetTasks(params);
