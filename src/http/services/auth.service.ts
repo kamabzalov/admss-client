@@ -1,12 +1,8 @@
 import { LoginForm } from "sign/sign-in";
-import {
-    APPLICATION,
-    authorizedUserApiInstance,
-    // MAGIC,
-    nonAuthorizedUserApiInstance,
-} from "../index";
+import { authorizedUserApiInstance, nonAuthorizedUserApiInstance } from "../index";
 import { BaseResponse } from "common/models/base-response";
 import { UserPermissionsResponse } from "common/models/user";
+import { AxiosError } from "axios";
 
 export interface AppError {
     status: "Error";
@@ -35,29 +31,73 @@ export interface AuthUser {
     permissions: UserPermissionsResponse;
 }
 
-export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> => {
-    const response = await nonAuthorizedUserApiInstance
-        .post<AuthUser | AppError>("user", {
-            user: signData.username,
-            secret: signData.password,
-            rememberme: signData.rememberme,
-            application: APPLICATION,
-            // magic: MAGIC,
-        })
-        .then((response) => {
-            return response.data;
-        })
-        .catch((err) => {
-            return err?.response?.data || err.message;
+export const auth = async ({
+    username,
+    password,
+    rememberme,
+    application,
+    version,
+}: LoginForm): Promise<AuthUser | AppError> => {
+    try {
+        const response = await nonAuthorizedUserApiInstance.post<AuthUser | AppError>("user", {
+            user: username,
+            secret: password,
+            rememberme,
+            application,
+            version,
         });
-    return response;
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error as AxiosError<AppError>;
+
+        if (axiosError.response) {
+            return {
+                status: "Error",
+                error: axiosError.response.data.error || "Authentication failed",
+                message: axiosError.response.data.message || axiosError.message,
+            };
+        } else if (axiosError.request) {
+            return {
+                status: "Error",
+                error: "No response from server",
+                message: axiosError.message,
+            };
+        } else {
+            return {
+                status: "Error",
+                error: "Request setup error",
+                message: axiosError.message,
+            };
+        }
+    }
 };
 
-export const logout = async (uid: string) => {
+export const logout = async (uid: string): Promise<BaseResponse | AppError> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/logout`);
         return response.data;
     } catch (error) {
-        // TODO: add error handler
+        const axiosError = error as AxiosError<AppError>;
+
+        if (axiosError.response) {
+            return {
+                status: "Error",
+                error: axiosError.response.data.error || "Logout failed",
+                message: axiosError.response.data.message || axiosError.message,
+            };
+        } else if (axiosError.request) {
+            return {
+                status: "Error",
+                error: "No response from server during logout",
+                message: axiosError.message,
+            };
+        } else {
+            return {
+                status: "Error",
+                error: "Logout request setup error",
+                message: axiosError.message,
+            };
+        }
     }
 };
