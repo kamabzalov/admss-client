@@ -19,7 +19,7 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     AdvancedSearchDialog,
     SEARCH_FIELD_TYPE,
@@ -50,6 +50,7 @@ import {
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
 
 const DATA_FIELD = "data-field";
 
@@ -91,6 +92,7 @@ export default function Inventories({
     const dataTableRef = useRef<DataTable<Inventory[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
+    const toast = useToast();
 
     const navigate = useNavigate();
 
@@ -284,26 +286,36 @@ export default function Inventories({
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
-        if (authUser) {
-            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
-            const updatedParams = { ...params, qry: queryString };
+        if (!authUser) return;
+
+        const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+        const updatedParams = { ...params, qry: queryString };
+
+        setIsLoading(true);
+        try {
             if (total) {
-                getInventoryList(authUser.useruid, { ...updatedParams, total: 1 }).then(
-                    (response) => {
-                        response &&
-                            !Array.isArray(response) &&
-                            setTotalRecords(response.total ?? 0);
-                    }
-                );
-            }
-            getInventoryList(authUser.useruid, updatedParams).then((response) => {
-                if (Array.isArray(response) && response.length) {
-                    setInventories(response);
-                } else {
-                    setInventories([]);
+                const totalResponse = await getInventoryList(authUser.useruid, {
+                    ...updatedParams,
+                    total: 1,
+                });
+                if (totalResponse && !Array.isArray(totalResponse)) {
+                    setTotalRecords(totalResponse.total ?? 0);
                 }
-                setIsLoading(false);
+            }
+
+            const response = await getInventoryList(authUser.useruid, updatedParams);
+            if (Array.isArray(response)) {
+                setInventories(response);
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: String(error) || "Failed to load inventory data",
+                life: TOAST_LIFETIME,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
