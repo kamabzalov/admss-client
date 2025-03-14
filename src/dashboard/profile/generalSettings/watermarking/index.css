@@ -34,8 +34,9 @@
             }
         }
         .watermarking__font-input {
+            flex: 1 1 610px;
             .p-inputtext {
-                width: 610px;
+                width: 100%;
                 height: 50px;
             }
         }

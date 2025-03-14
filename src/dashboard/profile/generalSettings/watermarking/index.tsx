@@ -9,7 +9,7 @@ import { getWatermark } from "http/services/settings.service";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
-import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
+import { WatermarkPostProcessing } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -19,23 +19,28 @@ import {
     itemTemplate,
     emptyTemplate,
 } from "dashboard/profile/generalSettings/watermarking/common";
-
-type LogoSettings = Partial<Pick<GeneralSettings, "logoenabled" | "logoposX" | "logoposY">>;
+import { Status } from "common/models/base-response";
 
 export const SettingsWatermarking = observer(() => {
     const store = useStore().generalSettingsStore;
-    const { settings, postProcessing, getPostProcessing, changePostProcessing } = store;
+    const {
+        settings,
+        changeSettings,
+        postProcessing,
+        getPostProcessing,
+        changePostProcessing,
+        restoreDefaultSettings,
+    } = store;
     const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
-    const [logoSettings, setLogoSettings] = useState<LogoSettings>({ logoenabled: 0 });
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
 
     useEffect(() => {
         getPostProcessing();
-        if (settings.logomediauid) {
+        if (settings?.logomediauid) {
             handleGetWatermark();
         }
-    }, []);
+    }, [settings?.logomediauid]);
 
     const handleDeletePostProcessing = (index: number) => {
         const newTextBlocks = postProcessing.filter((_, i) => i !== index);
@@ -117,7 +122,7 @@ export const SettingsWatermarking = observer(() => {
                                 changePostProcessing(newTextBlocks);
                             }}
                         />
-                        <label className='float-label'>Text</label>
+                        <label className='float-label'>Text String</label>
                     </span>
                     <div className='col-12 p-0 flex align-items-center justify-content-between'>
                         <span className='p-float-label watermarking__font-input'>
@@ -174,21 +179,38 @@ export const SettingsWatermarking = observer(() => {
     };
 
     const handleGetWatermark = async () => {
-        if (!settings.logomediauid) return;
+        if (!settings?.logomediauid) return;
         const watermark = await getWatermark(settings.logomediauid);
         if (watermark.error) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: watermark.error,
                 life: TOAST_LIFETIME,
             });
-        } else {
-            const { logoenabled, logoposX, logoposY } = settings;
-            setLogoSettings({
-                logoenabled,
-                logoposX,
-                logoposY,
+        }
+    };
+
+    const handleRestoreDefault = async () => {
+        try {
+            const result = await restoreDefaultSettings();
+            if (result.status === Status.OK) {
+                fileUploadRef.current?.clear();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Settings restored to default",
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                throw result.error;
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to restore default settings",
+                life: TOAST_LIFETIME,
             });
         }
     };
@@ -201,9 +223,8 @@ export const SettingsWatermarking = observer(() => {
                     <Checkbox
                         inputId='enableWatermark'
                         name='enableWatermark'
-                        value={enableWatermark}
+                        checked={enableWatermark}
                         onChange={() => setEnableWatermark(!enableWatermark)}
-                        checked
                     />
                     <label htmlFor='enableWatermark' className='ml-3 white-space-nowrap'>
                         Enable watermarking
@@ -214,6 +235,7 @@ export const SettingsWatermarking = observer(() => {
                     <Button
                         label='Restore default'
                         className='watermarking__button'
+                        onClick={handleRestoreDefault}
                         outlined
                         type='button'
                         severity='danger'
@@ -258,14 +280,10 @@ export const SettingsWatermarking = observer(() => {
                     <Checkbox
                         inputId='addLogo'
                         name='addLogo'
-                        value={logoSettings.logoenabled}
+                        checked={!!settings.logoenabled}
                         onChange={() =>
-                            setLogoSettings({
-                                ...logoSettings,
-                                logoenabled: !logoSettings.logoenabled ? 1 : 0,
-                            })
+                            changeSettings("logoenabled", !settings.logoenabled ? 1 : 0)
                         }
-                        checked
                     />
                     <label htmlFor='addLogo' className='ml-3'>
                         Add logo
@@ -273,22 +291,18 @@ export const SettingsWatermarking = observer(() => {
 
                     <span className='p-float-label watermarking__input'>
                         <InputNumber
-                            value={logoSettings.logoposX}
+                            value={settings.logoposX}
                             allowEmpty
-                            onChange={(e) =>
-                                setLogoSettings({ ...logoSettings, logoposX: e.value || 0 })
-                            }
+                            onChange={(e) => changeSettings("logoposX", e.value || 0)}
                         />
                         <label className='float-label'>PosX</label>
                     </span>
 
                     <span className='p-float-label watermarking__input'>
                         <InputNumber
-                            value={logoSettings.logoposY}
+                            value={settings.logoposY}
                             allowEmpty
-                            onChange={(e) =>
-                                setLogoSettings({ ...logoSettings, logoposY: e.value || 0 })
-                            }
+                            onChange={(e) => changeSettings("logoposY", e.value || 0)}
                         />
                         <label className='float-label'>PosY</label>
                     </span>

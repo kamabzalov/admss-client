@@ -39,7 +39,10 @@ export const getWatermark = async (mediauid: string) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting watermark",
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while getting watermark",
             };
         }
     }
@@ -80,7 +83,7 @@ export const getPostProcessing = async (useruid: string) => {
 
 export const updatePostProcessing = async (
     useruid: string,
-    body?: Partial<WatermarkPostProcessing>
+    body?: Partial<WatermarkPostProcessing>[]
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(

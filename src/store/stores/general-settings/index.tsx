@@ -85,9 +85,10 @@ export class GeneralSettingsStore {
         try {
             const userSettings = await getUserGeneralSettings();
             if (userSettings && !userSettings.error) {
-                const { settings } = userSettings as unknown as { settings: GeneralSettings };
-                this._settings = settings as GeneralSettings;
+                this._settings = userSettings as GeneralSettings;
+                this._isSettingsChanged = false;
             }
+            return { status: Status.OK };
         } catch (error) {
             return {
                 status: Status.ERROR,
@@ -109,12 +110,11 @@ export class GeneralSettingsStore {
                     status: Status.ERROR,
                     error: postProcessing.error,
                 };
-            } else {
-                if (!postProcessing && Array.isArray(postProcessing)) return;
-                const response = postProcessing as unknown as WatermarkPostProcessing[];
-                this._postProcessing = response;
-                this._isPostProcessingChanged = false;
             }
+            const response = Array.isArray(postProcessing) ? postProcessing : initialPostProcessing;
+            this._postProcessing = response as WatermarkPostProcessing[];
+            this._isPostProcessingChanged = false;
+            return { status: Status.OK };
         } catch (error) {
             return {
                 status: Status.ERROR,
@@ -126,11 +126,16 @@ export class GeneralSettingsStore {
     };
 
     public savePostProcessing = async () => {
+        this._isLoading = true;
         try {
             const useruid = this.rootStore.userStore.authUser?.useruid;
             if (!useruid) return { status: Status.ERROR, error: "User UID is not available" };
-            await updatePostProcessing(useruid, this._postProcessing as any);
+            const response = await updatePostProcessing(useruid, this._postProcessing);
+            if (response?.status === Status.ERROR) {
+                return response;
+            }
             this._isPostProcessingChanged = false;
+            return { status: Status.OK };
         } catch (error) {
             return {
                 status: Status.ERROR,
@@ -166,42 +171,85 @@ export class GeneralSettingsStore {
         }
         this._isLoading = true;
         try {
-            if (this._watermarkImage && this._watermarkImage.size) {
-                const formData = new FormData();
-                formData.append("file", this._watermarkImage);
-
-                const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
-                const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
-                if (createMediaResponse?.status === Status.OK) {
-                    const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
-                    const { itemuid } = uploadMediaResponse as any;
-                    if (uploadMediaResponse?.status === Status.OK) {
-                        await this.changeSettings("logomediauid", itemuid, true);
-                    }
-                }
+            const formData = new FormData();
+            formData.append("file", this._watermarkImage);
+            const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
+            if (createMediaResponse?.status === Status.ERROR) {
+                return createMediaResponse;
             }
+            const { itemUID } = createMediaResponse as CreateMediaItemRecordResponse;
+            const uploadMediaResponse = await uploadInventoryMedia(itemUID, formData);
+            if (uploadMediaResponse?.status === Status.ERROR) {
+                return uploadMediaResponse;
+            }
+            const { itemuid } = uploadMediaResponse as any;
+            this.changeSettings("logomediauid", itemuid);
+            return { status: Status.OK };
         } catch (error) {
-            return { status: Status.ERROR, error };
+            return {
+                status: Status.ERROR,
+                error,
+            };
         } finally {
             this._isLoading = false;
         }
     };
 
     public saveSettings = action(async (): Promise<BaseResponseError> => {
+        this._isLoading = true;
         try {
-            this._isLoading = true;
             if (this._isPostProcessingChanged) {
-                await this.savePostProcessing();
+                const postProcessingResult = await this.savePostProcessing();
+                if (postProcessingResult.status === Status.ERROR) {
+                    return postProcessingResult;
+                }
             }
             if (this._watermarkImage !== null) {
-                await this.setWatermarkImage();
+                const watermarkResult = await this.setWatermarkImage();
+                if (watermarkResult.status === Status.ERROR) {
+                    return watermarkResult;
+                }
             }
-            updateUserGeneralSettings({
-                ...this._settings,
-            });
+            const response = await updateUserGeneralSettings(this._settings);
+            if (response?.status === Status.ERROR) {
+                return response;
+            }
+            this._isSettingsChanged = false;
             return { status: Status.OK };
         } catch (error) {
-            return error as BaseResponseError;
+            return {
+                status: Status.ERROR,
+                error,
+            } as BaseResponseError;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public restoreDefaultSettings = action(async (): Promise<BaseResponseError> => {
+        this._isLoading = true;
+        this._isPostProcessingChanged = true;
+        try {
+            this._settings.logoenabled = 0;
+            this._settings.logoposX = 0;
+            this._settings.logoposY = 0;
+            this._settings.logomediauid = "";
+            this._watermarkImage = null;
+            this._postProcessing = initialPostProcessing as WatermarkPostProcessing[];
+
+            const saveResult = await this.saveSettings();
+            if (saveResult.status === Status.ERROR) {
+                return saveResult;
+            }
+
+            this._isSettingsChanged = false;
+            this._isPostProcessingChanged = false;
+            return { status: Status.OK };
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            } as BaseResponseError;
         } finally {
             this._isLoading = false;
         }
@@ -237,5 +285,7 @@ export class GeneralSettingsStore {
         this._isSettingsChanged = false;
         this._isPostProcessingChanged = false;
         this._settingsID = "";
+        this._watermarkImage = null;
+        this._postProcessing = initialPostProcessing as WatermarkPostProcessing[];
     };
 }
