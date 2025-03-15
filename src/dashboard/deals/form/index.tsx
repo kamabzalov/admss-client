@@ -482,7 +482,7 @@ export const DealsForm = observer(() => {
                                                         toast.current?.show({
                                                             severity: "error",
                                                             summary: "Error",
-                                                            detail: res.error,
+                                                            detail: res?.error,
                                                         });
                                                     } else {
                                                         navigate(`/dashboard/deals`);
