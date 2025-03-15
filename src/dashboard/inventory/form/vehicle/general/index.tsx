@@ -100,8 +100,13 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, [authUser]);
 
     useEffect(() => {
-        if (!values?.locationuid?.trim()) {
-            store.currentLocation = locationList[0]?.locationuid;
+        if (!values?.locationuid?.trim() && !!locationList.length) {
+            const defaultLocation = locationList.find(
+                (location) => location.locName.toLowerCase() === "default"
+            );
+            store.currentLocation = defaultLocation?.locationuid || locationList[0]?.locationuid;
+        } else {
+            store.currentLocation = "";
         }
     }, [currentLocation, locationList, values.locationuid, store]);
 
