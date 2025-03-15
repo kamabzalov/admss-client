@@ -131,7 +131,10 @@ export const setDeal = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while set deal",
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while set deal",
             };
         }
     }
