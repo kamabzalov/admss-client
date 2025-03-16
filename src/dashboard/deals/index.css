@@ -111,3 +111,7 @@
     font-size: 16px;
     color: var(--admss-app-main-blue);
 }
+
+.card-content__wrapper:has(.deal__accordion) {
+    flex: 0 0 343px;
+}
