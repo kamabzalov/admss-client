@@ -892,6 +892,9 @@ export default function Inventories({
                                                             style: {
                                                                 width: serverSettings?.inventory
                                                                     ?.columnWidth?.[field],
+                                                                maxWidth:
+                                                                    serverSettings?.inventory
+                                                                        ?.columnWidth?.[field],
                                                                 overflow: "hidden",
                                                                 textOverflow: "ellipsis",
                                                             },

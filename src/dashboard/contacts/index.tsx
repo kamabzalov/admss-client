@@ -504,6 +504,8 @@ export const ContactsDataTable = ({
                                                 width: serverSettings?.contacts?.columnWidth?.[
                                                     field
                                                 ],
+                                                maxWidth:
+                                                    serverSettings?.contacts?.columnWidth?.[field],
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
                                             },
