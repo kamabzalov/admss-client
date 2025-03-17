@@ -27,6 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
+const EMPTY_INFO_MESSAGE = "N/A";
 
 export type PartialDeal = Pick<
     Deal,
@@ -195,6 +196,7 @@ export const DealsForm = observer(() => {
     const store = useStore().dealStore;
     const {
         deal,
+        inventory,
         dealType,
         dealExtData,
         accordionActiveIndex,
@@ -361,24 +363,22 @@ export const DealsForm = observer(() => {
                                 <div className='card-header-info'>
                                     Stock#
                                     <span className='card-header-info__data'>
-                                        {dealExtData?.Trade1_StockNum}
+                                        {inventory?.StockNo || EMPTY_INFO_MESSAGE}
                                     </span>
                                     Make
                                     <span className='card-header-info__data'>
-                                        {dealExtData?.Trade1_Make}
+                                        {inventory?.Make || EMPTY_INFO_MESSAGE}
                                     </span>
                                     Model
                                     <span className='card-header-info__data'>
-                                        {dealExtData?.Trade1_Model}
+                                        {inventory?.Model || EMPTY_INFO_MESSAGE}
                                     </span>
                                     Year
                                     <span className='card-header-info__data'>
-                                        {dealExtData?.Trade1_Year}
+                                        {inventory?.Year || EMPTY_INFO_MESSAGE}
                                     </span>
                                     VIN
-                                    <span className='card-header-info__data'>
-                                        {dealExtData?.Trade1_VIN}
-                                    </span>
+                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
                                 </div>
                             )}
                         </div>
