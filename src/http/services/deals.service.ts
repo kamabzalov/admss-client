@@ -333,14 +333,13 @@ export const getHowToKnowList = async (useruid: string) => {
 
 export const setHowToKnow = async (
     useruid: string,
-    howToKnowData: Partial<HowToKnow>[]
+    howToKnowData: Partial<HowToKnow>
 ): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `user/${useruid}/howtoknow`,
             howToKnowData
         );
-
         if (response.status === 200) {
             return response.data;
         }
@@ -351,7 +350,7 @@ export const setHowToKnow = async (
                 error:
                     error.response?.data.info ||
                     error.response?.data.error ||
-                    "Error while setting how to know list",
+                    "Error while setting how to know item",
             };
         }
     }

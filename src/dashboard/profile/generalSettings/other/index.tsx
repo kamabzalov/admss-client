@@ -21,7 +21,7 @@ export const SettingsOther = (): ReactElement => {
     const [editedItem, setEditedItem] = useState<Partial<HowToKnow>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleGetUserGroupList = async () => {
+    const handleGetUserHowKnowList = async () => {
         if (!authUser) return;
         setIsLoading(true);
         const response = await getHowToKnowList(authUser.useruid);
@@ -34,22 +34,19 @@ export const SettingsOther = (): ReactElement => {
     };
 
     useEffect(() => {
-        handleGetUserGroupList();
+        handleGetUserHowKnowList();
     }, [authUser]);
 
-    const handleSaveGroup = async () => {
+    const handleSaveHowKnow = async () => {
         if (!authUser || !editedItem.description) return;
         setIsLoading(true);
 
-        const updatedList = howToKnowList.map((item) =>
-            item.itemuid === editedItem.itemuid ? editedItem : item
-        );
+        const itemToSave = {
+            description: editedItem.description,
+            itemuid: editedItem.itemuid === NEW_ITEM ? "0" : editedItem.itemuid,
+        };
 
-        if (editedItem.itemuid === NEW_ITEM) {
-            updatedList.push({ description: editedItem.description });
-        }
-
-        const response = await setHowToKnow(authUser.useruid, updatedList);
+        const response = await setHowToKnow(authUser.useruid, itemToSave);
         if (response?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
@@ -64,13 +61,16 @@ export const SettingsOther = (): ReactElement => {
                 detail: "Item saved successfully",
                 life: TOAST_LIFETIME,
             });
-            setHowToKnowList(updatedList);
+            const updatedList = await getHowToKnowList(authUser.useruid);
+            if (Array.isArray(updatedList)) {
+                setHowToKnowList(updatedList);
+            }
             setEditedItem({});
         }
         setIsLoading(false);
     };
 
-    const handleDeleteGroup = async (item: Partial<HowToKnow>) => {
+    const handleDeleteHowKnow = async (item: Partial<HowToKnow>) => {
         if (!authUser || !item.itemuid || item.itemuid === NEW_ITEM) return;
         setIsLoading(true);
 
@@ -140,7 +140,7 @@ export const SettingsOther = (): ReactElement => {
                                             />
                                             <Button
                                                 className='p-button row-edit__button'
-                                                onClick={handleSaveGroup}
+                                                onClick={handleSaveHowKnow}
                                                 disabled={!editedItem.description}
                                             >
                                                 Save
@@ -171,7 +171,7 @@ export const SettingsOther = (): ReactElement => {
                                     <Button
                                         className='settings-other__delete-button'
                                         outlined
-                                        onClick={() => handleDeleteGroup(item)}
+                                        onClick={() => handleDeleteHowKnow(item)}
                                         disabled={!item.itemuid || item.itemuid === NEW_ITEM}
                                     >
                                         Delete
@@ -196,7 +196,7 @@ export const SettingsOther = (): ReactElement => {
                                         />
                                         <Button
                                             className='p-button row-edit__button'
-                                            onClick={handleSaveGroup}
+                                            onClick={handleSaveHowKnow}
                                             disabled={!editedItem.description}
                                         >
                                             Save
