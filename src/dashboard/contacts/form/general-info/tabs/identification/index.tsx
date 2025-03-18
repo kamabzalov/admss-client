@@ -188,7 +188,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                                 changeContactExtData("Buyer_DL_State", value)
                             }
                             className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
                             showClear={!!contactExtData.Buyer_DL_State}
                         />
                         <label className='float-label'>DL's State</label>
@@ -203,7 +202,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("Buyer_Driver_License_Num", value);
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Driver License's Number</label>
                     </span>
@@ -219,7 +217,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
 
@@ -235,7 +232,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                                 changeContactExtData("Buyer_Sex", value)
                             }
                             className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
                             showClear={!!contactExtData.Buyer_Sex}
                         />
                         <label className='float-label'>Sex</label>
@@ -251,7 +247,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("Buyer_SS_Number", String(value));
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
@@ -267,7 +262,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
             </div>
