@@ -204,7 +204,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("CoBuyer_Driver_License_Num", value);
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Driver License's Number</label>
                     </span>
@@ -220,7 +219,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
 
@@ -236,7 +234,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                                 changeContactExtData("CoBuyer_Sex", value)
                             }
                             className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
                             showClear={!!contactExtData.CoBuyer_Sex}
                         />
                         <label className='float-label'>Sex</label>
@@ -252,7 +249,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("CoBuyer_SS_Number", String(value));
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
@@ -268,7 +264,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
             </div>
