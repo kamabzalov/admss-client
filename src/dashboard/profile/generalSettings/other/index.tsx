@@ -159,9 +159,15 @@ export const SettingsOther = (): ReactElement => {
                                                 ? setEditedItem({})
                                                 : setEditedItem(item)
                                         }
-                                        disabled={!item.itemuid || item.itemuid === NEW_ITEM}
+                                        disabled={
+                                            !item.itemuid ||
+                                            !!item.isdefault ||
+                                            item.itemuid === NEW_ITEM
+                                        }
                                         severity={
-                                            !item.itemuid || item.itemuid === NEW_ITEM
+                                            !item.itemuid ||
+                                            item.itemuid === NEW_ITEM ||
+                                            !!item.isdefault
                                                 ? "secondary"
                                                 : "success"
                                         }
@@ -172,7 +178,18 @@ export const SettingsOther = (): ReactElement => {
                                         className='settings-other__delete-button'
                                         outlined
                                         onClick={() => handleDeleteHowKnow(item)}
-                                        disabled={!item.itemuid || item.itemuid === NEW_ITEM}
+                                        disabled={
+                                            !item.itemuid ||
+                                            !!item.isdefault ||
+                                            item.itemuid === NEW_ITEM
+                                        }
+                                        severity={
+                                            !item.itemuid ||
+                                            item.itemuid === NEW_ITEM ||
+                                            !!item.isdefault
+                                                ? "secondary"
+                                                : "danger"
+                                        }
                                     >
                                         Delete
                                     </Button>

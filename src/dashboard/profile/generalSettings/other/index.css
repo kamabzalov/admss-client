@@ -74,5 +74,8 @@
             color: var(--admss-app-white);
             background: var(--admss-app-red);
         }
+        &:disabled {
+            color: var(--admss-app-light-grey);
+        }
     }
 }

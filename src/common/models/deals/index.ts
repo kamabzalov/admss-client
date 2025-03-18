@@ -417,8 +417,9 @@ export interface DealPickupPayment {
 
 export interface HowToKnow {
     created: string;
-    updated: string;
-    itemuid: string;
-    useruid: string;
     description: string;
+    isdefault: 0 | 1;
+    itemuid: string;
+    updated: string;
+    useruid: string;
 }
