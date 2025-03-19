@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
@@ -229,9 +230,10 @@ export class DealStore {
                 (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
+            const err = error as AxiosError;
             return {
                 status: Status.ERROR,
-                error: error as string,
+                error: err?.message,
             };
         } finally {
             this._isLoading = false;
