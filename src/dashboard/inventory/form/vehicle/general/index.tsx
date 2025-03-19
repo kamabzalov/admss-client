@@ -27,6 +27,7 @@ import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 
 const EQUIPMENT = "equipment";
+const DEFAULT_LOCATION = "default";
 
 const parseMileage = (mileage: string): number => {
     return parseFloat(mileage.replace(/,/g, ""));
@@ -100,8 +101,11 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, [authUser]);
 
     useEffect(() => {
-        if (!values?.locationuid?.trim()) {
-            store.currentLocation = locationList[0]?.locationuid;
+        if (!values?.locationuid?.trim() && !!locationList.length) {
+            const defaultLocation = locationList.find(
+                (location) => location.locName.toLowerCase() === DEFAULT_LOCATION
+            );
+            store.currentLocation = defaultLocation?.locationuid || locationList[0]?.locationuid;
         }
     }, [currentLocation, locationList, values.locationuid, store]);
 

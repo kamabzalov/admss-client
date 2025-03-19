@@ -27,6 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
+const EMPTY_INFO_MESSAGE = "N/A";
 
 export type PartialDeal = Pick<
     Deal,
@@ -195,6 +196,7 @@ export const DealsForm = observer(() => {
     const store = useStore().dealStore;
     const {
         deal,
+        inventory,
         dealType,
         dealExtData,
         accordionActiveIndex,
@@ -357,6 +359,28 @@ export const DealsForm = observer(() => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} Deal
                             </h2>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Stock#
+                                    <span className='card-header-info__data'>
+                                        {inventory?.StockNo || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Make
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Make || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Model
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Model || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Year
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Year || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    VIN
+                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content deal__card'>
                             <div className='grid flex-nowrap deal__card-content'>
@@ -570,7 +594,7 @@ export const DealsForm = observer(() => {
                                     severity={isFormChanged ? "success" : "secondary"}
                                     disabled={!isFormChanged}
                                 >
-                                    Save
+                                    {id ? "Update" : "Save"}
                                 </Button>
                             </div>
                         </div>

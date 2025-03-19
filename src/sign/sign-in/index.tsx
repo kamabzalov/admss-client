@@ -8,14 +8,16 @@ import { auth } from "http/services/auth.service";
 import { setKey } from "services/local-storage.service";
 import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
-import { APPLICATION } from "http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { APP_TYPE, APP_VERSION } from "http/index";
+import { TOAST_LIFETIME } from "common/settings";
 
 export interface LoginForm {
     username: string;
     password: string;
     rememberme: boolean;
-    application: string;
+    application: "admin" | "crm" | "client" | string;
+    version: string;
 }
 
 export default function SignIn() {
@@ -27,7 +29,8 @@ export default function SignIn() {
             username: "",
             password: "",
             rememberme: false,
-            application: APPLICATION,
+            application: APP_TYPE,
+            version: APP_VERSION,
         },
         validate: (data: { username: string; password: string }) => {
             let errors: any = {};
@@ -42,20 +45,30 @@ export default function SignIn() {
 
             return errors;
         },
-        onSubmit: () => {
-            auth(formik.values).then((response) => {
+        onSubmit: async () => {
+            try {
+                const response = await auth(formik.values);
                 if (response.status === "OK") {
                     setKey(LS_APP_USER, JSON.stringify(response));
                     navigate("/dashboard");
                 } else {
                     toast.current?.show({
                         severity: "error",
+                        life: TOAST_LIFETIME,
                         summary: response.status || "Error",
                         detail: response?.error || String(response),
                         sticky: true,
                     });
                 }
-            });
+            } catch (error) {
+                toast.current?.show({
+                    severity: "error",
+                    life: TOAST_LIFETIME,
+                    summary: "Error",
+                    detail: "An unexpected error occurred during login",
+                    sticky: true,
+                });
+            }
         },
     });
 

@@ -18,7 +18,7 @@ export interface Deals {
 
 export enum AccordionDealItems {
     SALE = "Sale",
-    ODOMETER = "Odometer",
+    ODOMETER = "Odometer Disclosure",
     SELLER = "Seller",
     LIENS = "Liens",
     FIRST_TRADE = "Trade 1",

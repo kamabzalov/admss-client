@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { ReactElement, useMemo, useRef, useState } from "react";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { ContactOFAC } from "common/models/contact";
+import { ContactExtData, ContactOFAC } from "common/models/contact";
 import { checkContactOFAC, scanContactDL } from "http/services/contacts-service";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
@@ -11,11 +11,14 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { BUYER_ID } from "dashboard/contacts/form/general-info";
 import { TextInput } from "dashboard/common/form/inputs";
+import { useFormikContext } from "formik";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
     const { contact, contactExtData, contactFullInfo, changeContactExtData } = store;
+
+    const { errors, setFieldValue } = useFormikContext<ContactExtData>();
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +88,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 <div className='general-info-overwrite pb-3'>
                     <Checkbox
                         checked={allowOverwrite}
-                        disabled={isControlDisabled}
                         inputId='general-info-overwrite'
                         className='general-info-overwrite__checkbox'
                         onChange={() => setAllowOverwrite(!allowOverwrite)}
@@ -112,40 +114,49 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    className='general-info__text-input'
+                    className={`general-info__text-input w-full ${errors.CoBuyer_First_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
                     onChange={({ target: { value } }) => {
+                        setFieldValue("CoBuyer_First_Name", value);
                         changeContactExtData("CoBuyer_First_Name", value);
                     }}
                     onBlur={handleOfacCheck}
                     name='First Name'
                     clearButton
                 />
+
+                <small className='p-error'>{errors.CoBuyer_First_Name}</small>
             </div>
 
             <div className='col-4 relative'>
                 <TextInput
                     name='Middle Name'
-                    className='general-info__text-input w-full'
+                    className={`general-info__text-input w-full ${errors.CoBuyer_Middle_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Middle_Name || ""}
                     onChange={({ target: { value } }) => {
+                        setFieldValue("CoBuyer_Middle_Name", value);
                         changeContactExtData("CoBuyer_Middle_Name", value);
                     }}
                     clearButton
                 />
+
+                <small className='p-error'>{errors.CoBuyer_Middle_Name}</small>
             </div>
 
             <div className='col-4 relative'>
                 <TextInput
                     name='Last Name'
-                    className='general-info__text-input'
+                    className={`general-info__text-input w-full ${errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {
+                        setFieldValue("CoBuyer_Last_Name", value);
                         changeContactExtData("CoBuyer_Last_Name", value);
                     }}
                     onBlur={handleOfacCheck}
                     clearButton
                 />
+
+                <small className='p-error'>{errors.CoBuyer_Last_Name}</small>
             </div>
 
             <div className='col-4 relative'>

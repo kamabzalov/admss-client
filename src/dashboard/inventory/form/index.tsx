@@ -434,7 +434,7 @@ export const InventoryForm = observer(() => {
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
-                                <div className='p-0' ref={stepsRef}>
+                                <div className='inventory__navigation' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
@@ -509,7 +509,7 @@ export const InventoryForm = observer(() => {
                                         </Button>
                                     )}
                                 </div>
-                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
+                                <div className='w-full flex flex-column p-0 inventory-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}

@@ -18,7 +18,7 @@ import { CONTACT_SUPPORT, HELP_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { authUser, settings } = store;
+    const { authUser, settings, isSettingsLoaded } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -103,6 +103,10 @@ export const Header = observer((): ReactElement => {
             ].filter(Boolean) as MenuItem[],
         [authUser, isSalesPerson, showChangeLocation]
     );
+
+    if (!isSettingsLoaded) {
+        return <></>;
+    }
 
     if (menuRight) {
         return (
