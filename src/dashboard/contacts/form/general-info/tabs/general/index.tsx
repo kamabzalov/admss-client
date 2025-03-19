@@ -33,7 +33,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, values, setFieldValue } = useFormikContext<Contact>();
+    const { errors, values, validateField, setFieldValue } = useFormikContext<Contact>();
 
     const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
     const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
@@ -245,8 +245,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
                             value={contact.firstName || ""}
                             onChange={({ target: { value } }) => {
-                                setFieldValue("firstName", value);
-                                changeContact("firstName", value);
+                                setFieldValue("firstName", value, true).then(() => {
+                                    changeContact("firstName", value);
+                                    validateField("firstName");
+                                });
                             }}
                             onBlur={handleOfacCheck}
                             name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
@@ -260,7 +262,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             disabled={shouldDisableNameFields}
                             clearButton
                         />
-
                         <small className='p-error'>{errors.firstName}</small>
                     </div>
 
@@ -270,8 +271,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`general-info__text-input ${errors.middleName ? "p-invalid" : ""}`}
                             value={contact.middleName || ""}
                             onChange={({ target: { value } }) => {
-                                changeContact("middleName", value);
-                                setFieldValue("middleName", value);
+                                setFieldValue("middleName", value, true).then(() => {
+                                    changeContact("middleName", value);
+                                    validateField("middleName");
+                                });
                             }}
                             tooltip={
                                 isBusinessNameRequired
@@ -292,8 +295,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
                             value={contact.lastName || ""}
                             onChange={({ target: { value } }) => {
-                                setFieldValue("lastName", value);
-                                changeContact("lastName", value);
+                                setFieldValue("lastName", value, true).then(() => {
+                                    changeContact("lastName", value);
+                                    validateField("lastName");
+                                });
                             }}
                             onBlur={handleOfacCheck}
                             disabled={shouldDisableNameFields}
@@ -306,7 +311,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             }
                             clearButton
                         />
-
                         <small className='p-error'>{errors.lastName}</small>
                     </div>
                 </>

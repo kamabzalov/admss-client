@@ -18,7 +18,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact, contactExtData, contactFullInfo, changeContactExtData } = store;
 
-    const { errors, setFieldValue } = useFormikContext<ContactExtData>();
+    const { errors, setFieldValue, validateField } = useFormikContext<ContactExtData>();
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,8 +117,10 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     className={`general-info__text-input w-full ${errors.CoBuyer_First_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
                     onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_First_Name", value);
-                        changeContactExtData("CoBuyer_First_Name", value);
+                        setFieldValue("CoBuyer_First_Name", value, true).then(() => {
+                            changeContactExtData("CoBuyer_First_Name", value);
+                            validateField("CoBuyer_First_Name");
+                        });
                     }}
                     onBlur={handleOfacCheck}
                     name='First Name'
@@ -134,8 +136,10 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     className={`general-info__text-input w-full ${errors.CoBuyer_Middle_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Middle_Name || ""}
                     onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Middle_Name", value);
-                        changeContactExtData("CoBuyer_Middle_Name", value);
+                        setFieldValue("CoBuyer_Middle_Name", value, true).then(() => {
+                            changeContactExtData("CoBuyer_Middle_Name", value);
+                            validateField("CoBuyer_Middle_Name");
+                        });
                     }}
                     clearButton
                 />
@@ -149,8 +153,10 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     className={`general-info__text-input w-full ${errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Last_Name", value);
-                        changeContactExtData("CoBuyer_Last_Name", value);
+                        setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
+                            changeContactExtData("CoBuyer_Last_Name", value);
+                            validateField("CoBuyer_Last_Name");
+                        });
                     }}
                     onBlur={handleOfacCheck}
                     clearButton
