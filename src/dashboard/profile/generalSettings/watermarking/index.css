@@ -1,4 +1,5 @@
 .watermarking {
+    --watermarking-height: 201px;
     .watermarking__buttons {
         gap: 25px;
     }
@@ -50,9 +51,28 @@
         margin: 36px 0;
     }
 
+    .presentation {
+        min-height: var(--watermarking-height);
+        max-height: var(--watermarking-height);
+        overflow: hidden;
+        position: relative;
+
+        .presentation__remove-button.p-button {
+            background: transparent;
+            position: absolute;
+            color: var(--admss-app-main-blue);
+            border: none;
+            height: auto;
+            width: 30px;
+            height: 30px;
+            top: 4px;
+            right: 4px;
+        }
+    }
+
     .p-fileupload {
         display: grid;
-        height: 201px;
+        height: var(--watermarking-height);
         padding-top: 20px;
 
         &:has(.empty-template) {
@@ -162,18 +182,6 @@
         .presentation__image {
             object-fit: cover;
             border-radius: 5px;
-        }
-
-        .presentation__remove-button.p-button {
-            background: transparent;
-            position: absolute;
-            color: var(--admss-app-main-blue);
-            border: none;
-            height: auto;
-            width: 30px;
-            height: 30px;
-            top: 4px;
-            right: 4px;
         }
 
         .presentation__remove-button.p-button > .pi {

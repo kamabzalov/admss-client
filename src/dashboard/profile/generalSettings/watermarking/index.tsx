@@ -1,11 +1,10 @@
 import "./index.css";
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { getWatermark } from "http/services/settings.service";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
@@ -20,27 +19,37 @@ import {
     emptyTemplate,
 } from "dashboard/profile/generalSettings/watermarking/common";
 import { Status } from "common/models/base-response";
+import { ImagePreview } from "dashboard/profile/generalSettings/watermarking/preview";
 
-export const SettingsWatermarking = observer(() => {
+export const SettingsWatermarking = observer((): ReactElement => {
     const store = useStore().generalSettingsStore;
     const {
         settings,
         changeSettings,
+        watermarkImage,
+        watermarkImageUrl,
         postProcessing,
         getPostProcessing,
+        getWatermarkImage,
         changePostProcessing,
         restoreDefaultSettings,
     } = store;
-    const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     useEffect(() => {
         getPostProcessing();
         if (settings?.logomediauid) {
-            handleGetWatermark();
+            getWatermarkImage();
         }
     }, [settings?.logomediauid]);
+
+    useEffect(() => {
+        if (watermarkImage && watermarkImage?.size) {
+            store.watermarkImageUrl = URL.createObjectURL(watermarkImage);
+        }
+    }, [watermarkImage]);
 
     const handleDeletePostProcessing = (index: number) => {
         const newTextBlocks = postProcessing.filter((_, i) => i !== index);
@@ -78,6 +87,23 @@ export const SettingsWatermarking = observer(() => {
             useruid: "",
         };
         changePostProcessing([...postProcessing, newTextBlock]);
+    };
+
+    const handlePreview = () => {
+        if (watermarkImageUrl || (watermarkImage && watermarkImage.size)) {
+            setIsPreviewOpen(true);
+        } else {
+            toast.current?.show({
+                severity: "warn",
+                summary: "No Image",
+                detail: "Please upload or fetch an image to preview.",
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
+
+    const handleClosePreview = () => {
+        setIsPreviewOpen(false);
     };
 
     const renderTextBlocks = () => {
@@ -178,19 +204,6 @@ export const SettingsWatermarking = observer(() => {
         ));
     };
 
-    const handleGetWatermark = async () => {
-        if (!settings?.logomediauid) return;
-        const watermark = await getWatermark(settings.logomediauid);
-        if (watermark.error) {
-            return toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: watermark.error,
-                life: TOAST_LIFETIME,
-            });
-        }
-    };
-
     const handleRestoreDefault = async () => {
         try {
             const result = await restoreDefaultSettings();
@@ -223,8 +236,8 @@ export const SettingsWatermarking = observer(() => {
                     <Checkbox
                         inputId='enableWatermark'
                         name='enableWatermark'
-                        checked={enableWatermark}
-                        onChange={() => setEnableWatermark(!enableWatermark)}
+                        checked={!!settings.watermarkenabled}
+                        onChange={(e) => changeSettings("watermarkenabled", e.checked ? 1 : 0)}
                     />
                     <label htmlFor='enableWatermark' className='ml-3 white-space-nowrap'>
                         Enable watermarking
@@ -243,6 +256,7 @@ export const SettingsWatermarking = observer(() => {
                     <Button
                         label='Preview'
                         className='watermarking__button'
+                        onClick={handlePreview}
                         outlined
                         type='button'
                     />
@@ -253,27 +267,31 @@ export const SettingsWatermarking = observer(() => {
                 </div>
 
                 <div className='col-12 py-0'>
-                    <FileUpload
-                        ref={fileUploadRef}
-                        accept='image/*'
-                        maxFileSize={limitations.maxSize * 1000000}
-                        chooseLabel='Choose from files'
-                        chooseOptions={{
-                            icon: <></>,
-                        }}
-                        onRemove={() => {
-                            store.watermarkImage = null;
-                            store.changeSettings("logomediauid", "", true);
-                        }}
-                        headerTemplate={chooseTemplate}
-                        onSelect={(event) => {
-                            store.watermarkImage = event.files[0];
-                        }}
-                        itemTemplate={(file, options) => itemTemplate(file, options, fileUploadRef)}
-                        emptyTemplate={emptyTemplate}
-                        progressBarTemplate={<></>}
-                        className='col-12'
-                    />
+                    {watermarkImageUrl ? (
+                        itemTemplate(watermarkImageUrl)
+                    ) : (
+                        <FileUpload
+                            ref={fileUploadRef}
+                            accept='image/*'
+                            maxFileSize={limitations.maxSize * 1000000}
+                            chooseLabel='Choose from files'
+                            chooseOptions={{
+                                icon: <></>,
+                            }}
+                            onRemove={() => {
+                                store.watermarkImage = null;
+                                store.changeSettings("logomediauid", "", true);
+                            }}
+                            headerTemplate={chooseTemplate}
+                            onSelect={(event) => {
+                                store.watermarkImage = event.files[0];
+                            }}
+                            itemTemplate={(file) => itemTemplate(file as File, fileUploadRef)}
+                            emptyTemplate={emptyTemplate}
+                            progressBarTemplate={<></>}
+                            className='col-12'
+                        />
+                    )}
                 </div>
 
                 <div className='col-12 watermarking__logo-settings'>
@@ -320,6 +338,13 @@ export const SettingsWatermarking = observer(() => {
                     />
                 </div>
             </div>
+
+            <ImagePreview
+                imageUrl={watermarkImageUrl}
+                imageFile={watermarkImage}
+                isOpen={isPreviewOpen}
+                onClose={handleClosePreview}
+            />
         </div>
     );
 });

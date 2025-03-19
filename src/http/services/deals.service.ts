@@ -131,7 +131,10 @@ export const setDeal = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while set deal",
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while set deal",
             };
         }
     }
@@ -311,26 +314,69 @@ export const getDealPrintFormTemplate = async (
     }
 };
 
-export const getHowToKnowList = async (itemuid: string) => {
+export const getHowToKnowList = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<HowToKnow[]>(
-            `user/${itemuid}/howtoknow`
+            `user/${useruid}/howtoknow`
         );
         if (request.status === 200) {
             return request.data;
         } else {
             throw new Error("Error while getting how to know list");
         }
-    } catch (error: Error | BaseResponseError | unknown) {
-        if (error instanceof Error) {
+    } catch (error) {
+        if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.message,
+                error: error.response?.data.error || "Error while getting how to know list",
             };
         }
-        return {
-            status: Status.ERROR,
-            error: error,
-        };
+    }
+};
+
+export const setHowToKnow = async (
+    useruid: string,
+    howToKnowData: Partial<HowToKnow>
+): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${useruid}/howtoknow`,
+            howToKnowData
+        );
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting how to know item",
+            };
+        }
+    }
+};
+
+export const deleteHowToKnow = async (itemuid: string): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${itemuid}/deletehowtoknow`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while deleting how to know item",
+            };
+        }
     }
 };

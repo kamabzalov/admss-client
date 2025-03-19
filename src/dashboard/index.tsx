@@ -8,7 +8,6 @@ import { AuthUser } from "http/services/auth.service";
 import { createApiDashboardInstance } from "../http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Loader } from "./common/loader";
-import { ToastProvider } from "./common/toast";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 
@@ -17,7 +16,7 @@ export const Dashboard = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
 
     const store = useStore().userStore;
-    const { authUser, settings } = store;
+    const { authUser, settings, isSettingsLoaded } = store;
 
     useEffect(() => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -34,10 +33,10 @@ export const Dashboard = observer((): ReactElement => {
     }
 
     return (
-        <ToastProvider>
-            <Suspense fallback={<Loader overlay />}>
-                <Header />
-                <Sidebar />
+        <Suspense fallback={<Loader overlay />}>
+            <Header />
+            <Sidebar />
+            {isSettingsLoaded ? (
                 <main
                     className={`main ${settings.isSidebarCollapsed ? "main--expanded" : "main--collapsed"}`}
                 >
@@ -45,7 +44,9 @@ export const Dashboard = observer((): ReactElement => {
                         <Outlet />
                     </div>
                 </main>
-            </Suspense>
-        </ToastProvider>
+            ) : (
+                <></>
+            )}
+        </Suspense>
     );
 });

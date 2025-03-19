@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
@@ -6,6 +7,7 @@ import {
     DealPickupPayment,
     DealPrintForm,
 } from "common/models/deals";
+import { Inventory } from "common/models/inventory";
 import {
     getDealFinance,
     getDealInfo,
@@ -15,6 +17,7 @@ import {
     setDealFinance,
     setDealPayments,
 } from "http/services/deals.service";
+import { getInventoryInfo } from "http/services/inventory-service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
@@ -27,6 +30,7 @@ interface DealPrintCollection {
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
+    private _inventory: Inventory = {} as Inventory;
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
@@ -48,6 +52,11 @@ export class DealStore {
     public get deal() {
         return this._deal;
     }
+
+    public get inventory() {
+        return this._inventory;
+    }
+
     public get dealExtData() {
         return this._dealExtData;
     }
@@ -104,6 +113,10 @@ export class DealStore {
                 this._dealID = extdata.dealUID;
                 this._dealExtData = extdata || ({} as DealExtData);
                 this._dealFinance = finance || ({} as DealFinance);
+                const inventoryResponse = await getInventoryInfo(deal.inventoryuid);
+                if (inventoryResponse?.status === Status.OK) {
+                    this._inventory = inventoryResponse as Inventory;
+                }
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
@@ -217,9 +230,10 @@ export class DealStore {
                 (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
+            const err = error as AxiosError;
             return {
                 status: Status.ERROR,
-                error: error as string,
+                error: err?.message,
             };
         } finally {
             this._isLoading = false;

@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { authorizedUserApiInstance } from "http/index";
 
@@ -31,10 +31,23 @@ export const updateUserGeneralSettings = async (body?: Partial<GeneralSettings>)
     }
 };
 
-export const getWatermark = async (mediauid: string) => {
+export const getWatermark = async (
+    mediauid: string
+): Promise<string | BaseResponseError | undefined> => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(`media/${mediauid}/watermark`);
-        return request.data;
+        const response = await authorizedUserApiInstance.get<any>(`media/${mediauid}/watermark`, {
+            responseType: "blob",
+        });
+
+        const dataUrl = await new Promise<string>((resolve) => {
+            const reader = new window.FileReader();
+            reader.addEventListener("load", (event) => {
+                resolve(event.target?.result as string);
+            });
+            reader.readAsDataURL(response.data);
+        });
+
+        return dataUrl;
     } catch (error) {
         if (isAxiosError(error)) {
             return {

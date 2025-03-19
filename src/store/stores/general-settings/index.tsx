@@ -6,6 +6,7 @@ import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media
 import {
     getPostProcessing,
     getUserGeneralSettings,
+    getWatermark,
     updatePostProcessing,
     updateUserGeneralSettings,
 } from "http/services/settings.service";
@@ -32,8 +33,8 @@ const initialPostProcessing: TextBlock[] = [
 export class GeneralSettingsStore {
     public rootStore: RootStore;
     private _settings: GeneralSettings = {} as GeneralSettings;
-    private _settingsID: string = "";
     private _watermarkImage: File | null = null;
+    private _watermarkImageUrl: string | null = null;
     private _postProcessing: WatermarkPostProcessing[] =
         initialPostProcessing as WatermarkPostProcessing[];
     protected _isLoading = false;
@@ -60,6 +61,10 @@ export class GeneralSettingsStore {
         return this._watermarkImage;
     }
 
+    public get watermarkImageUrl() {
+        return this._watermarkImageUrl;
+    }
+
     public get postProcessing() {
         return this._postProcessing;
     }
@@ -78,6 +83,10 @@ export class GeneralSettingsStore {
 
     public get activeTab() {
         return this._activeTab;
+    }
+
+    private get logomediauid() {
+        return this._settings.logomediauid;
     }
 
     public getSettings = async () => {
@@ -164,6 +173,18 @@ export class GeneralSettingsStore {
         this._isPostProcessingChanged = true;
         this._postProcessing = state as WatermarkPostProcessing[];
     });
+
+    public getWatermarkImage = (): void => {
+        getWatermark(this._settings.logomediauid).then((watermarkImage) => {
+            if (watermarkImage) {
+                const url =
+                    watermarkImage instanceof Blob || watermarkImage instanceof File
+                        ? URL.createObjectURL(watermarkImage)
+                        : watermarkImage;
+                this._watermarkImageUrl = url as string;
+            }
+        });
+    };
 
     private setWatermarkImage = async (): Promise<any> => {
         if (!this._watermarkImage) {
@@ -260,6 +281,15 @@ export class GeneralSettingsStore {
         this._watermarkImage = state;
     }
 
+    public set watermarkImageUrl(state: string | null) {
+        if (!state) {
+            this.watermarkImage = null;
+            this.logomediauid = "";
+        }
+        this._isSettingsChanged = true;
+        this._watermarkImageUrl = state;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
@@ -280,11 +310,14 @@ export class GeneralSettingsStore {
         this._isSettingsChanged = state;
     }
 
+    private set logomediauid(state: string) {
+        this._settings.logomediauid = state;
+    }
+
     public clearSettings = () => {
         this._settings = {} as GeneralSettings;
         this._isSettingsChanged = false;
         this._isPostProcessingChanged = false;
-        this._settingsID = "";
         this._watermarkImage = null;
         this._postProcessing = initialPostProcessing as WatermarkPostProcessing[];
     };

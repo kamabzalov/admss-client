@@ -33,12 +33,17 @@ export interface ExportWebUserSettings extends UserSettings {
     selectedFilterOptions?: FilterOptions[] | any;
 }
 
+export interface SidebarUserSettings {
+    isSidebarCollapsed: boolean;
+}
+
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
     exportWeb: ExportWebUserSettings;
     exportSchedule: ExportWebUserSettings;
     exportHistory: ExportWebUserSettings;
+    sidebar?: SidebarUserSettings;
 }
 
 export interface UserGroup {

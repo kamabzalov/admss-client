@@ -45,6 +45,7 @@ export interface GeneralSettings extends BaseResponseError {
     logoposY: number;
     logoopacity: number;
     exportService: number;
+    watermarkenabled: 0 | 1;
 }
 
 export interface WatermarkPostProcessing extends BaseResponseError {

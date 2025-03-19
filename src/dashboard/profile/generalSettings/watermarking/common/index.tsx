@@ -1,11 +1,8 @@
 import { MediaLimits } from "common/models";
 import { Button } from "primereact/button";
-import {
-    ItemTemplateOptions,
-    FileUpload,
-    FileUploadHeaderTemplateOptions,
-} from "primereact/fileupload";
+import { FileUpload, FileUploadHeaderTemplateOptions } from "primereact/fileupload";
 import { Tag } from "primereact/tag";
+import { store } from "store";
 
 export const limitations: MediaLimits = {
     formats: ["PNG", "JPEG"],
@@ -13,18 +10,21 @@ export const limitations: MediaLimits = {
     maxSize: 2,
 };
 
-export const itemTemplate = (
-    file: object,
-    _: ItemTemplateOptions,
-    fileUploadRef: React.RefObject<FileUpload>
-) => {
-    const inFile = file as File;
+export const itemTemplate = (image: File | string, fileUploadRef?: React.RefObject<FileUpload>) => {
+    const isFilePath = typeof image === "string";
+
+    const alt = isFilePath ? "watermark image" : image?.name;
+    const src = isFilePath ? image : URL.createObjectURL(image);
+    const handleDeleteImage = () => {
+        store.generalSettingsStore.watermarkImageUrl = null;
+        fileUploadRef && fileUploadRef.current?.clear();
+    };
     return (
         <div className='flex align-items-center presentation'>
             <div className='flex align-items-center w-full'>
                 <img
-                    alt={inFile.name}
-                    src={URL.createObjectURL(inFile)}
+                    alt={alt}
+                    src={src}
                     role='presentation'
                     width='100%'
                     height='100%'
@@ -35,7 +35,7 @@ export const itemTemplate = (
                 type='button'
                 icon='pi pi-times'
                 className='p-button presentation__remove-button'
-                onClick={() => fileUploadRef.current?.clear()}
+                onClick={handleDeleteImage}
             />
         </div>
     );
