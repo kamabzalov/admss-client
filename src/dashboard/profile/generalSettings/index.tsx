@@ -9,10 +9,8 @@ import { SettingsTaxes } from "dashboard/profile/generalSettings/taxes";
 import { SettingsLease } from "dashboard/profile/generalSettings/lease";
 import { SettingsAccount } from "dashboard/profile/generalSettings/account";
 import { SettingsContract } from "dashboard/profile/generalSettings/contract";
-import { SettingsStockNew } from "dashboard/profile/generalSettings/stockNew";
-import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/stockTradeIn";
 import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermarking";
-import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-groups";
+import { InventorySettings } from "dashboard/profile/generalSettings/inventory-settings";
 import { SettingsOther } from "dashboard/profile/generalSettings/other";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
@@ -57,9 +55,9 @@ export const GeneralSettings = observer((): ReactElement => {
 
     useEffect(() => {
         const defaultTabRoute = tabItems[0].route;
-        const currentTab = searchParams.get("tab");
+        const currentTab = searchParams.get("section");
         if (!currentTab) {
-            setSearchParams({ tab: defaultTabRoute });
+            setSearchParams({ section: defaultTabRoute });
         }
     }, [searchParams, setSearchParams]);
 
@@ -79,33 +77,9 @@ export const GeneralSettings = observer((): ReactElement => {
         { settingName: "Fees", route: "fees", component: <SettingsFees /> },
         { settingName: "Taxes", route: "taxes", component: <SettingsTaxes /> },
         {
-            settingName: "Stock# for new inventory",
-            route: "stock-for-new-inventory",
-            component: (
-                <SettingsStockNew
-                    radioSettings={[
-                        { name: "6vin", title: "Last 6 of VIN", value: 0 },
-                        { name: "8vin", title: "Last 8 of VIN", value: 1 },
-                    ]}
-                />
-            ),
-        },
-        {
-            settingName: "Stock# for trade-in inventory",
-            route: "stock-for-trade-in-inventory",
-            component: (
-                <SettingsStockTradeIn
-                    radioSettings={[
-                        { name: "6vin", title: "Last 6 of VIN", value: 0 },
-                        { name: "8vin", title: "Last 8 of VIN", value: 1 },
-                    ]}
-                />
-            ),
-        },
-        {
-            settingName: "Inventory groups",
-            route: "inventory-groups",
-            component: <SettingsInventoryGroups />,
+            settingName: "Inventory settings",
+            route: "inventory-settings",
+            component: <InventorySettings />,
         },
         {
             settingName: "Account Settings",
@@ -130,12 +104,12 @@ export const GeneralSettings = observer((): ReactElement => {
         },
     ];
 
-    const activeTabParam = searchParams.get("tab") || tabItems[0].route;
-    const activeTabIndex = tabItems.findIndex((tab) => tab.route === activeTabParam);
+    const activeTabParam = searchParams.get("section") || tabItems[0].route;
+    const activeTabIndex = tabItems.findIndex((section) => section.route === activeTabParam);
 
     const handleTabChange = (index: number) => {
         const selectedTabRoute = tabItems[index].route;
-        setSearchParams({ tab: selectedTabRoute });
+        setSearchParams({ section: selectedTabRoute });
     };
 
     const handleBackClick = () => {
@@ -176,7 +150,7 @@ export const GeneralSettings = observer((): ReactElement => {
                             );
                         })}
                     </TabView>
-                    <div className='flex justify-content-end gap-3 mt-8 mr-3'>
+                    <div className='general-settings__buttons'>
                         <Button
                             onClick={handleBackClick}
                             className='uppercase px-6 form__button'

@@ -1,3 +1,4 @@
+import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
 
 interface SettingsDealsProps {
@@ -10,9 +11,9 @@ interface SettingsDealsProps {
 
 export const SettingsDeals = ({ settings }: SettingsDealsProps): JSX.Element => {
     return (
-        <div className='settings-form'>
+        <div className='settings-form settings-deals'>
             <div className='settings-form__title'>Deals</div>
-            <div className='flex'>{settings && <DashboardRadio radioArray={settings} />}</div>
+            {settings && <DashboardRadio radioArray={settings} />}
         </div>
     );
 };

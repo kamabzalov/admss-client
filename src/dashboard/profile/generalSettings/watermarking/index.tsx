@@ -231,7 +231,7 @@ export const SettingsWatermarking = observer((): ReactElement => {
     return (
         <div className='settings-form watermarking'>
             <div className='settings-form__title'>Watermarking</div>
-            <div className='grid align-items-center'>
+            <div className='grid align-items-center mt-0'>
                 <div className='col-6'>
                     <Checkbox
                         inputId='enableWatermark'

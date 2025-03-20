@@ -21,7 +21,7 @@
     .watermarking__logo-settings {
         display: flex;
         align-items: center;
-        padding-bottom: 40px;
+        padding-bottom: 50px;
         padding-top: 40px;
     }
 
@@ -48,7 +48,7 @@
     }
 
     .form-line {
-        margin: 36px 0;
+        margin: 52px 0;
     }
 
     .presentation {
@@ -232,11 +232,18 @@
                 rotate: 180deg;
             }
         }
+
+        .p-accordion-tab:last-child {
+            .p-accordion-header .p-accordion-header-link {
+                border-bottom: none;
+            }
+        }
+
         .p-accordion-header .p-accordion-header-link {
             background: var(--admss-app-lightest-green);
             border-color: var(--admss-app-green);
-            border-bottom: none;
             height: 50px;
+
             &:hover {
                 background: var(--admss-app-lightest-green);
                 border-color: var(--admss-app-green);
