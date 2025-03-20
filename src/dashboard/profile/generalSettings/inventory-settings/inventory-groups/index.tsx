@@ -9,7 +9,6 @@ import {
 } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
-import { Loader } from "dashboard/common/loader";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
@@ -24,13 +23,11 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleGetUserGroupList = () => {
         if (authUser) {
             getUserGroupList(authUser.useruid).then((list) => {
                 list && setInventorySettings(list);
-                setIsLoading(false);
             });
         }
     };
@@ -41,7 +38,6 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
         if (currentItem) {
-            setIsLoading(true);
             const order = direction === "up" ? --currentItem.order : ++currentItem.order;
             addUserGroupList(authUser!.useruid, {
                 ...currentItem,
@@ -52,12 +48,6 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     const handleSetGroupDefault = (item: UserGroup) => {
         if (item) {
-            setIsLoading(true);
-
-            if (!item.enabled) {
-                return setIsLoading(false);
-            }
-
             addUserGroupList(authUser!.useruid, {
                 ...item,
                 isdefault: !!item.isdefault ? 0 : 1,
@@ -66,7 +56,6 @@ export const SettingsInventoryGroups = (): ReactElement => {
     };
 
     const handleSaveGroup = () => {
-        setIsLoading(true);
         addUserGroupList(authUser!.useruid, {
             description: editedItem.description,
             itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
@@ -79,18 +68,15 @@ export const SettingsInventoryGroups = (): ReactElement => {
                     detail: error,
                     life: TOAST_LIFETIME,
                 });
-                return setIsLoading(false);
             }
             getUserGroupList(authUser!.useruid).then((list) => {
                 list && setInventorySettings(list);
                 setEditedItem({});
-                setIsLoading(false);
             });
         });
     };
 
     const handleToggleGroupVisible = (item: UserGroup) => {
-        setIsLoading(true);
         addUserGroupList(authUser!.useruid, {
             enabled: !item.enabled ? 1 : 0,
             itemuid: item.itemuid,
@@ -99,18 +85,15 @@ export const SettingsInventoryGroups = (): ReactElement => {
     };
 
     const handleDeleteGroup = (item: UserGroup) => {
-        setIsLoading(true);
         item.itemuid &&
             deleteUserGroupList(item.itemuid).then(() => {
                 getUserGroupList(authUser!.useruid).then((list) => {
                     list && setInventorySettings(list);
-                    setIsLoading(false);
                 });
             });
     };
 
     const handleCheckAllGroups = ({ checked }: CheckboxChangeEvent) => {
-        setIsLoading(true);
         inventorySettings.forEach((item, index) => {
             if (!index) return;
             addUserGroupList(authUser!.useruid, {
@@ -118,23 +101,15 @@ export const SettingsInventoryGroups = (): ReactElement => {
                 itemuid: item.itemuid,
                 description: item.description,
             }).then(() => {
-                getUserGroupList(authUser!.useruid)
-                    .then((list) => {
-                        list && setInventorySettings(list);
-                        setIsLoading(false);
-                    })
-                    .finally(() => {
-                        setIsLoading(false);
-                    });
+                getUserGroupList(authUser!.useruid).then((list) => {
+                    list && setInventorySettings(list);
+                });
             });
         });
-        setIsLoading(false);
     };
 
     return (
-        <div className='settings-form'>
-            {isLoading && <Loader overlay />}
-            <div className='settings-form__title'>Inventory groups</div>
+        <>
             <div className='flex justify-content-end mb-4'>
                 <Button
                     className='settings-form__button'
@@ -271,6 +246,6 @@ export const SettingsInventoryGroups = (): ReactElement => {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };

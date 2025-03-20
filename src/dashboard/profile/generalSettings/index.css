@@ -1,15 +1,26 @@
+.general-settings {
+    --card-height: 83vh;
+    --card-max-height: 983px;
+    --content-height: 600px;
+    --title-height: 63px;
+}
+
 .general-settings .card {
-    height: 83vh;
+    padding: 40px;
+    padding-right: 30px;
+    height: calc(var(--card-height) + var(--title-height));
+    max-height: var(--card-max-height);
 }
 
 .settings-form {
-    height: 594px;
+    height: calc(var(--content-height) + var(--title-height));
+    max-height: calc(var(--content-height) + var(--title-height));
+    padding-right: 30px;
 }
 
 .general-settings__tabs {
     display: flex;
     border-right: 2px solid var(--admss-app-light-blue);
-    overflow: scroll;
 }
 
 .general-settings__tabs .p-tabview-nav {
@@ -24,10 +35,12 @@
 
 .general-settings__tabs .p-tabview-panels {
     flex: 1;
-    padding-top: 0;
+    padding: 0;
     padding-left: 40px;
     border-left: 2px solid var(--admss-app-light-blue);
     border-radius: 0;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
@@ -55,7 +68,7 @@
 }
 
 .settings-form__title {
-    margin-bottom: 40px;
+    height: var(--title-height);
     font-size: 20px;
     font-weight: 700;
     text-transform: uppercase;
@@ -64,4 +77,13 @@
 .general-settings .card-header__title {
     font-size: 20px;
     font-weight: 700;
+}
+
+.general-settings__buttons {
+    display: flex;
+    height: 162px;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 25px;
+    padding-right: 30px;
 }
