@@ -34,7 +34,7 @@ import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
 import {
-    convertDateToTimestamp,
+    convertDateForQuery,
     createStringifySearchQuery,
     isObjectValuesEmpty,
 } from "common/helpers";
@@ -163,7 +163,7 @@ export const TasksDataTable = observer((): ReactElement => {
                 switch (key) {
                     case SEARCH_FORM_FIELDS.CREATION_DATE:
                         keyName = SEARCH_FORM_QUERY.CREATION_DATE;
-                        formattedValue = convertDateToTimestamp(value as string);
+                        formattedValue = convertDateForQuery(value as string);
                         break;
 
                     case SEARCH_FORM_FIELDS.DESCRIPTION:
