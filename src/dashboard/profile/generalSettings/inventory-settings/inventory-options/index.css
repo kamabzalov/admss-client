@@ -1,0 +1,11 @@
+.inventory-options__delete.p-button.p-button-text {
+    color: var(--admss-app-light-grey);
+    transition: ease-in-out 0.3s;
+    width: 20px;
+    height: 20px;
+}
+
+.inventory-options__delete.p-button.p-button-text:enabled:hover {
+    color: var(--admss-darkest-grey);
+    background: transparent;
+}

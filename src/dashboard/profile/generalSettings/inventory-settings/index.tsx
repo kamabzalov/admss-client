@@ -7,9 +7,11 @@ import { useStore } from "store/hooks";
 import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-settings/inventory-groups";
 import { SettingsStockNew } from "dashboard/profile/generalSettings/inventory-settings/stockNew";
 import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/inventory-settings/stockTradeIn";
+import { SettingsInventoryOptions } from "dashboard/profile/generalSettings/inventory-settings/inventory-options";
 
 const tabs = [
     { header: "Groups", component: <SettingsInventoryGroups /> },
+    { header: "Options", component: <SettingsInventoryOptions /> },
     {
         header: "Stock# new",
         component: (
@@ -35,8 +37,8 @@ const tabs = [
 ];
 
 export const InventorySettings = observer((): ReactElement => {
-    const store = useStore().contactStore;
-    const { activeTab } = store;
+    const store = useStore().generalSettingsStore;
+    const { activeTab, getUserGroupList } = store;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -51,6 +53,10 @@ export const InventorySettings = observer((): ReactElement => {
             store.tabLength = 0;
         };
     }, [tabParam]);
+
+    useEffect(() => {
+        getUserGroupList();
+    }, []);
 
     const handleTabChange = (e: { index: number }) => {
         const newSearchParams = new URLSearchParams(location.search);
