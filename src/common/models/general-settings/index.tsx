@@ -1,4 +1,5 @@
 import { BaseResponseError } from "common/models/base-response";
+import { ListData } from "..";
 
 export interface GeneralSettings extends BaseResponseError {
     dealType: number;
@@ -63,4 +64,9 @@ export interface WatermarkPostProcessing extends BaseResponseError {
     fontName: string;
     ppText: string;
     ppPattern: string;
+}
+
+export interface GeneralInventoryOptions extends ListData {
+    itemuid: string;
+    order: number;
 }

@@ -1,11 +1,35 @@
-.inventory-options__delete.p-button.p-button-text {
-    color: var(--admss-app-light-grey);
-    transition: ease-in-out 0.3s;
-    width: 20px;
-    height: 20px;
-}
+.general-inventory-option {
+    .option-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        gap: 9px;
 
-.inventory-options__delete.p-button.p-button-text:enabled:hover {
-    color: var(--admss-darkest-grey);
-    background: transparent;
+        .p-button {
+            width: 22px;
+        }
+
+        .option-control__button.p-button .p-button-icon {
+            font-size: 19px;
+        }
+    }
+    .inventory-options__delete.p-button.p-button-text {
+        color: var(--admss-app-light-grey);
+        transition: ease-in-out 0.3s;
+        width: 20px;
+        height: 20px;
+    }
+
+    .inventory-options__delete.p-button.p-button-text:enabled:hover {
+        color: var(--admss-darkest-grey);
+        background: transparent;
+    }
+
+    .settings-inventory__row {
+        justify-content: center;
+        height: 45px;
+        padding: 0;
+        margin: 0;
+    }
 }
