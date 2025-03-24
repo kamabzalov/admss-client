@@ -16,8 +16,13 @@
     align-items: center;
     padding-left: 30px;
 
+    &:has(.row-edit__input) {
+        padding-left: 20px;
+    }
+
     .row-edit__input {
-        flex: 0 1 790px;
+        flex: 0 1 78%;
+        max-width: 790px;
     }
     .row-edit__button.p-button {
         height: 50px;
