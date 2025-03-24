@@ -172,6 +172,22 @@ export const getReportDocumentTemplate = async (documentuid: string) => {
     }
 };
 
+export const getReportDatasets = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+            `reports/${useruid}/datasets`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report datasets",
+            };
+        }
+    }
+};
+
 export const getReportColumns = async ({
     service,
     useruid,

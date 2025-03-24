@@ -113,6 +113,7 @@ export interface ReportServiceColumns {
     index: number;
     name: string;
     width: number;
+    originalDataSet?: ReportServices;
 }
 
 export interface ReportSetParams {
@@ -151,4 +152,11 @@ export enum REPORT_TYPES {
 export enum NODE_TYPES {
     DOCUMENT = "document",
     COLLECTION = "collection",
+}
+
+export interface Dataset {
+    id: number;
+    key: string;
+    match: { id: number; name: string }[];
+    name: ReportServices;
 }
