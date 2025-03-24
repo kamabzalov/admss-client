@@ -1,103 +1,30 @@
-import { ReportServiceColumns, ReportServices } from "common/models/reports";
-import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement, useEffect, useRef, useState } from "react";
-import { ReportSelect } from "../../common";
-import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
-import { getReportColumns } from "http/services/reports.service";
-import { useStore } from "store/hooks";
-import { useToast } from "dashboard/common/toast";
-
-const dataSetValues: ReportServices[] = [
-    ReportServices.INVENTORY,
-    ReportServices.CONTACTS,
-    ReportServices.DEALS,
-    ReportServices.ACCOUNTS,
-];
-
-const initialDataSetsData: Record<ReportServices, ReportServiceColumns[]> = {
-    [ReportServices.INVENTORY]: [],
-    [ReportServices.CONTACTS]: [],
-    [ReportServices.DEALS]: [],
-    [ReportServices.ACCOUNTS]: [],
-};
-
-enum MOVE_DIRECTION {
-    LEFT = "left",
-    RIGHT = "right",
-    TOP = "top",
-    BOTTOM = "bottom",
-    UP = "up",
-    DOWN = "down",
-}
+import { ReactElement, useRef } from "react";
+import { ReportSelect } from "dashboard/reports/form/common";
+import { observer } from "mobx-react-lite";
+import { ReportServiceColumns } from "common/models/reports";
+import {
+    MOVE_DIRECTION,
+    useReportColumnController,
+} from "dashboard/reports/form/edit/column-select/select-controller";
 
 export const ReportColumnSelect = observer((): ReactElement => {
-    const store = useStore().reportStore;
-    const { report } = store;
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
-    const toast = useToast();
-    const [dataSet, setDataSet] = useState<ReportServices | null>(null);
-    const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
-    const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
-    const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
-    const [initialDataSets, setInitialDataSets] =
-        useState<Record<ReportServices, ReportServiceColumns[]>>(initialDataSetsData);
+    const {
+        dataSet,
+        report,
+        setDataSet,
+        selectedValues,
+        setSelectedValues,
+        availableValues,
+        setAvailableValues,
+        currentItem,
+        setCurrentItem,
+        availableDatasets,
+    } = useReportColumnController();
+
     const availableRef = useRef<HTMLDivElement>(null);
     const selectedRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (report?.columns) {
-            setSelectedValues(report.columns.filter(Boolean));
-        }
-        return () => {
-            setSelectedValues([]);
-            setAvailableValues([]);
-            setDataSet(null);
-        };
-    }, [report]);
-
-    useEffect(() => {
-        if (dataSet) {
-            const allColumns = initialDataSets[dataSet] || [];
-            const filtered = allColumns.filter(
-                (col) => !selectedValues.some((sel) => sel.data === col.data)
-            );
-            setAvailableValues(filtered);
-        }
-    }, [dataSet, selectedValues, initialDataSets]);
-
-    useEffect(() => {
-        const useruid = authUser?.useruid;
-        if (!dataSet || !useruid) return;
-        const alreadyLoaded = initialDataSets[dataSet] && initialDataSets[dataSet].length > 0;
-        if (alreadyLoaded) return;
-        getReportColumns({ service: dataSet, useruid }).then((response) => {
-            if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error,
-                    life: TOAST_LIFETIME,
-                });
-            } else if (response) {
-                const columnsWithOrigin = response.map((item: ReportServiceColumns) => ({
-                    ...item,
-                    originalDataSet: dataSet,
-                }));
-                setInitialDataSets((prev) => ({
-                    ...prev,
-                    [dataSet]: columnsWithOrigin,
-                }));
-            }
-        });
-    }, [dataSet, authUser?.useruid, toast, initialDataSets]);
-
-    useEffect(() => {
-        store.reportColumns = selectedValues;
-    }, [selectedValues, store]);
 
     const scrollToTop = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -204,7 +131,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         className='report-controls__dropdown'
-                        options={dataSetValues}
+                        options={availableDatasets}
                         value={dataSet}
                         emptyMessage='-'
                         disabled={!!report.isdefault}
