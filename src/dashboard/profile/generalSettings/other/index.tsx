@@ -1,7 +1,8 @@
 import "./index.css";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
+import { Tooltip } from "primereact/tooltip";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
@@ -11,6 +12,7 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 
 const NEW_ITEM = "new";
+const DESCRIPTION_LIMIT = 100;
 
 export const SettingsOther = (): ReactElement => {
     const toast = useToast();
@@ -20,6 +22,7 @@ export const SettingsOther = (): ReactElement => {
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<HowToKnow>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const newInputRef = useRef<HTMLInputElement>(null);
 
     const handleGetUserHowKnowList = async () => {
         if (!authUser) return;
@@ -95,6 +98,23 @@ export const SettingsOther = (): ReactElement => {
         setIsLoading(false);
     };
 
+    useEffect(() => {
+        if (editedItem.itemuid === NEW_ITEM && newInputRef.current) {
+            newInputRef.current.focus();
+        }
+    }, [editedItem]);
+
+    const getTruncatedText = (text: string | undefined) => {
+        if (!text) return "";
+        return text.length > DESCRIPTION_LIMIT
+            ? text.substring(0, DESCRIPTION_LIMIT) + "..."
+            : text;
+    };
+
+    const needsTooltip = (text: string | undefined) => {
+        return text ? text.length > DESCRIPTION_LIMIT : false;
+    };
+
     return (
         <div className='settings-form'>
             {isLoading && <Loader overlay />}
@@ -147,7 +167,24 @@ export const SettingsOther = (): ReactElement => {
                                             </Button>
                                         </div>
                                     ) : (
-                                        item.description
+                                        <>
+                                            <span
+                                                className={`description-text ${
+                                                    needsTooltip(item.description)
+                                                        ? `description-text--tooltip-${item.itemuid}`
+                                                        : ""
+                                                }`}
+                                            >
+                                                {getTruncatedText(item.description)}
+                                            </span>
+                                            {needsTooltip(item.description) && (
+                                                <Tooltip
+                                                    target={`.description-text--tooltip-${item.itemuid}`}
+                                                    content={item.description}
+                                                    position='mouse'
+                                                />
+                                            )}
+                                        </>
                                     )}
                                 </div>
                                 <div className='col-2 p-0 settings-other__actions'>
@@ -210,6 +247,7 @@ export const SettingsOther = (): ReactElement => {
                                                     description: e.target.value,
                                                 })
                                             }
+                                            ref={newInputRef}
                                         />
                                         <Button
                                             className='p-button row-edit__button'

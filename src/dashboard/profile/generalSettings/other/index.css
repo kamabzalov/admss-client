@@ -30,6 +30,15 @@
     &:last-child {
         border-bottom: none;
     }
+
+    .description-text {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        padding-right: 40px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .settings-form .p-button {
