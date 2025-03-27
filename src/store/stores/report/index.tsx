@@ -1,5 +1,10 @@
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportCreate, ReportInfo, ReportServiceColumns } from "common/models/reports";
+import {
+    ReportCollection,
+    ReportCreate,
+    ReportInfo,
+    ReportServiceColumns,
+} from "common/models/reports";
 import { createCustomReport, getReportInfo, updateReportInfo } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -7,6 +12,7 @@ import { RootStore } from "store";
 export class ReportStore {
     public rootStore: RootStore;
     private _report: Partial<ReportInfo> = {} as ReportInfo;
+    private _customCollections: ReportCollection[] = [];
     private _currentID: string = "";
     private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
@@ -21,6 +27,10 @@ export class ReportStore {
 
     public get report() {
         return this._report;
+    }
+
+    public get customCollections() {
+        return this._customCollections;
     }
 
     public get currentID() {
@@ -145,6 +155,10 @@ export class ReportStore {
 
     public set report(state: Partial<ReportInfo>) {
         this._report = state;
+    }
+
+    public set customCollections(state: ReportCollection[]) {
+        this._customCollections = state;
     }
 
     public set reportName(state: string) {

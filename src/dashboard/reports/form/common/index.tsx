@@ -178,7 +178,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                             ? "secondary"
                             : "success"
                     }
-                    onClick={() => handleSaveReport()}
+                    onClick={handleSaveReport}
                 >
                     {report?.itemuid ? "Update" : "Create"}
                 </Button>
