@@ -12,6 +12,7 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 
 const NEW_ITEM = "new";
+const DESCRIPTION_MAX_LENGTH = 127;
 const DESCRIPTION_LIMIT = 100;
 
 export const SettingsOther = (): ReactElement => {
@@ -41,7 +42,12 @@ export const SettingsOther = (): ReactElement => {
     }, [authUser]);
 
     const handleSaveHowKnow = async () => {
-        if (!authUser || !editedItem.description) return;
+        if (
+            !authUser ||
+            !editedItem.description ||
+            editedItem.description.length > DESCRIPTION_MAX_LENGTH
+        )
+            return;
         setIsLoading(true);
 
         const itemToSave = {
@@ -149,6 +155,16 @@ export const SettingsOther = (): ReactElement => {
                                         <div className='flex row-edit'>
                                             <InputText
                                                 type='text'
+                                                maxLength={DESCRIPTION_MAX_LENGTH}
+                                                tooltip={
+                                                    editedItem?.description?.length ===
+                                                    DESCRIPTION_MAX_LENGTH
+                                                        ? `Max ${DESCRIPTION_MAX_LENGTH} characters`
+                                                        : ""
+                                                }
+                                                tooltipOptions={{
+                                                    position: "mouse",
+                                                }}
                                                 value={editedItem.description || ""}
                                                 className='row-edit__input'
                                                 onChange={(e) =>
@@ -161,7 +177,11 @@ export const SettingsOther = (): ReactElement => {
                                             <Button
                                                 className='p-button row-edit__button'
                                                 onClick={handleSaveHowKnow}
-                                                disabled={!editedItem.description}
+                                                disabled={
+                                                    !editedItem.description ||
+                                                    editedItem.description.length >
+                                                        DESCRIPTION_MAX_LENGTH
+                                                }
                                             >
                                                 Save
                                             </Button>
