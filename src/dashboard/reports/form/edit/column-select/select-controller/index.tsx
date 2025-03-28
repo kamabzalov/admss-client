@@ -40,7 +40,7 @@ const getCompatibleDatasets = (
     selectedDatasets: ReportServices[],
     allDatasets: Dataset[]
 ): ReportServices[] => {
-    if (!selectedDatasets.length) {
+    if (!allDatasets.length || !selectedDatasets.length) {
         return dataSetValues;
     }
 
@@ -54,13 +54,11 @@ const getCompatibleDatasets = (
 
         if (selectedDatasets.includes(datasetName)) return true;
 
-        const isCompatible = selectedDatasetObjects.every((selected) => {
-            if (selected.id === dataset.id) return true;
+        const datasetMatches = new Set(dataset.match.map((match) => match.id));
+        return selectedDatasetObjects.every((selected) => {
             const selectedMatches = new Set(selected.match.map((match) => match.id));
-            return selectedMatches.has(dataset.id);
+            return datasetMatches.has(selected.id) && selectedMatches.has(dataset.id);
         });
-
-        return isCompatible;
     });
 };
 
@@ -89,21 +87,32 @@ export const useReportColumnController = () => {
             }
         };
         fetchDatasets();
+    }, [authUser?.useruid]);
+
+    useEffect(() => {
+        if (!datasets.length || !report) return;
 
         if (report?.columns) {
-            setSelectedValues(report.columns.filter(Boolean));
-        }
+            const initialSelectedValues = report.columns.filter(Boolean);
+            setSelectedValues(initialSelectedValues);
 
-        return () => {
-            setSelectedValues([]);
-            setAvailableValues([]);
-            setDataSet(null);
-        };
-    }, [report, authUser?.useruid]);
+            const selectedDatasets = Array.from(
+                new Set(
+                    initialSelectedValues.map(
+                        (item: ReportServiceColumns) => item.dataset as ReportServices
+                    )
+                )
+            ).filter(Boolean) as ReportServices[];
+            const compatibleDatasets = getCompatibleDatasets(selectedDatasets, datasets);
+            setAvailableDatasets(compatibleDatasets);
+        }
+    }, [report, datasets, authUser?.useruid]);
 
     useEffect(() => {
         const selectedDatasets = Array.from(
-            new Set(selectedValues.map((item: ReportServiceColumns) => item.originalDataSet))
+            new Set(
+                selectedValues.map((item: ReportServiceColumns) => item.dataset as ReportServices)
+            )
         ).filter(Boolean) as ReportServices[];
 
         const compatibleDatasets = getCompatibleDatasets(selectedDatasets, datasets);
