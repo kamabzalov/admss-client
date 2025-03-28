@@ -2,6 +2,8 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
 import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { CreateMediaItemRecordResponse } from "common/models/inventory";
+import { UserGroup } from "common/models/user";
+import { getUserGroupList } from "http/services/auth-user.service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import {
     getPostProcessing,
@@ -33,6 +35,8 @@ const initialPostProcessing: TextBlock[] = [
 export class GeneralSettingsStore {
     public rootStore: RootStore;
     private _settings: GeneralSettings = {} as GeneralSettings;
+    private _inventoryGroups: UserGroup[] = [];
+    private _inventoryGroupID: string = "";
     private _watermarkImage: File | null = null;
     private _watermarkImageUrl: string | null = null;
     private _postProcessing: WatermarkPostProcessing[] =
@@ -51,6 +55,14 @@ export class GeneralSettingsStore {
 
     public get settings() {
         return this._settings;
+    }
+
+    public get inventoryGroups() {
+        return this._inventoryGroups;
+    }
+
+    public get inventoryGroupID() {
+        return this._inventoryGroupID;
     }
 
     public get isSettingsChanged() {
@@ -108,6 +120,16 @@ export class GeneralSettingsStore {
         }
     };
 
+    public getUserGroupList = async () => {
+        const useruid = this.rootStore.userStore.authUser!.useruid;
+        const response = await getUserGroupList(useruid);
+        if (response && Array.isArray(response)) {
+            const defaultGroup = response.find((group) => !!group.isdefault);
+            this._inventoryGroupID = defaultGroup?.itemuid ?? response[0]?.itemuid ?? "";
+            this._inventoryGroups = response as UserGroup[];
+        }
+    };
+
     public getPostProcessing = async () => {
         this._isLoading = true;
         try {
@@ -133,6 +155,10 @@ export class GeneralSettingsStore {
             this._isLoading = false;
         }
     };
+
+    public changeInventoryGroups = action((inventoryGroups: UserGroup[]) => {
+        this._inventoryGroups = inventoryGroups;
+    });
 
     public savePostProcessing = async () => {
         this._isLoading = true;
@@ -288,6 +314,10 @@ export class GeneralSettingsStore {
         }
         this._isSettingsChanged = true;
         this._watermarkImageUrl = state;
+    }
+
+    public set inventoryGroupID(state: string) {
+        this._inventoryGroupID = state;
     }
 
     public set isLoading(state: boolean) {
