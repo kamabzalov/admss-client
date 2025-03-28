@@ -1,5 +1,11 @@
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ReportCreate, ReportInfo, ReportServiceColumns } from "common/models/reports";
+import {
+    ReportCollection,
+    ReportCollections,
+    ReportCreate,
+    ReportInfo,
+    ReportServiceColumns,
+} from "common/models/reports";
 import { createCustomReport, getReportInfo, updateReportInfo } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -7,10 +13,12 @@ import { RootStore } from "store";
 export class ReportStore {
     public rootStore: RootStore;
     private _report: Partial<ReportInfo> = {} as ReportInfo;
+    private _customCollections: ReportCollection[] = [];
     private _currentID: string = "";
     private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
+    private _reportCollections: ReportCollection[] = [];
     private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
@@ -23,6 +31,10 @@ export class ReportStore {
         return this._report;
     }
 
+    public get customCollections() {
+        return this._customCollections;
+    }
+
     public get currentID() {
         return this._currentID;
     }
@@ -33,6 +45,10 @@ export class ReportStore {
 
     public get reportColumns() {
         return this._reportColumns;
+    }
+
+    public get reportCollections() {
+        return this._reportCollections;
     }
 
     public get isLoading() {
@@ -84,11 +100,18 @@ export class ReportStore {
         async (uid: string | undefined): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
             try {
+                const collections: ReportCollections[] = this._reportCollections.map(
+                    (collection) => {
+                        return { collectionuid: collection.itemUID };
+                    }
+                );
                 if (!uid) {
-                    const reportData: Partial<ReportCreate> & { columns?: ReportServiceColumns[] } =
-                        {
-                            name: this._report.name,
-                        };
+                    const reportData: Partial<ReportCreate> & {
+                        columns?: ReportServiceColumns[];
+                    } & { collections: ReportCollections[] } = {
+                        name: this._report.name,
+                        collections,
+                    };
 
                     if (this._reportColumns && this._reportColumns.length) {
                         reportData.columns = this._reportColumns;
@@ -115,6 +138,7 @@ export class ReportStore {
                         ShowLineCount: this._report.ShowLineCount,
                         AskForStartAndEndDates: this._report.AskForStartAndEndDates,
                         columns: this._reportColumns,
+                        collections,
                     });
 
                     if (response?.status === Status.OK) {
@@ -147,12 +171,20 @@ export class ReportStore {
         this._report = state;
     }
 
+    public set customCollections(state: ReportCollection[]) {
+        this._customCollections = state;
+    }
+
     public set reportName(state: string) {
         this._reportName = state;
     }
 
     public set reportColumns(state: ReportServiceColumns[]) {
         this._reportColumns = state;
+    }
+
+    public set reportCollections(state: ReportCollection[]) {
+        this._reportCollections = state;
     }
 
     public clearReport = () => {

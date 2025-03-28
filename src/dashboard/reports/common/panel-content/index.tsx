@@ -20,6 +20,10 @@ interface CollectionPanelContentProps {
     handleClosePanel?: () => void;
 }
 
+export const selectedItemTemplate = (item: ReportDocument): ReactElement => {
+    return <span className='multiselect-label'>{item?.name || ""}</span>;
+};
+
 export const CollectionPanelContent = ({
     collectionName,
     collectionuid,
@@ -64,10 +68,6 @@ export const CollectionPanelContent = ({
         const sorted1 = [...reports1].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
         const sorted2 = [...reports2].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
         return sorted1.every((item, idx) => item.itemUID === sorted2[idx].itemUID);
-    };
-
-    const selectedItemTemplate = (item: ReportDocument): ReactElement => {
-        return <span className='multiselect-label'>{item?.name || ""}</span>;
     };
 
     const handleDeleteCollection = () => {

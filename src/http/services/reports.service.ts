@@ -6,7 +6,6 @@ import {
     ReportCollection,
     ReportCollectionUpdate,
     ReportCreate,
-    ReportDocument,
     ReportInfo,
     ReportServiceColumns,
     ReportServices,
@@ -229,7 +228,7 @@ export const createCustomReport = async (
     }
 };
 
-export const updateReportInfo = async (uid: string, body: Partial<ReportDocument & ReportInfo>) => {
+export const updateReportInfo = async (uid: string, body: Partial<ReportSetParams>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${uid}/reportinfo`,

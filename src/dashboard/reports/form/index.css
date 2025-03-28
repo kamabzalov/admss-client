@@ -15,6 +15,19 @@
         }
 
         .p-treenode-content {
+            :has(.report__list-item--new) {
+                position: relative;
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 1.05rem;
+                    left: -1.5rem;
+                    width: 9px;
+                    height: 9px;
+                    border: 2px solid var(--admss-app-main-blue);
+                    border-radius: 50%;
+                }
+            }
             &.report__list-item--toggler-visible {
                 .p-tree-toggler {
                     visibility: visible;
@@ -151,6 +164,26 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
+}
+
+.report-form__control {
+    flex-wrap: wrap;
+    .report-form__input {
+        padding: 10px;
+        flex: 1 1 404px;
+    }
+}
+
+.report-form__buttons {
+    display: flex;
+    margin-left: auto;
+    flex: 0 0 135px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .report__button.p-button {
+        flex: 0 0 50px;
+    }
 }
 
 .report-select__item {

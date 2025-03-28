@@ -42,6 +42,8 @@ export const NodeContent = ({
 }) => {
     const ref = useRef<HTMLDivElement>(null);
 
+    const isNew = !!node.data?.document?.isNew;
+
     useEffect(() => {
         const parent = ref.current?.closest(".p-treenode-content");
         if (parent) {
@@ -58,7 +60,11 @@ export const NodeContent = ({
 
     return (
         <div className='w-full' ref={ref}>
-            <Button onClick={onClick} className={`report__list-item w-full`} text>
+            <Button
+                onClick={onClick}
+                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""}`}
+                text
+            >
                 {node.label}
             </Button>
         </div>
@@ -107,6 +113,7 @@ export const ReportForm = observer((): ReactElement => {
                 (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
             );
             if (customReportsCollection) {
+                reportStore.customCollections = [customReportsCollection];
                 setCollections([
                     customReportsCollection,
                     ...collectionsWithoutFavorite.filter(

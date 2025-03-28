@@ -5,6 +5,11 @@ export interface ReportsColumn {
     data: string;
 }
 
+export interface ReportCollections {
+    collectionuid: string;
+    itemuid?: string;
+}
+
 export interface ReportsPostData {
     itemUID?: string;
     data?: Record<string, string>[];
@@ -16,10 +21,7 @@ export interface ReportDocument {
     accessed: string;
     count: number;
     created: string;
-    collections?: {
-        collectionuid: string;
-        itemuid: string;
-    }[];
+    collections?: ReportCollections[];
     documentUID: string;
     index: number;
     isNew: 0 | 1;
@@ -116,7 +118,7 @@ export interface ReportServiceColumns {
     originalDataSet?: ReportServices;
 }
 
-export interface ReportSetParams {
+export interface ReportSetParams extends Omit<Partial<ReportInfo>, "columns"> {
     itemUID: string;
     timestamp?: number;
     from_date?: number;
@@ -124,6 +126,7 @@ export interface ReportSetParams {
     type?: number;
     data?: Record<string, unknown>[];
     format?: Record<string, unknown>;
+    collections?: ReportCollections[];
     columns?: ReportsColumn[];
 }
 
