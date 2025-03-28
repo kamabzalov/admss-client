@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,8 +20,15 @@ export const ReportEditForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const { id } = useParams();
-    const { report, reportName, reportColumns, customCollections, getReport, changeReport } = store;
-    const [selectedCollection, setSelectedCollection] = useState<ReportCollection | null>(null);
+    const {
+        report,
+        reportName,
+        reportColumns,
+        reportCollections,
+        customCollections,
+        getReport,
+        changeReport,
+    } = store;
     const toast = useToast();
 
     useEffect(() => {
@@ -123,12 +130,11 @@ export const ReportEditForm = observer((): ReactElement => {
                             className='w-full edit-collection__multiselect'
                             selectedItemTemplate={selectedItemTemplate}
                             maxSelectedLabels={4}
-                            placeholder='Collection'
                             showSelectAll={false}
-                            value={selectedCollection}
+                            value={reportCollections}
                             onChange={(e) => {
                                 e.stopPropagation();
-                                setSelectedCollection(e.value as ReportCollection);
+                                store.reportCollections = e.value as ReportCollection[];
                             }}
                             pt={{
                                 wrapper: {
@@ -139,7 +145,7 @@ export const ReportEditForm = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        <label className='float-label'>Select reports</label>
+                        <label className='float-label'>Collection</label>
                     </span>
                 </div>
                 {report && id && (

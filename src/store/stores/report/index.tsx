@@ -1,6 +1,7 @@
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     ReportCollection,
+    ReportCollections,
     ReportCreate,
     ReportInfo,
     ReportServiceColumns,
@@ -17,6 +18,7 @@ export class ReportStore {
     private _initialReport: Partial<ReportInfo> = {} as ReportInfo;
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
+    private _reportCollections: ReportCollection[] = [];
     private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
@@ -43,6 +45,10 @@ export class ReportStore {
 
     public get reportColumns() {
         return this._reportColumns;
+    }
+
+    public get reportCollections() {
+        return this._reportCollections;
     }
 
     public get isLoading() {
@@ -94,11 +100,18 @@ export class ReportStore {
         async (uid: string | undefined): Promise<BaseResponseError | undefined> => {
             this._isLoading = true;
             try {
+                const collections: ReportCollections[] = this._reportCollections.map(
+                    (collection) => {
+                        return { collectionuid: collection.itemUID };
+                    }
+                );
                 if (!uid) {
-                    const reportData: Partial<ReportCreate> & { columns?: ReportServiceColumns[] } =
-                        {
-                            name: this._report.name,
-                        };
+                    const reportData: Partial<ReportCreate> & {
+                        columns?: ReportServiceColumns[];
+                    } & { collections: ReportCollections[] } = {
+                        name: this._report.name,
+                        collections,
+                    };
 
                     if (this._reportColumns && this._reportColumns.length) {
                         reportData.columns = this._reportColumns;
@@ -125,6 +138,7 @@ export class ReportStore {
                         ShowLineCount: this._report.ShowLineCount,
                         AskForStartAndEndDates: this._report.AskForStartAndEndDates,
                         columns: this._reportColumns,
+                        collections,
                     });
 
                     if (response?.status === Status.OK) {
@@ -167,6 +181,10 @@ export class ReportStore {
 
     public set reportColumns(state: ReportServiceColumns[]) {
         this._reportColumns = state;
+    }
+
+    public set reportCollections(state: ReportCollection[]) {
+        this._reportCollections = state;
     }
 
     public clearReport = () => {

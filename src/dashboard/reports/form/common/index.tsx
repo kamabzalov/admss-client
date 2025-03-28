@@ -64,9 +64,10 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
     const [duplicateDialogVisible, setDuplicateDialogVisible] = useState<boolean>(false);
     const [deleteDialogVisible, setDeleteDialogVisible] = useState<boolean>(false);
 
-    const handleSaveReport = () => {
+    const handleSaveReport = async () => {
         if (!!report.isdefault) return;
-        saveReport(report?.itemuid).then((response) => {
+        const response = await saveReport(report?.itemuid);
+        if (response) {
             if (response?.status === Status.OK) {
                 toast.current?.show({
                     severity: "success",
@@ -85,7 +86,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                     life: TOAST_LIFETIME,
                 });
             }
-        });
+        }
     };
 
     const handleToastShow = (status: Status, detail: string) => {
