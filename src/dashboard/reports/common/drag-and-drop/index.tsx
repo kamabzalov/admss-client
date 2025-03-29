@@ -38,7 +38,8 @@ export const buildTreeNodes = (
     collectionsData: ReportCollection[],
     countInfo: boolean = false
 ): TreeNode[] => {
-    return collectionsData
+    const collections = JSON.parse(JSON.stringify(collectionsData)) as ReportCollection[];
+    return collections
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map((col) => {
             let label = col.name;

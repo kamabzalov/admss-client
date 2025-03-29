@@ -10,6 +10,9 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { setReportDocumentTemplate } from "http/services/reports.service";
 import { ReportColumnSelect } from "./column-select";
+import { MultiSelect } from "primereact/multiselect";
+import { ReportCollection, ReportCollections } from "common/models/reports";
+import { selectedItemTemplate } from "dashboard/reports/common/panel-content";
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -17,7 +20,15 @@ export const ReportEditForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const { id } = useParams();
-    const { report, reportName, reportColumns, getReport, changeReport } = store;
+    const {
+        report,
+        reportName,
+        reportColumns,
+        reportCollections,
+        customCollections,
+        getReport,
+        changeReport,
+    } = store;
     const toast = useToast();
 
     useEffect(() => {
@@ -78,13 +89,27 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     };
 
+    const getAllCollections = () => {
+        const allCollections: Partial<ReportCollection>[] = [];
+        customCollections.forEach((collection) => {
+            allCollections.push(collection);
+
+            if (collection.collections) {
+                collection.collections.forEach((subCollection) => {
+                    allCollections.push(subCollection);
+                });
+            }
+        });
+        return allCollections;
+    };
+
     return (
         <div className='col-8 report-form'>
             <div className='report-form__header uppercase'>
                 {report.isdefault ? "View" : id ? "Edit" : "New"} report
             </div>
-            <div className='report-form__body grid'>
-                <div className='col-6'>
+            <div className='report-form__control grid'>
+                <div className={report && id ? "report-form__input" : "col-6"}>
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
@@ -95,33 +120,56 @@ export const ReportEditForm = observer((): ReactElement => {
                         <label className='float-label w-full'>Name</label>
                     </span>
                 </div>
-                {report && (
-                    <>
-                        <div className='col-3'>
-                            <Button
-                                className='uppercase w-full px-6 report__button'
-                                outlined
-                                onClick={() => handleDownloadForm()}
-                                disabled={!report.name}
-                                severity={!report.name ? "secondary" : "success"}
-                            >
-                                Preview
-                            </Button>
-                        </div>
-                        <div className='col-3'>
-                            <Button
-                                className='uppercase w-full px-6 report__button'
-                                outlined
-                                onClick={() => handleDownloadForm(true)}
-                                disabled={!report.name}
-                                severity={!report.name ? "secondary" : "success"}
-                            >
-                                Download
-                            </Button>
-                        </div>
-                    </>
+                <div className={report && id ? "report-form__input" : "col-6"}>
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            dataKey='itemUID'
+                            filter
+                            optionLabel='name'
+                            options={getAllCollections()}
+                            className='w-full edit-collection__multiselect'
+                            selectedItemTemplate={selectedItemTemplate}
+                            maxSelectedLabels={4}
+                            showSelectAll={false}
+                            value={reportCollections}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                store.isReportChanged = true;
+                                store.reportCollections = e.value as ReportCollections[];
+                            }}
+                            pt={{
+                                wrapper: {
+                                    className: "edit-collection__multiselect-wrapper",
+                                    style: {
+                                        maxHeight: "550px",
+                                    },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Collection</label>
+                    </span>
+                </div>
+                {report && id && (
+                    <div className='col-2 report-form__buttons'>
+                        <Button
+                            className='report__button'
+                            onClick={() => handleDownloadForm()}
+                            icon='icon adms-preview'
+                            disabled={!report.name}
+                            severity={!report.name ? "secondary" : "success"}
+                        />
+                        <Button
+                            className='report__button'
+                            icon='icon adms-download'
+                            onClick={() => handleDownloadForm(true)}
+                            disabled={!report.name}
+                            severity={!report.name ? "secondary" : "success"}
+                        />
+                    </div>
                 )}
+            </div>
 
+            <div className='report-form__body grid'>
                 <ReportColumnSelect />
 
                 <div className='splitter col-12'>
