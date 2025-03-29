@@ -1,13 +1,11 @@
 import {
     NODE_TYPES,
-    REPORT_TYPES,
     ReportCollection,
     ReportDocument,
     TOAST_MESSAGES,
 } from "common/models/reports";
 import {
     getUserFavoriteReportList,
-    getUserReportCollectionsContent,
     setReportOrder,
     moveReportToCollection,
     setCollectionOrder,
@@ -74,12 +72,11 @@ export const NodeContent = ({
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { isReportChanged, clearReport } = reportStore;
+    const { isReportChanged, allCollections, getUserReportCollections, clearReport } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
     const toast = useToast();
-    const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
@@ -87,7 +84,7 @@ export const ReportForm = observer((): ReactElement => {
 
     const getCollections = async () => {
         if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
+            !id && getUserReportCollections();
             getUserFavoriteReportList(authUser.useruid).then((response) => {
                 if (Array.isArray(response)) {
                     setFavoriteCollections(response);
@@ -102,31 +99,6 @@ export const ReportForm = observer((): ReactElement => {
             clearReport();
         };
     }, [authUser]);
-
-    const handleGetUserReportCollections = async (useruid: string) => {
-        const response = await getUserReportCollectionsContent(useruid);
-        if (Array.isArray(response)) {
-            const collectionsWithoutFavorite = response.filter(
-                (collection: ReportCollection) => collection.description !== REPORT_TYPES.FAVORITES
-            );
-            const customReportsCollection = collectionsWithoutFavorite.find(
-                (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
-            );
-            if (customReportsCollection) {
-                reportStore.customCollections = [customReportsCollection];
-                setCollections([
-                    customReportsCollection,
-                    ...collectionsWithoutFavorite.filter(
-                        (collection) => collection.name !== REPORT_TYPES.CUSTOM
-                    ),
-                ]);
-            } else {
-                setCollections(collectionsWithoutFavorite);
-            }
-        } else {
-            setCollections([]);
-        }
-    };
 
     const allNodes = [
         ...favoriteCollections.map((collection) => ({
@@ -148,7 +120,7 @@ export const ReportForm = observer((): ReactElement => {
                         },
                     })) || [],
         })),
-        ...buildTreeNodes(collections),
+        ...buildTreeNodes(allCollections),
     ];
 
     const findPathToDocument = useCallback(
@@ -273,7 +245,8 @@ export const ReportForm = observer((): ReactElement => {
         ) {
             const collectionId = dragData.collectionId;
             const currentCollectionsLength =
-                collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
+                allCollections.find((col: ReportCollection) => col.itemUID === collectionId)
+                    ?.collections?.length || 0;
 
             if (dropIndex !== undefined) {
                 const response = await setReportOrder(
@@ -389,11 +362,7 @@ export const ReportForm = observer((): ReactElement => {
                         </div>
                         <ReportEditForm />
                     </div>
-                    <ReportFooter
-                        onRefetch={() => {
-                            handleGetUserReportCollections(authUser!.useruid);
-                        }}
-                    />
+                    <ReportFooter onRefetch={getUserReportCollections} />
                 </div>
             </div>
             <ConfirmModal

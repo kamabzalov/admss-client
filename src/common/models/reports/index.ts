@@ -99,6 +99,7 @@ export interface ReportInfo extends BaseResponseError {
     order: number;
     listid: 0 | 1;
     columns: ReportServiceColumns[];
+    collections?: ReportCollections[];
 }
 
 export interface ReportCreate extends BaseResponseError {
@@ -126,7 +127,6 @@ export interface ReportSetParams extends Omit<Partial<ReportInfo>, "columns"> {
     type?: number;
     data?: Record<string, unknown>[];
     format?: Record<string, unknown>;
-    collections?: ReportCollections[];
     columns?: ReportsColumn[];
 }
 

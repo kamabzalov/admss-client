@@ -11,7 +11,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { setReportDocumentTemplate } from "http/services/reports.service";
 import { ReportColumnSelect } from "./column-select";
 import { MultiSelect } from "primereact/multiselect";
-import { ReportCollection } from "common/models/reports";
+import { ReportCollection, ReportCollections } from "common/models/reports";
 import { selectedItemTemplate } from "dashboard/reports/common/panel-content";
 
 export const ReportEditForm = observer((): ReactElement => {
@@ -134,7 +134,8 @@ export const ReportEditForm = observer((): ReactElement => {
                             value={reportCollections}
                             onChange={(e) => {
                                 e.stopPropagation();
-                                store.reportCollections = e.value as ReportCollection[];
+                                store.isReportChanged = true;
+                                store.reportCollections = e.value as ReportCollections[];
                             }}
                             pt={{
                                 wrapper: {
