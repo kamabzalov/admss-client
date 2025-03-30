@@ -100,7 +100,11 @@ export const ReportEditForm = observer((): ReactElement => {
                 });
             }
         });
-        return allCollections;
+        const result = allCollections.map((collection) => ({
+            collectionuid: collection.itemUID,
+            name: collection.name,
+        }));
+        return result;
     };
 
     return (
@@ -123,7 +127,6 @@ export const ReportEditForm = observer((): ReactElement => {
                 <div className={report && id ? "report-form__input" : "col-6"}>
                     <span className='p-float-label'>
                         <MultiSelect
-                            dataKey='itemUID'
                             filter
                             optionLabel='name'
                             options={getAllCollections()}

@@ -97,8 +97,7 @@ export class ReportStore {
                     );
 
                     return {
-                        itemuid: collection.itemuid,
-                        collectionuid: collection.collectionuid,
+                        collectionuid: foundCollection?.itemUID || "",
                         name: foundCollection?.name || "",
                     };
                 });
@@ -157,12 +156,9 @@ export class ReportStore {
             this._isLoading = true;
             try {
                 const collections: ReportCollections[] = this._reportCollections.map(
-                    (collection: ReportCollections) => {
+                    ({ collectionuid }) => {
                         return {
-                            collectionuid:
-                                (collection as unknown as ReportCollection).itemUID ||
-                                collection.itemuid ||
-                                "",
+                            collectionuid,
                         };
                     }
                 );
