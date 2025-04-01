@@ -5,6 +5,7 @@ import {
     ContactUser,
     ContactsCategories,
     SalespersonsList,
+    ScanBarcodeDL,
     SetContactResponse,
     TotalUsers,
 } from "common/models/contact";
@@ -245,7 +246,7 @@ export const scanContactDL = async (dlImage: File) => {
         const formData = new FormData();
         formData.append("dlImage", dlImage);
 
-        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+        const response = await authorizedUserApiInstance.post<ScanBarcodeDL>(
             "decoder/dlbarcode",
             formData,
             {

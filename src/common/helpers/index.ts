@@ -141,6 +141,53 @@ export const formatDateForServer = (date: Date): string => {
     return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
 };
 
+export const parseCustomDate = (dateAsString: string): number => {
+    if (dateAsString.length !== 8) {
+        throw new Error(
+            `Invalid date string length: expected 8 characters, got ${dateAsString.length}`
+        );
+    }
+
+    if (!/^\d{8}$/.test(dateAsString)) {
+        throw new Error("Invalid date string: must contain only digits");
+    }
+
+    const month = parseInt(dateAsString.slice(0, 2), 10) - 1;
+    const day = parseInt(dateAsString.slice(2, 4), 10);
+    const year = parseInt(dateAsString.slice(4, 8), 10);
+
+    const MIN_DAY = 1;
+    const MAX_DAY = 31;
+    const MIN_MONTH = 0;
+    const MAX_MONTH = 11;
+    const MIN_YEAR = 1900;
+    const MAX_YEAR = 9999;
+
+    if (isNaN(month) || isNaN(day) || isNaN(year)) {
+        throw new Error("Invalid date string: failed to parse month, day, or year");
+    }
+
+    if (month < MIN_MONTH || month > MAX_MONTH) {
+        throw new Error(
+            `Invalid month: ${month + 1} (must be between ${MIN_MONTH + 1} and ${MAX_MONTH + 1})`
+        );
+    }
+    if (day < MIN_DAY || day > MAX_DAY) {
+        throw new Error(`Invalid day: ${day} (must be between ${MIN_DAY} and ${MAX_DAY})`);
+    }
+    if (year < MIN_YEAR || year > MAX_YEAR) {
+        throw new Error(`Invalid year: ${year} (must be between ${MIN_YEAR} and ${MAX_YEAR})`);
+    }
+
+    const date = new Date(year, month, day);
+
+    if (isNaN(date.getTime()) || date.getMonth() !== month || date.getDate() !== day) {
+        throw new Error(`Invalid date: ${dateAsString} does not represent a valid date`);
+    }
+
+    return date.getTime();
+};
+
 export const validateDates = (start: string, due: string): { isValid: boolean; error?: string } => {
     if (new Date(start) > new Date(due)) {
         return { isValid: false, error: "Start Date must be before Due Date" };

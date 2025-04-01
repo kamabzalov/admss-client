@@ -375,3 +375,36 @@ export interface SetContactResponse extends BaseResponseError {
     OFAC_cobuyer?: ContactOFAC;
     contactuid: string;
 }
+
+export interface ScanBarcodeDL extends BaseResponseError {
+    contact: Pick<
+        Contact,
+        | "ZIP"
+        | "city"
+        | "created"
+        | "dl_number"
+        | "dob"
+        | "exp"
+        | "firstName"
+        | "lastName"
+        | "middleName"
+        | "sex"
+        | "state"
+        | "streetAddress"
+        | "updated"
+    >;
+    qr_data: {
+        Bytes: string;
+        Content: string;
+        ECLevel: string;
+        Error: string;
+        Format: string;
+        HasECI: boolean;
+        Identifier: string;
+        IsInverted: boolean;
+        IsMirrored: boolean;
+        Rotation: number;
+        Text: string;
+        Version: string;
+    }[];
+}
