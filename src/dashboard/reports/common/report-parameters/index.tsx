@@ -30,7 +30,7 @@ export const reportDownloadForm = async (
 ): Promise<BaseResponseError | undefined> => {
     const payload: ReportSetParams = {
         itemUID: params.itemUID || "0",
-        timestamp: Date.now(),
+        timestamp_s: formatDateForServer(new Date()),
         columns: params.columns,
     };
 

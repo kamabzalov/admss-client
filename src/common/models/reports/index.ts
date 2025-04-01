@@ -122,6 +122,7 @@ export interface ReportServiceColumns {
 export interface ReportSetParams extends Omit<Partial<ReportInfo>, "columns"> {
     itemUID: string;
     timestamp?: number;
+    timestamp_s?: string;
     from_date?: string;
     to_date?: string;
     type?: number;
