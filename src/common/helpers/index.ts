@@ -127,18 +127,35 @@ export const truncateText = (text: string, maxLength: number = 30) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-export const formatDateForServer = (date: Date): string => {
+export const formatDateForServer = (date: Date | number): string => {
+    const parsedDate = new Date(date);
     const pad = (num: number) => num.toString().padStart(2, "0");
 
-    const day = pad(date.getDate());
-    const month = pad(date.getMonth() + 1);
-    const year = date.getFullYear();
+    const day = pad(parsedDate.getDate());
+    const month = pad(parsedDate.getMonth() + 1);
+    const year = parsedDate.getFullYear();
 
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
+    const hours = pad(parsedDate.getHours());
+    const minutes = pad(parsedDate.getMinutes());
+    const seconds = pad(parsedDate.getSeconds());
 
     return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+};
+
+export const parseDateFromServer = (dateString: string): number => {
+    if (!dateString) return 0;
+    const parts = dateString.split(" ");
+    const dateParts = parts[0].split("/");
+    const timeParts = parts[1].split(":");
+
+    return new Date(
+        parseInt(dateParts[2]),
+        parseInt(dateParts[0]) - 1,
+        parseInt(dateParts[1]),
+        parseInt(timeParts[0]),
+        parseInt(timeParts[1]),
+        parseInt(timeParts[2])
+    ).getTime();
 };
 
 export const parseCustomDate = (dateAsString: string): number => {
@@ -188,7 +205,10 @@ export const parseCustomDate = (dateAsString: string): number => {
     return date.getTime();
 };
 
-export const validateDates = (start: string, due: string): { isValid: boolean; error?: string } => {
+export const validateDates = (
+    start: string | number,
+    due: string | number
+): { isValid: boolean; error?: string } => {
     if (new Date(start) > new Date(due)) {
         return { isValid: false, error: "Start Date must be before Due Date" };
     }
