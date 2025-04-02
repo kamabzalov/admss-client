@@ -131,15 +131,16 @@ export const formatDateForServer = (date: Date | number): string => {
     const parsedDate = new Date(date);
     const pad = (num: number) => num.toString().padStart(2, "0");
 
-    const day = pad(parsedDate.getDate());
-    const month = pad(parsedDate.getMonth() + 1);
-    const year = parsedDate.getFullYear();
+    const { month, day, year, hours, minutes, seconds } = {
+        month: parsedDate.getMonth() + 1,
+        day: parsedDate.getDate(),
+        year: parsedDate.getFullYear(),
+        hours: parsedDate.getHours(),
+        minutes: parsedDate.getMinutes(),
+        seconds: parsedDate.getSeconds(),
+    };
 
-    const hours = pad(parsedDate.getHours());
-    const minutes = pad(parsedDate.getMinutes());
-    const seconds = pad(parsedDate.getSeconds());
-
-    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+    return `${pad(month)}/${pad(day)}/${year} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
 export const parseDateFromServer = (dateString: string): number => {
