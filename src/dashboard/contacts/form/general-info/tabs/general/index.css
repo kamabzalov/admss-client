@@ -33,7 +33,10 @@
 
 .general-info-overwrite__icon.p-button {
     color: var(--admss-app-main-blue);
+    padding-top: 13px;
     border: none;
+    width: 30px;
+    font-size: 14px;
     background-color: transparent;
     &:enabled:hover {
         color: var(--admss-app-main-blue);

@@ -49,13 +49,17 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const [savedBusinessName, setSavedBusinessName] = useState<string>(contact.businessName || "");
     const prevTypeRef = useRef<number | null>(null);
 
+    const handleGetTypeList = async () => {
+        const response = await getContactsTypeList(id || "0");
+        if (response && Array.isArray(response)) {
+            setTypeList(response);
+        } else {
+            setTypeList([]);
+        }
+    };
+
     useEffect(() => {
-        getContactsTypeList(id || "0").then((response) => {
-            if (response) {
-                const types = response as ContactType[];
-                setTypeList(types);
-            }
-        });
+        handleGetTypeList();
     }, [id]);
 
     const handleScanDL = () => {
@@ -64,75 +68,74 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            store.isLoading = true;
+        if (!file) return;
+
+        store.isLoading = true;
+
+        try {
             const response = await scanContactDL(file);
-            if (response && response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
-            } else if (response) {
-                const { contact } = response as ScanBarcodeDL;
 
-                try {
-                    if (!contact) {
-                        throw new Error("Failed to parse driver license");
-                    }
-
-                    if (allowOverwrite) {
-                        changeContact("firstName", contact.firstName);
-                        changeContact("lastName", contact.lastName);
-                        changeContact("middleName", contact.middleName);
-                        changeContact("ZIP", contact.ZIP);
-                        changeContact("city", contact.city);
-                        changeContact("streetAddress", contact.streetAddress);
-                        changeContact("state", contact.state);
-                        changeContact("sex", contact.sex);
-                        changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
-
-                        const dobTimestamp = parseCustomDate(contact.dob);
-                        changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
-
-                        const expTimestamp = parseCustomDate(contact.exp);
-                        changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
-                    } else {
-                        !contact.firstName && changeContact("firstName", contact.firstName);
-                        !contact.lastName && changeContact("lastName", contact.lastName);
-                        !contact.middleName && changeContact("middleName", contact.middleName);
-                        !contact.ZIP && changeContact("ZIP", contact.ZIP);
-                        !contact.city && changeContact("city", contact.city);
-                        !contact.state && changeContact("state", contact.state);
-                        !contact.sex && changeContact("sex", contact.sex);
-                        !contact.streetAddress &&
-                            changeContact("streetAddress", contact.streetAddress);
-                        !contactExtData?.Buyer_Driver_License_Num &&
-                            changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
-
-                        const dobTimestamp = parseCustomDate(contact.dob);
-                        !contactExtData?.Buyer_Date_Of_Birth &&
-                            changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
-
-                        const expTimestamp = parseCustomDate(contact.exp);
-                        !contactExtData?.Buyer_DL_Exp_Date &&
-                            changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
-                    }
-                } catch (error) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Date Parsing Error",
-                        detail:
-                            error instanceof Error
-                                ? error.message
-                                : "Failed to parse date from driver license",
-                        life: TOAST_LIFETIME,
-                    });
-                } finally {
-                    store.isLoading = false;
-                }
+            if (!response) {
+                throw new Error("No response from server");
             }
+
+            if (response.status === Status.ERROR) {
+                throw new Error(response.error || "Failed to scan DL");
+            }
+
+            const { contact } = response as ScanBarcodeDL;
+            if (!contact) {
+                throw new Error("Failed to parse driver license data");
+            }
+
+            if (allowOverwrite) {
+                changeContact("firstName", contact.firstName);
+                changeContact("lastName", contact.lastName);
+                changeContact("middleName", contact.middleName);
+                changeContact("ZIP", contact.ZIP);
+                changeContact("city", contact.city);
+                changeContact("streetAddress", contact.streetAddress);
+                changeContact("state", contact.state);
+                changeContact("sex", contact.sex);
+                changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
+
+                const dobTimestamp = parseCustomDate(contact.dob);
+                changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
+
+                const expTimestamp = parseCustomDate(contact.exp);
+                changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
+            } else {
+                !contact.firstName && changeContact("firstName", contact.firstName);
+                !contact.lastName && changeContact("lastName", contact.lastName);
+                !contact.middleName && changeContact("middleName", contact.middleName);
+                !contact.ZIP && changeContact("ZIP", contact.ZIP);
+                !contact.city && changeContact("city", contact.city);
+                !contact.state && changeContact("state", contact.state);
+                !contact.sex && changeContact("sex", contact.sex);
+                !contact.streetAddress && changeContact("streetAddress", contact.streetAddress);
+                !contactExtData?.Buyer_Driver_License_Num &&
+                    changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
+
+                const dobTimestamp = parseCustomDate(contact.dob);
+                !contactExtData?.Buyer_Date_Of_Birth &&
+                    changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
+
+                const expTimestamp = parseCustomDate(contact.exp);
+                !contactExtData?.Buyer_DL_Exp_Date &&
+                    changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to parse date from driver license",
+                life: TOAST_LIFETIME,
+            });
+        } finally {
+            store.isLoading = false;
             event.target.value = "";
         }
     };
@@ -257,52 +260,48 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 </div>
             </div>
             {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
-                <>
-                    <div className='col-3'>
+                <div className='col-12 flex gap-4'>
+                    <Button
+                        type='button'
+                        label='Scan driver license'
+                        className='general-info__button'
+                        tooltip='Data received from the DL’s backside will fill in related fields'
+                        outlined
+                        onClick={handleScanDL}
+                    />
+                    <input
+                        type='file'
+                        accept='image/*'
+                        style={{ display: "none" }}
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                    />
+                    <div className='general-info-overwrite pb-3'>
+                        <Checkbox
+                            checked={allowOverwrite}
+                            inputId='general-info-overwrite'
+                            className='general-info-overwrite__checkbox'
+                            onChange={() => setAllowOverwrite(!allowOverwrite)}
+                        />
+                        <label
+                            htmlFor='general-info-overwrite'
+                            className='general-info-overwrite__label'
+                        >
+                            Overwrite data
+                        </label>
                         <Button
-                            type='button'
-                            label='Scan driver license'
-                            className='general-info__button'
-                            tooltip='Data received from the DL’s backside will fill in related fields'
+                            text
+                            tooltip='Data received from the DL’s backside will overwrite user-entered data'
+                            icon='icon adms-help'
                             outlined
-                            onClick={handleScanDL}
-                        />
-                        <input
-                            type='file'
-                            accept='image/*'
-                            style={{ display: "none" }}
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
+                            type='button'
+                            className='general-info-overwrite__icon'
+                            tooltipOptions={{
+                                className: "overwrite-tooltip",
+                            }}
                         />
                     </div>
-                    <div className='col-9'>
-                        <div className='general-info-overwrite pb-3'>
-                            <Checkbox
-                                checked={allowOverwrite}
-                                inputId='general-info-overwrite'
-                                className='general-info-overwrite__checkbox'
-                                onChange={() => setAllowOverwrite(!allowOverwrite)}
-                            />
-                            <label
-                                htmlFor='general-info-overwrite'
-                                className='general-info-overwrite__label'
-                            >
-                                Overwrite data
-                            </label>
-                            <Button
-                                text
-                                tooltip='Data received from the DL’s backside will overwrite user-entered data'
-                                icon='icon adms-help'
-                                outlined
-                                type='button'
-                                className='general-info-overwrite__icon'
-                                tooltipOptions={{
-                                    className: "overwrite-tooltip",
-                                }}
-                            />
-                        </div>
-                    </div>
-                </>
+                </div>
             ) : null}
             {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
