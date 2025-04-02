@@ -46,7 +46,7 @@ export const ContactsCoBuyerInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className={`${contactType !== BUYER_ID ? "hidden" : "col-12"}`}>
+        <div className={`${contactType !== BUYER_ID ? "hidden" : "col-12 p-0"}`}>
             <TabView
                 className='contact-form__tabs'
                 activeIndex={activeTab || 0}
