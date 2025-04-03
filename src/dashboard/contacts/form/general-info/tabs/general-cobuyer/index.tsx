@@ -37,60 +37,73 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
             const response = await scanContactDL(file);
 
             if (!response) {
-                throw new Error("No response from server");
+                await Promise.reject("No response from server");
+                return;
             }
 
             if (response.status === Status.ERROR) {
-                throw new Error(response.error || "Failed to scan DL");
+                await Promise.reject(response.error || "Failed to scan DL");
+                return;
             }
 
             const { contact } = response as ScanBarcodeDL;
             if (!contact) {
-                throw new Error("Failed to parse driver license data");
+                await Promise.reject("Failed to parse driver license data");
+                return;
             }
 
-            if (allowOverwrite) {
-                changeContactExtData("CoBuyer_First_Name", contact.firstName);
-                changeContactExtData("CoBuyer_Last_Name", contact.lastName);
-                changeContactExtData("CoBuyer_Middle_Name", contact.middleName);
-                changeContactExtData("CoBuyer_Emp_Zip", contact.ZIP);
-                changeContactExtData("CoBuyer_Emp_City", contact.city);
-                changeContactExtData("CoBuyer_Emp_Address", contact.streetAddress);
-                changeContactExtData("CoBuyer_Emp_State", contact.state);
-                changeContactExtData("CoBuyer_Sex", contact.sex);
-                changeContactExtData("CoBuyer_Driver_License_Num", contact.dl_number);
+            const {
+                firstName,
+                lastName,
+                middleName,
+                ZIP,
+                city,
+                streetAddress,
+                state,
+                sex,
+                dl_number,
+                dob,
+                exp,
+            } = contact;
 
-                const dobTimestamp = parseCustomDate(contact.dob);
+            if (allowOverwrite) {
+                changeContactExtData([
+                    ["CoBuyer_First_Name", firstName],
+                    ["CoBuyer_Last_Name", lastName],
+                    ["CoBuyer_Middle_Name", middleName],
+                    ["CoBuyer_Emp_Zip", ZIP],
+                    ["CoBuyer_Emp_City", city],
+                    ["CoBuyer_Emp_Address", streetAddress],
+                    ["CoBuyer_Emp_State", state],
+                    ["CoBuyer_Sex", sex],
+                    ["CoBuyer_Driver_License_Num", dl_number],
+                ]);
+
+                const dobTimestamp = parseCustomDate(dob);
                 changeContactExtData("CoBuyer_Date_Of_Birth", dobTimestamp);
 
-                const expTimestamp = parseCustomDate(contact.exp);
+                const expTimestamp = parseCustomDate(exp);
                 changeContactExtData("CoBuyer_DL_Exp_Date", expTimestamp);
             } else {
-                !contactExtData?.CoBuyer_First_Name &&
-                    changeContactExtData("CoBuyer_First_Name", contact.firstName);
-                !contactExtData?.CoBuyer_Last_Name &&
-                    changeContactExtData("CoBuyer_Last_Name", contact.lastName);
-                !contactExtData?.CoBuyer_Middle_Name &&
-                    changeContactExtData("CoBuyer_Middle_Name", contact.middleName);
-                !contactExtData?.CoBuyer_Emp_Zip &&
-                    changeContactExtData("CoBuyer_Emp_Zip", contact.ZIP);
-                !contactExtData?.CoBuyer_Emp_City &&
-                    changeContactExtData("CoBuyer_Emp_City", contact.city);
-                !contactExtData?.CoBuyer_Emp_Address &&
-                    changeContactExtData("CoBuyer_Emp_Address", contact.streetAddress);
-                !contactExtData?.CoBuyer_Emp_State &&
-                    changeContactExtData("CoBuyer_Emp_State", contact.state);
-                !contactExtData?.CoBuyer_Sex && changeContactExtData("CoBuyer_Sex", contact.sex);
-                !contactExtData?.CoBuyer_Driver_License_Num &&
-                    changeContactExtData("CoBuyer_Driver_License_Num", contact.dl_number);
+                const fieldsToUpdate = {
+                    CoBuyer_First_Name: firstName,
+                    CoBuyer_Last_Name: lastName,
+                    CoBuyer_Middle_Name: middleName,
+                    CoBuyer_Emp_Zip: ZIP,
+                    CoBuyer_Emp_City: city,
+                    CoBuyer_Emp_Address: streetAddress,
+                    CoBuyer_Emp_State: state,
+                    CoBuyer_Sex: sex,
+                    CoBuyer_Driver_License_Num: dl_number,
+                    CoBuyer_Date_Of_Birth: parseCustomDate(dob),
+                    CoBuyer_DL_Exp_Date: parseCustomDate(exp),
+                };
 
-                const dobTimestamp = parseCustomDate(contact.dob);
-                !contactExtData?.CoBuyer_Date_Of_Birth &&
-                    changeContactExtData("CoBuyer_Date_Of_Birth", dobTimestamp);
+                const updates = (
+                    Object.entries(fieldsToUpdate) as [keyof ContactExtData, string | number][]
+                ).filter(([key]) => !contactExtData?.[key]);
 
-                const expTimestamp = parseCustomDate(contact.exp);
-                !contactExtData?.CoBuyer_DL_Exp_Date &&
-                    changeContactExtData("CoBuyer_DL_Exp_Date", expTimestamp);
+                !!updates.length && changeContactExtData(updates);
             }
         } catch (error) {
             toast.current?.show({
