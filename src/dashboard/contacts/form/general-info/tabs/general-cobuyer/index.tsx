@@ -1,22 +1,22 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useMemo, useRef, useState } from "react";
+import { ReactElement, useRef, useState } from "react";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { ContactExtData, ContactOFAC } from "common/models/contact";
+import { ContactExtData, ContactOFAC, ScanBarcodeDL } from "common/models/contact";
 import { checkContactOFAC, scanContactDL } from "http/services/contacts-service";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { BUYER_ID } from "dashboard/contacts/form/general-info";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
+import { parseCustomDate } from "common/helpers";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contact, contactExtData, contactFullInfo, changeContactExtData } = store;
+    const { contactExtData, contactFullInfo, changeContactExtData } = store;
 
     const { errors, setFieldValue, validateField } = useFormikContext<ContactExtData>();
     const toast = useToast();
@@ -27,24 +27,99 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            scanContactDL(file).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response.error,
-                        life: TOAST_LIFETIME,
-                    });
-                }
+        if (!file) return;
+
+        store.isLoading = true;
+
+        try {
+            const response = await scanContactDL(file);
+
+            if (!response) {
+                await Promise.reject("No response from server");
+                return;
+            }
+
+            if (response.status === Status.ERROR) {
+                await Promise.reject(response.error || "Failed to scan DL");
+                return;
+            }
+
+            const { contact } = response as ScanBarcodeDL;
+            if (!contact) {
+                await Promise.reject("Failed to parse driver license data");
+                return;
+            }
+
+            const {
+                firstName,
+                lastName,
+                middleName,
+                ZIP,
+                city,
+                streetAddress,
+                state,
+                sex,
+                dl_number,
+                dob,
+                exp,
+            } = contact;
+
+            if (allowOverwrite) {
+                changeContactExtData([
+                    ["CoBuyer_First_Name", firstName],
+                    ["CoBuyer_Last_Name", lastName],
+                    ["CoBuyer_Middle_Name", middleName],
+                    ["CoBuyer_Emp_Zip", ZIP],
+                    ["CoBuyer_Emp_City", city],
+                    ["CoBuyer_Emp_Address", streetAddress],
+                    ["CoBuyer_Emp_State", state],
+                    ["CoBuyer_Sex", sex],
+                    ["CoBuyer_Driver_License_Num", dl_number],
+                ]);
+
+                const dobTimestamp = parseCustomDate(dob);
+                changeContactExtData("CoBuyer_Date_Of_Birth", dobTimestamp);
+
+                const expTimestamp = parseCustomDate(exp);
+                changeContactExtData("CoBuyer_DL_Exp_Date", expTimestamp);
+            } else {
+                const fieldsToUpdate = {
+                    CoBuyer_First_Name: firstName,
+                    CoBuyer_Last_Name: lastName,
+                    CoBuyer_Middle_Name: middleName,
+                    CoBuyer_Emp_Zip: ZIP,
+                    CoBuyer_Emp_City: city,
+                    CoBuyer_Emp_Address: streetAddress,
+                    CoBuyer_Emp_State: state,
+                    CoBuyer_Sex: sex,
+                    CoBuyer_Driver_License_Num: dl_number,
+                    CoBuyer_Date_Of_Birth: parseCustomDate(dob),
+                    CoBuyer_DL_Exp_Date: parseCustomDate(exp),
+                };
+
+                const updates = (
+                    Object.entries(fieldsToUpdate) as [keyof ContactExtData, string | number][]
+                ).filter(([key]) => !contactExtData?.[key]);
+
+                !!updates.length && changeContactExtData(updates);
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to parse date from driver license",
+                life: TOAST_LIFETIME,
             });
+        } finally {
+            store.isLoading = false;
             event.target.value = "";
         }
     };
-
-    const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
 
     const handleOfacCheck = () => {
         if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
@@ -66,13 +141,12 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     return (
         <div className='grid general-info row-gap-2'>
-            <div className='col-3'>
+            <div className='col-12 flex gap-4'>
                 <Button
                     type='button'
                     label='Scan driver license'
                     className='general-info__button'
                     tooltip='Data received from the DL’s backside will fill in related fields'
-                    disabled={isControlDisabled}
                     outlined
                     onClick={handleScanDL}
                 />
@@ -83,8 +157,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     ref={fileInputRef}
                     onChange={handleFileChange}
                 />
-            </div>
-            <div className='col-9'>
                 <div className='general-info-overwrite pb-3'>
                     <Checkbox
                         checked={allowOverwrite}
