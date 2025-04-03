@@ -127,221 +127,229 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
     return (
         <div className='col-12 report-controls'>
-            <div className='report-controls__top'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        className='report-controls__dropdown'
-                        options={availableDatasets}
-                        value={dataSet}
-                        emptyMessage='-'
-                        disabled={!!report.isdefault}
-                        onChange={(e) => setDataSet(e.value)}
-                        pt={{
-                            wrapper: {
-                                className: "capitalize",
-                            },
-                        }}
+            <div className='report-controls__main'>
+                <div className='report-control__available'>
+                    <div className='report-control'>
+                        {ControlButton(
+                            MOVE_DIRECTION.UP,
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.UP,
+                                    availableValues,
+                                    setAvailableValues
+                                ),
+                            MOVE_DIRECTION.UP,
+                            availableValues.findIndex((i) => i === currentItem) === 0 ||
+                                !currentItem
+                        )}
+                        {ControlButton(
+                            "double-up",
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.TOP,
+                                    availableValues,
+                                    setAvailableValues
+                                ),
+                            MOVE_DIRECTION.TOP,
+                            availableValues.findIndex((i) => i === currentItem) === 0 ||
+                                !currentItem
+                        )}
+                        {ControlButton(
+                            MOVE_DIRECTION.DOWN,
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.DOWN,
+                                    availableValues,
+                                    setAvailableValues
+                                ),
+                            MOVE_DIRECTION.DOWN,
+                            availableValues.findIndex((i) => i === currentItem) ===
+                                availableValues.length - 1 || !currentItem
+                        )}
+                        {ControlButton(
+                            "double-down",
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.BOTTOM,
+                                    availableValues,
+                                    setAvailableValues
+                                ),
+                            MOVE_DIRECTION.BOTTOM,
+                            availableValues.findIndex((i) => i === currentItem) ===
+                                availableValues.length - 1 || !currentItem
+                        )}
+                    </div>
+                    <div className='report-control__content'>
+                        <span className='p-float-label'>
+                            <Dropdown
+                                className='report-controls__dropdown'
+                                options={availableDatasets}
+                                value={dataSet}
+                                emptyMessage='-'
+                                disabled={!!report.isdefault}
+                                onChange={(e) => setDataSet(e.value)}
+                                pt={{
+                                    wrapper: {
+                                        className: "capitalize",
+                                    },
+                                }}
+                            />
+                            <label className='float-label'>Data Set</label>
+                        </span>
+                        <ReportSelect
+                            header='Available'
+                            values={availableValues}
+                            currentItem={currentItem}
+                            onItemClick={(item) => setCurrentItem(item)}
+                            onItemDoubleClick={(item) =>
+                                moveItem(
+                                    item,
+                                    availableValues,
+                                    selectedValues,
+                                    setAvailableValues,
+                                    setSelectedValues
+                                )
+                            }
+                            containerRef={availableRef}
+                        />
+                    </div>
+                </div>
+                <div className='report-control'>
+                    {ControlButton(
+                        MOVE_DIRECTION.RIGHT,
+                        () =>
+                            currentItem &&
+                            moveItem(
+                                currentItem,
+                                availableValues,
+                                selectedValues,
+                                setAvailableValues,
+                                setSelectedValues
+                            ),
+                        "Move Right",
+                        !!selectedValues.includes(currentItem!) || !currentItem
+                    )}
+                    {ControlButton(
+                        "double-right",
+                        () =>
+                            moveAllItems(
+                                availableValues,
+                                selectedValues,
+                                setAvailableValues,
+                                setSelectedValues
+                            ),
+                        "Move All",
+                        !availableValues.length
+                    )}
+                    {ControlButton(
+                        MOVE_DIRECTION.LEFT,
+                        () =>
+                            currentItem &&
+                            moveItem(
+                                currentItem,
+                                selectedValues,
+                                availableValues,
+                                setSelectedValues,
+                                setAvailableValues
+                            ),
+                        "Move Left",
+                        !!availableValues.includes(currentItem!) || !currentItem
+                    )}
+                    {ControlButton(
+                        "double-left",
+                        () =>
+                            moveAllItems(
+                                selectedValues,
+                                availableValues,
+                                setSelectedValues,
+                                setAvailableValues
+                            ),
+                        "Move All",
+                        !selectedValues.length
+                    )}
+                </div>
+                <div className='report-control__selected'>
+                    <ReportSelect
+                        header='Selected'
+                        values={selectedValues}
+                        currentItem={currentItem}
+                        onItemClick={(item) => setCurrentItem(item)}
+                        onItemDoubleClick={(item) =>
+                            moveItem(
+                                item,
+                                selectedValues,
+                                availableValues,
+                                setSelectedValues,
+                                setAvailableValues
+                            )
+                        }
+                        containerRef={selectedRef}
                     />
-                    <label className='float-label'>Data Set</label>
-                </span>
-            </div>
-            <div className='report-control'>
-                {ControlButton(
-                    MOVE_DIRECTION.UP,
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
+                    <div className='report-control'>
+                        {ControlButton(
                             MOVE_DIRECTION.UP,
-                            availableValues,
-                            setAvailableValues
-                        ),
-                    MOVE_DIRECTION.UP,
-                    availableValues.findIndex((i) => i === currentItem) === 0 || !currentItem
-                )}
-                {ControlButton(
-                    "double-up",
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
-                            MOVE_DIRECTION.TOP,
-                            availableValues,
-                            setAvailableValues
-                        ),
-                    MOVE_DIRECTION.TOP,
-                    availableValues.findIndex((i) => i === currentItem) === 0 || !currentItem
-                )}
-                {ControlButton(
-                    MOVE_DIRECTION.DOWN,
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
-                            MOVE_DIRECTION.DOWN,
-                            availableValues,
-                            setAvailableValues
-                        ),
-                    MOVE_DIRECTION.DOWN,
-                    availableValues.findIndex((i) => i === currentItem) ===
-                        availableValues.length - 1 || !currentItem
-                )}
-                {ControlButton(
-                    "double-down",
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
-                            MOVE_DIRECTION.BOTTOM,
-                            availableValues,
-                            setAvailableValues
-                        ),
-                    MOVE_DIRECTION.BOTTOM,
-                    availableValues.findIndex((i) => i === currentItem) ===
-                        availableValues.length - 1 || !currentItem
-                )}
-            </div>
-            <ReportSelect
-                header='Available'
-                values={availableValues}
-                currentItem={currentItem}
-                onItemClick={(item) => setCurrentItem(item)}
-                onItemDoubleClick={(item) =>
-                    moveItem(
-                        item,
-                        availableValues,
-                        selectedValues,
-                        setAvailableValues,
-                        setSelectedValues
-                    )
-                }
-                containerRef={availableRef}
-            />
-            <div className='report-control'>
-                {ControlButton(
-                    MOVE_DIRECTION.RIGHT,
-                    () =>
-                        currentItem &&
-                        moveItem(
-                            currentItem,
-                            availableValues,
-                            selectedValues,
-                            setAvailableValues,
-                            setSelectedValues
-                        ),
-                    "Move Right",
-                    !!selectedValues.includes(currentItem!) || !currentItem
-                )}
-                {ControlButton(
-                    "double-right",
-                    () =>
-                        moveAllItems(
-                            availableValues,
-                            selectedValues,
-                            setAvailableValues,
-                            setSelectedValues
-                        ),
-                    "Move All",
-                    !availableValues.length
-                )}
-                {ControlButton(
-                    MOVE_DIRECTION.LEFT,
-                    () =>
-                        currentItem &&
-                        moveItem(
-                            currentItem,
-                            selectedValues,
-                            availableValues,
-                            setSelectedValues,
-                            setAvailableValues
-                        ),
-                    "Move Left",
-                    !!availableValues.includes(currentItem!) || !currentItem
-                )}
-                {ControlButton(
-                    "double-left",
-                    () =>
-                        moveAllItems(
-                            selectedValues,
-                            availableValues,
-                            setSelectedValues,
-                            setAvailableValues
-                        ),
-                    "Move All",
-                    !selectedValues.length
-                )}
-            </div>
-            <ReportSelect
-                header='Selected'
-                values={selectedValues}
-                currentItem={currentItem}
-                onItemClick={(item) => setCurrentItem(item)}
-                onItemDoubleClick={(item) =>
-                    moveItem(
-                        item,
-                        selectedValues,
-                        availableValues,
-                        setSelectedValues,
-                        setAvailableValues
-                    )
-                }
-                containerRef={selectedRef}
-            />
-            <div className='report-control'>
-                {ControlButton(
-                    MOVE_DIRECTION.UP,
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.UP,
+                                    selectedValues,
+                                    setSelectedValues
+                                ),
                             MOVE_DIRECTION.UP,
-                            selectedValues,
-                            setSelectedValues
-                        ),
-                    MOVE_DIRECTION.UP,
-                    selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
-                )}
-                {ControlButton(
-                    "double-up",
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
+                            selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
+                        )}
+                        {ControlButton(
+                            "double-up",
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.TOP,
+                                    selectedValues,
+                                    setSelectedValues
+                                ),
                             MOVE_DIRECTION.TOP,
-                            selectedValues,
-                            setSelectedValues
-                        ),
-                    MOVE_DIRECTION.TOP,
-                    selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
-                )}
-                {ControlButton(
-                    MOVE_DIRECTION.DOWN,
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
+                            selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
+                        )}
+                        {ControlButton(
                             MOVE_DIRECTION.DOWN,
-                            selectedValues,
-                            setSelectedValues
-                        ),
-                    MOVE_DIRECTION.DOWN,
-                    selectedValues.findIndex((i) => i === currentItem) ===
-                        selectedValues.length - 1 || !currentItem
-                )}
-                {ControlButton(
-                    "double-down",
-                    () =>
-                        currentItem &&
-                        changeOrder(
-                            currentItem,
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.DOWN,
+                                    selectedValues,
+                                    setSelectedValues
+                                ),
+                            MOVE_DIRECTION.DOWN,
+                            selectedValues.findIndex((i) => i === currentItem) ===
+                                selectedValues.length - 1 || !currentItem
+                        )}
+                        {ControlButton(
+                            "double-down",
+                            () =>
+                                currentItem &&
+                                changeOrder(
+                                    currentItem,
+                                    MOVE_DIRECTION.BOTTOM,
+                                    selectedValues,
+                                    setSelectedValues
+                                ),
                             MOVE_DIRECTION.BOTTOM,
-                            selectedValues,
-                            setSelectedValues
-                        ),
-                    MOVE_DIRECTION.BOTTOM,
-                    selectedValues.findIndex((i) => i === currentItem) ===
-                        selectedValues.length - 1 || !currentItem
-                )}
+                            selectedValues.findIndex((i) => i === currentItem) ===
+                                selectedValues.length - 1 || !currentItem
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
