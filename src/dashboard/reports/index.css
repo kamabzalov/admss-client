@@ -292,6 +292,30 @@
 }
 
 .report-parameters-dialog {
+    width: 477px;
+    .p-dialog-content-body {
+        padding-top: 14px;
+        gap: 20px;
+        position: relative;
+
+        .p-error {
+            bottom: -18px;
+            margin: 0;
+            padding: 0;
+            display: inline-flex;
+            width: 100%;
+            justify-content: center;
+            left: 0;
+        }
+    }
+
+    .p-dialog-footer {
+        height: 150px;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+    }
     .p-dialog-footer button.p-button {
         display: inline-flex;
         padding: 0;

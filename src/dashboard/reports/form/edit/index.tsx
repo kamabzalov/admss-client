@@ -15,6 +15,7 @@ import { selectedItemTemplate } from "dashboard/reports/common/panel-content";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { DateInput } from "dashboard/common/form/inputs";
 import { DIALOG_ACTION, reportDownloadForm } from "dashboard/reports/common/report-parameters";
+import { validateDates } from "common/helpers";
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -34,6 +35,7 @@ export const ReportEditForm = observer((): ReactElement => {
     const [dialogAction, setDialogAction] = useState<DIALOG_ACTION>(DIALOG_ACTION.PREVIEW);
     const [startDate, setStartDate] = useState<string | number>("");
     const [endDate, setEndDate] = useState<string | number>("");
+    const [dateError, setDateError] = useState<string>("");
 
     useEffect(() => {
         id &&
@@ -54,11 +56,21 @@ export const ReportEditForm = observer((): ReactElement => {
         };
     }, [id]);
 
+    useEffect(() => {
+        if (startDate && endDate) {
+            const validation = validateDates(Number(startDate), Number(endDate));
+            setDateError(validation.isValid ? "" : validation.error || "");
+        } else {
+            setDateError("");
+        }
+    }, [startDate, endDate]);
+
     const handleActionClick = async (action: DIALOG_ACTION) => {
         if (report.AskForStartAndEndDates) {
             setDialogAction(action);
             setIsDialogVisible(true);
         } else {
+            if (!!dateError) return;
             const response = await reportDownloadForm({
                 action,
                 columns: reportColumns,
@@ -230,6 +242,7 @@ export const ReportEditForm = observer((): ReactElement => {
             {}
             <DashboardDialog
                 visible={isDialogVisible}
+                position='top'
                 onHide={() => setIsDialogVisible(false)}
                 action={() =>
                     reportDownloadForm({
@@ -242,23 +255,26 @@ export const ReportEditForm = observer((): ReactElement => {
                 }
                 header='Parameters'
                 className='report-parameters-dialog'
-                buttonDisabled={!startDate || !endDate || !report.AskForStartAndEndDates}
+                buttonDisabled={
+                    !startDate || !endDate || !!dateError || !report.AskForStartAndEndDates
+                }
                 footer='Send'
             >
                 <DateInput
                     name='Start Date'
-                    colWidth={12}
                     date={startDate}
+                    className={`${dateError ? "p-invalid" : ""} w-full`}
                     emptyDate
                     onChange={({ value }) => setStartDate(Number(value))}
                 />
                 <DateInput
                     name='End Date'
-                    colWidth={12}
                     date={endDate}
+                    className={`${dateError ? "p-invalid" : ""} w-full`}
                     emptyDate
                     onChange={({ value }) => setEndDate(Number(value))}
                 />
+                {dateError && <small className='p-error'>{dateError}</small>}
             </DashboardDialog>
         </div>
     );
