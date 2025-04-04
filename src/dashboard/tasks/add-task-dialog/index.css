@@ -1,6 +1,10 @@
 .dialog__add-task {
     width: 660px;
-    height: 882px;
+    height: 872px;
+
+    .p-dialog-header {
+        padding-bottom: 8px;
+    }
 
     .p-dialog-content-body {
         padding-top: 20px;
@@ -22,13 +26,18 @@
     }
 
     .p-dialog-footer {
-        margin-top: 10px;
+        display: flex;
+        height: 139px;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
     }
 
     .p-dialog-footer .p-button {
         display: inline-flex;
         width: 220px;
         height: 59px;
+        margin-bottom: 10px;
     }
 }
 
