@@ -208,14 +208,22 @@ export class ContactStore {
 
     public changeContact = action(
         (
-            key: keyof Omit<Contact, "extdata">,
-            value: string | number | string[],
+            keyOrEntries:
+                | keyof Omit<Contact, "extdata">
+                | [keyof Omit<Contact, "extdata">, string | number][],
+            value?: string | number,
             isContactChanged: boolean = true
         ) => {
             if (isContactChanged) {
                 this._isContactChanged = true;
             }
-            this._contact[key] = value as never;
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._contact[key] = val as never;
+                });
+            } else {
+                this._contact[keyOrEntries] = value as never;
+            }
         }
     );
 
