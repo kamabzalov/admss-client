@@ -4,7 +4,13 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactOFAC, ContactType, ScanBarcodeDL } from "common/models/contact";
+import {
+    Contact,
+    ContactExtData,
+    ContactOFAC,
+    ContactType,
+    ScanBarcodeDL,
+} from "common/models/contact";
 import {
     checkContactOFAC,
     getContactsTypeList,
@@ -25,6 +31,11 @@ const enum TOOLTIP_MESSAGE {
     BUSINESS = "You can input either a person or a business name. If you entered a personal data but intended to enter business name, clear the personal data fields, and the field for entering business name will become active.",
     ONLY_BUSINESS = "The type of contact you have selected requires entering only the business name",
 }
+
+type ContactUpdate = Pick<
+    Contact,
+    "firstName" | "lastName" | "middleName" | "ZIP" | "city" | "streetAddress" | "state"
+>;
 
 export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -76,53 +87,87 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             const response = await scanContactDL(file);
 
             if (!response) {
-                throw new Error("No response from server");
+                await Promise.reject("No response from server");
+                return;
             }
 
             if (response.status === Status.ERROR) {
-                throw new Error(response.error || "Failed to scan DL");
+                await Promise.reject(response.error || "Failed to scan DL");
+                return;
             }
 
-            const { contact } = response as ScanBarcodeDL;
-            if (!contact) {
-                throw new Error("Failed to parse driver license data");
+            const { contact: scannedContact } = response as ScanBarcodeDL;
+
+            if (!scannedContact) {
+                await Promise.reject("Failed to parse driver license data");
+                return;
             }
+
+            const {
+                firstName,
+                lastName,
+                middleName,
+                ZIP,
+                city,
+                streetAddress,
+                state,
+                sex,
+                dl_number,
+                dob,
+                exp,
+            } = scannedContact;
 
             if (allowOverwrite) {
-                changeContact("firstName", contact.firstName);
-                changeContact("lastName", contact.lastName);
-                changeContact("middleName", contact.middleName);
-                changeContact("ZIP", contact.ZIP);
-                changeContact("city", contact.city);
-                changeContact("streetAddress", contact.streetAddress);
-                changeContact("state", contact.state);
-                changeContact("sex", contact.sex);
-                changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
+                changeContact([
+                    ["firstName", firstName],
+                    ["lastName", lastName],
+                    ["middleName", middleName],
+                    ["ZIP", ZIP],
+                    ["city", city],
+                    ["streetAddress", streetAddress],
+                    ["state", state],
+                    ["sex", sex],
+                ]);
 
-                const dobTimestamp = parseCustomDate(contact.dob);
-                changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
+                const [dobTimestamp, expTimestamp] = [parseCustomDate(dob), parseCustomDate(exp)];
 
-                const expTimestamp = parseCustomDate(contact.exp);
-                changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
+                changeContactExtData([
+                    ["Buyer_Driver_License_Num", dl_number],
+                    ["Buyer_Date_Of_Birth", dobTimestamp],
+                    ["Buyer_DL_Exp_Date", expTimestamp],
+                ]);
             } else {
-                !contact.firstName && changeContact("firstName", contact.firstName);
-                !contact.lastName && changeContact("lastName", contact.lastName);
-                !contact.middleName && changeContact("middleName", contact.middleName);
-                !contact.ZIP && changeContact("ZIP", contact.ZIP);
-                !contact.city && changeContact("city", contact.city);
-                !contact.state && changeContact("state", contact.state);
-                !contact.sex && changeContact("sex", contact.sex);
-                !contact.streetAddress && changeContact("streetAddress", contact.streetAddress);
-                !contactExtData?.Buyer_Driver_License_Num &&
-                    changeContactExtData("Buyer_Driver_License_Num", contact.dl_number);
+                const fieldsToUpdate = {
+                    firstName,
+                    lastName,
+                    middleName,
+                    ZIP,
+                    city,
+                    streetAddress,
+                    state,
+                    sex,
+                    dl_number,
+                };
 
-                const dobTimestamp = parseCustomDate(contact.dob);
-                !contactExtData?.Buyer_Date_Of_Birth &&
-                    changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
+                const updates = (
+                    Object.entries(fieldsToUpdate) as [keyof ContactUpdate, string | number][]
+                ).filter(([key]) => !contact[key]);
 
-                const expTimestamp = parseCustomDate(contact.exp);
-                !contactExtData?.Buyer_DL_Exp_Date &&
-                    changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
+                const extDataFieldsToUpdate = {
+                    Buyer_Driver_License_Num: dl_number,
+                    Buyer_Date_Of_Birth: parseCustomDate(dob),
+                    Buyer_DL_Exp_Date: parseCustomDate(exp),
+                };
+
+                const extDataUpdates = (
+                    Object.entries(extDataFieldsToUpdate) as [
+                        keyof ContactExtData,
+                        string | number,
+                    ][]
+                ).filter(([key]) => !contactExtData?.[key]);
+
+                !!updates.length && changeContact(updates);
+                !!extDataUpdates.length && changeContactExtData(extDataUpdates);
             }
         } catch (error) {
             toast.current?.show({
