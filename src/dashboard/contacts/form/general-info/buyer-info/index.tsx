@@ -46,7 +46,7 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className='col-12'>
+        <div className='col-12 p-0'>
             <TabView
                 className='contact-form__tabs'
                 activeIndex={activeTab || 0}

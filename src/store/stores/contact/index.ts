@@ -1,4 +1,4 @@
-import { getInventoryMediaItem } from "./../../../http/services/media.service";
+import { getInventoryMediaItem } from "http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
@@ -138,7 +138,8 @@ export class ContactStore {
         try {
             const response = await getContactInfo(itemuid);
             if (response && response.status === Status.ERROR) {
-                throw response.error;
+                await Promise.reject(response?.error);
+                return;
             } else {
                 const { extdata, ...contact } = response as Contact;
 
@@ -163,7 +164,10 @@ export class ContactStore {
         if (!this._contact.cobuyeruid) return;
         try {
             const response = await getContactInfo(this._contact.cobuyeruid);
-            if (response?.status === Status.ERROR) throw response.error;
+            if (response?.status === Status.ERROR) {
+                await Promise.reject(response?.error);
+                return;
+            }
             this._coBayerContact = response as Contact;
         } catch (error) {
             return { status: Status.ERROR, error };
@@ -204,14 +208,22 @@ export class ContactStore {
 
     public changeContact = action(
         (
-            key: keyof Omit<Contact, "extdata">,
-            value: string | number | string[],
+            keyOrEntries:
+                | keyof Omit<Contact, "extdata">
+                | [keyof Omit<Contact, "extdata">, string | number][],
+            value?: string | number,
             isContactChanged: boolean = true
         ) => {
             if (isContactChanged) {
                 this._isContactChanged = true;
             }
-            this._contact[key] = value as never;
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._contact[key] = val as never;
+                });
+            } else {
+                this._contact[keyOrEntries] = value as never;
+            }
         }
     );
 
@@ -221,10 +233,22 @@ export class ContactStore {
         }
     );
 
-    public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
-        this._isContactChanged = true;
-        this._contactExtData[key] = value as never;
-    });
+    public changeContactExtData = action(
+        (
+            keyOrEntries: keyof ContactExtData | [keyof ContactExtData, string | number][],
+            value?: string | number
+        ) => {
+            this._isContactChanged = true;
+
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._contactExtData[key] = val as never;
+                });
+            } else {
+                this._contactExtData[keyOrEntries] = value as never;
+            }
+        }
+    );
 
     public saveContact = action(async (): Promise<BaseResponseError> => {
         try {
@@ -257,7 +281,8 @@ export class ContactStore {
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
-                throw contactDataResponse;
+                await Promise.reject(contactDataResponse?.error);
+                return contactDataResponse;
             }
 
             if (this._contact.cobuyeruid) {
@@ -274,7 +299,8 @@ export class ContactStore {
                 ]);
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
-                    throw coBuyerContactDataResponse;
+                    await Promise.reject(coBuyerContactDataResponse?.error);
+                    return coBuyerContactDataResponse;
                 }
             }
 

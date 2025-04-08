@@ -16,14 +16,28 @@
     align-items: center;
     padding-left: 30px;
 
+    &:has(.row-edit__input) {
+        padding-left: 20px;
+    }
+
     .row-edit__input {
-        flex: 0 1 790px;
+        flex: 0 1 78%;
+        max-width: 790px;
     }
     .row-edit__button.p-button {
         height: 50px;
     }
     &:last-child {
         border-bottom: none;
+    }
+
+    .description-text {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        padding-right: 40px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 

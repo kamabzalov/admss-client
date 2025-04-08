@@ -1,30 +1,73 @@
-import { Status } from "common/models/base-response";
-import { ReportDocument } from "common/models/reports";
+import { formatDateForServer } from "common/helpers";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { ReportDocument, ReportSetParams } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { setReportDocumentTemplate } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
-import { useStore } from "store/hooks";
 
 interface ReportParametersProps {
     report: ReportDocument;
     handleClosePanel?: () => void;
 }
 
-const todayDate = new Date().toISOString().split("T")[0];
+export enum DIALOG_ACTION {
+    PREVIEW = "preview",
+    DOWNLOAD = "download",
+}
+
+interface reportDownloadFormParams extends Partial<Omit<ReportSetParams, "from_date" | "to_date">> {
+    action: DIALOG_ACTION;
+    from_date?: string | number;
+    to_date?: string | number;
+}
+
+export const reportDownloadForm = async (
+    params: reportDownloadFormParams,
+    withDate: boolean = false
+): Promise<BaseResponseError | undefined> => {
+    const payload: ReportSetParams = {
+        itemUID: params.itemUID || "0",
+        timestamp_s: formatDateForServer(new Date()),
+        columns: params.columns,
+    };
+
+    if (!!params.AskForStartAndEndDates || withDate) {
+        payload.from_date = params.from_date ? formatDateForServer(new Date(params.from_date)) : "";
+        payload.to_date = params.to_date ? formatDateForServer(new Date(params.to_date)) : "";
+    }
+
+    const response = await setReportDocumentTemplate(params.itemUID || "0", payload);
+
+    if (!response || response.status === Status.ERROR) {
+        return response;
+    }
+
+    const url = new Blob([response], { type: "application/pdf" });
+    let link = document.createElement("a");
+    link.href = window.URL.createObjectURL(url);
+    if (params.action === DIALOG_ACTION.DOWNLOAD) {
+        link.download = `report_form_${params.name}.pdf`;
+        link.click();
+    } else {
+        window.open(
+            link.href,
+            "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+        );
+    }
+};
 
 export const ReportParameters = ({
     report,
     handleClosePanel,
 }: ReportParametersProps): ReactElement => {
-    const userStore = useStore().userStore;
     const toast = useToast();
-    const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-    const [startDate, setStartDate] = useState<string>(todayDate);
-    const [endDate, setEndDate] = useState<string>(todayDate);
+    const [startDate, setStartDate] = useState<string | number>("");
+    const [endDate, setEndDate] = useState<string | number>("");
 
     useEffect(() => {
         if (!startDate || !endDate) {
@@ -39,42 +82,22 @@ export const ReportParameters = ({
     };
 
     const handleDownloadForm = async (download: boolean = false) => {
-        const errorMessage = "Error while download report";
-        if (authUser && authUser.useruid) {
-            const response = await setReportDocumentTemplate(report.documentUID || "0", {
-                itemUID: report.documentUID || "0",
-                timestamp: Date.now(),
-                from_date: new Date(startDate).getTime(),
-                to_date: new Date(endDate).getTime(),
-            }).then((response) => {
-                if (response && response.status === Status.ERROR) {
-                    const { error } = response;
-                    return toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: error || errorMessage,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    return response;
-                }
+        const response = await reportDownloadForm(
+            {
+                action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
+                from_date: startDate,
+                to_date: endDate,
+                ...report,
+            },
+            true
+        );
+        if (response && response.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error || "Error while downloading report",
+                life: TOAST_LIFETIME,
             });
-            if (!response) {
-                return;
-            }
-            const url = new Blob([response], { type: "application/pdf" });
-            let link = document.createElement("a");
-            link.href = window.URL.createObjectURL(url);
-            if (download) {
-                link.download = `report_form_${report.documentUID || report.name}.pdf`;
-                link.click();
-            } else {
-                window.open(
-                    link.href,
-                    "_blank",
-                    "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                );
-            }
         }
     };
 
@@ -92,14 +115,16 @@ export const ReportParameters = ({
                 <DateInput
                     name='Start Date'
                     colWidth={3}
-                    value={startDate}
-                    onChange={({ value }) => setStartDate(String(value))}
+                    date={startDate}
+                    emptyDate
+                    onChange={({ value }) => setStartDate(Number(value))}
                 />
                 <DateInput
                     name='End Date'
                     colWidth={3}
-                    value={endDate}
-                    onChange={({ value }) => setEndDate(String(value))}
+                    date={endDate}
+                    emptyDate
+                    onChange={({ value }) => setEndDate(Number(value))}
                 />
                 <div className='col-12 flex justify-content-end gap-3'>
                     <Button
