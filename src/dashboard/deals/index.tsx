@@ -40,7 +40,7 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "accountInfo", header: "Account" },
     { field: "contactinfo", header: "Customer" },
     { field: "dealtype", header: "Type" },
-    { field: "created", header: "Date" },
+    { field: "created", header: "Sale Date" },
     { field: "inventoryinfo", header: "Info (Vehicle)" },
 ];
 
