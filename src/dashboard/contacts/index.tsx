@@ -147,8 +147,7 @@ export const ContactsDataTable = ({
 
     const handleGetContactsList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
-            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
-            const updatedParams = { ...params, qry: queryString };
+            const updatedParams = { ...params };
 
             if (total) {
                 getContactsAmount(authUser.useruid, { ...updatedParams, total: 1 }).then(
@@ -288,7 +287,12 @@ export const ContactsDataTable = ({
     const handleAdvancedSearch = () => {
         const searchQuery = Object.entries(advancedSearch)
             .filter(([_, value]) => value)
-            .map(([key, value]) => `${value}.${key.replace(/\d+/g, "")}`)
+            .map(([key, value]) => {
+                if (key === "phone1") {
+                    return `${value}.phone1|${value}.phone2`;
+                }
+                return `${value}.${key.replace(/\d+/g, "")}`;
+            })
             .join("+");
 
         handleGetContactsList({ qry: searchQuery }, true);
@@ -328,7 +332,6 @@ export const ContactsDataTable = ({
             value: advancedSearch?.username,
             type: SEARCH_FIELD_TYPE.TEXT,
         },
-
         {
             key: "type",
             label: "Contact type",
