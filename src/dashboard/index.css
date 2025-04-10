@@ -682,3 +682,30 @@
     opacity: 0.5;
     pointer-events: none;
 }
+
+.p-tree {
+    .p-treenode-droppoint {
+        border: none;
+        height: 3px;
+        margin: 0;
+
+        &.p-treenode-droppoint-active {
+            background-color: var(--admss-app-main-blue);
+        }
+    }
+    .p-tree-container {
+        height: 100%;
+        border: none;
+
+        .p-treenode .p-treenode-content.p-treenode-dragover {
+            .report__list-item {
+                background: var(--admss-app-light-blue);
+            }
+            background-color: var(--admss-app-light-blue);
+        }
+
+        .p-treenode .p-treenode-content .p-tree-toggler:focus {
+            box-shadow: none;
+        }
+    }
+}

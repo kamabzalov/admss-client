@@ -41,6 +41,7 @@ export const NodeContent = ({
     const ref = useRef<HTMLDivElement>(null);
 
     const isNew = !!node.data?.document?.isNew;
+    const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
 
     useEffect(() => {
         const parent = ref.current?.closest(".p-treenode-content");
@@ -53,8 +54,11 @@ export const NodeContent = ({
             } else {
                 parent.classList.remove("report__list-item--selected-container");
             }
+            if (isSimpleNode) {
+                parent.classList.add("simple-node");
+            }
         }
-    }, [isSelected, isTogglerVisible]);
+    }, [isSelected, isTogglerVisible, isSimpleNode]);
 
     return (
         <div className='w-full' ref={ref}>
@@ -84,12 +88,11 @@ export const ReportForm = observer((): ReactElement => {
 
     const getCollections = async () => {
         if (authUser) {
-            !id && getUserReportCollections();
-            getUserFavoriteReportList(authUser.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
-                }
-            });
+            getUserReportCollections();
+            const response = await getUserFavoriteReportList(authUser.useruid);
+            if (response && Array.isArray(response)) {
+                setFavoriteCollections(response);
+            }
         }
     };
 
