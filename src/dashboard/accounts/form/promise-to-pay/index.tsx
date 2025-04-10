@@ -21,6 +21,9 @@ import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { observer } from "mobx-react-lite";
+import { MenuItem } from "primereact/menuitem";
+import { TypeList } from "common/models";
+import { Tooltip } from "primereact/tooltip";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -136,25 +139,29 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         }
     };
 
-    const promiseItems = [
+    const selectedCount = selectedRows.filter(Boolean).length;
+    const isEditDisabled = selectedCount === 0 || selectedCount > 1;
+    const isDeleteDisabled = selectedCount === 0;
+
+    const promiseItems: MenuItem[] = [
         {
             label: "Edit Promise",
             icon: `icon adms-edit-item`,
+            className: "promise-edit-menuitem",
+            disabled: isEditDisabled,
             command: () => {
+                if (isEditDisabled) return;
                 setAddPromiseVisible(true);
             },
         },
         {
             label: "Delete Promise",
             icon: `pi pi-times`,
+            className: "promise-delete-menuitem",
+            disabled: isDeleteDisabled,
             command: () => {
-                if (!selectedRows.some((isSelected) => isSelected)) {
-                    toast.current?.show({
-                        severity: "warn",
-                        summary: "No promise selected",
-                        detail: "Please select a promise to delete.",
-                        life: TOAST_LIFETIME,
-                    });
+                if (isDeleteDisabled) {
+                    return;
                 } else {
                     setConfirmText("Are you sure you want to delete the selected promises?");
                     setConfirmAction(() => handleDeletePromises);
@@ -167,6 +174,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
     const paymentItems = [
         {
             label: "Set Paid Late",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.LATE)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.LATE}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.LATE);
@@ -174,6 +182,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         },
         {
             label: "Set Promise Broken",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.BROKEN)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.BROKEN}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.BROKEN);
@@ -181,6 +190,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         },
         {
             label: "Set Outstanding",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.OUTSTANDING)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.OUTSTANDING}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.OUTSTANDING);
@@ -312,21 +322,37 @@ export const AccountPromiseToPay = observer((): ReactElement => {
             <h3 className='account-promise__title account-title'>Promise to pay</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
+                    <Tooltip
+                        target='.promise-edit-menuitem.p-disabled'
+                        content={
+                            selectedCount === 0
+                                ? "Select a promise to enable editing"
+                                : "Editing is available for one promise at a time"
+                        }
+                        position='mouse'
+                    />
+                    <Tooltip
+                        target='.promise-delete-menuitem.p-disabled'
+                        content='Select a promise to enable deleting'
+                        position='mouse'
+                    />
                     <SplitButton
                         model={promiseItems}
                         className='account__split-button'
+                        menuClassName='account__split-button-menu'
                         label='Add Promise'
                         tooltip='Add Promise'
                         tooltipOptions={{
                             position: "bottom",
                         }}
                         onClick={() => {
+                            setCurrentPromise(null);
                             setAddPromiseVisible(true);
                         }}
                         outlined
                     />
                     <SplitButton
-                        model={paymentItems}
+                        model={paymentItems as MenuItem[]}
                         className='account__split-button ml-auto'
                         label='Set Paid As Promised'
                         tooltip='Set Paid As Promised'
@@ -427,7 +453,12 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                 }}
                 currentPromise={currentPromise}
                 onHide={() => setAddPromiseVisible(false)}
-                statusList={Object.values(paymentItems).map((item) => item.label)}
+                statusList={
+                    Object.values(paymentItems).map((item) => ({
+                        name: item.label,
+                        id: item.id,
+                    })) as TypeList[]
+                }
                 visible={addPromiseVisible}
                 accountuid={id}
             />
