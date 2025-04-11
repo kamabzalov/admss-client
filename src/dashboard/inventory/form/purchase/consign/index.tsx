@@ -196,17 +196,19 @@ export const PurchaseConsign = observer((): ReactElement => {
                 />
             </div>
             <div className='col-12'>
-                <InputTextarea
-                    className='purchase-consign__text-area'
-                    placeholder='Consignment Notes'
-                    value={csNotes}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({
-                            key: "csNotes",
-                            value,
-                        });
-                    }}
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        className='purchase-consign__text-area'
+                        value={csNotes}
+                        onChange={({ target: { value } }) => {
+                            changeInventoryExtData({
+                                key: "csNotes",
+                                value,
+                            });
+                        }}
+                    />
+                    <label className='float-label'>Consignment Notes</label>
+                </span>
             </div>
 
             <hr className='form-line' />
