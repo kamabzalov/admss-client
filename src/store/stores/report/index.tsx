@@ -188,15 +188,19 @@ export class ReportStore {
                 }
 
                 if (uid) {
-                    const response = await updateReportInfo(uid, {
-                        name: this._report.name,
-                        ShowTotals: this._report.ShowTotals,
-                        ShowAverages: this._report.ShowAverages,
-                        ShowLineCount: this._report.ShowLineCount,
-                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
-                        columns: this._reportColumns,
-                        collections,
-                    });
+                    const response = await updateReportInfo(
+                        this.rootStore.userStore.authUser!.useruid,
+                        {
+                            name: this._report.name,
+                            ShowTotals: this._report.ShowTotals,
+                            ShowAverages: this._report.ShowAverages,
+                            ShowLineCount: this._report.ShowLineCount,
+                            AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                            columns: this._reportColumns,
+                            itemuid: this._report.itemuid,
+                            collections,
+                        }
+                    );
 
                     if (response?.status === Status.OK) {
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
