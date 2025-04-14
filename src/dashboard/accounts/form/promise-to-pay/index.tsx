@@ -64,6 +64,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [confirmText, setConfirmText] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+    const [tooltipsInitialized, setTooltipsInitialized] = useState(false);
 
     const getPromiseList = async () => {
         if (id) {
@@ -78,6 +79,47 @@ export const AccountPromiseToPay = observer((): ReactElement => {
     useEffect(() => {
         getPromiseList();
     }, [id]);
+
+    const selectedCount = selectedRows.filter(Boolean).length;
+    const isEditDisabled = selectedCount === 0 || selectedCount > 1;
+    const isDeleteDisabled = selectedCount === 0;
+
+    useEffect(() => {
+        setTooltipsInitialized(true);
+
+        const reinitializeTooltips = () => {
+            setTooltipsInitialized(false);
+            setTimeout(() => {
+                setTooltipsInitialized(true);
+            }, 50);
+        };
+
+        const handleMenuOpen = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (
+                target &&
+                (target.classList.contains("promise-edit-menuitem") ||
+                    target.classList.contains("promise-delete-menuitem"))
+            ) {
+                reinitializeTooltips();
+            }
+        };
+
+        document.addEventListener("mouseover", handleMenuOpen);
+
+        return () => {
+            document.removeEventListener("mouseover", handleMenuOpen);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (selectedRows.length > 0) {
+            setTooltipsInitialized(false);
+            setTimeout(() => {
+                setTooltipsInitialized(true);
+            }, 50);
+        }
+    }, [selectedRows]);
 
     const handleChangePromiseStatus = (status: PAID_STATUS) => {
         if (id && selectedRows.some((isSelected) => isSelected)) {
@@ -139,10 +181,6 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         }
     };
 
-    const selectedCount = selectedRows.filter(Boolean).length;
-    const isEditDisabled = selectedCount === 0 || selectedCount > 1;
-    const isDeleteDisabled = selectedCount === 0;
-
     const promiseItems: MenuItem[] = [
         {
             label: "Edit Promise",
@@ -160,13 +198,12 @@ export const AccountPromiseToPay = observer((): ReactElement => {
             className: "promise-delete-menuitem",
             disabled: isDeleteDisabled,
             command: () => {
-                if (isDeleteDisabled) {
-                    return;
-                } else {
-                    setConfirmText("Are you sure you want to delete the selected promises?");
-                    setConfirmAction(() => handleDeletePromises);
-                    setConfirmVisible(true);
-                }
+                if (isDeleteDisabled) return;
+                setConfirmText(
+                    "Do you really want to delete this promise? This process cannot be undone."
+                );
+                setConfirmAction(() => handleDeletePromises);
+                setConfirmVisible(true);
             },
         },
     ];
@@ -322,20 +359,32 @@ export const AccountPromiseToPay = observer((): ReactElement => {
             <h3 className='account-promise__title account-title'>Promise to pay</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
-                    <Tooltip
-                        target='.promise-edit-menuitem.p-disabled'
-                        content={
-                            selectedCount === 0
-                                ? "Select a promise to enable editing"
-                                : "Editing is available for one promise at a time"
-                        }
-                        position='mouse'
-                    />
-                    <Tooltip
-                        target='.promise-delete-menuitem.p-disabled'
-                        content='Select a promise to enable deleting'
-                        position='mouse'
-                    />
+                    {tooltipsInitialized && (
+                        <>
+                            <Tooltip
+                                target='.promise-edit-menuitem.p-disabled'
+                                content={
+                                    selectedCount === 0
+                                        ? "Select a promise to enable editing"
+                                        : "Editing is available for one promise at a time"
+                                }
+                                position='mouse'
+                                showDelay={0}
+                                mouseTrack={true}
+                                mouseTrackTop={10}
+                                appendTo={document.body}
+                            />
+                            <Tooltip
+                                target='.promise-delete-menuitem.p-disabled'
+                                content='Select a promise to enable deleting'
+                                position='mouse'
+                                showDelay={0}
+                                mouseTrack={true}
+                                mouseTrackTop={10}
+                                appendTo={document.body}
+                            />
+                        </>
+                    )}
                     <SplitButton
                         model={promiseItems}
                         className='account__split-button'
@@ -464,9 +513,9 @@ export const AccountPromiseToPay = observer((): ReactElement => {
             />
             <ConfirmModal
                 visible={confirmVisible}
-                title='Confirm Deletion'
+                title='Are you sure?'
                 bodyMessage={confirmText}
-                icon='pi pi-exclamation-triangle'
+                icon='adms-error'
                 acceptLabel='Delete'
                 rejectLabel='Cancel'
                 draggable={false}

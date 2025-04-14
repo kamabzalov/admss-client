@@ -124,3 +124,26 @@
         }
     }
 }
+
+.promise-confirm-dialog {
+    .p-dialog-content {
+        padding-top: 28px;
+    }
+    .confirm-header__icon {
+        font-size: 5.5rem;
+        padding-bottom: 35px;
+    }
+
+    .p-dialog-footer {
+        padding-top: 42px;
+        padding-bottom: 50px;
+        .p-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            width: 130px;
+            height: 60px;
+        }
+    }
+}
