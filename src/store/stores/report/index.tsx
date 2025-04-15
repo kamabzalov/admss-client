@@ -12,6 +12,7 @@ import {
     getReportInfo,
     getUserReportCollectionsContent,
     updateReportInfo,
+    updateCollection,
 } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -188,21 +189,51 @@ export class ReportStore {
                 }
 
                 if (uid) {
-                    const response = await updateReportInfo(
-                        this.rootStore.userStore.authUser!.useruid,
-                        {
-                            name: this._report.name,
-                            ShowTotals: this._report.ShowTotals,
-                            ShowAverages: this._report.ShowAverages,
-                            ShowLineCount: this._report.ShowLineCount,
-                            AskForStartAndEndDates: this._report.AskForStartAndEndDates,
-                            columns: this._reportColumns,
-                            itemuid: this._report.itemuid,
-                            collections,
-                        }
-                    );
+                    const response = await updateReportInfo(uid, {
+                        name: this._report.name,
+                        ShowTotals: this._report.ShowTotals,
+                        ShowAverages: this._report.ShowAverages,
+                        ShowLineCount: this._report.ShowLineCount,
+                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
+                        columns: this._reportColumns,
+                        itemuid: this._report.itemuid,
+                    });
 
                     if (response?.status === Status.OK) {
+                        const initialCollections = this._initialReport.collections || [];
+                        const collectionsChanged =
+                            collections.length !== initialCollections.length ||
+                            collections.some(
+                                (col, index) =>
+                                    col.collectionuid !== initialCollections[index]?.collectionuid
+                            );
+
+                        if (collectionsChanged) {
+                            for (const { collectionuid } of collections) {
+                                const collectionResponse = await updateCollection(
+                                    this.rootStore.userStore.authUser?.useruid!,
+                                    {
+                                        itemUID: collectionuid,
+                                        documents: [
+                                            {
+                                                documentUID: uid,
+                                                collections,
+                                            },
+                                        ],
+                                    }
+                                );
+
+                                if (collectionResponse?.status === Status.ERROR) {
+                                    return {
+                                        status: Status.ERROR,
+                                        error:
+                                            collectionResponse.error ||
+                                            "Error while updating collection",
+                                    };
+                                }
+                            }
+                        }
+
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
                         return { ...response, itemuid: uid } as ReportInfo;
                     } else {

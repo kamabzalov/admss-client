@@ -39,7 +39,7 @@ export interface ReportCollection extends BaseResponseError {
     created: string;
     description: string;
     collections?: ReportCollection[];
-    documents: ReportDocument[];
+    documents?: Partial<ReportDocument>[];
     index: number;
     isdefault: 0 | 1;
     isfavorite: 0 | 1;
