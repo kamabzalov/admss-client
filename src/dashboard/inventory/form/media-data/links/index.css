@@ -1,0 +1,6 @@
+.media-links {
+    .media-links__textarea {
+        height: 110px;
+        resize: none;
+    }
+}

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { AccountPayment } from "common/models/accounts";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
@@ -52,12 +53,24 @@ interface UploadMediaItem {
     data: Partial<InventoryMediaPostData>;
 }
 
+interface UploadMediaLink {
+    contenttype: number;
+    notes: string;
+    mediaurl: string;
+}
+
 const initialMediaItem: UploadMediaItem = {
     file: [],
     data: {
         contenttype: MediaType.mtUnknown,
         notes: "",
     },
+};
+
+const initialMediaLink: UploadMediaLink = {
+    contenttype: MediaType.mtUnknown,
+    notes: "",
+    mediaurl: "",
 };
 
 const initialAuditState: Partial<Audit> = {
@@ -96,6 +109,10 @@ export class InventoryStore {
     private _inventoryDocumentsID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
     private _documents: MediaItem[] = [];
+
+    private _inventoryLinksID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileLinks: UploadMediaLink = initialMediaLink;
+    private _links: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
     private _formErrorIndex: number[] = [];
@@ -162,6 +179,13 @@ export class InventoryStore {
     }
     public get documents() {
         return this._documents;
+    }
+
+    public get links() {
+        return this._links;
+    }
+    public get uploadFileLinks() {
+        return this._uploadFileLinks;
     }
 
     public get inventoryExportWebHistory() {
@@ -283,6 +307,13 @@ export class InventoryStore {
                                 break;
                             case MediaType.mtDocument:
                                 this.documents.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
+                                break;
+                            case MediaType.mtLink:
+                                this.links.push({
                                     src: "",
                                     itemuid,
                                     info,
@@ -511,6 +542,42 @@ export class InventoryStore {
         }
     );
 
+    private saveInventoryMediaLink = action(async (): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+            const mediaType = MediaType.mtLink;
+
+            try {
+                const createMediaResponse = (await createMediaItemRecord(
+                    mediaType
+                )) as CreateMediaItemRecordResponse;
+                if (createMediaResponse?.status === Status.OK) {
+                    await setMediaItemData(this._inventoryID, {
+                        contenttype: this._uploadFileLinks.contenttype,
+                        notes: this._uploadFileLinks.notes,
+                        mediaurl: this._uploadFileLinks.mediaurl,
+                        type: mediaType,
+                    }).then((response) => {
+                        if (response?.status === Status.ERROR) {
+                            const { error } = response as BaseResponseError;
+                            this._formErrorMessage = error || "Failed to save link";
+                        }
+                    });
+                }
+            } finally {
+                this._isLoading = false;
+                this._formErrorMessage = "";
+            }
+
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
             this._images = [];
@@ -558,6 +625,21 @@ export class InventoryStore {
         } catch (error) {
             // TODO: add error handler
             return undefined;
+        }
+    });
+
+    public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
+        try {
+            this._links = [];
+            await this.saveInventoryMediaLink();
+            this._uploadFileLinks = initialMediaLink;
+            this.fetchLinks();
+        } catch (error) {
+            const err = error as AxiosError;
+            return {
+                status: Status.ERROR,
+                error: err?.message,
+            };
         }
     });
 
@@ -609,6 +691,8 @@ export class InventoryStore {
                 this._videos = result;
             } else if (mediaType === MediaType.mtAudio) {
                 this._audios = result;
+            } else if (mediaType === MediaType.mtLink) {
+                this._links = result;
             }
         } catch (error) {
             // TODO: add error handler
@@ -639,6 +723,12 @@ export class InventoryStore {
         this._documents = [];
         this._inventoryDocumentsID = [];
         await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
+    });
+
+    public fetchLinks = action(async () => {
+        this._links = [];
+        this._inventoryLinksID = [];
+        await this.fetchMedia(MediaType.mtLink, this._links, this._inventoryLinksID);
     });
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
@@ -690,6 +780,11 @@ export class InventoryStore {
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
+
+    public set uploadFileLinks(data: UploadMediaLink) {
+        this._uploadFileLinks = data;
+    }
+
     public set exportWebActive(state: boolean) {
         this._exportWebActive = state;
     }

@@ -316,6 +316,7 @@ export interface InventoryMediaPostData {
     useruid: string;
     itemuid: string;
     mediaitemuid: string;
+    mediaurl: string;
     notes: string;
     type: number;
     contenttype: number;
