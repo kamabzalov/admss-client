@@ -18,7 +18,6 @@ export enum AccordionItems {
     PAYMENTS = "Payments",
     PRICE = "Price and comments",
     DATES = "Dates",
-    LINKS = "Links",
     FUEL = "Fuel Economy",
     EXTRA = "Extra data",
     HISTORY = "History",
@@ -26,6 +25,7 @@ export enum AccordionItems {
     VIDEO = "Video",
     AUDIO = "Audio",
     DOCUMENTS = "Documents",
+    LINKS = "Links",
 }
 
 export interface InventoryItem extends MenuItem {
