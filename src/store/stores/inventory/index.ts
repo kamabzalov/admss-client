@@ -12,10 +12,12 @@ import {
     InventoryPrintForm,
     Audit,
     InventoryMediaPostData,
-    InventoryMedia,
     InventoryWebCheck,
     CreateMediaItemRecordResponse,
     InventorySetResponse,
+    UploadMediaLink,
+    UploadMediaItem,
+    MediaItem,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -38,26 +40,6 @@ import {
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
-
-export interface MediaItem {
-    src: string;
-    itemuid: string;
-    mediauid?: string;
-    info?: Partial<InventoryMedia> & {
-        order?: number;
-    };
-}
-
-interface UploadMediaItem {
-    file: File[];
-    data: Partial<InventoryMediaPostData>;
-}
-
-interface UploadMediaLink {
-    contenttype: number;
-    notes: string;
-    mediaurl: string;
-}
 
 const initialMediaItem: UploadMediaItem = {
     file: [],
@@ -554,6 +536,7 @@ export class InventoryStore {
                 if (createMediaResponse?.status === Status.OK) {
                     await setMediaItemData(this._inventoryID, {
                         contenttype: this._uploadFileLinks.contenttype,
+                        mediaitemuid: createMediaResponse.itemUID,
                         notes: this._uploadFileLinks.notes,
                         mediaurl: this._uploadFileLinks.mediaurl,
                         type: mediaType,
@@ -656,6 +639,31 @@ export class InventoryStore {
                     });
                 }
             });
+        }
+    );
+
+    public changeInventoryLinksOrder = action(
+        async (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]): Promise<Status> => {
+            try {
+                const promises = list.map(async ({ itemuid, order }) => {
+                    const currentLink = this._links.find((link) => link.itemuid === itemuid);
+                    if (currentLink?.info) {
+                        const response = await setMediaItemData(this._inventoryID, {
+                            mediaitemuid: currentLink.info.mediauid,
+                            ...currentLink.info,
+                            itemuid,
+                            order,
+                        });
+                        return response?.status === Status.OK;
+                    }
+                    return false;
+                });
+
+                const results = await Promise.all(promises);
+                return results.every((result) => result) ? Status.OK : Status.ERROR;
+            } catch (error) {
+                return Status.ERROR;
+            }
         }
     );
 

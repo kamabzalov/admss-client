@@ -421,3 +421,23 @@ export interface InventoryOptions extends BaseResponseError {
     options_list: OptionsListData[];
     value: number;
 }
+
+export interface MediaItem {
+    src: string;
+    itemuid: string;
+    mediauid?: string;
+    info?: Partial<InventoryMedia> & {
+        order?: number;
+    };
+}
+
+export interface UploadMediaItem {
+    file: File[];
+    data: Partial<InventoryMediaPostData>;
+}
+
+export interface UploadMediaLink {
+    contenttype: number;
+    notes: string;
+    mediaurl: string;
+}
