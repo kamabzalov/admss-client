@@ -11,6 +11,7 @@ import {
     ReportServices,
     ReportSetParams,
     ReportsPostData,
+    UpdateReportCollections,
 } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
@@ -428,10 +429,13 @@ export const setCollectionOrder = async (collectionuid: string, order: number) =
     }
 };
 
-export const updateCollection = async (useruid: string, body: Partial<ReportCollection>) => {
+export const updateReportCollections = async (
+    reportuid: string,
+    body: Partial<UpdateReportCollections>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
-            `reports/${useruid}/collectionupdate`,
+            `reports/${reportuid}/addtocollections`,
             body
         );
         return request.data;
@@ -442,7 +446,7 @@ export const updateCollection = async (useruid: string, body: Partial<ReportColl
                 error:
                     error.response?.data.info ||
                     error.response?.data.error ||
-                    "Error while updating collection",
+                    "Error while updating report collections",
             };
         }
     }

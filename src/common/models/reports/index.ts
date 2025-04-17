@@ -164,3 +164,9 @@ export interface Dataset {
     match: { id: number; name: string }[];
     name: ReportServices;
 }
+
+export interface UpdateReportCollections extends BaseResponseError {
+    itemuid: string;
+    useruid: string;
+    collections: Pick<ReportCollections, "collectionuid">[];
+}
