@@ -10,14 +10,14 @@ export const useCursorToStart = (containerRef: RefObject<HTMLDivElement>) => {
     }, [containerRef]);
 };
 
-interface UseDateRangeResult {
+interface DateRangeResult {
     startDate: string | number;
     endDate: string | number;
     isButtonDisabled: boolean;
     handleDateChange: (date: number, isStartDate: boolean) => void;
 }
 
-export const useDateRange = (): UseDateRangeResult => {
+export const useDateRange = (): DateRangeResult => {
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [startDate, setStartDate] = useState<string | number>("");
     const [endDate, setEndDate] = useState<string | number>("");
