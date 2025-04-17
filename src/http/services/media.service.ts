@@ -118,6 +118,7 @@ export const setMediaItemData = async (
         notes,
         itemuid,
         order,
+        mediaurl,
         contenttype,
         useruid,
         type,
@@ -129,6 +130,7 @@ export const setMediaItemData = async (
             `inventory/${id}/media`,
             {
                 mediaitemuid,
+                mediaurl,
                 useruid,
                 itemuid,
                 contenttype,

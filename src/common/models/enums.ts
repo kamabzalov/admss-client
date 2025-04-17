@@ -9,6 +9,7 @@ export enum MediaType {
     mtJSONDocument,
     mtBinaryData,
     mtDocument,
+    mtLink,
 }
 
 export enum ContentType {
