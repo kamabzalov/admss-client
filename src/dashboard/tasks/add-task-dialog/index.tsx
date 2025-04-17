@@ -14,21 +14,18 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
-import { formatDateForServer, parseDateFromServer, validateDates } from "common/helpers";
+import { formatDateForServer, parseDateFromServer } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
+import { useDateRange } from "common/hooks";
 
 enum DATE_TYPE {
     START = "startdate",
     DEADLINE = "deadline",
 }
-
-const ERROR_MESSAGES = {
-    DATE_ERROR: "Start Date must be before Due Date",
-};
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
@@ -56,24 +53,11 @@ export const AddTaskDialog = observer(
         const toast = useToast();
         const [taskState, setTaskState] = useState<Partial<PostDataTask>>(initializeTaskState());
         const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
-        const [dateError, setDateError] = useState<string>("");
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
+        const { startDate, endDate, handleDateChange } = useDateRange();
 
-        const isSubmitDisabled =
-            !taskState.description?.trim() || !!dateError || !isFormChanged || isSaving;
-
-        useEffect(() => {
-            if (taskState.startdate && taskState.deadline) {
-                const validation = validateDates(
-                    Number(taskState.startdate),
-                    Number(taskState.deadline)
-                );
-                setDateError(validation.isValid ? "" : validation.error || "");
-            } else {
-                setDateError("");
-            }
-        }, [taskState.startdate, taskState.deadline]);
+        const isSubmitDisabled = !taskState.description?.trim() || !isFormChanged || isSaving;
 
         const handleGetTasksSubUserList = async () => {
             const response = await getTasksSubUserList(authUser!.useruid);
@@ -90,16 +74,30 @@ export const AddTaskDialog = observer(
         useEffect(() => {
             if (!visible) {
                 setTaskState(initializeTaskState());
-                setDateError("");
                 setIsFormChanged(false);
                 setAssignToData(null);
             }
         }, [visible]);
 
-        const handleDateChange = (key: DATE_TYPE, date: number) => {
-            setIsFormChanged(true);
-            setTaskState((prev) => ({ ...prev, [key]: Number(date) }));
-        };
+        useEffect(() => {
+            if (startDate) {
+                setTaskState((prev) => ({
+                    ...prev,
+                    [DATE_TYPE.START]: String(startDate),
+                }));
+                setIsFormChanged(true);
+            }
+        }, [startDate]);
+
+        useEffect(() => {
+            if (endDate) {
+                setTaskState((prev) => ({
+                    ...prev,
+                    [DATE_TYPE.DEADLINE]: String(endDate),
+                }));
+                setIsFormChanged(true);
+            }
+        }, [endDate]);
 
         const handleInputChange = (key: keyof PostDataTask, value: string) => {
             setTaskState((prev) => ({ ...prev, [key]: value }));
@@ -107,10 +105,6 @@ export const AddTaskDialog = observer(
         };
 
         const handleSaveTaskData = async () => {
-            if (!validateDates(Number(taskState.startdate), Number(taskState.deadline)).isValid) {
-                return setDateError(ERROR_MESSAGES.DATE_ERROR);
-            }
-
             setIsSaving(true);
 
             const taskDataToSave = {
@@ -196,8 +190,7 @@ export const AddTaskDialog = observer(
                             name='Start Date'
                             showTime
                             hourFormat='12'
-                            className={`${dateError ? "p-invalid" : ""}`}
-                            onChange={(e) => handleDateChange(DATE_TYPE.START, Number(e.value))}
+                            onChange={({ value }) => handleDateChange(Number(value), true)}
                         />
                     </div>
                     <div className='p-inputgroup'>
@@ -207,11 +200,14 @@ export const AddTaskDialog = observer(
                             name='Due Date'
                             showTime
                             hourFormat='12'
-                            className={`${dateError ? "p-invalid" : ""}`}
-                            onChange={(e) => handleDateChange(DATE_TYPE.DEADLINE, Number(e.value))}
+                            minDate={
+                                Number(taskState.startdate)
+                                    ? new Date(Number(taskState.startdate))
+                                    : undefined
+                            }
+                            onChange={({ value }) => handleDateChange(Number(value), false)}
                         />
                     </div>
-                    {dateError && <small className='p-error'>{dateError}</small>}
                 </div>
 
                 <AccountSearch
