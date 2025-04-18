@@ -102,6 +102,7 @@ export class InventoryStore {
     private _deleteReason: string = "";
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
+    private _inventoryLoaded: boolean = false;
     protected _tabLength: number = 0;
 
     protected _isLoading: boolean = false;
@@ -213,14 +214,17 @@ export class InventoryStore {
         return this._memoRoute;
     }
 
-    public getInventory = async (itemuid: string) => {
+    public get inventoryLoaded() {
+        return this._inventoryLoaded;
+    }
+
+    public getInventory = async () => {
         try {
-            const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
+            const response = (await getInventoryInfo(this._inventoryID)) as BaseResponseError;
             if (response?.status === Status.ERROR) {
                 throw response.error;
             } else {
                 const info = response as Inventory;
-                this._inventoryID = info.itemuid;
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
@@ -244,6 +248,7 @@ export class InventoryStore {
 
                 this._inventoryExtData = changedExtData || ({} as InventoryExtData);
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
+                this._inventoryLoaded = true;
             }
         } catch (error) {
             return {
@@ -288,18 +293,23 @@ export class InventoryStore {
                                 this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
-                                this.documents.push({
+                                this._documents.push({
                                     src: "",
                                     itemuid,
                                     info,
                                 });
                                 break;
                             case MediaType.mtLink:
-                                this.links.push({
-                                    src: "",
-                                    itemuid,
-                                    info,
-                                });
+                                const linkExists = this._links.some(
+                                    (link) => link.itemuid === itemuid
+                                );
+                                if (!linkExists) {
+                                    this._links.push({
+                                        src: "",
+                                        itemuid,
+                                        info,
+                                    });
+                                }
                                 break;
                             default:
                                 break;
@@ -516,7 +526,6 @@ export class InventoryStore {
 
                 return Status.OK;
             } catch (error) {
-                // TODO: add error handler
                 return undefined;
             } finally {
                 this._isLoading = false;
@@ -528,6 +537,16 @@ export class InventoryStore {
         try {
             this._isLoading = true;
             const mediaType = MediaType.mtLink;
+
+            const existingLink = this._links.find(
+                (link) =>
+                    link.info && (link.info as any).mediaurl === this._uploadFileLinks.mediaurl
+            );
+
+            if (existingLink) {
+                this._formErrorMessage = "A link with this URL already exists";
+                return Status.ERROR;
+            }
 
             try {
                 const createMediaResponse = (await createMediaItemRecord(
@@ -554,7 +573,6 @@ export class InventoryStore {
 
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         } finally {
             this._isLoading = false;
@@ -569,7 +587,6 @@ export class InventoryStore {
             this.fetchImages();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -581,7 +598,6 @@ export class InventoryStore {
             this.fetchVideos();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -593,7 +609,6 @@ export class InventoryStore {
             this.fetchAudios();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -606,17 +621,17 @@ export class InventoryStore {
             this.fetchDocuments();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
 
     public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
         try {
-            this._links = [];
-            await this.saveInventoryMediaLink();
-            this._uploadFileLinks = initialMediaLink;
-            this.fetchLinks();
+            const result = await this.saveInventoryMediaLink();
+            if (result === Status.OK) {
+                await this.fetchLinks();
+            }
+            return undefined;
         } catch (error) {
             const err = error as AxiosError;
             return {
@@ -673,8 +688,6 @@ export class InventoryStore {
         inventoryMediaID: Partial<InventoryMediaItemID>[]
     ) {
         try {
-            await this.getInventoryMedia();
-
             const result: MediaItem[] = [...mediaArray];
 
             await Promise.all(
@@ -700,10 +713,21 @@ export class InventoryStore {
             } else if (mediaType === MediaType.mtAudio) {
                 this._audios = result;
             } else if (mediaType === MediaType.mtLink) {
-                this._links = result;
+                this._links = [];
+
+                const uniqueLinks: MediaItem[] = [];
+                result.forEach((link) => {
+                    const linkExists = uniqueLinks.some(
+                        (existingLink) => existingLink.itemuid === link.itemuid
+                    );
+                    if (!linkExists) {
+                        uniqueLinks.push(link);
+                    }
+                });
+
+                this._links = uniqueLinks;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -712,30 +736,35 @@ export class InventoryStore {
     public fetchImages = action(async () => {
         this._images = [];
         this._inventoryImagesID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtPhoto, this._images, this._inventoryImagesID);
     });
 
     public fetchVideos = action(async () => {
         this._videos = [];
         this._inventoryVideoID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtVideo, this._videos, this._inventoryVideoID);
     });
 
     public fetchAudios = action(async () => {
         this._audios = [];
         this._inventoryAudioID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
     });
 
     public fetchDocuments = action(async () => {
         this._documents = [];
         this._inventoryDocumentsID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
     });
 
     public fetchLinks = action(async () => {
         this._links = [];
         this._inventoryLinksID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtLink, this._links, this._inventoryLinksID);
     });
 
@@ -746,7 +775,6 @@ export class InventoryStore {
                 this._printList = response;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -772,6 +800,10 @@ export class InventoryStore {
             }
         }
     );
+
+    public set inventoryID(id: string) {
+        this._inventoryID = id;
+    }
 
     public set uploadFileImages(files: UploadMediaItem) {
         this._uploadFileImages = files;
@@ -846,6 +878,8 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
+        this._inventoryLinksID = [];
+        this._links = [];
     };
 
     public clearInventory = () => {

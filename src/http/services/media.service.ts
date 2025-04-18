@@ -147,7 +147,10 @@ export const setMediaItemData = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting media item data",
             };
         }
     }
