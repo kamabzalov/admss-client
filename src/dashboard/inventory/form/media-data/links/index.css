@@ -92,4 +92,19 @@
             }
         }
     }
+
+    .inventory-links__delete-button {
+        color: var(--admss-app-light-grey);
+        &:enabled:hover,
+        &:enabled:focus {
+            color: var(--admss-app-dark-blue);
+        }
+    }
+
+    .inventory-links__expand-button {
+        color: var(--admss-app-blue);
+        &.inventory-links__expand-button--rotate {
+            transform: rotate(180deg);
+        }
+    }
 }

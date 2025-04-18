@@ -14,7 +14,6 @@ import {
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Checkbox } from "primereact/checkbox";
@@ -30,9 +29,7 @@ const limitations: MediaLimitations = {
 
 export const DocumentsMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryDocuments,
         uploadFileDocuments,
         documents,
@@ -40,7 +37,6 @@ export const DocumentsMedia = observer((): ReactElement => {
         removeMedia,
         fetchDocuments,
         clearMedia,
-        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -48,16 +44,12 @@ export const DocumentsMedia = observer((): ReactElement => {
     const [documentChecked, setDocumentChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchDocuments() : getInventory(id).then(() => fetchDocuments());
-        }
-        if (documents.length) {
-            setDocumentChecked(new Array(documents.length).fill(checked));
-        }
+        fetchDocuments();
+
         return () => {
             clearMedia();
         };
-    }, [fetchDocuments, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileDocuments = {

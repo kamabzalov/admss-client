@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
@@ -27,33 +26,28 @@ const isValidUrl = (url: string): boolean => {
 
 export const LinksMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const toast = useToast();
     const [expandedRows, setExpandedRows] = useState<MediaItem[]>([]);
     const [isUrlValid, setIsUrlValid] = useState(true);
     const {
-        getInventory,
         saveInventoryLinks,
         uploadFileLinks,
         links,
         isLoading,
         fetchLinks,
         clearMedia,
-        isFormChanged,
         formErrorMessage,
         removeMedia,
         changeInventoryLinksOrder,
     } = store;
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchLinks() : getInventory(id).then(() => fetchLinks());
-        }
+        fetchLinks();
 
         return () => {
             clearMedia();
         };
-    }, [fetchLinks, id]);
+    }, []);
 
     useEffect(() => {
         if (formErrorMessage) {
@@ -274,7 +268,11 @@ export const LinksMedia = observer((): ReactElement => {
                 <Button
                     tooltip='Expand'
                     type='button'
-                    className='inventory-links__expand-button'
+                    className={`inventory-links__expand-button ${
+                        expandedRows.includes(rowData)
+                            ? "inventory-links__expand-button--rotate"
+                            : ""
+                    }`}
                     icon='pi pi-angle-down'
                     text
                     onClick={() => handleRowExpansionClick(rowData)}
@@ -287,7 +285,9 @@ export const LinksMedia = observer((): ReactElement => {
         setExpandedRows(e.data as MediaItem[]);
     };
 
-    const linkControlTemplate = (rowData: MediaItem) => {
+    const linkControlTemplate = (rowData: MediaItem, { rowIndex }: { rowIndex: number }) => {
+        const isFirst = rowIndex === 0;
+        const isLast = rowIndex === links.length - 1;
         return (
             <div className='link-control p-0 flex justify-content-center'>
                 <Button
@@ -295,10 +295,10 @@ export const LinksMedia = observer((): ReactElement => {
                     type='button'
                     rounded
                     text
-                    severity={rowData.info?.order === 0 ? "secondary" : "success"}
+                    severity={isFirst ? "secondary" : "success"}
                     tooltip='Up'
                     className='p-button-text link-control__button'
-                    disabled={rowData.info?.order === 0}
+                    disabled={isFirst}
                     onClick={() => handleMoveUp(rowData)}
                 />
                 <Button
@@ -306,8 +306,8 @@ export const LinksMedia = observer((): ReactElement => {
                     type='button'
                     rounded
                     text
-                    severity={rowData.info?.order === links.length - 1 ? "secondary" : "success"}
-                    disabled={rowData.info?.order === links.length - 1}
+                    severity={isLast ? "secondary" : "success"}
+                    disabled={isLast}
                     tooltip='Down'
                     className='p-button-text link-control__button'
                     onClick={() => handleMoveDown(rowData)}

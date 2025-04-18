@@ -17,7 +17,6 @@ import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
@@ -36,9 +35,7 @@ const limitations: MediaLimitations = {
 
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryVideos,
         uploadFileVideos,
         videos,
@@ -46,7 +43,6 @@ export const VideoMedia = observer((): ReactElement => {
         removeMedia,
         fetchVideos,
         clearMedia,
-        isFormChanged,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
@@ -54,16 +50,12 @@ export const VideoMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchVideos() : getInventory(id).then(() => fetchVideos());
-        }
-        if (videos.length) {
-            setVideoChecked(new Array(videos.length).fill(checked));
-        }
+        fetchVideos();
+
         return () => {
             clearMedia();
         };
-    }, [fetchVideos, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileVideos = {
