@@ -12,6 +12,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
+import { SexList } from "common/constants/contract-options";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -75,7 +76,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     ["CoBuyer_Emp_City", city],
                     ["CoBuyer_Emp_Address", streetAddress],
                     ["CoBuyer_Emp_State", state],
-                    ["CoBuyer_Sex", sex],
+                    ["CoBuyer_Sex", SexList.find((item) => item?.id === Number(sex))?.name || ""],
+                    ["CoBuyer_DL_State", state],
                     ["CoBuyer_Driver_License_Num", dl_number],
                 ]);
 
@@ -93,7 +95,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     CoBuyer_Emp_City: city,
                     CoBuyer_Emp_Address: streetAddress,
                     CoBuyer_Emp_State: state,
-                    CoBuyer_Sex: sex,
+                    CoBuyer_Sex: SexList.find((item) => item?.id === Number(sex))?.name || "",
+                    CoBuyer_DL_State: state,
                     CoBuyer_Driver_License_Num: dl_number,
                     CoBuyer_Date_Of_Birth: parseCustomDate(dob),
                     CoBuyer_DL_Exp_Date: parseCustomDate(exp),
@@ -146,7 +149,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     type='button'
                     label='Scan driver license'
                     className='general-info__button'
-                    tooltip='Data received from the DL’s backside will fill in related fields'
+                    tooltip="Data received from the DL's backside will fill in related fields"
                     outlined
                     onClick={handleScanDL}
                 />
@@ -172,7 +175,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     </label>
                     <Button
                         text
-                        tooltip='Data received from the DL’s backside will overwrite user-entered data'
+                        tooltip="Data received from the DL's backside will overwrite user-entered data"
                         icon='icon adms-help'
                         outlined
                         type='button'
