@@ -17,7 +17,9 @@
 
 .contact__accordion .p-accordion-header .p-accordion-header-link,
 .contact__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
-.contact__accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
+.contact__accordion
+    .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
+    .p-accordion-header-link,
 .contact__accordion .p-accordion-header.p-highlight .p-accordion-header-link[aria-expanded="true"] {
     border: none;
     background: white;
@@ -190,5 +192,34 @@
         white-space: nowrap;
         font-weight: 700;
         padding: 0;
+    }
+}
+
+.general-info-overwrite {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    font-family: "Open Sans";
+    font-size: 18px;
+}
+
+.general-info-overwrite__label {
+    padding-left: 15px;
+    line-height: 1;
+}
+
+.general-info-overwrite__icon.p-button {
+    color: var(--admss-app-main-blue);
+    padding-top: 13px;
+    border: none;
+    width: 30px;
+    font-size: 14px;
+    background-color: transparent;
+    &:enabled:hover {
+        color: var(--admss-app-main-blue);
+        border: none;
+        background-color: transparent;
+        outline: none;
+        box-shadow: none;
     }
 }

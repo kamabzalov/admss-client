@@ -24,20 +24,7 @@ import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
-
-const SexList = [
-    {
-        name: "Male",
-    },
-    {
-        name: "Female",
-    },
-];
-
-enum DLSides {
-    FRONT = "front",
-    BACK = "back",
-}
+import { DLSides, SexList } from "common/constants/contract-options";
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const { id } = useParams();
