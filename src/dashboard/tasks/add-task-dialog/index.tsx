@@ -1,7 +1,6 @@
 import { DialogProps } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Dropdown } from "primereact/dropdown";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
@@ -21,7 +20,7 @@ import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
 import { useDateRange } from "common/hooks";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 enum DATE_TYPE {
     START = "startdate",
     DEADLINE = "deadline",
@@ -170,17 +169,15 @@ export const AddTaskDialog = observer(
                 action={handleSaveTaskData}
                 buttonDisabled={isSubmitDisabled}
             >
-                <span className='p-float-label'>
-                    <Dropdown
-                        value={taskState.useruid || ""}
-                        options={assignToData || []}
-                        optionLabel='username'
-                        optionValue='useruid'
-                        className='flex align-items-center'
-                        onChange={(e) => handleInputChange("useruid", e.value)}
-                    />
-                    <label className='float-label'>Assign to</label>
-                </span>
+                <ComboBox
+                    value={taskState.useruid || ""}
+                    options={assignToData || []}
+                    optionLabel='username'
+                    optionValue='useruid'
+                    className='flex align-items-center'
+                    onChange={(e) => handleInputChange("useruid", e.value)}
+                    label='Assign to'
+                />
 
                 <div className='flex flex-column md:flex-row column-gap-3 relative'>
                     <div className='p-inputgroup'>

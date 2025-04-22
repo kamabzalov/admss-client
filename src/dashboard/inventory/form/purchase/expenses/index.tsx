@@ -5,7 +5,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
@@ -23,7 +22,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { ListData } from "common/models";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const { id } = useParams();
@@ -183,7 +182,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     </div>
                     <div className='col-6'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 optionLabel='name'
                                 optionValue='id'
                                 filter
@@ -202,7 +201,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     </div>
                     <div className='col-12'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 optionLabel='userName'
                                 optionValue='contactuid'
                                 filter

@@ -209,25 +209,23 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <small className='p-error'>{errors.Trade1_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.Trade1_Make}
-                        required
-                        options={automakesList}
-                        onChange={({ value }) => {
-                            setFieldValue("Trade1_Make", value);
-                            changeDealExtData({ key: "Trade1_Make", value });
-                        }}
-                        valueTemplate={selectedAutoMakesTemplate}
-                        itemTemplate={autoMakesOptionTemplate}
-                        className={`deal-trade__dropdown w-full ${
-                            errors.Trade1_Make ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Make (required)</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={values.Trade1_Make}
+                    required
+                    options={automakesList}
+                    onChange={({ value }) => {
+                        setFieldValue("Trade1_Make", value);
+                        changeDealExtData({ key: "Trade1_Make", value });
+                    }}
+                    valueTemplate={selectedAutoMakesTemplate}
+                    itemTemplate={autoMakesOptionTemplate}
+                    className={`deal-trade__dropdown w-full ${
+                        errors.Trade1_Make ? "p-invalid" : ""
+                    }`}
+                    label='Make (required)'
+                />
 
                 <small className='p-error'>{errors.Trade1_Make || ""}</small>
             </div>

@@ -10,7 +10,7 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
@@ -22,6 +22,7 @@ import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -264,7 +265,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
                     optionLabel={"name"}

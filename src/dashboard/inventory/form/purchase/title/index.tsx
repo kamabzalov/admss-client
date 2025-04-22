@@ -1,10 +1,10 @@
 import { STATES_LIST } from "common/constants/states";
 import { TITLE_STATUS_LIST } from "common/constants/title-status";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { DateInput } from "dashboard/common/form/inputs";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import { useLocation } from "react-router-dom";
@@ -60,7 +60,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -76,7 +76,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -196,7 +196,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -273,7 +273,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         placeholder='State'
                         filter
                         optionLabel='name'

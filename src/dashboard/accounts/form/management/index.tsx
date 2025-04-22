@@ -2,7 +2,6 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,6 +14,7 @@ import { AddFeeDialog } from "./add-fee-dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useStore } from "store/hooks";
 import { makeShortReports } from "http/services/reports.service";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountListActivity;
@@ -206,7 +206,7 @@ export const AccountManagement = (): ReactElement => {
             <h3 className='account-management__title account-title'>Account Management</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
-                    <Dropdown
+                    <ComboBox
                         className='account__dropdown'
                         options={[...ACCOUNT_ACTIVITY_LIST]}
                         value={selectedActivity}

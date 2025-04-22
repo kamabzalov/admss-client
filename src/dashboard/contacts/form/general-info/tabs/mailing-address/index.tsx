@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const ContactsMailingAddressInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
@@ -24,7 +24,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
+                <ComboBox
                     optionLabel='label'
                     optionValue='id'
                     filter
