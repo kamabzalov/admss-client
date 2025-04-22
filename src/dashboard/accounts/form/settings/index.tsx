@@ -1,5 +1,4 @@
 import { Checkbox } from "primereact/checkbox";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useState } from "react";
 import "./index.css";
 import { Button } from "primereact/button";
@@ -8,6 +7,7 @@ import { TotalPaidDialog } from "./total-paid-dialog";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const AccountSettings = observer((): ReactElement => {
     const [accountStatus, setAccountStatus] = useState<string>("");
@@ -32,17 +32,15 @@ export const AccountSettings = observer((): ReactElement => {
 
             <div className='account-settings__header grid'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            className='w-full'
-                            options={ACCOUNT_STATUS_LIST}
-                            optionValue='name'
-                            optionLabel='name'
-                            value={accountStatus}
-                            onChange={({ value }) => setAccountStatus(value)}
-                        />
-                        <label className='float-label'>Account Status</label>
-                    </span>
+                    <ComboBox
+                        className='w-full'
+                        options={ACCOUNT_STATUS_LIST}
+                        optionValue='name'
+                        optionLabel='name'
+                        value={accountStatus}
+                        onChange={({ value }) => setAccountStatus(value)}
+                        label='Account Status'
+                    />
                 </div>
                 <div className='col-3 account-settings__checkbox'>
                     <Checkbox

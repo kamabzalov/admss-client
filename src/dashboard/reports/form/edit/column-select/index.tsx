@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useRef } from "react";
 import { ReportSelect } from "dashboard/reports/form/common";
 import { observer } from "mobx-react-lite";
@@ -8,7 +7,7 @@ import {
     MOVE_DIRECTION,
     useReportColumnController,
 } from "dashboard/reports/form/edit/column-select/select-controller";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 export const ReportColumnSelect = observer((): ReactElement => {
     const {
         dataSet,
@@ -189,7 +188,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     </div>
                     <div className='report-control__content'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 className='report-controls__dropdown'
                                 options={availableDatasets}
                                 value={dataSet}

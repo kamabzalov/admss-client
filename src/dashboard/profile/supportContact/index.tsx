@@ -3,11 +3,11 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useEffect, useState } from "react";
 import { DialogProps } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import "./index.css";
 import { createOrUpdateSupportMessage } from "http/services/support.service";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const SUPPORT_CONTACT_TOPICS: ReadonlyArray<string> = [
     "Question",
@@ -73,7 +73,7 @@ export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Elem
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
             />
-            <Dropdown
+            <ComboBox
                 placeholder='Choose your topic'
                 value={topic}
                 options={[...SUPPORT_CONTACT_TOPICS]}

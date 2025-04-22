@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
@@ -26,6 +25,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
@@ -283,28 +283,27 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         <div className='grid general-info row-gap-2'>
             <div className='col-12 grid'>
                 <div className='col-4 relative pr-0 pb-0'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='id'
-                            value={contact.type || 0}
-                            options={typeList}
-                            onChange={(e) => {
-                                store.contactType = e.value;
-                                setFieldValue("type", e.value);
-                                changeContact("type", e.value);
-                            }}
-                            className={`w-full general-info__dropdown ${
-                                errors.type ? "p-invalid" : ""
-                            }`}
-                            pt={{
-                                wrapper: {
-                                    style: { height: "auto", maxHeight: "none" },
-                                },
-                            }}
-                        />
-                        <label className='float-label'>Type (required)</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='id'
+                        value={contact.type || 0}
+                        options={typeList}
+                        onChange={(e) => {
+                            store.contactType = e.value;
+                            setFieldValue("type", e.value);
+                            changeContact("type", e.value);
+                        }}
+                        className={`w-full general-info__dropdown ${
+                            errors.type ? "p-invalid" : ""
+                        }`}
+                        label='Type (required)'
+                        pt={{
+                            wrapper: {
+                                style: { height: "auto", maxHeight: "none" },
+                            },
+                        }}
+                    />
+
                     <small className='p-error'>{errors.type}</small>
                 </div>
             </div>

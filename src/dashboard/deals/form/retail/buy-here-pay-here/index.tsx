@@ -67,35 +67,31 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='id'
-                        value={Con_Pmt_Freq}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Pmt_Freq", value })
-                        }
-                        options={[...PAYMENT_FREQUENCY_LIST]}
-                        required
-                        className='w-full deal-sale__dropdown'
-                    />
-                    <label className='float-label'>Payment Frequency</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='id'
+                    value={Con_Pmt_Freq}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Con_Pmt_Freq", value })
+                    }
+                    options={[...PAYMENT_FREQUENCY_LIST]}
+                    required
+                    className='w-full deal-sale__dropdown'
+                    label='Payment Frequency'
+                />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        value={Con_Term}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Term", value })
-                        }
-                        options={[...TERM_MONTH_LIST]}
-                        editable
-                        required
-                        className='w-full deal-sale__dropdown'
-                    />
-                    <label className='float-label'>Term (months)</label>
-                </span>
+                <ComboBox
+                    value={Con_Term}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Con_Term", value })
+                    }
+                    options={[...TERM_MONTH_LIST]}
+                    editable
+                    required
+                    className='w-full deal-sale__dropdown'
+                    label='Term (months)'
+                />
             </div>
             <div className='col-3'>
                 <PercentInput
@@ -195,16 +191,14 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        value={Con_Interest_Method}
-                        editable
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Interest_Method", value })
-                        }
-                    />
-                    <label className='float-label'>Interest Method</label>
-                </span>
+                <ComboBox
+                    value={Con_Interest_Method}
+                    editable
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Con_Interest_Method", value })
+                    }
+                    label='Interest Method'
+                />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox

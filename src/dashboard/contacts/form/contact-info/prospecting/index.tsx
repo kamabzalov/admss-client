@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
@@ -9,6 +8,7 @@ import { useStore } from "store/hooks";
 import { getContactsProspectList, getContactsSalesmanList } from "http/services/contacts-service";
 import { useParams } from "react-router-dom";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
@@ -40,7 +40,7 @@ export const ContactsProspecting = observer((): ReactElement => {
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='username'
                         optionValue='useruid'
                         filter
@@ -70,7 +70,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='notes'
                         optionValue='notes'
                         options={prospectList}
@@ -89,7 +89,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             {anotherVehicle ? (
                 <div className='col-6'>
                     <span className='p-float-label'>
-                        <Dropdown
+                        <ComboBox
                             optionLabel='notes'
                             optionValue='notes'
                             options={prospectList}

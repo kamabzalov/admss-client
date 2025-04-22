@@ -10,9 +10,9 @@ import {
     getInventoryBodyTypesList,
 } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -58,7 +58,7 @@ export const VehicleDescription = observer((): ReactElement => {
         <div className='grid vehicle-description row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -75,7 +75,7 @@ export const VehicleDescription = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -93,7 +93,7 @@ export const VehicleDescription = observer((): ReactElement => {
 
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -114,7 +114,7 @@ export const VehicleDescription = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -132,7 +132,7 @@ export const VehicleDescription = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         filter
@@ -150,7 +150,7 @@ export const VehicleDescription = observer((): ReactElement => {
 
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         value={inventory.Engine_id?.toString() || ""}
