@@ -14,7 +14,7 @@ import { DealsForm } from "dashboard/deals/form";
 import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";
 import { InventoryForm } from "dashboard/inventory/form";
-import SignIn from "sign/sign-in";
+import { SignIn } from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";

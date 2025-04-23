@@ -6,11 +6,12 @@ import { useFormik } from "formik";
 import "../index.css";
 import { auth } from "http/services/auth.service";
 import { setKey } from "services/local-storage.service";
-import { Toast } from "primereact/toast";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { APP_TYPE, APP_VERSION } from "http/index";
 import { TOAST_LIFETIME } from "common/settings";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
 
 export interface LoginForm {
     username: string;
@@ -20,10 +21,11 @@ export interface LoginForm {
     version: string;
 }
 
-export default function SignIn() {
+export const SignIn = () => {
     const navigate = useNavigate();
-    const toast = useRef<Toast>(null);
+    const toast = useToast();
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+
     const formik = useFormik<LoginForm>({
         initialValues: {
             username: "",
@@ -48,25 +50,28 @@ export default function SignIn() {
         onSubmit: async () => {
             try {
                 const response = await auth(formik.values);
-                if (response.status === "OK") {
+                if (response.status === Status.OK) {
+                    if (!response.token) {
+                        await Promise.reject(new Error("Invalid credentials"));
+                        return;
+                    }
                     setKey(LS_APP_USER, JSON.stringify(response));
                     navigate("/dashboard");
                 } else {
                     toast.current?.show({
                         severity: "error",
                         life: TOAST_LIFETIME,
-                        summary: response.status || "Error",
+                        summary: Status.ERROR,
                         detail: response?.error || String(response),
-                        sticky: true,
                     });
                 }
             } catch (error) {
+                const errorMessage = "An unexpected error occurred during login";
                 toast.current?.show({
                     severity: "error",
                     life: TOAST_LIFETIME,
-                    summary: "Error",
-                    detail: "An unexpected error occurred during login",
-                    sticky: true,
+                    summary: Status.ERROR,
+                    detail: error instanceof Error ? error.message || errorMessage : errorMessage,
                 });
             }
         },
@@ -160,7 +165,6 @@ export default function SignIn() {
                     </form>
                 </div>
             </div>
-            <Toast ref={toast} />
         </section>
     );
-}
+};
