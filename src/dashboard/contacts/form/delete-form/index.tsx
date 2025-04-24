@@ -1,9 +1,10 @@
 import { ListData } from "common/models";
 import { TOAST_LIFETIME } from "common/settings";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
 import { deleteContact, getContactDeleteReasonsList } from "http/services/contacts-service";
 import { observer } from "mobx-react-lite";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -75,7 +76,7 @@ export const DeleteForm = observer(
                 <div className='grid'>
                     <div className='col-6 relative'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 optionLabel='name'
                                 optionValue='name'
                                 value={deleteReason}

@@ -1,6 +1,6 @@
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
@@ -24,7 +24,7 @@ export const AccountAuditInfo = observer((): ReactElement => {
             <h3 className='take-payment__title'>Audit Information</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Cash Drawer</label>
-                <Dropdown
+                <ComboBox
                     id='cashDrawer'
                     className={`take-payment__input--small ${
                         fieldChanged["CashDrawer"] ? "input-change" : ""

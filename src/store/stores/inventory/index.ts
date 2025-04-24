@@ -658,26 +658,33 @@ export class InventoryStore {
     );
 
     public changeInventoryLinksOrder = action(
-        async (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]): Promise<Status> => {
+        async (
+            linkItem: Pick<InventoryMediaPostData, "itemuid" | "order">
+        ): Promise<BaseResponseError | undefined> => {
             try {
-                const promises = list.map(async ({ itemuid, order }) => {
-                    const currentLink = this._links.find((link) => link.itemuid === itemuid);
-                    if (currentLink?.info) {
-                        const response = await setMediaItemData(this._inventoryID, {
-                            mediaitemuid: currentLink.info.mediauid,
-                            ...currentLink.info,
-                            itemuid,
-                            order,
-                        });
-                        return response?.status === Status.OK;
-                    }
-                    return false;
-                });
-
-                const results = await Promise.all(promises);
-                return results.every((result) => result) ? Status.OK : Status.ERROR;
+                const currentLink = this._links.find((link) => link.itemuid === linkItem.itemuid);
+                if (currentLink?.info) {
+                    const response = await setMediaItemData(this._inventoryID, {
+                        mediaitemuid: currentLink.info.mediauid,
+                        ...currentLink.info,
+                        itemuid: linkItem.itemuid,
+                        order: linkItem.order,
+                    });
+                    return {
+                        status: response?.status ?? Status.ERROR,
+                        error: response?.error,
+                    };
+                }
+                return {
+                    status: Status.ERROR,
+                    error: "Link not found",
+                };
             } catch (error) {
-                return Status.ERROR;
+                const err = error as AxiosError;
+                return {
+                    status: Status.ERROR,
+                    error: err?.message,
+                };
             }
         }
     );

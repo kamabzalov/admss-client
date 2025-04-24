@@ -1,10 +1,11 @@
 import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
 import { AuthUser } from "http/services/auth.service";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -68,7 +69,7 @@ export const DeleteForm = observer(
                 <div className='grid'>
                     <div className='col-6 relative'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 optionLabel='name'
                                 optionValue='name'
                                 value={deleteReason}

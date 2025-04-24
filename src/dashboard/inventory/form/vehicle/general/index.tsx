@@ -1,4 +1,3 @@
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
@@ -25,6 +24,7 @@ import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
@@ -277,7 +277,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='locName'
                         optionValue='locationuid'
                         filter
@@ -301,7 +301,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='description'
                         optionValue='description'
                         filter
@@ -450,7 +450,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         {...getFieldProps("Model")}
                         optionLabel='name'
                         optionValue='name'
@@ -538,7 +538,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={inventory?.ExteriorColor}
@@ -555,7 +555,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         optionLabel='name'
                         optionValue='name'
                         value={inventory?.InteriorColor}
@@ -577,7 +577,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         options={auditOptions}
                         value={selectedAuditKey}
                         onChange={(e) => handleAuditChange(e.value as keyof Audit)}

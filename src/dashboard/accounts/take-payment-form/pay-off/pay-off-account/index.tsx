@@ -1,8 +1,8 @@
 import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
@@ -49,7 +49,7 @@ export const PayOffInfo = observer((): ReactElement => {
             </div>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Pmt Method</label>
-                <Dropdown
+                <ComboBox
                     id='pmtMethod'
                     className={`take-payment__input ${
                         fieldChanged["PaymentMethod"] ? "input-change" : ""
@@ -128,7 +128,7 @@ export const PayOffInfo = observer((): ReactElement => {
             <hr className='form-line' />
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Cash Drawer</label>
-                <Dropdown
+                <ComboBox
                     id='cashDrawer'
                     className={`take-payment__input ${
                         fieldChanged["CashDrawer"] ? "input-change" : ""
