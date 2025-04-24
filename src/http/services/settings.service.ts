@@ -156,3 +156,20 @@ export const deleteInventoryGroupOption = async (groupoptionuid: string) => {
         }
     }
 };
+
+export const restoreInventoryGroupDefaults = async (groupuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${groupuid}/grouprestoredefaults`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while restoring inventory group defaults",
+            };
+        }
+    }
+};

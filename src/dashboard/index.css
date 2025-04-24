@@ -394,8 +394,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 70vh;
+    height: 50vh;
     width: 100%;
+}
+
+.form-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
 }
 
 .dropdown-icon {

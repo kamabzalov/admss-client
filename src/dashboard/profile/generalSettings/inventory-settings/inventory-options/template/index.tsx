@@ -19,20 +19,27 @@ interface InventoryOptionRowProps {
     totalOffset?: number;
 }
 
-export const HeaderColumn = (): ReactElement => (
-    <div className='settings-inventory__header col-12 grid m-0'>
+export const HeaderColumn = (): ReactElement => {
+    const template = (numberPadding: 3 | 0, namePadding?: 5 | 2) => (
         <div className='col-6 grid m-0'>
-            <div className='settings-inventory__number settings-inventory__number--left'>#</div>
-            <div className='col-2'></div>
-            <div className='settings-inventory__name justify-content-start'>Option</div>
+            <div
+                className={`settings-inventory__number settings-inventory__number pl-${numberPadding}`}
+            >
+                #
+            </div>
+            <div className='col-1'></div>
+            <div className={`settings-inventory__name justify-content-start pl-${namePadding}`}>
+                Option
+            </div>
         </div>
-        <div className='col-6 grid m-0'>
-            <div className='col-3'></div>
-            <div className='settings-inventory__name justify-content-end'>Option</div>
-            <div className='settings-inventory__number settings-inventory__number--right'>#</div>
+    );
+    return (
+        <div className='settings-inventory__header col-12 grid m-0'>
+            {template(0, 2)}
+            {template(3, 5)}
         </div>
-    </div>
-);
+    );
+};
 
 export const InventoryOptionRow = observer(
     ({
@@ -51,14 +58,14 @@ export const InventoryOptionRow = observer(
             key={item.itemuid}
             className={`settings-inventory__row ${index < totalOffset / 2 ? "justify-content-start" : "justify-content-end settings-inventory__row--right"} grid col-12 ${draggedItemId === item.itemuid ? "dragged" : ""}`}
         >
-            <div className='col-2 option-control p-0'>
+            <div className='option-control p-0'>
                 {item.itemuid !== NEW_ITEM && (
                     <>
                         <Button
                             icon='pi pi-arrow-circle-up'
                             rounded
                             text
-                            severity='success'
+                            severity={isFirst ? "secondary" : "success"}
                             tooltip='To the top'
                             className='p-button-text option-control__button'
                             onClick={() => handleSetOrder(item, index - 1)}
@@ -68,7 +75,11 @@ export const InventoryOptionRow = observer(
                             icon='pi pi-arrow-circle-down'
                             rounded
                             text
-                            severity='success'
+                            severity={
+                                item.itemuid === NEW_ITEM || index === totalOffset - 1
+                                    ? "secondary"
+                                    : "success"
+                            }
                             tooltip='To the bottom'
                             disabled={item.itemuid === NEW_ITEM || index === totalOffset - 1}
                             onClick={() => handleSetOrder(item, index + 1)}
@@ -77,7 +88,7 @@ export const InventoryOptionRow = observer(
                     </>
                 )}
             </div>
-            <div className='col-7 p-0 flex align-items-center'>
+            <div className='col-8 p-0 flex align-items-center'>
                 {editedItem.itemuid === item.itemuid ? (
                     <div className='flex row-edit'>
                         <InputText
