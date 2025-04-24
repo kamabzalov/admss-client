@@ -1,5 +1,5 @@
 import { BaseResponseError } from "common/models/base-response";
-import { ListData } from "..";
+import { ListData } from "common/models";
 
 export interface GeneralSettings extends BaseResponseError {
     dealType: number;
