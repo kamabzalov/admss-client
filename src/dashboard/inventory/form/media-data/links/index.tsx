@@ -14,6 +14,12 @@ import { MediaItem, UploadMediaLink } from "common/models/inventory";
 import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Status } from "common/models/base-response";
+import { AxiosError } from "axios";
+
+enum DIRECTION {
+    UP = "up",
+    DOWN = "down",
+}
 
 const isValidUrl = (url: string): boolean => {
     try {
@@ -156,66 +162,30 @@ export const LinksMedia = observer((): ReactElement => {
         }
     };
 
-    const handleMoveUp = async (link: MediaItem) => {
+    const handleChangeOrder = async (link: MediaItem, direction: DIRECTION) => {
+        const order = link.info?.order ?? 0;
+        const newOrder = direction === DIRECTION.UP ? (order === 0 ? 0 : order - 1) : order + 1;
         try {
-            const currentIndex = links.findIndex((item) => item.itemuid === link.itemuid);
-            if (currentIndex > 0) {
-                const newOrder = links[currentIndex - 1].info?.order ?? 0;
-                const status = await changeInventoryLinksOrder([
-                    { itemuid: link.itemuid, order: newOrder },
-                ]);
-                if (status === Status.OK) {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Link order updated successfully",
-                    });
-                    await fetchLinks();
-                } else {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: "Failed to update link order",
-                    });
-                }
-            }
-        } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Failed to update link order",
+            const response = await changeInventoryLinksOrder({
+                itemuid: link.itemuid,
+                order: newOrder,
             });
-        }
-    };
-
-    const handleMoveDown = async (link: MediaItem) => {
-        try {
-            const currentIndex = links.findIndex((item) => item.itemuid === link.itemuid);
-            if (currentIndex < links.length - 1) {
-                const newOrder = links[currentIndex + 1].info?.order ?? 0;
-                const status = await changeInventoryLinksOrder([
-                    { itemuid: link.itemuid, order: newOrder },
-                ]);
-                if (status === Status.OK) {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Link order updated successfully",
-                    });
-                    await fetchLinks();
-                } else {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: "Failed to update link order",
-                    });
-                }
+            if (response?.status === Status.OK) {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Link order updated successfully",
+                });
+                await fetchLinks();
+            } else {
+                Promise.reject(response?.error);
             }
         } catch (error) {
+            const err = error as AxiosError;
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to update link order",
+                detail: err?.message || "Failed to update link order",
             });
         }
     };
@@ -299,7 +269,7 @@ export const LinksMedia = observer((): ReactElement => {
                     tooltip='Up'
                     className='p-button-text link-control__button'
                     disabled={isFirst}
-                    onClick={() => handleMoveUp(rowData)}
+                    onClick={() => handleChangeOrder(rowData, DIRECTION.UP)}
                 />
                 <Button
                     icon='pi pi-arrow-circle-down'
@@ -310,7 +280,7 @@ export const LinksMedia = observer((): ReactElement => {
                     disabled={isLast}
                     tooltip='Down'
                     className='p-button-text link-control__button'
-                    onClick={() => handleMoveDown(rowData)}
+                    onClick={() => handleChangeOrder(rowData, DIRECTION.DOWN)}
                 />
             </div>
         );
