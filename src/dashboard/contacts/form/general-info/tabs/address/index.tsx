@@ -75,26 +75,29 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='label'
-                    optionValue='id'
-                    filter
-                    placeholder='State'
-                    value={
-                        (type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State) || ""
-                    }
-                    options={STATES_LIST}
-                    onChange={({ target: { value } }) =>
-                        type === BUYER
-                            ? changeContact("state", value)
-                            : changeContactExtData("CoBuyer_Emp_State", value)
-                    }
-                    className='w-full address-info__dropdown'
-                    disabled={isControlDisabled}
-                    showClear={
-                        !!(type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State)
-                    }
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='label'
+                        optionValue='id'
+                        filter
+                        value={
+                            (type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State) ||
+                            ""
+                        }
+                        options={STATES_LIST}
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("state", value)
+                                : changeContactExtData("CoBuyer_Emp_State", value)
+                        }
+                        className='w-full address-info__dropdown'
+                        disabled={isControlDisabled}
+                        showClear={
+                            !!(type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State)
+                        }
+                    />
+                    <label className='float-label'>State</label>
+                </span>
             </div>
 
             <div className='col-3'>
@@ -174,30 +177,32 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
-                    optionLabel='label'
-                    optionValue='id'
-                    filter
-                    placeholder='State'
-                    value={
-                        (type === BUYER
-                            ? contact.mailState
-                            : contactExtData.CoBuyer_Mailing_State) || ""
-                    }
-                    onChange={({ target: { value } }) =>
-                        type === BUYER
-                            ? changeContact("mailState", value)
-                            : changeContactExtData("CoBuyer_Mailing_State", value)
-                    }
-                    options={STATES_LIST}
-                    className='w-full mailing-address-info__dropdown'
-                    disabled={isSameAsMailing || isControlDisabled}
-                    showClear={
-                        !!(type === BUYER
-                            ? contact.mailState
-                            : contactExtData.CoBuyer_Mailing_State)
-                    }
-                />
+                <span className='p-float-label'>
+                    <Dropdown
+                        optionLabel='label'
+                        optionValue='id'
+                        filter
+                        value={
+                            (type === BUYER
+                                ? contact.mailState
+                                : contactExtData.CoBuyer_Mailing_State) || ""
+                        }
+                        onChange={({ target: { value } }) =>
+                            type === BUYER
+                                ? changeContact("mailState", value)
+                                : changeContactExtData("CoBuyer_Mailing_State", value)
+                        }
+                        options={STATES_LIST}
+                        className='w-full mailing-address-info__dropdown'
+                        disabled={isSameAsMailing || isControlDisabled}
+                        showClear={
+                            !!(type === BUYER
+                                ? contact.mailState
+                                : contactExtData.CoBuyer_Mailing_State)
+                        }
+                    />
+                    <label className='float-label'>State</label>
+                </span>
             </div>
 
             <div className='col-3'>

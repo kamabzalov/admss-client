@@ -15,7 +15,6 @@ import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { Checkbox } from "primereact/checkbox";
 import { CATEGORIES } from "common/constants/media-categories";
@@ -32,9 +31,7 @@ const limitations: MediaLimitations = {
 
 export const AudioMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryAudios,
         uploadFileAudios,
         audios,
@@ -42,7 +39,6 @@ export const AudioMedia = observer((): ReactElement => {
         removeMedia,
         clearMedia,
         fetchAudios,
-        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -50,16 +46,12 @@ export const AudioMedia = observer((): ReactElement => {
     const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchAudios() : getInventory(id).then(() => fetchAudios());
-        }
-        if (audios.length) {
-            setAudioChecked(new Array(audios.length).fill(checked));
-        }
+        fetchAudios();
+
         return () => {
             clearMedia();
         };
-    }, [fetchAudios, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileAudios = {

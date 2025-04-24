@@ -118,6 +118,7 @@ export const setMediaItemData = async (
         notes,
         itemuid,
         order,
+        mediaurl,
         contenttype,
         useruid,
         type,
@@ -129,6 +130,7 @@ export const setMediaItemData = async (
             `inventory/${id}/media`,
             {
                 mediaitemuid,
+                mediaurl,
                 useruid,
                 itemuid,
                 contenttype,
@@ -145,7 +147,10 @@ export const setMediaItemData = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting media item data",
             };
         }
     }
