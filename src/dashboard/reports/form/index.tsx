@@ -27,6 +27,8 @@ import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
+const COLLECTION_DRAG_DELAY = 1000;
+
 export const NodeContent = ({
     node,
     isSelected,
@@ -85,6 +87,7 @@ export const ReportForm = observer((): ReactElement => {
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     const getCollections = async () => {
         if (authUser) {
@@ -203,7 +206,35 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
+    const handleDragEnter = (event: React.DragEvent<HTMLDivElement>, node: TreeNode) => {
+        const nodeData = node as TreeNodeEvent;
+        if (nodeData.type === NODE_TYPES.COLLECTION && nodeData.children?.length) {
+            if (hoverTimerRef.current) {
+                clearTimeout(hoverTimerRef.current);
+            }
+
+            hoverTimerRef.current = setTimeout(() => {
+                setExpandedKeys((prev) => ({
+                    ...prev,
+                    [node.key as string]: true,
+                }));
+            }, COLLECTION_DRAG_DELAY);
+        }
+    };
+
+    const handleDragLeave = () => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+    };
+
     const handleDragDrop = async (event: TreeDragDropEvent) => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
         const dropIndex = event.dropIndex - 1 < 0 ? 0 : event.dropIndex - 1;
@@ -282,7 +313,25 @@ export const ReportForm = observer((): ReactElement => {
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
                 } else {
-                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    if (dropIndex !== undefined) {
+                        const currentCollectionsLength =
+                            allCollections.find(
+                                (col: ReportCollection) => col.itemUID === targetCollectionId
+                            )?.collections?.length || 0;
+
+                        const orderResponse = await setReportOrder(
+                            targetCollectionId,
+                            reportId,
+                            dropIndex - currentCollectionsLength
+                        );
+                        if (orderResponse?.error) {
+                            showError(orderResponse.error);
+                        } else {
+                            showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                        }
+                    } else {
+                        showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    }
                 }
             }
         }
@@ -351,14 +400,19 @@ export const ReportForm = observer((): ReactElement => {
                                         nodeData.type === NODE_TYPES.DOCUMENT &&
                                         nodeData.data.document?.documentUID === id;
                                     return (
-                                        <NodeContent
-                                            node={nodeData}
-                                            isSelected={isSelected}
-                                            onClick={() => handleSelection(node)}
-                                            isTogglerVisible={
-                                                nodeData.type === NODE_TYPES.COLLECTION
-                                            }
-                                        />
+                                        <div
+                                            onDragEnter={(e) => handleDragEnter(e, node)}
+                                            onDragLeave={handleDragLeave}
+                                        >
+                                            <NodeContent
+                                                node={nodeData}
+                                                isSelected={isSelected}
+                                                onClick={() => handleSelection(node)}
+                                                isTogglerVisible={
+                                                    nodeData.type === NODE_TYPES.COLLECTION
+                                                }
+                                            />
+                                        </div>
                                     );
                                 }}
                             />

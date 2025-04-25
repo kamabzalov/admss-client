@@ -68,7 +68,7 @@
             .report__list-item {
                 background: transparent;
             }
-            background: transparent;
+            background-color: transparent;
         }
 
         .p-treenode .p-treenode-content .p-tree-toggler:focus {
