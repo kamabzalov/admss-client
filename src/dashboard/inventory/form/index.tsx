@@ -229,6 +229,20 @@ export const InventoryForm = observer(() => {
         return `/dashboard/inventory/${currentPath}?step=${activeIndex + 1}`;
     };
 
+    const handleGetInventory = async (id: string) => {
+        const response = await getInventory();
+        const res = response as unknown as BaseResponseError;
+        if (res?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: res?.error || "",
+                life: TOAST_LIFETIME,
+            });
+            navigate(`/dashboard/inventory`);
+        }
+    };
+
     useEffect(() => {
         const inventorySections: Pick<Inventory, "label" | "items">[] = [
             InventoryVehicleData,
@@ -245,18 +259,8 @@ export const InventoryForm = observer(() => {
         setDeleteActiveIndex(itemsMenuCount + 2);
 
         if (id) {
-            getInventory(id).then((response) => {
-                const res = response as unknown as BaseResponseError;
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res?.error || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(`/dashboard/inventory`);
-                }
-            });
+            store.inventoryID = id;
+            handleGetInventory(id);
         }
 
         return () => {

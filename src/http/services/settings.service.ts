@@ -1,6 +1,10 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
+import {
+    GeneralInventoryOptions,
+    GeneralSettings,
+    WatermarkPostProcessing,
+} from "common/models/general-settings";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUserGeneralSettings = async () => {
@@ -109,6 +113,62 @@ export const updatePostProcessing = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating postprocessing",
+            };
+        }
+    }
+};
+
+export const setInventoryGroupOption = async (
+    groupuid: string,
+    option: Partial<GeneralInventoryOptions>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${groupuid}/groupoption`,
+            option
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating inventory group option",
+            };
+        }
+    }
+};
+
+export const deleteInventoryGroupOption = async (groupoptionuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${groupoptionuid}/deletegroupoption`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.message ||
+                    error.response?.data.error ||
+                    "Error while deleting inventory group option",
+            };
+        }
+    }
+};
+
+export const restoreInventoryGroupDefaults = async (groupuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${groupuid}/grouprestoredefaults`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while restoring inventory group defaults",
             };
         }
     }

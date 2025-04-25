@@ -209,47 +209,43 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <small className='p-error'>{errors.Trade1_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.Trade1_Make}
-                        required
-                        options={automakesList}
-                        onChange={({ value }) => {
-                            setFieldValue("Trade1_Make", value);
-                            changeDealExtData({ key: "Trade1_Make", value });
-                        }}
-                        valueTemplate={selectedAutoMakesTemplate}
-                        itemTemplate={autoMakesOptionTemplate}
-                        className={`deal-trade__dropdown w-full ${
-                            errors.Trade1_Make ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Make (required)</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={values.Trade1_Make}
+                    required
+                    options={automakesList}
+                    onChange={({ value }) => {
+                        setFieldValue("Trade1_Make", value);
+                        changeDealExtData({ key: "Trade1_Make", value });
+                    }}
+                    valueTemplate={selectedAutoMakesTemplate}
+                    itemTemplate={autoMakesOptionTemplate}
+                    className={`deal-trade__dropdown w-full ${
+                        errors.Trade1_Make ? "p-invalid" : ""
+                    }`}
+                    label='Make (required)'
+                />
 
                 <small className='p-error'>{errors.Trade1_Make || ""}</small>
             </div>
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.Trade1_Model}
-                        editable={!automakesModelList.length}
-                        options={automakesModelList}
-                        onChange={({ value }) => {
-                            setFieldValue("Model", value);
-                            changeDealExtData({ key: "Trade1_Model", value });
-                        }}
-                        className={`deal-trade__dropdown w-full ${
-                            errors.Trade1_Model ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Model (required)</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={values.Trade1_Model}
+                    editable={!automakesModelList.length}
+                    options={automakesModelList}
+                    onChange={({ value }) => {
+                        setFieldValue("Model", value);
+                        changeDealExtData({ key: "Trade1_Model", value });
+                    }}
+                    className={`deal-trade__dropdown w-full ${
+                        errors.Trade1_Model ? "p-invalid" : ""
+                    }`}
+                    label='Model (required)'
+                />
                 <small className='p-error'>{errors.Trade1_Model}</small>
             </div>
             <div className='col-3 relative'>
@@ -302,36 +298,32 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <small className='p-error'>{errors.Trade1_Mileage || ""}</small>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={Trade1_Color}
-                        options={colorList}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Trade1_Color", value })
-                        }
-                        className='w-full deal-trade__dropdown'
-                    />
-                    <label className='float-label'>Color</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={Trade1_Color}
+                    options={colorList}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Trade1_Color", value })
+                    }
+                    className='w-full deal-trade__dropdown'
+                    label='Color'
+                />
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={Trade1_BodyStyle}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Trade1_BodyStyle", value });
-                        }}
-                        editable
-                        options={bodyTypeList}
-                        className='w-full deal-trade__dropdown'
-                    />
-                    <label className='float-label'>Body Style</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={Trade1_BodyStyle}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Trade1_BodyStyle", value });
+                    }}
+                    editable
+                    options={bodyTypeList}
+                    className='w-full deal-trade__dropdown'
+                    label='Body Style'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>

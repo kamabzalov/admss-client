@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
@@ -7,6 +6,7 @@ import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -75,7 +75,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
+                <ComboBox
                     optionLabel='label'
                     optionValue='id'
                     filter
@@ -174,10 +174,9 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
+                <ComboBox
                     optionLabel='label'
                     optionValue='id'
-                    filter
                     placeholder='State'
                     value={
                         (type === BUYER

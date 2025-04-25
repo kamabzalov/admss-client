@@ -3,7 +3,7 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
@@ -15,12 +15,12 @@ import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { Checkbox } from "primereact/checkbox";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
@@ -32,9 +32,7 @@ const limitations: MediaLimitations = {
 
 export const AudioMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryAudios,
         uploadFileAudios,
         audios,
@@ -42,7 +40,6 @@ export const AudioMedia = observer((): ReactElement => {
         removeMedia,
         clearMedia,
         fetchAudios,
-        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -50,16 +47,12 @@ export const AudioMedia = observer((): ReactElement => {
     const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchAudios() : getInventory(id).then(() => fetchAudios());
-        }
-        if (audios.length) {
-            setAudioChecked(new Array(audios.length).fill(checked));
-        }
+        fetchAudios();
+
         return () => {
             clearMedia();
         };
-    }, [fetchAudios, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileAudios = {
@@ -237,7 +230,7 @@ export const AudioMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
                     optionLabel={"name"}

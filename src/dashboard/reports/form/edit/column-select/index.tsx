@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useRef } from "react";
 import { ReportSelect } from "dashboard/reports/form/common";
 import { observer } from "mobx-react-lite";
@@ -8,7 +7,7 @@ import {
     MOVE_DIRECTION,
     useReportColumnController,
 } from "dashboard/reports/form/edit/column-select/select-controller";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 export const ReportColumnSelect = observer((): ReactElement => {
     const {
         dataSet,
@@ -188,22 +187,20 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         )}
                     </div>
                     <div className='report-control__content'>
-                        <span className='p-float-label'>
-                            <Dropdown
-                                className='report-controls__dropdown'
-                                options={availableDatasets}
-                                value={dataSet}
-                                emptyMessage='-'
-                                disabled={!!report.isdefault}
-                                onChange={(e) => setDataSet(e.value)}
-                                pt={{
-                                    wrapper: {
-                                        className: "capitalize",
-                                    },
-                                }}
-                            />
-                            <label className='float-label'>Data Set</label>
-                        </span>
+                        <ComboBox
+                            className='report-controls__dropdown'
+                            options={availableDatasets}
+                            value={dataSet}
+                            emptyMessage='-'
+                            disabled={!!report.isdefault}
+                            onChange={(e) => setDataSet(e.value)}
+                            pt={{
+                                wrapper: {
+                                    className: "capitalize",
+                                },
+                            }}
+                            label='Data Set'
+                        />
                         <ReportSelect
                             header='Available'
                             values={availableValues}

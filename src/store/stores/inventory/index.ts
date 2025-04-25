@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { AccountPayment } from "common/models/accounts";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
@@ -11,10 +12,12 @@ import {
     InventoryPrintForm,
     Audit,
     InventoryMediaPostData,
-    InventoryMedia,
     InventoryWebCheck,
     CreateMediaItemRecordResponse,
     InventorySetResponse,
+    UploadMediaLink,
+    UploadMediaItem,
+    MediaItem,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -38,26 +41,18 @@ import {
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
-export interface MediaItem {
-    src: string;
-    itemuid: string;
-    mediauid?: string;
-    info?: Partial<InventoryMedia> & {
-        order?: number;
-    };
-}
-
-interface UploadMediaItem {
-    file: File[];
-    data: Partial<InventoryMediaPostData>;
-}
-
 const initialMediaItem: UploadMediaItem = {
     file: [],
     data: {
         contenttype: MediaType.mtUnknown,
         notes: "",
     },
+};
+
+const initialMediaLink: UploadMediaLink = {
+    contenttype: MediaType.mtUnknown,
+    notes: "",
+    mediaurl: "",
 };
 
 const initialAuditState: Partial<Audit> = {
@@ -97,12 +92,17 @@ export class InventoryStore {
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
     private _documents: MediaItem[] = [];
 
+    private _inventoryLinksID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileLinks: UploadMediaLink = initialMediaLink;
+    private _links: MediaItem[] = [];
+
     private _printList: InventoryPrintForm[] = [];
     private _formErrorIndex: number[] = [];
     private _currentLocation: string = "";
     private _deleteReason: string = "";
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
+    private _inventoryLoaded: boolean = false;
     protected _tabLength: number = 0;
 
     protected _isLoading: boolean = false;
@@ -164,6 +164,13 @@ export class InventoryStore {
         return this._documents;
     }
 
+    public get links() {
+        return this._links;
+    }
+    public get uploadFileLinks() {
+        return this._uploadFileLinks;
+    }
+
     public get inventoryExportWebHistory() {
         return this._exportWebHistory;
     }
@@ -207,14 +214,17 @@ export class InventoryStore {
         return this._memoRoute;
     }
 
-    public getInventory = async (itemuid: string) => {
+    public get inventoryLoaded() {
+        return this._inventoryLoaded;
+    }
+
+    public getInventory = async () => {
         try {
-            const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
+            const response = (await getInventoryInfo(this._inventoryID)) as BaseResponseError;
             if (response?.status === Status.ERROR) {
                 throw response.error;
             } else {
                 const info = response as Inventory;
-                this._inventoryID = info.itemuid;
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
@@ -238,6 +248,7 @@ export class InventoryStore {
 
                 this._inventoryExtData = changedExtData || ({} as InventoryExtData);
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
+                this._inventoryLoaded = true;
             }
         } catch (error) {
             return {
@@ -282,11 +293,23 @@ export class InventoryStore {
                                 this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
-                                this.documents.push({
+                                this._documents.push({
                                     src: "",
                                     itemuid,
                                     info,
                                 });
+                                break;
+                            case MediaType.mtLink:
+                                const linkExists = this._links.some(
+                                    (link) => link.itemuid === itemuid
+                                );
+                                if (!linkExists) {
+                                    this._links.push({
+                                        src: "",
+                                        itemuid,
+                                        info,
+                                    });
+                                }
                                 break;
                             default:
                                 break;
@@ -503,13 +526,58 @@ export class InventoryStore {
 
                 return Status.OK;
             } catch (error) {
-                // TODO: add error handler
                 return undefined;
             } finally {
                 this._isLoading = false;
             }
         }
     );
+
+    private saveInventoryMediaLink = action(async (): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+            const mediaType = MediaType.mtLink;
+
+            const existingLink = this._links.find(
+                (link) =>
+                    link.info && (link.info as any).mediaurl === this._uploadFileLinks.mediaurl
+            );
+
+            if (existingLink) {
+                this._formErrorMessage = "A link with this URL already exists";
+                return Status.ERROR;
+            }
+
+            try {
+                const createMediaResponse = (await createMediaItemRecord(
+                    mediaType
+                )) as CreateMediaItemRecordResponse;
+                if (createMediaResponse?.status === Status.OK) {
+                    await setMediaItemData(this._inventoryID, {
+                        contenttype: this._uploadFileLinks.contenttype,
+                        mediaitemuid: createMediaResponse.itemUID,
+                        notes: this._uploadFileLinks.notes,
+                        mediaurl: this._uploadFileLinks.mediaurl,
+                        type: mediaType,
+                    }).then((response) => {
+                        if (response?.status === Status.ERROR) {
+                            const { error } = response as BaseResponseError;
+                            this._formErrorMessage = error || "Failed to save link";
+                        }
+                    });
+                }
+            } finally {
+                this._isLoading = false;
+                this._formErrorMessage = "";
+            }
+
+            return Status.OK;
+        } catch (error) {
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
 
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
@@ -519,7 +587,6 @@ export class InventoryStore {
             this.fetchImages();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -531,7 +598,6 @@ export class InventoryStore {
             this.fetchVideos();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -543,7 +609,6 @@ export class InventoryStore {
             this.fetchAudios();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -556,8 +621,23 @@ export class InventoryStore {
             this.fetchDocuments();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
+        }
+    });
+
+    public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
+        try {
+            const result = await this.saveInventoryMediaLink();
+            if (result === Status.OK) {
+                await this.fetchLinks();
+            }
+            return undefined;
+        } catch (error) {
+            const err = error as AxiosError;
+            return {
+                status: Status.ERROR,
+                error: err?.message,
+            };
         }
     });
 
@@ -577,14 +657,44 @@ export class InventoryStore {
         }
     );
 
+    public changeInventoryLinksOrder = action(
+        async (
+            linkItem: Pick<InventoryMediaPostData, "itemuid" | "order">
+        ): Promise<BaseResponseError | undefined> => {
+            try {
+                const currentLink = this._links.find((link) => link.itemuid === linkItem.itemuid);
+                if (currentLink?.info) {
+                    const response = await setMediaItemData(this._inventoryID, {
+                        mediaitemuid: currentLink.info.mediauid,
+                        ...currentLink.info,
+                        itemuid: linkItem.itemuid,
+                        order: linkItem.order,
+                    });
+                    return {
+                        status: response?.status ?? Status.ERROR,
+                        error: response?.error,
+                    };
+                }
+                return {
+                    status: Status.ERROR,
+                    error: "Link not found",
+                };
+            } catch (error) {
+                const err = error as AxiosError;
+                return {
+                    status: Status.ERROR,
+                    error: err?.message,
+                };
+            }
+        }
+    );
+
     private async fetchMedia(
         mediaType: MediaType,
         mediaArray: MediaItem[],
         inventoryMediaID: Partial<InventoryMediaItemID>[]
     ) {
         try {
-            await this.getInventoryMedia();
-
             const result: MediaItem[] = [...mediaArray];
 
             await Promise.all(
@@ -609,9 +719,22 @@ export class InventoryStore {
                 this._videos = result;
             } else if (mediaType === MediaType.mtAudio) {
                 this._audios = result;
+            } else if (mediaType === MediaType.mtLink) {
+                this._links = [];
+
+                const uniqueLinks: MediaItem[] = [];
+                result.forEach((link) => {
+                    const linkExists = uniqueLinks.some(
+                        (existingLink) => existingLink.itemuid === link.itemuid
+                    );
+                    if (!linkExists) {
+                        uniqueLinks.push(link);
+                    }
+                });
+
+                this._links = uniqueLinks;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -620,25 +743,36 @@ export class InventoryStore {
     public fetchImages = action(async () => {
         this._images = [];
         this._inventoryImagesID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtPhoto, this._images, this._inventoryImagesID);
     });
 
     public fetchVideos = action(async () => {
         this._videos = [];
         this._inventoryVideoID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtVideo, this._videos, this._inventoryVideoID);
     });
 
     public fetchAudios = action(async () => {
         this._audios = [];
         this._inventoryAudioID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
     });
 
     public fetchDocuments = action(async () => {
         this._documents = [];
         this._inventoryDocumentsID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
+    });
+
+    public fetchLinks = action(async () => {
+        this._links = [];
+        this._inventoryLinksID = [];
+        await this.getInventoryMedia();
+        await this.fetchMedia(MediaType.mtLink, this._links, this._inventoryLinksID);
     });
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
@@ -648,7 +782,6 @@ export class InventoryStore {
                 this._printList = response;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -675,6 +808,10 @@ export class InventoryStore {
         }
     );
 
+    public set inventoryID(id: string) {
+        this._inventoryID = id;
+    }
+
     public set uploadFileImages(files: UploadMediaItem) {
         this._uploadFileImages = files;
     }
@@ -690,6 +827,11 @@ export class InventoryStore {
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
+
+    public set uploadFileLinks(data: UploadMediaLink) {
+        this._uploadFileLinks = data;
+    }
+
     public set exportWebActive(state: boolean) {
         this._exportWebActive = state;
     }
@@ -743,6 +885,8 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
+        this._inventoryLinksID = [];
+        this._links = [];
     };
 
     public clearInventory = () => {

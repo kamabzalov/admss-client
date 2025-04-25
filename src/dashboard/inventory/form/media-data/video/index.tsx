@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
@@ -17,11 +17,11 @@ import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -36,9 +36,7 @@ const limitations: MediaLimitations = {
 
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryVideos,
         uploadFileVideos,
         videos,
@@ -46,7 +44,6 @@ export const VideoMedia = observer((): ReactElement => {
         removeMedia,
         fetchVideos,
         clearMedia,
-        isFormChanged,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
@@ -54,16 +51,12 @@ export const VideoMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchVideos() : getInventory(id).then(() => fetchVideos());
-        }
-        if (videos.length) {
-            setVideoChecked(new Array(videos.length).fill(checked));
-        }
+        fetchVideos();
+
         return () => {
             clearMedia();
         };
-    }, [fetchVideos, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileVideos = {
@@ -246,7 +239,7 @@ export const VideoMedia = observer((): ReactElement => {
                 className='col-12 video-upload'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
                     optionLabel={"name"}

@@ -3,7 +3,7 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
@@ -14,13 +14,13 @@ import {
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Checkbox } from "primereact/checkbox";
 import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["PDF"],
@@ -30,9 +30,7 @@ const limitations: MediaLimitations = {
 
 export const DocumentsMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const {
-        getInventory,
         saveInventoryDocuments,
         uploadFileDocuments,
         documents,
@@ -40,7 +38,6 @@ export const DocumentsMedia = observer((): ReactElement => {
         removeMedia,
         fetchDocuments,
         clearMedia,
-        isFormChanged,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -48,16 +45,12 @@ export const DocumentsMedia = observer((): ReactElement => {
     const [documentChecked, setDocumentChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchDocuments() : getInventory(id).then(() => fetchDocuments());
-        }
-        if (documents.length) {
-            setDocumentChecked(new Array(documents.length).fill(checked));
-        }
+        fetchDocuments();
+
         return () => {
             clearMedia();
         };
-    }, [fetchDocuments, checked, id]);
+    }, []);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileDocuments = {
@@ -230,7 +223,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
                     optionLabel={"name"}

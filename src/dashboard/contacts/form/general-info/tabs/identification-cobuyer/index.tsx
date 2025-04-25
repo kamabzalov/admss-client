@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
 import { DateInput } from "dashboard/common/form/inputs";
@@ -24,20 +23,8 @@ import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
 import "./index.css";
-
-const SexList = [
-    {
-        name: "Male",
-    },
-    {
-        name: "Female",
-    },
-];
-
-enum DLSides {
-    FRONT = "front",
-    BACK = "back",
-}
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { DLSides, SexList } from "common/constants/contract-options";
 
 export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -178,22 +165,19 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='label'
-                            optionValue='id'
-                            filter
-                            value={contactExtData.CoBuyer_DL_State || ""}
-                            options={STATES_LIST}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("CoBuyer_DL_State", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
-                            showClear={!!contactExtData.CoBuyer_DL_State}
-                        />
-                        <label className='float-label'>DL's State</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='label'
+                        optionValue='id'
+                        value={contactExtData.CoBuyer_DL_State || ""}
+                        options={STATES_LIST}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("CoBuyer_DL_State", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        disabled={isControlDisabled}
+                        showClear={!!contactExtData.CoBuyer_DL_State}
+                        label="DL's State"
+                    />
                 </div>
 
                 <div className='col-3'>
@@ -223,21 +207,18 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                 </div>
 
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='name'
-                            filter
-                            value={contactExtData.CoBuyer_Sex || ""}
-                            options={SexList}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("CoBuyer_Sex", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            showClear={!!contactExtData.CoBuyer_Sex}
-                        />
-                        <label className='float-label'>Sex</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        value={contactExtData.CoBuyer_Sex || ""}
+                        options={SexList}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("CoBuyer_Sex", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.CoBuyer_Sex}
+                        label='Sex'
+                    />
                 </div>
 
                 <div className='col-3'>

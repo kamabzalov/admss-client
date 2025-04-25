@@ -1,7 +1,7 @@
 import { ADJUSTMENT_TYPES } from "common/constants/account-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
 
@@ -30,7 +30,7 @@ export const AccountAdjustments = observer((): ReactElement => {
             <h3 className='take-payment__title'>Adjustments</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label'>Adjustment Type:</label>
-                <Dropdown
+                <ComboBox
                     id='adjType'
                     className={`take-payment__input ${
                         fieldChanged["AdjType"] ? "input-change" : ""

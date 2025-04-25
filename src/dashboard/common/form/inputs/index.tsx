@@ -10,6 +10,8 @@ import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
 import { InputMask, InputMaskProps } from "primereact/inputmask";
 import { useCursorToStart } from "common/hooks";
+import { ComboBox } from "../dropdown";
+import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -235,6 +237,7 @@ export const SearchInput = ({
             <span className='p-float-label search-input__wrapper'>
                 <Dropdown
                     ref={dropdownRef}
+                    filter={props.options && props.options?.length > DEFAULT_FILTER_THRESHOLD}
                     onInput={handleOnInputChange}
                     optionLabel='name'
                     editable
@@ -415,18 +418,16 @@ export const TextInput = ({
 
 export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
     const content = (
-        <span className='p-float-label'>
-            <Dropdown
-                optionLabel='label'
-                optionValue='id'
-                filter={props.filter || true}
-                options={STATES_LIST}
-                className={`w-full ${props.className || ""}`}
-                style={{ height: `${props.height || 50}px` }}
-                {...props}
-            />
-            <label className='float-label'>{name}</label>
-        </span>
+        <ComboBox
+            optionLabel='label'
+            optionValue='id'
+            filter={props.filter || true}
+            label={name}
+            options={STATES_LIST}
+            className={`w-full ${props.className || ""}`}
+            style={{ height: `${props.height || 50}px` }}
+            {...props}
+        />
     );
 
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
