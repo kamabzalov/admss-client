@@ -27,7 +27,6 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                 <ComboBox
                     optionLabel='label'
                     optionValue='id'
-                    filter
                     placeholder='State'
                     value={contact.mailState || ""}
                     onChange={({ target: { value } }) => store.changeContact("mailState", value)}

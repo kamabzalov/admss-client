@@ -187,22 +187,20 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         )}
                     </div>
                     <div className='report-control__content'>
-                        <span className='p-float-label'>
-                            <ComboBox
-                                className='report-controls__dropdown'
-                                options={availableDatasets}
-                                value={dataSet}
-                                emptyMessage='-'
-                                disabled={!!report.isdefault}
-                                onChange={(e) => setDataSet(e.value)}
-                                pt={{
-                                    wrapper: {
-                                        className: "capitalize",
-                                    },
-                                }}
-                            />
-                            <label className='float-label'>Data Set</label>
-                        </span>
+                        <ComboBox
+                            className='report-controls__dropdown'
+                            options={availableDatasets}
+                            value={dataSet}
+                            emptyMessage='-'
+                            disabled={!!report.isdefault}
+                            onChange={(e) => setDataSet(e.value)}
+                            pt={{
+                                wrapper: {
+                                    className: "capitalize",
+                                },
+                            }}
+                            label='Data Set'
+                        />
                         <ReportSelect
                             header='Available'
                             values={availableValues}

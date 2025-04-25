@@ -167,7 +167,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     <ComboBox
                         optionLabel='label'
                         optionValue='id'
-                        filter
                         value={contactExtData.Buyer_DL_State || ""}
                         options={STATES_LIST}
                         onChange={({ target: { value } }) =>
@@ -209,7 +208,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     <ComboBox
                         optionLabel='name'
                         optionValue='name'
-                        filter
                         value={contactExtData.Buyer_Sex || ""}
                         options={SexList}
                         onChange={({ target: { value } }) =>

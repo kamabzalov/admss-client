@@ -8,7 +8,7 @@ export const SettingsTaxes = () => {
             <div className='settings-form__title'>Taxes</div>
             <div className='grid'>
                 <div className='col-3'>
-                    <ComboBox placeholder='State' className='taxes__dropdown' />
+                    <ComboBox label='State' className='taxes__dropdown' />
                 </div>
                 <div className='col-3'>
                     <PercentInput />

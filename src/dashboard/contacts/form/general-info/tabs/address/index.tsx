@@ -177,7 +177,6 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 <ComboBox
                     optionLabel='label'
                     optionValue='id'
-                    filter
                     placeholder='State'
                     value={
                         (type === BUYER
