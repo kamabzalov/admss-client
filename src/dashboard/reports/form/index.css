@@ -24,15 +24,6 @@
 
         .p-treenode {
             padding: 0;
-
-            .p-treenode-droppoint {
-                border: none;
-                margin: 0;
-
-                &.p-treenode-droppoint-active {
-                    background: var(--admss-app-light-blue);
-                }
-            }
         }
 
         .p-treenode-content {
@@ -73,8 +64,11 @@
         height: 100%;
         border: none;
 
-        .p-treenode .p-treenode-content.p-treenode-dragover {
-            background: var(--admss-app-light-blue);
+        .p-treenode .p-treenode-content.simple-node.p-treenode-dragover {
+            .report__list-item {
+                background: transparent;
+            }
+            background-color: transparent;
         }
 
         .p-treenode .p-treenode-content .p-tree-toggler:focus {
