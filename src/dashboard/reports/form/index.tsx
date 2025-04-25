@@ -283,10 +283,14 @@ export const ReportForm = observer((): ReactElement => {
                     ?.collections?.length || 0;
 
             if (dropIndex !== undefined) {
+                const order =
+                    dropIndex - currentCollectionsLength < 0
+                        ? 0
+                        : dropIndex - currentCollectionsLength;
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
-                    dropIndex - currentCollectionsLength
+                    order
                 );
                 if (response?.error) {
                     showError(response.error);
@@ -319,10 +323,15 @@ export const ReportForm = observer((): ReactElement => {
                                 (col: ReportCollection) => col.itemUID === targetCollectionId
                             )?.collections?.length || 0;
 
+                        const order =
+                            dropIndex - currentCollectionsLength < 0
+                                ? 0
+                                : dropIndex - currentCollectionsLength;
+
                         const orderResponse = await setReportOrder(
                             targetCollectionId,
                             reportId,
-                            dropIndex - currentCollectionsLength
+                            order
                         );
                         if (orderResponse?.error) {
                             showError(orderResponse.error);
