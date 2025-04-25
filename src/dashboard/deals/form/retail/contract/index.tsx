@@ -72,19 +72,17 @@ export const DealRetailContract = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        value={Con_Term}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Term", value })
-                        }
-                        options={[...TERM_MONTH_LIST]}
-                        editable
-                        required
-                        className='w-full deal-sale__dropdown'
-                    />
-                    <label className='float-label'>Term (months)</label>
-                </span>
+                <ComboBox
+                    value={Con_Term}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Con_Term", value })
+                    }
+                    options={[...TERM_MONTH_LIST]}
+                    editable
+                    required
+                    className='w-full deal-sale__dropdown'
+                    label='Term (months)'
+                />
             </div>
             <div className='col-3'>
                 <PercentInput

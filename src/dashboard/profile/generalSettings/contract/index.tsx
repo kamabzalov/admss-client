@@ -20,10 +20,7 @@ export const SettingsContract = ({ settings }: SettingsAccountProps) => {
                     />
                 </div>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox className='settings-contract__dropdown' />
-                        <label className='float-label'>Payment frequency</label>
-                    </span>
+                    <ComboBox className='settings-contract__dropdown' label='Payment frequency' />
                 </div>
             </div>
         </div>

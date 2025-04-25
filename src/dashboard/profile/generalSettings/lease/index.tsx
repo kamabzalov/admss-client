@@ -23,10 +23,7 @@ export const SettingsLease = () => {
                     </span>
                 </div>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox className='settings-lease__dropdown' />
-                        <label className='float-label'> Default mileage</label>
-                    </span>
+                    <ComboBox className='settings-lease__dropdown' label='Default mileage' />
                 </div>
                 <div className='col-3'>
                     <CurrencyInput
@@ -37,16 +34,14 @@ export const SettingsLease = () => {
                     />
                 </div>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox id='settings-lease__term' className='settings-lease__dropdown' />
-                        <label className='float-label'>Term (months)</label>
-                    </span>
+                    <ComboBox
+                        id='settings-lease__term'
+                        className='settings-lease__dropdown'
+                        label='Term (months)'
+                    />
                 </div>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox className='settings-lease__dropdown' />
-                        <label className='float-label'>Payment frequency</label>
-                    </span>
+                    <ComboBox className='settings-lease__dropdown' label='Payment frequency' />
                 </div>
             </div>
         </div>

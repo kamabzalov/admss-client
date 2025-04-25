@@ -218,7 +218,6 @@ export const AdvancedSearchDialog = <T,>({
                                         optionLabel='name'
                                         optionValue='name'
                                         value={value ?? ""}
-                                        filter
                                         editable
                                         valueTemplate={selectedAutoMakesTemplate}
                                         itemTemplate={autoMakesOptionTemplate}
@@ -242,7 +241,6 @@ export const AdvancedSearchDialog = <T,>({
                                                 (typeItem) => typeItem?.name === selectedType
                                             )?.id
                                         }
-                                        filter
                                         options={typeList || []}
                                         onChange={({ target }) => {
                                             const selected = typeList.find(

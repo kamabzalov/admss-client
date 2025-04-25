@@ -181,42 +181,35 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         />
                     </div>
                     <div className='col-6'>
-                        <span className='p-float-label'>
-                            <ComboBox
-                                optionLabel='name'
-                                optionValue='id'
-                                filter
-                                options={expensesTypeList}
-                                value={currentEditExpense?.type || 0}
-                                onChange={({ value }) =>
-                                    value &&
-                                    currentEditExpense &&
-                                    setCurrentEditExpense({ ...currentEditExpense, type: value })
-                                }
-                                className='w-full purchase-expenses__dropdown'
-                            />
-
-                            <label className='float-label'>Type</label>
-                        </span>
+                        <ComboBox
+                            optionLabel='name'
+                            optionValue='id'
+                            options={expensesTypeList}
+                            value={currentEditExpense?.type || 0}
+                            onChange={({ value }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, type: value })
+                            }
+                            className='w-full purchase-expenses__dropdown'
+                            label='Type'
+                        />
                     </div>
                     <div className='col-12'>
-                        <span className='p-float-label'>
-                            <ComboBox
-                                optionLabel='userName'
-                                optionValue='contactuid'
-                                filter
-                                options={expensesVendorList}
-                                value={currentEditExpense?.vendor || ""}
-                                onChange={({ value }) =>
-                                    value &&
-                                    currentEditExpense &&
-                                    setCurrentEditExpense({ ...currentEditExpense, vendor: value })
-                                }
-                                className='w-full purchase-expenses__dropdown'
-                            />
-
-                            <label className='float-label'>Vendor</label>
-                        </span>
+                        <ComboBox
+                            optionLabel='userName'
+                            optionValue='contactuid'
+                            filter
+                            options={expensesVendorList}
+                            value={currentEditExpense?.vendor || ""}
+                            onChange={({ value }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, vendor: value })
+                            }
+                            className='w-full purchase-expenses__dropdown'
+                            label='Vendor'
+                        />
                     </div>
                     <div className='col-6'>
                         <CurrencyInput

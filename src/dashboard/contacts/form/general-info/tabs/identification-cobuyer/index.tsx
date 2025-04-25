@@ -168,7 +168,6 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                     <ComboBox
                         optionLabel='label'
                         optionValue='id'
-                        filter
                         value={contactExtData.CoBuyer_DL_State || ""}
                         options={STATES_LIST}
                         onChange={({ target: { value } }) =>
@@ -208,21 +207,18 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                 </div>
 
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            optionLabel='name'
-                            optionValue='name'
-                            filter
-                            value={contactExtData.CoBuyer_Sex || ""}
-                            options={SexList}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("CoBuyer_Sex", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            showClear={!!contactExtData.CoBuyer_Sex}
-                        />
-                        <label className='float-label'>Sex</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        value={contactExtData.CoBuyer_Sex || ""}
+                        options={SexList}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("CoBuyer_Sex", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.CoBuyer_Sex}
+                        label='Sex'
+                    />
                 </div>
 
                 <div className='col-3'>

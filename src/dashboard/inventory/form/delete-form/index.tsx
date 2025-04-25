@@ -68,23 +68,21 @@ export const DeleteForm = observer(
                 </div>
                 <div className='grid'>
                     <div className='col-6 relative'>
-                        <span className='p-float-label'>
-                            <ComboBox
-                                optionLabel='name'
-                                optionValue='name'
-                                value={deleteReason}
-                                required
-                                filter
-                                onChange={({ value }) => {
-                                    store.deleteReason = value;
-                                }}
-                                options={deleteReasonsList}
-                                className={`w-full vehicle-general__dropdown ${
-                                    attemptedSubmit && !deleteReason ? "p-invalid" : ""
-                                }`}
-                            />
-                            <label className='float-label'>Reason (required)</label>
-                        </span>
+                        <ComboBox
+                            optionLabel='name'
+                            optionValue='name'
+                            value={deleteReason}
+                            required
+                            onChange={({ value }) => {
+                                store.deleteReason = value;
+                            }}
+                            options={deleteReasonsList}
+                            className={`w-full vehicle-general__dropdown ${
+                                attemptedSubmit && !deleteReason ? "p-invalid" : ""
+                            }`}
+                            label='Reason (required)'
+                        />
+
                         {attemptedSubmit && !deleteReason && (
                             <small className='p-error'>Data is required</small>
                         )}
