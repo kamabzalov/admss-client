@@ -1,45 +1,44 @@
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import "./index.css";
-import { useState } from "react";
+import { useStore } from "store/hooks";
+import { GeneralSettings } from "common/models/general-settings";
+import { observer } from "mobx-react-lite";
 
-export const SettingsInventoryDefaults = () => {
-    const [settings, setSettings] = useState<any>({});
+export const SettingsInventoryDefaults = observer(() => {
+    const store = useStore().generalSettingsStore;
+    const { settings, changeSettings } = store;
 
-    const handleChange = (name: string, checked: boolean) => {
-        setSettings({ ...settings, [name]: checked });
+    const handleChange = (name: keyof GeneralSettings) => {
+        changeSettings(name, settings[name] ? 0 : 1);
     };
 
     return (
         <div className='settings-inventory-default'>
             <BorderedCheckbox
                 name='Mark Inventory PAID by default'
-                checked={settings.markInventoryPaidByDefault}
-                onChange={(e) => handleChange("markInventoryPaidByDefault", !!e.target.checked)}
+                checked={!!settings.defInvMarkPaid}
+                onChange={() => handleChange("defInvMarkPaid")}
             />
             <BorderedCheckbox
                 name='Mark Inventory TITLE RECEIVED by default'
-                checked={settings.markInventoryTitleReceivedByDefault}
-                onChange={(e) =>
-                    handleChange("markInventoryTitleReceivedByDefault", !!e.target.checked)
-                }
+                checked={!!settings.defInvTitleReceived}
+                onChange={() => handleChange("defInvTitleReceived")}
             />
             <BorderedCheckbox
                 name='Mark Inventory EXPORT TO WEB by default'
-                checked={settings.markInventoryExportToWebByDefault}
-                onChange={(e) =>
-                    handleChange("markInventoryExportToWebByDefault", !!e.target.checked)
-                }
+                checked={!!settings.defInvExportToWeb}
+                onChange={() => handleChange("defInvExportToWeb")}
             />
             <BorderedCheckbox
                 name='Mark Expenses DO NOT BILL by default'
-                checked={settings.markExpensesDoNotBillByDefault}
-                onChange={(e) => handleChange("markExpensesDoNotBillByDefault", !!e.target.checked)}
+                checked={!!settings.defInvDoNotBill}
+                onChange={() => handleChange("defInvDoNotBill")}
             />
             <BorderedCheckbox
                 name='Mark Expenses DO NOT POST by default'
-                checked={settings.markExpensesDoNotPostByDefault}
-                onChange={(e) => handleChange("markExpensesDoNotPostByDefault", !!e.target.checked)}
+                checked={!!settings.defInvDoNotPost}
+                onChange={() => handleChange("defInvDoNotPost")}
             />
         </div>
     );
-};
+});
