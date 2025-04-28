@@ -31,7 +31,7 @@ export interface GeneralSettings extends BaseResponseError {
     leaseOverageAmount: number;
     leasePaymentFrequency: number;
     leaseTerm: number;
-    logoenabled: number;
+    logoenabled: 0 | 1;
     logomediauid: string;
     logoopacity: number;
     logoposX: number;
@@ -50,7 +50,7 @@ export interface GeneralSettings extends BaseResponseError {
     stocknumtiSequental: number;
     stocknumtiSuffix: string;
     taxDefStateVehicleTaxRate: number;
-    uilogoenabled: number;
+    uilogoenabled: 0 | 1;
     uilogomediauid: string;
     updated: string;
     useruid: string;
