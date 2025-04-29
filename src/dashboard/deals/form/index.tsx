@@ -184,8 +184,6 @@ enum DealType {
     BHPH = 0,
 }
 
-const DATE_NOW = new Date().toISOString();
-
 export const DealsForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
@@ -462,8 +460,8 @@ export const DealsForm = observer(() => {
                                                     dealtype: deal.dealtype || dealType,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
-                                                    datepurchase: deal.datepurchase || DATE_NOW,
-                                                    dateeffective: deal.dateeffective || DATE_NOW,
+                                                    datepurchase: deal.datepurchase,
+                                                    dateeffective: deal.dateeffective,
                                                     inventorystatus: deal.inventorystatus || 0,
                                                     accountInfo: deal.accountInfo || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
