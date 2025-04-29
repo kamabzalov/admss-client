@@ -30,6 +30,7 @@ import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers"
 import { observer } from "mobx-react-lite";
 import "./index.css";
 import { DropdownHeaderPanel } from "dashboard/deals/common";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -394,25 +395,18 @@ export const DealsDataTable = observer(
                     />
 
                     <div className='contact-top-controls'>
-                        <Button
-                            className='contact-top-controls__button'
-                            icon='icon adms-add-item'
-                            severity='success'
-                            type='button'
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.NEW}
                             tooltip='Add new deal'
                             onClick={handleCreateDeal}
                         />
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-print'
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.PRINT}
                             tooltip='Print deals form'
                             onClick={() => printTableData(true)}
                         />
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-download'
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.DOWNLOAD}
                             tooltip='Download deals form'
                             onClick={() => printTableData()}
                         />
