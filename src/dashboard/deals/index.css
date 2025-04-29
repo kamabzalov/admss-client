@@ -1,3 +1,43 @@
+.deals {
+    .datatable-controls {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0;
+        gap: 20px;
+
+        .datatable-controls__search .p-inputtext {
+            width: 200px;
+            height: 50px;
+            align-items: center;
+        }
+
+        .datatable-controls__search-button.p-button {
+            display: flex;
+            padding: 0;
+            flex: 0 0 200px;
+            align-items: center;
+        }
+
+        .deals__columns,
+        .deals__filter {
+            width: 230px;
+            height: 50px;
+            align-items: center;
+            @media (max-width: 1252px) {
+                width: 200px;
+            }
+        }
+
+        .p-float-label:has(.deals__filter) {
+            margin-left: auto;
+            @media (max-width: 1252px) {
+                margin-left: 0;
+            }
+        }
+    }
+}
+
 .deal__card {
     display: flex;
     flex-direction: column;
@@ -56,12 +96,6 @@
     padding: 0;
     border-top: var(--admss-app-light-grey);
     margin: 28px 0;
-}
-
-.deals__dropdown {
-    width: 100%;
-    height: 50px;
-    align-items: center;
 }
 
 .p-button.deal__print-nav {
