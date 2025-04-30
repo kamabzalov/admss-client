@@ -1,7 +1,6 @@
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
-import { Dropdown } from "primereact/dropdown";
 import { useMemo, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -11,6 +10,7 @@ import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_FEE_TYPES } from "common/constants/account-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface AddFeeDialogProps extends DashboardDialogProps {}
 type AddFeeInfo = {
@@ -85,22 +85,21 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
             buttonDisabled={buttonDisabled}
             cancelButton
         >
-            <span className='p-float-label'>
-                <Dropdown
-                    className={`w-full ${changedFields.type ? "" : "input--grey"}`}
-                    value={addFee.type}
-                    onChange={({ value }) => {
-                        handleInputChange("type", value);
-                        if (value !== "Other") {
-                            handleInputChange("other", "");
-                        }
-                    }}
-                    options={[...ACCOUNT_FEE_TYPES]}
-                    optionLabel='name'
-                    optionValue='name'
-                />
-                <label className='float-label'>Type</label>
-            </span>
+            <ComboBox
+                className={`w-full ${changedFields.type ? "" : "input--grey"}`}
+                value={addFee.type}
+                onChange={({ value }) => {
+                    handleInputChange("type", value);
+                    if (value !== "Other") {
+                        handleInputChange("other", "");
+                    }
+                }}
+                options={[...ACCOUNT_FEE_TYPES]}
+                label='Type'
+                optionLabel='name'
+                optionValue='name'
+            />
+
             <span className='p-float-label'>
                 <InputText
                     className={`w-full ${changedFields.other ? "" : "input--grey"}`}

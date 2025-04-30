@@ -5,7 +5,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
@@ -23,7 +22,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { ListData } from "common/models";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const { id } = useParams();
@@ -182,42 +181,35 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         />
                     </div>
                     <div className='col-6'>
-                        <span className='p-float-label'>
-                            <Dropdown
-                                optionLabel='name'
-                                optionValue='id'
-                                filter
-                                options={expensesTypeList}
-                                value={currentEditExpense?.type || 0}
-                                onChange={({ value }) =>
-                                    value &&
-                                    currentEditExpense &&
-                                    setCurrentEditExpense({ ...currentEditExpense, type: value })
-                                }
-                                className='w-full purchase-expenses__dropdown'
-                            />
-
-                            <label className='float-label'>Type</label>
-                        </span>
+                        <ComboBox
+                            optionLabel='name'
+                            optionValue='id'
+                            options={expensesTypeList}
+                            value={currentEditExpense?.type || 0}
+                            onChange={({ value }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, type: value })
+                            }
+                            className='w-full purchase-expenses__dropdown'
+                            label='Type'
+                        />
                     </div>
                     <div className='col-12'>
-                        <span className='p-float-label'>
-                            <Dropdown
-                                optionLabel='userName'
-                                optionValue='contactuid'
-                                filter
-                                options={expensesVendorList}
-                                value={currentEditExpense?.vendor || ""}
-                                onChange={({ value }) =>
-                                    value &&
-                                    currentEditExpense &&
-                                    setCurrentEditExpense({ ...currentEditExpense, vendor: value })
-                                }
-                                className='w-full purchase-expenses__dropdown'
-                            />
-
-                            <label className='float-label'>Vendor</label>
-                        </span>
+                        <ComboBox
+                            optionLabel='userName'
+                            optionValue='contactuid'
+                            filter
+                            options={expensesVendorList}
+                            value={currentEditExpense?.vendor || ""}
+                            onChange={({ value }) =>
+                                value &&
+                                currentEditExpense &&
+                                setCurrentEditExpense({ ...currentEditExpense, vendor: value })
+                            }
+                            className='w-full purchase-expenses__dropdown'
+                            label='Vendor'
+                        />
                     </div>
                     <div className='col-6'>
                         <CurrencyInput

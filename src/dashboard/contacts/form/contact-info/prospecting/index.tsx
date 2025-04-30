@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
@@ -9,6 +8,7 @@ import { useStore } from "store/hooks";
 import { getContactsProspectList, getContactsSalesmanList } from "http/services/contacts-service";
 import { useParams } from "react-router-dom";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
@@ -39,21 +39,16 @@ export const ContactsProspecting = observer((): ReactElement => {
     return (
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='username'
-                        optionValue='useruid'
-                        filter
-                        value={contactExtData.SALESMAN_ID}
-                        options={salespersonsList}
-                        onChange={({ target: { value } }) =>
-                            changeContactExtData("SALESMAN_ID", value)
-                        }
-                        placeholder='Attending Salesman'
-                        className='w-full contacts-prospecting__dropdown'
-                    />
-                    <label className='float-label'>Attending Salesman</label>
-                </span>
+                <ComboBox
+                    optionLabel='username'
+                    optionValue='useruid'
+                    value={contactExtData.SALESMAN_ID}
+                    options={salespersonsList}
+                    onChange={({ target: { value } }) => changeContactExtData("SALESMAN_ID", value)}
+                    placeholder='Attending Salesman'
+                    className='w-full contacts-prospecting__dropdown'
+                    label='Attending Salesman'
+                />
             </div>
             <div className='col-6'>
                 <DateInput
@@ -69,41 +64,35 @@ export const ContactsProspecting = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='notes'
-                        optionValue='notes'
-                        options={prospectList}
-                        filter
-                        editable
-                        value={contactExtData.PROSPECT1_ID}
-                        onChange={({ target: { value } }) => {
-                            changeContactExtData("PROSPECT1_ID", value);
-                        }}
-                        placeholder='Choose a Vehicle'
-                        className='w-full contacts-prospecting__dropdown'
-                    />
-                    <label className='float-label'>Choose a Vehicle</label>
-                </span>
+                <ComboBox
+                    optionLabel='notes'
+                    optionValue='notes'
+                    options={prospectList}
+                    editable
+                    value={contactExtData.PROSPECT1_ID}
+                    onChange={({ target: { value } }) => {
+                        changeContactExtData("PROSPECT1_ID", value);
+                    }}
+                    placeholder='Choose a Vehicle'
+                    className='w-full contacts-prospecting__dropdown'
+                    label='Choose a Vehicle'
+                />
             </div>
             {anotherVehicle ? (
                 <div className='col-6'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='notes'
-                            optionValue='notes'
-                            options={prospectList}
-                            filter
-                            editable
-                            value={contactExtData.PROSPECT2_ID}
-                            onChange={({ target: { value } }) => {
-                                changeContactExtData("PROSPECT2_ID", value);
-                            }}
-                            placeholder='Choose a Vehicle'
-                            className='w-full contacts-prospecting__dropdown'
-                        />
-                        <label className='float-label'>Choose a Vehicle</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='notes'
+                        optionValue='notes'
+                        options={prospectList}
+                        editable
+                        value={contactExtData.PROSPECT2_ID}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("PROSPECT2_ID", value);
+                        }}
+                        placeholder='Choose a Vehicle'
+                        className='w-full contacts-prospecting__dropdown'
+                        label='Choose a Vehicle'
+                    />
                 </div>
             ) : (
                 <div className='col-6'>

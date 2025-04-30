@@ -16,6 +16,7 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { DateInput } from "dashboard/common/form/inputs";
 import { DIALOG_ACTION, reportDownloadForm } from "dashboard/reports/common/report-parameters";
 import { validateDates } from "common/helpers";
+import { useDateRange } from "common/hooks";
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -33,8 +34,7 @@ export const ReportEditForm = observer((): ReactElement => {
     const toast = useToast();
     const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<DIALOG_ACTION>(DIALOG_ACTION.PREVIEW);
-    const [startDate, setStartDate] = useState<string | number>("");
-    const [endDate, setEndDate] = useState<string | number>("");
+    const { startDate, endDate, handleDateChange } = useDateRange();
     const [dateError, setDateError] = useState<string>("");
 
     useEffect(() => {
@@ -239,7 +239,6 @@ export const ReportEditForm = observer((): ReactElement => {
                 </div>
             </div>
 
-            {}
             <DashboardDialog
                 visible={isDialogVisible}
                 position='top'
@@ -265,16 +264,16 @@ export const ReportEditForm = observer((): ReactElement => {
                     date={startDate}
                     className={`${dateError ? "p-invalid" : ""} w-full`}
                     emptyDate
-                    onChange={({ value }) => setStartDate(Number(value))}
+                    onChange={({ value }) => handleDateChange(Number(value), true)}
                 />
                 <DateInput
                     name='End Date'
                     date={endDate}
                     className={`${dateError ? "p-invalid" : ""} w-full`}
                     emptyDate
-                    onChange={({ value }) => setEndDate(Number(value))}
+                    minDate={startDate ? new Date(Number(startDate)) : undefined}
+                    onChange={({ value }) => handleDateChange(Number(value), false)}
                 />
-                {dateError && <small className='p-error'>{dateError}</small>}
             </DashboardDialog>
         </div>
     );

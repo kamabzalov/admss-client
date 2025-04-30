@@ -1,7 +1,7 @@
 import { PercentInput } from "dashboard/common/form/inputs";
 
 import "./index.css";
-import { Dropdown } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface SettingsAccountProps {
     settings?: any;
@@ -20,10 +20,7 @@ export const SettingsContract = ({ settings }: SettingsAccountProps) => {
                     />
                 </div>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown className='settings-contract__dropdown' />
-                        <label className='float-label'>Payment frequency</label>
-                    </span>
+                    <ComboBox className='settings-contract__dropdown' label='Payment frequency' />
                 </div>
             </div>
         </div>

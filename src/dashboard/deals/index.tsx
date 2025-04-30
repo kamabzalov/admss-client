@@ -14,11 +14,10 @@ import { TotalDealsList, getDealsList } from "http/services/deals.service";
 import { ROWS_PER_PAGE } from "common/settings";
 import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
-import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import {
@@ -29,19 +28,22 @@ import {
 import { useStore } from "store/hooks";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 import { observer } from "mobx-react-lite";
+import "./index.css";
+import { DropdownHeaderPanel } from "dashboard/deals/common";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
 }
 
-export type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
 const renderColumnsData: TableColumnsList[] = [
-    { field: "accountInfo", header: "Account" },
-    { field: "contactinfo", header: "Customer" },
-    { field: "dealtype", header: "Type" },
-    { field: "created", header: "Sale Date" },
-    { field: "inventoryinfo", header: "Info (Vehicle)" },
+    { field: "accountInfo", header: "Account", checked: true },
+    { field: "contactinfo", header: "Customer", checked: true },
+    { field: "dealtype", header: "Type", checked: true },
+    { field: "created", header: "Sale Date", checked: true },
+    { field: "inventoryinfo", header: "Info (Vehicle)", checked: true },
 ];
 
 interface DealsFilterOptions {
@@ -52,6 +54,12 @@ interface DealsFilterOptions {
 interface DealsFilterGroup {
     name: string;
     options: DealsFilterOptions[];
+}
+
+enum FILTER_CATEGORIES {
+    TYPE = "Type (one of the list)",
+    STATUS = "Status (one of the list)",
+    OTHER = "Other",
 }
 
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
@@ -79,9 +87,9 @@ const DEALS_STATUS_LIST: DealsFilterOptions[] = [
 ];
 
 const FILTER_GROUP_LIST: DealsFilterGroup[] = [
-    { name: "Type (one of the list)", options: DEALS_TYPE_LIST },
-    { name: "Status (one of the list)", options: DEALS_STATUS_LIST },
-    { name: "Other", options: DEALS_OTHER_LIST },
+    { name: FILTER_CATEGORIES.TYPE, options: DEALS_TYPE_LIST },
+    { name: FILTER_CATEGORIES.STATUS, options: DEALS_STATUS_LIST },
+    { name: FILTER_CATEGORIES.OTHER, options: DEALS_OTHER_LIST },
 ];
 
 enum SEARCH_FORM_FIELDS {
@@ -127,6 +135,7 @@ export const DealsDataTable = observer(
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(renderColumnsData);
 
         const searchFields = [
             {
@@ -367,77 +376,136 @@ export const DealsDataTable = observer(
 
         return (
             <div className='card-content'>
-                <div className='grid datatable-controls'>
-                    <div className='col-2'>
-                        <span className='p-float-label'>
-                            <MultiSelect
-                                optionValue='value'
-                                optionLabel='name'
-                                value={dealSelectedGroup}
-                                options={FILTER_GROUP_LIST}
-                                optionGroupLabel='name'
-                                optionGroupChildren='options'
-                                panelHeaderTemplate={<></>}
-                                display='chip'
-                                className='deals__dropdown'
-                                onChange={(e) => {
-                                    e.stopPropagation();
-                                    setDealSelectedGroup(e.value);
-                                }}
-                                pt={{
-                                    wrapper: {
-                                        style: {
-                                            maxHeight: "625px",
-                                        },
-                                    },
-                                }}
-                            />
-                            <label className='float-label'>Filter</label>
-                        </span>
+                <div className='datatable-controls'>
+                    <span className='p-input-icon-right p-float-label datatable-controls__search'>
+                        <i className='icon adms-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                        <label className='float-label'>Search</label>
+                    </span>
+
+                    <Button
+                        className='datatable-controls__search-button'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                        onClick={() => setDialogVisible(true)}
+                    />
+
+                    <div className='contact-top-controls'>
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.NEW}
+                            tooltip='Add new deal'
+                            onClick={handleCreateDeal}
+                        />
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.PRINT}
+                            tooltip='Print deals form'
+                            onClick={() => printTableData(true)}
+                        />
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.DOWNLOAD}
+                            tooltip='Download deals form'
+                            onClick={() => printTableData()}
+                        />
                     </div>
 
-                    <div className='col-4'>
-                        <div className='contact-top-controls'>
-                            <Button
-                                className='contact-top-controls__button'
-                                icon='icon adms-add-item'
-                                severity='success'
-                                type='button'
-                                tooltip='Add new deal'
-                                onClick={handleCreateDeal}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-print'
-                                tooltip='Print deals form'
-                                onClick={() => printTableData(true)}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-download'
-                                tooltip='Download deals form'
-                                onClick={() => printTableData()}
-                            />
-                        </div>
-                    </div>
-                    <div className='col-6 text-right flex flex-nowrap'>
-                        <Button
-                            className='contact-top-controls__button m-r-20px ml-auto'
-                            label='Advanced search'
-                            severity='success'
-                            type='button'
-                            onClick={() => setDialogVisible(true)}
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            optionValue='value'
+                            optionLabel='name'
+                            value={dealSelectedGroup}
+                            options={FILTER_GROUP_LIST}
+                            optionGroupLabel='name'
+                            optionGroupChildren='options'
+                            panelHeaderTemplate={<></>}
+                            display='chip'
+                            className='deals__filter'
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                const newValue = [...e.value];
+                                const lastSelected = newValue[newValue.length - 1];
+
+                                const lastSelectedCategory = FILTER_GROUP_LIST.find((group) =>
+                                    group.options.some((option) => option.value === lastSelected)
+                                )?.name;
+
+                                if (
+                                    lastSelectedCategory === FILTER_CATEGORIES.TYPE ||
+                                    lastSelectedCategory === FILTER_CATEGORIES.STATUS
+                                ) {
+                                    const filteredValue = newValue.filter((item) => {
+                                        const itemCategory = FILTER_GROUP_LIST.find((group) =>
+                                            group.options.some((option) => option.value === item)
+                                        )?.name;
+                                        return (
+                                            itemCategory !== lastSelectedCategory ||
+                                            item === lastSelected
+                                        );
+                                    });
+                                    setDealSelectedGroup(filteredValue);
+                                } else {
+                                    setDealSelectedGroup(newValue);
+                                }
+                            }}
+                            pt={{
+                                wrapper: {
+                                    style: {
+                                        width: "230px",
+                                        maxHeight: "625px",
+                                    },
+                                },
+                            }}
                         />
-                        <span className='p-input-icon-right'>
-                            <i className='icon adms-search' />
-                            <InputText
-                                value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
-                            />
-                        </span>
-                    </div>
+                        <label className='float-label'>Filter</label>
+                    </span>
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            value={activeColumns}
+                            options={renderColumnsData}
+                            optionLabel='header'
+                            className='deals__columns'
+                            display='chip'
+                            panelHeaderTemplate={() => (
+                                <DropdownHeaderPanel
+                                    columns={renderColumnsData}
+                                    activeColumns={activeColumns}
+                                    setActiveColumns={setActiveColumns}
+                                />
+                            )}
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+                                const sortedValue = value.sort(
+                                    (a: TableColumnsList, b: TableColumnsList) => {
+                                        const firstIndex = renderColumnsData.findIndex(
+                                            (col) => col.field === a.field
+                                        );
+                                        const secondIndex = renderColumnsData.findIndex(
+                                            (col) => col.field === b.field
+                                        );
+                                        return firstIndex - secondIndex;
+                                    }
+                                );
+
+                                setActiveColumns(sortedValue);
+                            }}
+                            pt={{
+                                header: {
+                                    className: "deals__columns-header",
+                                },
+                                wrapper: {
+                                    className: "deals__columns-wrapper",
+                                    style: {
+                                        width: "230px",
+                                        maxHeight: "500px",
+                                    },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Columns</label>
+                    </span>
                 </div>
                 <div className='grid'>
                     <div className='col-12'>
@@ -462,7 +530,7 @@ export const DealsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
-                                {renderColumnsData.map(({ field, header }) => (
+                                {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}
@@ -495,15 +563,11 @@ export const DealsDataTable = observer(
 
 export const Deals = () => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Deals</h2>
-                    </div>
-                    <DealsDataTable />
-                </div>
+        <div className='card deals'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Deals</h2>
             </div>
+            <DealsDataTable />
         </div>
     );
 };

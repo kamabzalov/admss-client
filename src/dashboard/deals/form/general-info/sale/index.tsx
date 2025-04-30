@@ -167,61 +167,56 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <small className='p-error'>{errors.inventoryinfo}</small>
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("dealtype")}
-                        optionLabel='name'
-                        optionValue='id'
-                        required
-                        options={dealTypesList}
-                        value={values.dealtype}
-                        onChange={(e) => {
-                            setFieldValue("dealtype", e.value);
-                            store.dealType = e.value;
-                            changeDeal({ key: "dealtype", value: e.value });
-                        }}
-                        className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
-                    />
-                    <label className='float-label'>Type of Deal (required)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("dealtype")}
+                    optionLabel='name'
+                    optionValue='id'
+                    required
+                    options={dealTypesList}
+                    label='Type of Deal (required)'
+                    value={values.dealtype}
+                    onChange={(e) => {
+                        setFieldValue("dealtype", e.value);
+                        store.dealType = e.value;
+                        changeDeal({ key: "dealtype", value: e.value });
+                    }}
+                    className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
+                />
+
                 <small className='p-error'>{errors.dealtype}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("dealstatus")}
-                        optionLabel='name'
-                        optionValue='id'
-                        value={values.dealstatus}
-                        onChange={(e) => {
-                            setFieldValue("dealstatus", e.value);
-                            changeDeal({ key: "dealstatus", value: e.value });
-                        }}
-                        options={dealStatusesList}
-                        required
-                        className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
-                    />
-                    <label className='float-label'>Sale status (required)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("dealstatus")}
+                    optionLabel='name'
+                    optionValue='id'
+                    value={values.dealstatus}
+                    onChange={(e) => {
+                        setFieldValue("dealstatus", e.value);
+                        changeDeal({ key: "dealstatus", value: e.value });
+                    }}
+                    options={dealStatusesList}
+                    required
+                    className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
+                    label='Sale status (required)'
+                />
                 <small className='p-error'>{errors.dealstatus}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("saletype")}
-                        optionLabel='name'
-                        optionValue='id'
-                        required
-                        options={saleTypesList}
-                        value={values.saletype}
-                        onChange={(e) => {
-                            setFieldValue("saletype", e.value);
-                            changeDeal({ key: "saletype", value: e.value });
-                        }}
-                        className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
-                    />
-                    <label className='float-label'>Sale type (required)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("saletype")}
+                    optionLabel='name'
+                    optionValue='id'
+                    required
+                    options={saleTypesList}
+                    value={values.saletype}
+                    onChange={(e) => {
+                        setFieldValue("saletype", e.value);
+                        changeDeal({ key: "saletype", value: e.value });
+                    }}
+                    label='Sale type (required)'
+                    className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
+                />
                 <small className='p-error'>{errors.saletype}</small>
             </div>
             <div className='col-3 relative'>
@@ -251,26 +246,22 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <small className='p-error'>{errors.dateeffective}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("inventorystatus")}
-                        optionLabel='name'
-                        optionValue='id'
-                        value={
-                            values.inventorystatus !== undefined
-                                ? Number(values.inventorystatus)
-                                : null
-                        }
-                        options={inventoryStatusesList}
-                        onChange={(e) => {
-                            setFieldValue("inventorystatus", e.value);
-                            changeDeal({ key: "inventorystatus", value: e.value });
-                        }}
-                        required
-                        className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
-                    />
-                    <label className='float-label'>New or Used (req.)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("inventorystatus")}
+                    optionLabel='name'
+                    optionValue='id'
+                    value={
+                        values.inventorystatus !== undefined ? Number(values.inventorystatus) : null
+                    }
+                    options={inventoryStatusesList}
+                    onChange={(e) => {
+                        setFieldValue("inventorystatus", e.value);
+                        changeDeal({ key: "inventorystatus", value: e.value });
+                    }}
+                    required
+                    className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
+                    label='New or Used (req.)'
+                />
                 <small className='p-error'>{errors.inventorystatus}</small>
             </div>
 
@@ -309,25 +300,21 @@ export const DealGeneralSale = observer((): ReactElement => {
             <hr className='col-12 form-line' />
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("HowFoundOut")}
-                        required
-                        optionLabel='description'
-                        optionValue='itemuid'
-                        options={howToKnowList}
-                        value={values.HowFoundOut}
-                        onChange={(e) => {
-                            setFieldValue("HowFoundOut", e.value);
-                            changeDealExtData({ key: "HowFoundOut", value: e.value });
-                        }}
-                        editable
-                        className={`w-full deal-sale__dropdown ${
-                            errors.HowFoundOut && "p-invalid"
-                        }`}
-                    />
-                    <label className='float-label'>How did you hear about us? (required)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("HowFoundOut")}
+                    required
+                    optionLabel='description'
+                    optionValue='itemuid'
+                    options={howToKnowList}
+                    value={values.HowFoundOut}
+                    onChange={(e) => {
+                        setFieldValue("HowFoundOut", e.value);
+                        changeDealExtData({ key: "HowFoundOut", value: e.value });
+                    }}
+                    editable
+                    className={`w-full deal-sale__dropdown ${errors.HowFoundOut && "p-invalid"}`}
+                    label='How did you hear about us? (required)'
+                />
                 <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
             <div className='col-3 relative'>
