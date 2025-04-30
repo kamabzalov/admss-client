@@ -12,7 +12,7 @@ import {
     getReportInfo,
     getUserReportCollectionsContent,
     updateReportInfo,
-    updateReportCollections,
+    updateCollection,
 } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -209,22 +209,28 @@ export class ReportStore {
                             );
 
                         if (collectionsChanged) {
-                            const collectionResponse = await updateReportCollections(
-                                this._report.itemuid!,
-                                {
-                                    itemuid: this._report.itemuid!,
-                                    useruid: this.rootStore.userStore.authUser?.useruid!,
-                                    collections,
-                                }
-                            );
+                            for (const { collectionuid } of collections) {
+                                const collectionResponse = await updateCollection(
+                                    this.rootStore.userStore.authUser?.useruid!,
+                                    {
+                                        itemUID: collectionuid,
+                                        documents: [
+                                            {
+                                                documentUID: uid,
+                                                collections,
+                                            },
+                                        ],
+                                    }
+                                );
 
-                            if (collectionResponse?.status === Status.ERROR) {
-                                return {
-                                    status: Status.ERROR,
-                                    error:
-                                        collectionResponse.error ||
-                                        "Error while updating collection",
-                                };
+                                if (collectionResponse?.status === Status.ERROR) {
+                                    return {
+                                        status: Status.ERROR,
+                                        error:
+                                            collectionResponse.error ||
+                                            "Error while updating collection",
+                                    };
+                                }
                             }
                         }
 
