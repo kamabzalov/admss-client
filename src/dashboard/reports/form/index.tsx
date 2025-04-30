@@ -395,37 +395,35 @@ export const ReportForm = observer((): ReactElement => {
                             </Button>
                         )}
                     </div>
-                    <div className='card-content report__card grid'>
-                        <div className='col-4'>
-                            <Tree
-                                value={allNodes}
-                                dragdropScope='reports'
-                                onDragDrop={handleDragDrop}
-                                expandedKeys={expandedKeys}
-                                onToggle={(e) => setExpandedKeys(e.value)}
-                                nodeTemplate={(node) => {
-                                    const nodeData = node as TreeNodeEvent;
-                                    const isSelected =
-                                        nodeData.type === NODE_TYPES.DOCUMENT &&
-                                        nodeData.data.document?.documentUID === id;
-                                    return (
-                                        <div
-                                            onDragEnter={(e) => handleDragEnter(e, node)}
-                                            onDragLeave={handleDragLeave}
-                                        >
-                                            <NodeContent
-                                                node={nodeData}
-                                                isSelected={isSelected}
-                                                onClick={() => handleSelection(node)}
-                                                isTogglerVisible={
-                                                    nodeData.type === NODE_TYPES.COLLECTION
-                                                }
-                                            />
-                                        </div>
-                                    );
-                                }}
-                            />
-                        </div>
+                    <div className='card-content report__card'>
+                        <Tree
+                            value={allNodes}
+                            dragdropScope='reports'
+                            onDragDrop={handleDragDrop}
+                            expandedKeys={expandedKeys}
+                            onToggle={(e) => setExpandedKeys(e.value)}
+                            nodeTemplate={(node) => {
+                                const nodeData = node as TreeNodeEvent;
+                                const isSelected =
+                                    nodeData.type === NODE_TYPES.DOCUMENT &&
+                                    nodeData.data.document?.documentUID === id;
+                                return (
+                                    <div
+                                        onDragEnter={(e) => handleDragEnter(e, node)}
+                                        onDragLeave={handleDragLeave}
+                                    >
+                                        <NodeContent
+                                            node={nodeData}
+                                            isSelected={isSelected}
+                                            onClick={() => handleSelection(node)}
+                                            isTogglerVisible={
+                                                nodeData.type === NODE_TYPES.COLLECTION
+                                            }
+                                        />
+                                    </div>
+                                );
+                            }}
+                        />
                         <ReportEditForm />
                     </div>
                     <ReportFooter onRefetch={getUserReportCollections} />
