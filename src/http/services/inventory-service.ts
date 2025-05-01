@@ -19,6 +19,7 @@ import {
     LocationsListData,
     MakesListData,
     OptionsListData,
+    InventoryShortList,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -189,6 +190,29 @@ export const getVINCheck = async (VIN: string) => {
                 error: error.response?.data.error || "Error while VIN check",
             };
         }
+    }
+};
+
+export const getShortInventoryList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            InventoryShortList[] | BaseResponseError
+        >(`inventory/${useruid}/shortlist`);
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error: Error | BaseResponseError | unknown) {
+        const errorMessage = "Error while getting inventory list";
+        if (error instanceof Error) {
+            return {
+                status: Status.ERROR,
+                error: error.message || errorMessage,
+            };
+        }
+        return {
+            status: Status.ERROR,
+            error: error || errorMessage,
+        };
     }
 };
 

@@ -441,3 +441,8 @@ export interface UploadMediaLink {
     notes: string;
     mediaurl: string;
 }
+
+export interface InventoryShortList {
+    itemuid: string;
+    name: string;
+}

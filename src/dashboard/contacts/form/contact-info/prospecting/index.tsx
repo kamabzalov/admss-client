@@ -5,30 +5,45 @@ import { DateInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
-import { getContactsProspectList, getContactsSalesmanList } from "http/services/contacts-service";
+import { getContactsSalesmanList } from "http/services/contacts-service";
 import { useParams } from "react-router-dom";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { ComboBox } from "dashboard/common/form/dropdown";
-
+import { getShortInventoryList } from "http/services/inventory-service";
+import { TOAST_LIFETIME } from "common/settings";
+import { useToast } from "dashboard/common/toast";
+import { InventoryShortList } from "common/models/inventory";
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
     const { authUser } = useStore().userStore;
     const { contactExtData, changeContactExtData } = store;
+    const toast = useToast();
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
-    const [prospectList, setProspectList] = useState<any>([]);
+    const [prospectList, setProspectList] = useState<InventoryShortList[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
+
+    const handleGetShortInventoryList = async () => {
+        const response = await getShortInventoryList(authUser?.useruid ?? "");
+        if (!Array.isArray(response) && response?.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.error as string,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            setProspectList(response as InventoryShortList[]);
+        }
+    };
 
     useEffect(() => {
         if (authUser) {
             getContactsSalesmanList(authUser.useruid).then((response) => {
                 response && setSalespersonsList(response);
             });
-            id &&
-                getContactsProspectList(id).then((response) => {
-                    setProspectList(response);
-                });
+            handleGetShortInventoryList();
         }
     }, [id]);
 
@@ -65,8 +80,8 @@ export const ContactsProspecting = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <ComboBox
-                    optionLabel='notes'
-                    optionValue='notes'
+                    optionLabel='name'
+                    optionValue='itemuid'
                     options={prospectList}
                     editable
                     value={contactExtData.PROSPECT1_ID}
@@ -81,8 +96,8 @@ export const ContactsProspecting = observer((): ReactElement => {
             {anotherVehicle ? (
                 <div className='col-6'>
                     <ComboBox
-                        optionLabel='notes'
-                        optionValue='notes'
+                        optionLabel='name'
+                        optionValue='itemuid'
                         options={prospectList}
                         editable
                         value={contactExtData.PROSPECT2_ID}
