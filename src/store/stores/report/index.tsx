@@ -157,9 +157,10 @@ export class ReportStore {
             this._isLoading = true;
             try {
                 const collections: ReportCollections[] = this._reportCollections.map(
-                    ({ collectionuid }) => {
+                    ({ collectionuid, name }) => {
                         return {
                             collectionuid,
+                            name,
                         };
                     }
                 );
@@ -209,11 +210,12 @@ export class ReportStore {
                             );
 
                         if (collectionsChanged) {
-                            for (const { collectionuid } of collections) {
+                            for (const { collectionuid, name } of collections) {
                                 const collectionResponse = await updateCollection(
                                     this.rootStore.userStore.authUser?.useruid!,
                                     {
-                                        itemUID: collectionuid,
+                                        itemuid: collectionuid,
+                                        name,
                                         documents: [
                                             {
                                                 documentUID: uid,

@@ -8,6 +8,7 @@ export interface ReportsColumn {
 export interface ReportCollections {
     collectionuid: string;
     itemuid?: string;
+    name?: string;
 }
 
 export interface ReportsPostData {
@@ -48,6 +49,7 @@ export interface ReportCollection extends BaseResponseError {
     name: string;
     updated: string;
     userUID: string;
+    itemuid: string;
 }
 
 export interface ReportCollectionUpdate {
