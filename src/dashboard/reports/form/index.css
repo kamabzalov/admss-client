@@ -85,10 +85,24 @@
         height: 100%;
         border: none;
 
+        .p-treenode .p-treenode-content.simple-node {
+            .report__list-item {
+                padding-left: 37px;
+            }
+            .p-tree-toggler {
+                display: none;
+            }
+        }
+
         .p-treenode .p-treenode-content.simple-node.p-treenode-dragover {
             .report__list-item {
                 background: transparent;
             }
+            .report__list-item.p-button {
+                transition: none;
+                background-color: transparent;
+            }
+
             background-color: transparent;
         }
 
@@ -330,12 +344,11 @@
     text-align: left;
 }
 
-.report__list-item.p-button.p-button-text:hover {
-    background-color: var(--admss-app-light-blue);
-}
-
-.report__list-item.p-button.p-button-text:enabled:hover {
+.report__list-item.p-button.p-button-text:enabled:hover,
+.report__list-item.p-button.p-button-text:enabled:focus,
+.report__list-item.p-button.p-button-text:enabled:active {
     color: var(--admss-app-primary);
+    background-color: transparent;
 }
 
 .report__list-item.p-button.p-button-text:focus {
