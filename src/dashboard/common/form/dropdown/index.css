@@ -1,0 +1,11 @@
+.combo-box {
+    .p-dropdown-trigger {
+        color: var(--admss-app-light-grey);
+        &:hover {
+            color: var(--admss-app-lightest-grey);
+        }
+        .p-icon {
+            font-size: 14px;
+        }
+    }
+}

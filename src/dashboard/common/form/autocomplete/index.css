@@ -1,0 +1,32 @@
+.autocomplete-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    .p-button {
+        color: var(--admss-app-light-grey);
+        .p-button-icon {
+            font-size: 14px;
+        }
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active {
+            color: var(--admss-app-lightest-grey);
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+    }
+    .autocomplete-dropdown__clear-button {
+        position: absolute;
+        right: 30px;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .p-button-icon-only {
+        transition: transform 0.3s ease-in-out;
+    }
+}
