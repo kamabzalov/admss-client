@@ -237,13 +237,13 @@ export const AdvancedSearchDialog = <T,>({
                                         optionLabel='name'
                                         optionValue='id'
                                         value={
-                                            typeList.find(
+                                            typeList?.find(
                                                 (typeItem) => typeItem?.name === selectedType
                                             )?.id
                                         }
                                         options={typeList || []}
                                         onChange={({ target }) => {
-                                            const selected = typeList.find(
+                                            const selected = typeList?.find(
                                                 (typeItem) => typeItem?.id === target.value
                                             );
                                             setSelectedType(selected?.name || "");

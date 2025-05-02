@@ -1,5 +1,6 @@
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
+import "./index.css";
 
 interface CustomDropdownProps extends DropdownProps {
     filterThreshold?: number;
@@ -16,7 +17,12 @@ export const ComboBox = ({
     const shouldEnableFilter = options && options.length > filterThreshold;
 
     const dropdown = (
-        <Dropdown {...props} options={options} filter={filter ?? shouldEnableFilter} />
+        <Dropdown
+            {...props}
+            className={`${props.className} combo-box`}
+            options={options}
+            filter={filter ?? shouldEnableFilter}
+        />
     );
 
     return label ? (
