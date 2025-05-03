@@ -29,4 +29,10 @@
     .p-button-icon-only {
         transition: transform 0.3s ease-in-out;
     }
+
+    &.p-inputgroup .p-float-label:first-child .p-inputtext {
+        overflow: hidden;
+        padding-right: 70px;
+        text-overflow: ellipsis;
+    }
 }
