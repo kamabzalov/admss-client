@@ -44,6 +44,9 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        .p-multiselect-token-icon {
+            flex-shrink: 0;
+        }
     }
 }
 
