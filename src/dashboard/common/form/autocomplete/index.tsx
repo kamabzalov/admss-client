@@ -1,6 +1,6 @@
 import { AutoComplete, AutoCompleteProps } from "primereact/autocomplete";
 import { Button } from "primereact/button";
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useRef, useEffect } from "react";
 import "./index.css";
 
 interface AutoCompleteDropdownProps extends AutoCompleteProps {
@@ -17,16 +17,33 @@ export const AutoCompleteDropdown = ({
     ...props
 }: AutoCompleteDropdownProps): ReactElement => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const autoCompleteRef = useRef<AutoComplete>(null);
+    const [dropdownWidth, setDropdownWidth] = useState<number>(0);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            const width = containerRef.current.offsetWidth;
+            setDropdownWidth(width);
+        }
+    }, []);
 
     return (
-        <div className='p-inputgroup autocomplete-dropdown'>
+        <div className='p-inputgroup autocomplete-dropdown' ref={containerRef}>
             <span className='p-float-label'>
                 <AutoComplete
                     {...props}
                     dropdown={dropdown}
                     inputClassName='autocomplete-dropdown__input'
+                    ref={autoCompleteRef}
                     onShow={() => setIsDropdownVisible(true)}
                     onHide={() => setIsDropdownVisible(false)}
+                    onDropdownClick={() => {
+                        if (isDropdownVisible && autoCompleteRef.current) {
+                            autoCompleteRef.current.hide();
+                            setIsDropdownVisible(false);
+                        }
+                    }}
                     pt={{
                         dropdownButton: {
                             root: {
@@ -34,6 +51,25 @@ export const AutoCompleteDropdown = ({
                                     rotate: `${isDropdownVisible ? "180deg" : "0deg"}`,
                                     transition: "rotate 0.3s ease",
                                 },
+                            },
+                        },
+
+                        panel: {
+                            style: {
+                                width: `${dropdownWidth}px`,
+                            },
+                        },
+                        list: {
+                            style: {
+                                width: `${dropdownWidth - 10}px`,
+                            },
+                        },
+                        item: {
+                            style: {
+                                width: "100%",
+                                textOverflow: "ellipsis",
+                                overflow: "hidden",
+                                whiteSpace: "nowrap",
                             },
                         },
                     }}
