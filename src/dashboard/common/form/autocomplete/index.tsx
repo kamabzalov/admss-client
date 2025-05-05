@@ -14,6 +14,7 @@ export const AutoCompleteDropdown = ({
     onClear,
     clearButton = false,
     dropdown = true,
+    value,
     ...props
 }: AutoCompleteDropdownProps): ReactElement => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -28,11 +29,27 @@ export const AutoCompleteDropdown = ({
         }
     }, []);
 
+    useEffect(() => {
+        if (!value && autoCompleteRef.current) {
+            autoCompleteRef.current.hide();
+            setIsDropdownVisible(false);
+        }
+    }, [value]);
+
+    const handleClear = () => {
+        if (autoCompleteRef.current) {
+            autoCompleteRef.current.hide();
+            setIsDropdownVisible(false);
+        }
+        onClear?.();
+    };
+
     return (
         <div className='p-inputgroup autocomplete-dropdown' ref={containerRef}>
             <span className='p-float-label'>
                 <AutoComplete
                     {...props}
+                    value={value}
                     dropdown={dropdown}
                     inputClassName='autocomplete-dropdown__input'
                     ref={autoCompleteRef}
@@ -76,12 +93,12 @@ export const AutoCompleteDropdown = ({
                 />
                 <label className='float-label'>{label}</label>
             </span>
-            {clearButton && !!props.value && (
+            {clearButton && !!value && (
                 <Button
                     icon='pi pi-times'
                     type='button'
                     className='autocomplete-dropdown__clear-button'
-                    onClick={onClear}
+                    onClick={handleClear}
                 />
             )}
         </div>
