@@ -123,6 +123,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     onClear={() => {
                         setProspectInput(null);
                         changeContactExtData("PROSPECT1_ID", "");
+                        setProspectList(initialProspectList);
                     }}
                 />
             </div>
@@ -152,6 +153,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                         onClear={() => {
                             setProspectSecondInput(null);
                             changeContactExtData("PROSPECT2_ID", "");
+                            setProspectList(initialProspectList);
                         }}
                         clearButton
                     />
