@@ -382,6 +382,11 @@
     flex: 0 1 104px;
     height: 50px;
     border-radius: 0 5px 5px 0;
+    .p-button-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .p-dialog .card {

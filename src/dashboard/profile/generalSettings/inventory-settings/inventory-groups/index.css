@@ -1,3 +1,13 @@
+.settings-inventory {
+    .row-edit__button.p-button {
+        display: inline-flex;
+        align-items: center;
+        text-transform: uppercase;
+        justify-content: center;
+        font-weight: 600;
+    }
+}
+
 .settings-inventory__header {
     background: var(--admss-app-light-blue);
     height: 60px;
@@ -29,6 +39,9 @@
 .settings-form .row-edit__button.p-button {
     height: 50px;
     border-radius: 0 5px 5px 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .settings-form__button.p-button {
