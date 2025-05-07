@@ -170,17 +170,25 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         });
 
         const updatedOptions = sortedLayout
-            .map((layoutItem, index) => {
+            .map((layoutItem) => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
+                if (!originalItem) return null;
+
+                const isFirstColumn = layoutItem.x === 0;
+                const baseOrder = isFirstColumn ? 1 : Math.ceil(inventoryOptions.length / 2) + 1;
+                const order = baseOrder + layoutItem.y;
+
                 return {
                     ...originalItem,
-                    order: index,
+                    order,
                 };
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
         const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-        updatedOption && (await handleChangeOrder(updatedOption));
+        if (updatedOption) {
+            await handleChangeOrder(updatedOption, updatedOption.order);
+        }
         setIsLoading(false);
     };
 
