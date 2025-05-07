@@ -193,6 +193,7 @@ export class DealStore {
             { key, value }: { key: keyof DealPickupPayment; value: string | number }
         ) => {
             const dealStore = this.rootStore.dealStore;
+            this._isFormChanged = true;
             if (dealStore) {
                 const currentPayment = dealStore.dealPickupPayments.find(
                     (item) => item.itemuid === itemuid
