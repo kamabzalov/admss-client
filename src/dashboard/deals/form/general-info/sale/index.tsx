@@ -221,29 +221,31 @@ export const DealGeneralSale = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <DateInput
-                    {...getFieldProps("datepurchase")}
-                    className={`${errors.datepurchase && "p-invalid"}`}
-                    name='Sale date (required)'
-                    date={new Date(values.datepurchase)}
-                    onChange={({ value }) => {
-                        setFieldValue("datepurchase", Number(value));
-                        changeDeal({ key: "datepurchase", value: Number(value) });
-                    }}
-                />
-                <small className='p-error'>{errors.datepurchase}</small>
-            </div>
-            <div className='col-3 relative'>
-                <DateInput
                     {...getFieldProps("dateeffective")}
                     className={`${errors.dateeffective && "p-invalid"}`}
-                    name='First operated (required)'
-                    date={new Date(values.dateeffective)}
+                    name='Sale date (required)'
+                    date={values.dateeffective}
+                    emptyDate
                     onChange={({ value }) => {
-                        setFieldValue("dateeffective", Number(value));
+                        setFieldValue("dateeffective", value);
                         changeDeal({ key: "dateeffective", value: Number(value) });
                     }}
                 />
                 <small className='p-error'>{errors.dateeffective}</small>
+            </div>
+            <div className='col-3 relative'>
+                <DateInput
+                    {...getFieldProps("datepurchase")}
+                    className={`${errors.datepurchase && "p-invalid"}`}
+                    name='First operated (required)'
+                    date={values.datepurchase}
+                    emptyDate
+                    onChange={({ value }) => {
+                        setFieldValue("datepurchase", value);
+                        changeDeal({ key: "datepurchase", value: Number(value) });
+                    }}
+                />
+                <small className='p-error'>{errors.datepurchase}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
