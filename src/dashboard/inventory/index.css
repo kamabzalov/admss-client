@@ -1,7 +1,7 @@
 .inventory {
     --inventory-navigate-width: 343px;
     --inventory-content-max-height: 705px;
-    --inventory-content-height: 54vh;
+    --inventory-content-height: 59vh;
 
     .form-line {
         margin: 15px 0;
