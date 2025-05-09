@@ -10,13 +10,14 @@ import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
 import { ContactsDataTable } from "dashboard/contacts";
 
-const FIELD: keyof ContactUser = "companyName";
+const FIELD: keyof ContactUser = "userName";
 
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
     returnedField?: keyof ContactUser;
+    onChangeGetFullInfo?: (contact: ContactUser) => void;
     getFullInfo?: (contact: ContactUser) => void;
 }
 
@@ -29,6 +30,7 @@ export const CompanySearch = ({
     originalPath,
     returnedField,
     getFullInfo,
+    onChangeGetFullInfo,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -84,12 +86,15 @@ export const CompanySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={returnedField || FIELD}
+                optionValue={onChangeGetFullInfo ? undefined : returnedField || FIELD}
                 optionLabel={FIELD}
                 options={options}
                 onInputChange={handleCompanyInputChange}
                 value={value}
-                onChange={onChange}
+                onChange={(event) => {
+                    onChangeGetFullInfo && onChangeGetFullInfo(event.target.value);
+                    onChange && onChange(event);
+                }}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}

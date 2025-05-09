@@ -239,6 +239,7 @@ export const SearchInput = ({
                 <Dropdown
                     ref={dropdownRef}
                     filter={props.options && props.options?.length > DEFAULT_FILTER_THRESHOLD}
+                    autoFocus={false}
                     onInput={handleOnInputChange}
                     optionLabel='name'
                     editable
