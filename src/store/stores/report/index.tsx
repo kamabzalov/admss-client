@@ -12,6 +12,7 @@ import {
     getReportInfo,
     getUserReportCollectionsContent,
     updateReportInfo,
+    updateCollection,
 } from "http/services/reports.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -156,9 +157,10 @@ export class ReportStore {
             this._isLoading = true;
             try {
                 const collections: ReportCollections[] = this._reportCollections.map(
-                    ({ collectionuid }) => {
+                    ({ collectionuid, name }) => {
                         return {
                             collectionuid,
+                            name,
                         };
                     }
                 );
@@ -195,10 +197,45 @@ export class ReportStore {
                         ShowLineCount: this._report.ShowLineCount,
                         AskForStartAndEndDates: this._report.AskForStartAndEndDates,
                         columns: this._reportColumns,
-                        collections,
+                        itemuid: this._report.itemuid,
                     });
 
                     if (response?.status === Status.OK) {
+                        const initialCollections = this._initialReport.collections || [];
+                        const collectionsChanged =
+                            collections.length !== initialCollections.length ||
+                            collections.some(
+                                (col, index) =>
+                                    col.collectionuid !== initialCollections[index]?.collectionuid
+                            );
+
+                        if (collectionsChanged) {
+                            for (const { collectionuid, name } of collections) {
+                                const collectionResponse = await updateCollection(
+                                    this.rootStore.userStore.authUser?.useruid!,
+                                    {
+                                        itemuid: collectionuid,
+                                        name,
+                                        documents: [
+                                            {
+                                                documentUID: uid,
+                                                collections,
+                                            },
+                                        ],
+                                    }
+                                );
+
+                                if (collectionResponse?.status === Status.ERROR) {
+                                    return {
+                                        status: Status.ERROR,
+                                        error:
+                                            collectionResponse.error ||
+                                            "Error while updating collection",
+                                    };
+                                }
+                            }
+                        }
+
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
                         return { ...response, itemuid: uid } as ReportInfo;
                     } else {

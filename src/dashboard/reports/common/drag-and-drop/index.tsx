@@ -50,7 +50,7 @@ export const buildTreeNodes = (
             if (col.documents?.length) {
                 const docNodes = col.documents
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                    .map((doc: ReportDocument) => ({
+                    .map((doc: Partial<ReportDocument>) => ({
                         key: doc.itemUID,
                         label: doc.name,
                         type: NODE_TYPES.DOCUMENT,

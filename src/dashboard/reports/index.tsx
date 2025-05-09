@@ -362,7 +362,7 @@ export const Reports = (): ReactElement => {
                                     collectionuid={currentCollection.itemUID}
                                     collectionName={currentCollection.name}
                                     collections={[...customCollections, ...reportCollections]}
-                                    selectedReports={currentCollection.documents || []}
+                                    selectedReports={currentCollection?.documents || []}
                                     setCollectionName={setCollectionName}
                                     setSelectedReports={setSelectedReports}
                                     handleCreateCollection={() =>
