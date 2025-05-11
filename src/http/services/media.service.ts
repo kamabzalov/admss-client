@@ -193,3 +193,22 @@ export const deleteMediaImage = async (itemuid: string) => {
         }
     }
 };
+
+export const getMediaWatermarkingPreview = async (inventoryuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.get<BaseResponseError>(
+            `inventory/${inventoryuid}/watermarkpreview`
+        );
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while getting media watermarking preview",
+            };
+        }
+    }
+};
