@@ -28,7 +28,7 @@ const MediaDataLinks = lazy(() =>
 );
 const MediaDataWatermarking = lazy(() =>
     import("dashboard/inventory/form/media-data/watermarking").then((module) => ({
-        default: module.inventoryMediaWatermarking,
+        default: module.InventoryMediaWatermarking,
     }))
 );
 

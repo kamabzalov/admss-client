@@ -1,3 +1,4 @@
+import "./index.css";
 import { ReactElement, useEffect, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
@@ -12,8 +13,11 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ImagePreview } from "dashboard/profile/generalSettings/watermarking/preview";
 
-export const inventoryMediaWatermarking = observer((): ReactElement => {
-    const store = useStore().generalSettingsStore;
+export const InventoryMediaWatermarking = observer((): ReactElement => {
+    const [settingsStore, inventoryStore] = [
+        useStore().generalSettingsStore,
+        useStore().inventoryStore,
+    ];
     const {
         settings,
         changeSettings,
@@ -22,22 +26,22 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
         postProcessing,
         changePostProcessing,
         restoreDefaultSettings,
-    } = store;
+    } = settingsStore;
     const toast = useToast();
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     useEffect(() => {
         if (watermarkImage && watermarkImage?.size) {
-            store.watermarkImageUrl = URL.createObjectURL(watermarkImage);
+            settingsStore.watermarkImageUrl = URL.createObjectURL(watermarkImage);
         }
     }, [watermarkImage]);
 
-    const handleDeletePostProcessing = (index: number) => {
+    const handleDeleteTextBlock = (index: number) => {
         const newTextBlocks = postProcessing.filter((_, i) => i !== index);
         changePostProcessing(newTextBlocks);
     };
 
-    const handleUpdatePostProcessing = (index: number) => {
+    const handleClearTextBlock = (index: number) => {
         const newTextBlocks = [...postProcessing];
         newTextBlocks[index] = {
             id: postProcessing[index]?.id || 0,
@@ -51,6 +55,8 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
             bkColor: 0,
             useruid: postProcessing[index]?.useruid || "",
         } as WatermarkPostProcessing;
+        settingsStore.watermarkImageUrl = "";
+        inventoryStore.isFormChanged = true;
         changePostProcessing(newTextBlocks);
     };
 
@@ -68,6 +74,7 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
             useruid: "",
         };
         changePostProcessing([...postProcessing, newTextBlock]);
+        inventoryStore.isFormChanged = true;
     };
 
     const handlePreview = () => {
@@ -100,13 +107,13 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                         severity={
                             !postProcessing[blockIndex]?.ppText?.length ? "secondary" : "success"
                         }
-                        onClick={() => handleUpdatePostProcessing(blockIndex)}
+                        onClick={() => handleClearTextBlock(blockIndex)}
                     />
                     <Button
                         icon='icon adms-close'
                         className='watermarking__remove-button'
                         text
-                        onClick={() => handleDeletePostProcessing(blockIndex)}
+                        onClick={() => handleDeleteTextBlock(blockIndex)}
                     />
                 </div>
             </div>
@@ -119,7 +126,7 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                 className='watermarking__accordion-tab'
                 contentClassName='watermarking__accordion-content'
             >
-                <div className='grid gap-3 mt-0'>
+                <div className='grid gap-4 mt-0'>
                     <span className='col-12 p-0 p-float-label watermarking__textarea'>
                         <InputTextarea
                             value={block.ppText || ""}
@@ -193,7 +200,10 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                         inputId='enableWatermark'
                         name='enableWatermark'
                         checked={!!settings.watermarkenabled}
-                        onChange={(e) => changeSettings("watermarkenabled", e.checked ? 1 : 0)}
+                        onChange={(e) => {
+                            changeSettings("watermarkenabled", e.checked ? 1 : 0);
+                            inventoryStore.isFormChanged = true;
+                        }}
                     />
                     <label htmlFor='enableWatermark' className='ml-3 white-space-nowrap'>
                         Enable watermarking
@@ -227,9 +237,10 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                         inputId='addLogo'
                         name='addLogo'
                         checked={!!settings.logoenabled}
-                        onChange={() =>
-                            changeSettings("logoenabled", !settings.logoenabled ? 1 : 0)
-                        }
+                        onChange={(e) => {
+                            changeSettings("logoenabled", e.checked ? 1 : 0);
+                            inventoryStore.isFormChanged = true;
+                        }}
                     />
                     <label htmlFor='addLogo' className='ml-3'>
                         Add logo
@@ -239,7 +250,10 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                         <InputNumber
                             value={settings.logoposX}
                             allowEmpty
-                            onChange={(e) => changeSettings("logoposX", e.value || 0)}
+                            onChange={(e) => {
+                                changeSettings("logoposX", e.value || 0);
+                                inventoryStore.isFormChanged = true;
+                            }}
                         />
                         <label className='float-label'>PosX</label>
                     </span>
@@ -248,7 +262,10 @@ export const inventoryMediaWatermarking = observer((): ReactElement => {
                         <InputNumber
                             value={settings.logoposY}
                             allowEmpty
-                            onChange={(e) => changeSettings("logoposY", e.value || 0)}
+                            onChange={(e) => {
+                                changeSettings("logoposY", e.value || 0);
+                                inventoryStore.isFormChanged = true;
+                            }}
                         />
                         <label className='float-label'>PosY</label>
                     </span>
