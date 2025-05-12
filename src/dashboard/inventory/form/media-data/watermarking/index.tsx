@@ -4,14 +4,12 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 import { WatermarkPostProcessing } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-import { ImagePreview } from "dashboard/profile/generalSettings/watermarking/preview";
+import { ImagePreview } from "dashboard/inventory/form/media-data/watermarking/preview";
 
 export const InventoryMediaWatermarking = observer((): ReactElement => {
     const [settingsStore, inventoryStore] = [
@@ -22,12 +20,10 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         settings,
         changeSettings,
         watermarkImage,
-        watermarkImageUrl,
         postProcessing,
         changePostProcessing,
         restoreDefaultSettings,
     } = settingsStore;
-    const toast = useToast();
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     useEffect(() => {
@@ -78,16 +74,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
     };
 
     const handlePreview = () => {
-        if (watermarkImageUrl || (watermarkImage && watermarkImage.size)) {
-            setIsPreviewOpen(true);
-        } else {
-            toast.current?.show({
-                severity: "warn",
-                summary: "No Image",
-                detail: "Please upload or fetch an image to preview.",
-                life: TOAST_LIFETIME,
-            });
-        }
+        setIsPreviewOpen(true);
     };
 
     const handleClosePreview = () => {
@@ -284,12 +271,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                 </div>
             </div>
 
-            <ImagePreview
-                imageUrl={watermarkImageUrl}
-                imageFile={watermarkImage}
-                isOpen={isPreviewOpen}
-                onClose={handleClosePreview}
-            />
+            {isPreviewOpen && <ImagePreview onClose={handleClosePreview} />}
         </div>
     );
 });

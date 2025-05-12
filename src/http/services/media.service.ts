@@ -197,7 +197,7 @@ export const deleteMediaImage = async (itemuid: string) => {
 export const getMediaWatermarkingPreview = async (inventoryuid: string) => {
     try {
         const response = await authorizedUserApiInstance.get<BaseResponseError>(
-            `inventory/${inventoryuid}/watermarkpreview`
+            `media/${inventoryuid}/watermarkpreview`
         );
         if (response.status === 200) {
             return response.data;

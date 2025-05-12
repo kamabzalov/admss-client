@@ -28,6 +28,7 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
                     summary: "Error",
                     detail: data?.error,
                 });
+                onClose();
             }
         }
     };
