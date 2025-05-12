@@ -78,7 +78,8 @@ export const DealRetailPickup = observer((): ReactElement => {
                         <div className='pickup-row__item'>
                             <DateInput
                                 checkbox
-                                value={payment.paydate}
+                                floatLabel={false}
+                                date={payment.paydate}
                                 name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
                                 onChange={(e) =>
                                     handleChange(payment.itemuid, "paydate", e.value || "")

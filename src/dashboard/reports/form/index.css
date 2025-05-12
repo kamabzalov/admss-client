@@ -3,6 +3,7 @@
     --select-area-height: 191px;
     --control-button-width: 30px;
     --column-padding-bottom: 26px;
+    --tree-padding-left: 50px;
 
     @media screen and (max-width: 1670px) {
         --column-width: 300px;
@@ -17,46 +18,66 @@
     }
 
     max-height: 70vh;
+    display: flex;
+    justify-content: space-between;
+    overflow: scroll;
 
     .p-tree {
+        flex: 0 0 30%;
+        padding: 0;
         height: 56vh;
         border: none;
 
-        .p-treenode {
-            padding: 0;
-        }
-
-        .p-treenode-content {
-            :has(.report__list-item--new) {
-                position: relative;
-
-                &::before {
-                    content: "";
-                    position: absolute;
-                    top: 1.05rem;
-                    left: -1.5rem;
-                    width: 9px;
-                    height: 9px;
-                    border: 2px solid var(--admss-app-main-blue);
-                    border-radius: 50%;
-                }
+        .p-tree-container {
+            .p-treenode {
+                padding: 0;
             }
 
-            &.report__list-item--toggler-visible {
+            .p-treenode-content {
+                border-radius: 5px;
+                padding-left: var(--tree-padding-left);
+                height: 50px;
+                :has(.report__list-item--new) {
+                    position: relative;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 1.05rem;
+                        left: -1.5rem;
+                        width: 9px;
+                        height: 9px;
+                        border: 2px solid var(--admss-app-main-blue);
+                        border-radius: 50%;
+                    }
+                }
+
                 .p-tree-toggler {
-                    visibility: visible;
+                    margin: 0;
+                }
+
+                &.report__list-item--toggler-visible {
+                    .p-tree-toggler {
+                        visibility: visible;
+                    }
+                }
+
+                &:hover {
+                    background: var(--admss-app-light-blue);
+                }
+            }
+            .p-treenode-children {
+                padding: 0;
+                .p-treenode-content {
+                    padding-left: calc(1.7rem + var(--tree-padding-left));
                 }
             }
 
-            &:hover {
+            .report__list-item--selected-container {
+                color: var(--admss-app-primary);
                 background: var(--admss-app-light-blue);
+                border-radius: 0;
             }
-        }
-
-        .report__list-item--selected-container {
-            color: var(--admss-app-primary);
-            background: var(--admss-app-light-blue);
-            border-radius: 0;
         }
     }
 
@@ -64,10 +85,24 @@
         height: 100%;
         border: none;
 
+        .p-treenode .p-treenode-content.simple-node {
+            .report__list-item {
+                padding-left: 37px;
+            }
+            .p-tree-toggler {
+                display: none;
+            }
+        }
+
         .p-treenode .p-treenode-content.simple-node.p-treenode-dragover {
             .report__list-item {
                 background: transparent;
             }
+            .report__list-item.p-button {
+                transition: none;
+                background-color: transparent;
+            }
+
             background-color: transparent;
         }
 
@@ -309,14 +344,21 @@
     text-align: left;
 }
 
-.report__list-item.p-button.p-button-text:hover {
-    background-color: var(--admss-app-light-blue);
-}
-
-.report__list-item.p-button.p-button-text:enabled:hover {
+.report__list-item.p-button.p-button-text:enabled:hover,
+.report__list-item.p-button.p-button-text:enabled:focus,
+.report__list-item.p-button.p-button-text:enabled:active {
     color: var(--admss-app-primary);
+    background-color: transparent;
 }
 
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
+}
+
+.report__title {
+    font-size: 20px;
+}
+
+.card.report {
+    padding: 40px 30px;
 }

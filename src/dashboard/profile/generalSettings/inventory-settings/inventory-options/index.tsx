@@ -32,7 +32,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
 
     const handleGetInventoryOptionsGroupList = async () => {
-        setIsLoading(true);
         const response = await getInventoryGroupOptions(inventoryGroupID);
         if (response?.error && !Array.isArray(response)) {
             toast.current?.show({
@@ -165,24 +164,31 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             return;
         }
 
-        setIsLoading(true);
         const sortedLayout = [...layout].sort((a, b) => {
             if (a.x === b.x) return a.y - b.y;
             return a.x - b.x;
         });
 
         const updatedOptions = sortedLayout
-            .map((layoutItem, index) => {
+            .map((layoutItem) => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
+                if (!originalItem) return null;
+
+                const isFirstColumn = layoutItem.x === 0;
+                const baseOrder = isFirstColumn ? 1 : Math.ceil(inventoryOptions.length / 2) + 1;
+                const order = baseOrder + layoutItem.y;
+
                 return {
                     ...originalItem,
-                    order: index,
+                    order,
                 };
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
         const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-        updatedOption && (await handleChangeOrder(updatedOption));
+        if (updatedOption) {
+            await handleChangeOrder(updatedOption, updatedOption.order);
+        }
         setIsLoading(false);
     };
 

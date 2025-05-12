@@ -193,6 +193,7 @@ export class DealStore {
             { key, value }: { key: keyof DealPickupPayment; value: string | number }
         ) => {
             const dealStore = this.rootStore.dealStore;
+            this._isFormChanged = true;
             if (dealStore) {
                 const currentPayment = dealStore.dealPickupPayments.find(
                     (item) => item.itemuid === itemuid
@@ -205,13 +206,24 @@ export class DealStore {
         }
     );
 
+    private filterOutTimestampKeys = (obj: any): any => {
+        if (!obj || typeof obj !== "object") return obj;
+
+        return Object.entries(obj).reduce((acc, [key, value]) => {
+            if (key !== "created" && key !== "updated") {
+                acc[key] = typeof value === "object" ? this.filterOutTimestampKeys(value) : value;
+            }
+            return acc;
+        }, {} as any);
+    };
+
     public saveDeal = action(async (): Promise<string | undefined | BaseResponseError> => {
         try {
             this._isLoading = true;
             const dealData: Deal = {
-                ...this._deal,
-                extdata: this._dealExtData,
-                finance: this._dealFinances,
+                ...this.filterOutTimestampKeys(this._deal),
+                extdata: this.filterOutTimestampKeys(this._dealExtData),
+                finance: this.filterOutTimestampKeys(this._dealFinances),
             };
             const dealResponse = await setDeal(this._dealID, dealData).then((response) => {
                 if (response?.status === Status.ERROR) {

@@ -55,7 +55,7 @@ export const getContactsTypeList = async (uid: string | "0") => {
             `contacts/${uid}/listtypes`
         );
         if (request.data.status === Status.OK) {
-            return request.data.contact_types;
+            return request.data?.contact_types;
         }
     } catch (error) {
         if (isAxiosError(error)) {

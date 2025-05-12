@@ -36,6 +36,18 @@
             }
         }
     }
+
+    .p-multiselect-token {
+        max-width: 170px;
+        .p-multiselect-token-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .p-multiselect-token-icon {
+            flex-shrink: 0;
+        }
+    }
 }
 
 .deal__card {
