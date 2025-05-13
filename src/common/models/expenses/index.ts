@@ -1,4 +1,4 @@
-import { BaseResponse } from "../base-response";
+import { BaseResponseError } from "common/models/base-response";
 
 export interface Expenses {
     amount: number;
@@ -29,6 +29,6 @@ export interface ExpensesTotal {
     total_i?: number;
 }
 
-export interface ExpensesSetResponse extends BaseResponse {
+export interface ExpensesSetResponse extends BaseResponseError {
     itemuid: string;
 }

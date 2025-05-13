@@ -24,6 +24,10 @@
     color: var(--admss-app-deep-purple);
 }
 
+.color-gray {
+    color: var(--admss-app-medium-grey);
+}
+
 .main {
     padding-top: calc(var(--admss-app-header-height) + var(--admss-app-content-top-margin));
     height: 100%;

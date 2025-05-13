@@ -34,8 +34,8 @@
 
 .purchase-expenses__delete-button.p-button-icon-only,
 .purchase-expenses__table-button.p-button-icon-only {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     font-size: 18px;
     border-radius: 50%;
     color: var(--admss-app-medium-grey);
@@ -64,11 +64,16 @@
     color: var(--admss-app-red);
 }
 
-.expenses-confirm-dialog .p-confirm-dialog-reject,
-.expenses-confirm-dialog .p-confirm-dialog-accept {
-    padding: 20px 33px;
-    height: 60px;
-    font-size: 20px;
+.expenses-confirm-dialog {
+    .confirm-header__icon {
+        padding-bottom: 38px;
+    }
+    .p-confirm-dialog-reject,
+    .p-confirm-dialog-accept {
+        padding: 20px 33px;
+        height: 60px;
+        font-size: 20px;
+    }
 }
 
 .expenses-confirm-dialog {
@@ -94,6 +99,7 @@
 }
 .purchase-expenses__table .expanded-row__label {
     font-weight: 700;
+    flex: 0;
 }
 
 .table-button-active .p-button-icon {
@@ -103,4 +109,25 @@
 
 .purchase-expenses__dropdown {
     height: 50px;
+}
+
+.purchase-expenses {
+    .purchase-expenses-controls__button.p-button {
+        font-weight: 700;
+    }
+}
+
+.inventory-form .p-datatable .p-datatable-tbody {
+    .purchase-expenses__table-controls {
+        padding: 0 10px;
+        height: 40px;
+
+        .purchase-expenses__table-controls-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
+        }
+    }
 }
