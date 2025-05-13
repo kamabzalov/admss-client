@@ -13,7 +13,7 @@ interface CollectionPanelContentProps {
     collectionName: string;
     collectionuid?: string;
     collections: ReportCollection[];
-    selectedReports: ReportDocument[];
+    selectedReports: Partial<ReportDocument>[];
     setCollectionName: (name: string) => void;
     setSelectedReports: (reports: ReportDocument[]) => void;
     handleCreateCollection: () => void;
@@ -42,9 +42,9 @@ export const CollectionPanelContent = ({
     const toast = useToast();
     const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
     const [initialSelectedReports, setInitialSelectedReports] =
-        useState<ReportDocument[]>(selectedReports);
+        useState<Partial<ReportDocument>[]>(selectedReports);
     const [panelSelectedReports, setPanelSelectedReports] =
-        useState<ReportDocument[]>(selectedReports);
+        useState<Partial<ReportDocument>[]>(selectedReports);
 
     useEffect(() => {
         setInitialCollectionName(collectionName);
@@ -63,10 +63,17 @@ export const CollectionPanelContent = ({
         }
     };
 
-    const reportsAreEqual = (reports1: ReportDocument[], reports2: ReportDocument[]) => {
+    const reportsAreEqual = (
+        reports1: Partial<ReportDocument>[],
+        reports2: Partial<ReportDocument>[]
+    ) => {
         if (reports1.length !== reports2.length) return false;
-        const sorted1 = [...reports1].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
-        const sorted2 = [...reports2].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
+        const sorted1 = [...reports1].sort(
+            (a, b) => a.itemUID?.localeCompare(b.itemUID || "") || 0
+        );
+        const sorted2 = [...reports2].sort(
+            (a, b) => a.itemUID?.localeCompare(b.itemUID || "") || 0
+        );
         return sorted1.every((item, idx) => item.itemUID === sorted2[idx].itemUID);
     };
 
