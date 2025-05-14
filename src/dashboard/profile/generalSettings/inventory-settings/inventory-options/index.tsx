@@ -123,7 +123,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     ) => {
         const response = await setInventoryGroupOption(inventoryGroupID, {
             ...option,
-            order: newOrder || option.order,
+            order: newOrder !== undefined ? newOrder : option.order,
         });
         if (response?.error) {
             toast.current?.show({
@@ -188,7 +188,10 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
         if (updatedOption) {
             await handleChangeOrder(updatedOption, updatedOption.order);
+
+            setInventoryOptions([...updatedOptions]);
         }
+
         setIsLoading(false);
     };
 
