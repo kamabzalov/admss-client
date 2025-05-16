@@ -701,27 +701,12 @@
 
 .p-tree {
     .p-treenode-droppoint {
-        position: relative;
         border: none;
-        height: 6px;
+        height: 3px;
         margin: 0;
 
-        &::before {
-            content: "";
-            background: transparent;
-            position: absolute;
-            height: 3px;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0;
-            width: 100%;
-        }
-
         &.p-treenode-droppoint-active {
-            background: transparent;
-            &::before {
-                background-color: var(--admss-app-main-blue);
-            }
+            background-color: var(--admss-app-main-blue);
         }
     }
     .p-tree-container {
