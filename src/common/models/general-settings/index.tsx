@@ -40,14 +40,14 @@ export interface GeneralSettings extends BaseResponseError {
     stocknumLast6ofVIN: number;
     stocknumLast8ofVIN: number;
     stocknumPrefix: string;
-    stocknumSequental: number;
+    stocknumSequental: 0 | 1;
     stocknumSuffix: string;
     stocknumtiFixedDigits: number;
-    stocknumtiFromSoldVehicle: number;
+    stocknumtiFromSoldVehicle: 0 | 1;
     stocknumtiLast6ofVIN: number;
     stocknumtiLast8ofVIN: number;
     stocknumtiPrefix: string;
-    stocknumtiSequental: number;
+    stocknumtiSequental: 0 | 1;
     stocknumtiSuffix: string;
     taxDefStateVehicleTaxRate: number;
     uilogoenabled: 0 | 1;

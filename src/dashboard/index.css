@@ -24,6 +24,10 @@
     color: var(--admss-app-deep-purple);
 }
 
+.color-gray {
+    color: var(--admss-app-medium-grey);
+}
+
 .main {
     padding-top: calc(var(--admss-app-header-height) + var(--admss-app-content-top-margin));
     height: 100%;
@@ -382,6 +386,11 @@
     flex: 0 1 104px;
     height: 50px;
     border-radius: 0 5px 5px 0;
+    .p-button-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .p-dialog .card {

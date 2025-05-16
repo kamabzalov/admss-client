@@ -32,7 +32,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
 
     const handleGetInventoryOptionsGroupList = async () => {
-        setIsLoading(true);
         const response = await getInventoryGroupOptions(inventoryGroupID);
         if (response?.error && !Array.isArray(response)) {
             toast.current?.show({
@@ -78,7 +77,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             const isNew = option.itemuid === NEW_ITEM;
             const response = await setInventoryGroupOption(inventoryGroupID, option);
             if (response?.error) {
-                throw new Error(response.error);
+                return Promise.reject(response.error);
             }
 
             await handleGetInventoryOptionsGroupList();
@@ -122,19 +121,58 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         option: Partial<GeneralInventoryOptions>,
         newOrder?: number
     ) => {
-        const response = await setInventoryGroupOption(inventoryGroupID, {
-            ...option,
-            order: newOrder || option.order,
+        const currentIndex = inventoryOptions.findIndex((item) => item.itemuid === option.itemuid);
+        const updatedOptions = inventoryOptions.map((item, index) => {
+            if (item.itemuid === option.itemuid) {
+                return {
+                    ...item,
+                    order: newOrder !== undefined ? newOrder : item.order,
+                };
+            }
+
+            if (
+                newOrder !== undefined &&
+                newOrder < currentIndex &&
+                index >= newOrder &&
+                index < currentIndex
+            ) {
+                return {
+                    ...item,
+                    order: (item.order ?? 0) + 1,
+                };
+            }
+
+            if (
+                newOrder !== undefined &&
+                newOrder > currentIndex &&
+                index > currentIndex &&
+                index <= newOrder
+            ) {
+                return {
+                    ...item,
+                    order: (item.order ?? 0) - 1,
+                };
+            }
+
+            return item;
         });
-        if (response?.error) {
+
+        try {
+            const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
+            if (response?.error) {
+                return Promise.reject(response.error);
+            }
+
+            await handleGetInventoryOptionsGroupList();
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : "Failed to update options order";
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to update order",
+                detail: errorMessage,
                 life: TOAST_LIFETIME,
             });
-        } else {
-            await handleGetInventoryOptionsGroupList();
         }
     };
 
@@ -165,25 +203,47 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             return;
         }
 
-        setIsLoading(true);
         const sortedLayout = [...layout].sort((a, b) => {
             if (a.x === b.x) return a.y - b.y;
             return a.x - b.x;
         });
 
         const updatedOptions = sortedLayout
-            .map((layoutItem, index) => {
+            .map((layoutItem) => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
+                if (!originalItem) return null;
+
+                const isFirstColumn = layoutItem.x === 0;
+                const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
+                const baseOrder = isFirstColumn ? 0 : itemsPerColumn;
+                const order = baseOrder + layoutItem.y;
+
                 return {
                     ...originalItem,
-                    order: index,
+                    order,
                 };
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
-        const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-        updatedOption && (await handleChangeOrder(updatedOption));
-        setIsLoading(false);
+        try {
+            const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
+            if (response?.error) {
+                return Promise.reject(response.error);
+            }
+
+            await handleGetInventoryOptionsGroupList();
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : "Failed to update options order";
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: errorMessage,
+                life: TOAST_LIFETIME,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const layouts = useMemo(() => {

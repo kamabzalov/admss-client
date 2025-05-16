@@ -1,4 +1,4 @@
-import { CSSProperties, LegacyRef, ReactElement, useEffect, useRef, useState } from "react";
+import { CSSProperties, LegacyRef, ReactElement, useEffect, useId, useRef, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
@@ -52,6 +52,7 @@ interface DateInputProps extends CalendarProps {
     checkbox?: boolean;
     emptyDate?: boolean;
     clearButton?: boolean;
+    floatLabel?: boolean;
     onClearAction?: () => void;
 }
 
@@ -270,11 +271,13 @@ export const DateInput = ({
     colWidth,
     emptyDate,
     clearButton,
+    floatLabel = true,
     onClearAction,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
+    const uniqueId = useId();
     const calendarRef = useRef<Calendar>(null);
 
     useEffect(() => {
@@ -311,9 +314,9 @@ export const DateInput = ({
                 innerDate ? "date-item--filled" : "date-item--empty"
             }`}
         >
-            {!isChecked && (
+            {!isChecked && floatLabel && (
                 <label
-                    htmlFor={name}
+                    htmlFor={uniqueId}
                     className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
                 >
                     {name}
@@ -329,7 +332,8 @@ export const DateInput = ({
                 )}
                 <Calendar
                     ref={calendarRef}
-                    inputId={name}
+                    inputId={uniqueId}
+                    placeholder={floatLabel ? undefined : name}
                     value={checkbox && !isChecked ? null : innerDate}
                     disabled={checkbox && !isChecked}
                     className={`w-full date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}

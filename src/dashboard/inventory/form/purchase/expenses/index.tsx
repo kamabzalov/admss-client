@@ -16,17 +16,18 @@ import {
     getExpensesTotal,
     setExpensesItem,
 } from "http/services/expenses.service";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
-export const PurchaseExpenses = observer((): ReactElement => {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const { id } = useParams();
+import { useToast } from "dashboard/common/toast";
+import { useStore } from "store/hooks";
 
+export const PurchaseExpenses = observer((): ReactElement => {
+    const { id } = useParams();
+    const toast = useToast();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
@@ -46,7 +47,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const getExpenses = useCallback(() => {
         if (id) {
             getExpensesList(id).then((response) => {
-                if (response) {
+                if (Array.isArray(response)) {
                     setExpensesList(response);
                 }
             });
@@ -55,11 +56,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
             );
         }
     }, [id]);
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
 
     const handleCompareData = useMemo(() => {
         const currentExpense = expensesList.find(
@@ -80,25 +76,23 @@ export const PurchaseExpenses = observer((): ReactElement => {
 
     useEffect(() => {
         getExpenses();
-        if (user) {
-            getExpensesListTypes(user.useruid).then((response) => {
-                if (response) {
-                    setExpensesTypeList(response);
-                }
-            });
-            getExpensesListVendors(user.useruid).then((response) => {
-                if (response) {
-                    setExpensesVendorList(response);
-                }
-            });
-        }
-    }, [getExpenses, user]);
+        getExpensesListTypes(authUser!.useruid).then((response) => {
+            if (response) {
+                setExpensesTypeList(response);
+            }
+        });
+        getExpensesListVendors(authUser!.useruid).then((response) => {
+            if (response) {
+                setExpensesVendorList(response);
+            }
+        });
+    }, [getExpenses]);
 
     const handleClearExpense = () => {
         setCurrentEditExpense({} as Expenses);
     };
 
-    const handleExpenseSubmit = (itemuid?: string) => {
+    const handleExpenseSubmit = async (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
             operationdate: currentEditExpense?.operationdate || "",
@@ -109,18 +103,43 @@ export const PurchaseExpenses = observer((): ReactElement => {
             notbillable: currentEditExpense?.notbillable || 0,
         };
 
-        setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
+        const response = await setExpensesItem({ expenseuid: itemuid || "0", expenseData });
+        if (response?.error) {
+            toast?.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.message,
+            });
+        } else {
             handleClearExpense();
             getExpenses();
-        });
+            toast?.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail:
+                    response?.message ||
+                    `Expense is successfully ${itemuid ? "updated" : "saved"}!`,
+            });
+        }
     };
 
-    const handleDeleteExpenses = () => {
-        currentEditExpense &&
-            deleteExpensesItem(currentEditExpense.itemuid).then(() => {
-                getExpenses();
-                handleClearExpense();
+    const handleDeleteExpenses = async () => {
+        const response = await deleteExpensesItem(currentEditExpense.itemuid);
+        if (response?.error) {
+            toast?.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.message,
             });
+        } else {
+            getExpenses();
+            handleClearExpense();
+            toast?.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Expense is successfully deleted!",
+            });
+        }
     };
 
     const deleteTemplate = (expense: Expenses) => {
@@ -221,6 +240,13 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 currentEditExpense &&
                                 setCurrentEditExpense({ ...currentEditExpense, amount: value })
                             }
+                            pt={{
+                                input: {
+                                    root: {
+                                        className: !currentEditExpense?.amount ? "color-gray" : "",
+                                    },
+                                },
+                            }}
                         />
                     </div>
                     <div className='col-6'>
@@ -287,19 +313,20 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             wrapper: {
                                 className: "overflow-x-hidden",
                                 style: {
-                                    height: "249px",
+                                    height: "232px",
                                 },
                             },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
+                            bodyClassName='purchase-expenses__table-controls'
                             body={(options) => {
                                 const isRowExpanded = expandedRows.some((item) => {
                                     return item === options;
                                 });
                                 return (
-                                    <div className='flex gap-3 align-items-center'>
+                                    <div className='purchase-expenses__table-controls-container'>
                                         <Button
                                             type='button'
                                             icon='icon adms-edit-item'
@@ -329,7 +356,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             pt={{
                                 root: {
                                     style: {
-                                        width: "60px",
+                                        width: "70px",
                                     },
                                 },
                             }}

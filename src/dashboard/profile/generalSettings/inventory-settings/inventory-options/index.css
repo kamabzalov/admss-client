@@ -27,6 +27,8 @@
         align-items: center;
         padding: 0;
         gap: 9px;
+        flex: 0 0 14%;
+        min-width: 50px;
 
         .p-button {
             width: 22px;
@@ -107,7 +109,6 @@
         display: flex;
         align-items: center;
         height: 45px;
-        align-items: center;
         padding: 0;
         margin: 0;
         width: 100%;
@@ -118,6 +119,7 @@
         .row-edit {
             width: 240px;
             height: 35px;
+            margin-top: -5px;
             .p-button {
                 display: inline-flex;
                 align-items: center;

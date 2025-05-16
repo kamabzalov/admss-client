@@ -3,8 +3,9 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import { useState } from "react";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 
 interface SettingsStockNewProps {
     settings?: any;
@@ -15,16 +16,22 @@ interface SettingsStockNewProps {
     }[];
 }
 
-export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewProps) => {
-    const [value, setValue] = useState<number>(5);
+export const SettingsStockNew = observer(({ radioSettings }: SettingsStockNewProps) => {
+    const store = useStore().generalSettingsStore;
+    const { settings, changeSettings } = store;
     return (
         <div className='grid'>
             <div className='col-3'>
                 <div className='flex align-items-center'>
-                    <Checkbox inputId={settings} name={settings} value={settings} checked />
-                    <label htmlFor={settings} className='ml-2'>
-                        Sequental
-                    </label>
+                    <Checkbox
+                        inputId='stocknumSequental'
+                        name='stocknumSequental'
+                        checked={!!settings.stocknumSequental}
+                        onChange={(e) => {
+                            changeSettings("stocknumSequental", e.checked ? 1 : 0);
+                        }}
+                    />
+                    <label className='ml-2'>Sequental</label>
                 </div>
             </div>
 
@@ -32,13 +39,25 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='stock-new__input' />
+                    <InputText
+                        className='stock-new__input'
+                        value={settings.stocknumPrefix}
+                        onChange={(e) => {
+                            changeSettings("stocknumPrefix", e.target.value);
+                        }}
+                    />
                     <label className='float-label'>Prefix</label>
                 </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='stock-new__input' />
+                    <InputText
+                        className='stock-new__input'
+                        value={settings.stocknumSuffix}
+                        onChange={(e) => {
+                            changeSettings("stocknumSuffix", e.target.value);
+                        }}
+                    />
                     <label className='float-label'>Suffix</label>
                 </span>
             </div>
@@ -47,24 +66,26 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
             </div>
 
             <div className='col-6 mt-3'>
-                <span className='p-float-label'>
+                <span className='p-float-label stock-new__slider'>
                     <InputNumber
-                        value={value}
+                        value={settings.stocknumFixedDigits}
                         max={10}
-                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
+                        onChange={(e: InputNumberChangeEvent) =>
+                            changeSettings("stocknumFixedDigits", Number(e.value))
+                        }
                         className='w-full'
                     />
                     <Slider
-                        value={value}
-                        onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
+                        value={settings.stocknumFixedDigits}
+                        onChange={(e: SliderChangeEvent) =>
+                            changeSettings("stocknumFixedDigits", Number(e.value))
+                        }
                         max={10}
                         className='w-full'
                     />
-                    <label htmlFor={settings} className='float-label'>
-                        Fixed digits
-                    </label>
+                    <label className='float-label'>Fixed digits</label>
                 </span>
             </div>
         </div>
     );
-};
+});

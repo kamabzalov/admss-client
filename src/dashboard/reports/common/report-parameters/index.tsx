@@ -1,5 +1,4 @@
 import { formatDateForServer } from "common/helpers";
-import { useDateRange } from "common/hooks";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportDocument, ReportSetParams } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
@@ -7,7 +6,7 @@ import { DateInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { setReportDocumentTemplate } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 interface ReportParametersProps {
     report: ReportDocument;
@@ -66,7 +65,17 @@ export const ReportParameters = ({
     handleClosePanel,
 }: ReportParametersProps): ReactElement => {
     const toast = useToast();
-    const { startDate, endDate, isButtonDisabled, handleDateChange } = useDateRange();
+    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+    const [startDate, setStartDate] = useState<string | number>("");
+    const [endDate, setEndDate] = useState<string | number>("");
+
+    useEffect(() => {
+        if (!startDate || !endDate) {
+            setIsButtonDisabled(true);
+        } else {
+            setIsButtonDisabled(false);
+        }
+    }, [startDate, endDate]);
 
     const handleCloseClick = () => {
         handleClosePanel?.();
@@ -108,15 +117,14 @@ export const ReportParameters = ({
                     colWidth={3}
                     date={startDate}
                     emptyDate
-                    onChange={({ value }) => handleDateChange(Number(value), true)}
+                    onChange={({ value }) => setStartDate(Number(value))}
                 />
                 <DateInput
                     name='End Date'
                     colWidth={3}
                     date={endDate}
                     emptyDate
-                    minDate={startDate ? new Date(Number(startDate)) : undefined}
-                    onChange={({ value }) => handleDateChange(Number(value), false)}
+                    onChange={({ value }) => setEndDate(Number(value))}
                 />
                 <div className='col-12 flex justify-content-end gap-3'>
                     <Button

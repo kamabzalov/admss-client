@@ -42,7 +42,7 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "accountInfo", header: "Account", checked: true },
     { field: "contactinfo", header: "Customer", checked: true },
     { field: "dealtype", header: "Type", checked: true },
-    { field: "created", header: "Sale Date", checked: true },
+    { field: "dateeffective", header: "Sale Date", checked: true },
     { field: "inventoryinfo", header: "Info (Vehicle)", checked: true },
 ];
 
@@ -129,7 +129,12 @@ export const DealsDataTable = observer(
         const { authUser } = userStore;
         const [totalRecords, setTotalRecords] = useState<number>(0);
         const [globalSearch, setGlobalSearch] = useState<string>("");
-        const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+        const [lazyState, setLazyState] = useState<DatatableQueries>({
+            ...initialDataTableQueries,
+            first: 0,
+            rows: ROWS_PER_PAGE[0],
+            page: 0,
+        });
         const [isLoading, setIsLoading] = useState<boolean>(false);
         const [dealSelectedGroup, setDealSelectedGroup] = useState<string[]>([]);
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
@@ -241,14 +246,6 @@ export const DealsDataTable = observer(
                 if (response && !error) {
                     const { total } = response as TotalDealsList;
                     setTotalRecords(total ?? 0);
-                    setLazyState({
-                        first: initialDataTableQueries.first,
-                        rows: initialDataTableQueries.rows,
-                        page: initialDataTableQueries.page,
-                        column: initialDataTableQueries.column,
-                        sortField: initialDataTableQueries.sortField,
-                        sortOrder: initialDataTableQueries.sortOrder,
-                    });
                 } else {
                     toast.current?.show({
                         severity: "error",

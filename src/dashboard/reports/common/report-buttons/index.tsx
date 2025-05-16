@@ -13,6 +13,7 @@ import { MenuItem } from "primereact/menuitem";
 import { ReactElement, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
+import { useStore } from "store/hooks";
 
 interface ActionButtonsProps {
     report: ReportDocument;
@@ -38,6 +39,8 @@ export const ActionButtons = ({
         event.stopPropagation();
         setEditAccessActive(true);
     };
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
 
     const moveTooltipLabel = useMemo(() => {
         switch (report.isdefault) {
@@ -107,8 +110,9 @@ export const ActionButtons = ({
           ];
 
     const handleChangeIsFavorite = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (!authUser) return;
         event.stopPropagation();
-        updateReportInfo(report.documentUID, {
+        updateReportInfo(authUser?.useruid, {
             ...report,
             isfavorite: !report.isfavorite ? 1 : 0,
         }).then((response) => {
