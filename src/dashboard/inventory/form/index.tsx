@@ -624,7 +624,7 @@ export const InventoryForm = observer(() => {
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
-                                        Save
+                                        {id ? "Update" : "Save"}
                                     </Button>
                                 )}
                             </div>
