@@ -27,6 +27,15 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
+enum DEAL_DELETE_MESSAGES {
+    DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
+    DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
+    DELETE_SELECTED_OPTIONS = "Do you really want to delete selected options? This action cannot be undone.",
+    SET_INVENTORY_TO_AVAILABLE_FOR_SALE = 'Do you really want to set the inventory to "Available for sale"? This action cannot be undone.',
+    DELETE_OPTIONS_AVAILABLE_FOR_SALE = 'Do you really want to delete selected options and set the inventory to "Available for sale"? This action cannot be undone.',
+    DELETE_DEAL_AVAILABLE_FOR_SALE = 'Do you really want to delete the deal with all related options you\'ve selected and set the inventory to "Available for sale"? This action cannot be undone.',
+}
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -43,6 +52,8 @@ export class DealStore {
     private _memoRoute: string = "";
     protected _isLoading = false;
     protected _isFormChanged = false;
+    private _deleteMessage: string = DEAL_DELETE_MESSAGES.DELETE_DEAL;
+    private _deleteReason: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -99,6 +110,14 @@ export class DealStore {
 
     public get accordionActiveIndex() {
         return this._accordionActiveIndex;
+    }
+
+    public get deleteMessage() {
+        return this._deleteMessage;
+    }
+
+    public get deleteReason() {
+        return this._deleteReason;
     }
 
     public getDeal = async (itemuid: string) => {
@@ -292,6 +311,14 @@ export class DealStore {
 
     public set memoRoute(state: string) {
         this._memoRoute = state;
+    }
+
+    public set deleteMessage(message: string) {
+        this._deleteMessage = message;
+    }
+
+    public set deleteReason(reason: string) {
+        this._deleteReason = reason;
     }
 
     public clearDeal = () => {
