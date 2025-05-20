@@ -25,6 +25,8 @@ import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { DeleteDealForm } from "dashboard/deals/form/delete-form";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
@@ -204,6 +206,7 @@ export const DealsForm = observer(() => {
         clearDeal,
         isFormChanged,
         isLoading,
+        deleteMessage,
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -215,6 +218,9 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -290,6 +296,7 @@ export const DealsForm = observer(() => {
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
+        setDeleteActiveIndex(itemsMenuCount + 2);
 
         return () => {
             sections.forEach((section) => section.clearCount());
@@ -448,6 +455,19 @@ export const DealsForm = observer(() => {
                                             Print forms
                                         </Button>
                                     )}
+                                    {id && (
+                                        <Button
+                                            icon='pi pi-times'
+                                            className='p-button gap-2 deal__delete-nav w-full'
+                                            severity='danger'
+                                            onClick={() => {
+                                                navigate(getUrl(deleteActiveIndex));
+                                                setStepActiveIndex(deleteActiveIndex);
+                                            }}
+                                        >
+                                            Delete deal
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
@@ -546,6 +566,11 @@ export const DealsForm = observer(() => {
                                                         </div>
                                                         <PrintDealForms />
                                                     </div>
+                                                )}{" "}
+                                                {stepActiveIndex === deleteActiveIndex && (
+                                                    <DeleteDealForm
+                                                        isDeleteConfirm={isDeleteConfirm}
+                                                    />
                                                 )}
                                             </Form>
                                         </Formik>
@@ -579,26 +604,49 @@ export const DealsForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
+                                        stepActiveIndex === deleteActiveIndex ||
+                                        stepActiveIndex >= itemsMenuCount
+                                            ? "secondary"
+                                            : "success"
                                     }
                                     className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button
-                                    onClick={handleSaveDealForm}
-                                    className='form-nav__button deal__button'
-                                    severity={isFormChanged ? "success" : "secondary"}
-                                    disabled={!isFormChanged}
-                                >
-                                    {id ? "Update" : "Save"}
-                                </Button>
+                                {stepActiveIndex === deleteActiveIndex ? (
+                                    <Button
+                                        onClick={() => setConfirmDeleteVisible(true)}
+                                        className='p-button form-nav__button deal__button deal__button--danger'
+                                    >
+                                        Delete
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSaveDealForm}
+                                        className='form-nav__button deal__button'
+                                        severity={isFormChanged ? "success" : "secondary"}
+                                        disabled={!isFormChanged}
+                                    >
+                                        {id ? "Update" : "Save"}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {confirmDeleteVisible && (
+                <ConfirmModal
+                    visible={confirmDeleteVisible}
+                    className='deal-delete-modal'
+                    acceptLabel='Delete'
+                    rejectLabel='Cancel'
+                    bodyMessage={deleteMessage}
+                    confirmAction={() => setIsDeleteConfirm(true)}
+                    onHide={() => setConfirmDeleteVisible(false)}
+                />
+            )}
         </Suspense>
     );
 });

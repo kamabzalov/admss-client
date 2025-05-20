@@ -3,6 +3,7 @@ import { QueryParams } from "common/models/query-params";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
+    DealDelete,
     DealFinance,
     DealPickupPayment,
     DealPrintFormResponse,
@@ -376,6 +377,46 @@ export const deleteHowToKnow = async (itemuid: string): Promise<BaseResponseErro
                     error.response?.data.info ||
                     error.response?.data.error ||
                     "Error while deleting how to know item",
+            };
+        }
+    }
+};
+
+export const getDealDeleteReasonsList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<string[] | BaseResponseError>(
+            `deals/${useruid}/listdeletionreasons`
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal delete reasons list",
+        };
+    }
+};
+
+export const deleteDeal = async (
+    dealuid: string,
+    data: Partial<DealDelete>
+): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `deals/${dealuid}/delete`,
+            data
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while deleting deal",
             };
         }
     }

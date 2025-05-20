@@ -423,3 +423,18 @@ export interface HowToKnow {
     updated: string;
     useruid: string;
 }
+
+export interface DealDelete {
+    status: string;
+    error: string;
+    description: string;
+    comment: string;
+    reason: string;
+    delete_buyer: 0 | 1;
+    delete_vehicle: 0 | 1;
+    send_back: 0 | 1;
+    delete_quote: 0 | 1;
+    delete_trade1: 0 | 1;
+    delete_trade2: 0 | 1;
+    delete_account: 0 | 1;
+}
