@@ -206,7 +206,6 @@ export const DealsForm = observer(() => {
         clearDeal,
         isFormChanged,
         isLoading,
-        deleteReason,
         deleteMessage,
     } = store;
 
@@ -220,7 +219,6 @@ export const DealsForm = observer(() => {
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
-    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
 
@@ -462,7 +460,10 @@ export const DealsForm = observer(() => {
                                             icon='pi pi-times'
                                             className='p-button gap-2 deal__delete-nav w-full'
                                             severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
+                                            onClick={() => {
+                                                navigate(getUrl(deleteActiveIndex));
+                                                setStepActiveIndex(deleteActiveIndex);
+                                            }}
                                         >
                                             Delete deal
                                         </Button>
@@ -568,7 +569,6 @@ export const DealsForm = observer(() => {
                                                 )}{" "}
                                                 {stepActiveIndex === deleteActiveIndex && (
                                                     <DeleteDealForm
-                                                        attemptedSubmit={attemptedSubmit}
                                                         isDeleteConfirm={isDeleteConfirm}
                                                     />
                                                 )}
@@ -616,11 +616,7 @@ export const DealsForm = observer(() => {
                                 </Button>
                                 {stepActiveIndex === deleteActiveIndex ? (
                                     <Button
-                                        onClick={() =>
-                                            deleteReason.length
-                                                ? setConfirmDeleteVisible(true)
-                                                : setAttemptedSubmit(true)
-                                        }
+                                        onClick={() => setConfirmDeleteVisible(true)}
                                         className='p-button form-nav__button deal__button deal__button--danger'
                                     >
                                         Delete
@@ -643,6 +639,9 @@ export const DealsForm = observer(() => {
             {confirmDeleteVisible && (
                 <ConfirmModal
                     visible={confirmDeleteVisible}
+                    className='deal-delete-modal'
+                    acceptLabel='Delete'
+                    rejectLabel='Cancel'
                     bodyMessage={deleteMessage}
                     confirmAction={() => setIsDeleteConfirm(true)}
                     onHide={() => setConfirmDeleteVisible(false)}

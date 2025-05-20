@@ -27,7 +27,7 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
-enum DEAL_DELETE_MESSAGES {
+export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
     DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
     DELETE_SELECTED_OPTIONS = "Do you really want to delete selected options? This action cannot be undone.",

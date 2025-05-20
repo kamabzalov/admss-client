@@ -181,3 +181,17 @@
 .deal-form__title--danger {
     color: var(--admss-app-red);
 }
+
+.deal-delete-modal {
+    .p-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 130px;
+        height: 60px;
+    }
+    .p-confirm-dialog-message {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
