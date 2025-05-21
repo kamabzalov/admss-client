@@ -6,6 +6,7 @@ import {
     moveReportToCollection,
     setCollectionOrder,
     setReportOrder,
+    updateCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
@@ -121,63 +122,71 @@ export const Reports = (): ReactElement => {
         ...buildTreeNodes(reportCollections, true),
     ];
 
-    const handleCreateCollection = () => {
+    const handleCreateCollection = async () => {
         if (!collectionName) return;
-        createReportCollection(authUser!.useruid, {
+        const response = await createReportCollection(authUser!.useruid, {
             name: collectionName,
             documents: newCollectionsReports,
-        }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "New collection is successfully created!",
-                    life: TOAST_LIFETIME,
-                });
-                setCollectionName("");
-                setNewCollectionsReports([]);
-            }
         });
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            await handleGetUserReportCollections();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "New collection is successfully created!",
+                life: TOAST_LIFETIME,
+            });
+            setCollectionName("");
+            setNewCollectionsReports([]);
+        }
     };
 
-    const handleUpdateCollection = (collectionUid: string, editCollectionName?: string) => {
+    const handleUpdateCollection = async (collectionUid: string, editCollectionName?: string) => {
         const finalName = collectionName || editCollectionName;
         if (!finalName) return;
-        createReportCollection(authUser!.useruid, {
+
+        const currentCollection = [...reportCollections, ...customCollections].find(
+            (col) => col.itemUID === collectionUid
+        );
+
+        const documentsToUpdate =
+            selectedReports.length > 0
+                ? selectedReports
+                : (currentCollection?.documents as ReportDocument[]) || [];
+
+        const response = await updateCollection(authUser!.useruid, {
             name: finalName,
-            documents: selectedReports,
+            documents: documentsToUpdate,
             itemuid: collectionUid,
-        }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Collection is successfully updated!",
-                    life: TOAST_LIFETIME,
-                });
-                setCollectionName("");
-                setSelectedReports([]);
-                setIsCollectionEditing(null);
-            }
         });
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            await handleGetUserReportCollections();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Collection is successfully updated!",
+                life: TOAST_LIFETIME,
+            });
+            setCollectionName("");
+            setSelectedReports([]);
+            setIsCollectionEditing(null);
+        }
     };
 
     const handleCustomEditCollection = (
@@ -187,6 +196,12 @@ export const Reports = (): ReactElement => {
         const target = event.target as HTMLElement;
         if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
             event.stopPropagation();
+            const currentCollection = [...reportCollections, ...customCollections].find(
+                (col) => col.itemUID === collectionUid
+            );
+            if (currentCollection?.documents) {
+                setSelectedReports(currentCollection.documents as ReportDocument[]);
+            }
             setIsCollectionEditing(collectionUid);
         }
     };
