@@ -69,6 +69,10 @@ interface StateDropdownProps extends DropdownProps {
     colWidth?: Range<1, 13>;
 }
 
+interface DateInputProps extends CalendarProps {
+    checked?: boolean;
+}
+
 export const DashboardRadio = ({
     radioArray,
     initialValue,
@@ -272,11 +276,12 @@ export const DateInput = ({
     emptyDate,
     clearButton,
     floatLabel = true,
+    checked = false,
     onClearAction,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date | null>(null);
-    const [isChecked, setIsChecked] = useState<boolean>(false);
+    const [isChecked, setIsChecked] = useState<boolean>(checked);
     const uniqueId = useId();
     const calendarRef = useRef<Calendar>(null);
 

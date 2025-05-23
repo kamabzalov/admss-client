@@ -36,6 +36,9 @@ export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL_AVAILABLE_FOR_SALE = 'Do you really want to delete the deal with all related options you\'ve selected and set the inventory to "Available for sale"? This action cannot be undone.',
 }
 
+export const NEW_PAYMENT_LABEL = "new_";
+export const EMPTY_PAYMENT_LENGTH = 7;
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -209,18 +212,35 @@ export class DealStore {
     public changeDealPickupPayments = action(
         (
             itemuid: string,
-            { key, value }: { key: keyof DealPickupPayment; value: string | number }
+            {
+                key,
+                value,
+                isNew,
+            }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
         ) => {
-            const dealStore = this.rootStore.dealStore;
             this._isFormChanged = true;
-            if (dealStore) {
-                const currentPayment = dealStore.dealPickupPayments.find(
-                    (item) => item.itemuid === itemuid
-                );
-                if (currentPayment) {
+
+            const currentPayment = this._dealPickupPayments.find((p) => p.itemuid === itemuid);
+            if (currentPayment) {
+                if (key === "paydate") {
+                    const date = new Date(value as string);
+                    currentPayment[key] = date.getTime();
+                } else {
                     (currentPayment as Record<typeof key, string | number>)[key] = value;
-                    currentPayment.changed = true;
                 }
+                currentPayment.changed = true;
+            } else if (itemuid.startsWith(NEW_PAYMENT_LABEL)) {
+                const newPayment = {
+                    itemuid,
+                    dealuid: this._dealID,
+                    paydate: key === "paydate" ? new Date(value as string).getTime() : 0,
+                    amount: key === "amount" ? (value as number) : 0,
+                    paid: key === "paid" ? (value as number) : 0,
+                };
+                this._dealPickupPayments = [
+                    ...this._dealPickupPayments,
+                    { ...newPayment, changed: true } as DealPickupPayment & { changed?: boolean },
+                ];
             }
         }
     );
@@ -254,8 +274,9 @@ export class DealStore {
             const paymentsResponse = await this._dealPickupPayments
                 .filter((item) => item.changed)
                 .forEach((item) => {
-                    const { changed, ...payment } = item;
-                    setDealPayments(item.itemuid, payment);
+                    const { itemuid, changed, ...payment } = item;
+                    const id = itemuid.startsWith(NEW_PAYMENT_LABEL) ? "0" : itemuid;
+                    setDealPayments(this._dealID, { itemuid: id, ...payment });
                 });
             await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
                 (response) => (response ? this._dealID : undefined)
@@ -288,7 +309,18 @@ export class DealStore {
             this._dealErrorMessage = "";
             const response = await getDealPayments(dealuid);
             if (Array.isArray(response)) {
-                this._dealPickupPayments = response;
+                const emptyPayments = Array.from(
+                    { length: Math.max(0, EMPTY_PAYMENT_LENGTH - response.length) },
+                    (_, index) =>
+                        ({
+                            itemuid: `${NEW_PAYMENT_LABEL}${index}`,
+                            dealuid: this._dealID,
+                            paydate: 0,
+                            amount: 0,
+                            paid: 0,
+                        }) as DealPickupPayment
+                );
+                this._dealPickupPayments = [...response, ...emptyPayments];
             } else {
                 this._dealErrorMessage = response.error as string;
             }

@@ -5,6 +5,7 @@ import {
     Deal,
     DealDelete,
     DealFinance,
+    DealPaymentsTotal,
     DealPickupPayment,
     DealPrintFormResponse,
     HowToKnow,
@@ -240,24 +241,28 @@ export const setDealPayments = async (
 
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while setting deal payments",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while setting deal payments",
+            };
+        }
     }
 };
 
 export const getDealPaymentsTotal = async (dealuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(
+        const request = await authorizedUserApiInstance.get<DealPaymentsTotal>(
             `deals/${dealuid || 0}/ppaymenttotal`
         );
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal payments total",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting deal payments total",
+            };
+        }
     }
 };
 
