@@ -26,6 +26,7 @@ export enum AccordionItems {
     AUDIO = "Audio",
     DOCUMENTS = "Documents",
     LINKS = "Links",
+    WATERMARKING = "Watermarking",
 }
 
 export interface InventoryItem extends MenuItem {
