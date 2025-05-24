@@ -224,6 +224,7 @@ export class DealStore {
             if (currentPayment) {
                 if (key === "paydate") {
                     const date = new Date(value as string);
+                    date.setHours(12, 0, 0, 0);
                     currentPayment[key] = date.getTime();
                 } else {
                     (currentPayment as Record<typeof key, string | number>)[key] = value;
@@ -233,7 +234,14 @@ export class DealStore {
                 const newPayment = {
                     itemuid,
                     dealuid: this._dealID,
-                    paydate: key === "paydate" ? new Date(value as string).getTime() : 0,
+                    paydate:
+                        key === "paydate"
+                            ? (() => {
+                                  const date = new Date(value as string);
+                                  date.setHours(12, 0, 0, 0);
+                                  return date.getTime();
+                              })()
+                            : 0,
                     amount: key === "amount" ? (value as number) : 0,
                     paid: key === "paid" ? (value as number) : 0,
                 };
