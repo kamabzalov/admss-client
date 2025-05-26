@@ -168,10 +168,12 @@
 }
 
 .deal__button {
-    &.deal__button--danger {
+    &.deal__button.p-button.p-button-danger {
         background-color: var(--admss-app-red);
+        color: var(--admss-app-white);
         border: none;
         &:hover {
+            color: var(--admss-app-white);
             background-color: var(--admss-app-red);
             opacity: 0.6;
         }
