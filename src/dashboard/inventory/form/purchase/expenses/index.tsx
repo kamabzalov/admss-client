@@ -22,6 +22,7 @@ import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
+import { convertToStandardTimestamp } from "common/helpers";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
@@ -74,18 +75,24 @@ export const PurchaseExpenses = observer((): ReactElement => {
         return false;
     }, [expensesList, currentEditExpense]);
 
+    const handleGetExpensesTypes = async () => {
+        const response = await getExpensesListTypes(authUser!.useruid);
+        if (response && Array.isArray(response)) {
+            setExpensesTypeList(response);
+        }
+    };
+
+    const handleGetExpensesVendors = async () => {
+        const response = await getExpensesListVendors(authUser!.useruid);
+        if (response && Array.isArray(response)) {
+            setExpensesVendorList(response);
+        }
+    };
+
     useEffect(() => {
         getExpenses();
-        getExpensesListTypes(authUser!.useruid).then((response) => {
-            if (response) {
-                setExpensesTypeList(response);
-            }
-        });
-        getExpensesListVendors(authUser!.useruid).then((response) => {
-            if (response) {
-                setExpensesVendorList(response);
-            }
-        });
+        handleGetExpensesTypes();
+        handleGetExpensesVendors();
     }, [getExpenses]);
 
     const handleClearExpense = () => {
@@ -95,7 +102,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const handleExpenseSubmit = async (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
-            operationdate: currentEditExpense?.operationdate || "",
+            operationdate: convertToStandardTimestamp(currentEditExpense?.operationdate),
             type: currentEditExpense?.type || 0,
             amount: (currentEditExpense?.amount && currentEditExpense?.amount * 100) || 0,
             vendor: currentEditExpense?.vendor || "",
@@ -188,7 +195,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-6'>
                         <DateInput
                             name='Date'
-                            date={Date.parse(currentEditExpense?.operationdate || "")}
+                            date={Date.parse(String(currentEditExpense?.operationdate))}
                             onChange={({ value }) =>
                                 value &&
                                 currentEditExpense &&
@@ -202,9 +209,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-6'>
                         <ComboBox
                             optionLabel='name'
-                            optionValue='id'
+                            optionValue='index'
                             options={expensesTypeList}
-                            value={currentEditExpense?.type || 0}
+                            value={currentEditExpense?.type}
                             onChange={({ value }) =>
                                 value &&
                                 currentEditExpense &&

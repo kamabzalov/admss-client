@@ -48,13 +48,18 @@ export const getExpensesTotal = async (inventoryuid: string) => {
 export const getExpensesListTypes = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<ExpensesListTypes>(
-            `contacts/${useruid}/listtypes`
+            `inventory/list/constants/expensetypes`
         );
-        if (request.status === 200 && request.data.status === Status.OK) {
-            return request.data.contact_types;
+        if (request.status === 200) {
+            return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (error instanceof AxiosError) {
+            return {
+                status: Status.ERROR,
+                message: error.response?.data?.message || "Error while getting expenses types",
+            };
+        }
     }
 };
 
