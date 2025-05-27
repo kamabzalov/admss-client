@@ -153,18 +153,9 @@ export const Reports = (): ReactElement => {
         const finalName = collectionName || editCollectionName;
         if (!finalName) return;
 
-        const currentCollection = [...reportCollections, ...customCollections].find(
-            (col) => col.itemUID === collectionUid
-        );
-
-        const documentsToUpdate =
-            selectedReports.length > 0
-                ? selectedReports
-                : (currentCollection?.documents as ReportDocument[]) || [];
-
         const response = await updateCollection(authUser!.useruid, {
             name: finalName,
-            documents: documentsToUpdate,
+            documents: selectedReports,
             itemuid: collectionUid,
         });
         const { error } = response as BaseResponseError;
