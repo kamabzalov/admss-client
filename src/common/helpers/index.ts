@@ -217,3 +217,18 @@ export const validateDates = (
 };
 
 export const toBinary = (value: boolean): 0 | 1 => (value ? 1 : 0);
+
+export const convertToStandardTimestamp = (dateInput: string | number | Date): number => {
+    let date: Date;
+
+    if (typeof dateInput === "string") {
+        date = new Date(dateInput);
+    } else if (typeof dateInput === "number") {
+        date = new Date(dateInput);
+    } else {
+        date = dateInput;
+    }
+
+    date.setHours(12, 0, 0, 0);
+    return date.getTime();
+};
