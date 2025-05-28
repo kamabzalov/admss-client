@@ -27,6 +27,18 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
+export enum DEAL_DELETE_MESSAGES {
+    DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
+    DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
+    DELETE_SELECTED_OPTIONS = "Do you really want to delete selected options? This action cannot be undone.",
+    SET_INVENTORY_TO_AVAILABLE_FOR_SALE = 'Do you really want to set the inventory to "Available for sale"? This action cannot be undone.',
+    DELETE_OPTIONS_AVAILABLE_FOR_SALE = 'Do you really want to delete selected options and set the inventory to "Available for sale"? This action cannot be undone.',
+    DELETE_DEAL_AVAILABLE_FOR_SALE = 'Do you really want to delete the deal with all related options you\'ve selected and set the inventory to "Available for sale"? This action cannot be undone.',
+}
+
+export const NEW_PAYMENT_LABEL = "new_";
+export const EMPTY_PAYMENT_LENGTH = 7;
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -43,6 +55,14 @@ export class DealStore {
     private _memoRoute: string = "";
     protected _isLoading = false;
     protected _isFormChanged = false;
+    private _deleteMessage: string = DEAL_DELETE_MESSAGES.DELETE_DEAL;
+    private _deleteReason: string = "";
+    private _deleteDealAndRelatedOption: boolean = false;
+    private _deleteDealOption: boolean = true;
+    private _deleteContactOption: boolean = false;
+    private _deleteAccountOption: boolean = false;
+    private _deleteInventoryOption: boolean = false;
+    private _setInventoryAvailableOption: boolean = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -99,6 +119,49 @@ export class DealStore {
 
     public get accordionActiveIndex() {
         return this._accordionActiveIndex;
+    }
+
+    public get deleteMessage() {
+        return this._deleteMessage;
+    }
+
+    public get deleteReason() {
+        return this._deleteReason;
+    }
+
+    public get deleteDealAndRelatedOption() {
+        return this._deleteDealAndRelatedOption;
+    }
+
+    public get deleteDealOption() {
+        return this._deleteDealOption;
+    }
+
+    public get deleteContactOption() {
+        return this._deleteContactOption;
+    }
+
+    public get deleteAccountOption() {
+        return this._deleteAccountOption;
+    }
+
+    public get deleteInventoryOption() {
+        return this._deleteInventoryOption;
+    }
+
+    public get setInventoryAvailableOption() {
+        return this._setInventoryAvailableOption;
+    }
+
+    public get hasDeleteOptionsSelected() {
+        return (
+            this._deleteDealAndRelatedOption ||
+            this._deleteDealOption ||
+            this._deleteContactOption ||
+            this._deleteAccountOption ||
+            this._deleteInventoryOption ||
+            this._setInventoryAvailableOption
+        );
     }
 
     public getDeal = async (itemuid: string) => {
@@ -190,18 +253,43 @@ export class DealStore {
     public changeDealPickupPayments = action(
         (
             itemuid: string,
-            { key, value }: { key: keyof DealPickupPayment; value: string | number }
+            {
+                key,
+                value,
+                isNew,
+            }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
         ) => {
-            const dealStore = this.rootStore.dealStore;
             this._isFormChanged = true;
-            if (dealStore) {
-                const currentPayment = dealStore.dealPickupPayments.find(
-                    (item) => item.itemuid === itemuid
-                );
-                if (currentPayment) {
+
+            const currentPayment = this._dealPickupPayments.find((p) => p.itemuid === itemuid);
+            if (currentPayment) {
+                if (key === "paydate") {
+                    const date = new Date(value as string);
+                    date.setHours(12, 0, 0, 0);
+                    currentPayment[key] = date.getTime();
+                } else {
                     (currentPayment as Record<typeof key, string | number>)[key] = value;
-                    currentPayment.changed = true;
                 }
+                currentPayment.changed = true;
+            } else if (itemuid.startsWith(NEW_PAYMENT_LABEL)) {
+                const newPayment = {
+                    itemuid,
+                    dealuid: this._dealID,
+                    paydate:
+                        key === "paydate"
+                            ? (() => {
+                                  const date = new Date(value as string);
+                                  date.setHours(12, 0, 0, 0);
+                                  return date.getTime();
+                              })()
+                            : 0,
+                    amount: key === "amount" ? (value as number) : 0,
+                    paid: key === "paid" ? (value as number) : 0,
+                };
+                this._dealPickupPayments = [
+                    ...this._dealPickupPayments,
+                    { ...newPayment, changed: true } as DealPickupPayment & { changed?: boolean },
+                ];
             }
         }
     );
@@ -235,8 +323,9 @@ export class DealStore {
             const paymentsResponse = await this._dealPickupPayments
                 .filter((item) => item.changed)
                 .forEach((item) => {
-                    const { changed, ...payment } = item;
-                    setDealPayments(item.itemuid, payment);
+                    const { itemuid, changed, ...payment } = item;
+                    const id = itemuid.startsWith(NEW_PAYMENT_LABEL) ? "0" : itemuid;
+                    setDealPayments(this._dealID, { itemuid: id, ...payment });
                 });
             await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
                 (response) => (response ? this._dealID : undefined)
@@ -269,7 +358,18 @@ export class DealStore {
             this._dealErrorMessage = "";
             const response = await getDealPayments(dealuid);
             if (Array.isArray(response)) {
-                this._dealPickupPayments = response;
+                const emptyPayments = Array.from(
+                    { length: Math.max(0, EMPTY_PAYMENT_LENGTH - response.length) },
+                    (_, index) =>
+                        ({
+                            itemuid: `${NEW_PAYMENT_LABEL}${index}`,
+                            dealuid: this._dealID,
+                            paydate: 0,
+                            amount: 0,
+                            paid: 0,
+                        }) as DealPickupPayment
+                );
+                this._dealPickupPayments = [...response, ...emptyPayments];
             } else {
                 this._dealErrorMessage = response.error as string;
             }
@@ -294,10 +394,43 @@ export class DealStore {
         this._memoRoute = state;
     }
 
+    public set deleteMessage(message: string) {
+        this._deleteMessage = message;
+    }
+
+    public set deleteReason(reason: string) {
+        this._deleteReason = reason;
+    }
+
+    public set deleteDealAndRelatedOption(value: boolean) {
+        this._deleteDealAndRelatedOption = value;
+    }
+
+    public set deleteDealOption(value: boolean) {
+        this._deleteDealOption = value;
+    }
+
+    public set deleteContactOption(value: boolean) {
+        this._deleteContactOption = value;
+    }
+
+    public set deleteAccountOption(value: boolean) {
+        this._deleteAccountOption = value;
+    }
+
+    public set deleteInventoryOption(value: boolean) {
+        this._deleteInventoryOption = value;
+    }
+
+    public set setInventoryAvailableOption(value: boolean) {
+        this._setInventoryAvailableOption = value;
+    }
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
         this._dealID = "";
+        this._deleteReason = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;

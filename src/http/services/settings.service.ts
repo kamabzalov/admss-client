@@ -120,7 +120,7 @@ export const updatePostProcessing = async (
 
 export const setInventoryGroupOption = async (
     groupuid: string,
-    option: Partial<GeneralInventoryOptions>
+    option: Partial<GeneralInventoryOptions> | Partial<GeneralInventoryOptions>[]
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(

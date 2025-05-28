@@ -7,9 +7,8 @@ import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
-import { DealPickupPayment } from "common/models/deals";
-
-const EMPTY_PAYMENT_LENGTH = 7;
+import { DealPaymentsTotal, DealPickupPayment } from "common/models/deals";
+import { Status } from "common/models/base-response";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
@@ -18,15 +17,15 @@ export const DealRetailPickup = observer((): ReactElement => {
     const { dealPickupPayments, getPickupPayments, changeDealPickupPayments, dealErrorMessage } =
         store;
     const [totalPayments, setTotalPayments] = useState(0);
-    const [localPayments, setLocalPayments] = useState<DealPickupPayment[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             if (id) {
                 await getPickupPayments(id);
                 const data = await getDealPaymentsTotal(id);
-                if (typeof data === "number") {
-                    setTotalPayments(data);
+                if (data?.status === Status.OK) {
+                    const { total_paid } = data as DealPaymentsTotal;
+                    setTotalPayments(total_paid);
                 }
             }
         };
@@ -43,25 +42,7 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
     }, [toast, dealErrorMessage]);
 
-    useEffect(() => {
-        if (dealPickupPayments.length) {
-            setLocalPayments(dealPickupPayments);
-        } else {
-            setLocalPayments(
-                Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
-                    itemuid: `empty-${index}`,
-                    paydate: "",
-                    amount: 0,
-                    paid: 0,
-                })) as DealPickupPayment[]
-            );
-        }
-    }, [dealPickupPayments]);
-
     const handleChange = (itemuid: string, key: keyof DealPickupPayment, value: any) => {
-        setLocalPayments((prev: DealPickupPayment[]) =>
-            prev.map((p: DealPickupPayment) => (p.itemuid === itemuid ? { ...p, [key]: value } : p))
-        );
         changeDealPickupPayments(itemuid, { key, value });
     };
 
@@ -73,13 +54,14 @@ export const DealRetailPickup = observer((): ReactElement => {
                 <div className='pickup-header__item'>Paid</div>
             </div>
             <div className='pickup-body col-12'>
-                {localPayments.map((payment: DealPickupPayment) => (
+                {dealPickupPayments.map((payment: DealPickupPayment) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
                             <DateInput
                                 checkbox
+                                checked={!!payment.paydate}
                                 floatLabel={false}
-                                date={payment.paydate}
+                                date={new Date(payment.paydate)}
                                 name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
                                 onChange={(e) =>
                                     handleChange(payment.itemuid, "paydate", e.value || "")
@@ -100,7 +82,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                                         handleChange(payment.itemuid, "amount", Number(value) || 0)
                                     }
                                     className={
-                                        payment.amount > 0
+                                        payment?.amount && payment.amount > 0
                                             ? "pickup-input"
                                             : "pickup-input pickup-input--grey"
                                     }
