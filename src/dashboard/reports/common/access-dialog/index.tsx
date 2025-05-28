@@ -33,6 +33,8 @@ interface EditAccessDialogProps {
     reportuid: string;
 }
 
+const ACCESS_ADMIN_ROLE = "Admin";
+
 enum ROLE {
     ALL = "All_roles",
     ADMIN = "admin.role",
@@ -206,6 +208,9 @@ export const EditAccessDialog = ({
                 <Checkbox
                     className='access-field__checkbox'
                     onClick={() => {
+                        if (data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()) {
+                            return;
+                        }
                         const newList = accessList.map((item: any) => {
                             if (item.username === data.username) {
                                 setIsButtonDisabled(false);
@@ -216,6 +221,7 @@ export const EditAccessDialog = ({
 
                         setAccessList(newList);
                     }}
+                    disabled={data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()}
                     checked={!!data.enabled}
                 />
                 {!!data.enabled ? "Granted" : "Denied"}
