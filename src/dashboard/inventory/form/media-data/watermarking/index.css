@@ -1,0 +1,11 @@
+.inventory-form {
+    .watermarking {
+        padding-right: 0;
+        .watermarking__logo-settings {
+            padding-top: 0;
+        }
+        .p-inputtextarea {
+            resize: vertical;
+        }
+    }
+}
