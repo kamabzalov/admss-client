@@ -18,8 +18,32 @@
     align-items: center;
 }
 
-.purchase-expenses__table.p-datatable .p-column-header-content {
-    justify-content: center;
+.purchase-expenses__table.p-datatable {
+    .p-datatable-thead {
+        height: 45px;
+    }
+    ::-webkit-scrollbar {
+        background: linear-gradient(to bottom, var(--admss-app-light-blue) 45px, transparent 45px);
+    }
+    ::-webkit-scrollbar-track {
+        margin-top: 45px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--admss-app-light-blue);
+        border-radius: 5px;
+    }
+
+    .p-datatable-wrapper {
+        overflow-x: auto;
+        padding-left: 6px;
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+    .p-column-header-content {
+        justify-content: center;
+    }
 }
 
 .purchase-expenses__table.p-datatable .p-datatable-emptymessage {
