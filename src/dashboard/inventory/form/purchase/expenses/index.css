@@ -18,8 +18,38 @@
     align-items: center;
 }
 
-.purchase-expenses__table.p-datatable .p-column-header-content {
-    justify-content: center;
+.purchase-expenses__table.p-datatable {
+    --datatable-header-height: 45px;
+    margin-top: 50px;
+    .p-datatable-thead {
+        height: var(--datatable-header-height);
+    }
+    ::-webkit-scrollbar {
+        background: linear-gradient(
+            to bottom,
+            var(--admss-app-light-blue) var(--datatable-header-height),
+            transparent var(--datatable-header-height)
+        );
+    }
+    ::-webkit-scrollbar-track {
+        margin-top: var(--datatable-header-height);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--admss-app-medium-blue);
+        border-radius: 5px;
+    }
+
+    .p-datatable-wrapper {
+        overflow-x: auto;
+        padding-left: 6px;
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+    .p-column-header-content {
+        justify-content: center;
+    }
 }
 
 .purchase-expenses__table.p-datatable .p-datatable-emptymessage {

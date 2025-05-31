@@ -42,7 +42,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         { field: "type_name", header: "Type" },
         { field: "amount_text", header: "Amount" },
         { field: "notbillable", header: "Not Billable" },
-        { field: "vendor", header: "Vendor" },
+        { field: "vendor_name", header: "Vendor" },
     ];
 
     const getExpenses = useCallback(() => {
@@ -307,20 +307,21 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
-                        className='mt-6 purchase-expenses__table'
+                        className='purchase-expenses__table'
                         value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        showGridlines
                         scrollable
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
-                                className: "overflow-x-hidden",
+                                className: "thin-scrollbar",
                                 style: {
-                                    height: "232px",
+                                    height: "205px",
                                 },
                             },
                         }}
@@ -328,6 +329,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             bodyClassName='purchase-expenses__table-controls'
+                            frozen
                             body={(options) => {
                                 const isRowExpanded = expandedRows.some((item) => {
                                     return item === options;
@@ -393,6 +395,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
 
                         <Column
                             body={deleteTemplate}
+                            frozen
+                            alignFrozen='right'
                             pt={{
                                 root: {
                                     style: {
