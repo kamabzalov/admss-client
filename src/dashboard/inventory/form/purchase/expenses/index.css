@@ -19,17 +19,23 @@
 }
 
 .purchase-expenses__table.p-datatable {
+    --datatable-header-height: 45px;
+    margin-top: 50px;
     .p-datatable-thead {
-        height: 45px;
+        height: var(--datatable-header-height);
     }
     ::-webkit-scrollbar {
-        background: linear-gradient(to bottom, var(--admss-app-light-blue) 45px, transparent 45px);
+        background: linear-gradient(
+            to bottom,
+            var(--admss-app-light-blue) var(--datatable-header-height),
+            transparent var(--datatable-header-height)
+        );
     }
     ::-webkit-scrollbar-track {
-        margin-top: 45px;
+        margin-top: var(--datatable-header-height);
     }
     ::-webkit-scrollbar-thumb {
-        background: var(--admss-app-light-blue);
+        background: var(--admss-app-medium-blue);
         border-radius: 5px;
     }
 
