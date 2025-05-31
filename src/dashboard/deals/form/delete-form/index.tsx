@@ -109,7 +109,6 @@ export const DeleteDealForm = observer(
                         store.setInventoryAvailableOption = false;
                         store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL_WITH_OPTIONS;
                     } else {
-                        store.deleteDealOption = false;
                         store.deleteContactOption = false;
                         store.deleteAccountOption = false;
                         store.deleteInventoryOption = false;
@@ -171,7 +170,6 @@ export const DeleteDealForm = observer(
                     store.deleteInventoryOption = checked;
                     if (checked) {
                         store.deleteDealAndRelatedOption = false;
-                        store.deleteDealOption = false;
                         store.setInventoryAvailableOption = false;
                         store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_SELECTED_OPTIONS;
                     } else if (setInventoryAvailableOption) {
@@ -185,7 +183,6 @@ export const DeleteDealForm = observer(
                     store.setInventoryAvailableOption = checked;
                     if (checked) {
                         store.deleteDealAndRelatedOption = false;
-                        store.deleteDealOption = false;
                         store.deleteInventoryOption = false;
                         if (deleteContactOption || deleteAccountOption) {
                             store.deleteMessage =
@@ -246,13 +243,7 @@ export const DeleteDealForm = observer(
                             />
                         </div>
                         <div className='col-6'>
-                            <BorderedCheckbox
-                                name='Delete the deal'
-                                checked={deleteDealOption}
-                                onChange={({ checked }) =>
-                                    handleCheckboxChange(DELETE_OPTION.DELETE_ONLY_DEAL, !!checked)
-                                }
-                            />
+                            <BorderedCheckbox name='Delete the deal' checked={deleteDealOption} />
                         </div>
                         <div className='col-6'>
                             <BorderedCheckbox
