@@ -6,7 +6,7 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
 import { getReportAccessList, setReportAccessList } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { Checkbox } from "primereact/checkbox";
+import { Checkbox, CheckboxClickEvent } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
@@ -198,6 +198,22 @@ export const EditAccessDialog = ({
         setSelectedRole(newSelectedValues.filter(Boolean));
     };
 
+    const handleCheckboxClick = (event: CheckboxClickEvent, data: ReportAccess) => {
+        event.stopPropagation();
+        if (data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()) {
+            return;
+        }
+        const newList = accessList.map((item: any) => {
+            if (item.username === data.username) {
+                setIsButtonDisabled(false);
+                return { ...item, enabled: !!item.enabled ? 0 : 1 };
+            } else {
+                return item;
+            }
+        });
+        setAccessList(newList);
+    };
+
     const accessField = (data: ReportAccess): ReactElement => {
         const accessBlock = (
             <label
@@ -207,20 +223,7 @@ export const EditAccessDialog = ({
             >
                 <Checkbox
                     className='access-field__checkbox'
-                    onClick={() => {
-                        if (data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()) {
-                            return;
-                        }
-                        const newList = accessList.map((item: any) => {
-                            if (item.username === data.username) {
-                                setIsButtonDisabled(false);
-                                return { ...item, enabled: !!item.enabled ? 0 : 1 };
-                            }
-                            return item;
-                        });
-
-                        setAccessList(newList);
-                    }}
+                    onClick={(event) => handleCheckboxClick(event, data)}
                     disabled={data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()}
                     checked={!!data.enabled}
                 />
