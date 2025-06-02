@@ -28,6 +28,7 @@ import { TreeNodeEvent } from "common/models";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const COLLECTION_DRAG_DELAY = 1000;
+const DEEPLY_NESTED_LEVEL = 3;
 
 export const NodeContent = ({
     node,
@@ -47,16 +48,20 @@ export const NodeContent = ({
     const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
 
     const getNestingLevel = (element: Element | null): number => {
+        const INCREMENT_LEVEL = 1;
         if (!element) return 0;
         const parent = element.closest(".p-treenode");
         if (!parent) return 0;
-        return 1 + getNestingLevel(parent.parentElement);
+        return INCREMENT_LEVEL + getNestingLevel(parent.parentElement);
     };
 
     useEffect(() => {
         const element = ref.current?.closest(".p-treenode-content");
+
         const isDeeplyNestedNode =
-            node.type === NODE_TYPES.DOCUMENT && element ? getNestingLevel(element) >= 3 : false;
+            node.type === NODE_TYPES.DOCUMENT && element
+                ? getNestingLevel(element) >= DEEPLY_NESTED_LEVEL
+                : false;
         setIsDeeplyNested(isDeeplyNestedNode);
     }, [node.type]);
 
