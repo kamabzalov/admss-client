@@ -149,53 +149,56 @@ export const Reports = (): ReactElement => {
         }
     };
 
-    const handleUpdateCollection = async (collectionUid: string, editCollectionName?: string) => {
-        const finalName = collectionName || editCollectionName;
-        if (!finalName) return;
+    const handleUpdateCollection = useCallback(
+        async (collectionUid: string, editCollectionName?: string) => {
+            const finalName = collectionName || editCollectionName;
+            if (!finalName) return;
 
-        const response = await updateCollection(authUser!.useruid, {
-            name: finalName,
-            documents: selectedReports,
-            itemuid: collectionUid,
-        });
-        const { error } = response as BaseResponseError;
-        if (error && toast.current) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: error,
-                life: TOAST_LIFETIME,
+            const response = await updateCollection(authUser!.useruid, {
+                name: finalName,
+                documents: selectedReports,
+                itemuid: collectionUid,
             });
-        } else {
-            await handleGetUserReportCollections();
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Collection is successfully updated!",
-                life: TOAST_LIFETIME,
-            });
-            setCollectionName("");
-            setSelectedReports([]);
-            setIsCollectionEditing(null);
-        }
-    };
-
-    const handleCustomEditCollection = (
-        event: React.MouseEvent<HTMLElement>,
-        collectionUid: string
-    ) => {
-        const target = event.target as HTMLElement;
-        if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
-            event.stopPropagation();
-            const currentCollection = [...reportCollections, ...customCollections].find(
-                (col) => col.itemUID === collectionUid
-            );
-            if (currentCollection?.documents) {
-                setSelectedReports(currentCollection.documents as ReportDocument[]);
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                await handleGetUserReportCollections();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Collection is successfully updated!",
+                    life: TOAST_LIFETIME,
+                });
+                setCollectionName("");
+                setSelectedReports([]);
+                setIsCollectionEditing(null);
             }
-            setIsCollectionEditing(collectionUid);
-        }
-    };
+        },
+        [authUser, collectionName, selectedReports, handleGetUserReportCollections]
+    );
+
+    const handleCustomEditCollection = useCallback(
+        (event: React.MouseEvent<HTMLElement>, collectionUid: string) => {
+            const target = event.target as HTMLElement;
+            if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
+                event.stopPropagation();
+                const currentCollection = [...reportCollections, ...customCollections].find(
+                    (col) => col.itemUID === collectionUid
+                );
+                if (currentCollection?.documents) {
+                    setSelectedReports(currentCollection.documents as ReportDocument[]);
+                }
+                setIsCollectionEditing(collectionUid);
+            }
+        },
+        [reportCollections, customCollections]
+    );
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
         const target = event.target as HTMLElement;
