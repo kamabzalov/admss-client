@@ -54,6 +54,12 @@
 
                 .p-tree-toggler {
                     margin: 0;
+                    &[aria-label="Collapse"] {
+                        transform: rotate(180deg);
+                    }
+                    &[aria-label="Expand"] {
+                        transform: rotate(90deg);
+                    }
                 }
 
                 &.report__list-item--toggler-visible {
@@ -87,7 +93,7 @@
 
         .p-treenode .p-treenode-content.simple-node {
             .report__list-item {
-                padding-left: 37px;
+                padding-left: 14px;
             }
             .p-tree-toggler {
                 display: none;
@@ -361,4 +367,8 @@
 
 .card.report {
     padding: 40px 30px;
+}
+
+.p-treenode-content.deeply-nested-node {
+    margin-left: 22px;
 }
