@@ -1,13 +1,11 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { SalespersonsList } from "common/models/contact";
-import { AuthUser } from "http/services/auth.service";
 import { getContactsSalesmanList } from "http/services/contacts-service";
-import { useState, useEffect } from "react";
-import { getKeyValue } from "services/local-storage.service";
+import { useState } from "react";
 import { DropdownProps } from "primereact/dropdown";
 import { SalespersonsDataTable } from "./salespersons-table";
+import { useStore } from "store/hooks";
 
 const FIELD: keyof SalespersonsList = "username";
 
@@ -26,30 +24,25 @@ export const SalespersonSearch = ({
     onChangeGetFullInfo,
     ...props
 }: SalespersonSearchProps) => {
-    const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<SalespersonsList[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
 
     const handleSalespersonInputChange = (searchValue: string): void => {
         if (!searchValue.trim()) {
             return;
         }
-        user &&
-            getContactsSalesmanList(user.useruid).then((response) => {
-                if (response?.length) {
-                    const filteredOptions = response.filter((item) =>
-                        item.username.toLowerCase().includes(searchValue.toLowerCase())
-                    );
-                    setOptions(filteredOptions);
-                } else {
-                    setOptions([]);
-                }
-            });
+        getContactsSalesmanList(authUser!.useruid).then((response) => {
+            if (response && Array.isArray(response)) {
+                const filteredOptions = response.filter((item) =>
+                    item.username.toLowerCase().includes(searchValue.toLowerCase())
+                );
+                setOptions(filteredOptions);
+            } else {
+                setOptions([]);
+            }
+        });
     };
 
     const handleOnRowClick = (username: string) => {
@@ -85,8 +78,6 @@ export const SalespersonSearch = ({
                 header={<div className='uppercase'>Choose a Contact</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw", height: "75vh" }}
-                maximizable
-                modal
                 onHide={() => setDialogVisible(false)}
             >
                 <SalespersonsDataTable
