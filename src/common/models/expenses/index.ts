@@ -18,6 +18,7 @@ export interface Expenses {
     updated: string;
     useruid: string;
     vendor: string;
+    vendor_name: string;
 }
 
 export interface ExpensesTotal {

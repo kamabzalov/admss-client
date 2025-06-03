@@ -52,14 +52,15 @@ export const CollectionPanelContent = ({
         if (!collectionuid) {
             setCollectionNameInput("");
             setPanelSelectedReports([]);
+        } else {
+            setCollectionNameInput(collectionName);
+            setPanelSelectedReports(selectedReports);
         }
     }, [collectionuid]);
 
     const handleCreateCollectionClick = () => {
         if (collectionNameInput) {
             handleCreateCollection();
-            setCollectionNameInput("");
-            setPanelSelectedReports([]);
         }
     };
 
