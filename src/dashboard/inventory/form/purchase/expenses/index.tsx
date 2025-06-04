@@ -59,6 +59,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [id]);
 
     const handleCompareData = useMemo(() => {
+        if (!currentEditExpense?.itemuid) {
+            return (
+                !currentEditExpense?.operationdate ||
+                !currentEditExpense?.amount ||
+                !currentEditExpense?.vendor
+            );
+        }
+
         const currentExpense = expensesList.find(
             (item) => item.itemuid === currentEditExpense?.itemuid
         );
@@ -196,6 +204,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <DateInput
                             name='Date'
                             date={Date.parse(String(currentEditExpense?.operationdate))}
+                            emptyDate
                             onChange={({ value }) =>
                                 value &&
                                 currentEditExpense &&
