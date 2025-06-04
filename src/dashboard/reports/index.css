@@ -223,14 +223,6 @@
     border: 1px solid var(--admss-app-warning-blue);
 }
 
-.p-dialog.edit-access {
-    width: 690px;
-
-    .p-dialog-content-body {
-        height: 618px;
-    }
-}
-
 .access-field {
     width: 100px;
     display: inline-flex;

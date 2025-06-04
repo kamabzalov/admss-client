@@ -397,9 +397,17 @@ export const Reports = (): ReactElement => {
                 <>
                     <div
                         className='reports__list-item reports__list-item--inner'
-                        onClick={(ev) => handleOpenParameters(ev, currentReport)}
-                        onDoubleClick={() => {
-                            navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                        onClick={(event) => handleOpenParameters(event, currentReport)}
+                        onDoubleClick={(event: React.MouseEvent<HTMLElement>) => {
+                            event.stopPropagation();
+                            const target = event.target as HTMLElement;
+                            if (
+                                OPEN_PARAMETERS_CLASSES.some((cls) =>
+                                    target.classList.contains(cls)
+                                )
+                            ) {
+                                navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                            }
                         }}
                     >
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>

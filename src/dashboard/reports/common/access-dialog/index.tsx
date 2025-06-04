@@ -354,9 +354,9 @@ export const EditAccessDialog = ({
                         scrollable
                         pt={{
                             wrapper: {
-                                className: "edit-collection__table-wrapper",
+                                className: "edit-collection__table-wrapper thin-scrollbar",
                                 style: {
-                                    maxHeight: "590px",
+                                    maxHeight: "464px",
                                 },
                             },
                         }}
@@ -366,6 +366,8 @@ export const EditAccessDialog = ({
                                 key={column.field}
                                 field={column.field}
                                 header={column.header}
+                                className='edit-access__row'
+                                style={{ height: "42px", padding: "0 10px" }}
                                 body={(data) => {
                                     if (column.field === "enabled") {
                                         return accessField(data);
