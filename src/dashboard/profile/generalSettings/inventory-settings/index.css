@@ -1,6 +1,15 @@
 .settings-inventory {
     padding-top: 0;
     padding-left: 0;
+    max-height: 712px;
+    overflow: hidden;
+
+    .p-tabview-nav-content {
+        background-color: var(--admss-app-white);
+        height: 60px;
+        z-index: 11;
+    }
+
     .settings-form__title {
         height: 48px;
     }
@@ -35,7 +44,6 @@
         padding-left: 0;
         padding-right: 10px;
         border: none;
-        height: 43.5vh;
     }
 
     .p-tabview-nav-container a.p-tabview-nav-link {

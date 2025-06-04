@@ -52,7 +52,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     }, [inventoryGroupID]);
 
     const handleSaveOption = async (option: Partial<GeneralInventoryOptions>) => {
-        setIsLoading(true);
         if (!option.name) {
             toast.current?.show({
                 severity: "warn",
@@ -208,13 +207,29 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             return a.x - b.x;
         });
 
+        const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
+
+        if (oldItem.x === 0 && newItem.x === 1) {
+            const firstSecondColumnItem = sortedLayout.find((item) => item.x === 1 && item.y === 0);
+
+            if (firstSecondColumnItem) {
+                firstSecondColumnItem.x = 0;
+                firstSecondColumnItem.y = itemsPerColumn - 1;
+
+                sortedLayout.forEach((item) => {
+                    if (item.x === 1 && item.y > 0) {
+                        item.y -= 1;
+                    }
+                });
+            }
+        }
+
         const updatedOptions = sortedLayout
             .map((layoutItem) => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
                 if (!originalItem) return null;
 
                 const isFirstColumn = layoutItem.x === 0;
-                const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
                 const baseOrder = isFirstColumn ? 0 : itemsPerColumn;
                 const order = baseOrder + layoutItem.y;
 
