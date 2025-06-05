@@ -92,7 +92,12 @@ export const getContactsSalesmanList = async (uid: string) => {
             return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contact salesman list",
+            };
+        }
     }
 };
 
