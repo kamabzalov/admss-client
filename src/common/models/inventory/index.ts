@@ -8,7 +8,18 @@ export interface LocationsListData {
     status: Status;
 }
 
-export type MakesListData = ListData & { logo: string };
+export interface MakesListData extends ListData {
+    created_at: string;
+    deleted_at: string;
+    group: string;
+    isdefault: 0 | 1;
+    logo: string;
+    name: string;
+    updated_at: string;
+    url: string;
+    url_hash: string;
+}
+
 export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
 export interface InventoryExtData {

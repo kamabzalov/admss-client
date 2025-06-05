@@ -2,6 +2,8 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
+    deleteInventoryMake,
+    deleteInventoryModel,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
@@ -25,6 +27,7 @@ import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useToast } from "dashboard/common/toast";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
@@ -36,6 +39,7 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const userStore = useStore().userStore;
+    const toast = useToast();
     const { authUser } = userStore;
     const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
         store;
@@ -52,17 +56,20 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
 
+    const hangeGetAutoMakeModelList = async () => {
+        const response = await getInventoryAutomakesList();
+        if (response && Array.isArray(response)) {
+            const upperCasedList = response.map((item) => ({
+                ...item,
+                name: item.name.toUpperCase(),
+            }));
+            setInitialAutoMakesList(upperCasedList);
+            setAutomakesList(upperCasedList);
+        }
+    };
+
     useEffect(() => {
-        getInventoryAutomakesList().then((list) => {
-            if (list) {
-                const upperCasedList = list.map((item) => ({
-                    ...item,
-                    name: item.name.toUpperCase(),
-                }));
-                setInitialAutoMakesList(upperCasedList);
-                setAutomakesList(upperCasedList);
-            }
-        });
+        hangeGetAutoMakeModelList();
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
         });
@@ -140,14 +147,69 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const autoMakesOptionTemplate = (option: MakesListData) => {
+        const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+            const response = await deleteInventoryMake(String(option?.id));
+            if (response?.error) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                });
+            } else {
+                hangeGetAutoMakeModelList();
+            }
+        };
+
         return (
-            <div className='flex align-items-center'>
+            <div className='flex align-items-center inventory-makes'>
                 <img
                     alt={option.name}
                     src={option?.logo || defaultMakesLogo}
                     className='mr-2 vehicle-general__dropdown-icon'
                 />
-                <div>{option.name}</div>
+                <div className='inventory-makes__name'>{option.name}</div>
+                {!option.isdefault && (
+                    <Button
+                        icon='pi pi-times'
+                        className='p-button-text inventory-makes__delete-button'
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteMake(event);
+                        }}
+                    />
+                )}
+            </div>
+        );
+    };
+
+    const autoMakesModelOptionTemplate = (option: MakesListData) => {
+        const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+            const response = await deleteInventoryModel(String(option?.id));
+            if (response?.error) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                });
+            } else {
+                hangeGetAutoMakeModelList();
+            }
+        };
+        return (
+            <div className='flex align-items-center inventory-makes'>
+                <div className='inventory-makes__name'>{option.name}</div>
+                {!option.isdefault && (
+                    <Button
+                        icon='pi pi-times'
+                        className='p-button-text inventory-makes__delete-button'
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteMake(event);
+                        }}
+                    />
+                )}
             </div>
         );
     };
@@ -435,6 +497,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
+                        panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
@@ -458,6 +521,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
                     }`}
+                    itemTemplate={autoMakesModelOptionTemplate}
                     label='Model (required)'
                 />
                 <small className='p-error'>{errors.Model}</small>
