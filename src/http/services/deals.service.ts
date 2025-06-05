@@ -426,3 +426,19 @@ export const deleteDeal = async (
         }
     }
 };
+
+export const deleteDealPayment = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `deals/${itemuid}/deleteppayment`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting payment",
+            };
+        }
+    }
+};
