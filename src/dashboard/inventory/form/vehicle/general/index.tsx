@@ -2,6 +2,8 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
+    deleteInventoryMake,
+    deleteInventoryModel,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
@@ -25,6 +27,7 @@ import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useToast } from "dashboard/common/toast";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
@@ -36,6 +39,7 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const userStore = useStore().userStore;
+    const toast = useToast();
     const { authUser } = userStore;
     const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
         store;
@@ -52,17 +56,20 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
 
+    const hangeGetAutoMakeModelList = async () => {
+        const response = await getInventoryAutomakesList();
+        if (response && Array.isArray(response)) {
+            const upperCasedList = response.map((item) => ({
+                ...item,
+                name: item.name.toUpperCase(),
+            }));
+            setInitialAutoMakesList(upperCasedList);
+            setAutomakesList(upperCasedList);
+        }
+    };
+
     useEffect(() => {
-        getInventoryAutomakesList().then((list) => {
-            if (list) {
-                const upperCasedList = list.map((item) => ({
-                    ...item,
-                    name: item.name.toUpperCase(),
-                }));
-                setInitialAutoMakesList(upperCasedList);
-                setAutomakesList(upperCasedList);
-            }
-        });
+        hangeGetAutoMakeModelList();
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
         });
@@ -113,7 +120,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
         if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
             getAutoMakeModelList(makeSting).then((list) => {
-                if (list && Object.keys(list).length) {
+                if (list && Array.isArray(list) && list.length) {
                     setAutomakesModelList(list);
                 } else {
                     setAutomakesModelList([]);
@@ -139,15 +146,60 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const autoMakesOptionTemplate = (option: MakesListData) => {
+    const handleDeleteInventoryRecord = (record: MakesListData, isModel: boolean = false) => {
+        const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+
+            if (!record.itemuid) return;
+            if (record.isdefault) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "You cannot delete a default make.",
+                });
+                return;
+            }
+
+            let response;
+            if (isModel) {
+                response = await deleteInventoryModel(record.itemuid);
+            } else {
+                response = await deleteInventoryMake(record.itemuid);
+            }
+
+            if (response?.error) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                });
+            } else {
+                toast?.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `${isModel ? "Model" : "Make"} ${record.name} deleted successfully`,
+                });
+                hangeGetAutoMakeModelList();
+            }
+        };
+
         return (
-            <div className='flex align-items-center'>
-                <img
-                    alt={option.name}
-                    src={option?.logo || defaultMakesLogo}
-                    className='mr-2 vehicle-general__dropdown-icon'
-                />
-                <div>{option.name}</div>
+            <div className='flex align-items-center inventory-makes'>
+                {!isModel && (
+                    <img
+                        alt={record.name}
+                        src={record?.logo || defaultMakesLogo}
+                        className='mr-2 vehicle-general__dropdown-icon'
+                    />
+                )}
+                <div className='inventory-makes__name'>{record.name}</div>
+                {!record.isdefault && (
+                    <Button
+                        icon='pi pi-times'
+                        className='p-button-text inventory-makes__delete-button'
+                        onClick={handleDelete}
+                    />
+                )}
             </div>
         );
     };
@@ -429,12 +481,13 @@ export const VehicleGeneral = observer((): ReactElement => {
                             setFieldValue("Make", make);
                             changeInventory({ key: "Make", value: make });
                         }}
-                        itemTemplate={autoMakesOptionTemplate}
+                        itemTemplate={(option) => handleDeleteInventoryRecord(option)}
                         selectedItemTemplate={selectedAutoMakesTemplate}
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
+                        panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
@@ -458,6 +511,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
                     }`}
+                    itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
                     label='Model (required)'
                 />
                 <small className='p-error'>{errors.Model}</small>
