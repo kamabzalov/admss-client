@@ -18,6 +18,7 @@ export interface MakesListData extends ListData {
     updated_at: string;
     url: string;
     url_hash: string;
+    itemuid?: string;
 }
 
 export type OptionsListData = ListData & { name: InventoryOptionsInfo };

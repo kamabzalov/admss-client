@@ -120,7 +120,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
         if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
             getAutoMakeModelList(makeSting).then((list) => {
-                if (list && Object.keys(list).length) {
+                if (list && Array.isArray(list) && list.length) {
                     setAutomakesModelList(list);
                 } else {
                     setAutomakesModelList([]);
@@ -146,10 +146,27 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const autoMakesOptionTemplate = (option: MakesListData) => {
-        const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleDeleteInventoryRecord = (record: MakesListData, isModel: boolean = false) => {
+        const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
             event.stopPropagation();
-            const response = await deleteInventoryMake(String(option?.id));
+
+            if (!record.itemuid) return;
+            if (record.isdefault) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "You cannot delete a default make.",
+                });
+                return;
+            }
+
+            let response;
+            if (isModel) {
+                response = await deleteInventoryModel(record.itemuid);
+            } else {
+                response = await deleteInventoryMake(record.itemuid);
+            }
+
             if (response?.error) {
                 toast?.current?.show({
                     severity: "error",
@@ -157,57 +174,30 @@ export const VehicleGeneral = observer((): ReactElement => {
                     detail: response.error,
                 });
             } else {
+                toast?.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `${isModel ? "Model" : "Make"} ${record.name} deleted successfully`,
+                });
                 hangeGetAutoMakeModelList();
             }
         };
 
         return (
             <div className='flex align-items-center inventory-makes'>
-                <img
-                    alt={option.name}
-                    src={option?.logo || defaultMakesLogo}
-                    className='mr-2 vehicle-general__dropdown-icon'
-                />
-                <div className='inventory-makes__name'>{option.name}</div>
-                {!option.isdefault && (
-                    <Button
-                        icon='pi pi-times'
-                        className='p-button-text inventory-makes__delete-button'
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            handleDeleteMake(event);
-                        }}
+                {!isModel && (
+                    <img
+                        alt={record.name}
+                        src={record?.logo || defaultMakesLogo}
+                        className='mr-2 vehicle-general__dropdown-icon'
                     />
                 )}
-            </div>
-        );
-    };
-
-    const autoMakesModelOptionTemplate = (option: MakesListData) => {
-        const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
-            event.stopPropagation();
-            const response = await deleteInventoryModel(String(option?.id));
-            if (response?.error) {
-                toast?.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: response.error,
-                });
-            } else {
-                hangeGetAutoMakeModelList();
-            }
-        };
-        return (
-            <div className='flex align-items-center inventory-makes'>
-                <div className='inventory-makes__name'>{option.name}</div>
-                {!option.isdefault && (
+                <div className='inventory-makes__name'>{record.name}</div>
+                {!record.isdefault && (
                     <Button
                         icon='pi pi-times'
                         className='p-button-text inventory-makes__delete-button'
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            handleDeleteMake(event);
-                        }}
+                        onClick={handleDelete}
                     />
                 )}
             </div>
@@ -491,7 +481,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             setFieldValue("Make", make);
                             changeInventory({ key: "Make", value: make });
                         }}
-                        itemTemplate={autoMakesOptionTemplate}
+                        itemTemplate={(option) => handleDeleteInventoryRecord(option)}
                         selectedItemTemplate={selectedAutoMakesTemplate}
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
@@ -521,7 +511,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
                     }`}
-                    itemTemplate={autoMakesModelOptionTemplate}
+                    itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
                     label='Model (required)'
                 />
                 <small className='p-error'>{errors.Model}</small>
