@@ -1,0 +1,11 @@
+.salespersons-table {
+    .p-datatable-thead {
+        height: 45px;
+        .salespersons-column-header:first-child {
+            border-left: none;
+        }
+        .salespersons-column-header:last-child {
+            border-right: none;
+        }
+    }
+}
