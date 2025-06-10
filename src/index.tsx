@@ -25,6 +25,7 @@ import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { Tasks } from "dashboard/tasks";
 import { ErrorBoundary } from "http/routes/ErrorBoundary";
 import { ToastProvider } from "dashboard/common/toast";
+import { ServiceUpdate } from "services/service-update";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -36,6 +37,10 @@ const AppRouter = (): ReactElement => {
             errorElement: <ErrorBoundary />,
             children: [
                 { path: "", element: <SignIn /> },
+                {
+                    path: "service-update",
+                    element: <ServiceUpdate />,
+                },
                 {
                     path: "dashboard",
                     element: <Dashboard />,

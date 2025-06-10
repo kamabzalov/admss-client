@@ -1,0 +1,59 @@
+.service-update {
+    margin: 20vh auto 0;
+    max-width: 1222px;
+    height: 618px;
+    border-radius: 15px;
+    .p-card-content {
+        font-family: "Open Sans", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.service-update__warning,
+.service-update__info {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0;
+}
+
+.service-update__warning {
+    font-size: 48px;
+}
+
+.service-update__info {
+    font-size: 32px;
+    padding-top: 34px;
+}
+
+.service-update__message {
+    font-size: 24px;
+    max-width: 922px;
+    text-align: center;
+    color: var(--admss-darkest-grey);
+}
+
+.service-update__image {
+    width: 284px;
+    height: 140px;
+    object-fit: cover;
+}
+
+.service-update__buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 25px;
+}
+
+.service-update__button.p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 20px;
+    width: 210px;
+    height: 60px;
+}
