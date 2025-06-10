@@ -28,6 +28,7 @@ import { TreeNodeEvent } from "common/models";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const COLLECTION_DRAG_DELAY = 1000;
+const DEEPLY_NESTED_LEVEL = 3;
 
 export const NodeContent = ({
     node,
@@ -41,12 +42,31 @@ export const NodeContent = ({
     isTogglerVisible?: boolean;
 }) => {
     const ref = useRef<HTMLDivElement>(null);
+    const [isDeeplyNested, setIsDeeplyNested] = useState(false);
 
     const isNew = !!node.data?.document?.isNew;
     const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
 
+    const getNestingLevel = (element: Element | null): number => {
+        const INCREMENT_LEVEL = 1;
+        if (!element) return 0;
+        const parent = element.closest(".p-treenode");
+        if (!parent) return 0;
+        return INCREMENT_LEVEL + getNestingLevel(parent.parentElement);
+    };
+
     useEffect(() => {
-        const parent = ref.current?.closest(".p-treenode-content");
+        const element = ref.current?.closest(".p-treenode-content");
+
+        const isDeeplyNestedNode =
+            node.type === NODE_TYPES.DOCUMENT && element
+                ? getNestingLevel(element) >= DEEPLY_NESTED_LEVEL
+                : false;
+        setIsDeeplyNested(isDeeplyNestedNode);
+    }, [node.type]);
+
+    useEffect(() => {
+        const parent = ref?.current?.closest(".p-treenode-content");
         if (parent) {
             if (isTogglerVisible) {
                 parent.classList.add("report__list-item--toggler-visible");
@@ -59,14 +79,17 @@ export const NodeContent = ({
             if (isSimpleNode) {
                 parent.classList.add("simple-node");
             }
+            if (isDeeplyNested) {
+                parent.classList.add("deeply-nested-node");
+            }
         }
-    }, [isSelected, isTogglerVisible, isSimpleNode]);
+    }, [isSelected, isTogglerVisible, isSimpleNode, isDeeplyNested]);
 
     return (
         <div className='w-full' ref={ref}>
             <Button
                 onClick={onClick}
-                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""}`}
+                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
                 text
             >
                 {node.label}
@@ -92,7 +115,6 @@ export const ReportForm = observer((): ReactElement => {
 
     const getCollections = async () => {
         if (authUser) {
-            getUserReportCollections();
             const response = await getUserFavoriteReportList(authUser.useruid);
             if (response && Array.isArray(response)) {
                 setFavoriteCollections(response);
@@ -243,10 +265,24 @@ export const ReportForm = observer((): ReactElement => {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
 
-        let dropIndex = event.dropIndex;
-        if (currentNodeOrder !== null && currentNodeOrder !== undefined) {
-            if (event.dropIndex > currentNodeOrder) {
-                dropIndex = event.dropIndex - 1;
+        let dropIndex = 0;
+        if (dropNode?.type === NODE_TYPES.COLLECTION) {
+            const children = dropNode.children || [];
+            const documentChildren = children.filter(
+                (node) => (node as TreeNodeEvent).type === NODE_TYPES.DOCUMENT
+            );
+            const documentKeys = documentChildren.map((node) => node.key);
+
+            if (event.dropIndex >= children.length) {
+                dropIndex = documentChildren.length - 1;
+            } else {
+                const dropChild = children[event.dropIndex];
+                if (dropChild) {
+                    const idx = documentKeys.indexOf(dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                    }
+                }
             }
         }
 
@@ -287,19 +323,12 @@ export const ReportForm = observer((): ReactElement => {
             dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
             const collectionId = dragData.collectionId;
-            const currentCollectionsLength =
-                allCollections.find((col: ReportCollection) => col.itemUID === collectionId)
-                    ?.collections?.length || 0;
 
             if (dropIndex !== undefined) {
-                const order =
-                    dropIndex - currentCollectionsLength < 0
-                        ? 0
-                        : dropIndex - currentCollectionsLength;
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
-                    order
+                    dropIndex
                 );
                 if (response?.error) {
                     showError(response.error);
@@ -328,20 +357,10 @@ export const ReportForm = observer((): ReactElement => {
                     showError(response.error);
                 } else {
                     if (dropIndex !== undefined) {
-                        const currentCollectionsLength =
-                            allCollections.find(
-                                (col: ReportCollection) => col.itemUID === targetCollectionId
-                            )?.collections?.length || 0;
-
-                        const order =
-                            dropIndex - currentCollectionsLength < 0
-                                ? 0
-                                : dropIndex - currentCollectionsLength;
-
                         const orderResponse = await setReportOrder(
                             targetCollectionId,
                             reportId,
-                            order
+                            dropIndex
                         );
                         if (orderResponse?.error) {
                             showError(orderResponse.error);
@@ -358,6 +377,17 @@ export const ReportForm = observer((): ReactElement => {
         if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
             const sourceCollectionId = dragData.collection.itemUID;
             if (sourceCollectionId) {
+                const collectionNodes = allNodes.filter(
+                    (node) => (node as TreeNodeEvent).type === NODE_TYPES.COLLECTION
+                );
+                const dropChild = collectionNodes[event.dropIndex];
+                if (dropChild) {
+                    const idx = collectionNodes.findIndex((node) => node.key === dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = idx;
+                    }
+                }
+
                 const response = await setCollectionOrder(sourceCollectionId, dropIndex);
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);

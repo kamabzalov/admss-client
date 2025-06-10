@@ -161,3 +161,39 @@
 .card-content__wrapper:has(.deal__accordion) {
     flex: 0 0 343px;
 }
+
+.deal__delete-nav {
+    border-radius: 5px 0 0 5px;
+    font-weight: 600;
+}
+
+.deal__button {
+    &.deal__button.p-button.p-button-danger {
+        background-color: var(--admss-app-red);
+        color: var(--admss-app-white);
+        border: none;
+        &:hover {
+            color: var(--admss-app-white);
+            background-color: var(--admss-app-red);
+            opacity: 0.6;
+        }
+    }
+}
+
+.deal-form__title--danger {
+    color: var(--admss-app-red);
+}
+
+.deal-delete-modal {
+    .p-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 130px;
+        height: 60px;
+    }
+    .p-confirm-dialog-message {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}

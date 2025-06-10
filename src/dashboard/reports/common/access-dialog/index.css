@@ -1,8 +1,37 @@
-.edit-access__header {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    height: 70px;
+.edit-access {
+    width: 690px;
+
+    .p-dialog-content-body {
+        height: 530px;
+    }
+    .p-dialog-header {
+        height: 144px;
+        padding-top: 76px;
+    }
+
+    .edit-access__header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        height: 70px;
+    }
+
+    .p-inputtext,
+    .p-input-icon-right {
+        height: 44px;
+    }
+
+    .p-datatable-table td,
+    .edit-access__row {
+        height: 44px;
+    }
+    .p-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-basis: 220px;
+    }
 }
 
 .access-multiselect {
@@ -10,7 +39,7 @@
 
     .access-multiselect__dropdown {
         width: 100%;
-        height: 50px;
+        height: 44px;
 
         &.p-inputwrapper-filled.p-multiselect.p-multiselect-chip .p-multiselect-label {
             padding-left: 0.25rem;

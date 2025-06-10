@@ -16,17 +16,19 @@ import {
     getExpensesTotal,
     setExpensesItem,
 } from "http/services/expenses.service";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
-export const PurchaseExpenses = observer((): ReactElement => {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const { id } = useParams();
+import { useToast } from "dashboard/common/toast";
+import { useStore } from "store/hooks";
+import { convertToStandardTimestamp } from "common/helpers";
 
+export const PurchaseExpenses = observer((): ReactElement => {
+    const { id } = useParams();
+    const toast = useToast();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
@@ -40,13 +42,13 @@ export const PurchaseExpenses = observer((): ReactElement => {
         { field: "type_name", header: "Type" },
         { field: "amount_text", header: "Amount" },
         { field: "notbillable", header: "Not Billable" },
-        { field: "vendor", header: "Vendor" },
+        { field: "vendor_name", header: "Vendor" },
     ];
 
     const getExpenses = useCallback(() => {
         if (id) {
             getExpensesList(id).then((response) => {
-                if (response) {
+                if (Array.isArray(response)) {
                     setExpensesList(response);
                 }
             });
@@ -56,12 +58,15 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
     }, [id]);
 
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
-
     const handleCompareData = useMemo(() => {
+        if (!currentEditExpense?.itemuid) {
+            return (
+                !currentEditExpense?.operationdate ||
+                !currentEditExpense?.amount ||
+                !currentEditExpense?.vendor
+            );
+        }
+
         const currentExpense = expensesList.find(
             (item) => item.itemuid === currentEditExpense?.itemuid
         );
@@ -78,30 +83,34 @@ export const PurchaseExpenses = observer((): ReactElement => {
         return false;
     }, [expensesList, currentEditExpense]);
 
+    const handleGetExpensesTypes = async () => {
+        const response = await getExpensesListTypes(authUser!.useruid);
+        if (response && Array.isArray(response)) {
+            setExpensesTypeList(response);
+        }
+    };
+
+    const handleGetExpensesVendors = async () => {
+        const response = await getExpensesListVendors(authUser!.useruid);
+        if (response && Array.isArray(response)) {
+            setExpensesVendorList(response);
+        }
+    };
+
     useEffect(() => {
         getExpenses();
-        if (user) {
-            getExpensesListTypes(user.useruid).then((response) => {
-                if (response) {
-                    setExpensesTypeList(response);
-                }
-            });
-            getExpensesListVendors(user.useruid).then((response) => {
-                if (response) {
-                    setExpensesVendorList(response);
-                }
-            });
-        }
-    }, [getExpenses, user]);
+        handleGetExpensesTypes();
+        handleGetExpensesVendors();
+    }, [getExpenses]);
 
     const handleClearExpense = () => {
         setCurrentEditExpense({} as Expenses);
     };
 
-    const handleExpenseSubmit = (itemuid?: string) => {
+    const handleExpenseSubmit = async (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
-            operationdate: currentEditExpense?.operationdate || "",
+            operationdate: convertToStandardTimestamp(currentEditExpense?.operationdate),
             type: currentEditExpense?.type || 0,
             amount: (currentEditExpense?.amount && currentEditExpense?.amount * 100) || 0,
             vendor: currentEditExpense?.vendor || "",
@@ -109,18 +118,43 @@ export const PurchaseExpenses = observer((): ReactElement => {
             notbillable: currentEditExpense?.notbillable || 0,
         };
 
-        setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
+        const response = await setExpensesItem({ expenseuid: itemuid || "0", expenseData });
+        if (response?.error) {
+            toast?.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.message,
+            });
+        } else {
             handleClearExpense();
             getExpenses();
-        });
+            toast?.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail:
+                    response?.message ||
+                    `Expense is successfully ${itemuid ? "updated" : "saved"}!`,
+            });
+        }
     };
 
-    const handleDeleteExpenses = () => {
-        currentEditExpense &&
-            deleteExpensesItem(currentEditExpense.itemuid).then(() => {
-                getExpenses();
-                handleClearExpense();
+    const handleDeleteExpenses = async () => {
+        const response = await deleteExpensesItem(currentEditExpense.itemuid);
+        if (response?.error) {
+            toast?.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.message,
             });
+        } else {
+            getExpenses();
+            handleClearExpense();
+            toast?.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Expense is successfully deleted!",
+            });
+        }
     };
 
     const deleteTemplate = (expense: Expenses) => {
@@ -169,7 +203,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-6'>
                         <DateInput
                             name='Date'
-                            date={Date.parse(currentEditExpense?.operationdate || "")}
+                            date={Date.parse(String(currentEditExpense?.operationdate))}
+                            emptyDate
                             onChange={({ value }) =>
                                 value &&
                                 currentEditExpense &&
@@ -183,9 +218,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-6'>
                         <ComboBox
                             optionLabel='name'
-                            optionValue='id'
+                            optionValue='index'
                             options={expensesTypeList}
-                            value={currentEditExpense?.type || 0}
+                            value={currentEditExpense?.type}
                             onChange={({ value }) =>
                                 value &&
                                 currentEditExpense &&
@@ -221,6 +256,13 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 currentEditExpense &&
                                 setCurrentEditExpense({ ...currentEditExpense, amount: value })
                             }
+                            pt={{
+                                input: {
+                                    root: {
+                                        className: !currentEditExpense?.amount ? "color-gray" : "",
+                                    },
+                                },
+                            }}
                         />
                     </div>
                     <div className='col-6'>
@@ -274,32 +316,35 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
-                        className='mt-6 purchase-expenses__table'
+                        className='purchase-expenses__table'
                         value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        showGridlines
                         scrollable
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
-                                className: "overflow-x-hidden",
+                                className: "thin-scrollbar",
                                 style: {
-                                    height: "249px",
+                                    height: "205px",
                                 },
                             },
                         }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
+                            bodyClassName='purchase-expenses__table-controls'
+                            frozen
                             body={(options) => {
                                 const isRowExpanded = expandedRows.some((item) => {
                                     return item === options;
                                 });
                                 return (
-                                    <div className='flex gap-3 align-items-center'>
+                                    <div className='purchase-expenses__table-controls-container'>
                                         <Button
                                             type='button'
                                             icon='icon adms-edit-item'
@@ -329,7 +374,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             pt={{
                                 root: {
                                     style: {
-                                        width: "60px",
+                                        width: "70px",
                                     },
                                 },
                             }}
@@ -359,6 +404,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
 
                         <Column
                             body={deleteTemplate}
+                            frozen
+                            alignFrozen='right'
                             pt={{
                                 root: {
                                     style: {

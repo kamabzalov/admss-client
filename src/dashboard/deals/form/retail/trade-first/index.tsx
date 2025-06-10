@@ -179,8 +179,28 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value: Trade1_Mileage || vinInfo.mileage,
                 });
             }
+            setFieldValue("Trade1_Make", values.Trade1_Make || vinInfo.Make);
+            setFieldValue("Trade1_Model", values.Trade1_Model || vinInfo.Model);
         }
     };
+
+    const handleMakeChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade1_Make", value);
+            changeDealExtData({ key: "Trade1_Make", value });
+
+            setAutomakesModelList([]);
+        },
+        [setFieldValue, changeDealExtData]
+    );
+
+    const handleModelChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade1_Model", value);
+            changeDealExtData({ key: "Trade1_Model", value });
+        },
+        [setFieldValue, changeDealExtData]
+    );
 
     return (
         <div className='grid deal-retail-trade row-gap-2'>
@@ -215,16 +235,14 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value={values.Trade1_Make}
                     required
                     options={automakesList}
-                    onChange={({ value }) => {
-                        setFieldValue("Trade1_Make", value);
-                        changeDealExtData({ key: "Trade1_Make", value });
-                    }}
+                    onChange={({ value }) => handleMakeChange(value)}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     className={`deal-trade__dropdown w-full ${
                         errors.Trade1_Make ? "p-invalid" : ""
                     }`}
                     label='Make (required)'
+                    editable
                 />
 
                 <small className='p-error'>{errors.Trade1_Make || ""}</small>
@@ -235,12 +253,9 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={values.Trade1_Model}
-                    editable={!automakesModelList.length}
+                    editable
                     options={automakesModelList}
-                    onChange={({ value }) => {
-                        setFieldValue("Model", value);
-                        changeDealExtData({ key: "Trade1_Model", value });
-                    }}
+                    onChange={({ value }) => handleModelChange(value)}
                     className={`deal-trade__dropdown w-full ${
                         errors.Trade1_Model ? "p-invalid" : ""
                     }`}

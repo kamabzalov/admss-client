@@ -6,22 +6,17 @@ import { Slider, SliderChangeEvent } from "primereact/slider";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
+import {
+    VIN_SETTINGS,
+    radioVINSettings,
+} from "dashboard/profile/generalSettings/inventory-settings";
 
-interface SettingsStockNewProps {
-    settings?: any;
-    radioSettings: {
-        name: string;
-        title: string;
-        value: number;
-    }[];
-}
-
-export const SettingsStockNew = observer(({ radioSettings }: SettingsStockNewProps) => {
+export const SettingsStockNew = observer(() => {
     const store = useStore().generalSettingsStore;
     const { settings, changeSettings } = store;
     return (
         <div className='grid'>
-            <div className='col-3'>
+            <div className='col-3 ml-2'>
                 <div className='flex align-items-center'>
                     <Checkbox
                         inputId='stocknumSequental'
@@ -41,7 +36,7 @@ export const SettingsStockNew = observer(({ radioSettings }: SettingsStockNewPro
                 <span className='p-float-label'>
                     <InputText
                         className='stock-new__input'
-                        value={settings.stocknumPrefix}
+                        value={settings.stocknumPrefix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumPrefix", e.target.value);
                         }}
@@ -53,7 +48,7 @@ export const SettingsStockNew = observer(({ radioSettings }: SettingsStockNewPro
                 <span className='p-float-label'>
                     <InputText
                         className='stock-new__input'
-                        value={settings.stocknumSuffix}
+                        value={settings.stocknumSuffix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumSuffix", e.target.value);
                         }}
@@ -62,7 +57,25 @@ export const SettingsStockNew = observer(({ radioSettings }: SettingsStockNewPro
                 </span>
             </div>
             <div className='col-6'>
-                <DashboardRadio radioArray={radioSettings} />
+                <DashboardRadio
+                    radioArray={radioVINSettings}
+                    onChange={(value) => {
+                        if (value === `${VIN_SETTINGS.LAST_6_OF_VIN}`) {
+                            changeSettings("stocknumLast6ofVIN", VIN_SETTINGS.LAST_6_OF_VIN);
+                            changeSettings("stocknumLast8ofVIN", VIN_SETTINGS.LAST_8_OF_VIN);
+                        } else {
+                            changeSettings("stocknumLast6ofVIN", VIN_SETTINGS.LAST_8_OF_VIN);
+                            changeSettings("stocknumLast8ofVIN", VIN_SETTINGS.LAST_6_OF_VIN);
+                        }
+                    }}
+                    initialValue={
+                        !settings.stocknumLast6ofVIN && !settings.stocknumLast8ofVIN
+                            ? null
+                            : settings.stocknumLast6ofVIN === VIN_SETTINGS.LAST_6_OF_VIN
+                              ? `${VIN_SETTINGS.LAST_6_OF_VIN}`
+                              : `${VIN_SETTINGS.LAST_8_OF_VIN}`
+                    }
+                />
             </div>
 
             <div className='col-6 mt-3'>

@@ -19,25 +19,29 @@ const tabs = [
     },
     {
         header: "Stock# new",
-        component: (
-            <SettingsStockNew
-                radioSettings={[
-                    { name: "6vin", title: "Last 6 of VIN", value: 0 },
-                    { name: "8vin", title: "Last 8 of VIN", value: 1 },
-                ]}
-            />
-        ),
+        component: <SettingsStockNew />,
     },
     {
         header: "Stock# trade-in",
-        component: (
-            <SettingsStockTradeIn
-                radioSettings={[
-                    { name: "6vin", title: "Last 6 of VIN", value: 0 },
-                    { name: "8vin", title: "Last 8 of VIN", value: 1 },
-                ]}
-            />
-        ),
+        component: <SettingsStockTradeIn />,
+    },
+];
+
+export enum VIN_SETTINGS {
+    LAST_6_OF_VIN,
+    LAST_8_OF_VIN,
+}
+
+export const radioVINSettings = [
+    {
+        name: `setting-${VIN_SETTINGS.LAST_6_OF_VIN}`,
+        title: "Last 6 of VIN",
+        value: VIN_SETTINGS.LAST_6_OF_VIN,
+    },
+    {
+        name: `setting-${VIN_SETTINGS.LAST_8_OF_VIN}`,
+        title: "Last 8 of VIN",
+        value: VIN_SETTINGS.LAST_8_OF_VIN,
     },
 ];
 

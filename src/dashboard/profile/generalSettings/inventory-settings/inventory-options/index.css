@@ -1,4 +1,6 @@
 .general-inventory-option {
+    height: 460px;
+    overflow: scroll;
     .react-grid-item.react-grid-placeholder {
         background-color: var(--admss-app-lightest-grey);
         z-index: 1;
@@ -27,6 +29,8 @@
         align-items: center;
         padding: 0;
         gap: 9px;
+        flex: 0 0 14%;
+        min-width: 50px;
 
         .p-button {
             width: 22px;

@@ -10,6 +10,8 @@
     padding-right: 30px;
     height: calc(var(--card-height) + var(--title-height));
     max-height: var(--card-max-height);
+    display: flex;
+    flex-direction: column;
 }
 
 .settings-form {
@@ -37,6 +39,7 @@
     flex: 1;
     padding: 0;
     padding-left: 40px;
+    min-height: 566px;
     border-left: 2px solid var(--admss-app-light-blue);
     border-radius: 0;
     overflow: hidden;
@@ -81,7 +84,8 @@
 
 .general-settings__buttons {
     display: flex;
-    height: 162px;
+    height: 150px;
+    margin-top: auto;
     align-items: flex-end;
     justify-content: flex-end;
     gap: 25px;

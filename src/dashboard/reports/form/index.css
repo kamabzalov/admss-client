@@ -20,7 +20,8 @@
     max-height: 70vh;
     display: flex;
     justify-content: space-between;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
     .p-tree {
         flex: 0 0 30%;
@@ -44,7 +45,7 @@
                         content: "";
                         position: absolute;
                         top: 1.05rem;
-                        left: -1.5rem;
+                        left: -0.6rem;
                         width: 9px;
                         height: 9px;
                         border: 2px solid var(--admss-app-main-blue);
@@ -54,6 +55,12 @@
 
                 .p-tree-toggler {
                     margin: 0;
+                    &[aria-label="Collapse"] {
+                        transform: rotate(180deg);
+                    }
+                    &[aria-label="Expand"] {
+                        transform: rotate(90deg);
+                    }
                 }
 
                 &.report__list-item--toggler-visible {
@@ -87,7 +94,7 @@
 
         .p-treenode .p-treenode-content.simple-node {
             .report__list-item {
-                padding-left: 37px;
+                padding-left: 14px;
             }
             .p-tree-toggler {
                 display: none;
@@ -361,4 +368,8 @@
 
 .card.report {
     padding: 40px 30px;
+}
+
+.p-treenode-content.deeply-nested-node {
+    margin-left: 22px;
 }

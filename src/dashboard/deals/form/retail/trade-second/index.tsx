@@ -179,9 +179,27 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     value: Trade2_Mileage || vinInfo.mileage,
                 });
             }
+            setFieldValue("Trade2_Make", values.Trade2_Make || vinInfo.Make);
+            setFieldValue("Trade2_Model", values.Trade2_Model || vinInfo.Model);
         }
     };
 
+    const handleMakeChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade2_Make", value);
+            changeDealExtData({ key: "Trade2_Make", value });
+            setAutomakesModelList([]);
+        },
+        [setFieldValue, changeDealExtData]
+    );
+
+    const handleModelChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade2_Model", value);
+            changeDealExtData({ key: "Trade2_Model", value });
+        },
+        [setFieldValue, changeDealExtData]
+    );
     return (
         <div className='grid deal-retail-trade row-gap-2'>
             <div className='col-12'>
@@ -215,10 +233,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     value={values.Trade2_Make}
                     required
                     options={automakesList}
-                    onChange={({ value }) => {
-                        setFieldValue("Trade2_Make", value);
-                        changeDealExtData({ key: "Trade2_Make", value });
-                    }}
+                    onChange={({ value }) => handleMakeChange(value)}
+                    editable
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     className={`deal-trade__dropdown w-full ${
@@ -235,12 +251,9 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={values.Trade2_Model}
-                    editable={!automakesModelList.length}
+                    editable
                     options={automakesModelList}
-                    onChange={({ value }) => {
-                        setFieldValue("Model", value);
-                        changeDealExtData({ key: "Trade2_Model", value });
-                    }}
+                    onChange={({ value }) => handleModelChange(value)}
                     className={`deal-trade__dropdown w-full ${errors.Trade2_Model ? "p-invalid" : ""}`}
                     label='Model (required)'
                 />

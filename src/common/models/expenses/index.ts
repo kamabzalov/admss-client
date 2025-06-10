@@ -1,4 +1,4 @@
-import { BaseResponse } from "../base-response";
+import { BaseResponseError } from "common/models/base-response";
 
 export interface Expenses {
     amount: number;
@@ -11,13 +11,14 @@ export interface Expenses {
     id: number;
     itemuid: string;
     notbillable: 1 | 0;
-    operationdate: string;
+    operationdate: string | number;
     ponumber: string;
     type: number;
     type_name: string;
     updated: string;
     useruid: string;
     vendor: string;
+    vendor_name: string;
 }
 
 export interface ExpensesTotal {
@@ -29,6 +30,6 @@ export interface ExpensesTotal {
     total_i?: number;
 }
 
-export interface ExpensesSetResponse extends BaseResponse {
+export interface ExpensesSetResponse extends BaseResponseError {
     itemuid: string;
 }
