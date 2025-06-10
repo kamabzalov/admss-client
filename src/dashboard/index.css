@@ -45,12 +45,14 @@
 }
 
 .card-header {
+    padding-top: 14px;
     margin-bottom: 30px;
     display: flex;
     align-items: center;
 }
 
 .card-header__title {
+    font-size: 20px;
     width: 343px;
 }
 
