@@ -5,6 +5,8 @@ import { getMediaWatermarkingPreview } from "http/services/media.service";
 import { useParams } from "react-router-dom";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
+import { Image } from "primereact/image";
+import { Loader } from "dashboard/common/loader";
 
 interface ImagePreviewProps {
     onClose: () => void;
@@ -15,13 +17,14 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
     const toast = useToast();
 
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const handleGetPreviewImage = async () => {
         if (id) {
+            setIsLoading(true);
             const data = await getMediaWatermarkingPreview(id);
-            if (data?.status === Status.OK) {
-                const image = data as unknown as string;
-                setPreviewImage(image);
+            if (data?.status !== Status.ERROR) {
+                setPreviewImage(data?.data);
             } else {
                 toast?.current?.show({
                     severity: "error",
@@ -30,6 +33,7 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
                 });
                 onClose();
             }
+            setIsLoading(false);
         }
     };
 
@@ -39,8 +43,19 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
 
     return (
         <div className='preview-overlay' onClick={onClose}>
-            <div className='preview-container' onClick={(e) => e.stopPropagation()}>
-                <img src={previewImage} alt='Watermark Preview' className='preview-image' />
+            <div className='preview-container p-6' onClick={(e) => e.stopPropagation()}>
+                {isLoading ? (
+                    <Loader />
+                ) : (
+                    <Image
+                        src={previewImage}
+                        alt='Watermark Preview'
+                        width='100%'
+                        height='auto'
+                        preview
+                        className='preview-image'
+                    />
+                )}
                 <Button
                     icon='pi pi-times'
                     text
