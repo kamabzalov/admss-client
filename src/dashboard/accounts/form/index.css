@@ -16,8 +16,6 @@
     width: 342px;
     border: none;
     min-height: 527px;
-
-    gap: 10px;
 }
 
 .account__tabs .p-tabview-panels {
@@ -26,19 +24,28 @@
     padding-top: 0;
 }
 
-.account__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+.account__tabs > .p-tabview-nav-container a.p-tabview-nav-link,
+.account__tabs .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled) {
     color: var(--admss-app-primary);
     border: none;
+    height: 50px;
 }
 
 .p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
     box-shadow: none;
 }
 
-.account__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+.account__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"],
+.account__tabs .p-tabview-nav .account__panel:hover,
+.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link,
+.account__tabs .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):hover {
     color: var(--admss-app-primary);
-    background: var(--admss-app-light-blue);
-    border-radius: 0;
+    background-color: var(--admss-app-light-blue);
+    border-radius: 5px 0 0 5px;
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
 }
 
 .account__footer {

@@ -637,7 +637,8 @@
     margin-left: 16px;
 }
 
-.vertical-step-menu .p-steps-item.p-highlight.p-steps-current {
+.vertical-step-menu .p-steps-item.p-highlight.p-steps-current,
+.vertical-step-menu .p-steps-item:hover {
     width: 100%;
     background: var(--admss-app-light-blue);
     border-radius: 5px 0 0 5px;
