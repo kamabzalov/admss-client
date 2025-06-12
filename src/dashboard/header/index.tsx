@@ -44,7 +44,7 @@ export const Header = observer((): ReactElement => {
             }
             if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-    }, [authUser]);
+    }, [authUser?.useruid]);
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
