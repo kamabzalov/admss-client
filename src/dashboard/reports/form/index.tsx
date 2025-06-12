@@ -398,6 +398,7 @@ export const ReportForm = observer((): ReactElement => {
         }
 
         getCollections();
+        getUserReportCollections();
     };
 
     const navigateToReports = () => {
