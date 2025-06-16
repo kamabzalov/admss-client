@@ -143,7 +143,9 @@ export const CurrencyInput = ({
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
-                <div className='currency-item__icon input-icon input-icon-left'>$</div>
+                <div className='currency-item__icon input-icon input-icon-left'>
+                    <i className='icon adms-dollar-sign' />
+                </div>
                 <InputNumber
                     minFractionDigits={2}
                     maxFractionDigits={2}

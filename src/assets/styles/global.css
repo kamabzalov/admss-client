@@ -25,6 +25,7 @@
     --admss-app-dusty-blue: #00839f;
     --admss-app-darkest-blue: #37455c;
     --admss-app-deep-blue: #292c33;
+    --admss-app-focus-blue: #eef4ff;
     --admss-app-ultra-deep-blue: #000a66;
     --admss-app-warning-blue: #0040bd;
     --admss-app-blue-violet: #2a359b;
@@ -44,6 +45,7 @@
     --admss-app-primary-main-green: #0db564;
     --admss-app-warning-green: #148d00;
     --admss-app-deep-green: #3e9231;
+    --admss-app-focus-light-green: #edfff7;
 
     --admss-app-yellow: #f1ae00;
     --admss-app-warning-yellow: #e97e00;
@@ -52,6 +54,7 @@
     --admss-app-red: #de0000;
     --admss-app-deep-red: #9b2a2a;
     --admss-app-focus-red: #ffc3c3;
+    --admss-app-light-red: #ffe9e9;
 
     --admss-app-deep-purple: #852a9b;
 
