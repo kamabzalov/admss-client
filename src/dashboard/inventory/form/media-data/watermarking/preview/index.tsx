@@ -18,10 +18,12 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
 
     const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
 
     const handleGetPreviewImage = async () => {
         if (id) {
             setIsLoading(true);
+            setIsImageLoaded(false);
             const data = await getMediaWatermarkingPreview(id);
             if (data?.status !== Status.ERROR) {
                 setPreviewImage(data?.data);
@@ -47,14 +49,15 @@ export const ImagePreview = ({ onClose }: ImagePreviewProps): ReactElement => {
                 {isLoading ? (
                     <Loader />
                 ) : (
-                    <Image
-                        src={previewImage}
-                        alt='Watermark Preview'
-                        width='100%'
-                        height='auto'
-                        preview
-                        className='preview-image'
-                    />
+                    <div>
+                        {!isImageLoaded && <Loader />}
+                        <Image
+                            src={previewImage}
+                            alt='Watermark Preview'
+                            onLoad={() => setIsImageLoaded(true)}
+                            className='preview-image'
+                        />
+                    </div>
                 )}
                 <Button
                     icon='pi pi-times'

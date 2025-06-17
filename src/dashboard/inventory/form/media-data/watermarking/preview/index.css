@@ -18,7 +18,10 @@
     border-radius: 8px;
     max-width: 80%;
     max-height: 80%;
-    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .preview-image {
