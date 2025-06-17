@@ -387,7 +387,7 @@ export const setInventoryPaymentBack = async (
     inventoryPayment: Partial<InventoryPaymentBack>
 ) => {
     try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `inventory/${inventoryuid}/paymentpack`,
             inventoryPayment
         );

@@ -90,7 +90,7 @@ export const setExpensesItem = async ({ expenseuid, expenseData }: ExpensesData)
     } catch (error) {
         if (error instanceof AxiosError) {
             return {
-                error: true,
+                status: Status.ERROR,
                 message: error.response?.data?.message || "Error while saving expense",
             };
         }
