@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { useStore } from "store/hooks";
-import { WatermarkPostProcessing } from "common/models/general-settings";
+import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -25,16 +25,36 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         restoreDefaultSettings,
     } = settingsStore;
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
         if (watermarkImage && watermarkImage?.size) {
             settingsStore.watermarkImageUrl = URL.createObjectURL(watermarkImage);
+            setHasChanges(true);
         }
     }, [watermarkImage]);
 
+    const handleSettingsChange = (key: keyof GeneralSettings, value: number | string) => {
+        changeSettings(key, value);
+        setHasChanges(true);
+        inventoryStore.isFormChanged = true;
+    };
+
+    const handlePostProcessingChange = (newBlocks: WatermarkPostProcessing[]) => {
+        changePostProcessing(newBlocks);
+        setHasChanges(true);
+        inventoryStore.isFormChanged = true;
+    };
+
+    const handleRestoreDefault = () => {
+        restoreDefaultSettings();
+        setHasChanges(false);
+        inventoryStore.isFormChanged = false;
+    };
+
     const handleDeleteTextBlock = (index: number) => {
         const newTextBlocks = postProcessing.filter((_, i) => i !== index);
-        changePostProcessing(newTextBlocks);
+        handlePostProcessingChange(newTextBlocks);
     };
 
     const handleClearTextBlock = (index: number) => {
@@ -52,8 +72,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
             useruid: postProcessing[index]?.useruid || "",
         } as WatermarkPostProcessing;
         settingsStore.watermarkImageUrl = "";
-        inventoryStore.isFormChanged = true;
-        changePostProcessing(newTextBlocks);
+        handlePostProcessingChange(newTextBlocks);
     };
 
     const handleCreateNewPostProcessing = () => {
@@ -69,8 +88,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
             bkColor: 0,
             useruid: "",
         };
-        changePostProcessing([...postProcessing, newTextBlock]);
-        inventoryStore.isFormChanged = true;
+        handlePostProcessingChange([...postProcessing, newTextBlock as WatermarkPostProcessing]);
     };
 
     const handlePreview = () => {
@@ -85,7 +103,10 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         const header = (blockIndex: number) => (
             <div className='flex align-items-center justify-content-between w-full'>
                 {`TEXT BLOCK ${blockIndex + 1}`}
-                <div className='watermarking__accordion-header-buttons'>
+                <div
+                    className='watermarking__accordion-header-buttons'
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <Button
                         label='Clear'
                         text
@@ -98,8 +119,12 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                     />
                     <Button
                         icon='icon adms-close'
+                        tooltip='Delete block'
+                        tooltipOptions={{ position: "mouse" }}
                         className='watermarking__remove-button'
                         text
+                        disabled={postProcessing.length === 1}
+                        severity={postProcessing.length === 1 ? "secondary" : "success"}
                         onClick={() => handleDeleteTextBlock(blockIndex)}
                     />
                 </div>
@@ -120,7 +145,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                             onChange={(e) => {
                                 const newTextBlocks = [...postProcessing];
                                 newTextBlocks[index] = { ...block, ppText: e.target.value };
-                                changePostProcessing(newTextBlocks);
+                                handlePostProcessingChange(newTextBlocks);
                             }}
                         />
                         <label className='float-label'>Text String</label>
@@ -132,7 +157,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                                 onChange={(e) => {
                                     const newTextBlocks = [...postProcessing];
                                     newTextBlocks[index] = { ...block, fontName: e.target.value };
-                                    changePostProcessing(newTextBlocks);
+                                    handlePostProcessingChange(newTextBlocks);
                                 }}
                             />
                             <label className='float-label'>Font name</label>
@@ -146,7 +171,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                                         ...block,
                                         fontSize: Number(e.value) || 0,
                                     };
-                                    changePostProcessing(newTextBlocks);
+                                    handlePostProcessingChange(newTextBlocks);
                                 }}
                             />
                             <label className='float-label'>Font size</label>
@@ -157,7 +182,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                                 onChange={(e) => {
                                     const newTextBlocks = [...postProcessing];
                                     newTextBlocks[index] = { ...block, posX: Number(e.value) || 0 };
-                                    changePostProcessing(newTextBlocks);
+                                    handlePostProcessingChange(newTextBlocks);
                                 }}
                             />
                             <label className='float-label'>PosX</label>
@@ -168,7 +193,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                                 onChange={(e) => {
                                     const newTextBlocks = [...postProcessing];
                                     newTextBlocks[index] = { ...block, posY: Number(e.value) || 0 };
-                                    changePostProcessing(newTextBlocks);
+                                    handlePostProcessingChange(newTextBlocks);
                                 }}
                             />
                             <label className='float-label'>PosY</label>
@@ -187,10 +212,9 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         inputId='enableWatermark'
                         name='enableWatermark'
                         checked={!!settings.watermarkenabled}
-                        onChange={(e) => {
-                            changeSettings("watermarkenabled", e.checked ? 1 : 0);
-                            inventoryStore.isFormChanged = true;
-                        }}
+                        onChange={(e) =>
+                            handleSettingsChange("watermarkenabled", e.checked ? 1 : 0)
+                        }
                     />
                     <label htmlFor='enableWatermark' className='ml-3 white-space-nowrap'>
                         Enable watermarking
@@ -201,10 +225,11 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                     <Button
                         label='Restore default'
                         className='watermarking__button'
-                        onClick={() => restoreDefaultSettings()}
+                        onClick={handleRestoreDefault}
                         outlined
                         type='button'
-                        severity='danger'
+                        severity={hasChanges ? "danger" : "secondary"}
+                        disabled={!hasChanges}
                     />
                     <Button
                         label='Preview'
@@ -212,6 +237,8 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         onClick={handlePreview}
                         outlined
                         type='button'
+                        severity={hasChanges ? "success" : "secondary"}
+                        disabled={!hasChanges}
                     />
                 </div>
 
@@ -225,8 +252,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         name='addLogo'
                         checked={!!settings.logoenabled}
                         onChange={(e) => {
-                            changeSettings("logoenabled", e.checked ? 1 : 0);
-                            inventoryStore.isFormChanged = true;
+                            handleSettingsChange("logoenabled", e.checked ? 1 : 0);
                         }}
                     />
                     <label htmlFor='addLogo' className='ml-3'>
@@ -238,8 +264,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                             value={settings.logoposX}
                             allowEmpty
                             onChange={(e) => {
-                                changeSettings("logoposX", e.value || 0);
-                                inventoryStore.isFormChanged = true;
+                                handleSettingsChange("logoposX", e.value || 0);
                             }}
                         />
                         <label className='float-label'>PosX</label>
@@ -250,8 +275,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                             value={settings.logoposY}
                             allowEmpty
                             onChange={(e) => {
-                                changeSettings("logoposY", e.value || 0);
-                                inventoryStore.isFormChanged = true;
+                                handleSettingsChange("logoposY", e.value || 0);
                             }}
                         />
                         <label className='float-label'>PosY</label>
