@@ -1,16 +1,21 @@
-import { useRef } from "react";
+import { useRef, ReactNode } from "react";
 import { ConfirmDialog, ConfirmDialogProps } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+import { Checkbox } from "primereact/checkbox";
 import "./index.css";
 
 interface ConfirmModalProps extends ConfirmDialogProps {
-    bodyMessage?: string;
+    bodyMessage?: string | ReactNode;
     title?: string;
     icon?: string;
     confirmAction?: () => void;
     rejectAction?: () => void;
     visible: boolean;
     onHide: () => void;
+    showCheckbox?: boolean;
+    checkboxLabel?: string;
+    checkboxChecked?: boolean;
+    onCheckboxChange?: (checked: boolean) => void;
 }
 
 export const ConfirmModal = ({
@@ -21,6 +26,10 @@ export const ConfirmModal = ({
     visible,
     onHide,
     icon,
+    showCheckbox = false,
+    checkboxLabel = "Remember this choice",
+    checkboxChecked = false,
+    onCheckboxChange,
     ...props
 }: ConfirmModalProps) => {
     const toast = useRef<Toast>(null);
@@ -49,6 +58,18 @@ export const ConfirmModal = ({
                 message={
                     <div className='text-center w-full confirm-body'>
                         {bodyMessage || "Please confirm to proceed moving forward."}
+                        {showCheckbox && (
+                            <div className='confirm-checkbox'>
+                                <Checkbox
+                                    checked={checkboxChecked}
+                                    onChange={(e) => onCheckboxChange?.(e.checked || false)}
+                                    inputId='confirmCheckbox'
+                                />
+                                <label htmlFor='confirmCheckbox' className='ml-2'>
+                                    {checkboxLabel}
+                                </label>
+                            </div>
+                        )}
                     </div>
                 }
                 visible={visible}
