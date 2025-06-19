@@ -318,18 +318,6 @@ export const DealsForm = observer(() => {
         }
     }, [stepActiveIndex, printActiveIndex, accordionSteps]);
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isFormChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isFormChanged]);
-
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
