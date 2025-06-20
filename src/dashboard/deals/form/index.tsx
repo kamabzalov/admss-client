@@ -224,6 +224,7 @@ export const DealsForm = observer(() => {
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const [confirmCloseVisible, setConfirmCloseVisible] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -318,6 +319,18 @@ export const DealsForm = observer(() => {
         }
     }, [stepActiveIndex, printActiveIndex, accordionSteps]);
 
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (isFormChanged) {
+                event.preventDefault();
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isFormChanged]);
+
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
@@ -351,6 +364,14 @@ export const DealsForm = observer(() => {
         });
     };
 
+    const handleCloseForm = () => {
+        if (isFormChanged) {
+            setConfirmCloseVisible(true);
+        } else {
+            navigate("/dashboard/deals");
+        }
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -359,7 +380,7 @@ export const DealsForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/deals")}
+                    onClick={handleCloseForm}
                 />
                 <div className='col-12'>
                     <div className='card deal'>
@@ -585,7 +606,7 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/deals`);
+                                            return handleCloseForm();
                                         }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
@@ -658,6 +679,7 @@ export const DealsForm = observer(() => {
             </div>
             {confirmDeleteVisible && (
                 <ConfirmModal
+                    position='top'
                     visible={confirmDeleteVisible}
                     className='deal-delete-modal'
                     acceptLabel='Delete'
@@ -665,6 +687,20 @@ export const DealsForm = observer(() => {
                     bodyMessage={deleteMessage}
                     confirmAction={() => setIsDeleteConfirm(true)}
                     onHide={() => setConfirmDeleteVisible(false)}
+                />
+            )}
+            {confirmCloseVisible && (
+                <ConfirmModal
+                    visible={confirmCloseVisible}
+                    position='top'
+                    title='Quit Editing?'
+                    icon='adms-warning'
+                    className='deal-close-modal'
+                    acceptLabel='Confirm'
+                    rejectLabel='Cancel'
+                    bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
+                    confirmAction={() => navigate("/dashboard/deals")}
+                    onHide={() => setConfirmCloseVisible(false)}
                 />
             )}
         </Suspense>
