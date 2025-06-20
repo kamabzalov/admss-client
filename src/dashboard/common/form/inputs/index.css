@@ -94,6 +94,11 @@
     border-radius: 0;
 }
 
+.currency-item__icon {
+    line-height: 0;
+    font-size: 15px;
+}
+
 .currency-item__input .p-inputnumber-input {
     width: 100%;
     border-radius: 0 5px 5px 0;
