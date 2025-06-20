@@ -434,6 +434,15 @@ export class InventoryStore {
         try {
             this._isLoading = true;
 
+            const generalSettingsStore = this.rootStore.generalSettingsStore;
+            const useruid = this.rootStore.userStore.authUser?.useruid;
+            if (generalSettingsStore.isSettingsChanged) {
+                if (useruid) {
+                    generalSettingsStore.saveSettings();
+                }
+                generalSettingsStore.isSettingsChanged = false;
+            }
+
             const inventoryData: Inventory = {
                 ...this.inventory,
                 extdata: {
