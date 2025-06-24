@@ -23,6 +23,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
 import { convertToStandardTimestamp } from "common/helpers";
+import { Status } from "common/models/base-response";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
@@ -119,7 +120,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         };
 
         const response = await setExpensesItem({ expenseuid: itemuid || "0", expenseData });
-        if (response?.error) {
+        if (response?.status === Status.ERROR) {
             toast?.current?.show({
                 severity: "error",
                 summary: "Error",

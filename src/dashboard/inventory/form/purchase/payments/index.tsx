@@ -11,6 +11,7 @@ import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/
 import { InventoryPaymentBack } from "common/models/inventory";
 import { Status } from "common/models/base-response";
 import { Checkbox } from "primereact/checkbox";
+import { useToast } from "dashboard/common/toast";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof InventoryPaymentBack;
@@ -27,6 +28,7 @@ export const PurchasePayments = observer((): ReactElement => {
     const [paid, setPaid] = useState<0 | 1>(0);
     const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
     const [description, setDescription] = useState<string>("");
+    const toast = useToast();
 
     const fetchInventoryPaymentBack = async () => {
         if (id) {
@@ -80,7 +82,15 @@ export const PurchasePayments = observer((): ReactElement => {
             paySalesTaxPaid: salesTaxPaid || 0,
             payRemarks: description,
         });
-        if (response?.status === Status.OK) fetchInventoryPaymentBack();
+        if (response?.status === Status.OK) {
+            fetchInventoryPaymentBack();
+        } else {
+            toast?.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.error,
+            });
+        }
     };
 
     return (

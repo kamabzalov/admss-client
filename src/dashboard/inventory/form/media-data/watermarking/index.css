@@ -7,5 +7,18 @@
         .p-inputtextarea {
             resize: vertical;
         }
+
+        .p-accordion-header-link:focus {
+            box-shadow: none;
+        }
+
+        .p-accordion-header-link {
+            padding-right: 5px;
+        }
+    }
+
+    .watermarking__clear-button.p-disabled.p-button-text,
+    .watermarking__remove-button.p-disabled.p-button-text {
+        color: var(--admss-app-medium-grey);
     }
 }
