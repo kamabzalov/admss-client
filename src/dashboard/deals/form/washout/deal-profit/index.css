@@ -32,6 +32,15 @@
 }
 
 .vehicle-profit {
+    position: relative;
+    .vehicle-profit__expenses-button {
+        position: absolute;
+        top: 65px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
     .vehicle-profit__inputs {
         display: flex;
         flex-direction: column;
@@ -67,6 +76,9 @@
     }
     &.deal-profit__item--blue {
         color: var(--admss-app-main-blue);
+    }
+    &.deal-profit__item--bold {
+        font-weight: 700;
     }
     .currency-item__input,
     .p-inputtext,
@@ -112,8 +124,19 @@
 
 .profit-commission {
     --commission-settings-width: 35%;
+    --commission-settings-header-width: 35.5%;
     --commission-worksheet-width: 65%;
+    --commission-worksheet-header-width: 64.5%;
     box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
+    position: relative;
+    .profit-commission__salesman-button {
+        position: absolute;
+        bottom: 80px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
     .profit-commission__header {
         padding: 0;
         display: flex;
@@ -125,14 +148,15 @@
         .profit-commission__header-title {
             padding: 8px 20px;
             background-color: var(--admss-app-focus-blue);
-            flex: 0 0 var(--commission-settings-width);
-            max-width: var(--commission-settings-width);
+            flex: 0 0 var(--commission-settings-header-width);
+            white-space: nowrap;
+            max-width: var(--commission-settings-header-width);
         }
         .profit-commission__header-subtitle {
             padding: 8px 20px;
             background-color: var(--admss-app-focus-blue);
-            flex: 0 0 var(--commission-worksheet-width);
-            max-width: var(--commission-worksheet-width);
+            flex: 0 0 var(--commission-worksheet-header-width);
+            max-width: var(--commission-worksheet-header-width);
         }
     }
 
@@ -141,10 +165,14 @@
         display: flex;
         gap: 10px;
         .commission-settings {
+            padding-right: 10px;
+            margin-right: 10px;
+            border-right: 1px solid var(--admss-app-focus-blue);
             .commission-settings__checkbox {
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                font-size: 14px;
             }
             .commission-settings__label {
                 display: inline-flex;
@@ -172,6 +200,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            padding-right: 20px;
             .deal-profit__item {
                 gap: 4px;
                 .currency-item {
@@ -250,4 +279,123 @@
         color: var(--admss-app-white);
         font-weight: 600;
     }
+
+    .totals-content {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        width: 100%;
+        .totals-content__info {
+            display: flex;
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 30px;
+            padding: 10px 15px;
+            justify-content: space-between;
+            align-items: center;
+            .totals-content__info-title,
+            .totals-content__info-value {
+                font-weight: 600;
+                font-size: 14px;
+            }
+            .totals-content__info-value {
+                margin-left: auto;
+                padding-right: 15%;
+            }
+            &.totals-content__info--red {
+                border-color: var(--admss-app-red);
+                color: var(--admss-app-red);
+                background-color: var(--admss-app-light-red);
+            }
+            &.totals-content__info--green {
+                border-color: var(--admss-app-warning-green);
+                color: var(--admss-app-warning-green);
+                background-color: var(--admss-app-light-green);
+            }
+            &.totals-content__info--blue {
+                border-color: var(--admss-app-main-blue);
+                color: var(--admss-app-main-blue);
+                background-color: var(--admss-app-white-blue);
+            }
+        }
+        .totals-misc,
+        .totals-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+            font-size: 14px;
+            .currency-item__input {
+                align-items: center;
+            }
+            .totals-misc__input,
+            .totals-info__title,
+            .totals-info__input {
+                font-size: 14px;
+                height: 32px;
+                max-width: 140px;
+                flex: 1 1 140px;
+            }
+
+            .totals-info__title {
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+
+            .currency-item {
+                .p-inputtext {
+                    max-width: 110px;
+                    font-size: 14px;
+                    flex: 1 1 110px;
+                }
+            }
+            .p-inputtext,
+            .currency-item__icon {
+                height: 32px;
+            }
+            .currency-item__icon {
+                line-height: 0;
+                width: 30px;
+            }
+        }
+
+        .totals-summary {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            .totals-summary__title {
+                font-size: 16px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+            .totals-summary__value {
+                font-size: 16px;
+                font-weight: 600;
+                margin-left: 15%;
+            }
+        }
+        .deal-profit__includes {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+    }
+}
+
+.fi-wrapper {
+    flex: 1 0 auto;
+    padding: 0.5rem;
+    width: 70%;
+}
+
+.totals-wrapper {
+    flex: 0 0 375px;
+    padding: 0.5rem;
+    width: 30%;
+    max-width: 375px;
 }

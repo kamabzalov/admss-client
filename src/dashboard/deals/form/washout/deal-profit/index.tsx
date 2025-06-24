@@ -15,6 +15,11 @@ enum CURRENCY_OPTIONS {
     PERCENT = "%",
 }
 
+export enum INCLUDE_OPTIONS {
+    COMMISSION1 = "commission1",
+    COMMISSION = "commission",
+}
+
 interface DealProfitItemProps extends InputNumberProps {
     numberSign?: "+" | "-" | "=";
     currency?: CURRENCY_OPTIONS | string;
@@ -25,10 +30,8 @@ interface DealProfitItemProps extends InputNumberProps {
     fieldName?: string;
     justify?: "start" | "end" | "between";
     includes?: boolean;
-    includeFirst?: boolean | undefined;
-    includeSecond?: boolean | undefined;
-    includeFirstOnChange?: (value: boolean) => void;
-    includeSecondOnChange?: (value: boolean) => void;
+    includeCheckbox?: INCLUDE_OPTIONS | null;
+    includeCheckboxOnChange?: (value: INCLUDE_OPTIONS | null) => void;
 }
 
 export const DealProfitItem = observer(
@@ -43,10 +46,8 @@ export const DealProfitItem = observer(
         checkboxOnChange,
         justify = "between",
         includes = false,
-        includeFirst,
-        includeSecond,
-        includeFirstOnChange,
-        includeSecondOnChange,
+        includeCheckbox,
+        includeCheckboxOnChange,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
@@ -57,6 +58,22 @@ export const DealProfitItem = observer(
         const handleChange = (event: any) => {
             setFieldChanged(true);
             props.onChange?.(event);
+        };
+
+        const handleFirstCheckboxChange = () => {
+            if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION1) {
+                includeCheckboxOnChange?.(null);
+            } else {
+                includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION1);
+            }
+        };
+
+        const handleSecondCheckboxChange = () => {
+            if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION) {
+                includeCheckboxOnChange?.(null);
+            } else {
+                includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION);
+            }
         };
 
         return (
@@ -108,25 +125,25 @@ export const DealProfitItem = observer(
                 )}
                 {includes && (
                     <div className='deal-profit__includes'>
-                        {includeFirst !== undefined && (
-                            <Checkbox
-                                inputId={`${fieldName}-includes-1`}
-                                checked={includeFirst}
-                                tooltip='Include in Commission1 Base'
-                                onChange={({ checked }) => {
-                                    includeFirstOnChange?.(!!checked);
-                                }}
-                            />
-                        )}
-                        {includeSecond !== undefined && (
-                            <Checkbox
-                                inputId={`${fieldName}-includes-2`}
-                                checked={includeSecond}
-                                tooltip='Include in Commission Base'
-                                onChange={({ checked }) => {
-                                    includeSecondOnChange?.(!!checked);
-                                }}
-                            />
+                        {includeCheckbox !== undefined && (
+                            <>
+                                <Checkbox
+                                    inputId={`${fieldName}-includes-1`}
+                                    checked={includeCheckbox === INCLUDE_OPTIONS.COMMISSION1}
+                                    tooltip='Include in Commission1 Base'
+                                    onChange={() => {
+                                        handleFirstCheckboxChange();
+                                    }}
+                                />
+                                <Checkbox
+                                    inputId={`${fieldName}-includes-2`}
+                                    checked={includeCheckbox === INCLUDE_OPTIONS.COMMISSION}
+                                    tooltip='Include in Commission Base'
+                                    onChange={() => {
+                                        handleSecondCheckboxChange();
+                                    }}
+                                />
+                            </>
                         )}
                     </div>
                 )}
@@ -144,10 +161,10 @@ export const DealProfit = () => {
             <div className='col-6'>
                 <DealProfitCommission />
             </div>
-            <div className='col-9'>
+            <div className='fi-wrapper'>
                 <DealFIProfit />
             </div>
-            <div className='col-3'>
+            <div className='totals-wrapper'>
                 <DealTotalsProfit />
             </div>
         </div>

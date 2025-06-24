@@ -1,30 +1,22 @@
 import { Card } from "primereact/card";
-import { DealProfitItem } from "..";
+import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
+import { useStore } from "store/hooks";
 
 export const DealFIProfit = () => {
-    const [warrantyProfitFirst, setWarrantyProfitFirst] = useState<boolean>(false);
-    const [warrantyProfitSecond, setWarrantyProfitSecond] = useState<boolean>(false);
-    const [gapProfitFirst, setGapProfitFirst] = useState<boolean>(false);
-    const [gapProfitSecond, setGapProfitSecond] = useState<boolean>(false);
-    const [accessoriesProfitFirst, setAccessoriesProfitFirst] = useState<boolean>(false);
-    const [accessoriesProfitSecond, setAccessoriesProfitSecond] = useState<boolean>(false);
-    const [clProfitFirst, setClProfitFirst] = useState<boolean>(false);
-    const [clProfitSecond, setClProfitSecond] = useState<boolean>(false);
-    const [ahProfitFirst, setAhProfitFirst] = useState<boolean>(false);
-    const [ahProfitSecond, setAhProfitSecond] = useState<boolean>(false);
-    const [vsiProfitFirst, setVsiProfitFirst] = useState<boolean>(false);
-    const [vsiProfitSecond, setVsiProfitSecond] = useState<boolean>(false);
-    const [netFIProfitFirst, setNetFIProfitFirst] = useState<boolean>(false);
-    const [netFIProfitSecond, setNetFIProfitSecond] = useState<boolean>(false);
-    const [interestMarkupFirst, setInterestMarkupFirst] = useState<boolean>(false);
-    const [interestMarkupSecond, setInterestMarkupSecond] = useState<boolean>(false);
-    const [discountFirst, setDiscountFirst] = useState<boolean>(false);
-    const [discountSecond, setDiscountSecond] = useState<boolean>(false);
-    const [acquisitionFeeFirst, setAcquisitionFeeFirst] = useState<boolean>(false);
-    const [acquisitionFeeSecond, setAcquisitionFeeSecond] = useState<boolean>(false);
-    const [reserveFirst, setReserveFirst] = useState<boolean>(false);
-    const [reserveSecond, setReserveSecond] = useState<boolean>(false);
+    const { dealWashout, changeDealWashout } = useStore().dealStore;
+
+    const [warrantyProfit, setWarrantyProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [gapProfit, setGapProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [accessoriesProfit, setAccessoriesProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [clProfit, setClProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [ahProfit, setAhProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [vsiProfit, setVsiProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [netFIProfit, setNetFIProfit] = useState<INCLUDE_OPTIONS | null>(null);
+    const [interestMarkup, setInterestMarkup] = useState<INCLUDE_OPTIONS | null>(null);
+    const [discount, setDiscount] = useState<INCLUDE_OPTIONS | null>(null);
+    const [acquisitionFee, setAcquisitionFee] = useState<INCLUDE_OPTIONS | null>(null);
+    const [reserve, setReserve] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
         <Card className='profit-card fi-profit'>
@@ -34,37 +26,37 @@ export const DealFIProfit = () => {
                     <div className='fi-profit__info'>
                         <DealProfitItem
                             title='Warranty Price:'
-                            value={0}
+                            value={Number(dealWashout.Warranty_Price) || 0}
                             fieldName='WarrantyPrice'
                             currency='$'
                         />
                         <DealProfitItem
                             title='Gap Price:'
-                            value={0}
+                            value={Number(dealWashout.Gap) || 0}
                             fieldName='GapPrice'
                             currency='$'
                         />
                         <DealProfitItem
                             title='Accessories Price:'
-                            value={0}
+                            value={Number(dealWashout.Accessory) || 0}
                             fieldName='AccessoriesPrice'
                             currency='$'
                         />
                         <DealProfitItem
                             title='C/L Price:'
-                            value={0}
+                            value={Number(dealWashout.CL) || 0}
                             fieldName='CLPrice'
                             currency='$'
                         />
                         <DealProfitItem
                             title='A/H Price:'
-                            value={0}
+                            value={Number(dealWashout.AH) || 0}
                             fieldName='AHPrice'
                             currency='$'
                         />
                         <DealProfitItem
                             title='VSI Price:'
-                            value={0}
+                            value={Number(dealWashout.VSI) || 0}
                             fieldName='VSIPrice'
                             currency='$'
                         />
@@ -72,46 +64,64 @@ export const DealFIProfit = () => {
                     <div className='fi-profit__inputs'>
                         <DealProfitItem
                             title='Warranty Cost:'
-                            value={0}
+                            value={Number(dealWashout.Warranty_Cost) || 0}
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("Warranty_Cost", value?.toString() || "0");
+                            }}
                             fieldName='WarrantyCost'
                             currency='$'
                         />
                         <DealProfitItem
                             title='Gap Cost:'
-                            value={0}
+                            value={Number(dealWashout.Gap_Cost) || 0}
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("Gap_Cost", value?.toString() || "0");
+                            }}
                             fieldName='GapCost'
                             currency='$'
                         />
                         <DealProfitItem
                             title='Accessories Cost:'
-                            value={0}
+                            value={Number(dealWashout.Accessory_Cost) || 0}
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("Accessory_Cost", value?.toString() || "0");
+                            }}
                             fieldName='AccessoriesCost'
                             currency='$'
                         />
                         <DealProfitItem
                             title='C/L:'
-                            value={0}
+                            value={Number(dealWashout.CL_Cost) || 0}
                             currencySelect
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("CL_Cost", value?.toString() || "0");
+                            }}
                             fieldName='CLCost'
                             currency='$'
                         />
                         <DealProfitItem
                             title='A/H:'
-                            value={0}
+                            value={Number(dealWashout.AH_Cost) || 0}
                             currencySelect
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("AH_Cost", value?.toString() || "0");
+                            }}
                             fieldName='AHCost'
                             currency='$'
                         />
                         <DealProfitItem
                             title='VSI:'
-                            value={0}
+                            value={Number(dealWashout.VSI_Cost) || 0}
                             currencySelect
                             withInput
+                            onChange={({ value }) => {
+                                changeDealWashout("VSI_Cost", value?.toString() || "0");
+                            }}
                             fieldName='VSICost'
                             currency='$'
                         />
@@ -125,37 +135,31 @@ export const DealFIProfit = () => {
                             <div className='fi-profit__loan-costs-title pl-4'>Loan Costs</div>
                             <DealProfitItem
                                 title='Discount:'
-                                value={0}
+                                value={Number(dealWashout.Discount) || 0}
                                 withInput
                                 fieldName='Discount'
                                 includes
-                                includeFirst={discountFirst}
-                                includeSecond={discountSecond}
-                                includeFirstOnChange={setDiscountFirst}
-                                includeSecondOnChange={setDiscountSecond}
+                                includeCheckbox={discount}
+                                includeCheckboxOnChange={setDiscount}
                                 currency='$'
                             />
                             <DealProfitItem
                                 title='Acquisition/ Loan Fee:'
-                                value={0}
+                                value={Number(dealWashout.AcquisitionFee) || 0}
                                 withInput
                                 includes
-                                includeFirst={acquisitionFeeFirst}
-                                includeSecond={acquisitionFeeSecond}
-                                includeFirstOnChange={setAcquisitionFeeFirst}
-                                includeSecondOnChange={setAcquisitionFeeSecond}
+                                includeCheckbox={acquisitionFee}
+                                includeCheckboxOnChange={setAcquisitionFee}
                                 fieldName='AcquisitionFee'
                                 currency='$'
                             />
                             <DealProfitItem
                                 title='Reserve:'
-                                value={0}
+                                value={Number(dealWashout.Reserve) || 0}
                                 currencySelect
                                 includes
-                                includeFirst={reserveFirst}
-                                includeSecond={reserveSecond}
-                                includeFirstOnChange={setReserveFirst}
-                                includeSecondOnChange={setReserveSecond}
+                                includeCheckbox={reserve}
+                                includeCheckboxOnChange={setReserve}
                                 withInput
                                 fieldName='Reserve'
                                 currency='$'
@@ -167,68 +171,56 @@ export const DealFIProfit = () => {
                 <div className='fi-profit__total'>
                     <DealProfitItem
                         title='Warranty Profit:'
-                        value={0}
+                        value={Number(dealWashout.Warranty_Profit) || 0}
                         currency='$'
                         includes
-                        includeFirst={warrantyProfitFirst}
-                        includeSecond={warrantyProfitSecond}
-                        includeFirstOnChange={setWarrantyProfitFirst}
-                        includeSecondOnChange={setWarrantyProfitSecond}
+                        includeCheckbox={warrantyProfit}
+                        includeCheckboxOnChange={setWarrantyProfit}
                     />
                     <DealProfitItem
                         title='Gap Profit:'
-                        value={0}
+                        value={Number(dealWashout.Gap_Profit) || 0}
                         currency='$'
                         numberSign='+'
                         includes
-                        includeFirst={gapProfitFirst}
-                        includeSecond={gapProfitSecond}
-                        includeFirstOnChange={setGapProfitFirst}
-                        includeSecondOnChange={setGapProfitSecond}
+                        includeCheckbox={gapProfit}
+                        includeCheckboxOnChange={setGapProfit}
                     />
                     <DealProfitItem
                         title='Accessories Profit:'
-                        value={0}
+                        value={Number(dealWashout.Accessory_Profit) || 0}
                         currency='$'
                         numberSign='+'
                         includes
-                        includeFirst={accessoriesProfitFirst}
-                        includeSecond={accessoriesProfitSecond}
-                        includeFirstOnChange={setAccessoriesProfitFirst}
-                        includeSecondOnChange={setAccessoriesProfitSecond}
+                        includeCheckbox={accessoriesProfit}
+                        includeCheckboxOnChange={setAccessoriesProfit}
                     />
                     <DealProfitItem
                         title='C/L Profit:'
-                        value={0}
+                        value={Number(dealWashout.CL_Profit) || 0}
                         currency='$'
                         numberSign='+'
                         includes
-                        includeFirst={clProfitFirst}
-                        includeSecond={clProfitSecond}
-                        includeFirstOnChange={setClProfitFirst}
-                        includeSecondOnChange={setClProfitSecond}
+                        includeCheckbox={clProfit}
+                        includeCheckboxOnChange={setClProfit}
                     />
                     <DealProfitItem
                         title='A/H Profit:'
-                        value={0}
+                        value={Number(dealWashout.AH_Profit) || 0}
                         currency='$'
                         numberSign='+'
                         includes
-                        includeFirst={ahProfitFirst}
-                        includeSecond={ahProfitSecond}
-                        includeFirstOnChange={setAhProfitFirst}
-                        includeSecondOnChange={setAhProfitSecond}
+                        includeCheckbox={ahProfit}
+                        includeCheckboxOnChange={setAhProfit}
                     />
                     <DealProfitItem
                         title='VSI Profit:'
-                        value={0}
+                        value={Number(dealWashout.VSI_Profit) || 0}
                         currency='$'
                         numberSign='+'
                         includes
-                        includeFirst={vsiProfitFirst}
-                        includeSecond={vsiProfitSecond}
-                        includeFirstOnChange={setVsiProfitFirst}
-                        includeSecondOnChange={setVsiProfitSecond}
+                        includeCheckbox={vsiProfit}
+                        includeCheckboxOnChange={setVsiProfit}
                     />
                     <div className='splitter my-0'>
                         <hr className='splitter__line flex-1' />
@@ -236,20 +228,18 @@ export const DealFIProfit = () => {
 
                     <DealProfitItem
                         title='Interest Markup:'
-                        value={0}
+                        value={Number(dealWashout.Interest_Markup) || 0}
                         fieldName='InterestMarkup'
                         numberSign='+'
                         includes
-                        includeFirst={interestMarkupFirst}
-                        includeSecond={interestMarkupSecond}
-                        includeFirstOnChange={setInterestMarkupFirst}
-                        includeSecondOnChange={setInterestMarkupSecond}
+                        includeCheckbox={interestMarkup}
+                        includeCheckboxOnChange={setInterestMarkup}
                         currency='$'
                     />
                     <DealProfitItem
                         title='Loan Costs:'
                         numberSign='-'
-                        value={0}
+                        value={Number(dealWashout.Loan_Cost) || 0}
                         fieldName='LoanCosts'
                         includes
                         currency='$'
@@ -262,14 +252,12 @@ export const DealFIProfit = () => {
                     <DealProfitItem
                         numberSign='='
                         title='Net F&I Profit:'
-                        value={0}
+                        value={Number(dealWashout.NetFI_Profit) || 0}
                         currency='$'
                         className='deal-profit__item--blue'
                         includes
-                        includeFirst={netFIProfitFirst}
-                        includeSecond={netFIProfitSecond}
-                        includeFirstOnChange={setNetFIProfitFirst}
-                        includeSecondOnChange={setNetFIProfitSecond}
+                        includeCheckbox={netFIProfit}
+                        includeCheckboxOnChange={setNetFIProfit}
                     />
                 </div>
             </div>

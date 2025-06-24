@@ -6,6 +6,7 @@ import {
     DealFinance,
     DealPickupPayment,
     DealPrintForm,
+    DealWashout,
 } from "common/models/deals";
 import { Inventory } from "common/models/inventory";
 import {
@@ -13,6 +14,7 @@ import {
     getDealInfo,
     getDealPayments,
     getDealPrintForms,
+    getDealWashout,
     setDeal,
     setDealFinance,
     setDealPayments,
@@ -46,6 +48,7 @@ export class DealStore {
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
+    private _dealWashout: DealWashout = {} as DealWashout;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _dealType: number = 0;
@@ -87,6 +90,10 @@ export class DealStore {
 
     public get dealFinances() {
         return this._dealFinances;
+    }
+
+    public get dealWashout() {
+        return this._dealWashout;
     }
 
     public get dealType() {
@@ -212,6 +219,27 @@ export class DealStore {
         }
     };
 
+    public getDealWashout = async (dealuid: string) => {
+        this._isLoading = true;
+        try {
+            this._dealErrorMessage = "";
+            const response = await getDealWashout(dealuid);
+            if (response && response.status === Status.OK) {
+                this._dealWashout = response as DealWashout;
+            } else {
+                const { error } = response as BaseResponseError;
+                this._dealErrorMessage = error!;
+            }
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
     public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
         if (this._deal && key !== "extdata" && key !== "finance") {
             this._isFormChanged = true;
@@ -249,6 +277,14 @@ export class DealStore {
             }
         }
     );
+
+    public changeDealWashout = action((key: keyof DealWashout, value: string | number) => {
+        const dealStore = this.rootStore.dealStore;
+        if (dealStore) {
+            const { dealWashout } = dealStore;
+            (dealWashout as Record<typeof key, string | number>)[key] = value;
+        }
+    });
 
     public changeDealPickupPayments = action(
         (
@@ -434,6 +470,7 @@ export class DealStore {
         this._dealExtData = {} as DealExtData;
         this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;
+        this._dealWashout = {} as DealWashout;
         this._printList = {} as DealPrintCollection;
         this._dealPickupPayments = [] as DealPickupPayment[];
     };

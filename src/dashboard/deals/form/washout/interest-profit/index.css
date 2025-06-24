@@ -1,0 +1,73 @@
+.interest-profit {
+    display: flex;
+    gap: 30px;
+
+    .interest-income {
+        width: 438px;
+    }
+
+    .account-wash {
+        width: 508px;
+    }
+
+    .profit-card {
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
+    }
+
+    .profit-card__header {
+        height: 50px;
+        background-color: var(--admss-app-focus-blue);
+        padding: 0;
+        padding-left: 24px;
+        display: flex;
+        overflow: hidden;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--admss-app-warning-blue);
+    }
+
+    .account-wash__body,
+    .interest-income__body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .deal-profit__item {
+        height: 32px;
+
+        .p-inputtext {
+            height: 32px;
+        }
+
+        .p-inputtext:focus {
+            box-shadow: none;
+        }
+
+        .input-icon {
+            height: 32px;
+            width: 32px;
+        }
+
+        .deal-profit__label {
+            width: 230px;
+        }
+
+        .deal-profit__value {
+            margin-left: 60px;
+        }
+    }
+
+    .account-wash {
+        .deal-profit__label {
+            width: 292px;
+        }
+
+        .deal-profit__value {
+            margin-left: 70px;
+        }
+    }
+}

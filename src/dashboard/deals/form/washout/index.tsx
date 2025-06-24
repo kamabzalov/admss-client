@@ -23,11 +23,12 @@ export const DealWashout = observer((): ReactElement => {
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().dealStore;
     const toast = useToast();
-    const { inventory, getDeal } = store;
+    const { inventory, getDeal, getDealWashout } = store;
 
     useEffect(() => {
         if (id) {
             getDeal(id);
+            getDealWashout(id);
         }
     }, [id]);
 
