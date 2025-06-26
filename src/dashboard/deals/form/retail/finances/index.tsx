@@ -29,6 +29,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                 <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                     <Button
                         outlined
+                        type='button'
                         onClick={() => {
                             id && dealFinancesWashout(id);
                         }}
@@ -37,6 +38,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                         Washout
                     </Button>
                     <Button
+                        type='button'
                         outlined
                         onClick={() => {
                             id && dealFinancesRecalculate(id);

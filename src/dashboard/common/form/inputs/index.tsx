@@ -8,7 +8,7 @@ import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
-import { InputMask, InputMaskProps } from "primereact/inputmask";
+import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inputmask";
 import { useCursorToStart } from "common/hooks";
 import { ComboBox } from "../dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
@@ -61,8 +61,10 @@ interface TextInputProps extends InputTextProps {
     clearButton?: boolean;
 }
 
-interface PhoneInputProps extends InputMaskProps {
+interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
     colWidth?: Range<1, 13>;
+    onChange?: (e: any) => void;
+    onBlur?: (e: any) => void;
 }
 
 interface StateDropdownProps extends DropdownProps {
@@ -442,8 +444,15 @@ export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps):
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
 
-export const PhoneInput = ({ name, colWidth, ...props }: PhoneInputProps): ReactElement => {
+export const PhoneInput = ({
+    name,
+    colWidth,
+    onChange,
+    onBlur,
+    ...props
+}: PhoneInputProps): ReactElement => {
     const inputRef = useRef(null);
+    const [error, setError] = useState<string>("");
 
     const handleCursorPosition = () => {
         const input = inputRef.current as unknown as HTMLInputElement | null;
@@ -457,20 +466,39 @@ export const PhoneInput = ({ name, colWidth, ...props }: PhoneInputProps): React
         }
     };
 
+    const validateAndHandle = (e: InputMaskChangeEvent, isBlur = false) => {
+        const { value } = e.target;
+        const cleanValue = value?.replace(/[^0-9]/g, "");
+
+        if (cleanValue && cleanValue.length < 10) {
+            setError("Phone number is not valid");
+        } else {
+            setError("");
+        }
+
+        if (onChange) onChange(e);
+        if (isBlur && onBlur) onBlur(e);
+    };
+
     const content = (
-        <span className='p-float-label relative'>
+        <span className='p-float-label relative phone-input'>
             <InputMask
                 type='tel'
                 ref={inputRef}
                 mask='999-999-9999'
-                className='w-full'
+                className={`w-full phone-input__input ${error ? "p-invalid" : ""}`}
                 style={{ height: `${props.height || 50}px` }}
                 onClick={handleCursorPosition}
                 id={name || "phoneId"}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
+                autoClear={false}
+                unmask={false}
+                onChange={(e) => validateAndHandle(e)}
+                onBlur={(e) => validateAndHandle(e as unknown as InputMaskChangeEvent, true)}
                 {...props}
             />
             <label className='float-label'>{name}</label>
+            {error && <div className='p-error pt-2'>{error}</div>}
         </span>
     );
 

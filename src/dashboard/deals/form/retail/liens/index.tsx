@@ -7,6 +7,7 @@ import { DateInput, StateDropdown } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
+import { InputMask } from "primereact/inputmask";
 
 export const DealRetailLiens = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -24,7 +25,8 @@ export const DealRetailLiens = observer((): ReactElement => {
         },
     } = store;
 
-    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+        useFormikContext<PartialDeal>();
     return (
         <div className='grid deal-retail-liens row-gap-2'>
             <div className='col-6'>
@@ -44,14 +46,17 @@ export const DealRetailLiens = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-liens__text-input w-full' ${
+                    <InputMask
+                        mask='999-999-9999'
+                        className={`deal-liens__text-input w-full ${
                             errors.First_Lien_Phone_Num ? "p-invalid" : ""
                         }`}
-                        value={values.First_Lien_Phone_Num}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("First_Lien_Phone_Num", value);
-                            changeDealExtData({ key: "First_Lien_Phone_Num", value });
+                        value={values.First_Lien_Phone_Num ?? ""}
+                        onBlur={handleBlur}
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("First_Lien_Phone_Num", value);
+                            value && changeDealExtData({ key: "First_Lien_Phone_Num", value });
+                            setFieldTouched("First_Lien_Phone_Num", true, true);
                         }}
                     />
                     <label className='float-label'>Phone Number</label>
