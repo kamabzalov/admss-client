@@ -14,7 +14,7 @@ import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { PartialDeal } from "dashboard/deals/form";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -45,7 +45,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         changeDeal,
         changeDealExtData,
     } = store;
-    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
+    const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -485,31 +485,26 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             errors.Trade1_Lien_Address ? "p-invalid" : ""
                         }`}
                         value={values.Trade1_Lien_Address}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade1_Lien_Address", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Trade1_Lien_Address", value);
+                            setFieldTouched("Trade1_Lien_Address", true);
                             changeDealExtData({ key: "Trade1_Lien_Address", value });
                         }}
+                        onBlur={() => setFieldTouched("Trade1_Lien_Address", true, true)}
                     />
                     <label className='float-label'>Mailing address</label>
                 </span>
                 <small className='p-error'>{errors.Trade1_Lien_Address}</small>
             </div>
 
-            <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-trade__text-input w-full' ${
-                            errors.Trade1_Lien_Phone ? "p-invalid" : ""
-                        }`}
-                        value={values.Trade1_Lien_Phone}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade1_Lien_Phone", value);
-                            changeDealExtData({ key: "Trade1_Lien_Phone", value });
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-                <small className='p-error'>{errors.Trade1_Lien_Phone}</small>
+            <div className='col-3'>
+                <PhoneInput
+                    name='Phone Number'
+                    value={values.Trade1_Lien_Phone}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Trade1_Lien_Phone", value: value ?? "" });
+                    }}
+                />
             </div>
             <div className='col-6'>
                 <CompanySearch
