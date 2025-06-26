@@ -8,7 +8,7 @@ import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
-import { InputMask, InputMaskProps } from "primereact/inputmask";
+import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inputmask";
 import { useCursorToStart } from "common/hooks";
 import { ComboBox } from "../dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
@@ -466,37 +466,18 @@ export const PhoneInput = ({
         }
     };
 
-    const validatePhoneNumber = (value: string) => {
+    const validateAndHandle = (e: InputMaskChangeEvent, isBlur = false) => {
+        const { value } = e.target;
         const cleanValue = value?.replace(/[^0-9]/g, "");
 
         if (cleanValue && cleanValue.length < 10) {
             setError("Phone number is not valid");
-            return false;
-        } else if (cleanValue && cleanValue.length === 10) {
-            setError("");
-            return true;
         } else {
             setError("");
-            return true;
         }
-    };
 
-    const handleChange = (e: any) => {
-        const { value } = e.target;
-        validatePhoneNumber(value);
-
-        if (onChange) {
-            onChange(e);
-        }
-    };
-
-    const handleBlur = (e: any) => {
-        const { value } = e.target;
-        validatePhoneNumber(value);
-
-        if (onBlur) {
-            onBlur(e);
-        }
+        if (onChange) onChange(e);
+        if (isBlur && onBlur) onBlur(e);
     };
 
     const content = (
@@ -512,8 +493,8 @@ export const PhoneInput = ({
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 autoClear={false}
                 unmask={false}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                onChange={(e) => validateAndHandle(e)}
+                onBlur={(e) => validateAndHandle(e as unknown as InputMaskChangeEvent, true)}
                 {...props}
             />
             <label className='float-label'>{name}</label>
