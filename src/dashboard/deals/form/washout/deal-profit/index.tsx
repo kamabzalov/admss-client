@@ -10,10 +10,15 @@ import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { ComboBox } from "dashboard/common/form/dropdown";
 
-enum CURRENCY_OPTIONS {
+export enum CURRENCY_OPTIONS {
     DOLLAR = "$",
     PERCENT = "%",
 }
+
+const CURRENCY_SELECT_OPTIONS = [
+    { label: CURRENCY_OPTIONS.DOLLAR, value: 0 },
+    { label: CURRENCY_OPTIONS.PERCENT, value: 1 },
+];
 
 export enum INCLUDE_OPTIONS {
     COMMISSION1 = "commission1",
@@ -23,7 +28,8 @@ export enum INCLUDE_OPTIONS {
 interface DealProfitItemProps extends InputNumberProps {
     numberSign?: "+" | "-" | "=";
     currency?: CURRENCY_OPTIONS | string;
-    currencySelect?: boolean;
+    currencySelectValue?: 0 | 1;
+    onCurrencySelect?: (value: 0 | 1) => void;
     withInput?: boolean;
     checkboxValue?: boolean;
     checkboxOnChange?: (value: boolean) => void;
@@ -41,19 +47,17 @@ export const DealProfitItem = observer(
         fieldName,
         withInput = false,
         currency,
-        currencySelect = false,
+        currencySelectValue,
         checkboxValue,
         checkboxOnChange,
         justify = "between",
         includes = false,
         includeCheckbox,
         includeCheckboxOnChange,
+        onCurrencySelect,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
-        const [currencySelectValue, setCurrencySelectValue] = useState<CURRENCY_OPTIONS>(
-            CURRENCY_OPTIONS.DOLLAR
-        );
 
         const handleChange = (event: any) => {
             setFieldChanged(true);
@@ -95,17 +99,22 @@ export const DealProfitItem = observer(
                 </label>
                 {withInput ? (
                     <>
-                        {currencySelect && (
+                        {currencySelectValue !== undefined && (
                             <ComboBox
-                                options={Object.values(CURRENCY_OPTIONS)}
+                                options={CURRENCY_SELECT_OPTIONS}
+                                optionLabel='label'
+                                optionValue='value'
                                 value={currencySelectValue}
                                 onChange={(e) => {
-                                    setCurrencySelectValue(e.value as CURRENCY_OPTIONS);
+                                    onCurrencySelect?.(e.value as 0 | 1);
                                 }}
                                 className={`deal-profit__currency-select`}
                             />
                         )}
                         <CurrencyInput
+                            currencyIcon={
+                                currency === CURRENCY_OPTIONS.PERCENT ? "percent" : "dollar"
+                            }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
                             onChange={handleChange}

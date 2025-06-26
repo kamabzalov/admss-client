@@ -29,6 +29,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
     const userStore = useStore().userStore;
+    const inventoryStore = useStore().inventoryStore;
     const { authUser } = userStore;
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
@@ -105,6 +106,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [getExpenses]);
 
     const handleClearExpense = () => {
+        inventoryStore.isFormChanged = true;
         setCurrentEditExpense({} as Expenses);
     };
 
@@ -128,6 +130,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             });
         } else {
             handleClearExpense();
+            inventoryStore.isFormChanged = true;
             getExpenses();
             toast?.current?.show({
                 severity: "success",
@@ -149,6 +152,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             });
         } else {
             getExpenses();
+            inventoryStore.isFormChanged = true;
             handleClearExpense();
             toast?.current?.show({
                 severity: "success",

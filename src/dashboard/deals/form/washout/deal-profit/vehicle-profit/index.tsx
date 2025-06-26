@@ -3,12 +3,23 @@ import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
 import { Button } from "primereact/button";
+import { useLocation, useNavigate } from "react-router-dom";
+import { INVENTORY_STEPS } from "dashboard/inventory/form";
+import { observer } from "mobx-react-lite";
 
-export const DealVehicleProfit = () => {
-    const { dealWashout, changeDealWashout } = useStore().dealStore;
+export const DealVehicleProfit = observer(() => {
+    const { dealWashout, inventory, changeDealWashout } = useStore().dealStore;
+    const inventoryStore = useStore().inventoryStore;
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
 
     const [includeOverallowance, setIncludeOverallowance] = useState<INCLUDE_OPTIONS | null>(null);
     const [includeVehicleProfit, setIncludeVehicleProfit] = useState<INCLUDE_OPTIONS | null>(null);
+
+    const handleNavigateToExpenses = () => {
+        inventoryStore.memoRoute = pathname;
+        navigate(`/dashboard/inventory/${inventory.itemuid}?step=${INVENTORY_STEPS.EXPENSES}`);
+    };
 
     return (
         <Card className='profit-card vehicle-profit'>
@@ -18,35 +29,44 @@ export const DealVehicleProfit = () => {
                     icon='pi pi-plus'
                     tooltip='Expenses'
                     className='vehicle-profit__expenses-button'
+                    onClick={handleNavigateToExpenses}
                 />
                 <div className='vehicle-profit__inputs'>
                     <DealProfitItem
                         title='Trade 1 Allowance:'
-                        value={0}
+                        value={Number(dealWashout.Trade1Allowance) || 0}
                         withInput
                         fieldName='Trade1Allowance'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("Trade1Allowance", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='Trade 1 ACV:'
-                        value={0}
+                        value={Number(dealWashout.Trade1ACV) || 0}
                         withInput
                         fieldName='Trade1ACV'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("Trade1ACV", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='Trade 2 Allowance:'
-                        value={0}
+                        value={Number(dealWashout.Trade2Allowance) || 0}
                         withInput
-                        fieldName='Trade1Allowance'
-                        onChange={({ value }) => {}}
+                        fieldName='Trade2Allowance'
+                        onChange={({ value }) => {
+                            changeDealWashout("Trade2Allowance", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='Trade 2 ACV:'
-                        value={0}
+                        value={Number(dealWashout.Trade2ACV) || 0}
                         withInput
                         fieldName='Trade2ACV'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("Trade2ACV", String(value));
+                        }}
                     />
                 </div>
                 <div className='vehicle-profit__info'>
@@ -55,8 +75,10 @@ export const DealVehicleProfit = () => {
                         justify='start'
                         includes
                         currency='$'
-                        value={0}
-                        onChange={({ value }) => {}}
+                        value={Number(dealWashout.CashPrice) || 0}
+                        onChange={({ value }) => {
+                            changeDealWashout("CashPrice", String(value));
+                        }}
                     />
                     <DealProfitItem
                         numberSign='-'
@@ -104,11 +126,13 @@ export const DealVehicleProfit = () => {
                         includes
                         includeCheckbox={includeVehicleProfit}
                         includeCheckboxOnChange={setIncludeVehicleProfit}
-                        value={0}
-                        onChange={({ value }) => {}}
+                        value={Number(dealWashout.VehicleProfit) || 0}
+                        onChange={({ value }) => {
+                            changeDealWashout("VehicleProfit", String(value));
+                        }}
                     />
                 </div>
             </div>
         </Card>
     );
-};
+});

@@ -9,6 +9,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { DealProfit } from "dashboard/deals/form/washout/deal-profit";
 import { InterestProfit } from "dashboard/deals/form/washout/interest-profit";
+import { setDealWashout } from "http/services/deals.service";
 
 export enum DealWashoutTabs {
     DEAL_PROFIT = "deal-profit",
@@ -69,12 +70,24 @@ export const DealWashout = observer((): ReactElement => {
     }, [tabParam, setSearchParams]);
 
     const handleSaveWashout = async () => {
-        toast.current?.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Error on save washout",
-            life: TOAST_LIFETIME,
-        });
+        if (!id) return;
+        const response = await setDealWashout(id, store.dealWashout);
+        if (!response?.error) {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Washout saved",
+                life: TOAST_LIFETIME,
+            });
+            navigate(`/dashboard/deals/${id}`);
+        } else {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error on save washout",
+                life: TOAST_LIFETIME,
+            });
+        }
     };
 
     return (

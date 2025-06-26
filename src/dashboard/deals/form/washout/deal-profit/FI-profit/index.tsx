@@ -2,8 +2,9 @@ import { Card } from "primereact/card";
 import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const DealFIProfit = () => {
+export const DealFIProfit = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
     const [warrantyProfit, setWarrantyProfit] = useState<INCLUDE_OPTIONS | null>(null);
@@ -95,7 +96,10 @@ export const DealFIProfit = () => {
                         <DealProfitItem
                             title='C/L:'
                             value={Number(dealWashout.CL_Cost) || 0}
-                            currencySelect
+                            currencySelectValue={dealWashout.CL_Type}
+                            onCurrencySelect={(value) => {
+                                changeDealWashout("CL_Type", value);
+                            }}
                             withInput
                             onChange={({ value }) => {
                                 changeDealWashout("CL_Cost", value?.toString() || "0");
@@ -106,7 +110,10 @@ export const DealFIProfit = () => {
                         <DealProfitItem
                             title='A/H:'
                             value={Number(dealWashout.AH_Cost) || 0}
-                            currencySelect
+                            currencySelectValue={dealWashout.AH_Type}
+                            onCurrencySelect={(value) => {
+                                changeDealWashout("AH_Type", value);
+                            }}
                             withInput
                             onChange={({ value }) => {
                                 changeDealWashout("AH_Cost", value?.toString() || "0");
@@ -117,7 +124,10 @@ export const DealFIProfit = () => {
                         <DealProfitItem
                             title='VSI:'
                             value={Number(dealWashout.VSI_Cost) || 0}
-                            currencySelect
+                            currencySelectValue={dealWashout.VSI_Type}
+                            onCurrencySelect={(value) => {
+                                changeDealWashout("VSI_Type", value);
+                            }}
                             withInput
                             onChange={({ value }) => {
                                 changeDealWashout("VSI_Cost", value?.toString() || "0");
@@ -156,7 +166,10 @@ export const DealFIProfit = () => {
                             <DealProfitItem
                                 title='Reserve:'
                                 value={Number(dealWashout.Reserve) || 0}
-                                currencySelect
+                                currencySelectValue={dealWashout.Reserve_Type}
+                                onCurrencySelect={(value) => {
+                                    changeDealWashout("Reserve_Type", value);
+                                }}
                                 includes
                                 includeCheckbox={reserve}
                                 includeCheckboxOnChange={setReserve}
@@ -263,4 +276,4 @@ export const DealFIProfit = () => {
             </div>
         </Card>
     );
-};
+});

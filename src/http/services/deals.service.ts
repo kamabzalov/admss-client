@@ -439,10 +439,14 @@ export const deleteDealPayment = async (itemuid: string) => {
     }
 };
 
-export const setDealWashout = async (dealuid: string): Promise<BaseResponseError | undefined> => {
+export const setDealWashout = async (
+    dealuid: string,
+    dealWashoutData?: Partial<DealWashout>
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/washout`
+            `deals/${dealuid || 0}/washout`,
+            dealWashoutData
         );
 
         if (response.status === 200) {

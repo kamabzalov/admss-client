@@ -53,7 +53,9 @@ export const ContactsProspecting = observer((): ReactElement => {
     useEffect(() => {
         if (authUser) {
             getContactsSalesmanList(authUser.useruid).then((response) => {
-                response && setSalespersonsList(response);
+                if (response && Array.isArray(response)) {
+                    setSalespersonsList(response);
+                }
             });
             handleGetShortInventoryList();
         }
