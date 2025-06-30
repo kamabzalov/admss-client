@@ -143,20 +143,37 @@ export const formatDateForServer = (date: Date | number): string => {
     return `${pad(month)}/${pad(day)}/${year} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-export const parseDateFromServer = (dateString: string): number => {
+export const parseDateFromServer = (dateString: string | number | undefined | null): number => {
     if (!dateString) return 0;
-    const parts = dateString.split(" ");
-    const dateParts = parts[0].split("/");
-    const timeParts = parts[1].split(":");
 
-    return new Date(
-        parseInt(dateParts[2]),
-        parseInt(dateParts[0]) - 1,
-        parseInt(dateParts[1]),
-        parseInt(timeParts[0]),
-        parseInt(timeParts[1]),
-        parseInt(timeParts[2])
-    ).getTime();
+    if (typeof dateString === "number") {
+        return dateString;
+    }
+
+    if (typeof dateString !== "string") {
+        return 0;
+    }
+
+    if (dateString.trim() === "") {
+        return 0;
+    }
+
+    try {
+        const parts = dateString.split(" ");
+        const dateParts = parts[0].split("/");
+        const timeParts = parts[1] ? parts[1].split(":") : ["0", "0", "0"];
+
+        return new Date(
+            parseInt(dateParts[2]),
+            parseInt(dateParts[0]) - 1,
+            parseInt(dateParts[1]),
+            parseInt(timeParts[0]),
+            parseInt(timeParts[1]),
+            parseInt(timeParts[2])
+        ).getTime();
+    } catch (error) {
+        return 0;
+    }
 };
 
 export const parseCustomDate = (dateAsString: string): number => {

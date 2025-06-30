@@ -148,6 +148,7 @@ export const AddTaskDialog = observer(
             handleInputChange(
                 "contactname",
                 contact.companyName ||
+                    contact.businessName ||
                     `${contact.firstName} ${contact.lastName}`.trim() ||
                     contact.userName
             );

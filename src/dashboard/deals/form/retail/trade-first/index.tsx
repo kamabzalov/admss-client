@@ -40,6 +40,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_Lien_Payoff_Good_Through,
             Trade1_Lien_Name,
             Trade1_Lien_Contact,
+            Trade1_Lien_Phone,
         },
         deal: { addToInventory },
         changeDeal,
@@ -500,8 +501,9 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <PhoneInput
                     name='Phone Number'
-                    value={values.Trade1_Lien_Phone}
+                    value={Trade1_Lien_Phone}
                     onChange={({ target: { value } }) => {
+                        setFieldValue("Trade1_Lien_Phone", value.replace(/[^0-9]/g, ""));
                         changeDealExtData({ key: "Trade1_Lien_Phone", value: value ?? "" });
                     }}
                 />
