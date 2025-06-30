@@ -1,0 +1,24 @@
+.salesman-select-dialog {
+    max-width: 817px;
+    width: 100%;
+
+    .salesman-select-dialog__body {
+        width: 100%;
+        display: flex;
+
+        .salesman-select-dialog__column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 30px;
+        }
+    }
+    .p-dialog-footer {
+        .p-button {
+            width: 240px;
+            height: 60px;
+            margin: 10px;
+            text-transform: uppercase;
+        }
+    }
+}

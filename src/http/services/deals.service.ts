@@ -8,6 +8,7 @@ import {
     DealPaymentsTotal,
     DealPickupPayment,
     DealPrintFormResponse,
+    DealWashout,
     HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
@@ -142,25 +143,6 @@ export const setDeal = async (
     }
 };
 
-export const dealFinancesWashout = async (
-    dealuid: string
-): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/washout`
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while washout deal finance",
-        };
-    }
-};
-
 export const dealFinancesRecalculate = async (
     dealuid: string
 ): Promise<BaseResponseError | undefined> => {
@@ -190,6 +172,20 @@ export const getDealFinance = async (dealuid: string) => {
         return {
             status: Status.ERROR,
             error: "Error while getting deal finance",
+        };
+    }
+};
+
+export const getDealWashout = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<DealWashout>(
+            `deals/${dealuid || 0}/washout`
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal washout",
         };
     }
 };
@@ -440,5 +436,40 @@ export const deleteDealPayment = async (itemuid: string) => {
                 error: error.response?.data.error || "Error while deleting payment",
             };
         }
+    }
+};
+
+export const setDealWashout = async (
+    dealuid: string,
+    dealWashoutData?: Partial<DealWashout>
+): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid || 0}/washout`,
+            dealWashoutData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while washout deal finance",
+        };
+    }
+};
+
+export const createDealWashout = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `print/${dealuid}/dealwash`
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while creating deal washout",
+        };
     }
 };
