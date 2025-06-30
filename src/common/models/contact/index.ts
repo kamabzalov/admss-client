@@ -347,14 +347,19 @@ export interface TotalUsers extends BaseResponse {
     total: number;
 }
 
-export interface SalespersonsList {
-    created: string;
-    createdbyuid: string;
-    creatorusername: string;
-    enabled: number;
-    updated: string;
+export interface SalespersonsList extends BaseResponseError {
+    created: number;
+    updated: number;
     username: string;
     useruid: string;
+    createdbyuid: string;
+    creatorusername: string;
+    Name: string;
+    WorkPhone: string;
+    HomePhone: string;
+    Address: string;
+    email: string;
+    enabled: 0 | 1;
 }
 
 export enum ContactTypeNameList {
