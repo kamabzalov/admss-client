@@ -31,6 +31,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         []
     );
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
+    const [layoutKey, setLayoutKey] = useState(false);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -54,29 +55,27 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
 
     const handleSaveOption = async (option: Partial<GeneralInventoryOptions>) => {
         if (!option.name) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: "Option name is required",
                 life: TOAST_LIFETIME,
             });
-            return;
         }
 
         if (!option.itemuid) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: "Option UID is required",
                 life: TOAST_LIFETIME,
             });
-            return;
         }
 
         const isNew = option.itemuid === NEW_ITEM;
         const response = await setInventoryGroupOption(inventoryGroupID, option);
         if (response?.error || response?.status === Status.ERROR) {
-            toast.current?.show({
+            return toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: response?.error,
@@ -237,6 +236,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                     detail: response?.error,
                     life: TOAST_LIFETIME,
                 });
+                setLayoutKey(!layoutKey);
                 return handleGetInventoryOptionsGroupList();
             }
 
@@ -250,6 +250,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 detail: errorMessage,
                 life: TOAST_LIFETIME,
             });
+            setLayoutKey(!layoutKey);
         } finally {
             setIsLoading(false);
         }
@@ -338,6 +339,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                         </div>
                         <div className='inventory-content'>
                             <ResponsiveReactGridLayout
+                                key={layoutKey.toString()}
                                 className='layout relative'
                                 layouts={layouts}
                                 cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 1 }}
