@@ -27,6 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
@@ -79,6 +80,7 @@ const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
         "SaleID",
     ],
     [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num"],
     [AccordionDealItems.FIRST_TRADE]: [
         "Trade1_Make",
         "Trade1_Model",
@@ -115,7 +117,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
-    First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+    First_Lien_Phone_Num: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -144,7 +146,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade1_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -173,7 +175,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade2_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -354,10 +356,17 @@ export const DealsForm = observer(() => {
                     });
                 });
                 setErrorSections(currentSectionsWithErrors);
+
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
                     life: TOAST_LIFETIME,
                 });
             }

@@ -253,7 +253,7 @@ export const ContactsDataTable = ({
         if (onRowClick) {
             const value = returnedField
                 ? data[returnedField]
-                : `${data.firstName} ${data.lastName}`;
+                : data.companyName || data.businessName || `${data.firstName} ${data.lastName}`;
             onRowClick(value);
         } else {
             navigate(data.contactuid);
