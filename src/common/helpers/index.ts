@@ -150,11 +150,7 @@ export const parseDateFromServer = (dateString: string | number | undefined | nu
         return dateString;
     }
 
-    if (typeof dateString !== "string") {
-        return 0;
-    }
-
-    if (dateString.trim() === "") {
+    if (typeof dateString !== "string" || dateString.trim() === "") {
         return 0;
     }
 
