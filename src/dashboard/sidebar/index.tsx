@@ -7,16 +7,12 @@ import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ServerUserSettings } from "common/models/user";
-import { testTask } from "http/services/tasks.service";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser, settings, isSettingsLoaded } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings | undefined>(undefined);
-    const toast = useToast();
 
     useEffect(() => {
         if (authUser) {
@@ -68,50 +64,17 @@ export const Sidebar = observer((): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
 
-    const handleTestTask = async () => {
-        if (!authUser) return;
-
-        const result = await testTask(authUser.useruid);
-        if (result?.status === "OK") {
-            toast?.current?.show({
-                severity: "success",
-                summary: "Test Task",
-                detail: "Test task completed successfully!",
-                life: TOAST_LIFETIME,
-            });
-        } else {
-            toast.current?.show({
-                severity: "error",
-                summary: "Test Task Error",
-                detail: result?.error,
-                life: 3000,
-            });
-        }
-    };
-
-    const renderNavItem = (
-        to: string | null,
-        iconClass: string,
-        label: string,
-        onClick?: () => void
-    ): ReactElement => {
-        const itemId = `nav-item-${to?.replace(/\//g, "-")}`;
+    const renderNavItem = (to: string, iconClass: string, label: string): ReactElement => {
+        const itemId = `nav-item-${to.replace(/\//g, "-")}`;
         return (
             <li className='sidebar-nav__item'>
                 {settings.isSidebarCollapsed && (
                     <Tooltip target={`#${itemId}`} content={label} position='right' />
                 )}
-                {to ? (
-                    <Link to={to} id={itemId} className='sidebar-nav__link'>
-                        <div className={`sidebar-nav__icon ${iconClass}`}></div>
-                        {!settings.isSidebarCollapsed && <span>{label}</span>}
-                    </Link>
-                ) : (
-                    <div id={itemId} className='sidebar-nav__link' onClick={onClick}>
-                        <div className={`sidebar-nav__icon ${iconClass}`}></div>
-                        {!settings.isSidebarCollapsed && <span>{label}</span>}
-                    </div>
-                )}
+                <Link to={to} id={itemId} className='sidebar-nav__link'>
+                    <div className={`sidebar-nav__icon ${iconClass}`}></div>
+                    {!settings.isSidebarCollapsed && <span>{label}</span>}
+                </Link>
             </li>
         );
     };
@@ -150,8 +113,6 @@ export const Sidebar = observer((): ReactElement => {
                         {renderNavItem("/dashboard/tasks", "tasks", "Tasks")}
                     </>
                 )}
-                {authUser?.loginname === "testError" &&
-                    renderNavItem(null, "tasks", "Test Error", handleTestTask)}
             </ul>
         </aside>
     );
