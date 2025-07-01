@@ -142,7 +142,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade1_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
@@ -171,7 +171,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade2_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),

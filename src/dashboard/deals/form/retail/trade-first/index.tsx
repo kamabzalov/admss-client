@@ -22,6 +22,7 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { DealExtData } from "common/models/deals";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -119,69 +120,86 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         );
     };
 
+    const handleChangeFormValue = ({
+        key,
+        value,
+    }: {
+        key: keyof DealExtData;
+        value: string | number;
+    }) => {
+        setFieldValue(key, value);
+        changeDealExtData({ key, value });
+    };
+
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo) {
             if (allowOverwrite) {
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Make",
                     value: vinInfo.Make || values.Trade1_Make,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Model",
                     value: vinInfo.Model || values.Trade1_Model,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Year",
                     value: vinInfo.Year || values.Trade1_Year,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_StockNum",
                     value: vinInfo.StockNo || Trade1_StockNum,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_BodyStyle",
                     value: vinInfo.BodyStyle || Trade1_BodyStyle,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Color",
                     value: vinInfo.ExteriorColor || Trade1_Color,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Mileage",
                     value: vinInfo.mileage || Trade1_Mileage,
                 });
             } else {
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Make",
                     value: values.Trade1_Make || vinInfo.Make,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Model",
                     value: values.Trade1_Model || vinInfo.Model,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Year",
                     value: values.Trade1_Year || vinInfo.Year,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_StockNum",
                     value: Trade1_StockNum || vinInfo.StockNo,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_BodyStyle",
                     value: Trade1_BodyStyle || vinInfo.BodyStyle,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Color",
                     value: Trade1_Color || vinInfo.ExteriorColor,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade1_Mileage",
                     value: Trade1_Mileage || vinInfo.mileage,
                 });
             }
-            setFieldValue("Trade1_Make", values.Trade1_Make || vinInfo.Make);
-            setFieldValue("Trade1_Model", values.Trade1_Model || vinInfo.Model);
+            handleChangeFormValue({
+                key: "Trade1_Make",
+                value: values.Trade1_Make || vinInfo.Make,
+            });
+            handleChangeFormValue({
+                key: "Trade1_Model",
+                value: values.Trade1_Model || vinInfo.Model,
+            });
         }
     };
 
