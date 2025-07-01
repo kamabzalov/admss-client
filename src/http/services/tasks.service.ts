@@ -126,3 +126,19 @@ export const setTaskStatus = async (taskuid: string, taskStatus: TaskStatus) => 
         }
     }
 };
+
+export const testTask = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `tasks/${useruid}/test`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while testing task",
+            };
+        }
+    }
+};

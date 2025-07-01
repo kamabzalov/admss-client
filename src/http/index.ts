@@ -1,7 +1,8 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { NavigateFunction } from "react-router-dom";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -22,17 +23,20 @@ export const nonAuthorizedUserApiInstance = axios.create({
     baseURL: APP_API_URL,
 });
 
-const handleErrorResponse = (error: any, navigate: any) => {
+const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
     if (error.response && error.response.status === 401) {
         localStorage.removeItem("useruid");
         navigate("/");
+        return Promise.reject(error.response);
+    } else if (error.response && error.response.status === 500) {
+        navigate("/service-update");
         return Promise.reject(error.response);
     } else {
         return Promise.reject(error);
     }
 };
 
-export function createApiDashboardInstance(navigate: any) {
+export function createApiDashboardInstance(navigate: NavigateFunction) {
     authorizedUserApiInstance = axios.create({
         baseURL: APP_API_URL,
         headers: {
