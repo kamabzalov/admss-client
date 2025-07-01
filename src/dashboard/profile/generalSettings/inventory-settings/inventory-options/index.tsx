@@ -73,7 +73,11 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         }
 
         const isNew = option.itemuid === NEW_ITEM;
-        const response = await setInventoryGroupOption(inventoryGroupID, option);
+        const itemuid = isNew ? "0" : option.itemuid;
+        const response = await setInventoryGroupOption(inventoryGroupID, {
+            ...option,
+            itemuid,
+        });
         if (response?.error || response?.status === Status.ERROR) {
             return toast.current?.show({
                 severity: "error",
