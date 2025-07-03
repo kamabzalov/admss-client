@@ -65,6 +65,12 @@ export const LinksMedia = observer((): ReactElement => {
         }
     }, [formErrorMessage, toast]);
 
+    useEffect(() => {
+        if (!uploadFileLinks?.mediaurl) {
+            setIsUrlValid(true);
+        }
+    }, [uploadFileLinks?.mediaurl]);
+
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileLinks = {
             ...store.uploadFileLinks,
@@ -90,7 +96,7 @@ export const LinksMedia = observer((): ReactElement => {
         };
     };
 
-    const handleUploadLink = () => {
+    const handleUploadLink = async () => {
         if (formErrorMessage) {
             toast.current?.show({
                 severity: "error",
@@ -100,7 +106,15 @@ export const LinksMedia = observer((): ReactElement => {
             return;
         }
 
-        saveInventoryLinks();
+        const result = await saveInventoryLinks();
+        if (!result) {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Link added successfully",
+            });
+            setIsUrlValid(true);
+        }
     };
 
     const handleCopyLink = (url: string) => {
@@ -142,6 +156,7 @@ export const LinksMedia = observer((): ReactElement => {
                 summary: "Success",
                 detail: "Link deleted successfully",
             });
+            await fetchLinks();
         } catch (error) {
             toast.current?.show({
                 severity: "error",
