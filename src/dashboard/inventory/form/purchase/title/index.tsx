@@ -1,8 +1,10 @@
 import { STATES_LIST } from "common/constants/states";
 import { TITLE_STATUS_LIST } from "common/constants/title-status";
+import { InventoryExtData } from "common/models/inventory";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { DateInput } from "dashboard/common/form/inputs";
+import { DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { useFormikContext } from "formik";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
@@ -36,6 +38,7 @@ export const PurchaseTitle = observer((): ReactElement => {
     } = store;
     const location = useLocation();
     const currentPath = location.pathname + location.search;
+    const { setFieldTouched } = useFormikContext<InventoryExtData>();
 
     return (
         <div className='grid purchase-title row-gap-2'>
@@ -148,16 +151,14 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleHolderPhone}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleHolderPhone", value })
-                        }
-                    />
-                    <label className='float-label'>Holder Phone Number</label>
-                </span>
+                <PhoneInput
+                    name='Phone number'
+                    value={titleHolderPhone}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({ key: "titleHolderPhone", value });
+                    }}
+                    onBlur={() => setFieldTouched("titleHolderPhone", true)}
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -235,16 +236,14 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titlePrevPhone}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titlePrevPhone", value })
-                        }
-                    />
-                    <label className='float-label'>Previous Phone Number</label>
-                </span>
+                <PhoneInput
+                    name='Phone number'
+                    value={titlePrevPhone}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({ key: "titlePrevPhone", value });
+                    }}
+                    onBlur={() => setFieldTouched("titlePrevPhone", true)}
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>

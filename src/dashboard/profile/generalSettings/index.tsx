@@ -27,8 +27,10 @@ export const GeneralSettings = observer((): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().generalSettingsStore;
+    const inventoryStore = useStore().inventoryStore;
     const toast = useToast();
     const { isSettingsChanged, saveSettings, getSettings } = store;
+    const { isErasingNeeded } = inventoryStore;
 
     useEffect(() => {
         getSettings();
@@ -122,12 +124,24 @@ export const GeneralSettings = observer((): ReactElement => {
         handleTabChange(newIndex);
     };
 
+    const handleCloseClick = () => {
+        if (store.prevPath) {
+            navigate(store.prevPath);
+            store.prevPath = "";
+            if (!isErasingNeeded) {
+                inventoryStore.isErasingNeeded = true;
+            }
+        } else {
+            navigate(`/dashboard`);
+        }
+    };
+
     return (
         <div className='grid relative general-settings'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate("/dashboard")}
+                onClick={handleCloseClick}
             />
             <div className='col-12'>
                 <div className='card'>

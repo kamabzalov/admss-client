@@ -7,16 +7,21 @@ import { observer } from "mobx-react-lite";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { InventoryOptions, OptionsListData } from "common/models/inventory";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
+
+const OPTION_PATH = "/dashboard/settings?section=inventory-settings&tab=1";
 
 export const VehicleOptions = observer((): ReactElement => {
     const store = useStore().inventoryStore;
+    const generalStore = useStore().generalSettingsStore;
     const toast = useToast();
     const { id } = useParams();
     const navigate = useNavigate();
     const { inventoryGroupID, inventoryOptions, changeInventoryOptions } = store;
     const [options, setOptions] = useState<OptionsListData[]>([]);
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -34,7 +39,7 @@ export const VehicleOptions = observer((): ReactElement => {
     };
 
     const handleGetInventoryOptionsList = async () => {
-        if (!id) return;
+        if (!id || store.isErasingNeeded) return;
         const response = await getInventoryOptions(id);
         if (response?.error) {
             toast.current?.show({
@@ -63,15 +68,19 @@ export const VehicleOptions = observer((): ReactElement => {
         }
     }, [id, inventoryGroupID]);
 
+    const handleNavigateToOptions = () => {
+        store.isErasingNeeded = false;
+        generalStore.prevPath = currentPath;
+        navigate(OPTION_PATH);
+    };
+
     return (
         <div className='grid flex-column vehicle-options'>
             <Button
                 label='Edit options'
                 type='button'
                 className='p-button vehicle-options__button'
-                onClick={() => {
-                    navigate(`/dashboard/settings`);
-                }}
+                onClick={handleNavigateToOptions}
             />
             {!id && !inventoryGroupID && (
                 <p className='vehicle-options__title'>
