@@ -465,6 +465,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 <DateInput
                     date={Trade2_Lien_Payoff_Good_Through}
                     checkbox
+                    checked={!!Trade2_Lien_Payoff_Good_Through}
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({
@@ -472,6 +473,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                             value: Number(value),
                         })
                     }
+                    emptyDate
+                    checkboxWithLabel
                     name='PO Good Thru'
                 />
             </div>

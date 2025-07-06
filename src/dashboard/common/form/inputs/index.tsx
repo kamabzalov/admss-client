@@ -50,6 +50,7 @@ interface DateInputProps extends CalendarProps {
     date?: number | Date | string;
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
+    checkboxWithLabel?: boolean;
     emptyDate?: boolean;
     clearButton?: boolean;
     floatLabel?: boolean;
@@ -274,6 +275,7 @@ export const DateInput = ({
     name,
     value,
     checkbox,
+    checkboxWithLabel,
     colWidth,
     emptyDate,
     clearButton,
@@ -290,9 +292,15 @@ export const DateInput = ({
     useEffect(() => {
         if (date !== undefined && date !== null && !isNaN(Number(date)) && Number(date) !== 0) {
             setInnerDate(new Date(Number(date)));
-        } else if (value !== undefined && value !== null && value !== "" && !isNaN(Number(value))) {
+        } else if (
+            value !== undefined &&
+            value !== null &&
+            value !== "" &&
+            !isNaN(Number(value)) &&
+            Number(value) !== 0
+        ) {
             setInnerDate(new Date(Number(value)));
-        } else if (!emptyDate) {
+        } else if (!emptyDate && !checkbox) {
             setInnerDate(new Date());
         } else {
             setInnerDate(null);
@@ -321,7 +329,9 @@ export const DateInput = ({
                 innerDate ? "date-item--filled" : "date-item--empty"
             }`}
         >
-            {!isChecked && floatLabel && (
+            {((!checkbox && floatLabel) ||
+                (checkbox && !isChecked && floatLabel) ||
+                (checkbox && checkboxWithLabel && isChecked)) && (
                 <label
                     htmlFor={uniqueId}
                     className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
@@ -334,7 +344,14 @@ export const DateInput = ({
                     <Checkbox
                         className='date-item__checkbox'
                         checked={isChecked}
-                        onChange={() => setIsChecked(!isChecked)}
+                        onChange={() => {
+                            setIsChecked(!isChecked);
+                            if (!isChecked) {
+                                setInnerDate(new Date());
+                            } else {
+                                setInnerDate(null);
+                            }
+                        }}
                     />
                 )}
                 <Calendar

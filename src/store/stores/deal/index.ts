@@ -335,6 +335,13 @@ export class DealStore {
             );
         } catch (error) {
             const err = error as AxiosError;
+            if (err?.response?.status === 500) {
+                const responseData = err?.response?.data as BaseResponseError;
+                return {
+                    status: Status.ERROR,
+                    error: responseData?.error,
+                };
+            }
             return {
                 status: Status.ERROR,
                 error: err?.message,
