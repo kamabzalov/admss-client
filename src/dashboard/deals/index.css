@@ -197,3 +197,20 @@
         padding-right: 20px;
     }
 }
+
+.deal-close-modal {
+    .confirm-header__icon {
+        font-size: 6rem;
+        padding-top: 0;
+        padding-bottom: 28px;
+    }
+    .p-dialog-content {
+        padding-top: 32px;
+    }
+    .p-dialog-footer {
+        .p-button {
+            height: 60px;
+            width: 130px;
+        }
+    }
+}

@@ -193,3 +193,33 @@ export const deleteMediaImage = async (itemuid: string) => {
         }
     }
 };
+
+export const getMediaWatermarkingPreview = async (inventoryuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.get(
+            `media/${inventoryuid}/watermarkpreview`,
+            { responseType: "blob" }
+        );
+        if (response.status === 200) {
+            const dataUrl = await new Promise<string>((resolve) => {
+                const reader = new window.FileReader();
+                reader.addEventListener("load", (event) => {
+                    resolve(event.target?.result as string);
+                });
+                reader.readAsDataURL(response.data);
+            });
+            return {
+                status: Status.OK,
+                data: dataUrl,
+            };
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while getting media watermarking preview",
+            };
+        }
+    }
+};

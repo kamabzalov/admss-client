@@ -62,6 +62,13 @@ export const ImagesMedia = observer((): ReactElement => {
     }, []);
 
     useEffect(() => {
+        if (images.length !== imagesChecked.length) {
+            const newCheckedState = new Array(images.length).fill(true);
+            setImagesChecked(newCheckedState);
+        }
+    }, [images.length]);
+
+    useEffect(() => {
         if (formErrorMessage) {
             toast.current?.show({
                 severity: "error",

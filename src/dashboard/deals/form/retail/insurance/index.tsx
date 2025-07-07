@@ -3,7 +3,12 @@ import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InputText } from "primereact/inputtext";
-import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import {
+    BorderedCheckbox,
+    CurrencyInput,
+    DateInput,
+    PhoneInput,
+} from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
@@ -138,17 +143,16 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     <label className='float-label'>Agent's Address</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={Agent_Phone_No}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Agent_Phone_No", value });
-                        }}
-                        className='deal-insurance__text-input w-full'
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
+
+            <div className='col-3 relative'>
+                <PhoneInput
+                    name='Phone Number'
+                    value={Agent_Phone_No}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Agent_Phone_No", value: value ?? "" });
+                    }}
+                    id='Agent_Phone_No'
+                />
             </div>
 
             <hr className='form-line' />

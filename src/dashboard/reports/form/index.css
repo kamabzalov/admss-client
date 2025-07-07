@@ -20,7 +20,8 @@
     max-height: 70vh;
     display: flex;
     justify-content: space-between;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
     .p-tree {
         flex: 0 0 30%;
@@ -44,7 +45,7 @@
                         content: "";
                         position: absolute;
                         top: 1.05rem;
-                        left: -1.5rem;
+                        left: -0.6rem;
                         width: 9px;
                         height: 9px;
                         border: 2px solid var(--admss-app-main-blue);

@@ -387,7 +387,7 @@ export const setInventoryPaymentBack = async (
     inventoryPayment: Partial<InventoryPaymentBack>
 ) => {
     try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `inventory/${inventoryuid}/paymentpack`,
             inventoryPayment
         );
@@ -399,6 +399,42 @@ export const setInventoryPaymentBack = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error on set inventory expense",
+            };
+        }
+    }
+};
+
+export const deleteInventoryMake = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${itemuid}/deletemake`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on delete inventory make",
+            };
+        }
+    }
+};
+
+export const deleteInventoryModel = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${itemuid}/deletemodel`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on delete inventory model",
             };
         }
     }

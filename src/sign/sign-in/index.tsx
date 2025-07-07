@@ -5,13 +5,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
 import { auth } from "http/services/auth.service";
-import { setKey } from "services/local-storage.service";
 import { useState } from "react";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { APP_TYPE, APP_VERSION } from "http/index";
 import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
+import { useStore } from "store/hooks";
 
 export interface LoginForm {
     username: string;
@@ -24,6 +23,7 @@ export interface LoginForm {
 export const SignIn = () => {
     const navigate = useNavigate();
     const toast = useToast();
+    const userStore = useStore().userStore;
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
     const formik = useFormik<LoginForm>({
@@ -55,8 +55,18 @@ export const SignIn = () => {
                         await Promise.reject(new Error("Invalid credentials"));
                         return;
                     }
-                    setKey(LS_APP_USER, JSON.stringify(response));
-                    navigate("/dashboard");
+                    try {
+                        userStore.storedUser = response;
+                        navigate("/dashboard");
+                    } catch (error) {
+                        toast.current?.show({
+                            severity: "error",
+                            life: TOAST_LIFETIME,
+                            summary: Status.ERROR,
+                            detail: String(error),
+                        });
+                        return;
+                    }
                 } else {
                     toast.current?.show({
                         severity: "error",

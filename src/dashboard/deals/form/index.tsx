@@ -27,6 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
@@ -79,6 +80,7 @@ const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
         "SaleID",
     ],
     [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num"],
     [AccordionDealItems.FIRST_TRADE]: [
         "Trade1_Make",
         "Trade1_Model",
@@ -115,7 +117,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
-    First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+    First_Lien_Phone_Num: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -140,11 +142,11 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade1_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade1_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -169,11 +171,11 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade2_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade2_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -224,6 +226,7 @@ export const DealsForm = observer(() => {
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const [confirmCloseVisible, setConfirmCloseVisible] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -318,6 +321,18 @@ export const DealsForm = observer(() => {
         }
     }, [stepActiveIndex, printActiveIndex, accordionSteps]);
 
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (isFormChanged) {
+                event.preventDefault();
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isFormChanged]);
+
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
@@ -341,14 +356,29 @@ export const DealsForm = observer(() => {
                     });
                 });
                 setErrorSections(currentSectionsWithErrors);
+
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
                     life: TOAST_LIFETIME,
                 });
             }
         });
+    };
+
+    const handleCloseForm = () => {
+        if (isFormChanged) {
+            setConfirmCloseVisible(true);
+        } else {
+            navigate("/dashboard/deals");
+        }
     };
 
     return isLoading ? (
@@ -359,7 +389,7 @@ export const DealsForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/deals")}
+                    onClick={handleCloseForm}
                 />
                 <div className='col-12'>
                     <div className='card deal'>
@@ -585,7 +615,7 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/deals`);
+                                            return handleCloseForm();
                                         }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
@@ -658,6 +688,7 @@ export const DealsForm = observer(() => {
             </div>
             {confirmDeleteVisible && (
                 <ConfirmModal
+                    position='top'
                     visible={confirmDeleteVisible}
                     className='deal-delete-modal'
                     acceptLabel='Delete'
@@ -665,6 +696,20 @@ export const DealsForm = observer(() => {
                     bodyMessage={deleteMessage}
                     confirmAction={() => setIsDeleteConfirm(true)}
                     onHide={() => setConfirmDeleteVisible(false)}
+                />
+            )}
+            {confirmCloseVisible && (
+                <ConfirmModal
+                    visible={confirmCloseVisible}
+                    position='top'
+                    title='Quit Editing?'
+                    icon='adms-warning'
+                    className='deal-close-modal'
+                    acceptLabel='Confirm'
+                    rejectLabel='Cancel'
+                    bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
+                    confirmAction={() => navigate("/dashboard/deals")}
+                    onHide={() => setConfirmCloseVisible(false)}
                 />
             )}
         </Suspense>

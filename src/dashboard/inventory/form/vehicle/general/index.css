@@ -56,3 +56,28 @@
     font-size: 14px;
     color: var(--admss-app-main-blue);
 }
+
+.vehicle-general__panel {
+    .p-autocomplete-items .p-autocomplete-item {
+        padding-right: 10px;
+        &:hover {
+            background-color: var(--admss-app-light-green);
+        }
+    }
+}
+
+.inventory-makes {
+    .inventory-makes__delete-button {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        margin-left: auto;
+        .p-button-icon {
+            font-size: 12px;
+            color: var(--admss-app-medium-grey);
+        }
+    }
+}

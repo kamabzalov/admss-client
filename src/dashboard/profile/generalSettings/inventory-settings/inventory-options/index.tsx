@@ -10,15 +10,16 @@ import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
 import { GeneralInventoryOptions } from "common/models/general-settings";
 import { NEW_ITEM, InventoryOptionRow, HeaderColumn } from "./template";
-import { Layout, Responsive, WidthProvider } from "react-grid-layout";
+import { Layout, Responsive, ResponsiveProps, WidthProvider } from "react-grid-layout";
 import {
     deleteInventoryGroupOption,
     restoreInventoryGroupDefaults,
     setInventoryGroupOption,
 } from "http/services/settings.service";
 import { Loader } from "dashboard/common/loader";
+import { Status } from "common/models/base-response";
 
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+const ResponsiveReactGridLayout = WidthProvider<ResponsiveProps>(Responsive);
 
 export const SettingsInventoryOptions = observer((): ReactElement => {
     const toast = useToast();
@@ -30,6 +31,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         []
     );
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
+    const [layoutKey, setLayoutKey] = useState(false);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -52,53 +54,48 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     }, [inventoryGroupID]);
 
     const handleSaveOption = async (option: Partial<GeneralInventoryOptions>) => {
-        setIsLoading(true);
         if (!option.name) {
-            toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
+            return toast.current?.show({
+                severity: "error",
+                summary: "Error",
                 detail: "Option name is required",
                 life: TOAST_LIFETIME,
             });
-            return;
         }
 
         if (!option.itemuid) {
-            toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
+            return toast.current?.show({
+                severity: "error",
+                summary: "Error",
                 detail: "Option UID is required",
                 life: TOAST_LIFETIME,
             });
-            return;
         }
 
-        try {
-            const isNew = option.itemuid === NEW_ITEM;
-            const response = await setInventoryGroupOption(inventoryGroupID, option);
-            if (response?.error) {
-                return Promise.reject(response.error);
-            }
-
-            await handleGetInventoryOptionsGroupList();
-            setEditedItem({});
-
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: isNew ? "Option created successfully" : "Option updated successfully",
-                life: TOAST_LIFETIME,
-            });
-        } catch (error) {
-            toast.current?.show({
+        const isNew = option.itemuid === NEW_ITEM;
+        const itemuid = isNew ? "0" : option.itemuid;
+        const response = await setInventoryGroupOption(inventoryGroupID, {
+            ...option,
+            itemuid,
+        });
+        if (response?.error || response?.status === Status.ERROR) {
+            return toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: `Failed to ${option.itemuid === NEW_ITEM ? "create" : "update"} option`,
+                detail: response?.error,
                 life: TOAST_LIFETIME,
             });
-        } finally {
-            setIsLoading(false);
         }
+
+        await handleGetInventoryOptionsGroupList();
+        setEditedItem({});
+
+        toast.current?.show({
+            severity: "success",
+            summary: "Success",
+            detail: `Option ${isNew ? "created" : "updated"} successfully`,
+            life: TOAST_LIFETIME,
+        });
     };
 
     const handleDeleteOption = async (optionuid: string) => {
@@ -157,22 +154,15 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             return item;
         });
 
-        try {
-            const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
-            if (response?.error) {
-                return Promise.reject(response.error);
-            }
-
-            await handleGetInventoryOptionsGroupList();
-        } catch (error) {
-            const errorMessage =
-                error instanceof Error ? error.message : "Failed to update options order";
+        const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
+        if (response?.error || response?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: errorMessage,
+                detail: response?.error,
                 life: TOAST_LIFETIME,
             });
+            return handleGetInventoryOptionsGroupList();
         }
     };
 
@@ -208,13 +198,29 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             return a.x - b.x;
         });
 
+        const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
+
+        if (oldItem.x === 0 && newItem.x === 1) {
+            const firstSecondColumnItem = sortedLayout.find((item) => item.x === 1 && item.y === 0);
+
+            if (firstSecondColumnItem) {
+                firstSecondColumnItem.x = 0;
+                firstSecondColumnItem.y = itemsPerColumn - 1;
+
+                sortedLayout.forEach((item) => {
+                    if (item.x === 1 && item.y > 0) {
+                        item.y -= 1;
+                    }
+                });
+            }
+        }
+
         const updatedOptions = sortedLayout
             .map((layoutItem) => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
                 if (!originalItem) return null;
 
                 const isFirstColumn = layoutItem.x === 0;
-                const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
                 const baseOrder = isFirstColumn ? 0 : itemsPerColumn;
                 const order = baseOrder + layoutItem.y;
 
@@ -227,8 +233,15 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
 
         try {
             const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
-            if (response?.error) {
-                return Promise.reject(response.error);
+            if (response?.error || response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response?.error,
+                    life: TOAST_LIFETIME,
+                });
+                setLayoutKey(!layoutKey);
+                return handleGetInventoryOptionsGroupList();
             }
 
             await handleGetInventoryOptionsGroupList();
@@ -241,6 +254,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 detail: errorMessage,
                 life: TOAST_LIFETIME,
             });
+            setLayoutKey(!layoutKey);
         } finally {
             setIsLoading(false);
         }
@@ -327,9 +341,9 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                     </div>
                                 ))}
                         </div>
-                        {}
                         <div className='inventory-content'>
                             <ResponsiveReactGridLayout
+                                key={layoutKey.toString()}
                                 className='layout relative'
                                 layouts={layouts}
                                 cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 1 }}

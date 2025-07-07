@@ -22,7 +22,7 @@ import { ContactMediaData } from "./media-data";
 import { DeleteForm } from "./delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
-import { LETTERS_ONLY_REGEX } from "common/constants/regex";
+import { LETTERS_ONLY_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -108,20 +108,20 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     email2: Yup.string().email("Invalid email address."),
     phone1: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
-        .matches(/^[\d]{10,13}$/, {
+        .matches(PHONE_NUMBER_REGEX, {
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
     phone2: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
-        .matches(/^[\d]{10,13}$/, {
+        .matches(PHONE_NUMBER_REGEX, {
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
     Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
     Buyer_Emp_Phone: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
-        .matches(/^[\d]{10,13}$/, {
+        .matches(PHONE_NUMBER_REGEX, {
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),

@@ -10,14 +10,13 @@ import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
 import { ContactsDataTable } from "dashboard/contacts";
 
-const FIELD: keyof ContactUser = "userName";
+const FIELD: keyof ContactUser = "companyName";
 
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
     returnedField?: keyof ContactUser;
-    onChangeGetFullInfo?: (contact: ContactUser) => void;
     getFullInfo?: (contact: ContactUser) => void;
 }
 
@@ -30,7 +29,6 @@ export const CompanySearch = ({
     originalPath,
     returnedField,
     getFullInfo,
-    onChangeGetFullInfo,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -64,7 +62,14 @@ export const CompanySearch = ({
         user &&
             getContacts(user.useruid, params).then((response) => {
                 if (response?.length) {
-                    setOptions(response);
+                    const optionsWithName = response.map((contact) => ({
+                        ...contact,
+                        name:
+                            contact.companyName ||
+                            contact.businessName ||
+                            `${contact.firstName} ${contact.lastName}`,
+                    }));
+                    setOptions(optionsWithName);
                 } else {
                     setOptions([]);
                 }
@@ -86,15 +91,12 @@ export const CompanySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={onChangeGetFullInfo ? undefined : returnedField || FIELD}
-                optionLabel={FIELD}
+                optionValue={returnedField || FIELD}
+                optionLabel='name'
                 options={options}
                 onInputChange={handleCompanyInputChange}
                 value={value}
-                onChange={(event) => {
-                    onChangeGetFullInfo && onChangeGetFullInfo(event.target.value);
-                    onChange && onChange(event);
-                }}
+                onChange={onChange}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}

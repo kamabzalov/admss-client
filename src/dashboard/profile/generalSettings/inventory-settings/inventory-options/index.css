@@ -1,4 +1,6 @@
 .general-inventory-option {
+    height: 460px;
+    overflow: scroll;
     .react-grid-item.react-grid-placeholder {
         background-color: var(--admss-app-lightest-grey);
         z-index: 1;
@@ -126,6 +128,7 @@
                 justify-content: center;
                 width: 35px;
                 height: 35px;
+                z-index: 2;
             }
         }
         .row-edit__input {

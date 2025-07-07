@@ -14,7 +14,7 @@ import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { PartialDeal } from "dashboard/deals/form";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -22,6 +22,7 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { DealExtData } from "common/models/deals";
 
 export const DealRetailTradeSecond = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -40,12 +41,13 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             Trade2_Lien_Payoff_Good_Through,
             Trade2_Lien_Name,
             Trade2_Lien_Contact,
+            Trade2_Lien_Phone,
         },
         deal: { addToInventory },
         changeDeal,
         changeDealExtData,
     } = store;
-    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
+    const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -118,70 +120,105 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
         );
     };
 
+    const handleChangeFormValue = ({
+        key,
+        value,
+    }: {
+        key: keyof DealExtData;
+        value: string | number;
+    }) => {
+        setFieldValue(key, value);
+        changeDealExtData({ key, value });
+    };
+
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo) {
             if (allowOverwrite) {
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Make",
                     value: vinInfo.Make || values.Trade2_Make,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Model",
                     value: vinInfo.Model || values.Trade2_Model,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Year",
                     value: vinInfo.Year || values.Trade2_Year,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_StockNum",
                     value: vinInfo.StockNo || Trade2_StockNum,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_BodyStyle",
                     value: vinInfo.BodyStyle || Trade2_BodyStyle,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Color",
                     value: vinInfo.ExteriorColor || Trade2_Color,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Mileage",
                     value: vinInfo.mileage || Trade2_Mileage,
                 });
             } else {
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Make",
                     value: values.Trade2_Make || vinInfo.Make,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Model",
                     value: values.Trade2_Model || vinInfo.Model,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Year",
                     value: values.Trade2_Year || vinInfo.Year,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_StockNum",
                     value: Trade2_StockNum || vinInfo.StockNo,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_BodyStyle",
                     value: Trade2_BodyStyle || vinInfo.BodyStyle,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Color",
                     value: Trade2_Color || vinInfo.ExteriorColor,
                 });
-                changeDealExtData({
+                handleChangeFormValue({
                     key: "Trade2_Mileage",
                     value: Trade2_Mileage || vinInfo.mileage,
                 });
             }
+            handleChangeFormValue({
+                key: "Trade2_Make",
+                value: values.Trade2_Make || vinInfo.Make,
+            });
+            handleChangeFormValue({
+                key: "Trade2_Model",
+                value: values.Trade2_Model || vinInfo.Model,
+            });
         }
     };
 
+    const handleMakeChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade2_Make", value);
+            changeDealExtData({ key: "Trade2_Make", value });
+            setAutomakesModelList([]);
+        },
+        [setFieldValue, changeDealExtData]
+    );
+
+    const handleModelChange = useCallback(
+        (value: string) => {
+            setFieldValue("Trade2_Model", value);
+            changeDealExtData({ key: "Trade2_Model", value });
+        },
+        [setFieldValue, changeDealExtData]
+    );
     return (
         <div className='grid deal-retail-trade row-gap-2'>
             <div className='col-12'>
@@ -215,10 +252,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     value={values.Trade2_Make}
                     required
                     options={automakesList}
-                    onChange={({ value }) => {
-                        setFieldValue("Trade2_Make", value);
-                        changeDealExtData({ key: "Trade2_Make", value });
-                    }}
+                    onChange={({ value }) => handleMakeChange(value)}
+                    editable
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     className={`deal-trade__dropdown w-full ${
@@ -235,12 +270,9 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={values.Trade2_Model}
-                    editable={!automakesModelList.length}
+                    editable
                     options={automakesModelList}
-                    onChange={({ value }) => {
-                        setFieldValue("Model", value);
-                        changeDealExtData({ key: "Trade2_Model", value });
-                    }}
+                    onChange={({ value }) => handleModelChange(value)}
                     className={`deal-trade__dropdown w-full ${errors.Trade2_Model ? "p-invalid" : ""}`}
                     label='Model (required)'
                 />
@@ -433,6 +465,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 <DateInput
                     date={Trade2_Lien_Payoff_Good_Through}
                     checkbox
+                    checked={!!Trade2_Lien_Payoff_Good_Through}
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({
@@ -440,6 +473,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                             value: Number(value),
                         })
                     }
+                    emptyDate
+                    checkboxWithLabel
                     name='PO Good Thru'
                 />
             </div>
@@ -468,31 +503,27 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                             errors.Trade2_Lien_Address ? "p-invalid" : ""
                         }`}
                         value={values.Trade2_Lien_Address}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade2_Lien_Address", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Trade2_Lien_Address", value);
+                            setFieldTouched("Trade2_Lien_Address", true);
                             changeDealExtData({ key: "Trade2_Lien_Address", value });
                         }}
+                        onBlur={() => setFieldTouched("Trade2_Lien_Address", true, true)}
                     />
                     <label className='float-label'>Mailing address</label>
                 </span>
                 <small className='p-error'>{errors.Trade2_Lien_Address}</small>
             </div>
 
-            <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-trade__text-input w-full' ${
-                            errors.Trade2_Lien_Phone ? "p-invalid" : ""
-                        }`}
-                        value={values.Trade2_Lien_Phone}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade2_Lien_Phone", value);
-                            changeDealExtData({ key: "Trade2_Lien_Phone", value });
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-                <small className='p-error'>{errors.Trade2_Lien_Phone}</small>
+            <div className='col-3'>
+                <PhoneInput
+                    name='Phone Number'
+                    value={Trade2_Lien_Phone}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("Trade2_Lien_Phone", value.replace(/[^0-9]/g, ""));
+                        changeDealExtData({ key: "Trade2_Lien_Phone", value: value ?? "" });
+                    }}
+                />
             </div>
             <div className='col-6'>
                 <CompanySearch

@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import { convertToStandardTimestamp } from "common/helpers";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
@@ -310,6 +311,8 @@ export class DealStore {
             this._isLoading = true;
             const dealData: Deal = {
                 ...this.filterOutTimestampKeys(this._deal),
+                datepurchase: convertToStandardTimestamp(this._deal.datepurchase),
+                dateeffective: convertToStandardTimestamp(this._deal.dateeffective),
                 extdata: this.filterOutTimestampKeys(this._dealExtData),
                 finance: this.filterOutTimestampKeys(this._dealFinances),
             };
@@ -332,6 +335,13 @@ export class DealStore {
             );
         } catch (error) {
             const err = error as AxiosError;
+            if (err?.response?.status === 500) {
+                const responseData = err?.response?.data as BaseResponseError;
+                return {
+                    status: Status.ERROR,
+                    error: responseData?.error,
+                };
+            }
             return {
                 status: Status.ERROR,
                 error: err?.message,
