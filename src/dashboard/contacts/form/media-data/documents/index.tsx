@@ -8,6 +8,7 @@ import {
     FileUploadUploadEvent,
     ItemTemplateOptions,
     FileUploadHeaderTemplateOptions,
+    FileUploadSelectEvent,
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
@@ -24,12 +25,20 @@ export const ContactsDocuments = observer((): ReactElement => {
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
-    const onTemplateUpload = (e: FileUploadUploadEvent) => {
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {
         setTotalCount(e.files.length);
     };
 
-    const onTemplateRemove = (file: File, callback: Function) => {
+    const onTemplateUpload = (e: FileUploadUploadEvent) => {
+        setTotalCount(0);
+    };
+
+    const onTemplateRemove = (_: File, callback: Function) => {
         callback();
+        if (fileUploadRef.current) {
+            const files = fileUploadRef.current.getFiles ? fileUploadRef.current.getFiles() : [];
+            setTotalCount(files.length - 1);
+        }
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -121,6 +130,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 accept='document/*'
                 maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
+                onSelect={onTemplateSelect}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("documents")}

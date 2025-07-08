@@ -30,6 +30,7 @@ export class ContactStore {
     private _contactProspect: Partial<ContactProspect>[] = [];
     private _contactID: string = "";
     private _contactOFAC: ContactOFAC = {} as ContactOFAC;
+    private _coBuyerContactOFAC: ContactOFAC = {} as ContactOFAC;
     protected _isLoading = false;
     private _frontSiteDLurl: string = "";
     private _backSiteDLurl: string = "";
@@ -104,6 +105,10 @@ export class ContactStore {
 
     public get contactOFAC() {
         return this._contactOFAC;
+    }
+
+    public get coBuyerContactOFAC() {
+        return this._coBuyerContactOFAC;
     }
 
     public get deleteReason() {
@@ -470,6 +475,10 @@ export class ContactStore {
         this._contactOFAC = state;
     }
 
+    public set coBuyerContactOFAC(state: ContactOFAC) {
+        this._coBuyerContactOFAC = state;
+    }
+
     public set deleteReason(state: string) {
         this._deleteReason = state;
     }
@@ -509,6 +518,8 @@ export class ContactStore {
         this._coBuyerFrontSideDL = {} as File;
         this._coBuyerBackSideDL = {} as File;
         this._contactExtData = {} as ContactExtData;
+        this._contactOFAC = {} as ContactOFAC;
+        this._coBuyerContactOFAC = {} as ContactOFAC;
         this._deleteReason = "";
     };
 }

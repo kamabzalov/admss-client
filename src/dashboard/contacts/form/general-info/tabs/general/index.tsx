@@ -27,7 +27,7 @@ import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 
-const enum TOOLTIP_MESSAGE {
+export const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
     BUSINESS = "You can input either a person or a business name. If you entered a personal data but intended to enter business name, clear the personal data fields, and the field for entering business name will become active.",
     ONLY_BUSINESS = "The type of contact you have selected requires entering only the business name",
@@ -42,18 +42,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const {
-        contact,
-        contactExtData,
-        contactFullInfo,
-        contactType,
-        changeContact,
-        changeContactExtData,
-    } = store;
+    const { contact, contactExtData, contactType, changeContact, changeContactExtData } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, values, validateField, setFieldValue } = useFormikContext<Contact>();
+    const { errors, values, validateField, setFieldValue, setFieldTouched } =
+        useFormikContext<Contact>();
 
     const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
     const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
@@ -138,6 +132,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     ["Buyer_Date_Of_Birth", dobTimestamp],
                     ["Buyer_DL_Exp_Date", expTimestamp],
                 ]);
+
+                if (firstName || lastName || middleName) {
+                    setFieldValue("businessName", "");
+                    changeContact("businessName", "");
+                }
             } else {
                 const fieldsToUpdate = {
                     firstName,
@@ -173,6 +172,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 !!updates.length && changeContact(updates);
                 !!extDataUpdates.length && changeContactExtData(extDataUpdates);
             }
+            handleOfacCheck();
         } catch (error) {
             toast.current?.show({
                 severity: "error",
@@ -262,10 +262,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     }, [shouldDisableBusinessName, contact.type]);
 
     const handleOfacCheck = () => {
-        if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
+        if (!contact?.firstName || !contact.lastName) {
             return;
         }
-        checkContactOFAC(id, { ...contactFullInfo }).then((response) => {
+        checkContactOFAC(id, { ...contact, extdata: contactExtData }).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
@@ -387,6 +387,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                 setFieldValue("middleName", value, true).then(() => {
                                     changeContact("middleName", value);
                                     validateField("middleName");
+                                    setFieldTouched("middleName", true, true);
                                 });
                             }}
                             tooltip={

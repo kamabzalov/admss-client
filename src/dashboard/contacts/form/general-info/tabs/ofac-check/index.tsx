@@ -5,7 +5,7 @@ import { ReactElement, useMemo, useState } from "react";
 import "./index.css";
 import { useParams } from "react-router-dom";
 import { checkContactOFAC } from "http/services/contacts-service";
-import { ContactOFAC, OFAC_CHECK_STATUS } from "common/models/contact";
+import { Contact, ContactOFAC, OFAC_CHECK_STATUS } from "common/models/contact";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
@@ -25,7 +25,7 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
     const { id } = useParams();
     const toast = useToast();
     const store = useStore().contactStore;
-    const { contactOFAC, contact, contactFullInfo } = store;
+    const { contactOFAC, contact, contactFullInfo, contactExtData } = store;
     const [dialogShow, setDialogShow] = useState<boolean>(false);
 
     const isControlDisabled = useMemo(
@@ -33,23 +33,40 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
         [type, contact.type]
     );
 
-    const handleOfacCheck = () => {
-        checkContactOFAC(id, contactFullInfo).then((response) => {
-            if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                const ofac = response as ContactOFAC;
-                if (ofac?.check_status === OFAC_CHECK_STATUS.FAILED) {
-                    setDialogShow(true);
-                }
-                store.contactOFAC = response as ContactOFAC;
+    const handleOfacCheck = async () => {
+        let contactData: Partial<Contact> = {} as Contact;
+        if (type === GENERAL_CONTACT_TYPE.CO_BUYER) {
+            contactData = {
+                firstName: contactExtData.CoBuyer_First_Name,
+                lastName: contactExtData.CoBuyer_Last_Name,
+                middleName: contactExtData.CoBuyer_Middle_Name,
+                ZIP: contactExtData.CoBuyer_Emp_Zip,
+                city: contactExtData.CoBuyer_Emp_City,
+                streetAddress: contactExtData.CoBuyer_Emp_Address,
+                state: contactExtData.CoBuyer_Emp_State,
+                sex: contactExtData.CoBuyer_Sex,
+                dl_number: contactExtData.CoBuyer_Driver_License_Num,
+                dob: contactExtData.CoBuyer_Date_Of_Birth,
+                exp: contactExtData.CoBuyer_DL_Exp_Date,
+            };
+        } else {
+            contactData = contactFullInfo;
+        }
+        const response = await checkContactOFAC(id, contactData as Contact);
+        if (response?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            const ofac = response as ContactOFAC;
+            if (ofac?.check_status === OFAC_CHECK_STATUS.FAILED) {
+                setDialogShow(true);
             }
-        });
+            store.contactOFAC = response as ContactOFAC;
+        }
     };
 
     return (
