@@ -262,7 +262,13 @@ export class GeneralSettingsStore {
                     return watermarkResult;
                 }
             }
-            const response = await updateUserGeneralSettings(this._settings);
+            const filteredSettings = Object.fromEntries(
+                Object.entries(this._settings).filter(
+                    ([key]) => !["itemuid", "index", "created", "updated", "status"].includes(key)
+                )
+            );
+
+            const response = await updateUserGeneralSettings(filteredSettings);
             if (response?.status === Status.ERROR) {
                 return response;
             }

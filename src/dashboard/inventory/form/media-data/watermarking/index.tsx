@@ -28,8 +28,8 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         changePostProcessing,
         restoreDefaultSettings,
     } = settingsStore;
-    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-    const [hasChanges, setHasChanges] = useState(false);
+    const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
 
     useEffect(() => {
         if (id) {
