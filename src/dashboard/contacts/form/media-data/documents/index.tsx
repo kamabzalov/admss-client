@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
@@ -12,33 +12,103 @@ import {
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
-import { MediaLimitations } from "common/models/inventory";
+import { useStore } from "store/hooks";
+import { Image } from "primereact/image";
+import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { useToast } from "dashboard/common/toast";
+import { ContactDocumentsLimitations } from "common/models/contact";
 
-const limitations: MediaLimitations = {
+const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
     maxSize: 8,
     maxUpload: 16,
+    maxUploadedDocuments: 50,
 };
 
 export const ContactsDocuments = observer((): ReactElement => {
+    const store = useStore().contactStore;
+    const toast = useToast();
+    const {
+        saveContactDocuments,
+        uploadFileDocuments,
+        documents,
+        isLoading,
+        removeContactMedia,
+        fetchDocuments,
+        clearContactMedia,
+        formErrorMessage,
+    } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
+    useEffect(() => {
+        fetchDocuments();
+
+        return () => {
+            clearContactMedia();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
+    }, [formErrorMessage, toast]);
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileDocuments = {
+            ...store.uploadFileDocuments,
+            data: {
+                ...store.uploadFileDocuments.data,
+                notes: e.target.value,
+            },
+        };
+    };
+
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
+        store.uploadFileDocuments = {
+            ...store.uploadFileDocuments,
+            file: e.files,
+        };
         setTotalCount(e.files.length);
     };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
-        setTotalCount(0);
+        setTotalCount(e.files.length);
     };
 
-    const onTemplateRemove = (_: File, callback: Function) => {
+    const onTemplateRemove = (file: File, callback: Function) => {
+        const newFiles = {
+            file: uploadFileDocuments.file.filter((item) => item.name !== file.name),
+            data: uploadFileDocuments.data,
+        };
+        store.uploadFileDocuments = newFiles;
+        setTotalCount(newFiles.file.length);
         callback();
-        if (fileUploadRef.current) {
-            const files = fileUploadRef.current.getFiles ? fileUploadRef.current.getFiles() : [];
-            setTotalCount(files.length - 1);
+    };
+
+    const handleUploadFiles = () => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
         }
+        saveContactDocuments().then((res) => {
+            if (res) {
+                fileUploadRef.current?.clear();
+            }
+        });
+    };
+
+    const handleDeleteDocument = (mediauid: string) => {
+        removeContactMedia(mediauid, fetchDocuments);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -124,42 +194,94 @@ export const ContactsDocuments = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
+            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
                 accept='document/*'
                 maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
-                onSelect={onTemplateSelect}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("documents")}
+                onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12 mb-4'
+                className='col-12'
             />
-            <div className='col-9 media-input'>
+            <div className='col-12 mt-4 media-input'>
                 <InputText
-                    className='media-input__text w-full'
-                    onChange={() => {}}
+                    className='media-input__text'
                     placeholder='Comment'
+                    value={uploadFileDocuments?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
                 />
-            </div>
-            <div className='col-3'>
                 <Button
                     severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount}
-                    className='p-button media-input__button w-full'
+                    disabled={!totalCount || isLoading}
+                    className='p-button media-input__button'
+                    onClick={handleUploadFiles}
+                    type='button'
                 >
                     Save
                 </Button>
             </div>
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded documents</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        documents?.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({documents?.length || 0}/{limitations.maxUploadedDocuments})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
-                <div className='w-full text-center'>No documents added yet.</div>
+                {documents?.length ? (
+                    documents.map(({ itemuid, src, notes, created }, index: number) => {
+                        return (
+                            <div key={itemuid} className='media-documents__item'>
+                                <Image
+                                    src={src}
+                                    alt='contact-document'
+                                    width='75'
+                                    height='75'
+                                    pt={{
+                                        image: {
+                                            className: "media-documents__image",
+                                        },
+                                    }}
+                                />
+                                <div className='media-documents__info document-info'>
+                                    <div className='document-info__item'>
+                                        <span className='document-info__icon'>
+                                            <span className='document-info__icon'>
+                                                <i className='pi pi-comment' />
+                                            </span>
+                                        </span>
+                                        <span className='document-info__text'>{notes}</span>
+                                    </div>
+                                    <div className='document-info__item'>
+                                        <span className='document-info__icon'>
+                                            <i className='pi pi-calendar' />
+                                        </span>
+                                        <span className='document-info__text'>{created}</span>
+                                    </div>
+                                </div>
+                                <Button
+                                    className='media-documents__close'
+                                    type='button'
+                                    onClick={() => handleDeleteDocument(itemuid || "")}
+                                >
+                                    <i className='pi pi-times' />
+                                </Button>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className='w-full text-center'>No documents added yet.</div>
+                )}
             </div>
         </div>
     );
