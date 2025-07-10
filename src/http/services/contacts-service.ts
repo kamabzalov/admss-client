@@ -12,6 +12,12 @@ import {
 import { BaseResponseError, Status } from "common/models/base-response";
 import { isAxiosError } from "axios";
 import { ListData } from "common/models";
+import {
+    InventoryMedia,
+    InventoryMediaPostData,
+    InventorySetResponse,
+} from "common/models/inventory";
+import { BaseResponse } from "common/models/base-response";
 
 export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
@@ -213,6 +219,140 @@ export const deleteContactBackDL = async (contactuid: string) => {
             `contacts/${contactuid}/deletedlicenseback`
         );
 
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting contact back DL",
+            };
+        }
+    }
+};
+
+export const getContactMediaItemList = async (
+    contactID: string
+): Promise<InventoryMedia[] | BaseResponseError | undefined> => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
+            `contacts/${contactID}/media`
+        );
+        if (request) {
+            return request.data;
+        } else throw new Error();
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contact media item",
+            };
+        }
+    }
+};
+
+export const getContactMediaItem = async (
+    mediaID: string
+): Promise<string | BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.get(`media/${mediaID}/media`, {
+            responseType: "blob",
+        });
+
+        const dataUrl = await new Promise<string>((resolve) => {
+            const reader = new window.FileReader();
+            reader.addEventListener("load", (event) => {
+                resolve(event.target?.result as string);
+            });
+            reader.readAsDataURL(response.data);
+        });
+
+        return dataUrl;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contact media item",
+            };
+        }
+    }
+};
+
+export const uploadContactMedia = async (contactUid: string, contactData: FormData) => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `media/${contactUid || 0}/media`,
+            contactData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while uploading contact media",
+            };
+        }
+    }
+};
+
+export const setContactMediaItemData = async (
+    contactUid: string,
+    {
+        mediaitemuid,
+        notes,
+        itemuid,
+        order,
+        mediaurl,
+        contenttype,
+        useruid,
+        type,
+    }: Partial<InventoryMediaPostData>
+) => {
+    try {
+        const id = contactUid ? contactUid : 0;
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `contacts/${id}/media`,
+            {
+                mediaitemuid,
+                mediaurl,
+                useruid,
+                itemuid,
+                contenttype,
+                notes,
+                order,
+                type,
+            }
+        );
+
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting contact media item data",
+            };
+        }
+    }
+};
+
+export const deleteContactMedia = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${itemuid}/deletemedia`
+        );
         if (response.status === 200) {
             return response.data;
         }

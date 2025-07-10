@@ -194,7 +194,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3 mr-2'>
                     <DateInput
                         name="DL's exp. date"
-                        value={contactExtData.Buyer_DL_Exp_Date || ""}
                         date={contactExtData.Buyer_DL_Exp_Date}
                         onChange={({ target: { value } }) =>
                             changeContactExtData("Buyer_DL_Exp_Date", Date.parse(String(value)))
@@ -236,7 +235,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3'>
                     <DateInput
                         name='Date of Birth'
-                        value={contactExtData.Buyer_Date_Of_Birth || ""}
                         date={contactExtData.Buyer_Date_Of_Birth}
                         onChange={({ target: { value } }) =>
                             changeContactExtData("Buyer_Date_Of_Birth", Date.parse(String(value)))

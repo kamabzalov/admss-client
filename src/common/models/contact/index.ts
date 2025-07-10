@@ -1,3 +1,4 @@
+import { MediaLimits } from "common/models";
 import { BaseResponse, BaseResponseError } from "../base-response";
 
 export interface ContactExtData {
@@ -412,4 +413,23 @@ export interface ScanBarcodeDL extends BaseResponseError {
         Text: string;
         Version: string;
     }[];
+}
+
+export interface ContactMediaItem {
+    contactuid: string;
+    contenttype: number;
+    created: string;
+    index: number;
+    itemuid: string;
+    mediauid: string;
+    notes: string;
+    type: number;
+    updated: string;
+    useruid: string;
+    src?: string;
+}
+
+export interface ContactDocumentsLimitations extends MediaLimits {
+    maxUpload: number;
+    maxUploadedDocuments: number;
 }
