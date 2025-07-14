@@ -2,7 +2,7 @@ import { CSSProperties, LegacyRef, ReactElement, useEffect, useId, useRef, useSt
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
-import { Checkbox, CheckboxProps } from "primereact/checkbox";
+import { Checkbox, CheckboxChangeEvent, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
@@ -74,6 +74,7 @@ interface StateDropdownProps extends DropdownProps {
 
 interface DateInputProps extends CalendarProps {
     checked?: boolean;
+    onCheckboxChange?: (e: CheckboxChangeEvent) => void;
 }
 
 export const DashboardRadio = ({
@@ -276,6 +277,7 @@ export const DateInput = ({
     name,
     value,
     checkbox,
+    onCheckboxChange,
     checkboxWithLabel,
     colWidth,
     emptyDate,
@@ -345,7 +347,8 @@ export const DateInput = ({
                     <Checkbox
                         className='date-item__checkbox'
                         checked={isChecked}
-                        onChange={() => {
+                        onChange={(e) => {
+                            onCheckboxChange?.(e);
                             setIsChecked(!isChecked);
                             if (!isChecked) {
                                 setInnerDate(new Date());

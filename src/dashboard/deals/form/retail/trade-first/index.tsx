@@ -470,6 +470,21 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     date={Trade1_Lien_Payoff_Good_Through}
                     checkbox
                     checked={!!Trade1_Lien_Payoff_Good_Through}
+                    onCheckboxChange={() => {
+                        const isChecked = !Trade1_Lien_Payoff_Good_Through;
+                        if (isChecked) {
+                            changeDealExtData({
+                                key: "Trade1_Lien_Payoff_Good_Through",
+                                value: Number(Trade1_Lien_Payoff_Good_Through) || Date.now(),
+                            });
+                        } else {
+                            changeDealExtData({
+                                key: "Trade1_Lien_Payoff_Good_Through",
+                                value: "",
+                            });
+                        }
+                        store.isFormChanged = true;
+                    }}
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({

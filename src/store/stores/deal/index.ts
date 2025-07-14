@@ -436,6 +436,10 @@ export class DealStore {
         this._setInventoryAvailableOption = value;
     }
 
+    public set isFormChanged(value: boolean) {
+        this._isFormChanged = value;
+    }
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
