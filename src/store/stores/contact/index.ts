@@ -476,74 +476,6 @@ export class ContactStore {
         }
     };
 
-    public set contactType(state: number) {
-        this._contactType = state;
-    }
-
-    public set frontSideDL(file: File) {
-        this._frontSiteDL = file;
-    }
-
-    public set backSideDL(file: File) {
-        this._backSiteDL = file;
-    }
-
-    public set frontSideDLurl(url: string) {
-        this._frontSiteDLurl = url;
-    }
-
-    public set backSideDLurl(url: string) {
-        this._backSiteDLurl = url;
-    }
-
-    public set coBuyerFrontSideDL(file: File) {
-        this._coBuyerFrontSideDL = file;
-    }
-
-    public set coBuyerBackSideDL(file: File) {
-        this._coBuyerBackSideDL = file;
-    }
-
-    public set coBuyerFrontSideDLurl(url: string) {
-        this._coBuyerFrontSideDLurl = url;
-    }
-
-    public set coBuyerBackSideDLurl(url: string) {
-        this._coBuyerBackSideDLurl = url;
-    }
-
-    public set contactOFAC(state: ContactOFAC) {
-        this._contactOFAC = state;
-    }
-
-    public set coBuyerContactOFAC(state: ContactOFAC) {
-        this._coBuyerContactOFAC = state;
-    }
-
-    public set deleteReason(state: string) {
-        this._deleteReason = state;
-    }
-
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
-    }
-
-    public set memoRoute(state: string) {
-        this._memoRoute = state;
-    }
-
-    public set tabLength(state: number) {
-        this._tabLength = state;
-    }
-
-    public set activeTab(state: number | null) {
-        this._activeTab = state;
-    }
-
-    public set isContactChanged(state: boolean) {
-        this._isContactChanged = state;
-    }
-
     public clearContact = () => {
         this._contact = {} as Contact;
         this._coBayerContact = {} as Contact;
@@ -607,8 +539,8 @@ export class ContactStore {
             if (mediaType === MediaType.mtPhoto || mediaType === MediaType.mtDocument) {
                 this._documents = result;
             }
-        } finally {
-            this._isLoading = false;
+        } catch (error) {
+            return { status: Status.ERROR, error };
         }
     }
 
@@ -628,7 +560,6 @@ export class ContactStore {
             mediaType: MediaType
         ): Promise<{ status: Status; savedItems?: Partial<ContactMediaItem>[] }> => {
             try {
-                this._isLoading = true;
                 const { file, data } = this._uploadFileDocuments;
                 if (!file.length) {
                     return { status: Status.ERROR };
@@ -707,7 +638,6 @@ export class ContactStore {
     public removeContactMedia = action(
         async (mediauid: string, cb: () => void): Promise<Status | undefined> => {
             try {
-                this._isLoading = true;
                 await deleteContactMedia(mediauid);
 
                 await cb();
@@ -715,11 +645,81 @@ export class ContactStore {
                 return Status.OK;
             } catch (error) {
                 return undefined;
-            } finally {
-                this._isLoading = false;
             }
         }
     );
+
+    public set contactType(state: number) {
+        this._contactType = state;
+    }
+
+    public set frontSideDL(file: File) {
+        this._frontSiteDL = file;
+    }
+
+    public set backSideDL(file: File) {
+        this._backSiteDL = file;
+    }
+
+    public set frontSideDLurl(url: string) {
+        this._frontSiteDLurl = url;
+    }
+
+    public set backSideDLurl(url: string) {
+        this._backSiteDLurl = url;
+    }
+
+    public set coBuyerFrontSideDL(file: File) {
+        this._coBuyerFrontSideDL = file;
+    }
+
+    public set coBuyerBackSideDL(file: File) {
+        this._coBuyerBackSideDL = file;
+    }
+
+    public set coBuyerFrontSideDLurl(url: string) {
+        this._coBuyerFrontSideDLurl = url;
+    }
+
+    public set coBuyerBackSideDLurl(url: string) {
+        this._coBuyerBackSideDLurl = url;
+    }
+
+    public set contactOFAC(state: ContactOFAC) {
+        this._contactOFAC = state;
+    }
+
+    public set coBuyerContactOFAC(state: ContactOFAC) {
+        this._coBuyerContactOFAC = state;
+    }
+
+    public set deleteReason(state: string) {
+        this._deleteReason = state;
+    }
+
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
+
+    public set memoRoute(state: string) {
+        this._memoRoute = state;
+    }
+
+    public set tabLength(state: number) {
+        this._tabLength = state;
+    }
+
+    public set activeTab(state: number | null) {
+        this._activeTab = state;
+    }
+
+    public set isContactChanged(state: boolean) {
+        this._isContactChanged = state;
+    }
+
+    public set uploadFileDocuments(files: UploadMediaItem) {
+        this._uploadFileDocuments = files;
+    }
 
     public clearContactMedia = () => {
         this._documents = [];
@@ -727,8 +727,4 @@ export class ContactStore {
         this._uploadFileDocuments = initialMediaItem;
         this._formErrorMessage = "";
     };
-
-    public set uploadFileDocuments(files: UploadMediaItem) {
-        this._uploadFileDocuments = files;
-    }
 }
