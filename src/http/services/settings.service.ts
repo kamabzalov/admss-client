@@ -23,7 +23,10 @@ export const getUserGeneralSettings = async () => {
 
 export const updateUserGeneralSettings = async (body?: Partial<GeneralSettings>) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`user/settings`, body);
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `user/settings`,
+            body
+        );
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
@@ -39,7 +42,7 @@ export const getWatermark = async (
     mediauid: string
 ): Promise<string | BaseResponseError | undefined> => {
     try {
-        const response = await authorizedUserApiInstance.get<any>(`media/${mediauid}/watermark`, {
+        const response = await authorizedUserApiInstance.get<Blob>(`media/${mediauid}/watermark`, {
             responseType: "blob",
         });
 
@@ -103,7 +106,7 @@ export const updatePostProcessing = async (
     body?: Partial<WatermarkPostProcessing>[]
 ) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `user/${useruid}/postprocessing`,
             body
         );

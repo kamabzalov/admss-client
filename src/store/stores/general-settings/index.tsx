@@ -47,6 +47,7 @@ export class GeneralSettingsStore {
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
+    private _prevPath: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -95,6 +96,10 @@ export class GeneralSettingsStore {
 
     public get activeTab() {
         return this._activeTab;
+    }
+
+    public get prevPath() {
+        return this._prevPath;
     }
 
     private get logomediauid() {
@@ -257,7 +262,13 @@ export class GeneralSettingsStore {
                     return watermarkResult;
                 }
             }
-            const response = await updateUserGeneralSettings(this._settings);
+            const filteredSettings = Object.fromEntries(
+                Object.entries(this._settings).filter(
+                    ([key]) => !["itemuid", "index", "created", "updated", "status"].includes(key)
+                )
+            );
+
+            const response = await updateUserGeneralSettings(filteredSettings);
             if (response?.status === Status.ERROR) {
                 return response;
             }
@@ -344,11 +355,16 @@ export class GeneralSettingsStore {
         this._settings.logomediauid = state;
     }
 
+    public set prevPath(state: string) {
+        this._prevPath = state;
+    }
+
     public clearSettings = () => {
         this._settings = {} as GeneralSettings;
         this._isSettingsChanged = false;
         this._isPostProcessingChanged = false;
         this._watermarkImage = null;
         this._postProcessing = initialPostProcessing as WatermarkPostProcessing[];
+        this._prevPath = "";
     };
 }

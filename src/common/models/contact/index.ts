@@ -1,3 +1,4 @@
+import { MediaLimits } from "common/models";
 import { BaseResponse, BaseResponseError } from "../base-response";
 
 export interface ContactExtData {
@@ -347,14 +348,19 @@ export interface TotalUsers extends BaseResponse {
     total: number;
 }
 
-export interface SalespersonsList {
-    created: string;
-    createdbyuid: string;
-    creatorusername: string;
-    enabled: number;
-    updated: string;
+export interface SalespersonsList extends BaseResponseError {
+    created: number;
+    updated: number;
     username: string;
     useruid: string;
+    createdbyuid: string;
+    creatorusername: string;
+    Name: string;
+    WorkPhone: string;
+    HomePhone: string;
+    Address: string;
+    email: string;
+    enabled: 0 | 1;
 }
 
 export enum ContactTypeNameList {
@@ -407,4 +413,23 @@ export interface ScanBarcodeDL extends BaseResponseError {
         Text: string;
         Version: string;
     }[];
+}
+
+export interface ContactMediaItem {
+    contactuid: string;
+    contenttype: number;
+    created: string;
+    index: number;
+    itemuid: string;
+    mediauid: string;
+    notes: string;
+    type: number;
+    updated: string;
+    useruid: string;
+    src?: string;
+}
+
+export interface ContactDocumentsLimitations extends MediaLimits {
+    maxUpload: number;
+    maxUploadedDocuments: number;
 }

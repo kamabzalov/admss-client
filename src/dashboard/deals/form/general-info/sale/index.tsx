@@ -20,9 +20,9 @@ import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { Button } from "primereact/button";
+import { parseDateFromServer } from "common/helpers";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -32,7 +32,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const toast = useToast();
     const location = useLocation();
     const currentPath = location.pathname + location.search;
-    const navigate = useNavigate();
+
     const { authUser } = userStore;
     const { deal, changeDeal, changeDealExtData } = store;
 
@@ -105,6 +105,7 @@ export const DealGeneralSale = observer((): ReactElement => {
         setFieldValue(
             "contactinfo",
             contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName
         );
@@ -112,6 +113,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             key: "contactinfo",
             value:
                 contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName,
         });
@@ -135,16 +137,6 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
-            <div className='col-12 flex justify-content-end'>
-                <Button
-                    className='deal-sale__washout-button'
-                    outlined
-                    label={"Washout"}
-                    onClick={() => {
-                        navigate(`${location.pathname}/washout`);
-                    }}
-                />
-            </div>
             <div className='col-6 relative'>
                 <CompanySearch
                     {...getFieldProps("contactinfo")}
@@ -235,7 +227,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("dateeffective")}
                     className={`${errors.dateeffective && "p-invalid"}`}
                     name='Sale date (required)'
-                    date={values.dateeffective}
+                    date={parseDateFromServer(values.dateeffective)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", value);
@@ -249,7 +241,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("datepurchase")}
                     className={`${errors.datepurchase && "p-invalid"}`}
                     name='First operated (required)'
-                    date={values.datepurchase}
+                    date={parseDateFromServer(values.datepurchase)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", value);

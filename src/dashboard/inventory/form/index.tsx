@@ -19,13 +19,18 @@ import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import { Inventory as InventoryModel, InventoryStockNumber } from "common/models/inventory";
+import {
+    InventoryExtData,
+    Inventory as InventoryModel,
+    InventoryStockNumber,
+} from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 import { TOAST_LIFETIME } from "common/settings";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 
 const STEP = "step";
 export enum INVENTORY_STEPS {
@@ -68,7 +73,14 @@ type PartialInventory = Pick<
     | "TypeOfFuel_id"
 >;
 
-const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
+type PartialInventoryExtData = Pick<
+    InventoryExtData,
+    "purPurchaseEmail" | "purPurchasePhone" | "titleHolderPhone" | "titlePrevPhone"
+>;
+
+const tabFields: Partial<
+    Record<AccordionItems, (keyof PartialInventory)[] | (keyof PartialInventoryExtData)[]>
+> = {
     [AccordionItems.GENERAL]: [
         "VIN",
         "Make",
@@ -79,6 +91,8 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "StockNo",
     ],
     [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
+    [AccordionItems.PURCHASES]: ["purPurchaseEmail", "purPurchasePhone"],
+    [AccordionItems.TITLE]: ["titleHolderPhone", "titlePrevPhone"],
 };
 
 const MIN_YEAR = 1970;
@@ -114,6 +128,7 @@ export const InventoryForm = observer(() => {
         activeTab,
         tabLength,
         inventory,
+        inventoryExtData,
         isFormChanged,
         currentLocation,
         deleteReason,
@@ -233,6 +248,16 @@ export const InventoryForm = observer(() => {
                     });
                 }),
             TypeOfFuel_id: Yup.string().trim().required("Data is required."),
+            purPurchaseEmail: Yup.string().email("Invalid email address"),
+            purPurchasePhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
+                PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titleHolderPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
+                PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titlePrevPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
+                PHONE_NUMBER_REGEX.test(value || "")
+            ),
         });
     };
 
@@ -386,10 +411,17 @@ export const InventoryForm = observer(() => {
                 });
                 setErrorSections(currentSectionsWithErrors);
 
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
+                    life: TOAST_LIFETIME,
                 });
             }
         });
@@ -564,6 +596,14 @@ export const InventoryForm = observer(() => {
                                                     locationuid:
                                                         inventory?.locationuid || currentLocation,
                                                     GroupClassName: inventory?.GroupClassName || "",
+                                                    purPurchaseEmail:
+                                                        inventoryExtData?.purPurchaseEmail || "",
+                                                    purPurchasePhone:
+                                                        inventoryExtData?.purPurchasePhone || "",
+                                                    titleHolderPhone:
+                                                        inventoryExtData?.titleHolderPhone || "",
+                                                    titlePrevPhone:
+                                                        inventoryExtData?.titlePrevPhone || "",
                                                 } as PartialInventory
                                             }
                                             enableReinitialize

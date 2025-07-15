@@ -248,3 +248,8 @@
         box-shadow: none;
     }
 }
+.phone-input {
+    .p-error {
+        top: 2.2rem;
+    }
+}

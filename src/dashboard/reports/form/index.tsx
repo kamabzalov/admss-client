@@ -11,7 +11,7 @@ import {
     setCollectionOrder,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState, useCallback, useRef } from "react";
+import { ReactElement, useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useStore } from "store/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
@@ -113,44 +113,63 @@ export const ReportForm = observer((): ReactElement => {
     const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
     const [currentNodeOrder, setCurrentNodeOrder] = useState<number | null>(null);
 
-    const getCollections = async () => {
+    const getCollections = useCallback(async () => {
         if (authUser) {
             const response = await getUserFavoriteReportList(authUser.useruid);
             if (response && Array.isArray(response)) {
                 setFavoriteCollections(response);
             }
         }
-    };
+    }, [authUser]);
 
     useEffect(() => {
-        getCollections();
+        const loadCollections = async () => {
+            try {
+                await getCollections();
+                if (!id) {
+                    await getUserReportCollections();
+                }
+            } catch (error) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: TOAST_MESSAGES.ERROR,
+                    detail: "Failed to load report collections",
+                    life: TOAST_LIFETIME,
+                });
+            }
+        };
+
+        loadCollections();
         return () => {
             clearReport();
         };
-    }, [authUser]);
+    }, [authUser, getCollections, getUserReportCollections, id]);
 
-    const allNodes = [
-        ...favoriteCollections.map((collection) => ({
-            key: collection.itemUID,
-            label: collection.name,
-            type: NODE_TYPES.COLLECTION,
-            data: { collection: collection, order: collection.order },
-            children:
-                collection.documents
-                    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                    .map((doc) => ({
-                        key: doc.itemUID,
-                        label: doc.name,
-                        type: NODE_TYPES.DOCUMENT,
-                        data: {
-                            document: doc,
-                            collectionId: collection.itemUID,
-                            order: doc.order,
-                        },
-                    })) || [],
-        })),
-        ...buildTreeNodes(allCollections),
-    ];
+    const allNodes = useMemo(
+        () => [
+            ...favoriteCollections.map((collection) => ({
+                key: collection.itemUID,
+                label: collection.name,
+                type: NODE_TYPES.COLLECTION,
+                data: { collection: collection, order: collection.order },
+                children:
+                    collection.documents
+                        ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map((doc) => ({
+                            key: doc.itemUID,
+                            label: doc.name,
+                            type: NODE_TYPES.DOCUMENT,
+                            data: {
+                                document: doc,
+                                collectionId: collection.itemUID,
+                                order: doc.order,
+                            },
+                        })) || [],
+            })),
+            ...buildTreeNodes(allCollections),
+        ],
+        [favoriteCollections, allCollections]
+    );
 
     const findPathToDocument = useCallback(
         (nodes: TreeNode[], docId: string, path: string[] = []): string[] | null => {
@@ -398,7 +417,7 @@ export const ReportForm = observer((): ReactElement => {
         }
 
         getCollections();
-        getUserReportCollections();
+        getUserReportCollections(true);
     };
 
     const navigateToReports = () => {
@@ -468,7 +487,7 @@ export const ReportForm = observer((): ReactElement => {
                         />
                         <ReportEditForm />
                     </div>
-                    <ReportFooter onRefetch={getUserReportCollections} />
+                    <ReportFooter onRefetch={() => getUserReportCollections(true)} />
                 </div>
             </div>
             <ConfirmModal

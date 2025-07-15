@@ -105,7 +105,10 @@ export const InventoryOptionRow = observer(
                         <Button
                             className='p-button row-edit__button'
                             icon='icon adms-arrow-right-1'
-                            onClick={() => handleSaveOption(editedItem)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveOption(editedItem);
+                            }}
                         />
                     </div>
                 ) : (
@@ -120,16 +123,20 @@ export const InventoryOptionRow = observer(
                             className='inventory-options__edit-button'
                             icon='icon adms-edit-item'
                             text
-                            onClick={() =>
-                                editedItem.itemuid ? setEditedItem({}) : setEditedItem(item)
-                            }
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                editedItem.itemuid ? setEditedItem({}) : setEditedItem(item);
+                            }}
                         />
                         <Button
                             tooltip='Delete option'
                             className='inventory-options__delete-button'
                             icon='icon adms-trash-can'
                             text
-                            onClick={() => item?.itemuid && handleDeleteOption(item.itemuid)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                item?.itemuid && handleDeleteOption(item.itemuid);
+                            }}
                         />
                     </>
                 )}

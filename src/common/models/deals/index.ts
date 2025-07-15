@@ -26,7 +26,9 @@ export interface Deal {
     name: string;
     price: string;
     salesperson1uid: string;
+    salesperson1name: string;
     salesperson2uid: string;
+    salesperson2name: string;
     saletype: number;
     status: string;
     updated: string;
