@@ -22,7 +22,7 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { DealExtData } from "common/models/deals";
+import { AddToInventory, DealExtData } from "common/models/deals";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -44,8 +44,9 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_Lien_Phone,
         },
         deal: { addToInventory },
-        changeDeal,
+
         changeDealExtData,
+        changeAddToInventory,
     } = store;
     const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
 
@@ -220,6 +221,11 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         },
         [setFieldValue, changeDealExtData]
     );
+
+    const isTradeChecked = Boolean(addToInventory & AddToInventory.TRADE_FIRST_ENABLED);
+    const toggleTrade = isTradeChecked
+        ? addToInventory & ~AddToInventory.TRADE_FIRST_ENABLED
+        : addToInventory | AddToInventory.TRADE_FIRST_ENABLED;
 
     return (
         <div className='grid deal-retail-trade row-gap-2'>
@@ -420,13 +426,8 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <Checkbox
                     inputId='Trade1_AddToInventory'
                     name='Trade1_AddToInventory'
-                    checked={!!addToInventory}
-                    onChange={() =>
-                        changeDeal({
-                            key: "addToInventory",
-                            value: !addToInventory ? 1 : 0,
-                        })
-                    }
+                    checked={isTradeChecked}
+                    onChange={() => changeAddToInventory(toggleTrade)}
                 />
                 <label htmlFor='Trade1_AddToInventory' className='ml-2'>
                     Add to inventory

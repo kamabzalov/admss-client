@@ -1,11 +1,18 @@
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
-import { PrintForm, TypeList } from "..";
-import { Status } from "../base-response";
+import { PrintForm, TypeList } from "common/models";
+import { Status } from "common/models/base-response";
+
+export enum AddToInventory {
+    ALL_DISABLED = 0,
+    TRADE_FIRST_ENABLED = 1,
+    TRADE_SECOND_ENABLED = 2,
+    ALL_ENABLED = 3,
+}
 
 export interface Deal {
     accountInfo: string;
     accountuid: string;
-    addToInventory: number;
+    addToInventory: AddToInventory;
     contactinfo: string;
     contactuid: string;
     created: string;
