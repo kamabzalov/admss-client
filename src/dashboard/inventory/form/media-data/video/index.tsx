@@ -49,6 +49,12 @@ export const VideoMedia = observer((): ReactElement => {
     const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const videosSet = new Set();
+    const uniqueVideos = videos.filter((vid) => {
+        if (!vid.itemuid || videosSet.has(vid.itemuid)) return false;
+        videosSet.add(vid.itemuid);
+        return true;
+    });
 
     useEffect(() => {
         fetchVideos();
@@ -278,8 +284,8 @@ export const VideoMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-video'>
-                {videos.length ? (
-                    videos.map(({ itemuid, src, info }, index: number) => {
+                {uniqueVideos.length ? (
+                    uniqueVideos.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-video__item'>
                                 {checked && (

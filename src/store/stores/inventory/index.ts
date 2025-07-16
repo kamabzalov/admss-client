@@ -321,6 +321,12 @@ export class InventoryStore {
                         }
                     }
                 });
+                const uniqueImages = new Set();
+                this._images = this._images.filter((img) => {
+                    if (!img.itemuid || uniqueImages.has(img.itemuid)) return false;
+                    uniqueImages.add(img.itemuid);
+                    return true;
+                });
             }
 
             return Status.OK;
@@ -618,12 +624,9 @@ export class InventoryStore {
 
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
-            const { status, savedItems } = await this.saveInventoryMedia(MediaType.mtPhoto);
+            const { status } = await this.saveInventoryMedia(MediaType.mtPhoto);
             if (status === Status.OK) {
                 this._uploadFileImages = initialMediaItem;
-                if (savedItems) {
-                    this._images = [...this._images, ...savedItems];
-                }
             }
             return status;
         } catch (error) {
@@ -857,6 +860,11 @@ export class InventoryStore {
             }
         }
     );
+
+    public resetUploadState = () => {
+        this._uploadFileImages = initialMediaItem;
+        this._formErrorMessage = "";
+    };
 
     public set inventoryID(id: string) {
         this._inventoryID = id;

@@ -205,6 +205,13 @@ export const DocumentsMedia = observer((): ReactElement => {
         icon: "none",
     };
 
+    const documentsSet = new Set();
+    const uniqueDocuments = documents.filter((doc) => {
+        if (!doc.itemuid || documentsSet.has(doc.itemuid)) return false;
+        documentsSet.add(doc.itemuid);
+        return true;
+    });
+
     return (
         <div className='media grid'>
             {isLoading && <Loader overlay />}
@@ -252,8 +259,8 @@ export const DocumentsMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
-                {documents.length ? (
-                    documents.map(({ itemuid, src, info }, index: number) => {
+                {uniqueDocuments.length ? (
+                    uniqueDocuments.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-documents__item'>
                                 {checked && (

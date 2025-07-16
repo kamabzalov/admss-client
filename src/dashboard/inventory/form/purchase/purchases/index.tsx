@@ -195,6 +195,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <PercentInput
                     labelPosition='top'
+                    emptyValue
                     title='Buyer Percent'
                     value={purPurchaseBuyerPercent}
                     onChange={({ value }) => {

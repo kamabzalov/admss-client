@@ -29,6 +29,7 @@ interface CurrencyInputProps extends InputNumberProps {
 
 interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
+    emptyValue?: boolean;
 }
 
 type Push<N extends number, T extends any[]> = ((...args: T) => void) extends (
@@ -164,6 +165,7 @@ export const PercentInput = ({
     name,
     title,
     labelPosition = "left",
+    emptyValue = false,
     ...props
 }: PercentInputProps): ReactElement => {
     return (
@@ -178,7 +180,14 @@ export const PercentInput = ({
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>
-                <InputNumber inputId={name} min={0} minFractionDigits={2} name={name} {...props} />
+                <InputNumber
+                    inputId={name}
+                    min={0}
+                    minFractionDigits={2}
+                    name={name}
+                    value={emptyValue ? 0 : props.value}
+                    {...props}
+                />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
         </div>

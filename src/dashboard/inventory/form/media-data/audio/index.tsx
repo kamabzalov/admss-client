@@ -45,6 +45,12 @@ export const AudioMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
     const [checked, setChecked] = useState<boolean>(true);
     const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
+    const audiosSet = new Set();
+    const uniqueAudio = audios.filter((aud) => {
+        if (!aud.itemuid || audiosSet.has(aud.itemuid)) return false;
+        audiosSet.add(aud.itemuid);
+        return true;
+    });
 
     useEffect(() => {
         fetchAudios();
@@ -259,8 +265,8 @@ export const AudioMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-audio'>
-                {audios.length ? (
-                    audios.map(({ itemuid, src, info }, index: number) => {
+                {uniqueAudio.length ? (
+                    uniqueAudio.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-audio__item'>
                                 {checked && (
