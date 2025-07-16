@@ -39,7 +39,7 @@ export const VehicleOptions = observer((): ReactElement => {
     };
 
     const handleGetInventoryOptionsList = async () => {
-        if (!id || store.isErasingNeeded) return;
+        if (!id) return;
         const response = await getInventoryOptions(id);
         if (response?.error) {
             toast.current?.show({

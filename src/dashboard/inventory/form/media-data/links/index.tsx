@@ -9,7 +9,7 @@ import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useToast } from "dashboard/common/toast";
-import { MediaLinkRowExpansionTemplate } from "./link-item";
+import { MediaLinkRowExpansionTemplate } from "dashboard/inventory/form/media-data/links/link-item";
 import { MediaItem, UploadMediaLink } from "common/models/inventory";
 import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -22,12 +22,17 @@ enum DIRECTION {
 }
 
 const isValidUrl = (url: string): boolean => {
-    try {
-        new URL(url);
-        return true;
-    } catch {
-        return false;
-    }
+    if (!url) return false;
+    if (!/\./.test(url)) return false;
+    const tryUrl = (u: string) => {
+        try {
+            new URL(u);
+            return true;
+        } catch {
+            return false;
+        }
+    };
+    return tryUrl(url) || tryUrl(`http://${url}`);
 };
 
 export const LinksMedia = observer((): ReactElement => {
@@ -336,7 +341,7 @@ export const LinksMedia = observer((): ReactElement => {
                     disabled={isLoading || !isUrlValid || !uploadFileLinks?.mediaurl}
                     tooltip={!isUrlValid ? "Please enter a valid URL" : ""}
                     tooltipOptions={{ showOnDisabled: true, position: "mouse" }}
-                    severity={!isUrlValid ? "secondary" : "success"}
+                    severity={!isUrlValid || !uploadFileLinks?.mediaurl ? "secondary" : "success"}
                     className='p-button media-input__button'
                     onClick={handleUploadLink}
                 >

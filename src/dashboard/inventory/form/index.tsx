@@ -222,14 +222,20 @@ export const InventoryForm = observer(() => {
                 }),
             TypeOfFuel_id: Yup.string().trim().required("Data is required."),
             purPurchaseEmail: Yup.string().email("Invalid email address"),
-            purPurchasePhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
-                PHONE_NUMBER_REGEX.test(value || "")
+            purPurchasePhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
             ),
-            titleHolderPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
-                PHONE_NUMBER_REGEX.test(value || "")
+            titleHolderPhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
             ),
-            titlePrevPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
-                PHONE_NUMBER_REGEX.test(value || "")
+            titlePrevPhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
             ),
         });
     };
