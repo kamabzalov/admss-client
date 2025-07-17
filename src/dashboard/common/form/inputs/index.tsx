@@ -25,10 +25,12 @@ interface DashboardRadioProps {
 
 interface CurrencyInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
+    coloredEmptyValue?: boolean;
 }
 
 interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
+    floatLabel?: boolean;
     emptyValue?: boolean;
 }
 
@@ -131,9 +133,11 @@ export const CurrencyInput = ({
     value,
     title,
     labelPosition = "left",
+    coloredEmptyValue = false,
     ...props
 }: CurrencyInputProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const uniqueId = useId();
 
     useCursorToStart(containerRef);
 
@@ -143,17 +147,22 @@ export const CurrencyInput = ({
             className='flex align-items-center justify-content-between currency-item relative'
             ref={containerRef}
         >
-            <label className={`currency-item__label ${labelPosition === "top" && "label-top"}`}>
+            <label
+                htmlFor={uniqueId}
+                className={`currency-item__label ${labelPosition === "top" && "label-top"}`}
+            >
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
                 <InputNumber
+                    inputId={uniqueId}
                     minFractionDigits={2}
                     maxFractionDigits={2}
                     min={0}
                     locale='en-US'
                     value={value || 0}
+                    inputClassName={`${coloredEmptyValue && !value ? "currency-item__input--empty" : ""}`}
                     {...props}
                 />
             </div>
@@ -166,27 +175,35 @@ export const PercentInput = ({
     title,
     labelPosition = "left",
     emptyValue = false,
+    floatLabel = false,
     ...props
 }: PercentInputProps): ReactElement => {
+    const uniqueId = useId();
     return (
         <div
             key={name}
             className='flex align-items-center justify-content-between percent-item relative'
         >
             <label
-                htmlFor={name}
-                className={`percent-item__label ${labelPosition === "top" && "label-top"}`}
+                htmlFor={uniqueId}
+                className={`percent-item__label ${!props.value && floatLabel ? "percent-item__label--empty" : ""} ${labelPosition === "top" && "label-top"}`}
             >
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>
                 <InputNumber
-                    inputId={name}
                     min={0}
                     minFractionDigits={2}
+                    inputId={uniqueId}
                     name={name}
-                    value={emptyValue ? 0 : props.value}
+                    inputClassName={`${props.value ? "percent-item__input--filled" : "percent-item__input--empty"}`}
                     {...props}
+                    value={!emptyValue && props.value ? props.value : 0}
+                    pt={{
+                        root: {
+                            id: name,
+                        },
+                    }}
                 />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
@@ -402,6 +419,7 @@ export const TextInput = ({
     ...props
 }: TextInputProps): ReactElement => {
     const [value, setValue] = useState<string>(props.value || "");
+    const uniqueId = useId();
 
     useEffect(() => {
         setValue(props.value || "");
@@ -421,6 +439,7 @@ export const TextInput = ({
     const content = (
         <span className='p-float-label relative'>
             <InputText
+                id={uniqueId}
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
@@ -447,7 +466,9 @@ export const TextInput = ({
                     onClick={handleClear}
                 />
             )}
-            <label className='float-label'>{name}</label>
+            <label htmlFor={uniqueId} className='float-label'>
+                {name}
+            </label>
         </span>
     );
 
@@ -480,6 +501,7 @@ export const PhoneInput = ({
 }: PhoneInputProps): ReactElement => {
     const inputRef = useRef(null);
     const [error, setError] = useState<string>("");
+    const uniqueId = useId();
 
     const handleCursorPosition = () => {
         const input = inputRef.current as unknown as HTMLInputElement | null;
@@ -516,7 +538,7 @@ export const PhoneInput = ({
                 className={`w-full phone-input__input ${error ? "p-invalid" : ""}`}
                 style={{ height: `${props.height || 50}px` }}
                 onClick={handleCursorPosition}
-                id={name || "phoneId"}
+                id={uniqueId}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 autoClear={false}
                 unmask={false}
@@ -524,7 +546,9 @@ export const PhoneInput = ({
                 onBlur={(e) => validateAndHandle(e as unknown as InputMaskChangeEvent, true)}
                 {...props}
             />
-            <label className='float-label'>{name}</label>
+            <label htmlFor={uniqueId} className='float-label'>
+                {name}
+            </label>
             {error && <div className='p-error pt-2'>{error}</div>}
         </span>
     );
