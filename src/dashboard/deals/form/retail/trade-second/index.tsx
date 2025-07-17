@@ -22,7 +22,7 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { DealExtData } from "common/models/deals";
+import { AddToInventory, DealExtData } from "common/models/deals";
 
 export const DealRetailTradeSecond = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -44,8 +44,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             Trade2_Lien_Phone,
         },
         deal: { addToInventory },
-        changeDeal,
         changeDealExtData,
+        changeAddToInventory,
     } = store;
     const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
 
@@ -219,6 +219,11 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
         },
         [setFieldValue, changeDealExtData]
     );
+
+    const isTradeChecked = Boolean(addToInventory & AddToInventory.TRADE_SECOND_ENABLED);
+    const toggleTrade = isTradeChecked
+        ? addToInventory & ~AddToInventory.TRADE_SECOND_ENABLED
+        : addToInventory | AddToInventory.TRADE_SECOND_ENABLED;
     return (
         <div className='grid deal-retail-trade row-gap-2'>
             <div className='col-12'>
@@ -416,13 +421,8 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 <Checkbox
                     inputId='Trade2_AddToInventory'
                     name='Trade2_AddToInventory'
-                    checked={!!addToInventory}
-                    onChange={() =>
-                        changeDeal({
-                            key: "addToInventory",
-                            value: !addToInventory ? 1 : 0,
-                        })
-                    }
+                    checked={isTradeChecked}
+                    onChange={() => changeAddToInventory(toggleTrade)}
                 />
                 <label htmlFor='Trade2_AddToInventory' className='ml-2'>
                     Add to inventory
@@ -466,6 +466,21 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     date={Trade2_Lien_Payoff_Good_Through}
                     checkbox
                     checked={!!Trade2_Lien_Payoff_Good_Through}
+                    onCheckboxChange={() => {
+                        const isChecked = !Trade2_Lien_Payoff_Good_Through;
+                        if (isChecked) {
+                            changeDealExtData({
+                                key: "Trade2_Lien_Payoff_Good_Through",
+                                value: Number(Trade2_Lien_Payoff_Good_Through) || Date.now(),
+                            });
+                        } else {
+                            changeDealExtData({
+                                key: "Trade2_Lien_Payoff_Good_Through",
+                                value: "",
+                            });
+                        }
+                        store.isFormChanged = true;
+                    }}
                     onChange={({ value }) =>
                         value &&
                         changeDealExtData({
