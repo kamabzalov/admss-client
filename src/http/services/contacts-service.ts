@@ -91,17 +91,15 @@ export const getContactDeleteReasonsList = async (uid: string | "0") => {
 
 export const getContactsSalesmanList = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<SalespersonsList[]>(
+        const request = await authorizedUserApiInstance.get<SalespersonsList[] | BaseResponseError>(
             `user/${uid}/salespersons`
         );
-        if (request.status === 200) {
-            return request.data;
-        }
+        return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting contact salesman list",
+                error: error.response?.data.error || "Error while getting contacts salesman list",
             };
         }
     }

@@ -26,6 +26,7 @@ import { Tasks } from "dashboard/tasks";
 import { ErrorBoundary } from "http/routes/ErrorBoundary";
 import { ToastProvider } from "dashboard/common/toast";
 import { ServiceUpdate } from "services/service-update";
+import { DealWashout } from "dashboard/deals/form/washout";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -98,6 +99,7 @@ const AppRouter = (): ReactElement => {
                                 { path: "", element: <Deals /> },
                                 { path: "create", element: <DealsForm /> },
                                 { path: ":id", element: <DealsForm /> },
+                                { path: ":id/washout", element: <DealWashout /> },
                             ],
                         },
                         {

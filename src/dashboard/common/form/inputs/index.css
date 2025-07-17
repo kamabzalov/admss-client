@@ -94,6 +94,14 @@
     border-radius: 0;
 }
 
+.currency-item__icon {
+    line-height: 0;
+    font-size: 15px;
+    .icon {
+        font-size: 12px;
+    }
+}
+
 .currency-item__input .p-inputnumber-input {
     &.currency-item__input--empty {
         color: var(--admss-app-light-grey);

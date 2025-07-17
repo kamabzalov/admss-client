@@ -20,8 +20,9 @@ import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { Button } from "primereact/button";
 import { parseDateFromServer } from "common/helpers";
 
 export const DealGeneralSale = observer((): ReactElement => {
@@ -32,7 +33,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const toast = useToast();
     const location = useLocation();
     const currentPath = location.pathname + location.search;
-
+    const navigate = useNavigate();
     const { authUser } = userStore;
     const { deal, changeDeal, changeDealExtData } = store;
 
@@ -137,6 +138,16 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
+            <div className='col-12 flex justify-content-end'>
+                <Button
+                    className='deal-sale__washout-button'
+                    outlined
+                    label={"Washout"}
+                    onClick={() => {
+                        navigate(`${location.pathname}/washout`);
+                    }}
+                />
+            </div>
             <div className='col-6 relative'>
                 <CompanySearch
                     {...getFieldProps("contactinfo")}
