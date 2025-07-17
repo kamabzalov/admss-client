@@ -8,6 +8,7 @@ import {
     DealPickupPayment,
     DealPrintForm,
     DealWashout,
+    AddToInventory,
 } from "common/models/deals";
 import { Inventory } from "common/models/inventory";
 import {
@@ -424,6 +425,24 @@ export class DealStore {
         }
     });
 
+    public changeAddToInventory = action((value: AddToInventory) => {
+        this._isFormChanged = true;
+        switch (value) {
+            case AddToInventory.ALL_DISABLED:
+                this._deal.addToInventory = AddToInventory.ALL_DISABLED;
+                break;
+            case AddToInventory.TRADE_FIRST_ENABLED:
+                this._deal.addToInventory = AddToInventory.TRADE_FIRST_ENABLED;
+                break;
+            case AddToInventory.TRADE_SECOND_ENABLED:
+                this._deal.addToInventory = AddToInventory.TRADE_SECOND_ENABLED;
+                break;
+            default:
+                this._deal.addToInventory = AddToInventory.ALL_ENABLED;
+                break;
+        }
+    });
+
     public set dealType(type: number) {
         this._dealType = type;
     }
@@ -470,6 +489,10 @@ export class DealStore {
 
     public set setInventoryAvailableOption(value: boolean) {
         this._setInventoryAvailableOption = value;
+    }
+
+    public set isFormChanged(value: boolean) {
+        this._isFormChanged = value;
     }
 
     public clearDeal = () => {
