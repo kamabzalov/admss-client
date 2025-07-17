@@ -95,6 +95,9 @@
 }
 
 .currency-item__input .p-inputnumber-input {
+    &.currency-item__input--empty {
+        color: var(--admss-app-light-grey);
+    }
     width: 100%;
     border-radius: 0 5px 5px 0;
 }
@@ -176,9 +179,24 @@
     font-size: 12px;
 }
 
-.percent-item__input .p-inputnumber-input {
-    width: 100%;
-    border-radius: 5px 0 0 5px;
+.percent-item {
+    .percent-item__input {
+        .percent-item__input--empty {
+            color: var(--admss-app-light-grey);
+        }
+        .p-inputnumber-input {
+            text-align: right;
+            width: 100%;
+            border-radius: 5px 0 0 5px;
+        }
+    }
+    .percent-item__label {
+        transition: all 0.2s ease;
+    }
+    .percent-item__label--empty {
+        font-size: 1rem;
+        top: 1.5rem;
+    }
 }
 
 .bordered-checkbox {
