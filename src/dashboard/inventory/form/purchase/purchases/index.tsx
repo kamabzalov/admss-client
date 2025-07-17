@@ -195,6 +195,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <PercentInput
                     labelPosition='top'
+                    emptyValue
                     title='Buyer Percent'
                     value={purPurchaseBuyerPercent}
                     onChange={({ value }) => {
@@ -208,6 +209,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
+                    coloredEmptyValue
                     title='Buyer Commission'
                     value={purPurchaseBuyerComm}
                     onChange={({ value }) => {
@@ -233,6 +235,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
+                    coloredEmptyValue
                     title='Amount'
                     value={purPurchaseAmount}
                     onChange={({ value }) => {

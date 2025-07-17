@@ -131,6 +131,11 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
+                store.resetUploadState();
+                fetchImages();
+                setTotalCount(0);
+                setImagesChecked([]);
+                setChecked(true);
             }
         });
     };
@@ -254,6 +259,16 @@ export const ImagesMedia = observer((): ReactElement => {
         icon: "none",
     };
 
+    const layoutItems = images
+        .filter((img) => img.itemuid !== undefined && img.itemuid !== null)
+        .map(({ itemuid }, index) => ({
+            i: String(itemuid),
+            x: index % 3,
+            y: Math.floor(index / 3),
+            w: 1,
+            h: 4,
+        }));
+
     return (
         <div className='media grid'>
             {isLoading && <Loader overlay />}
@@ -322,15 +337,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         isDroppable={true}
                         className='layout w-full relative'
                         onDragStop={(item) => handleChangeOrder(item)}
-                        layouts={{
-                            lg: images.map(({ itemuid }, index: number) => ({
-                                i: itemuid,
-                                x: index % 3,
-                                y: 0,
-                                w: 1,
-                                h: 4,
-                            })),
-                        }}
+                        layouts={{ lg: layoutItems }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
                         draggableCancel='
                         .media-uploaded__checkbox,
