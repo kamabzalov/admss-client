@@ -261,7 +261,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                     onClick={handleUploadFiles}
                     type='button'
                 >
-                    {isLoading ? "Saving..." : "Save"}
+                    Save
                 </Button>
             </div>
             <div className='media__uploaded media-uploaded'>
