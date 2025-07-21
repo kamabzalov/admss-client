@@ -26,6 +26,7 @@ import { TextInput } from "dashboard/common/form/inputs";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { Loader } from "dashboard/common/loader";
 
 export const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
@@ -54,18 +55,23 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const [savedMiddleName, setSavedMiddleName] = useState<string>(contact.middleName || "");
     const [savedBusinessName, setSavedBusinessName] = useState<string>(contact.businessName || "");
     const prevTypeRef = useRef<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleGetTypeList = async () => {
+        setIsLoading(true);
         const response = await getContactsTypeList(id || "0");
         if (response && Array.isArray(response)) {
             setTypeList(response);
         } else {
             setTypeList([]);
         }
+        setIsLoading(false);
     };
 
     useEffect(() => {
-        handleGetTypeList();
+        if (!typeList.length) {
+            handleGetTypeList();
+        }
     }, [id]);
 
     const handleScanDL = () => {
@@ -279,7 +285,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader className='contact-form__loader' />
+    ) : (
         <div className='grid general-info row-gap-2'>
             <div className='col-12 grid'>
                 <div className='col-4 relative pr-0 pb-0'>

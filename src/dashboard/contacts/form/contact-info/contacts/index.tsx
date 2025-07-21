@@ -8,12 +8,11 @@ import { Contact } from "common/models/contact";
 import { InputMask } from "primereact/inputmask";
 
 interface SocialInputProps extends InputTextProps {
-    social: "Skype" | "Facebook" | "WhatsApp" | "Slack";
+    social: "Facebook" | "WhatsApp" | "Slack";
 }
 
 const SocialInput = (props: SocialInputProps): ReactElement => {
     const iconMap = {
-        Skype: "adms-skype",
         Facebook: "adms-facebook",
         WhatsApp: "adms-whatsapp",
         Slack: "adms-slack-01",
@@ -182,14 +181,6 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                     social={"Slack"}
                     value={contact.messager3}
                     onChange={({ target: { value } }) => changeContact("messager3", value)}
-                />
-            </div>
-
-            <div className='col-6'>
-                <SocialInput
-                    social='Skype'
-                    value={contact.messager4}
-                    onChange={({ target: { value } }) => changeContact("messager4", value)}
                 />
             </div>
         </div>
