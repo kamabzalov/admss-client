@@ -68,11 +68,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                     value={values.Buyer_Emp_Phone || ""}
                     onChange={async ({ target: { value } }) => {
                         await setFieldValue("Buyer_Emp_Phone", value);
-                        changeContactExtData("Buyer_Emp_Phone", Number(value));
+                        changeContactExtData("Buyer_Emp_Phone", value);
                         setFieldTouched("Buyer_Emp_Phone", true, true);
                     }}
                 />
-                <small className='p-error'>{errors.Buyer_Emp_Phone}</small>
             </div>
         </div>
     );

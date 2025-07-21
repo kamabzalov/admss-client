@@ -8,6 +8,7 @@ import { ContactsOfacCheck } from "dashboard/contacts/form/general-info/tabs/ofa
 import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
+import { Loader } from "dashboard/common/loader";
 
 const { BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -20,7 +21,7 @@ const tabs = [
 
 export const ContactsBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const { activeTab } = store;
+    const { activeTab, isLoading } = store;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -54,7 +55,7 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
             >
                 {tabs.map((tab, index) => (
                     <TabPanel key={index} header={tab.header}>
-                        {tab.component}
+                        {isLoading ? <Loader /> : tab.component}
                     </TabPanel>
                 ))}
             </TabView>

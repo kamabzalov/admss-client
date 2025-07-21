@@ -160,7 +160,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         );
     };
 
-    return (
+    return isLoading ? (
+        <Loader className='contact-form__loader' />
+    ) : (
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>

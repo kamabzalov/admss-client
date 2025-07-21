@@ -15,6 +15,7 @@ import { useToast } from "dashboard/common/toast";
 import { InventoryShortList } from "common/models/inventory";
 import { AutoCompleteCompleteEvent } from "primereact/autocomplete";
 import { AutoCompleteDropdown } from "dashboard/common/form/autocomplete";
+import { Loader } from "dashboard/common/loader";
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
@@ -28,8 +29,10 @@ export const ContactsProspecting = observer((): ReactElement => {
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [prospectInput, setProspectInput] = useState<InventoryShortList | null>(null);
     const [prospectSecondInput, setProspectSecondInput] = useState<InventoryShortList | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleGetShortInventoryList = async () => {
+        setIsLoading(true);
         const response = await getShortInventoryList(authUser?.useruid ?? "");
         if (!Array.isArray(response) && response?.error) {
             toast.current?.show({
@@ -48,6 +51,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                 list.find((prospect) => prospect.itemuid === contactExtData.PROSPECT2_ID) ?? null
             );
         }
+        setIsLoading(false);
     };
 
     useEffect(() => {
@@ -72,7 +76,9 @@ export const ContactsProspecting = observer((): ReactElement => {
         setProspectList(filteredProspects);
     };
 
-    return (
+    return isLoading ? (
+        <Loader className='contact-form__loader' />
+    ) : (
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
                 <ComboBox

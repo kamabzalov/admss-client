@@ -6,6 +6,7 @@ import {
     ContactMediaItem,
     ContactOFAC,
     ContactProspect,
+    ContactType,
 } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
@@ -49,6 +50,7 @@ export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = { type: 0 } as Contact;
     private _coBayerContact: Contact = { type: 0 } as Contact;
+    private _contactTypeList: ContactType[] = [];
     private _contactType: number = 0;
     private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactProspect: Partial<ContactProspect>[] = [];
@@ -90,6 +92,10 @@ export class ContactStore {
 
     public get contactType() {
         return this._contactType;
+    }
+
+    public get contactTypeList() {
+        return this._contactTypeList;
     }
 
     public get contactExtData() {
@@ -636,11 +642,11 @@ export class ContactStore {
     });
 
     public removeContactMedia = action(
-        async (mediauid: string, cb: () => void): Promise<Status | undefined> => {
+        async (mediauid: string, cb?: () => void): Promise<Status | undefined> => {
             try {
                 await deleteContactMedia(mediauid);
 
-                await cb();
+                await cb?.();
 
                 return Status.OK;
             } catch (error) {
