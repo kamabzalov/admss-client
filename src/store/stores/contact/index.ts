@@ -30,6 +30,7 @@ import {
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
+import { filterPostPayload } from "common/utils";
 
 enum DLSides {
     FRONT = "front",
@@ -319,9 +320,15 @@ export class ContactStore {
                 );
             }
 
+            const filteredContact = filterPostPayload(this.contact);
+
+            const filteredExtData = filterPostPayload(this.contactExtData, [
+                "useruid",
+            ] as (keyof ContactExtData)[]);
+
             const contactData: Contact = {
-                ...this.contact,
-                extdata: this.contactExtData,
+                ...filteredContact,
+                extdata: filteredExtData,
                 prospect: newProspect as ContactProspect[],
             };
 
