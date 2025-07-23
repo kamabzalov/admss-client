@@ -7,6 +7,7 @@ import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { StateDropdown } from "dashboard/common/form/inputs";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -74,24 +75,20 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     <label className='float-label'>Street Address</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <ComboBox
-                    optionLabel='label'
-                    optionValue='id'
-                    filter
-                    placeholder='State'
-                    value={(type === BUYER ? contact.state : contactExtData.CoBuyer_State) || ""}
-                    options={STATES_LIST}
-                    onChange={({ target: { value } }) =>
-                        type === BUYER
-                            ? changeContact("state", value)
-                            : changeContactExtData("CoBuyer_State", value)
-                    }
-                    className='w-full address-info__dropdown'
-                    disabled={isControlDisabled}
-                    showClear={!!(type === BUYER ? contact.state : contactExtData.CoBuyer_State)}
-                />
-            </div>
+
+            <StateDropdown
+                name='State'
+                showClear={!!(type === BUYER ? contact.state : contactExtData.CoBuyer_State)}
+                className='w-full address-info__dropdown'
+                disabled={isControlDisabled}
+                value={type === BUYER ? contact.state : contactExtData.CoBuyer_State}
+                colWidth={3}
+                onChange={({ value }) =>
+                    type === BUYER
+                        ? changeContact("state", value)
+                        : changeContactExtData("CoBuyer_State", value)
+                }
+            />
 
             <div className='col-3'>
                 <span className='p-float-label'>
