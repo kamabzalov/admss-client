@@ -221,7 +221,6 @@ export const AudioMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -265,7 +264,8 @@ export const AudioMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-audio'>
-                {uniqueAudio.length ? (
+                {isLoading && <Loader />}
+                {!isLoading && uniqueAudio.length ? (
                     uniqueAudio.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-audio__item'>
