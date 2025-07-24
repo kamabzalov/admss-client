@@ -22,7 +22,7 @@ import { ContactMediaData } from "./media-data";
 import { DeleteForm } from "./delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
-import { LETTERS_ONLY_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -54,8 +54,8 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
-const handleOnlyLettersMessage = (text: string) => {
-    return `${text || "This field"} must contain only letters.`;
+const handleValidationMessage = (text: string) => {
+    return `${text || "This field"} does not match the required format.`;
 };
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
@@ -68,14 +68,14 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("First name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("First name"),
             excludeEmptyString: true,
         }),
     middleName: Yup.string()
         .trim()
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("Middle name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Middle name"),
         }),
     lastName: Yup.string()
         .trim()
@@ -86,8 +86,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("Last name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
     businessName: Yup.string()
@@ -125,14 +125,14 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
-    CoBuyer_First_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("First name"),
+    CoBuyer_First_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+        message: handleValidationMessage("First name"),
     }),
-    CoBuyer_Middle_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("Middle name"),
+    CoBuyer_Middle_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+        message: handleValidationMessage("Middle name"),
     }),
-    CoBuyer_Last_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("Last name"),
+    CoBuyer_Last_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+        message: handleValidationMessage("Last name"),
     }),
 });
 
