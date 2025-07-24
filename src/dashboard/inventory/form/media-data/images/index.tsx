@@ -271,7 +271,6 @@ export const ImagesMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -331,7 +330,8 @@ export const ImagesMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-images'>
-                {images.length ? (
+                {isLoading && <Loader />}
+                {!isLoading && images?.length ? (
                     <ResponsiveReactGridLayout
                         isDraggable={true}
                         isDroppable={true}

@@ -308,7 +308,6 @@ export const LinksMedia = observer((): ReactElement => {
 
     return (
         <div className='media-links grid'>
-            {isLoading && <Loader overlay />}
             <div className='col-12'>
                 <span className='p-float-label'>
                     <InputTextarea
@@ -350,7 +349,8 @@ export const LinksMedia = observer((): ReactElement => {
             </div>
             <div className='media-links mt-4 col-12'>
                 <div className='inventory-content w-full'>
-                    {links.length ? (
+                    {isLoading && <Loader />}
+                    {!isLoading && links.length ? (
                         <DataTable
                             value={links}
                             rowExpansionTemplate={rowExpansionTemplate}

@@ -229,7 +229,6 @@ export const VideoMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -284,7 +283,8 @@ export const VideoMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-video'>
-                {uniqueVideos.length ? (
+                {isLoading && <Loader />}
+                {!isLoading && uniqueVideos.length ? (
                     uniqueVideos.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-video__item'>

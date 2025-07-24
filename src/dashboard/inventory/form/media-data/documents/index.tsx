@@ -214,7 +214,6 @@ export const DocumentsMedia = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -259,7 +258,8 @@ export const DocumentsMedia = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
-                {uniqueDocuments.length ? (
+                {isLoading && <Loader />}
+                {!isLoading && uniqueDocuments.length ? (
                     uniqueDocuments.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-documents__item'>
