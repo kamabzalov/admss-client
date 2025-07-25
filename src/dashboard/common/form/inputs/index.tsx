@@ -24,6 +24,7 @@ interface DashboardRadioProps {
 }
 
 interface CurrencyInputProps extends InputNumberProps {
+    currencyIcon?: "dollar" | "percent";
     labelPosition?: LabelPosition;
     coloredEmptyValue?: boolean;
 }
@@ -134,6 +135,7 @@ export const CurrencyInput = ({
     value,
     title,
     labelPosition = "left",
+    currencyIcon = "dollar",
     coloredEmptyValue = false,
     ...props
 }: CurrencyInputProps) => {
@@ -155,7 +157,16 @@ export const CurrencyInput = ({
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
-                <div className='currency-item__icon input-icon input-icon-left'>$</div>
+                {currencyIcon === "dollar" && (
+                    <div className='currency-item__icon input-icon input-icon-left'>
+                        <i className='icon adms-dollar-sign' />
+                    </div>
+                )}
+                {currencyIcon === "percent" && (
+                    <div className='currency-item__icon input-icon input-icon-left'>
+                        <i className='icon adms-percentage' />
+                    </div>
+                )}
                 <InputNumber
                     inputId={uniqueId}
                     minFractionDigits={2}

@@ -33,6 +33,33 @@ import { TOAST_LIFETIME } from "common/settings";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 
 const STEP = "step";
+export enum INVENTORY_STEPS {
+    GENERAL = 1,
+    DESCRIPTION = 2,
+    OPTIONS = 3,
+    CHECKLIST = 4,
+    KEYS = 5,
+    DISCLOSURES = 6,
+    OTHER = 7,
+    PURCHASES = 8,
+    PAYMENTS = 9,
+    EXPENSES = 10,
+    TITLE = 11,
+    FLOORPLAN = 12,
+    CONSIGN = 13,
+    IMAGES = 14,
+    VIDEO = 15,
+    AUDIO = 16,
+    DOCUMENTS = 17,
+    LINKS = 18,
+    WATERMARKING = 19,
+    PRICE = 20,
+    DATES = 21,
+    EXPORT_LINKS = 22,
+    FUEL_ECONOMY = 23,
+    EXTRA_DATA = 24,
+    HISTORY = 25,
+}
 
 type PartialInventory = Pick<
     InventoryModel,
@@ -411,7 +438,12 @@ export const InventoryForm = observer(() => {
     };
 
     const navigateAndClear = () => {
-        navigate(`/dashboard/inventory`);
+        if (memoRoute) {
+            navigate(memoRoute);
+            store.memoRoute = "";
+        } else {
+            navigate(`/dashboard/inventory`);
+        }
         clearInventory();
     };
 

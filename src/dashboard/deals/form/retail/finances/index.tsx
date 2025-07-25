@@ -3,7 +3,7 @@ import { ReactElement, useEffect } from "react";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
-import { dealFinancesRecalculate, dealFinancesWashout } from "http/services/deals.service";
+import { dealFinancesRecalculate, setDealWashout } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { DealFinance } from "common/models/deals";
 import { useStore } from "store/hooks";
@@ -31,7 +31,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                         outlined
                         type='button'
                         onClick={() => {
-                            id && dealFinancesWashout(id);
+                            id && setDealWashout(id);
                         }}
                         className='finances__button bold px-6'
                     >
