@@ -111,7 +111,6 @@
 }
 
 .date-item__label {
-    transition: all 0.2s ease;
     max-width: calc(100% - 60px);
     white-space: nowrap;
     overflow: hidden;

@@ -142,8 +142,12 @@ export const LinksMedia = observer((): ReactElement => {
     };
 
     const handleNavigateToLink = (url: string) => {
-        if (url) {
-            window.open(url, "_blank");
+        if (isValidUrl(url)) {
+            let finalUrl = url;
+            if (!/^https?:\/\//i.test(url)) {
+                finalUrl = "https://" + url;
+            }
+            window.open(finalUrl, "_blank");
         } else {
             toast.current?.show({
                 severity: "error",
@@ -308,7 +312,6 @@ export const LinksMedia = observer((): ReactElement => {
 
     return (
         <div className='media-links grid'>
-            {isLoading && <Loader overlay />}
             <div className='col-12'>
                 <span className='p-float-label'>
                     <InputTextarea
@@ -350,7 +353,8 @@ export const LinksMedia = observer((): ReactElement => {
             </div>
             <div className='media-links mt-4 col-12'>
                 <div className='inventory-content w-full'>
-                    {links.length ? (
+                    {isLoading && <Loader />}
+                    {!isLoading && links.length ? (
                         <DataTable
                             value={links}
                             rowExpansionTemplate={rowExpansionTemplate}
@@ -360,7 +364,12 @@ export const LinksMedia = observer((): ReactElement => {
                         >
                             <Column body={linkControlTemplate} />
                             <Column header='#' body={numberColumnTemplate} />
-                            <Column field='info.mediaurl' header='URL' style={{ width: "70%" }} />
+                            <Column
+                                className='media-links__url-ellipsis'
+                                field='info.mediaurl'
+                                header='URL'
+                                style={{ width: "70%", maxWidth: "34vw" }}
+                            />
                             <Column body={actionColumnTemplate} />
                         </DataTable>
                     ) : (

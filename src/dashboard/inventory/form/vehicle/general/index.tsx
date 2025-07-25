@@ -290,6 +290,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 });
                 changeInventory({ key: "mileage", value: inventory.mileage || vinInfo.mileage });
             }
+            handleGetInventoryGroupFullInfo(vinInfo.GroupClassName || values.GroupClassName);
         }
     };
 
@@ -421,9 +422,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                             value={values.VIN}
                             onChange={async ({ target: { value } }) => {
                                 await setFieldValue("VIN", value);
-                                await setFieldTouched("VIN", true, true);
+                                await setFieldTouched("VIN", true, false);
                                 changeInventory({ key: "VIN", value });
-                                await validateField("VIN");
+                                validateField("VIN");
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}
@@ -445,9 +446,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={values.StockNo}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("StockNo", value);
-                            await setFieldTouched("StockNo", true, true);
+                            await setFieldTouched("StockNo", true, false);
                             changeInventory({ key: "StockNo", value });
-                            await validateField("StockNo");
+                            validateField("StockNo");
                         }}
                         onInput={(event: React.FormEvent<HTMLInputElement>) => {
                             const value = (event.target as HTMLInputElement).value;

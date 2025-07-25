@@ -1,3 +1,4 @@
+import { DEBOUNCE_TIME } from "common/settings";
 import { FilterOptions } from "dashboard/common/filter";
 
 export const isObjectValuesEmpty = (obj: Record<string, string | number>) =>
@@ -45,7 +46,7 @@ export const createStringifyFilterQuery = (filterArray: FilterOptions[]): string
 
 export function debounce<T extends (...args: any[]) => any>(
     callee: T,
-    timeoutMs: number
+    timeoutMs: number = DEBOUNCE_TIME
 ): (...args: Parameters<T>) => void {
     let lastCall: number | null = null;
     let lastCallTimer: NodeJS.Timeout | null = null;

@@ -133,7 +133,6 @@ export const InventoryForm = observer(() => {
         currentLocation,
         deleteReason,
         memoRoute,
-        isLoading,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -162,20 +161,13 @@ export const InventoryForm = observer(() => {
         return "";
     }, [inventory]);
 
-    const InventoryFormSchema = ({
-        initialVIN,
-        initialStockNo,
-    }: {
-        initialVIN?: string;
-        initialStockNo?: string;
-    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
-        const debouncedCheckStockNoAvailability = debounce(
-            async (value: string, resolve: (exists: boolean) => void) => {
+    const debouncedCheckStockNoAvailability = useMemo(
+        () =>
+            debounce(async (value: string, resolve: (exists: boolean) => void) => {
                 if (!value || initialStockNo === value) {
                     resolve(true);
                     return;
                 }
-
                 try {
                     const res = (await checkStockNoAvailability(
                         value
@@ -184,27 +176,39 @@ export const InventoryForm = observer(() => {
                 } catch (error) {
                     resolve(true);
                 }
-            },
-            500
-        );
+            }),
+        [initialStockNo]
+    );
 
-        const debouncedCheckVINAvailability = debounce(
-            async (value: string, resolve: (exists: boolean) => void) => {
+    const debouncedCheckVINAvailability = useMemo(
+        () =>
+            debounce(async (value: string, resolve: (exists: boolean) => void) => {
                 if (!value || initialVIN === value) {
                     resolve(true);
                     return;
                 }
-
                 try {
                     const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
                     resolve(!(res && res.status === Status.OK && res.exists));
                 } catch (error) {
                     resolve(true);
                 }
-            },
-            500
-        );
+            }, 500),
+        [initialVIN]
+    );
 
+    const InventoryFormSchema = ({
+        debouncedCheckStockNoAvailability,
+        debouncedCheckVINAvailability,
+    }: {
+        initialVIN?: string;
+        initialStockNo?: string;
+        debouncedCheckStockNoAvailability: (
+            value: string,
+            resolve: (exists: boolean) => void
+        ) => void;
+        debouncedCheckVINAvailability: (value: string, resolve: (exists: boolean) => void) => void;
+    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
         return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
@@ -467,10 +471,8 @@ export const InventoryForm = observer(() => {
         }
     };
 
-    return isLoading ? (
-        <Loader overlay />
-    ) : (
-        <Suspense>
+    return (
+        <Suspense fallback={<Loader className='inventory-loader' />}>
             <div className='grid relative'>
                 <Button
                     icon='pi pi-times'
@@ -590,6 +592,8 @@ export const InventoryForm = observer(() => {
                                             validationSchema={InventoryFormSchema({
                                                 initialVIN,
                                                 initialStockNo,
+                                                debouncedCheckStockNoAvailability,
+                                                debouncedCheckVINAvailability,
                                             })}
                                             initialValues={
                                                 {
@@ -633,7 +637,11 @@ export const InventoryForm = observer(() => {
                                                                 {item.itemLabel}
                                                             </div>
                                                             {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense fallback={<Loader />}>
+                                                                <Suspense
+                                                                    fallback={
+                                                                        <Loader className='inventory-loader' />
+                                                                    }
+                                                                >
                                                                     {item.component}
                                                                 </Suspense>
                                                             )}

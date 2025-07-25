@@ -223,3 +223,7 @@
         box-shadow: none;
     }
 }
+
+.contact-form__loader {
+    height: 40vh;
+}

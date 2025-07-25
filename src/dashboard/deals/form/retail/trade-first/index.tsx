@@ -148,10 +148,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value: vinInfo.Year || values.Trade1_Year,
                 });
                 handleChangeFormValue({
-                    key: "Trade1_StockNum",
-                    value: vinInfo.StockNo || Trade1_StockNum,
-                });
-                handleChangeFormValue({
                     key: "Trade1_BodyStyle",
                     value: vinInfo.BodyStyle || Trade1_BodyStyle,
                 });
@@ -175,10 +171,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 handleChangeFormValue({
                     key: "Trade1_Year",
                     value: values.Trade1_Year || vinInfo.Year,
-                });
-                handleChangeFormValue({
-                    key: "Trade1_StockNum",
-                    value: Trade1_StockNum || vinInfo.StockNo,
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
