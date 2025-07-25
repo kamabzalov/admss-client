@@ -10,6 +10,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DealProfit } from "dashboard/deals/form/washout/deal-profit";
 import { InterestProfit } from "dashboard/deals/form/washout/interest-profit";
 import { setDealWashout } from "http/services/deals.service";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 export enum DealWashoutTabs {
     DEAL_PROFIT = "deal-profit",
@@ -90,6 +91,10 @@ export const DealWashout = observer((): ReactElement => {
         }
     };
 
+    const handlePrint = () => {};
+
+    const handleDownload = () => {};
+
     return (
         <div className='grid relative deal-washout'>
             <Button
@@ -144,23 +149,37 @@ export const DealWashout = observer((): ReactElement => {
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div className='deal-washout__footer form-nav'>
-                        <Button
-                            className='uppercase px-6 form-nav__button deal-washout__button'
-                            onClick={() => navigate(-1)}
-                            severity='danger'
-                            outlined
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type='button'
-                            onClick={handleSaveWashout}
-                            severity='success'
-                            className='uppercase px-6 form-nav__button deal-washout__button'
-                        >
-                            Save
-                        </Button>
+                    <div className='deal-washout__footer washout-footer form-nav'>
+                        <div className='washout-footer__controls'>
+                            <ControlButton
+                                variant={BUTTON_VARIANTS.PRINT}
+                                tooltip='Print'
+                                onClick={handlePrint}
+                            />
+                            <ControlButton
+                                variant={BUTTON_VARIANTS.DOWNLOAD}
+                                tooltip='Download'
+                                onClick={handleDownload}
+                            />
+                        </div>
+                        <div className='washout-footer__buttons'>
+                            <Button
+                                className='uppercase px-6 form-nav__button deal-washout__button'
+                                onClick={() => navigate(-1)}
+                                severity='danger'
+                                outlined
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type='button'
+                                onClick={handleSaveWashout}
+                                severity='success'
+                                className='uppercase px-6 form-nav__button deal-washout__button'
+                            >
+                                Save
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
