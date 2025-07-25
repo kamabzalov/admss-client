@@ -19,6 +19,8 @@ export enum DealWashoutTabs {
 
 const EMPTY_INFO_MESSAGE = "N/A";
 
+const CREATE_DEAL_ID = "create";
+
 export const DealWashout = observer((): ReactElement => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -28,7 +30,7 @@ export const DealWashout = observer((): ReactElement => {
     const { inventory, getDeal, getDealWashout } = store;
 
     useEffect(() => {
-        if (id) {
+        if (id && id !== CREATE_DEAL_ID) {
             getDeal(id);
             getDealWashout(id);
         }

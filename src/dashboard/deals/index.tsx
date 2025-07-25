@@ -125,6 +125,7 @@ export const DealsDataTable = observer(
     ({ onRowClick, originalPath, returnedField, getFullInfo }: DealsDataTableProps) => {
         const [deals, setDeals] = useState<Deal[]>([]);
         const store = useStore().dealStore;
+        const { clearDeal } = store;
         const userStore = useStore().userStore;
         const { authUser } = userStore;
         const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -365,6 +366,7 @@ export const DealsDataTable = observer(
         };
 
         const handleCreateDeal = () => {
+            clearDeal();
             if (originalPath) {
                 store.memoRoute = originalPath;
             }

@@ -15,13 +15,14 @@ export const DealGeneralOdometer = observer((): ReactElement => {
         dealExtData: { OdomInExcess, OdomNotActual },
         changeDealExtData,
     } = store;
+
     return (
         <div className='grid deal-general-odometer row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
                         {...getFieldProps("OdometerReading")}
-                        className={`'deal-odometer__text-input w-full' ${
+                        className={`deal-odometer__text-input w-full ${
                             errors.OdometerReading ? "p-invalid" : ""
                         }`}
                         value={values.OdometerReading}
@@ -45,7 +46,7 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                     options={[5, 6, 7, 8]}
                     label='Number of Digits (required)'
                     required
-                    className={`'w-full deal-odometer__dropdown' ${
+                    className={`w-full deal-odometer__dropdown ${
                         errors.OdomDigits ? "p-invalid" : ""
                     }`}
                 />
