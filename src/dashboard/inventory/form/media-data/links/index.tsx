@@ -1,5 +1,5 @@
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState, useRef, useId } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
@@ -15,6 +15,7 @@ import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Status } from "common/models/base-response";
 import { AxiosError } from "axios";
+import { Tooltip } from "primereact/tooltip";
 
 enum DIRECTION {
     UP = "up",
@@ -35,11 +36,38 @@ const isValidUrl = (url: string): boolean => {
     return tryUrl(url) || tryUrl(`http://${url}`);
 };
 
+const UrlCell = ({ mediaUrl }: { mediaUrl: string }) => {
+    const [isTextTruncated, setIsTextTruncated] = useState<boolean>(false);
+    const urlRef = useRef<HTMLDivElement>(null);
+    const uniqueId = useId();
+
+    useEffect(() => {
+        if (urlRef.current) {
+            const element = urlRef.current;
+            const isTruncated = element.scrollWidth > element.clientWidth;
+            setIsTextTruncated(isTruncated);
+        }
+    }, [mediaUrl]);
+
+    return (
+        <div ref={urlRef} className='media-links__url-ellipsis' data-tooltip-id={uniqueId}>
+            {mediaUrl}
+            {isTextTruncated && (
+                <Tooltip
+                    target={`[data-tooltip-id="${uniqueId}"]`}
+                    content={mediaUrl}
+                    position='mouse'
+                />
+            )}
+        </div>
+    );
+};
+
 export const LinksMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const toast = useToast();
     const [expandedRows, setExpandedRows] = useState<MediaItem[]>([]);
-    const [isUrlValid, setIsUrlValid] = useState(true);
+    const [isUrlValid, setIsUrlValid] = useState<boolean>(true);
     const {
         saveInventoryLinks,
         uploadFileLinks,
@@ -310,6 +338,11 @@ export const LinksMedia = observer((): ReactElement => {
         );
     };
 
+    const urlColumnTemplate = (rowData: MediaItem) => {
+        const mediaUrl = (rowData.info as UploadMediaLink)?.mediaurl || "";
+        return <UrlCell mediaUrl={mediaUrl} />;
+    };
+
     return (
         <div className='media-links grid'>
             <div className='col-12'>
@@ -366,9 +399,9 @@ export const LinksMedia = observer((): ReactElement => {
                             <Column header='#' body={numberColumnTemplate} />
                             <Column
                                 className='media-links__url-ellipsis'
-                                field='info.mediaurl'
                                 header='URL'
                                 style={{ width: "70%", maxWidth: "34vw" }}
+                                body={urlColumnTemplate}
                             />
                             <Column body={actionColumnTemplate} />
                         </DataTable>
