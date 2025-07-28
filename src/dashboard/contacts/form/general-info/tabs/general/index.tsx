@@ -285,22 +285,24 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         });
     };
 
+    const handleTypeChange = (e: { value: number }) => {
+        store.contactType = e.value;
+        setFieldValue("type", e.value);
+        changeContact("type", e.value);
+    };
+
     return isLoading ? (
         <Loader className='contact-form__loader' />
     ) : (
         <div className='grid general-info row-gap-2'>
             <div className='col-12 grid'>
-                <div className='col-4 relative pr-0 pb-0'>
+                <div className='col-4 relative pr-0'>
                     <ComboBox
                         optionLabel='name'
                         optionValue='id'
                         value={contact.type || 0}
                         options={typeList}
-                        onChange={(e) => {
-                            store.contactType = e.value;
-                            setFieldValue("type", e.value);
-                            changeContact("type", e.value);
-                        }}
+                        onChange={handleTypeChange}
                         className={`w-full general-info__dropdown ${
                             errors.type ? "p-invalid" : ""
                         }`}

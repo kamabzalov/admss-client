@@ -13,12 +13,11 @@ import {
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { useStore } from "store/hooks";
-import { Image } from "primereact/image";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { useToast } from "dashboard/common/toast";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
-import { Status } from "common/models/base-response";
+import { ContactDocumentTemplate } from "./document-template";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -27,8 +26,9 @@ const limitations: ContactDocumentsLimitations = {
     maxUploadedDocuments: 50,
 };
 
-const SUCCESS_MESSAGE = "Document deleted successfully";
-const ERROR_MESSAGE = "Failed to delete document";
+const isPdf = (file: File) => {
+    return file.type === "application/pdf" || file.name?.toLowerCase().includes(".pdf");
+};
 
 export const ContactsDocuments = observer((): ReactElement => {
     const store = useStore().contactStore;
@@ -37,7 +37,6 @@ export const ContactsDocuments = observer((): ReactElement => {
         saveContactDocuments,
         uploadFileDocuments,
         documents,
-        removeContactMedia,
         fetchDocuments,
         clearContactMedia,
         formErrorMessage,
@@ -120,49 +119,25 @@ export const ContactsDocuments = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteDocument = async (mediauid: string) => {
-        try {
-            setIsLoading(true);
-            const result = await removeContactMedia(mediauid);
-
-            if (result === Status.OK) {
-                await fetchDocuments();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: SUCCESS_MESSAGE,
-                });
-            } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: formErrorMessage || ERROR_MESSAGE,
-                });
-            }
-        } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: ERROR_MESSAGE,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__document'
-                    />
+                    {isPdf(file) ? (
+                        <div className='presentation__icon'>
+                            <i className='pi pi-file-pdf' />
+                        </div>
+                    ) : (
+                        <img
+                            alt={file.name}
+                            src={URL.createObjectURL(file)}
+                            role='presentation'
+                            width={29}
+                            height={29}
+                            className='presentation__document'
+                        />
+                    )}
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
                     </span>
@@ -278,47 +253,9 @@ export const ContactsDocuments = observer((): ReactElement => {
             <div className='media-documents'>
                 {isLoading && <Loader />}
                 {!isLoading && documents?.length ? (
-                    documents.map(({ itemuid, src, notes, created }, index: number) => {
-                        return (
-                            <div key={itemuid} className='media-documents__item'>
-                                <Image
-                                    src={src}
-                                    alt='contact-document'
-                                    width='75'
-                                    height='75'
-                                    pt={{
-                                        image: {
-                                            className: "media-documents__image",
-                                        },
-                                    }}
-                                />
-                                <div className='media-documents__info document-info'>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
-                                            <span className='document-info__icon'>
-                                                <i className='pi pi-comment' />
-                                            </span>
-                                        </span>
-                                        <span className='document-info__text'>{notes}</span>
-                                    </div>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
-                                            <i className='pi pi-calendar' />
-                                        </span>
-                                        <span className='document-info__text'>{created}</span>
-                                    </div>
-                                </div>
-                                <button
-                                    className='media-documents__close'
-                                    type='button'
-                                    disabled={isLoading}
-                                    onClick={() => handleDeleteDocument(itemuid || "")}
-                                >
-                                    <i className='pi pi-times' />
-                                </button>
-                            </div>
-                        );
-                    })
+                    documents.map((document) => (
+                        <ContactDocumentTemplate key={document.itemuid} document={document} />
+                    ))
                 ) : !isLoading ? (
                     <div className='w-full text-center'>No documents added yet.</div>
                 ) : null}

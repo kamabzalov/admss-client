@@ -103,7 +103,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         }),
-    type: Yup.number().default(0).required("Data is required."),
+    type: Yup.number()
+        .test("typeRequired", "Data is required.", function (value) {
+            return value !== 0 && value !== null && value !== undefined;
+        })
+        .required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
     phone1: Yup.string()
@@ -524,7 +528,7 @@ export const ContactForm = observer((): ReactElement => {
                                                     firstName: contact?.firstName || "",
                                                     middleName: contact?.middleName || "",
                                                     lastName: contact?.lastName || "",
-                                                    type: contact?.type || 0,
+                                                    type: contact?.type || null,
                                                     businessName: contact?.businessName || "",
                                                     email1: contact?.email1 || "",
                                                     email2: contact?.email2 || "",
