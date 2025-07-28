@@ -527,26 +527,6 @@ export class ContactStore {
         }
     };
 
-    public clearContact = () => {
-        this._contact = {} as Contact;
-        this._coBayerContact = {} as Contact;
-        this._isContactChanged = false;
-        this._contactID = "";
-        this._contactType = 0;
-        this._frontSiteDLurl = "";
-        this._backSiteDLurl = "";
-        this._coBuyerFrontSideDLurl = "";
-        this._coBuyerBackSideDLurl = "";
-        this._frontSiteDL = {} as File;
-        this._backSiteDL = {} as File;
-        this._coBuyerFrontSideDL = {} as File;
-        this._coBuyerBackSideDL = {} as File;
-        this._contactExtData = {} as ContactExtData;
-        this._contactOFAC = {} as ContactOFAC;
-        this._coBuyerContactOFAC = {} as ContactOFAC;
-        this._deleteReason = "";
-    };
-
     private getContactMedia = async (): Promise<Status> => {
         try {
             const mediaList = await getContactMediaItemList(this._contactID);
@@ -607,9 +587,7 @@ export class ContactStore {
     });
 
     private saveContactMedia = action(
-        async (
-            mediaType: MediaType
-        ): Promise<{ status: Status; savedItems?: Partial<ContactMediaItem>[] }> => {
+        async (): Promise<{ status: Status; savedItems?: Partial<ContactMediaItem>[] }> => {
             try {
                 const { file, data } = this._uploadFileDocuments;
                 if (!file.length) {
@@ -622,8 +600,13 @@ export class ContactStore {
                     formData.append("file", file);
 
                     try {
+                        const isPdf =
+                            file.type === "application/pdf" ||
+                            file.name?.toLowerCase().includes(".pdf");
+                        const fileMediaType = isPdf ? MediaType.mtDocument : MediaType.mtPhoto;
+
                         const createMediaResponse = (await createMediaItemRecord(
-                            mediaType
+                            fileMediaType
                         )) as CreateMediaItemRecordResponse;
                         if (createMediaResponse?.status === Status.OK) {
                             const uploadMediaResponse = (await uploadContactMedia(
@@ -637,7 +620,7 @@ export class ContactStore {
                                         mediaitemuid: uploadMediaResponse.itemuid,
                                         contenttype: data.contenttype,
                                         notes: data.notes,
-                                        type: mediaType,
+                                        type: fileMediaType,
                                     }
                                 );
 
@@ -673,7 +656,7 @@ export class ContactStore {
 
     public saveContactDocuments = action(async (): Promise<Status | undefined> => {
         try {
-            const { status, savedItems } = await this.saveContactMedia(MediaType.mtPhoto);
+            const { status, savedItems } = await this.saveContactMedia();
             if (status === Status.OK) {
                 this._uploadFileDocuments = initialMediaItem;
                 if (savedItems) {
@@ -777,5 +760,25 @@ export class ContactStore {
         this._contactDocumentsID = [];
         this._uploadFileDocuments = initialMediaItem;
         this._formErrorMessage = "";
+    };
+
+    public clearContact = () => {
+        this._contact = {} as Contact;
+        this._coBayerContact = {} as Contact;
+        this._isContactChanged = false;
+        this._contactID = "";
+        this._contactType = 0;
+        this._frontSiteDLurl = "";
+        this._backSiteDLurl = "";
+        this._coBuyerFrontSideDLurl = "";
+        this._coBuyerBackSideDLurl = "";
+        this._frontSiteDL = {} as File;
+        this._backSiteDL = {} as File;
+        this._coBuyerFrontSideDL = {} as File;
+        this._coBuyerBackSideDL = {} as File;
+        this._contactExtData = {} as ContactExtData;
+        this._contactOFAC = {} as ContactOFAC;
+        this._coBuyerContactOFAC = {} as ContactOFAC;
+        this._deleteReason = "";
     };
 }

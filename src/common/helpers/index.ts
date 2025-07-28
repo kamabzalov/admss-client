@@ -246,3 +246,16 @@ export const convertToStandardTimestamp = (dateInput: string | number | Date): n
     date.setHours(12, 0, 0, 0);
     return date.getTime();
 };
+
+export const convertDateToLocale = (date: string | number | undefined) => {
+    if (!date) return "";
+    const dateObj = new Date(date);
+    return new Intl.DateTimeFormat("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    }).format(dateObj);
+};
