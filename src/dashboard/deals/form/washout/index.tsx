@@ -11,6 +11,8 @@ import { DealProfit } from "dashboard/deals/form/washout/deal-profit";
 import { InterestProfit } from "dashboard/deals/form/washout/interest-profit";
 import { setDealWashout } from "http/services/deals.service";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
+import { DEALS_PAGE } from "common/constants/links";
+import { Loader } from "dashboard/common/loader";
 
 export enum DealWashoutTabs {
     DEAL_PROFIT = "deal-profit",
@@ -18,10 +20,9 @@ export enum DealWashoutTabs {
 }
 
 const EMPTY_INFO_MESSAGE = "N/A";
-
 const CREATE_DEAL_ID = "create";
 
-export const DealWashout = observer((): ReactElement => {
+export const DealWashout = observer((): ReactElement | null => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -30,11 +31,18 @@ export const DealWashout = observer((): ReactElement => {
     const { inventory, getDeal, getDealWashout } = store;
 
     useEffect(() => {
-        if (id && id !== CREATE_DEAL_ID) {
-            getDeal(id);
-            getDealWashout(id);
+        if (!id || id === CREATE_DEAL_ID) {
+            navigate(DEALS_PAGE.CREATE());
+            return;
         }
+
+        getDeal(id);
+        getDealWashout(id);
     }, [id]);
+
+    if (!id || id === CREATE_DEAL_ID) {
+        return null;
+    }
 
     const tabParam = searchParams.get("tab") || DealWashoutTabs.DEAL_PROFIT;
 
@@ -82,7 +90,7 @@ export const DealWashout = observer((): ReactElement => {
                 detail: "Washout saved",
                 life: TOAST_LIFETIME,
             });
-            navigate(`/dashboard/deals/${id}`);
+            navigate(DEALS_PAGE.EDIT(id));
         } else {
             toast.current?.show({
                 severity: "error",
@@ -99,10 +107,11 @@ export const DealWashout = observer((): ReactElement => {
 
     return (
         <div className='grid relative deal-washout'>
+            {store.isLoading && <Loader overlay />}
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate(`/dashboard/deals/${id}`)}
+                onClick={() => navigate(DEALS_PAGE.EDIT(id))}
             />
             <div className='col-12'>
                 <div className='card'>

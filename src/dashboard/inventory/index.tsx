@@ -577,6 +577,10 @@ export default function Inventories({
         },
     ];
 
+    const handleAddNewInventory = () => {
+        navigate(`/dashboard/inventory/create`);
+    };
+
     const header = (
         <div className='grid datatable-controls'>
             <div className='flex justify-content-between align-items-center gap-3'>
@@ -606,7 +610,7 @@ export default function Inventories({
                         severity='success'
                         type='button'
                         tooltip='Add new inventory'
-                        onClick={() => navigate("create")}
+                        onClick={handleAddNewInventory}
                     >
                         New
                     </Button>

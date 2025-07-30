@@ -7,6 +7,16 @@ import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ServerUserSettings } from "common/models/user";
+import {
+    ACCOUNTS_PAGE,
+    CONTACTS_PAGE,
+    DASHBOARD_PAGE,
+    DEALS_PAGE,
+    EXPORT_WEB_PAGE,
+    INVENTORY_PAGE,
+    REPORTS_PAGE,
+    TASKS_PAGE,
+} from "common/constants/links";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -101,16 +111,16 @@ export const Sidebar = observer((): ReactElement => {
                 }}
             />
             <ul className='sidebar-nav'>
-                {renderNavItem("/dashboard", "home", "Home")}
-                {renderNavItem("/dashboard/inventory", "inventory", "Inventory")}
+                {renderNavItem(DASHBOARD_PAGE, "home", "Home")}
+                {renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
                 {isSalesPerson || (
                     <>
-                        {renderNavItem("/dashboard/contacts", "contacts", "Contacts")}
-                        {renderNavItem("/dashboard/deals", "deals", "Deals")}
-                        {renderNavItem("/dashboard/accounts", "accounts", "Accounts")}
-                        {renderNavItem("/dashboard/reports", "reports", "Reports")}
-                        {renderNavItem("/dashboard/export-web", "export-web", "Export to Web")}
-                        {renderNavItem("/dashboard/tasks", "tasks", "Tasks")}
+                        {renderNavItem(CONTACTS_PAGE.MAIN, "contacts", "Contacts")}
+                        {renderNavItem(DEALS_PAGE.MAIN, "deals", "Deals")}
+                        {renderNavItem(ACCOUNTS_PAGE.MAIN, "accounts", "Accounts")}
+                        {renderNavItem(REPORTS_PAGE.MAIN, "reports", "Reports")}
+                        {renderNavItem(EXPORT_WEB_PAGE.MAIN, "export-web", "Export to Web")}
+                        {renderNavItem(TASKS_PAGE.MAIN, "tasks", "Tasks")}
                     </>
                 )}
             </ul>

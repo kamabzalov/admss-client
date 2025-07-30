@@ -7,9 +7,12 @@ import { DateInput, PhoneInput, StateDropdown } from "dashboard/common/form/inpu
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
+import { useLocation } from "react-router-dom";
 
 export const DealRetailLiens = observer((): ReactElement => {
     const store = useStore().dealStore;
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const { setFieldValue } = useFormikContext<PartialDeal>();
     const {
         changeDealExtData,
@@ -35,6 +38,7 @@ export const DealRetailLiens = observer((): ReactElement => {
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "First_Lien_Name", value })
                     }
+                    originalPath={currentPath}
                     onRowClick={(value) =>
                         changeDealExtData({
                             key: "First_Lien_Name",
