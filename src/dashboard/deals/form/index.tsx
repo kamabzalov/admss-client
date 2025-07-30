@@ -28,6 +28,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { DEALS_PAGE } from "common/constants/links";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
@@ -251,7 +252,7 @@ export const DealsForm = observer(() => {
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
-        return `/dashboard/deals/${currentPath}?step=${activeIndex + 1}`;
+        return `${DEALS_PAGE.MAIN}/${currentPath}?step=${activeIndex + 1}`;
     };
 
     const handleGetDeal = async () => {
@@ -265,7 +266,7 @@ export const DealsForm = observer(() => {
                     detail: (response?.error as string) || "",
                     life: TOAST_LIFETIME,
                 });
-                navigate(`/dashboard/deals`);
+                navigate(DEALS_PAGE.MAIN);
             }
         }
     };
@@ -377,7 +378,35 @@ export const DealsForm = observer(() => {
         if (isFormChanged) {
             setConfirmCloseVisible(true);
         } else {
-            navigate("/dashboard/deals");
+            navigate(DEALS_PAGE.MAIN);
+        }
+    };
+
+    const handleSubmit = async () => {
+        const response = await saveDeal();
+        const res = response as BaseResponseError;
+        if (typeof res === "string" || !res) {
+            navigate(DEALS_PAGE.MAIN);
+        }
+
+        if (res?.error) {
+            if (Array.isArray(res?.errors)) {
+                res?.errors.forEach((error) => {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error.message,
+                    });
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: res?.error,
+                });
+            }
+        } else {
+            navigate(DEALS_PAGE.MAIN);
         }
     };
 
@@ -550,25 +579,7 @@ export const DealsForm = observer(() => {
                                             validationSchema={DealFormSchema}
                                             validateOnChange={false}
                                             validateOnBlur={false}
-                                            onSubmit={() => {
-                                                saveDeal().then((response) => {
-                                                    const res = response as BaseResponseError;
-                                                    if (res?.status === Status.ERROR) {
-                                                        toast.current?.show({
-                                                            severity: "error",
-                                                            summary: "Error",
-                                                            detail: res?.error,
-                                                        });
-                                                    } else {
-                                                        navigate(`/dashboard/deals`);
-                                                        toast.current?.show({
-                                                            severity: "success",
-                                                            summary: "Success",
-                                                            detail: "Deal saved successfully",
-                                                        });
-                                                    }
-                                                });
-                                            }}
+                                            onSubmit={handleSubmit}
                                         >
                                             <Form name='dealForm' className='w-full'>
                                                 {dealsSections.map((section) =>
@@ -708,7 +719,7 @@ export const DealsForm = observer(() => {
                     acceptLabel='Confirm'
                     rejectLabel='Cancel'
                     bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
-                    confirmAction={() => navigate("/dashboard/deals")}
+                    confirmAction={() => navigate(DEALS_PAGE.MAIN)}
                     onHide={() => setConfirmCloseVisible(false)}
                 />
             )}

@@ -138,6 +138,7 @@ export const setDeal = async (
                     error.response?.data.info ||
                     error.response?.data.error ||
                     "Error while set deal",
+                errors: error.response?.data.errors,
             };
         }
     }

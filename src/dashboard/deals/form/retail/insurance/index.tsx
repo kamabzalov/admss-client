@@ -12,10 +12,13 @@ import {
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { useLocation } from "react-router-dom";
 
 const [MIN_LIMIT, MAX_LIMIT] = [0, 1000000];
 
 export const DealRetailInsurance = observer((): ReactElement => {
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const store = useStore().dealStore;
     const {
         dealExtData: {
@@ -42,6 +45,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-6'>
                 <CompanySearch
                     value={Insurance_Company}
+                    originalPath={currentPath}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Insurance_Company", value })
                     }
@@ -119,6 +123,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-6'>
                 <CompanySearch
                     value={Agent_Name}
+                    originalPath={currentPath}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Agent_Name", value })
                     }

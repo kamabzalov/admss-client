@@ -1,3 +1,4 @@
+import { DEALS_PAGE } from "common/constants/links";
 import { toBinary } from "common/helpers";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -80,7 +81,7 @@ export const DeleteDealForm = observer(
                             detail: error,
                         });
                     } else {
-                        navigate("/dashboard/deals");
+                        navigate(DEALS_PAGE.MAIN);
                         toast.current?.show({
                             severity: "success",
                             summary: "Success",

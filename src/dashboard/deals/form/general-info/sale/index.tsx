@@ -24,6 +24,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { Button } from "primereact/button";
 import { parseDateFromServer } from "common/helpers";
+import { DEALS_PAGE } from "common/constants/links";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -138,16 +139,18 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
-            <div className='col-12 flex justify-content-end'>
-                <Button
-                    className='deal-sale__washout-button'
-                    outlined
-                    label={"Washout"}
-                    onClick={() => {
-                        navigate(`${location.pathname}/washout`);
-                    }}
-                />
-            </div>
+            {id && (
+                <div className='col-12 flex justify-content-end'>
+                    <Button
+                        className='deal-sale__washout-button'
+                        outlined
+                        label={"Washout"}
+                        onClick={() => {
+                            navigate(DEALS_PAGE.WASHOUT(id));
+                        }}
+                    />
+                </div>
+            )}
             <div className='col-6 relative'>
                 <CompanySearch
                     {...getFieldProps("contactinfo")}

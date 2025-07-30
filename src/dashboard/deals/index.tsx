@@ -31,6 +31,7 @@ import { observer } from "mobx-react-lite";
 import "./index.css";
 import { DropdownHeaderPanel } from "dashboard/deals/common";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
+import { DEALS_PAGE } from "common/constants/links";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -370,7 +371,7 @@ export const DealsDataTable = observer(
             if (originalPath) {
                 store.memoRoute = originalPath;
             }
-            navigate("/dashboard/deals/create");
+            navigate(DEALS_PAGE.CREATE());
         };
 
         return (

@@ -355,7 +355,7 @@ export class DealStore {
             };
             const dealResponse = await setDeal(this._dealID, dealData).then((response) => {
                 if (response?.status === Status.ERROR) {
-                    throw new Error(response.error);
+                    throw response;
                 }
                 return response;
             });
@@ -371,18 +371,17 @@ export class DealStore {
                 (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
-            const err = error as AxiosError;
-            if (err?.response?.status === 500) {
-                const responseData = err?.response?.data as BaseResponseError;
+            if (error instanceof AxiosError && error.response?.status === 500) {
+                const responseData = error?.response?.data as BaseResponseError;
                 return {
                     status: Status.ERROR,
                     error: responseData?.error,
+                    errors: responseData?.errors,
                 };
+            } else {
+                const err = error as BaseResponseError;
+                return err;
             }
-            return {
-                status: Status.ERROR,
-                error: err?.message,
-            };
         } finally {
             this._isLoading = false;
         }
