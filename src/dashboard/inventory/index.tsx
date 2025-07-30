@@ -31,7 +31,12 @@ import {
     getUserSettings,
     setUserSettings,
 } from "http/services/auth-user.service";
-import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
+import {
+    FilterOptions,
+    TableColumnsList,
+    columns,
+    filterOptions,
+} from "dashboard/inventory/common/data-table";
 import {
     InventoryUserSettings,
     ServerUserSettings,
@@ -51,6 +56,7 @@ import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
+import { INVENTORY_PAGE } from "common/constants/links";
 
 const DATA_FIELD = "data-field";
 
@@ -92,6 +98,7 @@ export default function Inventories({
     const dataTableRef = useRef<DataTable<Inventory[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
+    const { clearInventory } = store;
     const toast = useToast();
 
     const navigate = useNavigate();
@@ -138,7 +145,9 @@ export default function Inventories({
             });
         }
         return () => {
+            store.isErasingNeeded = true;
             store.memoRoute = "";
+            clearInventory();
         };
     }, []);
 
@@ -578,7 +587,7 @@ export default function Inventories({
     ];
 
     const handleAddNewInventory = () => {
-        navigate(`/dashboard/inventory/create`);
+        navigate(INVENTORY_PAGE.CREATE());
     };
 
     const header = (
