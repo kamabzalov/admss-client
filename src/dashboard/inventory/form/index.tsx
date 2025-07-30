@@ -1,20 +1,20 @@
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicleData } from "./vehicle";
+import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 import { Button } from "primereact/button";
 import { AccordionItems, Inventory, InventoryItem, InventorySection } from "../common";
-import { InventoryPurchaseData } from "./purchase";
-import { InventoryMediaData } from "./media-data";
+import { InventoryPurchaseData } from "dashboard/inventory/form/purchase";
+import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { checkStockNoAvailability, getVINCheck } from "http/services/inventory-service";
-import { InventoryExportWebData } from "./export-web";
+import { InventoryExportWebData } from "dashboard/inventory/form/export-web";
 
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { PrintForms } from "./print-forms";
+import { PrintForms } from "dashboard/inventory/form/print-forms";
 import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
@@ -26,11 +26,12 @@ import {
 } from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
-import { DeleteForm } from "./delete-form";
+import { DeleteForm } from "dashboard/inventory/form/delete-form";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 import { TOAST_LIFETIME } from "common/settings";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { INVENTORY_PAGE } from "common/constants/links";
 
 const STEP = "step";
 export enum INVENTORY_STEPS {
@@ -102,6 +103,8 @@ const enum DIALOG_MESSAGES {
     QUIT = "Are you sure you want to leave this page? All unsaved data will be lost.",
     DELETE = "Do you really want to delete this inventory? This process cannot be undone.",
 }
+
+const CREATE_INVENTORY_ID = "create";
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
@@ -287,13 +290,13 @@ export const InventoryForm = observer(() => {
     }, [stepActiveIndex, stepsRef.current]);
 
     const getUrl = (activeIndex: number) => {
-        const currentPath = id ? id : "create";
-        return `/dashboard/inventory/${currentPath}?step=${activeIndex + 1}`;
+        const currentPath = id ? id : CREATE_INVENTORY_ID;
+        return `${INVENTORY_PAGE.EDIT(currentPath)}?step=${activeIndex + 1}`;
     };
 
-    const handleGetInventory = async (id: string) => {
+    const handleGetInventory = async () => {
         const response = await getInventory();
-        const res = response as unknown as BaseResponseError;
+        const res = response as BaseResponseError;
         if (res?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
@@ -301,7 +304,7 @@ export const InventoryForm = observer(() => {
                 detail: res?.error || "",
                 life: TOAST_LIFETIME,
             });
-            navigate(`/dashboard/inventory`);
+            navigate(INVENTORY_PAGE.MAIN);
         }
     };
 
@@ -320,9 +323,9 @@ export const InventoryForm = observer(() => {
         setPrintActiveIndex(itemsMenuCount + 1);
         setDeleteActiveIndex(itemsMenuCount + 2);
 
-        if (id) {
+        if (id && id !== CREATE_INVENTORY_ID) {
             store.inventoryID = id;
-            handleGetInventory(id);
+            handleGetInventory();
         }
 
         return () => {
@@ -363,7 +366,7 @@ export const InventoryForm = observer(() => {
                 navigate(memoRoute);
                 store.memoRoute = "";
             } else {
-                navigate(`/dashboard/inventory`);
+                navigate(INVENTORY_PAGE.MAIN);
             }
         };
 
@@ -442,7 +445,7 @@ export const InventoryForm = observer(() => {
             navigate(memoRoute);
             store.memoRoute = "";
         } else {
-            navigate(`/dashboard/inventory`);
+            navigate(INVENTORY_PAGE.MAIN);
         }
         clearInventory();
     };
