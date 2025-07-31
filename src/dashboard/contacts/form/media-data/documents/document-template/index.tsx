@@ -3,13 +3,13 @@ import { Image } from "primereact/image";
 import { ContactMediaItem } from "common/models/contact";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
-import { useState } from "react";
 import { Status } from "common/models/base-response";
 import { convertDateToLocale } from "common/helpers";
 import { MediaType } from "common/models/enums";
 
 interface ContactDocumentTemplateProps extends Partial<HTMLDivElement> {
     document: Partial<ContactMediaItem>;
+    setIsLoading: (isLoading: boolean) => void;
 }
 
 const SUCCESS_MESSAGE = "Document deleted successfully";
@@ -17,8 +17,8 @@ const ERROR_MESSAGE = "Failed to delete document";
 
 export const ContactDocumentTemplate = ({
     document: { itemuid, src, notes, created, type },
+    setIsLoading,
 }: ContactDocumentTemplateProps) => {
-    const [isLoading, setIsLoading] = useState(false);
     const { removeContactMedia, fetchDocuments, formErrorMessage } = useStore().contactStore;
     const toast = useToast();
 
@@ -91,7 +91,6 @@ export const ContactDocumentTemplate = ({
             <button
                 className='media-documents__close'
                 type='button'
-                disabled={isLoading}
                 onClick={() => handleDeleteDocument(itemuid || "")}
             >
                 <i className='pi pi-times' />

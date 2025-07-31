@@ -145,7 +145,8 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 25px 15px;
-    padding-top: 50px;
+    padding-top: 30px;
+    padding-bottom: 30px;
     color: var(--admss-app-light-grey);
 }
 
