@@ -64,6 +64,7 @@ interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
+    originalPath?: string;
 }
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
@@ -72,6 +73,7 @@ export default function Inventories({
     onRowClick,
     returnedField,
     getFullInfo,
+    originalPath,
 }: InventoriesProps): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -146,7 +148,9 @@ export default function Inventories({
         }
         return () => {
             store.isErasingNeeded = true;
-            store.memoRoute = "";
+            if (originalPath) {
+                store.memoRoute = originalPath;
+            }
             clearInventory();
         };
     }, []);

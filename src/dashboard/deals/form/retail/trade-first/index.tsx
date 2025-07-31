@@ -39,6 +39,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_OdomNotActual,
             Trade1_Allowance,
             Trade1_Lien_Payoff,
+            Trade1_Lien_Per_Diem,
             Trade1_Lien_Payoff_Good_Through,
             Trade1_Lien_Name,
             Trade1_Lien_Contact,
@@ -444,12 +445,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade1_Lien_Payoff) || 0}
+                    value={Number(Trade1_Lien_Per_Diem) || 0}
                     onChange={({ value }) => {
-                        changeDealExtData({ key: "Trade1_Lien_Payoff", value: value || 0 });
+                        changeDealExtData({ key: "Trade1_Lien_Per_Diem", value: value || 0 });
                     }}
                     labelPosition='top'
-                    title='Payoff Amount'
+                    title='Per Diem'
                 />
             </div>
             <div className='col-3'>

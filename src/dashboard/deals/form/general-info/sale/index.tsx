@@ -175,6 +175,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                             setFieldValue("inventoryinfo", value);
                             changeDeal({ key: "inventoryinfo", value });
                         }}
+                        originalPath={currentPath}
                         value={values?.inventoryinfo}
                         getFullInfo={handleGetInventoryInfo}
                         name='Vehicle (required)'
