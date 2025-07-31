@@ -114,7 +114,14 @@ export const ContactsDocuments = observer((): ReactElement => {
 
         if (response) {
             fileUploadRef.current?.clear();
-            fetchDocuments();
+            setTotalCount(0);
+            store.uploadFileDocuments = {
+                file: [],
+                data: {
+                    notes: "",
+                },
+            };
+            await fetchDocuments();
             setIsLoading(false);
         }
     };
@@ -254,7 +261,11 @@ export const ContactsDocuments = observer((): ReactElement => {
                 {isLoading && <Loader />}
                 {!isLoading && documents?.length ? (
                     documents.map((document) => (
-                        <ContactDocumentTemplate key={document.itemuid} document={document} />
+                        <ContactDocumentTemplate
+                            key={document.itemuid}
+                            setIsLoading={setIsLoading}
+                            document={document}
+                        />
                     ))
                 ) : !isLoading ? (
                     <div className='w-full text-center'>No documents added yet.</div>
