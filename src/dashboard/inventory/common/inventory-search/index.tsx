@@ -16,6 +16,7 @@ interface InventorySearchProps extends DropdownProps {
     onRowClick?: (inventoryName: string) => void;
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
+    originalPath?: string;
 }
 
 export const InventorySearch = ({
@@ -25,6 +26,7 @@ export const InventorySearch = ({
     onChange,
     returnedField,
     getFullInfo,
+    originalPath,
     ...props
 }: InventorySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -88,6 +90,7 @@ export const InventorySearch = ({
                     returnedField={returnedField}
                     getFullInfo={handleGetFullInfo}
                     onRowClick={handleOnRowClick}
+                    originalPath={originalPath}
                 />
             </Dialog>
         </>
