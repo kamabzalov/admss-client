@@ -53,7 +53,7 @@ export const DealRetailTag = observer((): ReactElement => {
                         }
                     }}
                     initialValue={
-                        !Title_Only && !Title_and_License ? "1" : Title_Only === 1 ? "0" : "1"
+                        !Title_Only && !Title_and_License ? "0" : Title_Only === 1 ? "0" : "1"
                     }
                     style={{ width: `${95 / tagTopRadio.length}%` }}
                 />

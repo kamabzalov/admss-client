@@ -3,7 +3,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { authorizedUserApiInstance } from "http/index";
 
 export interface VehicleDecodeInfo extends BaseResponseError {
-    BodyStyle: string;
+    BodyStyle: number;
     Category: string;
     Cylinders: string;
     Cylinders_id: number;

@@ -151,7 +151,9 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade2_BodyStyle",
-                    value: vinInfo.BodyStyle || Trade2_BodyStyle,
+                    value:
+                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
+                        Trade2_BodyStyle,
                 });
                 handleChangeFormValue({
                     key: "Trade2_Color",
@@ -176,7 +178,10 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade2_BodyStyle",
-                    value: Trade2_BodyStyle || vinInfo.BodyStyle,
+                    value:
+                        Trade2_BodyStyle ||
+                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
+                        "",
                 });
                 handleChangeFormValue({
                     key: "Trade2_Color",
