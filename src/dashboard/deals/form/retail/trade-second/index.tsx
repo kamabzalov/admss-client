@@ -151,9 +151,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade2_BodyStyle",
-                    value:
-                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
-                        Trade2_BodyStyle,
+                    value: vinInfo.BodyStyle_id || Trade2_BodyStyle,
                 });
                 handleChangeFormValue({
                     key: "Trade2_Color",
@@ -178,10 +176,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade2_BodyStyle",
-                    value:
-                        Trade2_BodyStyle ||
-                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
-                        "",
+                    value: Trade2_BodyStyle || vinInfo.BodyStyle_id,
                 });
                 handleChangeFormValue({
                     key: "Trade2_Color",
@@ -327,7 +322,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             <div className='col-3'>
                 <ComboBox
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={Trade2_Color}
                     options={colorList}
                     onChange={({ target: { value } }) =>
