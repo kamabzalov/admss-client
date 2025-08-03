@@ -152,9 +152,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value:
-                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
-                        Trade1_BodyStyle,
+                    value: vinInfo.BodyStyle_id || Trade1_BodyStyle,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -179,10 +177,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value:
-                        Trade1_BodyStyle ||
-                        bodyTypeList.find((item) => item.id === vinInfo.BodyStyle)?.name ||
-                        "",
+                    value: Trade1_BodyStyle || vinInfo.BodyStyle_id,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -346,7 +341,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <ComboBox
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={Trade1_BodyStyle}
                     onChange={({ target: { value } }) => {
                         changeDealExtData({ key: "Trade1_BodyStyle", value });

@@ -235,7 +235,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Trim", value: vinInfo.Trim || values.Trim });
                 changeInventory({
                     key: "BodyStyle_id",
-                    value: vinInfo.BodyStyle || values.BodyStyle_id,
+                    value: vinInfo.BodyStyle_id || values.BodyStyle_id,
                 });
                 changeInventory({
                     key: "InteriorColor",
@@ -278,7 +278,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
                 changeInventory({
                     key: "BodyStyle_id",
-                    value: inventory.BodyStyle_id || vinInfo.BodyStyle,
+                    value: inventory.BodyStyle_id || vinInfo.BodyStyle_id,
                 });
                 changeInventory({
                     key: "InteriorColor",
