@@ -6,8 +6,9 @@ import { ContactsOfacCheck } from "dashboard/contacts/form/general-info/tabs/ofa
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
-import { ContactsGeneralCoBuyerInfo } from "../tabs/general-cobuyer";
-import { ContactsIdentificationCoBuyerInfo } from "../tabs/identification-cobuyer";
+import { ContactsGeneralCoBuyerInfo } from "dashboard/contacts/form/general-info/tabs/general-cobuyer";
+import { ContactsIdentificationCoBuyerInfo } from "dashboard/contacts/form/general-info/tabs/identification-cobuyer";
+import { Loader } from "dashboard/common/loader";
 
 const { CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -20,7 +21,7 @@ const tabs = [
 
 export const ContactsCoBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const { contactType, activeTab } = store;
+    const { contactType, activeTab, isLoading } = store;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -54,7 +55,7 @@ export const ContactsCoBuyerInfo = observer((): ReactElement => {
             >
                 {tabs.map((tab, index) => (
                     <TabPanel key={index} header={tab.header}>
-                        {tab.component}
+                        {isLoading ? <Loader className='contact-form__loader' /> : tab.component}
                     </TabPanel>
                 ))}
             </TabView>
