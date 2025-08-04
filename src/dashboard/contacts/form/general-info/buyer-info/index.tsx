@@ -55,7 +55,7 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
             >
                 {tabs.map((tab, index) => (
                     <TabPanel key={index} header={tab.header}>
-                        {isLoading ? <Loader /> : tab.component}
+                        {isLoading ? <Loader className='contact-form__loader' /> : tab.component}
                     </TabPanel>
                 ))}
             </TabView>
