@@ -341,7 +341,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             value: value || locationList[0].locationuid,
                         });
                     }}
-                    placeholder='Location name'
+                    required
                     className={`w-full vehicle-general__dropdown ${
                         inventory.locationuid === "" && "p-inputwrapper-filled"
                     } ${errors.locationuid ? "p-invalid" : ""}`}
@@ -355,6 +355,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionValue='description'
                     options={groupClassList}
                     value={values?.GroupClassName}
+                    required
                     onChange={({ value }) => {
                         setFieldValue("GroupClassName", value);
                         changeInventory({
@@ -363,7 +364,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         });
                         handleGetInventoryGroupFullInfo(value);
                     }}
-                    placeholder='Group class'
                     className={`w-full vehicle-general__dropdown ${
                         errors.GroupClassName ? "p-invalid" : ""
                     }`}
@@ -504,6 +504,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={values.Model}
                     editable
                     options={automakesModelList}
+                    required
                     onChange={({ value }) => {
                         setFieldValue("Model", value);
                         changeInventory({ key: "Model", value });
@@ -567,7 +568,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className={`vehicle-general__text-input w-full ${
                             errors.mileage ? "p-invalid" : ""
                         }`}
-                        required
                         value={parseMileage(inventory?.mileage || "0")}
                         useGrouping={false}
                         min={0}
@@ -587,7 +587,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.ExteriorColor}
-                    required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
                     options={colorList}
                     className='w-full vehicle-general__dropdown'
@@ -600,7 +599,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.InteriorColor}
-                    required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
                     options={interiorList}
                     className='w-full vehicle-general__dropdown'
@@ -617,6 +615,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <ComboBox
                     options={auditOptions}
                     value={selectedAuditKey}
+                    optionLabel='label'
+                    optionValue='value'
                     onChange={(e) => handleAuditChange(e.value as keyof Audit)}
                     className='w-full vehicle-general__dropdown'
                     label='Status'

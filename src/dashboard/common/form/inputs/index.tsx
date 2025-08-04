@@ -210,7 +210,7 @@ export const PercentInput = ({
                     name={name}
                     inputClassName={`${props.value ? "percent-item__input--filled" : "percent-item__input--empty"}`}
                     {...props}
-                    value={!emptyValue && props.value ? props.value : 0}
+                    value={props.value ? props.value : 0}
                     pt={{
                         root: {
                             id: name,

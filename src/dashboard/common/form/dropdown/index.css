@@ -8,6 +8,13 @@
             font-size: 14px;
         }
     }
+
+    .p-dropdown-clear-icon.p-clickable {
+        color: var(--admss-app-medium-grey);
+        width: 14px;
+        height: 14px;
+        margin-top: -0.4rem;
+    }
 }
 .combo-box__list .combo-box__list-item {
     width: 100%;
