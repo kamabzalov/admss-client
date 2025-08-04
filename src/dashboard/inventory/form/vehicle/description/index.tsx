@@ -90,6 +90,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     optionValue='id'
                     options={fuelList}
                     value={inventory.TypeOfFuel_id?.toString()}
+                    required
                     onChange={({ value }) => {
                         setFieldValue("TypeOfFuel_id", value || "0");
                         changeInventory({ key: "TypeOfFuel_id", value: value || "0" });

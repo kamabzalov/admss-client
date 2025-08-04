@@ -31,6 +31,7 @@ export const ComboBox = ({
     const dropdown = (
         <Dropdown
             {...props}
+            showClear={!props.required && props.value}
             className={`${props.className} combo-box`}
             options={options}
             filter={filter ?? shouldEnableFilter}
