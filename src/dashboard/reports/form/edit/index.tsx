@@ -65,7 +65,7 @@ export const ReportEditForm = observer((): ReactElement => {
         }
     }, [startDate, endDate]);
 
-    const handleActionClick = async (action: DIALOG_ACTION) => {
+    const handleActionClick = async (action: DIALOG_ACTION, itemUID?: string) => {
         if (report.AskForStartAndEndDates) {
             setDialogAction(action);
             setIsDialogVisible(true);
@@ -76,6 +76,7 @@ export const ReportEditForm = observer((): ReactElement => {
                 columns: reportColumns,
                 from_date: startDate,
                 to_date: endDate,
+                itemUID,
                 ...report,
             });
             if (response && response.status === Status.ERROR) {
@@ -156,7 +157,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <div className='col-2 report-form__buttons'>
                         <Button
                             className='report__button'
-                            onClick={() => handleActionClick(DIALOG_ACTION.PREVIEW)}
+                            onClick={() => handleActionClick(DIALOG_ACTION.PREVIEW, report.itemuid)}
                             icon='icon adms-preview'
                             disabled={!report.name}
                             severity={!report.name ? "secondary" : "success"}
@@ -164,7 +165,9 @@ export const ReportEditForm = observer((): ReactElement => {
                         <Button
                             className='report__button'
                             icon='icon adms-download'
-                            onClick={() => handleActionClick(DIALOG_ACTION.DOWNLOAD)}
+                            onClick={() =>
+                                handleActionClick(DIALOG_ACTION.DOWNLOAD, report.itemuid)
+                            }
                             disabled={!report.name}
                             severity={!report.name ? "secondary" : "success"}
                         />
