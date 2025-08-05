@@ -64,6 +64,9 @@ interface DateInputProps extends CalendarProps {
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
     clearButton?: boolean;
+    ref?: React.RefObject<HTMLInputElement>;
+    wrapperClassName?: string;
+    infoText?: string;
 }
 
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
@@ -430,6 +433,9 @@ export const TextInput = ({
     name,
     colWidth,
     clearButton,
+    ref,
+    wrapperClassName,
+    infoText,
     ...props
 }: TextInputProps): ReactElement => {
     const [value, setValue] = useState<string>(props.value || "");
@@ -450,14 +456,17 @@ export const TextInput = ({
             } as React.ChangeEvent<HTMLInputElement>);
         }
     };
+
     const content = (
-        <span className='p-float-label relative'>
+        <span className={`p-float-label relative ${wrapperClassName || ""}`}>
             <InputText
+                ref={ref}
                 id={uniqueId}
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 value={value.trim()}
+                aria-describedby={`${uniqueId}-info`}
                 onChange={(e) => {
                     props.onChange && props.onChange(e);
                     setValue(e.target.value);
@@ -479,6 +488,11 @@ export const TextInput = ({
                     className='clear-input-button'
                     onClick={handleClear}
                 />
+            )}
+            {infoText && (
+                <small className='input-help' id={`${uniqueId}-info`}>
+                    {infoText}
+                </small>
             )}
             <label htmlFor={uniqueId} className='float-label'>
                 {name}

@@ -1,7 +1,6 @@
 import "./index.css";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState, useRef } from "react";
-import { InputText } from "primereact/inputtext";
+import { ReactElement, useEffect, useState, useRef, useMemo } from "react";
 import { Tooltip } from "primereact/tooltip";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
@@ -10,10 +9,11 @@ import { getHowToKnowList, setHowToKnow, deleteHowToKnow } from "http/services/d
 import { HowToKnow } from "common/models/deals";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { TextInput } from "dashboard/common/form/inputs";
 
 const NEW_ITEM = "new";
 const DESCRIPTION_MAX_LENGTH = 127;
-const DESCRIPTION_LIMIT = 100;
+const WINDOW_WIDTH_LIMIT = 1665;
 
 export const SettingsOther = (): ReactElement => {
     const toast = useToast();
@@ -23,6 +23,7 @@ export const SettingsOther = (): ReactElement => {
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<HowToKnow>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const newInputRef = useRef<HTMLInputElement>(null);
 
     const handleGetUserHowKnowList = async () => {
@@ -40,6 +41,12 @@ export const SettingsOther = (): ReactElement => {
     useEffect(() => {
         handleGetUserHowKnowList();
     }, [authUser]);
+
+    const symbolToLimit = useMemo(() => {
+        if (!editedItem.description) return DESCRIPTION_MAX_LENGTH.toString();
+        const limit = DESCRIPTION_MAX_LENGTH - editedItem.description.length;
+        return limit.toString();
+    }, [editedItem.description]);
 
     const handleSaveHowKnow = async () => {
         if (
@@ -110,16 +117,18 @@ export const SettingsOther = (): ReactElement => {
         }
     }, [editedItem]);
 
-    const getTruncatedText = (text: string | undefined) => {
-        if (!text) return "";
-        return text.length > DESCRIPTION_LIMIT
-            ? text.substring(0, DESCRIPTION_LIMIT) + "..."
-            : text;
-    };
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
 
-    const needsTooltip = (text: string | undefined) => {
-        return text ? text.length > DESCRIPTION_LIMIT : false;
-    };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const needsTooltip = useMemo(() => {
+        return windowWidth < WINDOW_WIDTH_LIMIT;
+    }, [windowWidth]);
 
     return (
         <div className='settings-form'>
@@ -153,20 +162,12 @@ export const SettingsOther = (): ReactElement => {
                                 <div className='col-10 flex align-items-center p-0'>
                                     {editedItem.itemuid === item.itemuid ? (
                                         <div className='flex row-edit'>
-                                            <InputText
-                                                type='text'
+                                            <TextInput
+                                                wrapperClassName='row-edit__input-wrapper'
                                                 maxLength={DESCRIPTION_MAX_LENGTH}
-                                                tooltip={
-                                                    editedItem?.description?.length ===
-                                                    DESCRIPTION_MAX_LENGTH
-                                                        ? `Max ${DESCRIPTION_MAX_LENGTH} characters`
-                                                        : ""
-                                                }
-                                                tooltipOptions={{
-                                                    position: "mouse",
-                                                }}
                                                 value={editedItem.description || ""}
-                                                className='row-edit__input'
+                                                className='row-edit__input validated-input'
+                                                infoText={symbolToLimit}
                                                 onChange={(e) =>
                                                     setEditedItem({
                                                         ...editedItem,
@@ -188,16 +189,16 @@ export const SettingsOther = (): ReactElement => {
                                         </div>
                                     ) : (
                                         <>
-                                            <span
+                                            <div
                                                 className={`description-text ${
-                                                    needsTooltip(item.description)
+                                                    needsTooltip
                                                         ? `description-text--tooltip-${item.itemuid}`
                                                         : ""
                                                 }`}
                                             >
-                                                {getTruncatedText(item.description)}
-                                            </span>
-                                            {needsTooltip(item.description) && (
+                                                {item.description}
+                                            </div>
+                                            {needsTooltip && (
                                                 <Tooltip
                                                     target={`.description-text--tooltip-${item.itemuid}`}
                                                     content={item.description}
@@ -257,10 +258,12 @@ export const SettingsOther = (): ReactElement => {
                             <div className='settings-other__row'>
                                 <div className='col-10 flex align-items-center p-0'>
                                     <div className='flex row-edit'>
-                                        <InputText
-                                            type='text'
+                                        <TextInput
                                             value={editedItem.description || ""}
+                                            wrapperClassName='row-edit__input-wrapper'
+                                            infoText={symbolToLimit}
                                             className='row-edit__input'
+                                            maxLength={DESCRIPTION_MAX_LENGTH}
                                             onChange={(e) =>
                                                 setEditedItem({
                                                     ...editedItem,

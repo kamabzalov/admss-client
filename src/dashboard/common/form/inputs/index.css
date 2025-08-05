@@ -267,3 +267,24 @@
         top: 2.2rem;
     }
 }
+
+.p-float-label {
+    --input-help-width: 30px;
+    &:has(.input-help) {
+        .p-inputtext {
+            padding-right: calc(var(--input-help-width) + 10px);
+        }
+    }
+
+    .input-help {
+        user-select: none;
+        position: absolute;
+        width: var(--input-help-width);
+        text-align: right;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--admss-app-medium-grey);
+        font-size: 16px;
+    }
+}
