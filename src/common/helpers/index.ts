@@ -230,6 +230,14 @@ export const validateDates = (
     return { isValid: true };
 };
 
+export const convertDateForQuery = (dateString: string): string => {
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${month}${day}${year}`;
+};
+
 export const toBinary = (value: boolean): 0 | 1 => (value ? 1 : 0);
 
 export const convertToStandardTimestamp = (dateInput: string | number | Date): number => {
