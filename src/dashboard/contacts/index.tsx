@@ -10,7 +10,6 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
@@ -33,6 +32,7 @@ import {
     SearchField,
 } from "dashboard/common/dialog/search";
 import { createStringifySearchQuery, formatPhoneNumber, isObjectValuesEmpty } from "common/helpers";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
@@ -253,7 +253,7 @@ export const ContactsDataTable = ({
         if (onRowClick) {
             const value = returnedField
                 ? data[returnedField]
-                : `${data.firstName} ${data.lastName}`;
+                : data.companyName || data.businessName || `${data.firstName} ${data.lastName}`;
             onRowClick(value);
         } else {
             navigate(data.contactuid);
@@ -360,7 +360,7 @@ export const ContactsDataTable = ({
             <div className='grid datatable-controls'>
                 <div className='col-6'>
                     <div className='contact-top-controls'>
-                        <Dropdown
+                        <ComboBox
                             value={selectedCategory}
                             onChange={(e) => {
                                 if (contactCategory) return;
@@ -504,6 +504,8 @@ export const ContactsDataTable = ({
                                                 width: serverSettings?.contacts?.columnWidth?.[
                                                     field
                                                 ],
+                                                maxWidth:
+                                                    serverSettings?.contacts?.columnWidth?.[field],
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
                                             },

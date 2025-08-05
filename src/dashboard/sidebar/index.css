@@ -7,7 +7,7 @@
     width: var(--admss-app-aside-expanded-width);
     transition: width 0.3s ease;
     top: var(--admss-app-header-height);
-    height: 100vh;
+    height: calc(100vh - var(--admss-app-header-height));
     background: var(--admss-app-main-blue);
     z-index: 999;
 
@@ -45,9 +45,18 @@
     color: var(--admss-app-white);
     width: 100%;
     gap: 30px;
+    max-height: calc(100% - 45px);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width: 0;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
 }
 
 .sidebar-nav__item {
+    flex: 0 0 auto;
     display: inline-flex;
     flex-direction: column;
     justify-content: center;

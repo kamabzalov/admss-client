@@ -7,6 +7,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { TERM_MONTH_LIST } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useLocation } from "react-router-dom";
 
 enum WarrantyTerm {
     MILES = "Miles",
@@ -15,6 +16,8 @@ enum WarrantyTerm {
 
 export const DealRetailProducts = observer((): ReactElement => {
     const store = useStore().dealStore;
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const {
         deal: { price },
         dealExtData: {
@@ -33,6 +36,7 @@ export const DealRetailProducts = observer((): ReactElement => {
         <div className='grid deal-retail-products row-gap-2'>
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     name='Service Contract Company'
                     value={Warranty_Name}
                     onChange={({ target: { value } }) =>
@@ -114,6 +118,7 @@ export const DealRetailProducts = observer((): ReactElement => {
 
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     value={GAP_Company}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "GAP_Company", value })

@@ -1,3 +1,5 @@
+@import "dashboard/common/form/index.css";
+
 .color-dusty-blue {
     color: var(--admss-app-dusty-blue);
 }
@@ -22,6 +24,10 @@
     color: var(--admss-app-deep-purple);
 }
 
+.color-gray {
+    color: var(--admss-app-medium-grey);
+}
+
 .main {
     padding-top: calc(var(--admss-app-header-height) + var(--admss-app-content-top-margin));
     height: 100%;
@@ -39,12 +45,14 @@
 }
 
 .card-header {
+    padding-top: 14px;
     margin-bottom: 30px;
     display: flex;
     align-items: center;
 }
 
 .card-header__title {
+    font-size: 20px;
     width: 343px;
 }
 
@@ -380,6 +388,11 @@
     flex: 0 1 104px;
     height: 50px;
     border-radius: 0 5px 5px 0;
+    .p-button-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .p-dialog .card {
@@ -392,8 +405,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 70vh;
+    height: 50vh;
     width: 100%;
+}
+
+.form-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
 }
 
 .dropdown-icon {
@@ -617,7 +637,8 @@
     margin-left: 16px;
 }
 
-.vertical-step-menu .p-steps-item.p-highlight.p-steps-current {
+.vertical-step-menu .p-steps-item.p-highlight.p-steps-current,
+.vertical-step-menu .p-steps-item:hover {
     width: 100%;
     background: var(--admss-app-light-blue);
     border-radius: 5px 0 0 5px;
@@ -679,4 +700,71 @@
 .row--deleted {
     opacity: 0.5;
     pointer-events: none;
+}
+
+.p-tree {
+    .p-treenode-droppoint {
+        position: relative;
+        border: none;
+        height: 6px;
+        margin: 0;
+
+        &::before {
+            content: "";
+            background: transparent;
+            position: absolute;
+            height: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            width: 100%;
+        }
+
+        &.p-treenode-droppoint-active {
+            background: transparent;
+            &::before {
+                background-color: var(--admss-app-main-blue);
+            }
+        }
+    }
+    .p-tree-container {
+        height: 100%;
+        border: none;
+
+        .p-treenode .p-treenode-content.p-treenode-dragover {
+            .report__list-item {
+                background: var(--admss-app-light-blue);
+            }
+            background-color: var(--admss-app-light-blue);
+        }
+
+        .p-treenode .p-treenode-content .p-tree-toggler:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.p-inputtext + .float-label,
+.combo-box + .float-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 90%;
+}
+
+.combo-box + .float-label {
+    width: calc(100% - 50px);
+}
+
+figure {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
 }

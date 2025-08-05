@@ -1,10 +1,12 @@
 import { STATES_LIST } from "common/constants/states";
 import { TITLE_STATUS_LIST } from "common/constants/title-status";
-import { DateInput } from "dashboard/common/form/inputs";
+import { InventoryExtData } from "common/models/inventory";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { useFormikContext } from "formik";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import { useLocation } from "react-router-dom";
@@ -36,6 +38,7 @@ export const PurchaseTitle = observer((): ReactElement => {
     } = store;
     const location = useLocation();
     const currentPath = location.pathname + location.search;
+    const { setFieldTouched } = useFormikContext<InventoryExtData>();
 
     return (
         <div className='grid purchase-title row-gap-2'>
@@ -59,36 +62,26 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </div>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        filter
-                        className='w-full purchase-title__dropdown'
-                        value={titleStatus}
-                        options={[...TITLE_STATUS_LIST]}
-                        onChange={({ value }) =>
-                            changeInventoryExtData({ key: "titleStatus", value })
-                        }
-                    />
-                    <label className='float-label'>Status</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='id'
+                    className='w-full purchase-title__dropdown'
+                    value={titleStatus}
+                    options={[...TITLE_STATUS_LIST]}
+                    onChange={({ value }) => changeInventoryExtData({ key: "titleStatus", value })}
+                    label='Status'
+                />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        filter
-                        className='w-full purchase-title__dropdown'
-                        value={titleState}
-                        options={STATES_LIST}
-                        onChange={({ value }) =>
-                            changeInventoryExtData({ key: "titleState", value })
-                        }
-                    />
-                    <label className='float-label'>State</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='id'
+                    className='w-full purchase-title__dropdown'
+                    value={titleState}
+                    options={STATES_LIST}
+                    onChange={({ value }) => changeInventoryExtData({ key: "titleState", value })}
+                    label='State'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -158,16 +151,14 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleHolderPhone}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleHolderPhone", value })
-                        }
-                    />
-                    <label className='float-label'>Holder Phone Number</label>
-                </span>
+                <PhoneInput
+                    name='Phone number'
+                    value={titleHolderPhone}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({ key: "titleHolderPhone", value });
+                    }}
+                    onBlur={() => setFieldTouched("titleHolderPhone", true)}
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -195,23 +186,20 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        filter
-                        className='w-full purchase-title__dropdown'
-                        value={titleHolderState}
-                        onChange={({ value }) => {
-                            changeInventoryExtData({
-                                key: "titleHolderState",
-                                value,
-                            });
-                        }}
-                        options={STATES_LIST}
-                    />
-                    <label className='float-label'>Holder State</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='id'
+                    className='w-full purchase-title__dropdown'
+                    value={titleHolderState}
+                    onChange={({ value }) => {
+                        changeInventoryExtData({
+                            key: "titleHolderState",
+                            value,
+                        });
+                    }}
+                    options={STATES_LIST}
+                    label='Holder State'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -248,16 +236,14 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titlePrevPhone}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titlePrevPhone", value })
-                        }
-                    />
-                    <label className='float-label'>Previous Phone Number</label>
-                </span>
+                <PhoneInput
+                    name='Phone number'
+                    value={titlePrevPhone}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({ key: "titlePrevPhone", value });
+                    }}
+                    onBlur={() => setFieldTouched("titlePrevPhone", true)}
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
@@ -272,24 +258,21 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        placeholder='State'
-                        filter
-                        optionLabel='name'
-                        optionValue='id'
-                        className='w-full purchase-title__dropdown'
-                        options={STATES_LIST}
-                        value={titlePrevState}
-                        onChange={({ value }) => {
-                            changeInventoryExtData({
-                                key: "titlePrevState",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Previous State</label>
-                </span>
+                <ComboBox
+                    placeholder='State'
+                    optionLabel='name'
+                    optionValue='id'
+                    className='w-full purchase-title__dropdown'
+                    options={STATES_LIST}
+                    value={titlePrevState}
+                    onChange={({ value }) => {
+                        changeInventoryExtData({
+                            key: "titlePrevState",
+                            value,
+                        });
+                    }}
+                    label='Previous State'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>

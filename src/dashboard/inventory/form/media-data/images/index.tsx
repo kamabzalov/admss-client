@@ -10,19 +10,19 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
-import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -36,10 +36,8 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const toast = useToast();
     const {
-        getInventory,
         saveInventoryImages,
         uploadFileImages,
         images,
@@ -48,7 +46,6 @@ export const ImagesMedia = observer((): ReactElement => {
         fetchImages,
         changeInventoryMediaOrder,
         clearMedia,
-        isFormChanged,
         formErrorMessage,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
@@ -57,16 +54,19 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchImages() : getInventory(id).then(() => fetchImages());
-        }
-        if (images.length) {
-            setImagesChecked(new Array(images.length).fill(checked));
-        }
+        fetchImages();
+
         return () => {
             clearMedia();
         };
-    }, [fetchImages, checked, id]);
+    }, []);
+
+    useEffect(() => {
+        if (images.length !== imagesChecked.length) {
+            const newCheckedState = new Array(images.length).fill(true);
+            setImagesChecked(newCheckedState);
+        }
+    }, [images.length]);
 
     useEffect(() => {
         if (formErrorMessage) {
@@ -131,6 +131,11 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
+                store.resetUploadState();
+                fetchImages();
+                setTotalCount(0);
+                setImagesChecked([]);
+                setChecked(true);
             }
         });
     };
@@ -254,9 +259,18 @@ export const ImagesMedia = observer((): ReactElement => {
         icon: "none",
     };
 
+    const layoutItems = images
+        .filter((img) => img.itemuid !== undefined && img.itemuid !== null)
+        .map(({ itemuid }, index) => ({
+            i: String(itemuid),
+            x: index % 3,
+            y: Math.floor(index / 3),
+            w: 1,
+            h: 4,
+        }));
+
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -272,7 +286,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
                     optionLabel={"name"}
@@ -316,21 +330,14 @@ export const ImagesMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-images'>
-                {images.length ? (
+                {isLoading && <Loader />}
+                {!isLoading && images?.length ? (
                     <ResponsiveReactGridLayout
                         isDraggable={true}
                         isDroppable={true}
                         className='layout w-full relative'
                         onDragStop={(item) => handleChangeOrder(item)}
-                        layouts={{
-                            lg: images.map(({ itemuid }, index: number) => ({
-                                i: itemuid,
-                                x: index % 3,
-                                y: 0,
-                                w: 1,
-                                h: 4,
-                            })),
-                        }}
+                        layouts={{ lg: layoutItems }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
                         draggableCancel='
                         .media-uploaded__checkbox,

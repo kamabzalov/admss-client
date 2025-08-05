@@ -1,5 +1,8 @@
+import { TableColumnsList } from "dashboard/deals";
 import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
+import { MultiSelectPanelHeaderTemplateEvent } from "primereact/multiselect";
 import { ReactElement } from "react";
 
 export interface DealsItem extends MenuItem {
@@ -18,7 +21,7 @@ export interface Deals {
 
 export enum AccordionDealItems {
     SALE = "Sale",
-    ODOMETER = "Odometer",
+    ODOMETER = "Odometer Disclosure",
     SELLER = "Seller",
     LIENS = "Liens",
     FIRST_TRADE = "Trade 1",
@@ -34,6 +37,47 @@ export enum AccordionDealItems {
     BHPH = "BHPH",
     DISMANTLE = "Dismantle",
 }
+
+interface DropdownHeaderPanelProps extends Partial<MultiSelectPanelHeaderTemplateEvent> {
+    columns: TableColumnsList[];
+    activeColumns: TableColumnsList[];
+    setActiveColumns: (columns: TableColumnsList[]) => void;
+}
+
+export const DropdownHeaderPanel = ({
+    onCloseClick,
+    columns,
+    activeColumns,
+    setActiveColumns,
+}: DropdownHeaderPanelProps) => {
+    return (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    onChange={() => {
+                        if (columns.length === activeColumns.length) {
+                            setActiveColumns(columns.filter(({ checked }) => checked));
+                        } else {
+                            setActiveColumns(columns);
+                        }
+                    }}
+                    checked={columns.length === activeColumns.length}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={(e) => {
+                    setActiveColumns(columns.filter(({ checked }) => checked));
+                    onCloseClick?.(e);
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+};
 
 export class DealsSection implements Deals {
     private static instancesCount: number = 0;

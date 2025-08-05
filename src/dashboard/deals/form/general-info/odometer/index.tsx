@@ -15,13 +15,14 @@ export const DealGeneralOdometer = observer((): ReactElement => {
         dealExtData: { OdomInExcess, OdomNotActual },
         changeDealExtData,
     } = store;
+
     return (
         <div className='grid deal-general-odometer row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
                         {...getFieldProps("OdometerReading")}
-                        className={`'deal-odometer__text-input w-full' ${
+                        className={`deal-odometer__text-input w-full ${
                             errors.OdometerReading ? "p-invalid" : ""
                         }`}
                         value={values.OdometerReading}
@@ -35,23 +36,22 @@ export const DealGeneralOdometer = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        {...getFieldProps("OdomDigits")}
-                        value={values.OdomDigits}
-                        onChange={(e) => {
-                            setFieldValue("OdomDigits", e.value);
-                            changeDealExtData({ key: "OdomDigits", value: e.value });
-                        }}
-                        options={[5, 6, 7, 8]}
-                        required
-                        className={`'w-full deal-odometer__dropdown' ${
-                            errors.OdomDigits ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Number of Digits (required)</label>
-                    <small className='p-error'>{errors.OdomDigits}</small>
-                </span>
+                <ComboBox
+                    {...getFieldProps("OdomDigits")}
+                    value={values.OdomDigits}
+                    onChange={(e) => {
+                        setFieldValue("OdomDigits", e.value);
+                        changeDealExtData({ key: "OdomDigits", value: e.value });
+                    }}
+                    options={[5, 6, 7, 8]}
+                    label='Number of Digits (required)'
+                    required
+                    className={`w-full deal-odometer__dropdown ${
+                        errors.OdomDigits ? "p-invalid" : ""
+                    }`}
+                />
+
+                <small className='p-error'>{errors.OdomDigits}</small>
             </div>
             <div className='col-3'>
                 <div className='deal-odometer__checkbox flex px-2'>

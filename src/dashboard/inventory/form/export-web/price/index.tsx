@@ -114,14 +114,16 @@ export const ExportWebPrice = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-12'>
-                <InputTextarea
-                    placeholder='Dealer comments on vehicle'
-                    className='w-full export-web-price__text-area'
-                    value={DealerComments}
-                    onChange={({ target: { value } }) =>
-                        changeExportWeb({ key: "DealerComments", value })
-                    }
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        className='w-full export-web-price__text-area'
+                        value={DealerComments}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "DealerComments", value })
+                        }
+                    />
+                    <label className='float-label'>Dealer comments on vehicle</label>
+                </span>
             </div>
         </div>
     );

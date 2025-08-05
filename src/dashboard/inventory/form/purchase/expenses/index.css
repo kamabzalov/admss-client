@@ -18,8 +18,38 @@
     align-items: center;
 }
 
-.purchase-expenses__table.p-datatable .p-column-header-content {
-    justify-content: center;
+.purchase-expenses__table.p-datatable {
+    --datatable-header-height: 45px;
+    margin-top: 50px;
+    .p-datatable-thead {
+        height: var(--datatable-header-height);
+    }
+    ::-webkit-scrollbar {
+        background: linear-gradient(
+            to bottom,
+            var(--admss-app-light-blue) var(--datatable-header-height),
+            transparent var(--datatable-header-height)
+        );
+    }
+    ::-webkit-scrollbar-track {
+        margin-top: var(--datatable-header-height);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--admss-app-medium-blue);
+        border-radius: 5px;
+    }
+
+    .p-datatable-wrapper {
+        overflow-x: auto;
+        padding-left: 6px;
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+    .p-column-header-content {
+        justify-content: center;
+    }
 }
 
 .purchase-expenses__table.p-datatable .p-datatable-emptymessage {
@@ -34,8 +64,8 @@
 
 .purchase-expenses__delete-button.p-button-icon-only,
 .purchase-expenses__table-button.p-button-icon-only {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     font-size: 18px;
     border-radius: 50%;
     color: var(--admss-app-medium-grey);
@@ -64,11 +94,16 @@
     color: var(--admss-app-red);
 }
 
-.expenses-confirm-dialog .p-confirm-dialog-reject,
-.expenses-confirm-dialog .p-confirm-dialog-accept {
-    padding: 20px 33px;
-    height: 60px;
-    font-size: 20px;
+.expenses-confirm-dialog {
+    .confirm-header__icon {
+        padding-bottom: 38px;
+    }
+    .p-confirm-dialog-reject,
+    .p-confirm-dialog-accept {
+        padding: 20px 33px;
+        height: 60px;
+        font-size: 20px;
+    }
 }
 
 .expenses-confirm-dialog {
@@ -94,6 +129,7 @@
 }
 .purchase-expenses__table .expanded-row__label {
     font-weight: 700;
+    flex: 0;
 }
 
 .table-button-active .p-button-icon {
@@ -103,4 +139,25 @@
 
 .purchase-expenses__dropdown {
     height: 50px;
+}
+
+.purchase-expenses {
+    .purchase-expenses-controls__button.p-button {
+        font-weight: 700;
+    }
+}
+
+.inventory-form .p-datatable .p-datatable-tbody {
+    .purchase-expenses__table-controls {
+        padding: 0 10px;
+        height: 40px;
+
+        .purchase-expenses__table-controls-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
+        }
+    }
 }

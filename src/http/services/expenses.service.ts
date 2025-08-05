@@ -1,8 +1,9 @@
 import { Expenses, ExpensesSetResponse, ExpensesTotal } from "common/models/expenses";
 import { authorizedUserApiInstance } from "http/index";
-import { BaseResponse, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { Contact } from "common/models/contact";
 import { ListData } from "common/models";
+import { AxiosError } from "axios";
 
 interface ExpensesListTypes extends BaseResponse {
     contact_types: ListData[];
@@ -15,14 +16,19 @@ interface ExpensesData {
 
 export const getExpensesList = async (inventoryuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<Expenses[]>(
+        const request = await authorizedUserApiInstance.get<Expenses[] | BaseResponseError>(
             `inventory/${inventoryuid}/expenses`
         );
         if (request.status === 200) {
             return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (error instanceof AxiosError) {
+            return {
+                status: Status.ERROR,
+                message: error.response?.data?.message || "Error while getting expenses",
+            };
+        }
     }
 };
 
@@ -42,13 +48,18 @@ export const getExpensesTotal = async (inventoryuid: string) => {
 export const getExpensesListTypes = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<ExpensesListTypes>(
-            `contacts/${useruid}/listtypes`
+            `inventory/list/constants/expensetypes`
         );
-        if (request.status === 200 && request.data.status === Status.OK) {
-            return request.data.contact_types;
+        if (request.status === 200) {
+            return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (error instanceof AxiosError) {
+            return {
+                status: Status.ERROR,
+                message: error.response?.data?.message || "Error while getting expenses types",
+            };
+        }
     }
 };
 
@@ -77,7 +88,12 @@ export const setExpensesItem = async ({ expenseuid, expenseData }: ExpensesData)
             return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (error instanceof AxiosError) {
+            return {
+                status: Status.ERROR,
+                message: error.response?.data?.message || "Error while saving expense",
+            };
+        }
     }
 };
 

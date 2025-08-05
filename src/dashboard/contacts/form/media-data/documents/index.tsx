@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
@@ -8,28 +8,122 @@ import {
     FileUploadUploadEvent,
     ItemTemplateOptions,
     FileUploadHeaderTemplateOptions,
+    FileUploadSelectEvent,
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
-import { MediaLimitations } from "common/models/inventory";
+import { useStore } from "store/hooks";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { useToast } from "dashboard/common/toast";
+import { ContactDocumentsLimitations } from "common/models/contact";
+import { Loader } from "dashboard/common/loader";
+import { ContactDocumentTemplate } from "./document-template";
 
-const limitations: MediaLimitations = {
+const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
     maxSize: 8,
     maxUpload: 16,
+    maxUploadedDocuments: 50,
+};
+
+const isPdf = (file: File) => {
+    return file.type === "application/pdf" || file.name?.toLowerCase().includes(".pdf");
 };
 
 export const ContactsDocuments = observer((): ReactElement => {
+    const store = useStore().contactStore;
+    const toast = useToast();
+    const {
+        saveContactDocuments,
+        uploadFileDocuments,
+        documents,
+        fetchDocuments,
+        clearContactMedia,
+        formErrorMessage,
+    } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        setIsLoading(true);
+        const handleFetchDocuments = async () => {
+            await fetchDocuments();
+            setIsLoading(false);
+        };
+        handleFetchDocuments();
+
+        return () => {
+            clearContactMedia();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
+    }, [formErrorMessage, toast]);
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileDocuments = {
+            ...store.uploadFileDocuments,
+            data: {
+                ...store.uploadFileDocuments.data,
+                notes: e.target.value,
+            },
+        };
+    };
+
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {
+        store.uploadFileDocuments = {
+            ...store.uploadFileDocuments,
+            file: e.files,
+        };
+        setTotalCount(e.files.length);
+    };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
+        setIsLoading(true);
         setTotalCount(e.files.length);
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
+        const newFiles = {
+            file: uploadFileDocuments.file.filter((item) => item.name !== file.name),
+            data: uploadFileDocuments.data,
+        };
+        store.uploadFileDocuments = newFiles;
+        setTotalCount(newFiles.file.length);
         callback();
+    };
+
+    const handleUploadFiles = async () => {
+        setIsLoading(true);
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
+        const response = await saveContactDocuments();
+
+        if (response) {
+            fileUploadRef.current?.clear();
+            setTotalCount(0);
+            store.uploadFileDocuments = {
+                file: [],
+                data: {
+                    notes: "",
+                },
+            };
+            await fetchDocuments();
+            setIsLoading(false);
+        }
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -37,14 +131,20 @@ export const ContactsDocuments = observer((): ReactElement => {
         return (
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__document'
-                    />
+                    {isPdf(file) ? (
+                        <div className='presentation__icon'>
+                            <i className='pi pi-file-pdf' />
+                        </div>
+                    ) : (
+                        <img
+                            alt={file.name}
+                            src={URL.createObjectURL(file)}
+                            role='presentation'
+                            width={29}
+                            height={29}
+                            className='presentation__document'
+                        />
+                    )}
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
                     </span>
@@ -124,32 +224,52 @@ export const ContactsDocuments = observer((): ReactElement => {
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("documents")}
+                onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12 mb-4'
+                className='col-12'
             />
-            <div className='col-9 media-input'>
+            <div className='col-12 mt-4 media-input'>
                 <InputText
-                    className='media-input__text w-full'
-                    onChange={() => {}}
+                    className='media-input__text'
                     placeholder='Comment'
+                    value={uploadFileDocuments?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
                 />
-            </div>
-            <div className='col-3'>
                 <Button
-                    severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount}
-                    className='p-button media-input__button w-full'
+                    severity={totalCount && !isLoading ? "success" : "secondary"}
+                    disabled={!totalCount || isLoading}
+                    className='p-button media-input__button'
+                    onClick={handleUploadFiles}
+                    type='button'
                 >
                     Save
                 </Button>
             </div>
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded documents</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        documents?.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({documents?.length || 0}/{limitations.maxUploadedDocuments})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
-                <div className='w-full text-center'>No documents added yet.</div>
+                {isLoading && <Loader />}
+                {!isLoading && documents?.length ? (
+                    documents.map((document) => (
+                        <ContactDocumentTemplate
+                            key={document.itemuid}
+                            setIsLoading={setIsLoading}
+                            document={document}
+                        />
+                    ))
+                ) : !isLoading ? (
+                    <div className='w-full text-center'>No documents added yet.</div>
+                ) : null}
             </div>
         </div>
     );

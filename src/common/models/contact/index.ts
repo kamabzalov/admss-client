@@ -1,3 +1,4 @@
+import { MediaLimits } from "common/models";
 import { BaseResponse, BaseResponseError } from "../base-response";
 
 export interface ContactExtData {
@@ -347,14 +348,19 @@ export interface TotalUsers extends BaseResponse {
     total: number;
 }
 
-export interface SalespersonsList {
-    created: string;
-    createdbyuid: string;
-    creatorusername: string;
-    enabled: number;
-    updated: string;
+export interface SalespersonsList extends BaseResponseError {
+    created: number;
+    updated: number;
     username: string;
     useruid: string;
+    createdbyuid: string;
+    creatorusername: string;
+    Name: string;
+    WorkPhone: string;
+    HomePhone: string;
+    Address: string;
+    email: string;
+    enabled: 0 | 1;
 }
 
 export enum ContactTypeNameList {
@@ -374,4 +380,56 @@ export interface SetContactResponse extends BaseResponseError {
     OFAC?: ContactOFAC;
     OFAC_cobuyer?: ContactOFAC;
     contactuid: string;
+}
+
+export interface ScanBarcodeDL extends BaseResponseError {
+    contact: Pick<
+        Contact,
+        | "ZIP"
+        | "city"
+        | "created"
+        | "dl_number"
+        | "dob"
+        | "exp"
+        | "firstName"
+        | "lastName"
+        | "middleName"
+        | "sex"
+        | "state"
+        | "streetAddress"
+        | "updated"
+    >;
+    qr_data: {
+        Bytes: string;
+        Content: string;
+        ECLevel: string;
+        Error: string;
+        Format: string;
+        HasECI: boolean;
+        Identifier: string;
+        IsInverted: boolean;
+        IsMirrored: boolean;
+        Rotation: number;
+        Text: string;
+        Version: string;
+    }[];
+}
+
+export interface ContactMediaItem {
+    contactuid: string;
+    contenttype: number;
+    created: string;
+    index: number;
+    itemuid: string;
+    mediauid: string;
+    notes: string;
+    type: number;
+    updated: string;
+    useruid: string;
+    src?: string;
+}
+
+export interface ContactDocumentsLimitations extends MediaLimits {
+    maxUpload: number;
+    maxUploadedDocuments: number;
 }

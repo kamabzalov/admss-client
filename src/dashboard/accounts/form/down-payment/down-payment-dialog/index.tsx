@@ -8,11 +8,11 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { DialogProps } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface DownPaymentDialogProps extends DialogProps {
     visible: boolean;
@@ -82,17 +82,17 @@ export const DownPaymentDialog = ({
                     emptyDate
                     onChange={(e) => setPaymentDate(e.target.value as string)}
                 />
-                <span className='p-float-label'>
-                    <Dropdown
-                        options={[...ACCOUNT_PAYMENT_METHODS]}
-                        value={paymentType}
-                        onChange={(e) => setPaymentType(e.value)}
-                        optionValue='name'
-                        optionLabel='name'
-                        className='w-full payment-dialog__dropdown'
-                    />
-                    <label className='float-label'>Payment Type</label>
-                </span>
+
+                <ComboBox
+                    options={[...ACCOUNT_PAYMENT_METHODS]}
+                    value={paymentType}
+                    onChange={(e) => setPaymentType(e.value)}
+                    optionValue='name'
+                    label='Payment Type'
+                    optionLabel='name'
+                    className='w-full payment-dialog__dropdown'
+                />
+
                 {isCheckNumberActive && (
                     <span className='p-float-label'>
                         <InputText

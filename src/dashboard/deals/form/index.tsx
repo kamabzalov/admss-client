@@ -25,8 +25,13 @@ import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { DeleteDealForm } from "dashboard/deals/form/delete-form";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { DEALS_PAGE } from "common/constants/links";
 
 const STEP = "step";
+const EMPTY_INFO_MESSAGE = "N/A";
 
 export type PartialDeal = Pick<
     Deal,
@@ -76,6 +81,7 @@ const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
         "SaleID",
     ],
     [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num"],
     [AccordionDealItems.FIRST_TRADE]: [
         "Trade1_Make",
         "Trade1_Model",
@@ -112,7 +118,7 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     SaleID: Yup.string().required("Data is required."),
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
-    First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+    First_Lien_Phone_Num: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -137,11 +143,11 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade1_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade1_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -166,11 +172,11 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     Trade2_Mileage: Yup.string()
         .required("Data is required.")
         .test("is-positive", "Mileage must be greater than 0", (value) => {
-            const numValue = Number(value);
+            const numValue = parseFloat(value);
             return !isNaN(numValue) && numValue > 0;
         }),
     Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
-    Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+    Trade2_Lien_Phone: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -183,8 +189,6 @@ enum DealType {
     BHPH = 0,
 }
 
-const DATE_NOW = new Date().toISOString();
-
 export const DealsForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
@@ -195,6 +199,7 @@ export const DealsForm = observer(() => {
     const store = useStore().dealStore;
     const {
         deal,
+        inventory,
         dealType,
         dealExtData,
         accordionActiveIndex,
@@ -204,6 +209,9 @@ export const DealsForm = observer(() => {
         clearDeal,
         isFormChanged,
         isLoading,
+        deleteMessage,
+        deleteReason,
+        hasDeleteOptionsSelected,
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -215,6 +223,11 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
+    const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
+    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const [confirmCloseVisible, setConfirmCloseVisible] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -239,7 +252,7 @@ export const DealsForm = observer(() => {
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
-        return `/dashboard/deals/${currentPath}?step=${activeIndex + 1}`;
+        return `${DEALS_PAGE.MAIN}/${currentPath}?step=${activeIndex + 1}`;
     };
 
     const handleGetDeal = async () => {
@@ -253,7 +266,7 @@ export const DealsForm = observer(() => {
                     detail: (response?.error as string) || "",
                     life: TOAST_LIFETIME,
                 });
-                navigate(`/dashboard/deals`);
+                navigate(DEALS_PAGE.MAIN);
             }
         }
     };
@@ -290,6 +303,7 @@ export const DealsForm = observer(() => {
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
+        setDeleteActiveIndex(itemsMenuCount + 2);
 
         return () => {
             sections.forEach((section) => section.clearCount());
@@ -307,6 +321,18 @@ export const DealsForm = observer(() => {
             });
         }
     }, [stepActiveIndex, printActiveIndex, accordionSteps]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (isFormChanged) {
+                event.preventDefault();
+            }
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [isFormChanged]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
@@ -331,14 +357,57 @@ export const DealsForm = observer(() => {
                     });
                 });
                 setErrorSections(currentSectionsWithErrors);
+
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
                     life: TOAST_LIFETIME,
                 });
             }
         });
+    };
+
+    const handleCloseForm = () => {
+        if (isFormChanged) {
+            setConfirmCloseVisible(true);
+        } else {
+            navigate(DEALS_PAGE.MAIN);
+        }
+    };
+
+    const handleSubmit = async () => {
+        const response = await saveDeal();
+        const res = response as BaseResponseError;
+        if (typeof res === "string" || !res) {
+            navigate(DEALS_PAGE.MAIN);
+        }
+
+        if (res?.error) {
+            if (Array.isArray(res?.errors)) {
+                res?.errors.forEach((error) => {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error.message,
+                    });
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: res?.error,
+                });
+            }
+        } else {
+            navigate(DEALS_PAGE.MAIN);
+        }
     };
 
     return isLoading ? (
@@ -349,7 +418,7 @@ export const DealsForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/deals")}
+                    onClick={handleCloseForm}
                 />
                 <div className='col-12'>
                     <div className='card deal'>
@@ -357,6 +426,28 @@ export const DealsForm = observer(() => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} Deal
                             </h2>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Stock#
+                                    <span className='card-header-info__data'>
+                                        {inventory?.StockNo || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Make
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Make || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Model
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Model || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    Year
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Year || EMPTY_INFO_MESSAGE}
+                                    </span>
+                                    VIN
+                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content deal__card'>
                             <div className='grid flex-nowrap deal__card-content'>
@@ -426,6 +517,19 @@ export const DealsForm = observer(() => {
                                             Print forms
                                         </Button>
                                     )}
+                                    {id && (
+                                        <Button
+                                            icon='pi pi-times'
+                                            className='p-button gap-2 deal__delete-nav w-full'
+                                            severity='danger'
+                                            onClick={() => {
+                                                navigate(getUrl(deleteActiveIndex));
+                                                setStepActiveIndex(deleteActiveIndex);
+                                            }}
+                                        >
+                                            Delete deal
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
@@ -438,8 +542,8 @@ export const DealsForm = observer(() => {
                                                     dealtype: deal.dealtype || dealType,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
-                                                    datepurchase: deal.datepurchase || DATE_NOW,
-                                                    dateeffective: deal.dateeffective || DATE_NOW,
+                                                    datepurchase: deal.datepurchase,
+                                                    dateeffective: deal.dateeffective,
                                                     inventorystatus: deal.inventorystatus || 0,
                                                     accountInfo: deal.accountInfo || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
@@ -475,25 +579,7 @@ export const DealsForm = observer(() => {
                                             validationSchema={DealFormSchema}
                                             validateOnChange={false}
                                             validateOnBlur={false}
-                                            onSubmit={() => {
-                                                saveDeal().then((response) => {
-                                                    const res = response as BaseResponseError;
-                                                    if (res?.status === Status.ERROR) {
-                                                        toast.current?.show({
-                                                            severity: "error",
-                                                            summary: "Error",
-                                                            detail: res.error,
-                                                        });
-                                                    } else {
-                                                        navigate(`/dashboard/deals`);
-                                                        toast.current?.show({
-                                                            severity: "success",
-                                                            summary: "Success",
-                                                            detail: "Deal saved successfully",
-                                                        });
-                                                    }
-                                                });
-                                            }}
+                                            onSubmit={handleSubmit}
                                         >
                                             <Form name='dealForm' className='w-full'>
                                                 {dealsSections.map((section) =>
@@ -524,6 +610,12 @@ export const DealsForm = observer(() => {
                                                         </div>
                                                         <PrintDealForms />
                                                     </div>
+                                                )}{" "}
+                                                {stepActiveIndex === deleteActiveIndex && (
+                                                    <DeleteDealForm
+                                                        isDeleteConfirm={isDeleteConfirm}
+                                                        attemptedSubmit={attemptedSubmit}
+                                                    />
                                                 )}
                                             </Form>
                                         </Formik>
@@ -534,7 +626,7 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={() => {
                                         if (!stepActiveIndex) {
-                                            return navigate(`/dashboard/deals`);
+                                            return handleCloseForm();
                                         }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
@@ -557,26 +649,80 @@ export const DealsForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
+                                        stepActiveIndex === deleteActiveIndex ||
+                                        stepActiveIndex >= itemsMenuCount
+                                            ? "secondary"
+                                            : "success"
                                     }
                                     className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button
-                                    onClick={handleSaveDealForm}
-                                    className='form-nav__button deal__button'
-                                    severity={isFormChanged ? "success" : "secondary"}
-                                    disabled={!isFormChanged}
-                                >
-                                    Save
-                                </Button>
+                                {stepActiveIndex === deleteActiveIndex ? (
+                                    <Button
+                                        onClick={() =>
+                                            deleteReason.length
+                                                ? setConfirmDeleteVisible(true)
+                                                : setAttemptedSubmit(true)
+                                        }
+                                        disabled={
+                                            !deleteReason.length ||
+                                            !deleteMessage ||
+                                            !hasDeleteOptionsSelected
+                                        }
+                                        severity={
+                                            !deleteReason.length ||
+                                            !deleteMessage ||
+                                            !hasDeleteOptionsSelected
+                                                ? "secondary"
+                                                : "danger"
+                                        }
+                                        className='p-button form-nav__button deal__button'
+                                    >
+                                        Delete
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSaveDealForm}
+                                        className='form-nav__button deal__button'
+                                        severity={isFormChanged ? "success" : "secondary"}
+                                        disabled={!isFormChanged}
+                                    >
+                                        {id ? "Update" : "Save"}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {confirmDeleteVisible && (
+                <ConfirmModal
+                    position='top'
+                    visible={confirmDeleteVisible}
+                    className='deal-delete-modal'
+                    acceptLabel='Delete'
+                    rejectLabel='Cancel'
+                    bodyMessage={deleteMessage}
+                    confirmAction={() => setIsDeleteConfirm(true)}
+                    onHide={() => setConfirmDeleteVisible(false)}
+                />
+            )}
+            {confirmCloseVisible && (
+                <ConfirmModal
+                    visible={confirmCloseVisible}
+                    position='top'
+                    title='Quit Editing?'
+                    icon='adms-warning'
+                    className='deal-close-modal'
+                    acceptLabel='Confirm'
+                    rejectLabel='Cancel'
+                    bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
+                    confirmAction={() => navigate(DEALS_PAGE.MAIN)}
+                    onHide={() => setConfirmCloseVisible(false)}
+                />
+            )}
         </Suspense>
     );
 });

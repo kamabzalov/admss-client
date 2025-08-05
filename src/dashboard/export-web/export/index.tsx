@@ -912,6 +912,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                 width: serverSettings?.exportWeb?.columnWidth?.[
                                                     field
                                                 ],
+                                                maxWidth:
+                                                    serverSettings?.exportWeb?.columnWidth?.[field],
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
                                             },

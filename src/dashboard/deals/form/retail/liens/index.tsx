@@ -3,13 +3,17 @@ import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InputText } from "primereact/inputtext";
-import { DateInput, StateDropdown } from "dashboard/common/form/inputs";
+import { DateInput, PhoneInput, StateDropdown } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
+import { useLocation } from "react-router-dom";
 
 export const DealRetailLiens = observer((): ReactElement => {
     const store = useStore().dealStore;
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
+    const { setFieldValue } = useFormikContext<PartialDeal>();
     const {
         changeDealExtData,
         dealExtData: {
@@ -21,10 +25,10 @@ export const DealRetailLiens = observer((): ReactElement => {
             First_Lien_Date,
             First_Lien_Acct_Num,
             First_Lien_Lienholder_ID,
+            First_Lien_Phone_Num,
         },
     } = store;
 
-    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
     return (
         <div className='grid deal-retail-liens row-gap-2'>
             <div className='col-6'>
@@ -34,6 +38,7 @@ export const DealRetailLiens = observer((): ReactElement => {
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "First_Lien_Name", value })
                     }
+                    originalPath={currentPath}
                     onRowClick={(value) =>
                         changeDealExtData({
                             key: "First_Lien_Name",
@@ -43,20 +48,14 @@ export const DealRetailLiens = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-liens__text-input w-full' ${
-                            errors.First_Lien_Phone_Num ? "p-invalid" : ""
-                        }`}
-                        value={values.First_Lien_Phone_Num}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("First_Lien_Phone_Num", value);
-                            changeDealExtData({ key: "First_Lien_Phone_Num", value });
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-                <small className='p-error'>{errors.First_Lien_Phone_Num}</small>
+                <PhoneInput
+                    name='Phone Number'
+                    value={First_Lien_Phone_Num}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("First_Lien_Phone_Num", value.replace(/[^0-9]/g, ""));
+                        changeDealExtData({ key: "First_Lien_Phone_Num", value });
+                    }}
+                />
             </div>
 
             <hr className='form-line' />

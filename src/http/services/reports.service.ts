@@ -6,7 +6,6 @@ import {
     ReportCollection,
     ReportCollectionUpdate,
     ReportCreate,
-    ReportDocument,
     ReportInfo,
     ReportServiceColumns,
     ReportServices,
@@ -172,6 +171,22 @@ export const getReportDocumentTemplate = async (documentuid: string) => {
     }
 };
 
+export const getReportDatasets = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+            `reports/${useruid}/datasets`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report datasets",
+            };
+        }
+    }
+};
+
 export const getReportColumns = async ({
     service,
     useruid,
@@ -213,10 +228,10 @@ export const createCustomReport = async (
     }
 };
 
-export const updateReportInfo = async (uid: string, body: Partial<ReportDocument & ReportInfo>) => {
+export const updateReportInfo = async (reportuid: string, body: Partial<ReportSetParams>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `reports/${uid}/reportinfo`,
+            `reports/${reportuid}/reportinfo`,
             body
         );
         return request.data;
@@ -408,6 +423,26 @@ export const setCollectionOrder = async (collectionuid: string, order: number) =
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while changing collection order",
+            };
+        }
+    }
+};
+
+export const updateCollection = async (useruid: string, body: Partial<ReportCollection>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `reports/${useruid}/collectionupdate`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while updating collection",
             };
         }
     }

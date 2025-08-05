@@ -1,19 +1,17 @@
 import {
     NODE_TYPES,
-    REPORT_TYPES,
     ReportCollection,
     ReportDocument,
     TOAST_MESSAGES,
 } from "common/models/reports";
 import {
     getUserFavoriteReportList,
-    getUserReportCollectionsContent,
     setReportOrder,
     moveReportToCollection,
     setCollectionOrder,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState, useCallback, useRef } from "react";
+import { ReactElement, useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useStore } from "store/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
@@ -29,6 +27,9 @@ import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
+const COLLECTION_DRAG_DELAY = 1000;
+const DEEPLY_NESTED_LEVEL = 3;
+
 export const NodeContent = ({
     node,
     isSelected,
@@ -41,9 +42,31 @@ export const NodeContent = ({
     isTogglerVisible?: boolean;
 }) => {
     const ref = useRef<HTMLDivElement>(null);
+    const [isDeeplyNested, setIsDeeplyNested] = useState(false);
+
+    const isNew = !!node.data?.document?.isNew;
+    const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
+
+    const getNestingLevel = (element: Element | null): number => {
+        const INCREMENT_LEVEL = 1;
+        if (!element) return 0;
+        const parent = element.closest(".p-treenode");
+        if (!parent) return 0;
+        return INCREMENT_LEVEL + getNestingLevel(parent.parentElement);
+    };
 
     useEffect(() => {
-        const parent = ref.current?.closest(".p-treenode-content");
+        const element = ref.current?.closest(".p-treenode-content");
+
+        const isDeeplyNestedNode =
+            node.type === NODE_TYPES.DOCUMENT && element
+                ? getNestingLevel(element) >= DEEPLY_NESTED_LEVEL
+                : false;
+        setIsDeeplyNested(isDeeplyNestedNode);
+    }, [node.type]);
+
+    useEffect(() => {
+        const parent = ref?.current?.closest(".p-treenode-content");
         if (parent) {
             if (isTogglerVisible) {
                 parent.classList.add("report__list-item--toggler-visible");
@@ -53,12 +76,22 @@ export const NodeContent = ({
             } else {
                 parent.classList.remove("report__list-item--selected-container");
             }
+            if (isSimpleNode) {
+                parent.classList.add("simple-node");
+            }
+            if (isDeeplyNested) {
+                parent.classList.add("deeply-nested-node");
+            }
         }
-    }, [isSelected, isTogglerVisible]);
+    }, [isSelected, isTogglerVisible, isSimpleNode, isDeeplyNested]);
 
     return (
         <div className='w-full' ref={ref}>
-            <Button onClick={onClick} className={`report__list-item w-full`} text>
+            <Button
+                onClick={onClick}
+                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
+                text
+            >
                 {node.label}
             </Button>
         </div>
@@ -68,81 +101,75 @@ export const NodeContent = ({
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
-    const { isReportChanged, clearReport } = reportStore;
+    const { isReportChanged, allCollections, getUserReportCollections, clearReport } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
     const toast = useToast();
-    const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [currentNodeOrder, setCurrentNodeOrder] = useState<number | null>(null);
 
-    const getCollections = async () => {
+    const getCollections = useCallback(async () => {
         if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
-            getUserFavoriteReportList(authUser.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
-                }
-            });
+            const response = await getUserFavoriteReportList(authUser.useruid);
+            if (response && Array.isArray(response)) {
+                setFavoriteCollections(response);
+            }
         }
-    };
+    }, [authUser]);
 
     useEffect(() => {
-        getCollections();
+        const loadCollections = async () => {
+            try {
+                await getCollections();
+                if (!id) {
+                    await getUserReportCollections();
+                }
+            } catch (error) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: TOAST_MESSAGES.ERROR,
+                    detail: "Failed to load report collections",
+                    life: TOAST_LIFETIME,
+                });
+            }
+        };
+
+        loadCollections();
         return () => {
             clearReport();
         };
-    }, [authUser]);
+    }, [authUser, getCollections, getUserReportCollections, id]);
 
-    const handleGetUserReportCollections = async (useruid: string) => {
-        const response = await getUserReportCollectionsContent(useruid);
-        if (Array.isArray(response)) {
-            const collectionsWithoutFavorite = response.filter(
-                (collection: ReportCollection) => collection.description !== REPORT_TYPES.FAVORITES
-            );
-            const customReportsCollection = collectionsWithoutFavorite.find(
-                (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
-            );
-            if (customReportsCollection) {
-                setCollections([
-                    customReportsCollection,
-                    ...collectionsWithoutFavorite.filter(
-                        (collection) => collection.name !== REPORT_TYPES.CUSTOM
-                    ),
-                ]);
-            } else {
-                setCollections(collectionsWithoutFavorite);
-            }
-        } else {
-            setCollections([]);
-        }
-    };
-
-    const allNodes = [
-        ...favoriteCollections.map((collection) => ({
-            key: collection.itemUID,
-            label: collection.name,
-            type: NODE_TYPES.COLLECTION,
-            data: { collection: collection, order: collection.order },
-            children:
-                collection.documents
-                    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                    .map((doc) => ({
-                        key: doc.itemUID,
-                        label: doc.name,
-                        type: NODE_TYPES.DOCUMENT,
-                        data: {
-                            document: doc,
-                            collectionId: collection.itemUID,
-                            order: doc.order,
-                        },
-                    })) || [],
-        })),
-        ...buildTreeNodes(collections),
-    ];
+    const allNodes = useMemo(
+        () => [
+            ...favoriteCollections.map((collection) => ({
+                key: collection.itemUID,
+                label: collection.name,
+                type: NODE_TYPES.COLLECTION,
+                data: { collection: collection, order: collection.order },
+                children:
+                    collection.documents
+                        ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map((doc) => ({
+                            key: doc.itemUID,
+                            label: doc.name,
+                            type: NODE_TYPES.DOCUMENT,
+                            data: {
+                                document: doc,
+                                collectionId: collection.itemUID,
+                                order: doc.order,
+                            },
+                        })) || [],
+            })),
+            ...buildTreeNodes(allCollections),
+        ],
+        [favoriteCollections, allCollections]
+    );
 
     const findPathToDocument = useCallback(
         (nodes: TreeNode[], docId: string, path: string[] = []): string[] | null => {
@@ -221,12 +248,62 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
+    const handleDragEnter = (event: React.DragEvent<HTMLDivElement>, node: TreeNode) => {
+        const nodeData = node as TreeNodeEvent;
+        if (nodeData.data.document && !currentNodeOrder) {
+            setCurrentNodeOrder(nodeData.data.document.order);
+        }
+
+        if (nodeData.type === NODE_TYPES.COLLECTION && nodeData.children?.length) {
+            if (hoverTimerRef.current) {
+                clearTimeout(hoverTimerRef.current);
+            }
+
+            hoverTimerRef.current = setTimeout(() => {
+                setExpandedKeys((prev) => ({
+                    ...prev,
+                    [node.key as string]: true,
+                }));
+            }, COLLECTION_DRAG_DELAY);
+        }
+    };
+
+    const handleDragLeave = () => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+    };
+
     const handleDragDrop = async (event: TreeDragDropEvent) => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
-        const dropIndex = event.dropIndex - 1 < 0 ? 0 : event.dropIndex - 1;
 
-        if (!dropNode) return;
+        let dropIndex = 0;
+        if (dropNode?.type === NODE_TYPES.COLLECTION) {
+            const children = dropNode.children || [];
+            const documentChildren = children.filter(
+                (node) => (node as TreeNodeEvent).type === NODE_TYPES.DOCUMENT
+            );
+            const documentKeys = documentChildren.map((node) => node.key);
+
+            if (event.dropIndex >= children.length) {
+                dropIndex = documentChildren.length - 1;
+            } else {
+                const dropChild = children[event.dropIndex];
+                if (dropChild) {
+                    const idx = documentKeys.indexOf(dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                    }
+                }
+            }
+        }
 
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
@@ -265,18 +342,17 @@ export const ReportForm = observer((): ReactElement => {
             dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
             const collectionId = dragData.collectionId;
-            const currentCollectionsLength =
-                collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
 
             if (dropIndex !== undefined) {
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
-                    dropIndex - currentCollectionsLength
+                    dropIndex
                 );
                 if (response?.error) {
                     showError(response.error);
                 } else {
+                    setCurrentNodeOrder(null);
                     showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                 }
             }
@@ -299,7 +375,20 @@ export const ReportForm = observer((): ReactElement => {
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
                 } else {
-                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    if (dropIndex !== undefined) {
+                        const orderResponse = await setReportOrder(
+                            targetCollectionId,
+                            reportId,
+                            dropIndex
+                        );
+                        if (orderResponse?.error) {
+                            showError(orderResponse.error);
+                        } else {
+                            showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                        }
+                    } else {
+                        showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    }
                 }
             }
         }
@@ -307,6 +396,17 @@ export const ReportForm = observer((): ReactElement => {
         if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
             const sourceCollectionId = dragData.collection.itemUID;
             if (sourceCollectionId) {
+                const collectionNodes = allNodes.filter(
+                    (node) => (node as TreeNodeEvent).type === NODE_TYPES.COLLECTION
+                );
+                const dropChild = collectionNodes[event.dropIndex];
+                if (dropChild) {
+                    const idx = collectionNodes.findIndex((node) => node.key === dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = idx;
+                    }
+                }
+
                 const response = await setCollectionOrder(sourceCollectionId, dropIndex);
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
@@ -317,6 +417,7 @@ export const ReportForm = observer((): ReactElement => {
         }
 
         getCollections();
+        getUserReportCollections(true);
     };
 
     const navigateToReports = () => {
@@ -354,20 +455,24 @@ export const ReportForm = observer((): ReactElement => {
                             </Button>
                         )}
                     </div>
-                    <div className='card-content report__card grid'>
-                        <div className='col-4'>
-                            <Tree
-                                value={allNodes}
-                                dragdropScope='reports'
-                                onDragDrop={handleDragDrop}
-                                expandedKeys={expandedKeys}
-                                onToggle={(e) => setExpandedKeys(e.value)}
-                                nodeTemplate={(node) => {
-                                    const nodeData = node as TreeNodeEvent;
-                                    const isSelected =
-                                        nodeData.type === NODE_TYPES.DOCUMENT &&
-                                        nodeData.data.document?.documentUID === id;
-                                    return (
+                    <div className='card-content report__card'>
+                        <Tree
+                            value={allNodes}
+                            dragdropScope='reports'
+                            onDragDrop={handleDragDrop}
+                            expandedKeys={expandedKeys}
+                            onToggle={(e) => setExpandedKeys(e.value)}
+                            nodeTemplate={(node) => {
+                                const nodeData = node as TreeNodeEvent;
+                                const isSelected =
+                                    nodeData.type === NODE_TYPES.DOCUMENT &&
+                                    nodeData.data.document?.documentUID === id;
+                                return (
+                                    <div
+                                        onDragEnter={(e) => handleDragEnter(e, node)}
+                                        onDragLeave={handleDragLeave}
+                                        className='w-full'
+                                    >
                                         <NodeContent
                                             node={nodeData}
                                             isSelected={isSelected}
@@ -376,17 +481,13 @@ export const ReportForm = observer((): ReactElement => {
                                                 nodeData.type === NODE_TYPES.COLLECTION
                                             }
                                         />
-                                    );
-                                }}
-                            />
-                        </div>
+                                    </div>
+                                );
+                            }}
+                        />
                         <ReportEditForm />
                     </div>
-                    <ReportFooter
-                        onRefetch={() => {
-                            handleGetUserReportCollections(authUser!.useruid);
-                        }}
-                    />
+                    <ReportFooter onRefetch={() => getUserReportCollections(true)} />
                 </div>
             </div>
             <ConfirmModal

@@ -3,11 +3,11 @@ import { AccountNote } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { addAccountNote } from "http/services/accounts.service";
 import { DialogProps } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
@@ -119,15 +119,13 @@ export const AddNoteDialog = ({
                     onChange={({ target: { value } }) => setNoteTaker(value)}
                 />
                 <div className='col-12'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            options={[...ACCOUNT_NOTE_CONTACT_TYPE]}
-                            value={contactType}
-                            onChange={(e) => setContactType(e.value)}
-                            className='w-full'
-                        />
-                        <label className='float-label'>Contact Type</label>
-                    </span>
+                    <ComboBox
+                        options={[...ACCOUNT_NOTE_CONTACT_TYPE]}
+                        value={contactType}
+                        onChange={(e) => setContactType(e.value)}
+                        className='w-full'
+                        label='Contact Type'
+                    />
                 </div>
                 <div className='col-12'>
                     <span className='p-float-label'>

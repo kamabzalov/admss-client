@@ -356,6 +356,10 @@ export const ExportSchedule = (): ReactElement => {
                                             style: {
                                                 width: serverSettings?.exportSchedule
                                                     ?.columnWidth?.[field],
+                                                maxWidth:
+                                                    serverSettings?.exportSchedule?.columnWidth?.[
+                                                        field
+                                                    ],
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
                                             },

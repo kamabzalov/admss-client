@@ -1,33 +1,66 @@
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicleData } from "./vehicle";
+import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 import { Button } from "primereact/button";
 import { AccordionItems, Inventory, InventoryItem, InventorySection } from "../common";
-import { InventoryPurchaseData } from "./purchase";
-import { InventoryMediaData } from "./media-data";
+import { InventoryPurchaseData } from "dashboard/inventory/form/purchase";
+import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { checkStockNoAvailability, getVINCheck } from "http/services/inventory-service";
-import { InventoryExportWebData } from "./export-web";
+import { InventoryExportWebData } from "dashboard/inventory/form/export-web";
 
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { PrintForms } from "./print-forms";
+import { PrintForms } from "dashboard/inventory/form/print-forms";
 import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import { Inventory as InventoryModel, InventoryStockNumber } from "common/models/inventory";
+import {
+    InventoryExtData,
+    Inventory as InventoryModel,
+    InventoryStockNumber,
+} from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
-import { DeleteForm } from "./delete-form";
+import { DeleteForm } from "dashboard/inventory/form/delete-form";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 import { TOAST_LIFETIME } from "common/settings";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { INVENTORY_PAGE } from "common/constants/links";
 
 const STEP = "step";
+export enum INVENTORY_STEPS {
+    GENERAL = 1,
+    DESCRIPTION = 2,
+    OPTIONS = 3,
+    CHECKLIST = 4,
+    KEYS = 5,
+    DISCLOSURES = 6,
+    OTHER = 7,
+    PURCHASES = 8,
+    PAYMENTS = 9,
+    EXPENSES = 10,
+    TITLE = 11,
+    FLOORPLAN = 12,
+    CONSIGN = 13,
+    IMAGES = 14,
+    VIDEO = 15,
+    AUDIO = 16,
+    DOCUMENTS = 17,
+    LINKS = 18,
+    WATERMARKING = 19,
+    PRICE = 20,
+    DATES = 21,
+    EXPORT_LINKS = 22,
+    FUEL_ECONOMY = 23,
+    EXTRA_DATA = 24,
+    HISTORY = 25,
+}
 
 type PartialInventory = Pick<
     InventoryModel,
@@ -41,7 +74,14 @@ type PartialInventory = Pick<
     | "TypeOfFuel_id"
 >;
 
-const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
+type PartialInventoryExtData = Pick<
+    InventoryExtData,
+    "purPurchaseEmail" | "purPurchasePhone" | "titleHolderPhone" | "titlePrevPhone"
+>;
+
+const tabFields: Partial<
+    Record<AccordionItems, (keyof PartialInventory)[] | (keyof PartialInventoryExtData)[]>
+> = {
     [AccordionItems.GENERAL]: [
         "VIN",
         "Make",
@@ -52,6 +92,8 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "StockNo",
     ],
     [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
+    [AccordionItems.PURCHASES]: ["purPurchaseEmail", "purPurchasePhone"],
+    [AccordionItems.TITLE]: ["titleHolderPhone", "titlePrevPhone"],
 };
 
 const MIN_YEAR = 1970;
@@ -61,6 +103,8 @@ const enum DIALOG_MESSAGES {
     QUIT = "Are you sure you want to leave this page? All unsaved data will be lost.",
     DELETE = "Do you really want to delete this inventory? This process cannot be undone.",
 }
+
+const CREATE_INVENTORY_ID = "create";
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
@@ -87,11 +131,11 @@ export const InventoryForm = observer(() => {
         activeTab,
         tabLength,
         inventory,
+        inventoryExtData,
         isFormChanged,
         currentLocation,
         deleteReason,
         memoRoute,
-        isLoading,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -120,20 +164,13 @@ export const InventoryForm = observer(() => {
         return "";
     }, [inventory]);
 
-    const InventoryFormSchema = ({
-        initialVIN,
-        initialStockNo,
-    }: {
-        initialVIN?: string;
-        initialStockNo?: string;
-    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
-        const debouncedCheckStockNoAvailability = debounce(
-            async (value: string, resolve: (exists: boolean) => void) => {
+    const debouncedCheckStockNoAvailability = useMemo(
+        () =>
+            debounce(async (value: string, resolve: (exists: boolean) => void) => {
                 if (!value || initialStockNo === value) {
                     resolve(true);
                     return;
                 }
-
                 try {
                     const res = (await checkStockNoAvailability(
                         value
@@ -142,27 +179,39 @@ export const InventoryForm = observer(() => {
                 } catch (error) {
                     resolve(true);
                 }
-            },
-            500
-        );
+            }),
+        [initialStockNo]
+    );
 
-        const debouncedCheckVINAvailability = debounce(
-            async (value: string, resolve: (exists: boolean) => void) => {
+    const debouncedCheckVINAvailability = useMemo(
+        () =>
+            debounce(async (value: string, resolve: (exists: boolean) => void) => {
                 if (!value || initialVIN === value) {
                     resolve(true);
                     return;
                 }
-
                 try {
                     const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
                     resolve(!(res && res.status === Status.OK && res.exists));
                 } catch (error) {
                     resolve(true);
                 }
-            },
-            500
-        );
+            }, 500),
+        [initialVIN]
+    );
 
+    const InventoryFormSchema = ({
+        debouncedCheckStockNoAvailability,
+        debouncedCheckVINAvailability,
+    }: {
+        initialVIN?: string;
+        initialStockNo?: string;
+        debouncedCheckStockNoAvailability: (
+            value: string,
+            resolve: (exists: boolean) => void
+        ) => void;
+        debouncedCheckVINAvailability: (value: string, resolve: (exists: boolean) => void) => void;
+    }): Yup.ObjectSchema<Partial<PartialInventory>> => {
         return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
@@ -206,6 +255,22 @@ export const InventoryForm = observer(() => {
                     });
                 }),
             TypeOfFuel_id: Yup.string().trim().required("Data is required."),
+            purPurchaseEmail: Yup.string().email("Invalid email address"),
+            purPurchasePhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titleHolderPhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titlePrevPhone: Yup.string().test(
+                "is-valid-phone",
+                "Invalid phone number",
+                (value) => !value || PHONE_NUMBER_REGEX.test(value || "")
+            ),
         });
     };
 
@@ -225,8 +290,22 @@ export const InventoryForm = observer(() => {
     }, [stepActiveIndex, stepsRef.current]);
 
     const getUrl = (activeIndex: number) => {
-        const currentPath = id ? id : "create";
-        return `/dashboard/inventory/${currentPath}?step=${activeIndex + 1}`;
+        const currentPath = id ? id : CREATE_INVENTORY_ID;
+        return `${INVENTORY_PAGE.EDIT(currentPath)}?step=${activeIndex + 1}`;
+    };
+
+    const handleGetInventory = async () => {
+        const response = await getInventory();
+        const res = response as BaseResponseError;
+        if (res?.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: res?.error || "",
+                life: TOAST_LIFETIME,
+            });
+            navigate(INVENTORY_PAGE.MAIN);
+        }
     };
 
     useEffect(() => {
@@ -244,19 +323,9 @@ export const InventoryForm = observer(() => {
         setPrintActiveIndex(itemsMenuCount + 1);
         setDeleteActiveIndex(itemsMenuCount + 2);
 
-        if (id) {
-            getInventory(id).then((response) => {
-                const res = response as unknown as BaseResponseError;
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res?.error || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(`/dashboard/inventory`);
-                }
-            });
+        if (id && id !== CREATE_INVENTORY_ID) {
+            store.inventoryID = id;
+            handleGetInventory();
         }
 
         return () => {
@@ -297,7 +366,7 @@ export const InventoryForm = observer(() => {
                 navigate(memoRoute);
                 store.memoRoute = "";
             } else {
-                navigate(`/dashboard/inventory`);
+                navigate(INVENTORY_PAGE.MAIN);
             }
         };
 
@@ -355,17 +424,29 @@ export const InventoryForm = observer(() => {
                 });
                 setErrorSections(currentSectionsWithErrors);
 
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
+                    life: TOAST_LIFETIME,
                 });
             }
         });
     };
 
     const navigateAndClear = () => {
-        navigate(`/dashboard/inventory`);
+        if (memoRoute) {
+            navigate(memoRoute);
+            store.memoRoute = "";
+        } else {
+            navigate(INVENTORY_PAGE.MAIN);
+        }
         clearInventory();
     };
 
@@ -393,10 +474,8 @@ export const InventoryForm = observer(() => {
         }
     };
 
-    return isLoading ? (
-        <Loader overlay />
-    ) : (
-        <Suspense>
+    return (
+        <Suspense fallback={<Loader className='inventory-loader' />}>
             <div className='grid relative'>
                 <Button
                     icon='pi pi-times'
@@ -434,7 +513,7 @@ export const InventoryForm = observer(() => {
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
-                                <div className='p-0' ref={stepsRef}>
+                                <div className='inventory__navigation' ref={stepsRef}>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
@@ -509,13 +588,15 @@ export const InventoryForm = observer(() => {
                                         </Button>
                                     )}
                                 </div>
-                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
+                                <div className='w-full flex flex-column p-0 inventory-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
                                             validationSchema={InventoryFormSchema({
                                                 initialVIN,
                                                 initialStockNo,
+                                                debouncedCheckStockNoAvailability,
+                                                debouncedCheckVINAvailability,
                                             })}
                                             initialValues={
                                                 {
@@ -528,6 +609,14 @@ export const InventoryForm = observer(() => {
                                                     locationuid:
                                                         inventory?.locationuid || currentLocation,
                                                     GroupClassName: inventory?.GroupClassName || "",
+                                                    purPurchaseEmail:
+                                                        inventoryExtData?.purPurchaseEmail || "",
+                                                    purPurchasePhone:
+                                                        inventoryExtData?.purPurchasePhone || "",
+                                                    titleHolderPhone:
+                                                        inventoryExtData?.titleHolderPhone || "",
+                                                    titlePrevPhone:
+                                                        inventoryExtData?.titlePrevPhone || "",
                                                 } as PartialInventory
                                             }
                                             enableReinitialize
@@ -551,7 +640,11 @@ export const InventoryForm = observer(() => {
                                                                 {item.itemLabel}
                                                             </div>
                                                             {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense fallback={<Loader />}>
+                                                                <Suspense
+                                                                    fallback={
+                                                                        <Loader className='inventory-loader' />
+                                                                    }
+                                                                >
                                                                     {item.component}
                                                                 </Suspense>
                                                             )}
@@ -620,7 +713,7 @@ export const InventoryForm = observer(() => {
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
-                                        Save
+                                        {id ? "Update" : "Save"}
                                     </Button>
                                 )}
                             </div>

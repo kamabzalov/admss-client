@@ -1,0 +1,401 @@
+.deal-profit {
+    --input-height: 32px;
+}
+
+.profit-card__header {
+    padding-bottom: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 20px;
+    &.vehicle-profit__header {
+        border-radius: 6px 6px 0 0;
+        background-color: var(--admss-app-light-red);
+        color: var(--admss-app-red);
+    }
+}
+
+.profit-card {
+    overflow: hidden;
+    .p-card-body,
+    .p-card-content {
+        padding: 0;
+    }
+    &.vehicle-profit {
+        box-shadow: 0 0 3px 0 var(--admss-app-red);
+    }
+}
+
+.profit-card__body {
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.vehicle-profit {
+    position: relative;
+    .vehicle-profit__expenses-button {
+        position: absolute;
+        top: 65px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
+    .vehicle-profit__inputs {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        gap: 10px;
+        padding: 20px;
+        border-radius: 6px;
+        border: 1px solid var(--admss-app-light-grey);
+    }
+
+    .vehicle-profit__info {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+    }
+
+    .deal-profit__item {
+        .deal-profit__value {
+            margin-left: auto;
+        }
+    }
+}
+
+.deal-profit__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+    height: var(--input-height);
+    .currency-item__input {
+        width: 140px;
+    }
+    &.deal-profit__item--blue {
+        color: var(--admss-app-main-blue);
+    }
+    &.deal-profit__item--bold {
+        font-weight: 700;
+    }
+    .currency-item__input,
+    .p-inputtext,
+    .p-inputnumber {
+        height: var(--input-height);
+        font-size: 14px;
+        &:focus {
+            box-shadow: none;
+        }
+    }
+    .deal-profit__currency-select {
+        width: 54px;
+        height: var(--input-height);
+        margin-left: auto;
+        margin-right: 10px;
+        font-size: 14px;
+        .p-dropdown-trigger {
+            height: var(--input-height);
+            width: 24px;
+        }
+        .p-dropdown-label {
+            height: var(--input-height);
+            line-height: 1;
+        }
+        .p-inputtext {
+            text-overflow: initial;
+            font-size: 14px;
+            height: var(--input-height);
+            align-items: center;
+        }
+    }
+    .currency-item__icon {
+        width: var(--input-height);
+    }
+    .deal-profit__includes {
+        display: flex;
+        margin-left: 15px;
+        align-items: center;
+        justify-content: space-between;
+        width: 45px;
+    }
+}
+
+.profit-commission {
+    --commission-settings-width: 35%;
+    --commission-settings-header-width: 35.5%;
+    --commission-worksheet-width: 65%;
+    --commission-worksheet-header-width: 64.5%;
+    box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
+    position: relative;
+    .profit-commission__salesman-button {
+        position: absolute;
+        bottom: 80px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
+    .profit-commission__header {
+        padding: 0;
+        display: flex;
+        overflow: hidden;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        color: var(--admss-app-warning-blue);
+        .profit-commission__header-title {
+            padding: 8px 20px;
+            background-color: var(--admss-app-focus-blue);
+            flex: 0 0 var(--commission-settings-header-width);
+            white-space: nowrap;
+            max-width: var(--commission-settings-header-width);
+        }
+        .profit-commission__header-subtitle {
+            padding: 8px 20px;
+            background-color: var(--admss-app-focus-blue);
+            flex: 0 0 var(--commission-worksheet-header-width);
+            max-width: var(--commission-worksheet-header-width);
+        }
+    }
+
+    .profit-commission__body {
+        font-size: 16px;
+        display: flex;
+        gap: 10px;
+        .commission-settings {
+            padding-right: 10px;
+            margin-right: 10px;
+            border-right: 1px solid var(--admss-app-focus-blue);
+            .commission-settings__checkbox {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+            }
+            .commission-settings__label {
+                display: inline-flex;
+                align-items: center;
+                height: var(--input-height);
+                font-weight: 600;
+                line-height: 1;
+            }
+            flex: 0 0 var(--commission-settings-width);
+            max-width: var(--commission-settings-width);
+            .p-dropdown-label {
+                height: var(--input-height);
+                line-height: 1;
+            }
+            .commission-settings__input,
+            .p-inputtext {
+                font-size: 14px;
+                height: var(--input-height);
+                align-items: center;
+            }
+        }
+        .commission-worksheet {
+            flex: 0 0 var(--commission-worksheet-width);
+            max-width: var(--commission-worksheet-width);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-right: 20px;
+            .deal-profit__item {
+                gap: 4px;
+                .currency-item {
+                    margin-left: auto;
+                }
+            }
+        }
+    }
+}
+
+.fi-profit {
+    box-shadow: 0 0 3px 0 var(--admss-app-green);
+    .fi-profit__header {
+        background-color: var(--admss-app-focus-light-green);
+        color: var(--admss-app-green);
+        font-weight: 600;
+    }
+
+    .fi-profit__costs {
+        display: flex;
+        flex: 0 0 63%;
+        max-width: 63%;
+        gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .fi-profit__info,
+        .fi-profit__inputs {
+            width: 47.5%;
+        }
+        .fi-profit__loan-costs {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+            .deal-profit__item {
+                margin-left: auto;
+                width: 60%;
+                .currency-item {
+                    margin-left: auto;
+                }
+            }
+            .fi-profit__loan-costs-title {
+                font-weight: 800;
+                color: var(--admss-app-main-blue);
+            }
+        }
+    }
+    .fi-profit__total {
+        border-left: 1px solid var(--admss-app-lightest-grey);
+        padding-left: 1%;
+        flex: 1;
+    }
+
+    .fi-profit__info,
+    .fi-profit__inputs,
+    .fi-profit__total {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .fi-profit__total {
+        .deal-profit__item {
+            .deal-profit__value {
+                margin-left: auto;
+            }
+        }
+    }
+}
+
+.totals-profit {
+    box-shadow: 0 0 3px 0 var(--admss-app-dark-blue);
+    background-color: var(--admss-app-focus-blue);
+    .totals-profit__header {
+        background-color: var(--admss-app-dark-blue);
+        text-transform: uppercase;
+        color: var(--admss-app-white);
+        font-weight: 600;
+    }
+
+    .totals-content {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        width: 100%;
+        .totals-content__info {
+            display: flex;
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 30px;
+            padding: 10px 15px;
+            justify-content: space-between;
+            align-items: center;
+            .totals-content__info-title,
+            .totals-content__info-value {
+                font-weight: 600;
+                font-size: 14px;
+            }
+            .totals-content__info-value {
+                margin-left: auto;
+                padding-right: 15%;
+            }
+            &.totals-content__info--red {
+                border-color: var(--admss-app-red);
+                color: var(--admss-app-red);
+                background-color: var(--admss-app-light-red);
+            }
+            &.totals-content__info--green {
+                border-color: var(--admss-app-warning-green);
+                color: var(--admss-app-warning-green);
+                background-color: var(--admss-app-light-green);
+            }
+            &.totals-content__info--blue {
+                border-color: var(--admss-app-main-blue);
+                color: var(--admss-app-main-blue);
+                background-color: var(--admss-app-white-blue);
+            }
+        }
+        .totals-misc,
+        .totals-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+            font-size: 14px;
+            .currency-item__input {
+                align-items: center;
+            }
+            .totals-misc__input,
+            .totals-info__title,
+            .totals-info__input {
+                font-size: 14px;
+                height: 32px;
+                max-width: 140px;
+                flex: 1 1 140px;
+            }
+
+            .totals-info__title {
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+
+            .currency-item {
+                .p-inputtext {
+                    max-width: 110px;
+                    font-size: 14px;
+                    flex: 1 1 110px;
+                }
+            }
+            .p-inputtext,
+            .currency-item__icon {
+                height: 32px;
+            }
+            .currency-item__icon {
+                line-height: 0;
+                width: 30px;
+            }
+        }
+
+        .totals-summary {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            .totals-summary__title {
+                font-size: 16px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+            .totals-summary__value {
+                font-size: 16px;
+                font-weight: 600;
+                margin-left: 15%;
+            }
+        }
+        .deal-profit__includes {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+    }
+}
+
+.fi-wrapper {
+    flex: 1 0 auto;
+    padding: 0.5rem;
+    width: 70%;
+}
+
+.totals-wrapper {
+    flex: 0 0 375px;
+    padding: 0.5rem;
+    width: 30%;
+    max-width: 375px;
+}

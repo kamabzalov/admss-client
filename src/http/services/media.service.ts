@@ -118,6 +118,7 @@ export const setMediaItemData = async (
         notes,
         itemuid,
         order,
+        mediaurl,
         contenttype,
         useruid,
         type,
@@ -129,6 +130,7 @@ export const setMediaItemData = async (
             `inventory/${id}/media`,
             {
                 mediaitemuid,
+                mediaurl,
                 useruid,
                 itemuid,
                 contenttype,
@@ -145,7 +147,10 @@ export const setMediaItemData = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting media item data",
             };
         }
     }
@@ -184,6 +189,36 @@ export const deleteMediaImage = async (itemuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error,
+            };
+        }
+    }
+};
+
+export const getMediaWatermarkingPreview = async (inventoryuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.get(
+            `media/${inventoryuid}/watermarkpreview`,
+            { responseType: "blob" }
+        );
+        if (response.status === 200) {
+            const dataUrl = await new Promise<string>((resolve) => {
+                const reader = new window.FileReader();
+                reader.addEventListener("load", (event) => {
+                    resolve(event.target?.result as string);
+                });
+                reader.readAsDataURL(response.data);
+            });
+            return {
+                status: Status.OK,
+                data: dataUrl,
+            };
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.error || "Error while getting media watermarking preview",
             };
         }
     }

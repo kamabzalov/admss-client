@@ -1,0 +1,30 @@
+.new-item-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    flex-direction: column;
+    height: 50px;
+    width: 50px;
+}
+
+.new-item-button .icon {
+    font-size: 20px;
+}
+
+.print-button,
+.download-button {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+}
+
+.print-button .icon,
+.download-button .icon {
+    font-size: 26px;
+}

@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
@@ -7,6 +6,8 @@ import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { StateDropdown } from "dashboard/common/form/inputs";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -27,10 +28,10 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 changeContact("mailCity", contact.city);
                 changeContact("mailZIP", contact.ZIP);
             } else {
-                changeContactExtData("CoBuyer_Mailing_Address", contactExtData.CoBuyer_Emp_Address);
-                changeContactExtData("CoBuyer_Mailing_State", contactExtData.CoBuyer_Emp_State);
-                changeContactExtData("CoBuyer_Mailing_City", contactExtData.CoBuyer_Emp_City);
-                changeContactExtData("CoBuyer_Mailing_Zip", contactExtData.CoBuyer_Emp_Zip);
+                changeContactExtData("CoBuyer_Mailing_Address", contactExtData.CoBuyer_Res_Address);
+                changeContactExtData("CoBuyer_Mailing_State", contactExtData.CoBuyer_State);
+                changeContactExtData("CoBuyer_Mailing_City", contactExtData.CoBuyer_City);
+                changeContactExtData("CoBuyer_Mailing_Zip", contactExtData.CoBuyer_Zip_Code);
             }
         }
     }, [
@@ -39,10 +40,10 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
         contact.state,
         contact.city,
         contact.ZIP,
-        contactExtData.CoBuyer_Emp_Address,
-        contactExtData.CoBuyer_Emp_State,
-        contactExtData.CoBuyer_Emp_City,
-        contactExtData.CoBuyer_Emp_Zip,
+        contactExtData.CoBuyer_Res_Address,
+        contactExtData.CoBuyer_State,
+        contactExtData.CoBuyer_City,
+        contactExtData.CoBuyer_Zip_Code,
         type,
         changeContact,
         changeContactExtData,
@@ -62,52 +63,42 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                         value={
                             (type === BUYER
                                 ? contact.streetAddress
-                                : contactExtData.CoBuyer_Emp_Address) || ""
+                                : contactExtData.CoBuyer_Res_Address) || ""
                         }
                         onChange={({ target: { value } }) =>
                             type === BUYER
                                 ? changeContact("streetAddress", value)
-                                : changeContactExtData("CoBuyer_Emp_Address", value)
+                                : changeContactExtData("CoBuyer_Res_Address", value)
                         }
                         disabled={isControlDisabled}
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <Dropdown
-                    optionLabel='label'
-                    optionValue='id'
-                    filter
-                    placeholder='State'
-                    value={
-                        (type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State) || ""
-                    }
-                    options={STATES_LIST}
-                    onChange={({ target: { value } }) =>
-                        type === BUYER
-                            ? changeContact("state", value)
-                            : changeContactExtData("CoBuyer_Emp_State", value)
-                    }
-                    className='w-full address-info__dropdown'
-                    disabled={isControlDisabled}
-                    showClear={
-                        !!(type === BUYER ? contact.state : contactExtData.CoBuyer_Emp_State)
-                    }
-                />
-            </div>
+
+            <StateDropdown
+                name='State'
+                showClear={!!(type === BUYER ? contact.state : contactExtData.CoBuyer_State)}
+                className='w-full address-info__dropdown'
+                disabled={isControlDisabled}
+                value={type === BUYER ? contact.state : contactExtData.CoBuyer_State}
+                colWidth={3}
+                onChange={({ value }) =>
+                    type === BUYER
+                        ? changeContact("state", value)
+                        : changeContactExtData("CoBuyer_State", value)
+                }
+            />
 
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
                         className='address-info__text-input w-full'
-                        value={
-                            (type === BUYER ? contact.city : contactExtData.CoBuyer_Emp_City) || ""
-                        }
+                        value={(type === BUYER ? contact.city : contactExtData.CoBuyer_City) || ""}
                         onChange={({ target: { value } }) =>
                             type === BUYER
                                 ? changeContact("city", value)
-                                : changeContactExtData("CoBuyer_Emp_City", value)
+                                : changeContactExtData("CoBuyer_City", value)
                         }
                         disabled={isControlDisabled}
                     />
@@ -120,12 +111,12 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     <InputText
                         className='address-info__text-input w-full'
                         value={
-                            (type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Emp_Zip) || ""
+                            (type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Zip_Code) || ""
                         }
                         onChange={({ target: { value } }) =>
                             type === BUYER
                                 ? changeContact("ZIP", value)
-                                : changeContactExtData("CoBuyer_Emp_Zip", value)
+                                : changeContactExtData("CoBuyer_Zip_Code", value)
                         }
                         disabled={isControlDisabled}
                     />
@@ -174,10 +165,9 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown
+                <ComboBox
                     optionLabel='label'
                     optionValue='id'
-                    filter
                     placeholder='State'
                     value={
                         (type === BUYER

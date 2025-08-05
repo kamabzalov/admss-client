@@ -6,6 +6,7 @@ import {
     moveReportToCollection,
     setCollectionOrder,
     setReportOrder,
+    updateCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
@@ -121,42 +122,43 @@ export const Reports = (): ReactElement => {
         ...buildTreeNodes(reportCollections, true),
     ];
 
-    const handleCreateCollection = () => {
+    const handleCreateCollection = async () => {
         if (!collectionName) return;
-        createReportCollection(authUser!.useruid, {
+        const response = await createReportCollection(authUser!.useruid, {
             name: collectionName,
             documents: newCollectionsReports,
-        }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "New collection is successfully created!",
-                    life: TOAST_LIFETIME,
-                });
-                setCollectionName("");
-                setNewCollectionsReports([]);
-            }
         });
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            await handleGetUserReportCollections();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "New collection is successfully created!",
+                life: TOAST_LIFETIME,
+            });
+            setCollectionName("");
+            setNewCollectionsReports([]);
+        }
     };
 
-    const handleUpdateCollection = (collectionUid: string, editCollectionName?: string) => {
-        const finalName = collectionName || editCollectionName;
-        if (!finalName) return;
-        createReportCollection(authUser!.useruid, {
-            name: finalName,
-            documents: selectedReports,
-            itemuid: collectionUid,
-        }).then((response) => {
+    const handleUpdateCollection = useCallback(
+        async (collectionUid: string, editCollectionName?: string) => {
+            const finalName = collectionName || editCollectionName;
+            if (!finalName) return;
+
+            const response = await updateCollection(authUser!.useruid, {
+                name: finalName,
+                documents: selectedReports,
+                itemuid: collectionUid,
+            });
             const { error } = response as BaseResponseError;
             if (error && toast.current) {
                 toast.current.show({
@@ -166,7 +168,7 @@ export const Reports = (): ReactElement => {
                     life: TOAST_LIFETIME,
                 });
             } else {
-                handleGetUserReportCollections();
+                await handleGetUserReportCollections();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
@@ -177,19 +179,26 @@ export const Reports = (): ReactElement => {
                 setSelectedReports([]);
                 setIsCollectionEditing(null);
             }
-        });
-    };
+        },
+        [authUser, collectionName, selectedReports, handleGetUserReportCollections]
+    );
 
-    const handleCustomEditCollection = (
-        event: React.MouseEvent<HTMLElement>,
-        collectionUid: string
-    ) => {
-        const target = event.target as HTMLElement;
-        if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
-            event.stopPropagation();
-            setIsCollectionEditing(collectionUid);
-        }
-    };
+    const handleCustomEditCollection = useCallback(
+        (event: React.MouseEvent<HTMLElement>, collectionUid: string) => {
+            const target = event.target as HTMLElement;
+            if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
+                event.stopPropagation();
+                const currentCollection = [...reportCollections, ...customCollections].find(
+                    (col) => col.itemUID === collectionUid
+                );
+                if (currentCollection?.documents) {
+                    setSelectedReports(currentCollection.documents as ReportDocument[]);
+                }
+                setIsCollectionEditing(collectionUid);
+            }
+        },
+        [reportCollections, customCollections]
+    );
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
         const target = event.target as HTMLElement;
@@ -362,7 +371,7 @@ export const Reports = (): ReactElement => {
                                     collectionuid={currentCollection.itemUID}
                                     collectionName={currentCollection.name}
                                     collections={[...customCollections, ...reportCollections]}
-                                    selectedReports={currentCollection.documents || []}
+                                    selectedReports={currentCollection?.documents || []}
                                     setCollectionName={setCollectionName}
                                     setSelectedReports={setSelectedReports}
                                     handleCreateCollection={() =>
@@ -388,9 +397,17 @@ export const Reports = (): ReactElement => {
                 <>
                     <div
                         className='reports__list-item reports__list-item--inner'
-                        onClick={(ev) => handleOpenParameters(ev, currentReport)}
-                        onDoubleClick={() => {
-                            navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                        onClick={(event) => handleOpenParameters(event, currentReport)}
+                        onDoubleClick={(event: React.MouseEvent<HTMLElement>) => {
+                            event.stopPropagation();
+                            const target = event.target as HTMLElement;
+                            if (
+                                OPEN_PARAMETERS_CLASSES.some((cls) =>
+                                    target.classList.contains(cls)
+                                )
+                            ) {
+                                navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                            }
                         }}
                     >
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>

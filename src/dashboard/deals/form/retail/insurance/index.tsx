@@ -3,14 +3,22 @@ import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InputText } from "primereact/inputtext";
-import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import {
+    BorderedCheckbox,
+    CurrencyInput,
+    DateInput,
+    PhoneInput,
+} from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { useLocation } from "react-router-dom";
 
 const [MIN_LIMIT, MAX_LIMIT] = [0, 1000000];
 
 export const DealRetailInsurance = observer((): ReactElement => {
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const store = useStore().dealStore;
     const {
         dealExtData: {
@@ -37,6 +45,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-6'>
                 <CompanySearch
                     value={Insurance_Company}
+                    originalPath={currentPath}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Insurance_Company", value })
                     }
@@ -114,6 +123,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
             <div className='col-6'>
                 <CompanySearch
                     value={Agent_Name}
+                    originalPath={currentPath}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Agent_Name", value })
                     }
@@ -138,17 +148,16 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     <label className='float-label'>Agent's Address</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={Agent_Phone_No}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Agent_Phone_No", value });
-                        }}
-                        className='deal-insurance__text-input w-full'
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
+
+            <div className='col-3 relative'>
+                <PhoneInput
+                    name='Phone Number'
+                    value={Agent_Phone_No}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Agent_Phone_No", value: value ?? "" });
+                    }}
+                    id='Agent_Phone_No'
+                />
             </div>
 
             <hr className='form-line' />

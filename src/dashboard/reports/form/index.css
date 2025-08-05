@@ -1,41 +1,118 @@
 .report__card {
+    --column-width: 370px;
+    --select-area-height: 191px;
+    --control-button-width: 30px;
+    --column-padding-bottom: 26px;
+    --tree-padding-left: 50px;
+
+    @media screen and (max-width: 1670px) {
+        --column-width: 300px;
+    }
+
+    @media screen and (max-width: 1400px) {
+        --column-width: 250px;
+    }
+
+    @media screen and (max-width: 1260px) {
+        --column-width: 180px;
+    }
+
     max-height: 70vh;
+    display: flex;
+    justify-content: space-between;
+    overflow-y: scroll;
+    overflow-x: hidden;
+
     .p-tree {
+        flex: 0 0 30%;
+        padding: 0;
         height: 56vh;
         border: none;
-        .p-treenode {
-            padding: 0;
-            .p-treenode-droppoint {
-                border: none;
-                margin: 0;
-                &.p-treenode-droppoint-active {
+
+        .p-tree-container {
+            .p-treenode {
+                padding: 0;
+            }
+
+            .p-treenode-content {
+                border-radius: 5px;
+                padding-left: var(--tree-padding-left);
+                height: 50px;
+                :has(.report__list-item--new) {
+                    position: relative;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 1.05rem;
+                        left: -0.6rem;
+                        width: 9px;
+                        height: 9px;
+                        border: 2px solid var(--admss-app-main-blue);
+                        border-radius: 50%;
+                    }
+                }
+
+                .p-tree-toggler {
+                    margin: 0;
+                    &[aria-label="Collapse"] {
+                        transform: rotate(180deg);
+                    }
+                    &[aria-label="Expand"] {
+                        transform: rotate(90deg);
+                    }
+                }
+
+                &.report__list-item--toggler-visible {
+                    .p-tree-toggler {
+                        visibility: visible;
+                    }
+                }
+
+                &:hover {
                     background: var(--admss-app-light-blue);
                 }
             }
-        }
-
-        .p-treenode-content {
-            &.report__list-item--toggler-visible {
-                .p-tree-toggler {
-                    visibility: visible;
+            .p-treenode-children {
+                padding: 0;
+                .p-treenode-content {
+                    padding-left: calc(1.7rem + var(--tree-padding-left));
                 }
             }
-            &:hover {
+
+            .report__list-item--selected-container {
+                color: var(--admss-app-primary);
                 background: var(--admss-app-light-blue);
+                border-radius: 0;
             }
         }
-        .report__list-item--selected-container {
-            color: var(--admss-app-primary);
-            background: var(--admss-app-light-blue);
-            border-radius: 0;
-        }
     }
+
     .p-tree-container {
         height: 100%;
         border: none;
-        .p-treenode .p-treenode-content.p-treenode-dragover {
-            background: var(--admss-app-light-blue);
+
+        .p-treenode .p-treenode-content.simple-node {
+            .report__list-item {
+                padding-left: 14px;
+            }
+            .p-tree-toggler {
+                display: none;
+            }
         }
+
+        .p-treenode .p-treenode-content.simple-node.p-treenode-dragover {
+            .report__list-item {
+                background: transparent;
+            }
+            .report__list-item.p-button {
+                transition: none;
+                background-color: transparent;
+            }
+
+            background-color: transparent;
+        }
+
         .p-treenode .p-treenode-content .p-tree-toggler:focus {
             box-shadow: none;
         }
@@ -62,31 +139,70 @@
     border-radius: 5px;
     box-shadow: 1px 1px 5px var(--admss-app-light-blue);
     border: var(--admss-app-light-blue) solid 1px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 20px;
 }
 
-.report-controls__top {
-    flex: 1 0 100%;
-    height: 50px;
-    padding-left: 84px;
-    margin: 30px;
-}
-.report-controls__dropdown {
-    width: 370px;
-    text-transform: capitalize;
-}
-
-.report-control {
+.report-controls__main {
+    display: flex;
     justify-content: center;
-    margin: 10px;
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+.report-control__available {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.report-control__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.report-control__available .p-float-label {
+    width: var(--column-width);
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.report-control__available .report-select {
+    width: var(--column-width);
+    margin-bottom: 0;
+}
+
+.report-control__available .report-control {
+    width: var(--control-button-width);
+    margin: 0;
+    margin-bottom: var(--column-padding-bottom);
+}
+
+.report-control__selected {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+
+    .report-control {
+        margin-left: 0px;
+    }
+}
+
+.report-controls__dropdown {
+    width: var(--column-width);
+    text-transform: capitalize;
 }
 
 .report-control {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 10px;
+    width: var(--control-button-width);
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: var(--column-padding-bottom);
 }
 
 .report-control__button.p-button {
@@ -101,27 +217,6 @@
     background-color: var(--admss-app-medium-blue);
 }
 
-.report-select {
-    border: var(--admss-app-medium-blue) solid 1px;
-    border-radius: 5px;
-    width: 370px;
-    margin-bottom: 30px;
-}
-
-.report-select__header {
-    background-color: var(--admss-app-white-blue);
-    border-bottom: var(--admss-app-medium-blue) solid 1px;
-    padding: 5px 10px;
-    display: flex;
-    align-items: center;
-    font-family: Open Sans;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 19px;
-    text-align: left;
-    padding: 15px;
-}
-
 .report-control__button.p-button.p-button-outlined:enabled:hover,
 .p-button.p-button-outlined:not(button):not(a):not(.p-disabled):hover {
     box-shadow: none;
@@ -130,10 +225,29 @@
     background: var(--admss-app-medium-blue);
 }
 
+.report-select {
+    border: var(--admss-app-medium-blue) solid 1px;
+    border-radius: 5px;
+    width: var(--column-width);
+}
+
+.report-select__header {
+    background-color: var(--admss-app-white-blue);
+    border-bottom: var(--admss-app-medium-blue) solid 1px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+    text-align: left;
+}
+
 .report-select__list {
     background: var(--admss-app-white);
-    height: 200px;
-    max-height: 200px;
+    height: var(--select-area-height);
+    max-height: var(--select-area-height);
     overflow-y: scroll;
     list-style: none;
     padding: 0;
@@ -151,6 +265,27 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
+}
+
+.report-form__control {
+    flex-wrap: wrap;
+
+    .report-form__input {
+        padding: 10px;
+        flex: 1 1 404px;
+    }
+}
+
+.report-form__buttons {
+    display: flex;
+    margin-left: auto;
+    flex: 0 0 135px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .report__button.p-button {
+        flex: 0 0 50px;
+    }
 }
 
 .report-select__item {
@@ -216,14 +351,25 @@
     text-align: left;
 }
 
-.report__list-item.p-button.p-button-text:hover {
-    background-color: var(--admss-app-light-blue);
-}
-
-.report__list-item.p-button.p-button-text:enabled:hover {
+.report__list-item.p-button.p-button-text:enabled:hover,
+.report__list-item.p-button.p-button-text:enabled:focus,
+.report__list-item.p-button.p-button-text:enabled:active {
     color: var(--admss-app-primary);
+    background-color: transparent;
 }
 
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
+}
+
+.report__title {
+    font-size: 20px;
+}
+
+.card.report {
+    padding: 40px 30px;
+}
+
+.p-treenode-content.deeply-nested-node {
+    margin-left: 22px;
 }

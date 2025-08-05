@@ -1,8 +1,9 @@
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
+    deleteInventoryMake,
+    deleteInventoryModel,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
@@ -25,8 +26,11 @@ import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { useToast } from "dashboard/common/toast";
 
 const EQUIPMENT = "equipment";
+const DEFAULT_LOCATION = "default";
 
 const parseMileage = (mileage: string): number => {
     return parseFloat(mileage.replace(/,/g, ""));
@@ -35,6 +39,7 @@ const parseMileage = (mileage: string): number => {
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const userStore = useStore().userStore;
+    const toast = useToast();
     const { authUser } = userStore;
     const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
         store;
@@ -51,17 +56,20 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
 
+    const hangeGetAutoMakeModelList = async () => {
+        const response = await getInventoryAutomakesList();
+        if (response && Array.isArray(response)) {
+            const upperCasedList = response.map((item) => ({
+                ...item,
+                name: item.name.toUpperCase(),
+            }));
+            setInitialAutoMakesList(upperCasedList);
+            setAutomakesList(upperCasedList);
+        }
+    };
+
     useEffect(() => {
-        getInventoryAutomakesList().then((list) => {
-            if (list) {
-                const upperCasedList = list.map((item) => ({
-                    ...item,
-                    name: item.name.toUpperCase(),
-                }));
-                setInitialAutoMakesList(upperCasedList);
-                setAutomakesList(upperCasedList);
-            }
-        });
+        hangeGetAutoMakeModelList();
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
         });
@@ -100,8 +108,11 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, [authUser]);
 
     useEffect(() => {
-        if (!values?.locationuid?.trim()) {
-            store.currentLocation = locationList[0]?.locationuid;
+        if (!values?.locationuid?.trim() && !!locationList.length) {
+            const defaultLocation = locationList.find(
+                (location) => location.locName.toLowerCase() === DEFAULT_LOCATION
+            );
+            store.currentLocation = defaultLocation?.locationuid || locationList[0]?.locationuid;
         }
     }, [currentLocation, locationList, values.locationuid, store]);
 
@@ -109,7 +120,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
         if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
             getAutoMakeModelList(makeSting).then((list) => {
-                if (list && Object.keys(list).length) {
+                if (list && Array.isArray(list) && list.length) {
                     setAutomakesModelList(list);
                 } else {
                     setAutomakesModelList([]);
@@ -135,15 +146,60 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const autoMakesOptionTemplate = (option: MakesListData) => {
+    const handleDeleteInventoryRecord = (record: MakesListData, isModel: boolean = false) => {
+        const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+
+            if (!record.itemuid) return;
+            if (record.isdefault) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "You cannot delete a default make.",
+                });
+                return;
+            }
+
+            let response;
+            if (isModel) {
+                response = await deleteInventoryModel(record.itemuid);
+            } else {
+                response = await deleteInventoryMake(record.itemuid);
+            }
+
+            if (response?.error) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                });
+            } else {
+                toast?.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: `${isModel ? "Model" : "Make"} ${record.name} deleted successfully`,
+                });
+                hangeGetAutoMakeModelList();
+            }
+        };
+
         return (
-            <div className='flex align-items-center'>
-                <img
-                    alt={option.name}
-                    src={option?.logo || defaultMakesLogo}
-                    className='mr-2 vehicle-general__dropdown-icon'
-                />
-                <div>{option.name}</div>
+            <div className='flex align-items-center inventory-makes'>
+                {!isModel && (
+                    <img
+                        alt={record.name}
+                        src={record?.logo || defaultMakesLogo}
+                        className='mr-2 vehicle-general__dropdown-icon'
+                    />
+                )}
+                <div className='inventory-makes__name'>{record.name}</div>
+                {!record.isdefault && (
+                    <Button
+                        icon='pi pi-times'
+                        className='p-button-text inventory-makes__delete-button'
+                        onClick={handleDelete}
+                    />
+                )}
             </div>
         );
     };
@@ -179,7 +235,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Trim", value: vinInfo.Trim || values.Trim });
                 changeInventory({
                     key: "BodyStyle_id",
-                    value: vinInfo.BodyStyle || values.BodyStyle_id,
+                    value: vinInfo.BodyStyle_id || values.BodyStyle_id,
                 });
                 changeInventory({
                     key: "InteriorColor",
@@ -222,7 +278,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
                 changeInventory({
                     key: "BodyStyle_id",
-                    value: inventory.BodyStyle_id || vinInfo.BodyStyle,
+                    value: inventory.BodyStyle_id || vinInfo.BodyStyle_id,
                 });
                 changeInventory({
                     key: "InteriorColor",
@@ -234,6 +290,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 });
                 changeInventory({ key: "mileage", value: inventory.mileage || vinInfo.mileage });
             }
+            handleGetInventoryGroupFullInfo(vinInfo.GroupClassName || values.GroupClassName);
         }
     };
 
@@ -272,52 +329,46 @@ export const VehicleGeneral = observer((): ReactElement => {
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='locName'
-                        optionValue='locationuid'
-                        filter
-                        options={locationList}
-                        value={values.locationuid}
-                        onChange={({ value }) => {
-                            setFieldValue("locationuid", value || locationList[0].locationuid);
-                            changeInventory({
-                                key: "locationuid",
-                                value: value || locationList[0].locationuid,
-                            });
-                        }}
-                        placeholder='Location name'
-                        className={`w-full vehicle-general__dropdown ${
-                            inventory.locationuid === "" && "p-inputwrapper-filled"
-                        } ${errors.locationuid ? "p-invalid" : ""}`}
-                    />
-                    <label className='float-label'>Location name (required)</label>
-                </span>
+                <ComboBox
+                    optionLabel='locName'
+                    optionValue='locationuid'
+                    options={locationList}
+                    value={values.locationuid}
+                    onChange={({ value }) => {
+                        setFieldValue("locationuid", value || locationList[0].locationuid);
+                        changeInventory({
+                            key: "locationuid",
+                            value: value || locationList[0].locationuid,
+                        });
+                    }}
+                    required
+                    className={`w-full vehicle-general__dropdown ${
+                        inventory.locationuid === "" && "p-inputwrapper-filled"
+                    } ${errors.locationuid ? "p-invalid" : ""}`}
+                    label='Location name (required)'
+                />
                 <small className='p-error'>{errors.locationuid}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='description'
-                        optionValue='description'
-                        filter
-                        options={groupClassList}
-                        value={values?.GroupClassName}
-                        onChange={({ value }) => {
-                            setFieldValue("GroupClassName", value);
-                            changeInventory({
-                                key: "GroupClassName",
-                                value,
-                            });
-                            handleGetInventoryGroupFullInfo(value);
-                        }}
-                        placeholder='Group class'
-                        className={`w-full vehicle-general__dropdown ${
-                            errors.GroupClassName ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Inventory group (required)</label>
-                </span>
+                <ComboBox
+                    optionLabel='description'
+                    optionValue='description'
+                    options={groupClassList}
+                    value={values?.GroupClassName}
+                    required
+                    onChange={({ value }) => {
+                        setFieldValue("GroupClassName", value);
+                        changeInventory({
+                            key: "GroupClassName",
+                            value,
+                        });
+                        handleGetInventoryGroupFullInfo(value);
+                    }}
+                    className={`w-full vehicle-general__dropdown ${
+                        errors.GroupClassName ? "p-invalid" : ""
+                    }`}
+                    label='Inventory group (required)'
+                />
                 <small className='p-error'>{errors.GroupClassName}</small>
             </div>
 
@@ -371,9 +422,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                             value={values.VIN}
                             onChange={async ({ target: { value } }) => {
                                 await setFieldValue("VIN", value);
-                                await setFieldTouched("VIN", true, true);
+                                await setFieldTouched("VIN", true, false);
                                 changeInventory({ key: "VIN", value });
-                                await validateField("VIN");
+                                validateField("VIN");
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}
@@ -395,9 +446,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={values.StockNo}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("StockNo", value);
-                            await setFieldTouched("StockNo", true, true);
+                            await setFieldTouched("StockNo", true, false);
                             changeInventory({ key: "StockNo", value });
-                            await validateField("StockNo");
+                            validateField("StockNo");
                         }}
                         onInput={(event: React.FormEvent<HTMLInputElement>) => {
                             const value = (event.target as HTMLInputElement).value;
@@ -431,12 +482,13 @@ export const VehicleGeneral = observer((): ReactElement => {
                             setFieldValue("Make", make);
                             changeInventory({ key: "Make", value: make });
                         }}
-                        itemTemplate={autoMakesOptionTemplate}
+                        itemTemplate={(option) => handleDeleteInventoryRecord(option)}
                         selectedItemTemplate={selectedAutoMakesTemplate}
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
+                        panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
@@ -445,26 +497,25 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        {...getFieldProps("Model")}
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.Model}
-                        filter={!!automakesModelList.length}
-                        editable
-                        options={automakesModelList}
-                        onChange={({ value }) => {
-                            setFieldValue("Model", value);
-                            changeInventory({ key: "Model", value });
-                        }}
-                        placeholder='Model (required)'
-                        className={`vehicle-general__dropdown w-full ${
-                            errors.Model ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Model (required)</label>
-                </span>
+                <ComboBox
+                    {...getFieldProps("Model")}
+                    optionLabel='name'
+                    optionValue='name'
+                    value={values.Model}
+                    editable
+                    options={automakesModelList}
+                    required
+                    onChange={({ value }) => {
+                        setFieldValue("Model", value);
+                        changeInventory({ key: "Model", value });
+                    }}
+                    placeholder='Model (required)'
+                    className={`vehicle-general__dropdown w-full ${
+                        errors.Model ? "p-invalid" : ""
+                    }`}
+                    itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
+                    label='Model (required)'
+                />
                 <small className='p-error'>{errors.Model}</small>
             </div>
             <div className='col-3'>
@@ -517,7 +568,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className={`vehicle-general__text-input w-full ${
                             errors.mileage ? "p-invalid" : ""
                         }`}
-                        required
                         value={parseMileage(inventory?.mileage || "0")}
                         useGrouping={false}
                         min={0}
@@ -533,37 +583,27 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <small className='p-error'>{errors.mileage}</small>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        value={inventory?.ExteriorColor}
-                        filter
-                        required
-                        onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                        options={colorList}
-                        placeholder='Color'
-                        className='w-full vehicle-general__dropdown'
-                    />
-                    <label className='float-label'>Color</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={inventory?.ExteriorColor}
+                    onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
+                    options={colorList}
+                    className='w-full vehicle-general__dropdown'
+                    label='Color'
+                />
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        value={inventory?.InteriorColor}
-                        filter
-                        required
-                        onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                        options={interiorList}
-                        placeholder='Interior color'
-                        className='w-full vehicle-general__dropdown'
-                    />
-                    <label className='float-label'>Interior color</label>
-                </span>
+                <ComboBox
+                    optionLabel='name'
+                    optionValue='name'
+                    value={inventory?.InteriorColor}
+                    onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
+                    options={interiorList}
+                    className='w-full vehicle-general__dropdown'
+                    label='Interior color'
+                />
             </div>
 
             <div className='flex col-12'>
@@ -572,16 +612,15 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        options={auditOptions}
-                        value={selectedAuditKey}
-                        onChange={(e) => handleAuditChange(e.value as keyof Audit)}
-                        placeholder='Select Status'
-                        className='w-full vehicle-general__dropdown'
-                    />
-                    <label className='float-label'>Status</label>
-                </span>
+                <ComboBox
+                    options={auditOptions}
+                    value={selectedAuditKey}
+                    optionLabel='label'
+                    optionValue='value'
+                    onChange={(e) => handleAuditChange(e.value as keyof Audit)}
+                    className='w-full vehicle-general__dropdown'
+                    label='Status'
+                />
             </div>
         </div>
     );

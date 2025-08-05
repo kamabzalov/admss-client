@@ -2,7 +2,7 @@ import { ReactElement, useCallback, useEffect, useState } from "react";
 import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import { getAutoMakeModelList, getInventoryAutomakesList } from "http/services/inventory-service";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
@@ -13,7 +13,7 @@ import { DateInput } from "dashboard/common/form/inputs";
 import { ListData } from "common/models";
 import { MakesListData } from "common/models/inventory";
 import { InputTextarea } from "primereact/inputtextarea";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
@@ -213,12 +213,11 @@ export const AdvancedSearchDialog = <T,>({
 
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
                                 searchForm === SEARCH_FORM_TYPE.INVENTORY && (
-                                    <Dropdown
+                                    <ComboBox
                                         className='w-full'
                                         optionLabel='name'
                                         optionValue='name'
                                         value={value ?? ""}
-                                        filter
                                         editable
                                         valueTemplate={selectedAutoMakesTemplate}
                                         itemTemplate={autoMakesOptionTemplate}
@@ -233,19 +232,18 @@ export const AdvancedSearchDialog = <T,>({
 
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
                                 searchForm === SEARCH_FORM_TYPE.CONTACTS && (
-                                    <Dropdown
+                                    <ComboBox
                                         className='w-full'
                                         optionLabel='name'
                                         optionValue='id'
                                         value={
-                                            typeList.find(
+                                            typeList?.find(
                                                 (typeItem) => typeItem?.name === selectedType
                                             )?.id
                                         }
-                                        filter
                                         options={typeList || []}
                                         onChange={({ target }) => {
-                                            const selected = typeList.find(
+                                            const selected = typeList?.find(
                                                 (typeItem) => typeItem?.id === target.value
                                             );
                                             setSelectedType(selected?.name || "");

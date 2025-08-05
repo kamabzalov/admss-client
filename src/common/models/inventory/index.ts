@@ -1,13 +1,26 @@
 import { ListData, PrintForm } from "common/models";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { ContentType } from "common/models/enums";
+import { MediaLimits } from "common/models";
 
 export interface LocationsListData {
     locations: InventoryLocations[];
     status: Status;
 }
 
-export type MakesListData = ListData & { logo: string };
+export interface MakesListData extends ListData {
+    created_at: string;
+    deleted_at: string;
+    group: string;
+    isdefault: 0 | 1;
+    logo: string;
+    name: string;
+    updated_at: string;
+    url: string;
+    url_hash: string;
+    itemuid?: string;
+}
+
 export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
 export interface InventoryExtData {
@@ -315,6 +328,7 @@ export interface InventoryMediaPostData {
     useruid: string;
     itemuid: string;
     mediaitemuid: string;
+    mediaurl: string;
     notes: string;
     type: number;
     contenttype: number;
@@ -331,14 +345,7 @@ export interface InventoryMedia extends InventoryMediaItemID {
     useruid: string;
 }
 
-export interface MediaLimitations {
-    formats: string[];
-    codecs?: string;
-    minResolution?: string;
-    prefResolution?: string;
-    maxResolution?: string;
-    maxDuration?: number;
-    maxSize: number;
+export interface MediaLimitations extends MediaLimits {
     maxUpload: number;
 }
 
@@ -425,4 +432,29 @@ export interface InventoryPaymentBack extends BaseResponseError {
 export interface InventoryOptions extends BaseResponseError {
     options_list: OptionsListData[];
     value: number;
+}
+
+export interface MediaItem {
+    src: string;
+    itemuid: string;
+    mediauid?: string;
+    info?: Partial<InventoryMedia> & {
+        order?: number;
+    };
+}
+
+export interface UploadMediaItem {
+    file: File[];
+    data: Partial<InventoryMediaPostData>;
+}
+
+export interface UploadMediaLink {
+    contenttype: number;
+    notes: string;
+    mediaurl: string;
+}
+
+export interface InventoryShortList {
+    itemuid: string;
+    name: string;
 }

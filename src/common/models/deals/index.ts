@@ -1,11 +1,18 @@
-import { BaseResponse } from "common/models/base-response";
-import { PrintForm, TypeList } from "..";
-import { Status } from "../base-response";
+import { BaseResponse, BaseResponseError } from "common/models/base-response";
+import { PrintForm, TypeList } from "common/models";
+import { Status } from "common/models/base-response";
+
+export enum AddToInventory {
+    ALL_DISABLED = 0,
+    TRADE_FIRST_ENABLED = 1,
+    TRADE_SECOND_ENABLED = 2,
+    ALL_ENABLED = 3,
+}
 
 export interface Deal {
     accountInfo: string;
     accountuid: string;
-    addToInventory: number;
+    addToInventory: AddToInventory;
     contactinfo: string;
     contactuid: string;
     created: string;
@@ -26,7 +33,9 @@ export interface Deal {
     name: string;
     price: string;
     salesperson1uid: string;
+    salesperson1name: string;
     salesperson2uid: string;
+    salesperson2name: string;
     saletype: number;
     status: string;
     updated: string;
@@ -410,15 +419,109 @@ export interface DealPickupPayment {
     dealuid: string;
     itemuid: string;
     paid: number;
-    paydate: string;
+    paydate: number | string;
     updated: string;
     useruid: string;
 }
 
 export interface HowToKnow {
     created: string;
-    updated: string;
-    itemuid: string;
-    useruid: string;
     description: string;
+    isdefault: 0 | 1;
+    itemuid: string;
+    updated: string;
+    useruid: string;
+}
+
+export interface DealDelete {
+    status: string;
+    error: string;
+    description: string;
+    comment: string;
+    reason: string;
+    delete_buyer: 0 | 1;
+    delete_vehicle: 0 | 1;
+    send_back: 0 | 1;
+    delete_quote: 0 | 1;
+    delete_trade1: 0 | 1;
+    delete_trade2: 0 | 1;
+    delete_account: 0 | 1;
+}
+
+export interface DealPaymentsTotal extends BaseResponseError {
+    total: number;
+    total_paid: number;
+}
+
+export interface DealWashout extends BaseResponseError {
+    AH: string;
+    AH_Cost: string;
+    AH_Profit: string;
+    AH_Type: 0 | 1;
+    Accessory: string;
+    Accessory_Cost: string;
+    Accessory_Profit: string;
+    AcquisitionFee: string;
+    ActualProfitRealized: string;
+    AddExpectedToTotal: number;
+    BHPHCollectedInterest: string;
+    BuyRate: string;
+    BuyRateTermInterest: string;
+    CashPrice: string;
+    CL: string;
+    CL_Cost: string;
+    CL_Profit: string;
+    CL_Type: 0 | 1;
+    CollectedInterestOther: string;
+    Comm2Options: 0 | 1;
+    Commission1: string;
+    Commission2: string;
+    CommissionBase: string;
+    CommissionMgr: string;
+    CommissionTotal: string;
+    ContractRate: string;
+    Discount: string;
+    DocFee: string;
+    FIProfitTotal: string;
+    ExpectedInterest: string;
+    Expenses: string;
+    Gap: string;
+    Gap_Cost: string;
+    Gap_Profit: string;
+    Interest_Markup: string;
+    Loan_Cost: string;
+    MiscCost: string;
+    MiscCostDescription: string;
+    MiscProfit: string;
+    MiscProfitDescription: string;
+    NetFI_Profit: string;
+    Overllowance: string;
+    PercentWitheld: string;
+    ProjTermInterest: string;
+    PurchaseCost: string;
+    Reserve: string;
+    ReserveRefund: string;
+    Reserve_Type: 0 | 1;
+    StockNo: string;
+    TotalCollected: string;
+    TotalCollectedInterest: string;
+    TotalDealCost: string;
+    TotalInterest: string;
+    Trade1Allowance: string;
+    Trade1ACV: string;
+    Trade2Allowance: string;
+    Trade2ACV: string;
+    VIN: string;
+    VSI: string;
+    VSI_Cost: string;
+    VSI_Profit: string;
+    VSI_Type: 0 | 1;
+    VehicleCost: string;
+    VehiclePack: string;
+    VehicleProfit: string;
+    Warranty_Cost: string;
+    Warranty_Price: string;
+    Warranty_Profit: string;
+    name: string;
+    requestuid: string;
 }

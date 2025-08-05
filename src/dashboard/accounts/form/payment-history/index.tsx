@@ -2,7 +2,6 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,6 +22,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { observer } from "mobx-react-lite";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -347,7 +347,7 @@ export const AccountPaymentHistory = observer((): ReactElement => {
             <h3 className='account-history__title account-title'>Payment History</h3>
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
-                    <Dropdown
+                    <ComboBox
                         className='account__dropdown'
                         options={[...ACCOUNT_PAYMENT_STATUS_LIST]}
                         value={selectedPayment}

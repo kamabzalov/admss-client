@@ -5,29 +5,34 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
 import { auth } from "http/services/auth.service";
-import { setKey } from "services/local-storage.service";
-import { Toast } from "primereact/toast";
-import { useRef, useState } from "react";
-import { APPLICATION } from "http/index";
-import { LS_APP_USER } from "common/constants/localStorage";
+import { useState } from "react";
+import { APP_TYPE, APP_VERSION } from "http/index";
+import { TOAST_LIFETIME } from "common/settings";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { useStore } from "store/hooks";
 
 export interface LoginForm {
     username: string;
     password: string;
     rememberme: boolean;
-    application: string;
+    application: "admin" | "crm" | "client" | string;
+    version: string;
 }
 
-export default function SignIn() {
+export const SignIn = () => {
     const navigate = useNavigate();
-    const toast = useRef<Toast>(null);
+    const toast = useToast();
+    const userStore = useStore().userStore;
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+
     const formik = useFormik<LoginForm>({
         initialValues: {
             username: "",
             password: "",
             rememberme: false,
-            application: APPLICATION,
+            application: APP_TYPE,
+            version: APP_VERSION,
         },
         validate: (data: { username: string; password: string }) => {
             let errors: any = {};
@@ -42,20 +47,43 @@ export default function SignIn() {
 
             return errors;
         },
-        onSubmit: () => {
-            auth(formik.values).then((response) => {
-                if (response.status === "OK") {
-                    setKey(LS_APP_USER, JSON.stringify(response));
-                    navigate("/dashboard");
+        onSubmit: async () => {
+            try {
+                const response = await auth(formik.values);
+                if (response.status === Status.OK) {
+                    if (!response.token) {
+                        await Promise.reject(new Error("Invalid credentials"));
+                        return;
+                    }
+                    try {
+                        userStore.storedUser = response;
+                        navigate("/dashboard");
+                    } catch (error) {
+                        toast.current?.show({
+                            severity: "error",
+                            life: TOAST_LIFETIME,
+                            summary: Status.ERROR,
+                            detail: String(error),
+                        });
+                        return;
+                    }
                 } else {
                     toast.current?.show({
                         severity: "error",
-                        summary: response.status || "Error",
+                        life: TOAST_LIFETIME,
+                        summary: Status.ERROR,
                         detail: response?.error || String(response),
-                        sticky: true,
                     });
                 }
-            });
+            } catch (error) {
+                const errorMessage = "An unexpected error occurred during login";
+                toast.current?.show({
+                    severity: "error",
+                    life: TOAST_LIFETIME,
+                    summary: Status.ERROR,
+                    detail: error instanceof Error ? error.message || errorMessage : errorMessage,
+                });
+            }
         },
     });
 
@@ -147,7 +175,6 @@ export default function SignIn() {
                     </form>
                 </div>
             </div>
-            <Toast ref={toast} />
         </section>
     );
-}
+};

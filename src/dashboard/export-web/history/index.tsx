@@ -311,6 +311,10 @@ export const ExportHistory = (): ReactElement => {
                                                 width: serverSettings?.exportHistory?.columnWidth?.[
                                                     field
                                                 ],
+                                                maxWidth:
+                                                    serverSettings?.exportHistory?.columnWidth?.[
+                                                        field
+                                                    ],
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
                                             },

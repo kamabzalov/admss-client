@@ -1,0 +1,15 @@
+.settings-inventory {
+    .stock-new__slider {
+        .p-inputtext {
+            border-radius: 5px 5px 0 0;
+        }
+    }
+    .p-float-label {
+        margin-left: 10px;
+    }
+
+    .stock-new__input {
+        width: 100%;
+        height: 50px;
+    }
+}

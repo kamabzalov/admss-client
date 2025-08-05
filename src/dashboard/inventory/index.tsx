@@ -19,7 +19,7 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     AdvancedSearchDialog,
     SEARCH_FIELD_TYPE,
@@ -31,7 +31,12 @@ import {
     getUserSettings,
     setUserSettings,
 } from "http/services/auth-user.service";
-import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
+import {
+    FilterOptions,
+    TableColumnsList,
+    columns,
+    filterOptions,
+} from "dashboard/inventory/common/data-table";
 import {
     InventoryUserSettings,
     ServerUserSettings,
@@ -50,6 +55,8 @@ import {
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
+import { INVENTORY_PAGE } from "common/constants/links";
 
 const DATA_FIELD = "data-field";
 
@@ -57,6 +64,7 @@ interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
+    originalPath?: string;
 }
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
@@ -65,6 +73,7 @@ export default function Inventories({
     onRowClick,
     returnedField,
     getFullInfo,
+    originalPath,
 }: InventoriesProps): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -91,6 +100,8 @@ export default function Inventories({
     const dataTableRef = useRef<DataTable<Inventory[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
+    const { clearInventory } = store;
+    const toast = useToast();
 
     const navigate = useNavigate();
 
@@ -136,7 +147,11 @@ export default function Inventories({
             });
         }
         return () => {
-            store.memoRoute = "";
+            store.isErasingNeeded = true;
+            if (originalPath) {
+                store.memoRoute = originalPath;
+            }
+            clearInventory();
         };
     }, []);
 
@@ -284,26 +299,36 @@ export default function Inventories({
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
-        if (authUser) {
-            const queryString = params.qry ? encodeURIComponent(params.qry) : "";
-            const updatedParams = { ...params, qry: queryString };
+        if (!authUser) return;
+
+        const queryString = params.qry ? encodeURIComponent(params.qry) : "";
+        const updatedParams = { ...params, qry: queryString };
+
+        setIsLoading(true);
+        try {
             if (total) {
-                getInventoryList(authUser.useruid, { ...updatedParams, total: 1 }).then(
-                    (response) => {
-                        response &&
-                            !Array.isArray(response) &&
-                            setTotalRecords(response.total ?? 0);
-                    }
-                );
-            }
-            getInventoryList(authUser.useruid, updatedParams).then((response) => {
-                if (Array.isArray(response) && response.length) {
-                    setInventories(response);
-                } else {
-                    setInventories([]);
+                const totalResponse = await getInventoryList(authUser.useruid, {
+                    ...updatedParams,
+                    total: 1,
+                });
+                if (totalResponse && !Array.isArray(totalResponse)) {
+                    setTotalRecords(totalResponse.total ?? 0);
                 }
-                setIsLoading(false);
+            }
+
+            const response = await getInventoryList(authUser.useruid, updatedParams);
+            if (Array.isArray(response)) {
+                setInventories(response);
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: String(error) || "Failed to load inventory data",
+                life: TOAST_LIFETIME,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -565,6 +590,10 @@ export default function Inventories({
         },
     ];
 
+    const handleAddNewInventory = () => {
+        navigate(INVENTORY_PAGE.CREATE());
+    };
+
     const header = (
         <div className='grid datatable-controls'>
             <div className='flex justify-content-between align-items-center gap-3'>
@@ -594,7 +623,7 @@ export default function Inventories({
                         severity='success'
                         type='button'
                         tooltip='Add new inventory'
-                        onClick={() => navigate("create")}
+                        onClick={handleAddNewInventory}
                     >
                         New
                     </Button>
@@ -880,6 +909,9 @@ export default function Inventories({
                                                             style: {
                                                                 width: serverSettings?.inventory
                                                                     ?.columnWidth?.[field],
+                                                                maxWidth:
+                                                                    serverSettings?.inventory
+                                                                        ?.columnWidth?.[field],
                                                                 overflow: "hidden",
                                                                 textOverflow: "ellipsis",
                                                             },

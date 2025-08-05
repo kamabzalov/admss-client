@@ -22,6 +22,38 @@
     align-items: center;
     flex: 0 0 30%;
     border-right: 1px solid var(--admss-app-medium-blue);
+    .currency-item__input,
+    .date-item__input {
+        height: 44px;
+    }
+    .pickup-input .p-inputtext {
+        height: 44px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+        &:focus,
+        &:focus-visible,
+        &:active,
+        &:hover {
+            border-color: var(--admss-app-light-grey);
+        }
+    }
+
+    .date-item__icon,
+    .currency-item__icon {
+        height: 44px;
+    }
+    .pickup-checkbox {
+        border: 1px solid var(--admss-app-light-grey);
+        background-color: var(--admss-app-lightest-grey);
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .pickup-header__item:last-child,
@@ -54,6 +86,19 @@
     .pickup-input.pickup-input--grey {
         .p-inputtext {
             color: var(--admss-app-medium-grey);
+        }
+    }
+}
+
+.pickup-delete-dialog {
+    .p-dialog-content {
+        padding: 30px 70px;
+        padding-bottom: 0;
+    }
+    .p-dialog-footer {
+        padding-top: 20px;
+        .p-button {
+            height: 60px;
         }
     }
 }

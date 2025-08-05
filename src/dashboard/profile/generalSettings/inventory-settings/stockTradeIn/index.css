@@ -1,0 +1,10 @@
+.settings-inventory {
+    .stock-ti__slider {
+        .p-inputtext {
+            border-radius: 5px 5px 0 0;
+        }
+    }
+    .stock-trade-in__input {
+        width: 250px;
+    }
+}

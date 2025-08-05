@@ -206,9 +206,6 @@
 .adms-save:before {
   content: "\33";
 }
-.adms-download:before {
-  content: "\34";
-}
 .adms-skype:before {
   content: "\35";
 }
@@ -230,9 +227,42 @@
 .adms-check-modal:before {
   content: "\22";
 }
-.adms-print-receipt-01:before {
+.adms-print-receipt:before {
   content: "\23";
 }
 .adms-preview:before {
   content: "\24";
+}
+.adms-download:before {
+  content: "\34";
+}
+.adms-arrow-down-options:before {
+  content: "\25";
+}
+.adms-arrow-up-options:before {
+  content: "\26";
+}
+.adms-arrow-onhover-up:before {
+  content: "\27";
+}
+.adms-arrow-onhover-down:before {
+  content: "\28";
+}
+.adms-switch-active:before {
+  content: "\29";
+}
+.adms-switch-disable:before {
+  content: "\2a";
+}
+.adms-expenses:before {
+  content: "\2b";
+}
+.adms-generate-password:before {
+  content: "\2c";
+}
+.adms-salesman:before {
+  content: "\2d";
+}
+.adms-msteams:before {
+  content: "\2e";
 }

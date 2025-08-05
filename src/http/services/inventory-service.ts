@@ -19,6 +19,7 @@ import {
     LocationsListData,
     MakesListData,
     OptionsListData,
+    InventoryShortList,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -189,6 +190,29 @@ export const getVINCheck = async (VIN: string) => {
                 error: error.response?.data.error || "Error while VIN check",
             };
         }
+    }
+};
+
+export const getShortInventoryList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            InventoryShortList[] | BaseResponseError
+        >(`inventory/${useruid}/shortlist`);
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error: Error | BaseResponseError | unknown) {
+        const errorMessage = "Error while getting inventory list";
+        if (error instanceof Error) {
+            return {
+                status: Status.ERROR,
+                error: error.message || errorMessage,
+            };
+        }
+        return {
+            status: Status.ERROR,
+            error: error || errorMessage,
+        };
     }
 };
 
@@ -363,7 +387,7 @@ export const setInventoryPaymentBack = async (
     inventoryPayment: Partial<InventoryPaymentBack>
 ) => {
     try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
             `inventory/${inventoryuid}/paymentpack`,
             inventoryPayment
         );
@@ -375,6 +399,42 @@ export const setInventoryPaymentBack = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error on set inventory expense",
+            };
+        }
+    }
+};
+
+export const deleteInventoryMake = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${itemuid}/deletemake`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on delete inventory make",
+            };
+        }
+    }
+};
+
+export const deleteInventoryModel = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${itemuid}/deletemodel`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on delete inventory model",
             };
         }
     }

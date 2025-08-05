@@ -31,6 +31,11 @@
 
 .p-confirm-dialog {
     width: 455px;
+    .confirm-checkbox {
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+    }
 }
 
 .p-confirm-dialog .p-dialog-content {
@@ -38,6 +43,7 @@
     padding-top: 14px;
     line-height: 1.4;
     letter-spacing: 0.5px;
+    justify-content: center;
 }
 
 .p-confirm-dialog .p-dialog-footer {

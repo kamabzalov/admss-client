@@ -1,0 +1,24 @@
+.combo-box {
+    .p-dropdown-trigger {
+        color: var(--admss-app-light-grey);
+        &:hover {
+            color: var(--admss-app-lightest-grey);
+        }
+        .p-icon {
+            font-size: 14px;
+        }
+    }
+
+    .p-dropdown-clear-icon.p-clickable {
+        color: var(--admss-app-medium-grey);
+        width: 14px;
+        height: 14px;
+        margin-top: -0.4rem;
+    }
+}
+.combo-box__list .combo-box__list-item {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

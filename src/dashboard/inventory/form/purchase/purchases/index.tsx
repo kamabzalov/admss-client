@@ -3,6 +3,7 @@ import {
     CurrencyInput,
     DateInput,
     PercentInput,
+    PhoneInput,
 } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
@@ -13,6 +14,8 @@ import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { useLocation } from "react-router-dom";
+import { useFormikContext } from "formik";
+import { InventoryExtData } from "common/models/inventory";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -40,6 +43,7 @@ export const PurchasePurchases = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+    const { setFieldTouched, errors } = useFormikContext<InventoryExtData>();
 
     return (
         <div className='grid purchase-purchases row-gap-2'>
@@ -63,10 +67,13 @@ export const PurchasePurchases = observer((): ReactElement => {
                     originalPath={currentPath}
                 />
             </div>
-            <div className='col-3'>
+
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='purchase-purchases__text-input w-full'
+                        className={`'purchase-purchases__text-input w-full' ${
+                            errors.purPurchaseEmail ? "p-invalid" : ""
+                        }`}
                         value={purPurchaseEmail}
                         onChange={({ target: { value } }) => {
                             changeInventoryExtData({
@@ -74,24 +81,29 @@ export const PurchasePurchases = observer((): ReactElement => {
                                 value,
                             });
                         }}
+                        onBlur={() => setFieldTouched("purPurchaseEmail", true, true)}
+                        pt={{
+                            root: {
+                                className: "w-full",
+                            },
+                        }}
                     />
                     <label className='float-label'>E-mail</label>
                 </span>
+                <small className='p-error'>{errors.purPurchaseEmail}</small>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-purchases__text-input w-full'
-                        value={purPurchasePhone}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchasePhone",
-                                value,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Phone number</label>
-                </span>
+                <PhoneInput
+                    name='Phone number'
+                    value={purPurchasePhone}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "purPurchasePhone",
+                            value,
+                        });
+                    }}
+                    onBlur={() => setFieldTouched("purPurchasePhone", true)}
+                />
             </div>
 
             <div className='col-6'>
@@ -183,6 +195,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <PercentInput
                     labelPosition='top'
+                    emptyValue
                     title='Buyer Percent'
                     value={purPurchaseBuyerPercent}
                     onChange={({ value }) => {
@@ -196,6 +209,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
+                    coloredEmptyValue
                     title='Buyer Commission'
                     value={purPurchaseBuyerComm}
                     onChange={({ value }) => {
@@ -221,6 +235,7 @@ export const PurchasePurchases = observer((): ReactElement => {
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
+                    coloredEmptyValue
                     title='Amount'
                     value={purPurchaseAmount}
                     onChange={({ value }) => {

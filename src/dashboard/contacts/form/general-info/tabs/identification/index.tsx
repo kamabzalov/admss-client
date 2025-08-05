@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
 import "./index.css";
@@ -24,20 +23,8 @@ import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
-
-const SexList = [
-    {
-        name: "Male",
-    },
-    {
-        name: "Female",
-    },
-];
-
-enum DLSides {
-    FRONT = "front",
-    BACK = "back",
-}
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { DLSides, SexList } from "common/constants/contract-options";
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -173,26 +160,24 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         );
     };
 
-    return (
+    return isLoading ? (
+        <Loader className='contact-form__loader' />
+    ) : (
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='label'
-                            optionValue='id'
-                            filter
-                            value={contactExtData.Buyer_DL_State || ""}
-                            options={STATES_LIST}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_DL_State", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
-                            showClear={!!contactExtData.Buyer_DL_State}
-                        />
-                        <label className='float-label'>DL's State</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='label'
+                        optionValue='id'
+                        value={contactExtData.Buyer_DL_State || ""}
+                        options={STATES_LIST}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("Buyer_DL_State", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.Buyer_DL_State}
+                        label="DL's State"
+                    />
                 </div>
 
                 <div className='col-3'>
@@ -203,7 +188,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("Buyer_Driver_License_Num", value);
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Driver License's Number</label>
                     </span>
@@ -212,34 +196,28 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3 mr-2'>
                     <DateInput
                         name="DL's exp. date"
-                        value={contactExtData.Buyer_DL_Exp_Date || ""}
                         date={contactExtData.Buyer_DL_Exp_Date}
                         onChange={({ target: { value } }) =>
                             changeContactExtData("Buyer_DL_Exp_Date", Date.parse(String(value)))
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
 
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='name'
-                            filter
-                            value={contactExtData.Buyer_Sex || ""}
-                            options={SexList}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_Sex", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
-                            showClear={!!contactExtData.Buyer_Sex}
-                        />
-                        <label className='float-label'>Sex</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        value={contactExtData.Buyer_Sex || ""}
+                        options={SexList}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("Buyer_Sex", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.Buyer_Sex}
+                        label='Sex'
+                    />
                 </div>
 
                 <div className='col-3'>
@@ -251,7 +229,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             onChange={({ target: { value } }) => {
                                 changeContactExtData("Buyer_SS_Number", String(value));
                             }}
-                            disabled={isControlDisabled}
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
@@ -260,14 +237,12 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <div className='col-3'>
                     <DateInput
                         name='Date of Birth'
-                        value={contactExtData.Buyer_Date_Of_Birth || ""}
                         date={contactExtData.Buyer_Date_Of_Birth}
                         onChange={({ target: { value } }) =>
                             changeContactExtData("Buyer_Date_Of_Birth", Date.parse(String(value)))
                         }
                         className='identification-info__date-input w-full'
                         emptyDate
-                        disabled={isControlDisabled}
                     />
                 </div>
             </div>

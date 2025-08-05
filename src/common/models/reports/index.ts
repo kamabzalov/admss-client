@@ -5,6 +5,12 @@ export interface ReportsColumn {
     data: string;
 }
 
+export interface ReportCollections {
+    collectionuid: string;
+    itemuid?: string;
+    name?: string;
+}
+
 export interface ReportsPostData {
     itemUID?: string;
     data?: Record<string, string>[];
@@ -16,10 +22,7 @@ export interface ReportDocument {
     accessed: string;
     count: number;
     created: string;
-    collections?: {
-        collectionuid: string;
-        itemuid: string;
-    }[];
+    collections?: ReportCollections[];
     documentUID: string;
     index: number;
     isNew: 0 | 1;
@@ -37,7 +40,7 @@ export interface ReportCollection extends BaseResponseError {
     created: string;
     description: string;
     collections?: ReportCollection[];
-    documents: ReportDocument[];
+    documents?: Partial<ReportDocument>[];
     index: number;
     isdefault: 0 | 1;
     isfavorite: 0 | 1;
@@ -46,6 +49,7 @@ export interface ReportCollection extends BaseResponseError {
     name: string;
     updated: string;
     userUID: string;
+    itemuid: string;
 }
 
 export interface ReportCollectionUpdate {
@@ -97,6 +101,7 @@ export interface ReportInfo extends BaseResponseError {
     order: number;
     listid: 0 | 1;
     columns: ReportServiceColumns[];
+    collections?: ReportCollections[];
 }
 
 export interface ReportCreate extends BaseResponseError {
@@ -113,13 +118,15 @@ export interface ReportServiceColumns {
     index: number;
     name: string;
     width: number;
+    originalDataSet?: ReportServices;
 }
 
-export interface ReportSetParams {
+export interface ReportSetParams extends Omit<Partial<ReportInfo>, "columns"> {
     itemUID: string;
     timestamp?: number;
-    from_date?: number;
-    to_date?: number;
+    timestamp_s?: string;
+    from_date?: string;
+    to_date?: string;
     type?: number;
     data?: Record<string, unknown>[];
     format?: Record<string, unknown>;
@@ -151,4 +158,11 @@ export enum REPORT_TYPES {
 export enum NODE_TYPES {
     DOCUMENT = "document",
     COLLECTION = "collection",
+}
+
+export interface Dataset {
+    id: number;
+    key: string;
+    match: { id: number; name: string }[];
+    name: ReportServices;
 }
