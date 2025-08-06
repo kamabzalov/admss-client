@@ -291,7 +291,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                         });
                     }}
                     onBlur={handleOfacCheck}
-                    name='First Name'
+                    name={`First Name${contactExtData.CoBuyer_Last_Name?.trim() || contactExtData.CoBuyer_Middle_Name?.trim() ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
@@ -320,7 +320,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    name='Last Name'
+                    name={`Last Name${contactExtData.CoBuyer_First_Name?.trim() || contactExtData.CoBuyer_Middle_Name?.trim() ? " (required)" : ""}`}
                     className={`general-info__text-input w-full ${errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {

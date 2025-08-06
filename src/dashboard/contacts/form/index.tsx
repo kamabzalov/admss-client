@@ -137,8 +137,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_First_Name: Yup.string()
         .trim()
         .test("coBuyerFirstNameRequired", "Data is required.", function (value) {
-            const { type } = this.parent;
-            if (type === BUYER_ID) {
+            const { CoBuyer_Last_Name, CoBuyer_Middle_Name } = this.parent;
+            if (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
                 return !!value?.trim();
             }
             return true;
@@ -155,8 +155,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_Last_Name: Yup.string()
         .trim()
         .test("coBuyerLastNameRequired", "Data is required.", function (value) {
-            const { type } = this.parent;
-            if (type === BUYER_ID) {
+            const { CoBuyer_First_Name, CoBuyer_Middle_Name } = this.parent;
+            if (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
                 return !!value?.trim();
             }
             return true;
