@@ -50,11 +50,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { errors, values, validateField, setFieldValue, setFieldTouched } =
         useFormikContext<Contact>();
 
-    const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
-    const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
-    const [savedMiddleName, setSavedMiddleName] = useState<string>(contact.middleName || "");
-    const [savedBusinessName, setSavedBusinessName] = useState<string>(contact.businessName || "");
-    const prevTypeRef = useRef<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleGetTypeList = async () => {
@@ -207,65 +202,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
 
     const shouldDisableBusinessName = useMemo(() => {
         return (
-            !isBusinessNameRequired && (!!contact.firstName?.trim() || !!contact.lastName?.trim())
+            !isBusinessNameRequired &&
+            (!!contact.firstName?.trim() ||
+                !!contact.middleName?.trim() ||
+                !!contact.lastName?.trim())
         );
     }, [isBusinessNameRequired, contact.firstName, contact.lastName]);
-
-    useEffect(() => {
-        if (prevTypeRef.current === contact.type) return;
-
-        if (shouldDisableNameFields) {
-            if (contact.firstName) {
-                setSavedFirstName(contact.firstName);
-                setFieldValue("firstName", "");
-                changeContact("firstName", "", false);
-            }
-            if (contact.lastName) {
-                setSavedLastName(contact.lastName);
-                setFieldValue("lastName", "");
-                changeContact("lastName", "", false);
-            }
-            if (contact.middleName) {
-                setSavedMiddleName(contact.middleName);
-                setFieldValue("middleName", "");
-                changeContact("middleName", "", false);
-            }
-        } else {
-            if (!contact.firstName && savedFirstName) {
-                setFieldValue("firstName", savedFirstName);
-                changeContact("firstName", savedFirstName, false);
-            }
-            if (!contact.lastName && savedLastName) {
-                setFieldValue("lastName", savedLastName);
-                changeContact("lastName", savedLastName, false);
-            }
-            if (!contact.middleName && savedMiddleName) {
-                setFieldValue("middleName", savedMiddleName);
-                changeContact("middleName", savedMiddleName, false);
-            }
-        }
-
-        prevTypeRef.current = contact.type;
-    }, [shouldDisableNameFields, contact.type]);
-
-    useEffect(() => {
-        if (prevTypeRef.current === contact.type) return;
-
-        if (shouldDisableBusinessName) {
-            if (contact.businessName) {
-                setSavedBusinessName(contact.businessName);
-                setFieldValue("businessName", "");
-                changeContact("businessName", "", false);
-            }
-        } else {
-            if (!contact.businessName && savedBusinessName) {
-                setFieldValue("businessName", savedBusinessName);
-                changeContact("businessName", savedBusinessName, false);
-            }
-        }
-
-        prevTypeRef.current = contact.type;
-    }, [shouldDisableBusinessName, contact.type]);
 
     const handleOfacCheck = () => {
         if (!contact?.firstName || !contact.lastName) {
