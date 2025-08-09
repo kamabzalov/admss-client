@@ -20,8 +20,8 @@ export enum DIALOG_ACTION {
 
 interface reportDownloadFormParams extends Partial<Omit<ReportSetParams, "from_date" | "to_date">> {
     action: DIALOG_ACTION;
-    from_date?: string | number;
-    to_date?: string | number;
+    from_date?: number | Date;
+    to_date?: number | Date;
 }
 
 export const reportDownloadForm = async (
@@ -35,8 +35,12 @@ export const reportDownloadForm = async (
     };
 
     if (!!params.AskForStartAndEndDates || withDate) {
-        payload.from_date = params.from_date ? formatDateForServer(new Date(params.from_date)) : "";
-        payload.to_date = params.to_date ? formatDateForServer(new Date(params.to_date)) : "";
+        payload.from_date = params.from_date
+            ? new Date(params.from_date).getTime()
+            : new Date().getTime();
+        payload.to_date = params.to_date
+            ? new Date(params.to_date).getTime()
+            : new Date().getTime();
     }
 
     const response = await setReportDocumentTemplate(params.itemUID || "0", payload);
@@ -85,8 +89,8 @@ export const ReportParameters = ({
         const response = await reportDownloadForm(
             {
                 action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
-                from_date: startDate,
-                to_date: endDate,
+                from_date: startDate ? new Date(Number(startDate)) : new Date().getTime(),
+                to_date: endDate ? new Date(Number(endDate)) : new Date().getTime(),
                 ...report,
             },
             true
