@@ -74,8 +74,8 @@ export const ReportEditForm = observer((): ReactElement => {
             const response = await reportDownloadForm({
                 action,
                 columns: reportColumns,
-                from_date: startDate,
-                to_date: endDate,
+                from_date: startDate ? new Date(Number(startDate)) : new Date().getTime(),
+                to_date: endDate ? new Date(Number(endDate)) : new Date().getTime(),
                 itemUID,
                 ...report,
             });
@@ -250,8 +250,8 @@ export const ReportEditForm = observer((): ReactElement => {
                     reportDownloadForm({
                         action: dialogAction,
                         columns: report.columns,
-                        from_date: startDate,
-                        to_date: endDate,
+                        from_date: startDate ? new Date(Number(startDate)) : new Date().getTime(),
+                        to_date: endDate ? new Date(Number(endDate)) : new Date().getTime(),
                         ...report,
                     })
                 }
