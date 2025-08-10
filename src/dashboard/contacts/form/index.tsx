@@ -380,7 +380,41 @@ export const ContactForm = observer((): ReactElement => {
                 });
                 setErrorSections(currentSectionsWithErrors);
 
-                setIsDataMissingConfirm(true);
+                const hasCoBuyerMiddleNameOnly =
+                    contactExtData.CoBuyer_Middle_Name?.trim() &&
+                    !contactExtData.CoBuyer_First_Name?.trim() &&
+                    !contactExtData.CoBuyer_Last_Name?.trim();
+
+                const hasMainMiddleNameOnly =
+                    contact.middleName?.trim() &&
+                    !contact.firstName?.trim() &&
+                    !contact.lastName?.trim();
+
+                const hasBusinessNameOnly =
+                    contact.businessName?.trim() &&
+                    !contact.firstName?.trim() &&
+                    !contact.lastName?.trim() &&
+                    REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type || 0);
+
+                const hasCoBuyerBusinessNameOnly =
+                    contactExtData.CoBuyer_Emp_Company?.trim() &&
+                    !contactExtData.CoBuyer_First_Name?.trim() &&
+                    !contactExtData.CoBuyer_Last_Name?.trim();
+
+                if (
+                    hasCoBuyerMiddleNameOnly ||
+                    hasMainMiddleNameOnly ||
+                    hasBusinessNameOnly ||
+                    hasCoBuyerBusinessNameOnly
+                ) {
+                    setConfirmAction(() => {
+                        setIsConfirmVisible(false);
+                        setIsDataMissingConfirm(true);
+                    });
+                    setIsConfirmVisible(true);
+                } else {
+                    setIsDataMissingConfirm(true);
+                }
             }
         });
     };

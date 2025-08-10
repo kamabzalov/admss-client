@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useRef, useState, useEffect, useMemo } from "react";
+import { ReactElement, useRef, useState, useMemo } from "react";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
 import { Contact, ContactExtData, ContactOFAC, ScanBarcodeDL } from "common/models/contact";
@@ -25,18 +25,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [savedFirstName, setSavedFirstName] = useState<string>(
-        contactExtData.CoBuyer_First_Name || ""
-    );
-    const [savedLastName, setSavedLastName] = useState<string>(
-        contactExtData.CoBuyer_Last_Name || ""
-    );
-    const [savedMiddleName, setSavedMiddleName] = useState<string>(
-        contactExtData.CoBuyer_Middle_Name || ""
-    );
-    const [savedBusinessName, setSavedBusinessName] = useState<string>(
-        contactExtData.CoBuyer_Emp_Company || ""
-    );
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -46,57 +34,15 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     const shouldDisableBusinessName = useMemo(() => {
         return !!(
-            contactExtData.CoBuyer_First_Name?.trim() || contactExtData.CoBuyer_Last_Name?.trim()
+            contactExtData.CoBuyer_First_Name?.trim() ||
+            contactExtData.CoBuyer_Middle_Name?.trim() ||
+            contactExtData.CoBuyer_Last_Name?.trim()
         );
-    }, [contactExtData.CoBuyer_First_Name, contactExtData.CoBuyer_Last_Name]);
-
-    useEffect(() => {
-        if (shouldDisableNameFields) {
-            if (contactExtData.CoBuyer_First_Name) {
-                setSavedFirstName(contactExtData.CoBuyer_First_Name);
-                setFieldValue("CoBuyer_First_Name", "");
-                changeContactExtData("CoBuyer_First_Name", "");
-            }
-            if (contactExtData.CoBuyer_Last_Name) {
-                setSavedLastName(contactExtData.CoBuyer_Last_Name);
-                setFieldValue("CoBuyer_Last_Name", "");
-                changeContactExtData("CoBuyer_Last_Name", "");
-            }
-            if (contactExtData.CoBuyer_Middle_Name) {
-                setSavedMiddleName(contactExtData.CoBuyer_Middle_Name);
-                setFieldValue("CoBuyer_Middle_Name", "");
-                changeContactExtData("CoBuyer_Middle_Name", "");
-            }
-        } else {
-            if (!contactExtData.CoBuyer_First_Name && savedFirstName) {
-                setFieldValue("CoBuyer_First_Name", savedFirstName);
-                changeContactExtData("CoBuyer_First_Name", savedFirstName);
-            }
-            if (!contactExtData.CoBuyer_Last_Name && savedLastName) {
-                setFieldValue("CoBuyer_Last_Name", savedLastName);
-                changeContactExtData("CoBuyer_Last_Name", savedLastName);
-            }
-            if (!contactExtData.CoBuyer_Middle_Name && savedMiddleName) {
-                setFieldValue("CoBuyer_Middle_Name", savedMiddleName);
-                changeContactExtData("CoBuyer_Middle_Name", savedMiddleName);
-            }
-        }
-    }, [shouldDisableNameFields]);
-
-    useEffect(() => {
-        if (shouldDisableBusinessName) {
-            if (contactExtData.CoBuyer_Emp_Company) {
-                setSavedBusinessName(contactExtData.CoBuyer_Emp_Company);
-                setFieldValue("CoBuyer_Emp_Company", "");
-                changeContactExtData("CoBuyer_Emp_Company", "");
-            }
-        } else {
-            if (!contactExtData.CoBuyer_Emp_Company && savedBusinessName) {
-                setFieldValue("CoBuyer_Emp_Company", savedBusinessName);
-                changeContactExtData("CoBuyer_Emp_Company", savedBusinessName);
-            }
-        }
-    }, [shouldDisableBusinessName]);
+    }, [
+        contactExtData.CoBuyer_First_Name,
+        contactExtData.CoBuyer_Middle_Name,
+        contactExtData.CoBuyer_Last_Name,
+    ]);
 
     const handleScanDL = () => {
         fileInputRef.current?.click();
