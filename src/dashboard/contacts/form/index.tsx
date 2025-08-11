@@ -334,8 +334,18 @@ export const ContactForm = observer((): ReactElement => {
             const coBuyerValidationErrors: Record<string, string> = {};
 
             if (store.isCoBuyerFieldsFilled) {
-                coBuyerValidationErrors.CoBuyer_First_Name = ERROR_MESSAGES.REQUIRED;
-                coBuyerValidationErrors.CoBuyer_Last_Name = ERROR_MESSAGES.REQUIRED;
+                const hasCoBuyerName =
+                    contactExtData.CoBuyer_First_Name?.trim() ||
+                    contactExtData.CoBuyer_Last_Name?.trim();
+
+                if (!hasCoBuyerName) {
+                    coBuyerValidationErrors.CoBuyer_First_Name = ERROR_MESSAGES.REQUIRED;
+                    coBuyerValidationErrors.CoBuyer_Last_Name = ERROR_MESSAGES.REQUIRED;
+                }
+
+                if (!hasCoBuyerName && !contactExtData.CoBuyer_Emp_Company?.trim()) {
+                    coBuyerValidationErrors.CoBuyer_Emp_Company = ERROR_MESSAGES.REQUIRED;
+                }
             }
 
             const allErrors = { ...errors, ...coBuyerValidationErrors };

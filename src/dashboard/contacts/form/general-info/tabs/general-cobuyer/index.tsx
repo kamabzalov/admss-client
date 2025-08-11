@@ -21,7 +21,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
 
-    const { errors, setFieldValue, validateField, setFieldTouched } =
+    const { setFieldValue, validateField, setFieldTouched, errors } =
         useFormikContext<ContactExtData>();
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
@@ -268,7 +268,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     disabled={shouldDisableNameFields}
                     clearButton
                 />
-                <small className='p-error'>{errors.CoBuyer_Middle_Name}</small>
+                <small className='p-error'>{errors.CoBuyer_Middle_Name || ""}</small>
             </div>
 
             <div className='col-4 relative'>
@@ -297,8 +297,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    name='Business Name'
-                    className='general-info__text-input w-full'
+                    name={`Business Name${store.isCoBuyerFieldsFilled && !shouldDisableBusinessName ? " (required)" : ""}`}
+                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && !shouldDisableBusinessName && (!contactExtData.CoBuyer_Emp_Company || !contactExtData.CoBuyer_Emp_Company.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Emp_Company || ""}
                     onChange={({ target: { value } }) => {
                         changeContactExtData("CoBuyer_Emp_Company", value);
@@ -308,6 +308,14 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     disabled={shouldDisableBusinessName}
                     clearButton
                 />
+                <small className='p-error'>
+                    {store.isCoBuyerFieldsFilled &&
+                    !shouldDisableBusinessName &&
+                    (!contactExtData.CoBuyer_Emp_Company ||
+                        !contactExtData.CoBuyer_Emp_Company.trim())
+                        ? ERROR_MESSAGES.REQUIRED
+                        : ""}
+                </small>
             </div>
         </div>
     );

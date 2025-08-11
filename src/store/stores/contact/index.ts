@@ -190,8 +190,25 @@ export class ContactStore {
     }
 
     public get isCoBuyerFieldsFilled() {
-        const coBuyerFields = [
+        if (
+            this._contactExtData.CoBuyer_Emp_Company &&
+            typeof this._contactExtData.CoBuyer_Emp_Company === "string" &&
+            this._contactExtData.CoBuyer_Emp_Company.trim()
+        ) {
+            return false;
+        }
+
+        const nameFields = [
+            this._contactExtData.CoBuyer_First_Name,
             this._contactExtData.CoBuyer_Middle_Name,
+            this._contactExtData.CoBuyer_Last_Name,
+        ];
+
+        if (nameFields.some((field) => field && typeof field === "string" && field.trim())) {
+            return true;
+        }
+
+        const otherTabFields = [
             this._contactExtData.CoBuyer_Res_Address,
             this._contactExtData.CoBuyer_State,
             this._contactExtData.CoBuyer_City,
@@ -207,7 +224,8 @@ export class ContactStore {
             this._contactExtData.CoBuyer_Date_Of_Birth,
             this._contactExtData.CoBuyer_Sex,
         ];
-        return coBuyerFields.some((field) => field && typeof field === "string" && field.trim());
+
+        return otherTabFields.some((field) => field && typeof field === "string" && field.trim());
     }
 
     public getContact = async (itemuid: string) => {
