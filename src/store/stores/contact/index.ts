@@ -189,6 +189,27 @@ export class ContactStore {
         return this._formErrorMessage;
     }
 
+    public get isCoBuyerFieldsFilled() {
+        const coBuyerFields = [
+            this._contactExtData.CoBuyer_Middle_Name,
+            this._contactExtData.CoBuyer_Res_Address,
+            this._contactExtData.CoBuyer_State,
+            this._contactExtData.CoBuyer_City,
+            this._contactExtData.CoBuyer_Zip_Code,
+            this._contactExtData.CoBuyer_Mailing_Address,
+            this._contactExtData.CoBuyer_Mailing_State,
+            this._contactExtData.CoBuyer_Mailing_City,
+            this._contactExtData.CoBuyer_Mailing_Zip,
+            this._contactExtData.CoBuyer_DL_State,
+            this._contactExtData.CoBuyer_Driver_License_Num,
+            this._contactExtData.CoBuyer_DL_Exp_Date,
+            this._contactExtData.CoBuyer_SS_Number,
+            this._contactExtData.CoBuyer_Date_Of_Birth,
+            this._contactExtData.CoBuyer_Sex,
+        ];
+        return coBuyerFields.some((field) => field && typeof field === "string" && field.trim());
+    }
+
     public getContact = async (itemuid: string) => {
         this._isLoading = true;
         try {

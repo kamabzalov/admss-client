@@ -27,6 +27,7 @@ import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
 import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -66,7 +67,7 @@ const handleValidationMessage = (text: string) => {
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
     firstName: Yup.string()
         .trim()
-        .test("firstNameRequired", "Data is required.", function (value) {
+        .test("firstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { type, businessName } = this.parent;
             if (!REQUIRED_COMPANY_TYPE_INDEXES.includes(type) && !businessName?.trim()) {
                 return !!value?.trim();
@@ -84,7 +85,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         }),
     lastName: Yup.string()
         .trim()
-        .test("lastNameRequired", "Data is required.", function (value) {
+        .test("lastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { type, businessName } = this.parent;
             if (!REQUIRED_COMPANY_TYPE_INDEXES.includes(type) && !businessName?.trim()) {
                 return !!value?.trim();
@@ -97,7 +98,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         }),
     businessName: Yup.string()
         .trim()
-        .test("businessNameRequired", "Data is required.", function (value) {
+        .test("businessNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { type, firstName, lastName } = this.parent;
             if (
                 REQUIRED_COMPANY_TYPE_INDEXES.includes(type) &&
@@ -109,34 +110,34 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             return true;
         }),
     type: Yup.number()
-        .test("typeRequired", "Data is required.", function (value) {
+        .test("typeRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             return value !== 0 && value !== null && value !== undefined;
         })
-        .required("Data is required."),
-    email1: Yup.string().email("Invalid email address."),
-    email2: Yup.string().email("Invalid email address."),
+        .required(ERROR_MESSAGES.REQUIRED),
+    email1: Yup.string().email(ERROR_MESSAGES.EMAIL),
+    email2: Yup.string().email(ERROR_MESSAGES.EMAIL),
     phone1: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
-            message: "Invalid phone number.",
+            message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
     phone2: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
-            message: "Invalid phone number.",
+            message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
-    Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
+    Buyer_Emp_Ext: Yup.string().email(ERROR_MESSAGES.EMAIL),
     Buyer_Emp_Phone: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
-            message: "Invalid phone number.",
+            message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
     CoBuyer_First_Name: Yup.string()
         .trim()
-        .test("coBuyerFirstNameRequired", "Data is required.", function (value) {
+        .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_Last_Name, CoBuyer_Middle_Name } = this.parent;
             if (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
                 return !!value?.trim();
@@ -154,7 +155,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         }),
     CoBuyer_Last_Name: Yup.string()
         .trim()
-        .test("coBuyerLastNameRequired", "Data is required.", function (value) {
+        .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_First_Name, CoBuyer_Middle_Name } = this.parent;
             if (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
                 return !!value?.trim();
@@ -330,7 +331,16 @@ export const ContactForm = observer((): ReactElement => {
 
     const handleSaveContactForm = () => {
         formikRef.current?.validateForm().then(async (errors) => {
-            if (!Object.keys(errors).length) {
+            const coBuyerValidationErrors: Record<string, string> = {};
+
+            if (store.isCoBuyerFieldsFilled) {
+                coBuyerValidationErrors.CoBuyer_First_Name = ERROR_MESSAGES.REQUIRED;
+                coBuyerValidationErrors.CoBuyer_Last_Name = ERROR_MESSAGES.REQUIRED;
+            }
+
+            const allErrors = { ...errors, ...coBuyerValidationErrors };
+
+            if (!Object.keys(allErrors).length) {
                 const response = await saveContact();
                 if (response && response.status === Status.OK) {
                     if (memoRoute) {
@@ -365,8 +375,13 @@ export const ContactForm = observer((): ReactElement => {
                 }
             } else {
                 setValidateOnMount(true);
+                formikRef.current?.setErrors(allErrors);
 
-                const sectionsWithErrors = Object.keys(errors);
+                Object.keys(allErrors).forEach((field) => {
+                    formikRef.current?.setFieldTouched(field, true, false);
+                });
+
+                const sectionsWithErrors = Object.keys(allErrors);
                 const currentSectionsWithErrors: string[] = [];
                 Object.entries(tabFields).forEach(([key, value]) => {
                     value.forEach((field) => {
