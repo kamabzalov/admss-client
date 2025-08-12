@@ -133,6 +133,7 @@ export const InventoryForm = observer(() => {
         inventory,
         inventoryExtData,
         isFormChanged,
+        isErasingNeeded,
         currentLocation,
         deleteReason,
         memoRoute,
@@ -323,7 +324,7 @@ export const InventoryForm = observer(() => {
         setPrintActiveIndex(itemsMenuCount + 1);
         setDeleteActiveIndex(itemsMenuCount + 2);
 
-        if (id && id !== CREATE_INVENTORY_ID) {
+        if (id && id !== CREATE_INVENTORY_ID && isErasingNeeded) {
             store.inventoryID = id;
             handleGetInventory();
         }
