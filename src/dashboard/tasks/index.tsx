@@ -33,11 +33,7 @@ import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
-import {
-    convertDateForQuery,
-    createStringifySearchQuery,
-    isObjectValuesEmpty,
-} from "common/helpers";
+import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -159,11 +155,11 @@ export const TasksDataTable = observer((): ReactElement => {
             .filter(([_, value]) => value)
             .map(([key, value]) => {
                 let keyName: string = key;
-                let formattedValue: string | number = value;
+                let formattedValue: string | number | Date = value;
                 switch (key) {
                     case SEARCH_FORM_FIELDS.CREATION_DATE:
                         keyName = SEARCH_FORM_QUERY.CREATION_DATE;
-                        formattedValue = convertDateForQuery(value as string);
+                        formattedValue = new Date(value as string).getTime();
                         break;
 
                     case SEARCH_FORM_FIELDS.DESCRIPTION:
