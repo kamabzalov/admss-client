@@ -99,12 +99,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     businessName: Yup.string()
         .trim()
         .test("businessNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { type, firstName, lastName } = this.parent;
-            if (
-                REQUIRED_COMPANY_TYPE_INDEXES.includes(type) &&
-                !firstName?.trim() &&
-                !lastName?.trim()
-            ) {
+            const { type } = this.parent;
+            if (REQUIRED_COMPANY_TYPE_INDEXES.includes(type)) {
                 return !!value?.trim();
             }
             return true;
@@ -138,8 +134,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_First_Name: Yup.string()
         .trim()
         .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_Last_Name, CoBuyer_Middle_Name } = this.parent;
-            if (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
+            const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type } = this.parent;
+            if (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
@@ -156,8 +152,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_Last_Name: Yup.string()
         .trim()
         .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_First_Name, CoBuyer_Middle_Name } = this.parent;
-            if (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()) {
+            const { CoBuyer_First_Name, CoBuyer_Middle_Name, type } = this.parent;
+            if (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
@@ -205,6 +201,7 @@ export const ContactForm = observer((): ReactElement => {
         getContact,
         clearContact,
         saveContact,
+        changeContact,
         isContactChanged,
         memoRoute,
         deleteReason,
@@ -333,7 +330,15 @@ export const ContactForm = observer((): ReactElement => {
         formikRef.current?.validateForm().then(async (errors) => {
             const coBuyerValidationErrors: Record<string, string> = {};
 
-            if (store.isCoBuyerFieldsFilled) {
+            if (REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type)) {
+                changeContact([
+                    ["firstName", ""],
+                    ["lastName", ""],
+                    ["middleName", ""],
+                ]);
+            }
+
+            if (store.isCoBuyerFieldsFilled && contactType === BUYER_ID) {
                 const hasCoBuyerName =
                     contactExtData.CoBuyer_First_Name?.trim() ||
                     contactExtData.CoBuyer_Last_Name?.trim();
@@ -403,9 +408,11 @@ export const ContactForm = observer((): ReactElement => {
                         }
                     });
                 });
+
                 setErrorSections(currentSectionsWithErrors);
 
                 const hasCoBuyerMiddleNameOnly =
+                    contactType === BUYER_ID &&
                     contactExtData.CoBuyer_Middle_Name?.trim() &&
                     !contactExtData.CoBuyer_First_Name?.trim() &&
                     !contactExtData.CoBuyer_Last_Name?.trim();
@@ -419,9 +426,10 @@ export const ContactForm = observer((): ReactElement => {
                     contact.businessName?.trim() &&
                     !contact.firstName?.trim() &&
                     !contact.lastName?.trim() &&
-                    REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type || 0);
+                    REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
 
                 const hasCoBuyerBusinessNameOnly =
+                    contactType === BUYER_ID &&
                     contactExtData.CoBuyer_Emp_Company?.trim() &&
                     !contactExtData.CoBuyer_First_Name?.trim() &&
                     !contactExtData.CoBuyer_Last_Name?.trim();
