@@ -16,6 +16,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { DASHBOARD_PAGE } from "common/constants/links";
 
 interface TabItem {
     settingName: string;
@@ -27,10 +28,8 @@ export const GeneralSettings = observer((): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().generalSettingsStore;
-    const inventoryStore = useStore().inventoryStore;
     const toast = useToast();
     const { isSettingsChanged, saveSettings, getSettings } = store;
-    const { isErasingNeeded } = inventoryStore;
 
     useEffect(() => {
         getSettings();
@@ -128,11 +127,8 @@ export const GeneralSettings = observer((): ReactElement => {
         if (store.prevPath) {
             navigate(store.prevPath);
             store.prevPath = "";
-            if (!isErasingNeeded) {
-                inventoryStore.isErasingNeeded = true;
-            }
         } else {
-            navigate(`/dashboard`);
+            navigate(DASHBOARD_PAGE);
         }
     };
 

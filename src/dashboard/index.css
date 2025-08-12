@@ -758,6 +758,10 @@
     width: 90%;
 }
 
+.p-inputtextarea + .float-label {
+    padding-bottom: 2px;
+}
+
 .combo-box + .float-label {
     width: calc(100% - 50px);
 }
