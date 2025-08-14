@@ -21,12 +21,15 @@ interface DashboardRadioProps {
     disabled?: boolean;
     initialValue?: string | number | null;
     onChange?: (value: string | number) => void;
+    wrapperClassName?: string;
+    children?: React.ReactNode;
 }
 
 interface CurrencyInputProps extends InputNumberProps {
     currencyIcon?: "dollar" | "percent";
     labelPosition?: LabelPosition;
     coloredEmptyValue?: boolean;
+    wrapperClassName?: string;
 }
 
 interface PercentInputProps extends InputNumberProps {
@@ -89,7 +92,9 @@ export const DashboardRadio = ({
     initialValue,
     style,
     disabled,
+    wrapperClassName,
     onChange,
+    children,
 }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string>("");
 
@@ -105,7 +110,9 @@ export const DashboardRadio = ({
     }, [initialValue]);
 
     return (
-        <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
+        <section
+            className={`flex flex-wrap row-gap-3 justify-content-between radio ${wrapperClassName || ""}`}
+        >
             {radioArray.map(({ name, title, value }) => {
                 return (
                     <div
@@ -129,7 +136,8 @@ export const DashboardRadio = ({
                     </div>
                 );
             })}
-        </div>
+            {children}
+        </section>
     );
 };
 
@@ -140,6 +148,7 @@ export const CurrencyInput = ({
     labelPosition = "left",
     currencyIcon = "dollar",
     coloredEmptyValue = false,
+    wrapperClassName,
     ...props
 }: CurrencyInputProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -150,7 +159,7 @@ export const CurrencyInput = ({
     return (
         <div
             key={name}
-            className='flex align-items-center justify-content-between currency-item relative'
+            className={`flex align-items-center justify-content-between currency-item relative ${wrapperClassName || ""}`}
             ref={containerRef}
         >
             <label
