@@ -1,7 +1,7 @@
 .deal-washout {
     --input-regular: 40px;
     --input-small: 30px;
-    --washout-height: 70vh;
+    --washout-height: 72vh;
 
     .info-section__title {
         color: var(--admss-app-main-blue);
@@ -44,7 +44,7 @@
 }
 
 .deal-washout .p-tabview-nav-content {
-    padding: 10px 20px;
+    padding: 0 20px 10px 20px;
 }
 
 .deal-washout__card {

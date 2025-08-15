@@ -37,11 +37,12 @@ export const DealProfitCommission = observer(() => {
 
             <article className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__settings commission-settings'>
-                    <div className='commission-settings__label'>Commission 2 Options:</div>
+                    <div className='commission-settings__title'>Commission 2 Options:</div>
 
                     <DashboardRadio
                         radioArray={COMMISSION_2_OPTIONS}
                         wrapperClassName='commission-settings__radio'
+                        rowGap={2}
                         initialValue={dealWashout.Comm2Options}
                         onChange={(value) => {
                             changeDealWashout("Comm2Options", String(value));

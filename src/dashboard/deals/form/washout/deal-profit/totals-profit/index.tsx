@@ -144,10 +144,10 @@ export const DealTotalsProfit = observer(() => {
 
                     <div className='totals-row'>
                         <span className='totals-info__title'>
-                            (+) Reserve Refund from Finance Co.:
+                            (+) Reserve Refund from Finance Co:
                         </span>
                         <CurrencyInput
-                            name='Reserve Refund from Finance Co.'
+                            name='Reserve Refund from Finance Co'
                             value={Number(dealWashout.ReserveRefund) || 0}
                             className='totals-info__input'
                             onChange={(e: InputNumberChangeEvent) =>
@@ -174,7 +174,7 @@ export const DealTotalsProfit = observer(() => {
                         </div>
                     </div>
 
-                    <div className='totals-row'>
+                    <div className='totals-row mb-0'>
                         <span className='totals-info__title'>(+) Vehicle Pack:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.VehiclePack, true)}
@@ -198,7 +198,7 @@ export const DealTotalsProfit = observer(() => {
                             />
                         </div>
                     </div>
-                    <div className='totals-row'>
+                    <div className='totals-row mb-1'>
                         <span className='totals-info__title'>(+) Doc Fee:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.DocFee, true)}

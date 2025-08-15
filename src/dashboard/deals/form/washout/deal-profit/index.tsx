@@ -120,6 +120,7 @@ export const DealProfitItem = observer(
                             }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
+                            coloredEmptyValue
                             onChange={handleChange}
                         />
                     </>
@@ -172,13 +173,13 @@ export const DealProfitItem = observer(
 export const DealProfit = () => {
     return (
         <div className='deal-profit grid'>
-            <div className='col-3'>
+            <div className='col-3 pt-0'>
                 <DealVehicleProfit />
             </div>
-            <div className='col-4'>
+            <div className='col-4 pt-0'>
                 <DealProfitCommission />
             </div>
-            <div className='col-5'>
+            <div className='col-5 pt-0'>
                 <DealProfitFinanceWorksheet />
             </div>
             <div className='col-7'>
