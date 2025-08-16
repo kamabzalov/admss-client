@@ -55,6 +55,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
+    const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
 
     const hangeGetAutoMakeModelList = async () => {
         const response = await getInventoryAutomakesList();
@@ -364,10 +365,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         });
                         handleGetInventoryGroupFullInfo(value);
                     }}
+                    onFocus={() => setIsGroupClassFocused(true)}
+                    onBlur={() => setIsGroupClassFocused(false)}
                     className={`w-full vehicle-general__dropdown ${
                         errors.GroupClassName ? "p-invalid" : ""
                     }`}
-                    label='Inventory group (required)'
+                    label={`Inventory group (${!inventory.GroupClassName && !isGroupClassFocused ? "req." : "required"})`}
                 />
                 <small className='p-error'>{errors.GroupClassName}</small>
             </div>

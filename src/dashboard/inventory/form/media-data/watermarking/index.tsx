@@ -60,7 +60,6 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
     const handleRestoreDefault = () => {
         restoreDefaultSettings();
         setHasChanges(false);
-        inventoryStore.isFormChanged = false;
     };
 
     const handleDeleteTextBlock = (index: number) => {

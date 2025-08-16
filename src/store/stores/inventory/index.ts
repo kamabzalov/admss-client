@@ -441,58 +441,67 @@ export class InventoryStore {
         }
     );
 
-    public saveInventory = action(async (inventoryuid: string = "0"): Promise<string> => {
-        try {
-            this._isLoading = true;
+    public saveInventory = action(
+        async (inventoryuid: string = "0"): Promise<string | BaseResponseError> => {
+            try {
+                this._isLoading = true;
 
-            const generalSettingsStore = this.rootStore.generalSettingsStore;
-            const useruid = this.rootStore.userStore.authUser?.useruid;
-            if (generalSettingsStore.isSettingsChanged) {
-                if (useruid) {
-                    generalSettingsStore.saveSettings();
+                const generalSettingsStore = this.rootStore.generalSettingsStore;
+                const useruid = this.rootStore.userStore.authUser?.useruid;
+                if (generalSettingsStore.isSettingsChanged) {
+                    if (useruid) {
+                        generalSettingsStore.saveSettings();
+                    }
+                    generalSettingsStore.isSettingsChanged = false;
                 }
-                generalSettingsStore.isSettingsChanged = false;
-            }
 
-            const inventoryData: Inventory = {
-                ...this.inventory,
-                extdata: {
-                    ...this.inventoryExtData,
-                    fpReduxAmt: (this.inventoryExtData?.fpReduxAmt || 0) * 100,
-                    fpRemainBal: (this.inventoryExtData?.fpRemainBal || 0) * 100,
-                    csFee: (this.inventoryExtData?.csFee || 0) * 100,
-                    csReserveAmt: (this.inventoryExtData?.csReserveAmt || 0) * 100,
-                    csEarlyRemoval: (this.inventoryExtData?.csEarlyRemoval || 0) * 100,
-                    csListingFee: (this.inventoryExtData?.csListingFee || 0) * 100,
-                    csOwnerAskingPrice: (this.inventoryExtData?.csOwnerAskingPrice || 0) * 100,
-                    purPurchaseBuyerComm: (this.inventoryExtData?.purPurchaseBuyerComm || 0) * 100,
-                    purPurchaseAmount: (this.inventoryExtData?.purPurchaseAmount || 0) * 100,
-                },
-                options_info: this.inventoryOptions,
-                Audit: this.inventoryAudit,
-            };
+                const inventoryData: Inventory = {
+                    ...this.inventory,
+                    extdata: {
+                        ...this.inventoryExtData,
+                        fpReduxAmt: (this.inventoryExtData?.fpReduxAmt || 0) * 100,
+                        fpRemainBal: (this.inventoryExtData?.fpRemainBal || 0) * 100,
+                        csFee: (this.inventoryExtData?.csFee || 0) * 100,
+                        csReserveAmt: (this.inventoryExtData?.csReserveAmt || 0) * 100,
+                        csEarlyRemoval: (this.inventoryExtData?.csEarlyRemoval || 0) * 100,
+                        csListingFee: (this.inventoryExtData?.csListingFee || 0) * 100,
+                        csOwnerAskingPrice: (this.inventoryExtData?.csOwnerAskingPrice || 0) * 100,
+                        purPurchaseBuyerComm:
+                            (this.inventoryExtData?.purPurchaseBuyerComm || 0) * 100,
+                        purPurchaseAmount: (this.inventoryExtData?.purPurchaseAmount || 0) * 100,
+                    },
+                    options_info: this.inventoryOptions,
+                    Audit: this.inventoryAudit,
+                };
 
-            const [inventoryResponse, webResponse] = await Promise.all([
-                setInventory(inventoryuid, inventoryData),
-                setInventoryExportWeb(inventoryuid, this._exportWeb),
-            ]);
+                const [inventoryResponse, webResponse] = await Promise.all([
+                    setInventory(inventoryuid, inventoryData),
+                    setInventoryExportWeb(inventoryuid, this._exportWeb),
+                ]);
 
-            if (inventoryResponse?.status === Status.OK && webResponse?.status === Status.OK) {
-                if (inventoryuid !== "0") {
-                    await setInventoryWebCheck(inventoryuid, {
-                        enabled: !!this._exportWebActive ? 1 : 0,
-                    });
+                if (inventoryResponse?.status === Status.OK && webResponse?.status === Status.OK) {
+                    if (inventoryuid !== "0") {
+                        await setInventoryWebCheck(inventoryuid, {
+                            enabled: !!this._exportWebActive ? 1 : 0,
+                        });
+                    }
+                    return Status.OK;
                 }
-                return Status.OK;
-            }
 
-            return Status.ERROR;
-        } catch (error) {
-            return Status.ERROR;
-        } finally {
-            this._isLoading = false;
+                return {
+                    status: Status.ERROR,
+                    error: inventoryResponse?.error || webResponse?.error,
+                };
+            } catch (error) {
+                return {
+                    status: Status.ERROR,
+                    error: error as string,
+                };
+            } finally {
+                this._isLoading = false;
+            }
         }
-    });
+    );
 
     private saveInventoryMedia = action(
         async (mediaType: MediaType): Promise<{ status: Status; savedItems?: MediaItem[] }> => {

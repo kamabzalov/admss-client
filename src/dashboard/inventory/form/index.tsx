@@ -467,10 +467,12 @@ export const InventoryForm = observer(() => {
             navigateAndClear();
             showToastMessage();
         } else {
+            const { error } = response as BaseResponseError;
+
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: response,
+                detail: error,
             });
         }
     };

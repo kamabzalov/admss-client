@@ -219,18 +219,26 @@ export const getShortInventoryList = async (useruid: string) => {
 export const setInventory = async (
     inventoryUid: string,
     inventoryData: Partial<Inventory>
-): Promise<InventorySetResponse | undefined> => {
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<InventorySetResponse>(
             `inventory/${inventoryUid || 0}/set`,
             inventoryData
         );
 
-        if (response.status === 200) {
+        if (response.data.status === Status.OK) {
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data?.info ||
+                    error.response?.data?.error ||
+                    "Error on set inventory",
+            };
+        }
     }
 };
 
