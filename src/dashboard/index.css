@@ -753,17 +753,14 @@
 .combo-box + .float-label {
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-bottom: 2px;
     white-space: nowrap;
     display: block;
-    width: 90%;
+    width: calc(100% - 50px);
 }
 
 .p-inputtextarea + .float-label {
     padding-bottom: 2px;
-}
-
-.combo-box + .float-label {
-    width: calc(100% - 50px);
 }
 
 figure {
