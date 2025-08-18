@@ -84,6 +84,7 @@ export const DealWashout = observer((): ReactElement | null => {
         if (!id) return;
         const response = await setDealWashout(id, store.dealWashout);
         if (!response?.error) {
+            store.resetWashoutChanges();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -176,7 +177,7 @@ export const DealWashout = observer((): ReactElement | null => {
                         <div className='washout-footer__buttons'>
                             <Button
                                 className='uppercase px-6 form-nav__button deal-washout__button'
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate(DEALS_PAGE.EDIT(id))}
                                 severity='danger'
                                 outlined
                             >
@@ -185,8 +186,9 @@ export const DealWashout = observer((): ReactElement | null => {
                             <Button
                                 type='button'
                                 onClick={handleSaveWashout}
-                                severity='success'
+                                severity={store.isWashoutChanged ? "success" : "secondary"}
                                 className='uppercase px-6 form-nav__button deal-washout__button'
+                                disabled={!store.isWashoutChanged}
                             >
                                 Save
                             </Button>

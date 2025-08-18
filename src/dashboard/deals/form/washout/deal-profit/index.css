@@ -2,9 +2,11 @@
     --input-height: 32px;
     --vehicle-profit-color: var(--admss-app-light-purple);
     --vehicle-profit-accent-color: var(--admss-app-deep-purple);
+    --vehicle-profit-button-color: var(--admss-app-focus-purple);
 
     --commission-color: var(--admss-app-light-dusty-blue);
     --commission-accent-color: var(--admss-app-dusty-blue);
+    --commission-button-color: var(--admss-app-button-dusty-blue);
 
     --finance-color: var(--admss-app-light-red);
     --finance-accent-color: var(--admss-app-deep-red);
@@ -177,6 +179,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    font-family: "Open Sans", sans-serif;
     font-size: 16px;
     font-weight: 600;
     height: var(--input-height);
@@ -312,7 +315,7 @@
         font-weight: 700;
         text-transform: uppercase;
         &:hover {
-            background-color: var(--vehicle-profit-accent-color);
+            background-color: var(--vehicle-profit-button-color);
             color: var(--admss-app-white);
         }
     }
@@ -332,7 +335,7 @@
         font-weight: 700;
         font-size: 18px;
         &:hover {
-            background-color: var(--commission-accent-color);
+            background-color: var(--commission-button-color);
             border-color: var(--commission-accent-color);
             color: var(--admss-app-white);
         }
@@ -685,6 +688,18 @@
             }
         }
 
+        .totals-misc {
+            .p-float-label label {
+                margin-top: -0.4rem;
+                overflow: visible;
+            }
+
+            .p-inputtext:focus + label {
+                margin-top: -0.5rem;
+                font-size: 8px;
+            }
+        }
+
         .totals-misc__input,
         .totals-info__title,
         .totals-info__input {
@@ -692,6 +707,8 @@
             height: 32px;
             max-width: 140px;
             flex: 1 1 140px;
+            display: flex;
+            align-items: center;
         }
 
         .totals-info__title {

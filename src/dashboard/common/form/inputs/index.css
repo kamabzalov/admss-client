@@ -96,7 +96,10 @@
 
 .currency-item__icon {
     line-height: 0;
-    font-size: 15px;
+    font-size: 16px;
+    &.currency-item__icon--percent {
+        font-size: 12px;
+    }
 }
 
 .currency-item__input .p-inputnumber-input {

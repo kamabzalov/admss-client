@@ -177,7 +177,7 @@ export const CurrencyInput = ({
                     </div>
                 )}
                 {currencyIcon === "percent" && (
-                    <div className='currency-item__icon input-icon input-icon-left'>
+                    <div className='currency-item__icon input-icon input-icon-left currency-item__icon--percent'>
                         <i className='icon adms-percentage' />
                     </div>
                 )}

@@ -2,8 +2,9 @@ import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { Checkbox } from "primereact/checkbox";
 import { useStore } from "store/hooks";
 import { useState } from "react";
+import { observer } from "mobx-react-lite";
 
-export const InterestIncome = () => {
+export const InterestIncome = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
     const [addExpectedToTotal, setAddExpectedToTotal] = useState(false);
 
@@ -82,4 +83,4 @@ export const InterestIncome = () => {
             </div>
         </div>
     );
-};
+});
