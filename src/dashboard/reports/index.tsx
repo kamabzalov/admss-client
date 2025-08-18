@@ -217,7 +217,27 @@ export const Reports = (): ReactElement => {
     const handleDragDrop = async (event: TreeDragDropEvent) => {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
-        const dropIndex = event.dropIndex - 1 < 0 ? 0 : event.dropIndex - 1;
+
+        let dropIndex = 0;
+        if (dropNode?.type === NODE_TYPES.COLLECTION) {
+            const children = dropNode.children || [];
+            const documentChildren = children.filter(
+                (node) => (node as TreeNodeEvent).type === NODE_TYPES.DOCUMENT
+            );
+            const documentKeys = documentChildren.map((node) => node.key);
+
+            if (event.dropIndex >= children.length) {
+                dropIndex = documentChildren.length - 1;
+            } else {
+                const dropChild = children[event.dropIndex];
+                if (dropChild) {
+                    const idx = documentKeys.indexOf(dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                    }
+                }
+            }
+        }
 
         if (!dropNode) return;
 
@@ -258,15 +278,12 @@ export const Reports = (): ReactElement => {
             dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
             const collectionId = dragData.collectionId;
-            const currentCollectionsLength =
-                reportCollections.find((col) => col.itemUID === collectionId)?.collections
-                    ?.length || 0;
 
             if (dropIndex !== undefined && collectionId && dragData.document.documentUID != null) {
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
-                    dropIndex - currentCollectionsLength
+                    dropIndex
                 );
                 if (response?.error) {
                     showError(response.error);
