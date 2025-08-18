@@ -18,8 +18,8 @@ export enum CURRENCY_OPTIONS {
 }
 
 const CURRENCY_SELECT_OPTIONS = [
-    { label: CURRENCY_OPTIONS.DOLLAR, value: 0 },
-    { label: CURRENCY_OPTIONS.PERCENT, value: 1 },
+    { label: CURRENCY_OPTIONS.DOLLAR, value: 0, name: "dollar" },
+    { label: CURRENCY_OPTIONS.PERCENT, value: 1, name: "percent" },
 ];
 
 export enum INCLUDE_OPTIONS {
@@ -66,6 +66,10 @@ export const DealProfitItem = observer(
             props.onChange?.(event);
         };
 
+        const handleCurrencySelect = (value: 0 | 1) => {
+            onCurrencySelect?.(value);
+        };
+
         const handleFirstCheckboxChange = () => {
             if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION1) {
                 includeCheckboxOnChange?.(null);
@@ -109,15 +113,14 @@ export const DealProfitItem = observer(
                                 value={currencySelectValue}
                                 required
                                 onChange={(e) => {
-                                    onCurrencySelect?.(e.value as 0 | 1);
+                                    handleCurrencySelect(e.value as 0 | 1);
                                 }}
-                                className={`deal-profit__currency-select`}
+                                className={`deal-profit__currency-select currency-select`}
+                                panelClassName='currency-select__list'
                             />
                         )}
                         <CurrencyInput
-                            currencyIcon={
-                                currency === CURRENCY_OPTIONS.PERCENT ? "percent" : "dollar"
-                            }
+                            currencyIcon={currencySelectValue === 1 ? "percent" : "dollar"}
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
                             coloredEmptyValue

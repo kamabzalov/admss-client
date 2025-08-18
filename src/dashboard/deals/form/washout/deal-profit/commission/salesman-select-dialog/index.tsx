@@ -49,6 +49,7 @@ export const SalesmanSelectDialog = ({
             className='salesman-select-dialog'
             footer='OK'
             cancelButton
+            buttonDisabled={!manager || !salesmanFirst || !salesmanSecond}
             action={() => {
                 props.onHide?.();
             }}

@@ -1,7 +1,8 @@
 import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const AccountWash = () => {
+export const AccountWash = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
     return (
@@ -55,4 +56,4 @@ export const AccountWash = () => {
             />
         </div>
     );
-};
+});

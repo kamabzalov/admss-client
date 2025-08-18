@@ -51,6 +51,7 @@ export class DealStore {
     private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealWashout: DealWashout = {} as DealWashout;
+    private _originalDealWashout: DealWashout = {} as DealWashout;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _dealType: number = 0;
@@ -96,6 +97,12 @@ export class DealStore {
 
     public get dealWashout() {
         return this._dealWashout;
+    }
+
+    public get isWashoutChanged() {
+        const current = JSON.stringify(this._dealWashout);
+        const original = JSON.stringify(this._originalDealWashout);
+        return current !== original;
     }
 
     public get dealType() {
@@ -228,6 +235,7 @@ export class DealStore {
             const response = await getDealWashout(dealuid);
             if (response && response.status === Status.OK) {
                 this._dealWashout = response as DealWashout;
+                this._originalDealWashout = JSON.parse(JSON.stringify(response as DealWashout));
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
@@ -286,6 +294,10 @@ export class DealStore {
             const { dealWashout } = dealStore;
             (dealWashout as Record<typeof key, string | number>)[key] = value;
         }
+    });
+
+    public resetWashoutChanges = action(() => {
+        this._originalDealWashout = JSON.parse(JSON.stringify(this._dealWashout));
     });
 
     public changeDealPickupPayments = action(

@@ -80,6 +80,7 @@ export const DealTotalsProfit = observer(() => {
                             name='(+) Misc. Cost'
                             value={Number(dealWashout.MiscProfit) || 0}
                             className='totals-misc__input'
+                            coloredEmptyValue
                             onChange={(e: InputNumberChangeEvent) =>
                                 changeDealWashout("MiscProfit", String(e.value))
                             }
@@ -118,6 +119,7 @@ export const DealTotalsProfit = observer(() => {
                             name='Misc. Cost'
                             value={Number(dealWashout.MiscCost) || 0}
                             className='totals-misc__input'
+                            coloredEmptyValue
                             onChange={(e: InputNumberChangeEvent) =>
                                 changeDealWashout("MiscCost", String(e.value))
                             }
@@ -150,6 +152,7 @@ export const DealTotalsProfit = observer(() => {
                             name='Reserve Refund from Finance Co'
                             value={Number(dealWashout.ReserveRefund) || 0}
                             className='totals-info__input'
+                            coloredEmptyValue
                             onChange={(e: InputNumberChangeEvent) =>
                                 changeDealWashout("ReserveRefund", String(e.value))
                             }

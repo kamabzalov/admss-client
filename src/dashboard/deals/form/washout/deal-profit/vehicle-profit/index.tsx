@@ -32,6 +32,7 @@ export const DealVehicleProfit = observer(() => {
                         title='Allowance'
                         labelPosition='top'
                         value={Number(dealWashout.Trade1Allowance) || 0}
+                        coloredEmptyValue
                         wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade1Allowance", String(value));
@@ -40,6 +41,7 @@ export const DealVehicleProfit = observer(() => {
                     <CurrencyInput
                         title='ACV'
                         labelPosition='top'
+                        coloredEmptyValue
                         value={Number(dealWashout.Trade1ACV) || 0}
                         wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
@@ -53,6 +55,7 @@ export const DealVehicleProfit = observer(() => {
                         title='Allowance'
                         labelPosition='top'
                         value={Number(dealWashout.Trade2Allowance) || 0}
+                        coloredEmptyValue
                         wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade2Allowance", String(value));
@@ -61,6 +64,7 @@ export const DealVehicleProfit = observer(() => {
                     <CurrencyInput
                         title='ACV'
                         labelPosition='top'
+                        coloredEmptyValue
                         value={Number(dealWashout.Trade2ACV) || 0}
                         wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
