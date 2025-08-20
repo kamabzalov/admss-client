@@ -3,12 +3,16 @@
     --input-small: 30px;
     --washout-height: 72vh;
 
+    .p-tabview-panels {
+        padding-bottom: 0px;
+    }
+
     .info-section__title {
         color: var(--admss-app-main-blue);
     }
 
     .card {
-        padding: 40px;
+        padding: 28px 40px;
 
         .card-header {
             padding-top: 0;
@@ -21,16 +25,40 @@
     }
 
     .washout-footer {
-        padding: 0;
+        padding: 0 12px;
         margin: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.5) 70%,
+                rgb(255, 255, 255) 100%
+            );
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        &.show-overlay::after {
+            opacity: 1;
+        }
 
         .washout-footer__controls {
             display: flex;
             gap: 25px;
-            padding-left: 12px;
+
             .p-button {
                 width: 70px;
                 height: 70px;
@@ -52,8 +80,14 @@
     display: flex;
     flex-direction: column;
     border-radius: 8px;
-    height: var(--washout-height);
+    max-height: var(--washout-height);
     overflow-y: auto;
+    position: relative;
+    transition: box-shadow 0.3s ease;
+}
+
+.deal-washout__card--with-shadow {
+    box-shadow: inset 0 -30px 30px -30px rgba(0, 0, 0, 0.15);
 }
 
 .deal-washout__title {
@@ -71,8 +105,14 @@
     font-weight: 600;
 }
 
+.currency-select {
+    .p-dropdown-label.p-inputtext {
+        padding: 0.55em 10px;
+    }
+}
+
 .currency-select__list .p-dropdown-items .p-dropdown-item {
-    padding: 6px;
+    padding: 10px;
     font-size: 14px;
 }
 

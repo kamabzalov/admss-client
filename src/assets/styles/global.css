@@ -24,6 +24,7 @@
     --admss-app-dark-blue: #7e9cd6;
     --admss-app-light-dusty-blue: #e0f5fa;
     --admss-app-dusty-blue: #00839f;
+    --admss-app-button-dusty-blue: #55cde6;
     --admss-app-darkest-blue: #37455c;
     --admss-app-deep-blue: #292c33;
     --admss-app-focus-blue: #eef4ff;
@@ -61,6 +62,7 @@
 
     --admss-app-light-purple: #f3ddf9;
     --admss-app-deep-purple: #852a9b;
+    --admss-app-focus-purple: #de5bff;
 
     --admss-app-statuses-default: #5ed69d;
     --admss-app-statuses-started: #0085ff;

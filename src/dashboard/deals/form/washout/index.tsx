@@ -1,5 +1,5 @@
 import { TabView, TabPanel } from "primereact/tabview";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useState, useRef } from "react";
 import { Button } from "primereact/button";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStore } from "store/hooks";
@@ -29,6 +29,8 @@ export const DealWashout = observer((): ReactElement | null => {
     const store = useStore().dealStore;
     const toast = useToast();
     const { inventory, getDeal, getDealWashout } = store;
+    const [showOverlay, setShowOverlay] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!id || id === CREATE_DEAL_ID) {
@@ -79,6 +81,26 @@ export const DealWashout = observer((): ReactElement | null => {
             setSearchParams({ tab: DealWashoutTabs.DEAL_PROFIT });
         }
     }, [tabParam, setSearchParams]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (cardRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = cardRef.current;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+                setShowOverlay(!isAtBottom);
+            }
+        };
+
+        const cardElement = cardRef.current;
+        if (cardElement) {
+            cardElement.addEventListener("scroll", handleScroll);
+            handleScroll();
+
+            return () => {
+                cardElement.removeEventListener("scroll", handleScroll);
+            };
+        }
+    }, []);
 
     const handleSaveWashout = async () => {
         if (!id) return;
@@ -141,7 +163,7 @@ export const DealWashout = observer((): ReactElement | null => {
                             </div>
                         )}
                     </div>
-                    <div className='card-content deal-washout__card grid'>
+                    <div className='card-content deal-washout__card grid' ref={cardRef}>
                         <TabView
                             className='deal-washout__tabs'
                             activeIndex={activeIndex}
@@ -161,7 +183,9 @@ export const DealWashout = observer((): ReactElement | null => {
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div className='deal-washout__footer washout-footer form-nav'>
+                    <div
+                        className={`deal-washout__footer washout-footer form-nav ${showOverlay ? "show-overlay" : "pt-3"}`}
+                    >
                         <div className='washout-footer__controls'>
                             <ControlButton
                                 variant={BUTTON_VARIANTS.PRINT}

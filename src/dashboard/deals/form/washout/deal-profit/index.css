@@ -250,12 +250,15 @@
         padding-bottom: 28px;
     }
     .deal-profit__item {
+        font-size: 14px;
         &:first-child .deal-profit__includes::before {
             color: var(--vehicle-profit-accent-color);
         }
-        &:last-child .deal-profit__includes::before {
-            padding-bottom: 0px;
-            border-radius: 0 0 6px 6px;
+        &:last-child {
+            .deal-profit__includes::before {
+                padding-bottom: 0px;
+                border-radius: 0 0 6px 6px;
+            }
         }
 
         .deal-profit__includes {
@@ -340,6 +343,7 @@
             color: var(--admss-app-white);
         }
     }
+
     .profit-commission__worksheet {
         width: 100%;
         display: flex;
@@ -398,6 +402,7 @@
         background-color: var(--commission-color);
         padding: 8px 20px;
         white-space: nowrap;
+        font-weight: 600;
     }
 
     .profit-commission__body.profit-card__body {
@@ -408,7 +413,7 @@
 
         .deal-profit__label {
             padding-left: 5px;
-            flex: 0 0 48%;
+            flex: 0 0 44%;
         }
 
         .deal-profit__value {
@@ -419,6 +424,10 @@
             align-items: center;
         }
 
+        .currency-item__input {
+            flex: 0 0 120px;
+        }
+
         .commission-settings {
             display: flex;
             flex-direction: column;
@@ -426,6 +435,7 @@
             .commission-settings__title {
                 padding-bottom: 6px;
             }
+
             .commission-settings__radio {
                 width: 100%;
                 .radio__item {
@@ -444,6 +454,12 @@
 
 .profit-finance {
     box-shadow: 0 0 3px 0 var(--finance-accent-color);
+
+    .deal-profit__item {
+        .deal-profit__value {
+            font-weight: 400;
+        }
+    }
 
     .profit-finance__header {
         background-color: var(--finance-color);
@@ -505,6 +521,10 @@
             &::before {
                 color: var(--finance-accent-color);
             }
+        }
+
+        .currency-item__input {
+            flex: 0 0 160px;
         }
 
         .profit-card__body {

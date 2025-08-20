@@ -537,6 +537,10 @@
     background: var(--admss-app-white);
 }
 
+.p-dropdown-panel .p-dropdown-items {
+    padding: 0;
+}
+
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
     background-color: var(--admss-app-light-green);
     color: var(--admss-app-blue-text);
@@ -651,8 +655,13 @@
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
-.p-checkbox .p-checkbox-box {
-    border-radius: 3px;
+.p-checkbox {
+    &:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+        box-shadow: none;
+    }
+    .p-checkbox-box {
+        border-radius: 3px;
+    }
 }
 
 .p-datepicker-calendar {
