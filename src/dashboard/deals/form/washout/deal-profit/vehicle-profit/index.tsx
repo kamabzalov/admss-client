@@ -135,7 +135,7 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='='
                         title='Vehicle Profit:'
                         currency='$'
-                        className='deal-profit__item--purple'
+                        className='deal-profit__item--purple deal-profit__item--bold'
                         includes
                         includeCheckbox={includeVehicleProfit}
                         includeCheckboxOnChange={setIncludeVehicleProfit}
