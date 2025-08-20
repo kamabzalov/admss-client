@@ -239,6 +239,37 @@ export const Reports = (): ReactElement => {
             }
         }
 
+        if (dragNode?.type === NODE_TYPES.COLLECTION) {
+            if (event.dropNode && event.dropNode.children) {
+                const collectionChildren = event.dropNode.children.filter(
+                    (child) => (child as TreeNodeEvent).type === NODE_TYPES.COLLECTION
+                );
+                const dropPosition = event.dropIndex;
+
+                if (dropPosition >= event.dropNode.children.length) {
+                    dropIndex = collectionChildren.length;
+                } else {
+                    let collectionCount = 0;
+                    for (let i = 0; i < dropPosition; i++) {
+                        const child = event.dropNode.children[i];
+                        if (
+                            (child as TreeNodeEvent).type === NODE_TYPES.COLLECTION &&
+                            child.key !== dragNode.key
+                        ) {
+                            collectionCount++;
+                        }
+                    }
+                    dropIndex = collectionCount;
+                }
+            } else {
+                const allCollections = [...favoriteCollections, ...reportCollections];
+                const collectionChildren = allCollections.filter(
+                    (col) => col.itemUID !== dragNode.data?.collection?.itemUID
+                );
+                dropIndex = Math.min(event.dropIndex, collectionChildren.length);
+            }
+        }
+
         if (!dropNode) return;
 
         if (
