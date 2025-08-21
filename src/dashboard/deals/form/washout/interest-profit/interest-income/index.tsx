@@ -1,4 +1,5 @@
 import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
+import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { useStore } from "store/hooks";
 import { useState } from "react";
@@ -14,18 +15,18 @@ export const InterestIncome = observer(() => {
                 title='Sell Rate (Contract Rate):'
                 justify='start'
                 value={Number(dealWashout.ContractRate) || 0}
-                currency='$'
+                currency={CURRENCY_OPTIONS.DOLLAR}
             />
             <DealProfitItem
                 title='Projected Term Interest:'
                 justify='start'
                 value={Number(dealWashout.ProjTermInterest) || 0}
-                currency='$'
+                currency={CURRENCY_OPTIONS.DOLLAR}
             />
             <DealProfitItem
                 title='Buy Rate:'
                 value={Number(dealWashout.BuyRate) || 0}
-                currency='%'
+                currency={CURRENCY_OPTIONS.PERCENT}
                 withInput
                 fieldName='BuyRate'
                 onChange={({ value }: any) => changeDealWashout("BuyRate", String(value))}
@@ -34,7 +35,7 @@ export const InterestIncome = observer(() => {
                 title='(-) Buy Rate Term Interest:'
                 justify='start'
                 value={Number(dealWashout.BuyRateTermInterest) || 0}
-                currency='$'
+                currency={CURRENCY_OPTIONS.DOLLAR}
             />
 
             <div className='splitter my-0'>
@@ -44,14 +45,14 @@ export const InterestIncome = observer(() => {
             <DealProfitItem
                 title='Expected Interest / Reserve:'
                 value={Number(dealWashout.ExpectedInterest) || 0}
-                currency='$'
+                currency={CURRENCY_OPTIONS.DOLLAR}
                 justify='start'
                 className='deal-profit__item--bold'
             />
             <DealProfitItem
                 title='Percent Witheld:'
                 value={Number(dealWashout.PercentWitheld) || 0}
-                currency='%'
+                currency={CURRENCY_OPTIONS.PERCENT}
                 withInput
                 fieldName='PercentWitheld'
                 onChange={({ value }: any) => changeDealWashout("PercentWitheld", String(value))}
@@ -64,7 +65,7 @@ export const InterestIncome = observer(() => {
             <DealProfitItem
                 title='Total Interest / Reserve:'
                 value={Number(dealWashout.TotalInterest) || 0}
-                currency='$'
+                currency={CURRENCY_OPTIONS.DOLLAR}
                 justify='start'
                 className='deal-profit__item--bold'
             />

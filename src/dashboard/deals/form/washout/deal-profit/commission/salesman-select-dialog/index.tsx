@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import { getContactsSalesmanList } from "http/services/contacts-service";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import { CURRENCY_OPTIONS, CurrencyInput } from "dashboard/common/form/inputs";
 import "./index.css";
 
 interface SalesmanSelectDialogProps extends DashboardDialogProps {
@@ -95,17 +95,17 @@ export const SalesmanSelectDialog = ({
                     <CurrencyInput
                         placeholder='Manager Commission'
                         className='w-full'
-                        currencyIcon='percent'
+                        currencyIcon={CURRENCY_OPTIONS.PERCENT}
                     />
                     <CurrencyInput
                         placeholder='Salesman 1 Commission'
                         className='w-full'
-                        currencyIcon='percent'
+                        currencyIcon={CURRENCY_OPTIONS.PERCENT}
                     />
                     <CurrencyInput
                         placeholder='Salesman 2 Commission'
                         className='w-full'
-                        currencyIcon='percent'
+                        currencyIcon={CURRENCY_OPTIONS.PERCENT}
                     />
                 </div>
             </div>

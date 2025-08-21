@@ -6,7 +6,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/commission/salesman-select-dialog";
 import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit/index";
-import { DashboardRadio } from "dashboard/common/form/inputs";
+import { CURRENCY_OPTIONS, DashboardRadio } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
 
 const COMMISSION_2_OPTIONS: RadioButtonProps[] = [
@@ -78,7 +78,7 @@ export const DealProfitCommission = observer(() => {
                         className='deal-profit__item--blue'
                         value={Number(dealWashout.CommissionBase) || 0}
                         includes
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         fieldName='commissionBase'
                         onChange={({ value }) => {
                             changeDealWashout("CommissionBase", String(value));
@@ -130,8 +130,8 @@ export const DealProfitCommission = observer(() => {
                     <DealProfitItem
                         title='(=) Commission Profit:'
                         value={Number(dealWashout.CommissionTotal) || 0}
-                        currency='$'
-                        className='deal-profit__item--blue'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
+                        className='deal-profit__item--blue deal-profit__item--bold'
                         fieldName='commissionProfit'
                         includes
                         onChange={({ value }) => {

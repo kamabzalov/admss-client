@@ -15,6 +15,16 @@ import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 
 type LabelPosition = "left" | "right" | "top";
 
+export enum CURRENCY_OPTIONS {
+    DOLLAR = "$",
+    PERCENT = "%",
+}
+
+export const CURRENCY_SELECT_OPTIONS = [
+    { label: CURRENCY_OPTIONS.DOLLAR, value: 0, name: "dollar" },
+    { label: CURRENCY_OPTIONS.PERCENT, value: 1, name: "percent" },
+];
+
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
@@ -27,7 +37,7 @@ interface DashboardRadioProps {
 }
 
 interface CurrencyInputProps extends InputNumberProps {
-    currencyIcon?: "dollar" | "percent";
+    currencyIcon?: CURRENCY_OPTIONS;
     labelPosition?: LabelPosition;
     coloredEmptyValue?: boolean;
     wrapperClassName?: string;
@@ -148,7 +158,7 @@ export const CurrencyInput = ({
     value,
     title,
     labelPosition = "left",
-    currencyIcon = "dollar",
+    currencyIcon = CURRENCY_OPTIONS.DOLLAR,
     coloredEmptyValue = false,
     wrapperClassName,
     ...props
@@ -171,12 +181,12 @@ export const CurrencyInput = ({
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
-                {currencyIcon === "dollar" && (
+                {currencyIcon === CURRENCY_OPTIONS.DOLLAR && (
                     <div className='currency-item__icon input-icon input-icon-left'>
                         <i className='icon adms-dollar-sign' />
                     </div>
                 )}
-                {currencyIcon === "percent" && (
+                {currencyIcon === CURRENCY_OPTIONS.PERCENT && (
                     <div className='currency-item__icon input-icon input-icon-left currency-item__icon--percent'>
                         <i className='icon adms-percentage' />
                     </div>

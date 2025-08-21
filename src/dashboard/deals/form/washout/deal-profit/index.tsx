@@ -2,7 +2,11 @@ import "./index.css";
 import { observer } from "mobx-react-lite";
 import { InputNumberProps } from "primereact/inputnumber";
 import { ReactElement, useState } from "react";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import {
+    CURRENCY_OPTIONS,
+    CURRENCY_SELECT_OPTIONS,
+    CurrencyInput,
+} from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DealTotalsProfit } from "dashboard/deals/form/washout/deal-profit/totals-profit";
@@ -12,16 +16,6 @@ import { DealProfitFinanceWorksheet } from "dashboard/deals/form/washout/deal-pr
 import { DealInterestProfit } from "dashboard/deals/form/washout/deal-profit/interest-profit";
 import { TruncatedText } from "dashboard/common/display";
 
-export enum CURRENCY_OPTIONS {
-    DOLLAR = "$",
-    PERCENT = "%",
-}
-
-const CURRENCY_SELECT_OPTIONS = [
-    { label: CURRENCY_OPTIONS.DOLLAR, value: 0, name: "dollar" },
-    { label: CURRENCY_OPTIONS.PERCENT, value: 1, name: "percent" },
-];
-
 export enum INCLUDE_OPTIONS {
     COMMISSION1 = "commission1",
     COMMISSION = "commission",
@@ -29,7 +23,7 @@ export enum INCLUDE_OPTIONS {
 
 interface DealProfitItemProps extends InputNumberProps {
     numberSign?: "+" | "-" | "=";
-    currency?: CURRENCY_OPTIONS | string;
+    currency?: CURRENCY_OPTIONS;
     currencySelectValue?: 0 | 1;
     onCurrencySelect?: (value: 0 | 1) => void;
     withInput?: boolean;
@@ -40,6 +34,7 @@ interface DealProfitItemProps extends InputNumberProps {
     includes?: boolean;
     includeCheckbox?: INCLUDE_OPTIONS | null;
     includeCheckboxOnChange?: (value: INCLUDE_OPTIONS | null) => void;
+    additionalValue?: string;
 }
 
 export const DealProfitItem = observer(
@@ -57,6 +52,7 @@ export const DealProfitItem = observer(
         includeCheckbox,
         includeCheckboxOnChange,
         onCurrencySelect,
+        additionalValue,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
@@ -120,7 +116,13 @@ export const DealProfitItem = observer(
                             />
                         )}
                         <CurrencyInput
-                            currencyIcon={currencySelectValue === 1 ? "percent" : "dollar"}
+                            currencyIcon={
+                                currencySelectValue !== undefined
+                                    ? CURRENCY_SELECT_OPTIONS.find(
+                                          (option) => option.value === currencySelectValue
+                                      )?.label
+                                    : currency
+                            }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
                             coloredEmptyValue
@@ -143,6 +145,9 @@ export const DealProfitItem = observer(
                               })
                             : props.value}
                     </div>
+                )}
+                {additionalValue && (
+                    <span className='deal-profit__additional-value'>{additionalValue}</span>
                 )}
                 {includes && (
                     <div className='deal-profit__includes'>
