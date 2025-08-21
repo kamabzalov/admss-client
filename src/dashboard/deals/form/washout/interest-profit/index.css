@@ -39,7 +39,9 @@
     .deal-profit__item {
         height: 32px;
         font-family: "Open Sans", sans-serif;
-        font-weight: 600;
+        &:not(.deal-profit__item--bold) {
+            font-weight: 600;
+        }
         .p-inputtext {
             height: 32px;
         }
@@ -58,7 +60,11 @@
         }
 
         .deal-profit__value {
+            :has(.deal-profit__item--bold) {
+                font-weight: 600;
+            }
             margin-left: 60px;
+
             display: inline-flex;
             align-items: center;
             flex-wrap: nowrap;
@@ -67,6 +73,7 @@
 
     .account-wash {
         .deal-profit__label {
+            white-space: nowrap;
             width: 292px;
         }
 

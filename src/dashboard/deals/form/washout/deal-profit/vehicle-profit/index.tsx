@@ -1,12 +1,12 @@
 import { Card } from "primereact/card";
-import { DealProfitItem, INCLUDE_OPTIONS } from "..";
+import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit";
 import { useState } from "react";
 import { useStore } from "store/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import { INVENTORY_STEPS } from "dashboard/inventory/form";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import { CURRENCY_OPTIONS, CurrencyInput } from "dashboard/common/form/inputs";
 
 export const DealVehicleProfit = observer(() => {
     const { dealWashout, inventory, changeDealWashout } = useStore().dealStore;
@@ -88,7 +88,7 @@ export const DealVehicleProfit = observer(() => {
                     <DealProfitItem
                         title='Cash Price:'
                         includes
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         value={Number(dealWashout.CashPrice) || 0}
                         onChange={({ value }) => {
                             changeDealWashout("CashPrice", String(value));
@@ -98,7 +98,7 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='-'
                         title='Vehicle Cost:'
                         includes
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         value={Number(dealWashout.VehicleCost) || 0}
                         onChange={({ value }) => {
                             changeDealWashout("VehicleCost", String(value));
@@ -108,7 +108,7 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='-'
                         title='Expenses:'
                         includes
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         value={Number(dealWashout.Expenses) || 0}
                         onChange={({ value }) => {
                             changeDealWashout("Expenses", String(value));
@@ -120,7 +120,7 @@ export const DealVehicleProfit = observer(() => {
                         includes
                         includeCheckbox={includeOverallowance}
                         includeCheckboxOnChange={setIncludeOverallowance}
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         value={Number(dealWashout.Overllowance) || 0}
                         onChange={({ value }) => {
                             changeDealWashout("Overllowance", String(value));
@@ -134,7 +134,7 @@ export const DealVehicleProfit = observer(() => {
                     <DealProfitItem
                         numberSign='='
                         title='Vehicle Profit:'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                         className='deal-profit__item--purple deal-profit__item--bold'
                         includes
                         includeCheckbox={includeVehicleProfit}

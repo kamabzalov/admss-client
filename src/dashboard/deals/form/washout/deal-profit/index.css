@@ -38,6 +38,12 @@
         }
         .deal-profit__item,
         .totals-row {
+            &:not(.deal-profit__item--bold) {
+                .deal-profit__value {
+                    font-weight: 400;
+                }
+            }
+
             &:first-child {
                 margin-top: 20px;
             }
@@ -455,12 +461,6 @@
 .profit-finance {
     box-shadow: 0 0 3px 0 var(--finance-accent-color);
 
-    .deal-profit__item {
-        .deal-profit__value {
-            font-weight: 400;
-        }
-    }
-
     .profit-finance__header {
         background-color: var(--finance-color);
         color: var(--finance-accent-color);
@@ -504,6 +504,14 @@
             }
         }
 
+        .deal-profit__additional-value {
+            font-size: 14px;
+            font-weight: 400;
+            flex: 0 0 65px;
+            margin-left: auto;
+            text-align: right;
+        }
+
         .deal-profit__label {
             flex: 0 0 40%;
             white-space: nowrap;
@@ -542,10 +550,10 @@
     }
 }
 
-.interest-profit {
+.deal-interest-profit {
     box-shadow: 0 0 3px 0 var(--interest-accent-color);
     padding: 0;
-    .profit-card__header.interest-profit__header {
+    .profit-card__header.deal-interest-profit__header {
         background-color: var(--interest-color);
         color: var(--interest-accent-color);
     }
@@ -554,7 +562,7 @@
         border-color: var(--interest-accent-color);
     }
 
-    .interest-profit__body.profit-card__body {
+    .deal-interest-profit__body.profit-card__body {
         display: flex;
         justify-content: space-between;
         padding-bottom: 24px;
@@ -562,6 +570,11 @@
         .deal-profit__item {
             .deal-profit__label {
                 white-space: nowrap;
+            }
+            .deal-profit__value {
+                flex: 1;
+                justify-content: flex-end;
+                padding-right: 15px;
             }
             .deal-profit__includes::before {
                 background-color: var(--interest-color);
@@ -650,6 +663,7 @@
                 font-size: 14px;
                 white-space: nowrap;
             }
+
             .totals-info__value {
                 margin-left: auto;
                 padding-right: 5%;
@@ -673,6 +687,7 @@
     }
 
     .totals-controls {
+        --padding-left: 10%;
         padding-left: 20px;
         padding-top: 12px;
         display: flex;
@@ -738,7 +753,10 @@
         }
 
         .totals-info__value {
-            padding-left: 10%;
+            padding-left: var(--padding-left);
+            &:not(.totals-summary) {
+                font-weight: 400;
+            }
         }
 
         .currency-item {
@@ -760,6 +778,9 @@
         .totals-summary {
             color: var(--totals-text-color);
             font-weight: 700;
+            .totals-summary__value {
+                margin-left: var(--padding-left);
+            }
         }
     }
 }

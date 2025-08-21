@@ -1,8 +1,9 @@
 import { Card } from "primereact/card";
 import { useState } from "react";
-import { DealProfitItem, INCLUDE_OPTIONS } from "..";
+import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
 
 export const DealProfitFinanceWorksheet = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
@@ -21,37 +22,37 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         title='Warranty Price:'
                         value={Number(dealWashout.Warranty_Price) || 0}
                         fieldName='WarrantyPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Gap Price:'
                         value={Number(dealWashout.Gap) || 0}
                         fieldName='GapPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Accessories Price:'
                         value={Number(dealWashout.Accessory) || 0}
                         fieldName='AccessoriesPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='C/L Price:'
                         value={Number(dealWashout.CL) || 0}
                         fieldName='CLPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='A/H Price:'
                         value={Number(dealWashout.AH) || 0}
                         fieldName='AHPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='VSI Price:'
                         value={Number(dealWashout.VSI) || 0}
                         fieldName='VSIPrice'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                 </div>
                 <div className='vertical-splitter' />
@@ -64,7 +65,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("Warranty_Cost", value?.toString() || "0");
                         }}
                         fieldName='WarrantyCost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Gap Cost:'
@@ -74,7 +75,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("Gap_Cost", value?.toString() || "0");
                         }}
                         fieldName='GapCost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Accessories Cost:'
@@ -84,7 +85,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("Accessory_Cost", value?.toString() || "0");
                         }}
                         fieldName='AccessoriesCost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='C/L:'
@@ -98,7 +99,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("CL_Cost", value?.toString() || "0");
                         }}
                         fieldName='CLCost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='A/H:'
@@ -112,7 +113,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("AH_Cost", value?.toString() || "0");
                         }}
                         fieldName='AHCost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='VSI:'
@@ -126,7 +127,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("VSI_Cost", value?.toString() || "0");
                         }}
                         fieldName='VSICost'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                 </div>{" "}
             </article>
@@ -143,7 +144,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         includes
                         includeCheckbox={discount}
                         includeCheckboxOnChange={setDiscount}
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Acquisition/ Loan Fee:'
@@ -154,7 +155,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         includeCheckbox={acquisitionFee}
                         includeCheckboxOnChange={setAcquisitionFee}
                         fieldName='AcquisitionFee'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
                         title='Reserve:'
@@ -169,7 +170,8 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         includeCheckboxOnChange={setReserve}
                         withInput
                         fieldName='Reserve'
-                        currency='$'
+                        currency={CURRENCY_OPTIONS.DOLLAR}
+                        additionalValue='$ 0.00'
                     />
                 </article>
             </section>
