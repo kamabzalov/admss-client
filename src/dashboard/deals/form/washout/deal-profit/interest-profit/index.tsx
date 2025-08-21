@@ -112,7 +112,7 @@ export const DealInterestProfit = observer(() => {
                         title='Net F&I Profit:'
                         value={Number(dealWashout.NetFI_Profit) || 0}
                         currency={CURRENCY_OPTIONS.DOLLAR}
-                        className='deal-profit__item--green'
+                        className='deal-profit__item--green deal-profit__item--bold'
                         includes
                     />
                 </div>
