@@ -25,13 +25,13 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     const toast = useToast();
     const store = useStore().generalSettingsStore;
     const { inventoryGroupID, inventoryGroups } = store;
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [inventoryOptions, setInventoryOptions] = useState<Partial<GeneralInventoryOptions>[]>(
         []
     );
-    const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
-    const [layoutKey, setLayoutKey] = useState(false);
+    const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions> | null>(null);
+    const [layoutKey, setLayoutKey] = useState<boolean>(false);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -164,6 +164,8 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             });
             return handleGetInventoryOptionsGroupList();
         }
+
+        await handleGetInventoryOptionsGroupList();
     };
 
     const handleRestoreDefaults = async () => {
@@ -274,11 +276,16 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     }, [inventoryOptions]);
 
     const handleNewOption = () => {
+        if (inventoryOptions.find((item) => item.itemuid === NEW_ITEM)) {
+            setEditedItem({});
+            setInventoryOptions(inventoryOptions.filter((item) => item.itemuid !== NEW_ITEM));
+            return;
+        }
         setEditedItem({ name: "", itemuid: NEW_ITEM });
         setInventoryOptions([...inventoryOptions, { name: "", itemuid: NEW_ITEM }]);
         setTimeout(() => {
             const contentRef = document.querySelector(
-                ".settings-inventory__tabs .p-tabview-panels"
+                ".settings-inventory__tabs .general-inventory-option"
             ) as HTMLDivElement;
             if (contentRef) {
                 contentRef.scrollTo({ top: contentRef.scrollHeight, behavior: "smooth" });
@@ -302,6 +309,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                             options={inventoryGroups}
                             value={inventoryGroupID}
                             onChange={(e) => {
+                                setEditedItem({});
                                 store.inventoryGroupID = e.value;
                             }}
                             placeholder='Group class'
