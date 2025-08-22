@@ -121,9 +121,9 @@ export const DealVehicleProfit = observer(() => {
                         includeCheckbox={includeOverallowance}
                         includeCheckboxOnChange={setIncludeOverallowance}
                         currency={CURRENCY_OPTIONS.DOLLAR}
-                        value={Number(dealWashout.Overllowance) || 0}
+                        value={Number(dealWashout.Overallowance) || 0}
                         onChange={({ value }) => {
-                            changeDealWashout("Overllowance", String(value));
+                            changeDealWashout("Overallowance", String(value));
                         }}
                     />
 

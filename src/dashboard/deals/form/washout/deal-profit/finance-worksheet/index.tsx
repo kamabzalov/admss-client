@@ -171,7 +171,12 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         withInput
                         fieldName='Reserve'
                         currency={CURRENCY_OPTIONS.DOLLAR}
-                        additionalValue='$ 0.00'
+                        additionalValue={`$ ${
+                            Number(dealWashout.ReserveCalculated).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }) || 0
+                        }`}
                     />
                 </article>
             </section>
