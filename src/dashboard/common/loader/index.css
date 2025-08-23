@@ -24,14 +24,7 @@
     -webkit-mask: conic-gradient(from 15deg, #0000, #000);
     animation: l26 1s infinite steps(12);
 }
-.loader,
-.loader:before,
-.loader:after {
-    background: radial-gradient(closest-side at 50% 12.5%, var(--admss-app-main-blue) 96%, #0000)
-            50% 0/20% 80% repeat-y,
-        radial-gradient(closest-side at 12.5% 50%, var(--admss-app-main-blue) 96%, #0000) 0 50%/80%
-            20% repeat-x;
-}
+
 .loader:before,
 .loader:after {
     content: "";
@@ -46,7 +39,40 @@
     margin-top: 30px;
     font-size: 16px;
     font-weight: 600;
+}
+
+.loader--white {
+    color: var(--admss-app-white);
+}
+
+.loader--default {
+    .loader,
+    .loader:before,
+    .loader:after {
+        background:
+            radial-gradient(closest-side at 50% 12.5%, var(--admss-app-main-blue) 96%, #0000) 50% 0/20%
+                80% repeat-y,
+            radial-gradient(closest-side at 12.5% 50%, var(--admss-app-main-blue) 96%, #0000) 0 50%/80%
+                20% repeat-x;
+    }
     color: var(--admss-app-main-blue);
+}
+
+.loader--white {
+    .loader,
+    .loader:before,
+    .loader:after {
+        background:
+            radial-gradient(closest-side at 50% 12.5%, var(--admss-app-white) 96%, #0000) 50% 0/20%
+                80% repeat-y,
+            radial-gradient(closest-side at 12.5% 50%, var(--admss-app-white) 96%, #0000) 0 50%/80%
+                20% repeat-x;
+    }
+    color: var(--admss-app-white);
+}
+
+.loader--small {
+    width: 30px;
 }
 
 .loader--large {

@@ -16,6 +16,20 @@
     font-size: 18px;
     line-height: 23px;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    .p-button-label {
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+    &.general-info__button--loading {
+        flex-direction: row-reverse;
+        .loader-wrapper {
+            padding-left: 10px;
+            flex: 0 0 20%;
+        }
+    }
 }
 
 .p-float-label .p-tooltip-target-wrapper ~ label {
