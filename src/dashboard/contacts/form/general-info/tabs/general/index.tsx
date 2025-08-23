@@ -50,7 +50,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { errors, values, validateField, setFieldValue, setFieldTouched } =
         useFormikContext<Contact>();
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isScanning, setIsScanning] = useState<boolean>(false);
 
     const handleGetTypeList = async () => {
         setIsLoading(true);
@@ -77,7 +78,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        store.isLoading = true;
+        setIsScanning(true);
 
         try {
             const response = await scanContactDL(file);
@@ -185,7 +186,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } finally {
-            store.isLoading = false;
+            setIsScanning(false);
             event.target.value = "";
         }
     };
@@ -265,11 +266,15 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         <div className='col-12 flex gap-4'>
                             <Button
                                 type='button'
-                                label='Scan driver license'
-                                className='general-info__button'
+                                label={isScanning ? "Scanning" : "Scan driver license"}
+                                className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
                                 tooltip='Data received from the DL’s backside will fill in related fields'
-                                outlined
+                                outlined={!isScanning}
                                 onClick={handleScanDL}
+                                loading={isScanning}
+                                loadingIcon={
+                                    <Loader size='small' includeText={false} color='white' />
+                                }
                             />
                             <input
                                 type='file'
