@@ -17,4 +17,11 @@
     text-transform: uppercase;
     font-size: 18px;
     font-weight: 700;
+    &.vin-decoder__decode-button--loading {
+        flex-direction: row-reverse;
+        .loader-wrapper {
+            padding-left: 10px;
+            flex: 0 0 20%;
+        }
+    }
 }

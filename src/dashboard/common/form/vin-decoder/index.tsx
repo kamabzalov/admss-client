@@ -6,6 +6,7 @@ import "./index.css";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { Loader } from "dashboard/common/loader";
 
 interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
@@ -28,33 +29,35 @@ export const VINDecoder = ({
 }: VINDecoderProps): ReactElement => {
     const toast = useToast();
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+    const [isDecoding, setIsDecoding] = useState<boolean>(false);
 
-    const handleGetVinInfo = () => {
+    const handleGetVinInfo = async () => {
         const trimedValue = value?.replaceAll(" ", "");
         if (!buttonDisabled && trimedValue && validateVin(trimedValue)) {
-            inventoryDecodeVIN(trimedValue).then((response) => {
-                if (response && response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    const stringifiedResponse =
-                        response &&
-                        (Object.fromEntries(
-                            Object.entries(response).map(([key, val]) => [key, String(val)])
-                        ) as unknown as VehicleDecodeInfo);
-                    onAction(stringifiedResponse as VehicleDecodeInfo);
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "VIN decoded successfully",
-                        life: TOAST_LIFETIME,
-                    });
-                }
-            });
+            setIsDecoding(true);
+            const response = await inventoryDecodeVIN(trimedValue);
+            setIsDecoding(false);
+            if (response && response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                const stringifiedResponse =
+                    response &&
+                    (Object.fromEntries(
+                        Object.entries(response).map(([key, val]) => [key, String(val)])
+                    ) as unknown as VehicleDecodeInfo);
+                onAction(stringifiedResponse as VehicleDecodeInfo);
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "VIN decoded successfully",
+                    life: TOAST_LIFETIME,
+                });
+            }
         }
     };
 
@@ -80,10 +83,12 @@ export const VINDecoder = ({
                 onChange={handleInputChange}
             />
             <Button
-                className={`vin-decoder__decode-button ${buttonClassName}`}
+                className={`vin-decoder__decode-button ${buttonClassName} ${isDecoding ? "vin-decoder__decode-button--loading" : ""}`}
                 disabled={buttonDisabled || disabled}
+                loading={isDecoding}
                 type='button'
                 onClick={handleGetVinInfo}
+                loadingIcon={<Loader size='small' includeText={false} color='white' />}
             >
                 Decode
             </Button>
