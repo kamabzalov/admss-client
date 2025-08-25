@@ -20,7 +20,7 @@ import { Audit, Inventory, InventoryLocations, MakesListData } from "common/mode
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { getUserGroupActiveList } from "http/services/auth-user.service";
+import { getUserGroupList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
@@ -52,12 +52,13 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
     const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
+    const [initialGroupClassName, setInitialGroupClassName] = useState<string>("");
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
 
-    const hangeGetAutoMakeModelList = async () => {
+    const handleGetAutoMakeModelList = async () => {
         const response = await getInventoryAutomakesList();
         if (response && Array.isArray(response)) {
             const upperCasedList = response.map((item) => ({
@@ -69,44 +70,75 @@ export const VehicleGeneral = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        hangeGetAutoMakeModelList();
-        getInventoryExteriorColorsList().then((list) => {
-            list && setColorList(list);
-        });
-        getInventoryInteriorColorsList().then((list) => {
-            list && setInteriorList(list);
-        });
-    }, []);
+    const handleGetColorsList = async () => {
+        const [exteriorColorsResponse, interiorColorsResponse] = await Promise.all([
+            getInventoryExteriorColorsList(),
+            getInventoryInteriorColorsList(),
+        ]);
+        if (exteriorColorsResponse && Array.isArray(exteriorColorsResponse)) {
+            setColorList(exteriorColorsResponse);
+        }
+        if (interiorColorsResponse && Array.isArray(interiorColorsResponse)) {
+            setInteriorList(interiorColorsResponse);
+        }
+    };
 
-    const handleGetInventoryGroupFullInfo = (groupName: string) => {
-        if (groupName) {
-            const activeGroup = groupClassList.find(
-                (group) => group.description === inventory.GroupClassName
+    const handleGetLocationsList = async () => {
+        if (!authUser) return;
+        const response = await getInventoryLocations(authUser.useruid);
+        if (response && Array.isArray(response)) {
+            setLocationList(response);
+        }
+    };
+
+    const handleGetUserGroupsList = async () => {
+        if (groupClassList.length > 0 && !inventory.GroupClassName) return;
+
+        const userGroupsResponse = await getUserGroupList(authUser!.useruid);
+        if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
+            if (!initialGroupClassName && inventory.GroupClassName) {
+                setInitialGroupClassName(inventory.GroupClassName);
+            }
+
+            const activeUserGroups = userGroupsResponse.filter(
+                (group) =>
+                    (group.enabled === 1 && Boolean(group.itemuid)) ||
+                    (inventory.GroupClassName && group.description === inventory.GroupClassName) ||
+                    (initialGroupClassName && group.description === initialGroupClassName)
             );
-            if (activeGroup) {
-                store.inventoryGroupID = activeGroup.itemuid;
+
+            setGroupClassList(activeUserGroups);
+
+            if (
+                inventory.GroupClassName &&
+                userGroupsResponse.some((group) => group.description === inventory.GroupClassName)
+            ) {
+                handleGetInventoryGroupFullInfo(inventory.GroupClassName);
             }
         }
     };
 
     useEffect(() => {
+        handleGetAutoMakeModelList();
+        handleGetColorsList();
+        handleGetLocationsList();
+    }, []);
+
+    useEffect(() => {
         if (authUser) {
-            getInventoryLocations(authUser.useruid).then((list) => {
-                if (list && Array.isArray(list)) {
-                    setLocationList(list);
-                }
-            });
-            getUserGroupActiveList(authUser.useruid).then((list) => {
-                if (list && Array.isArray(list)) {
-                    setGroupClassList(list);
-                    if (list.some((group) => group.description === inventory.GroupClassName)) {
-                        handleGetInventoryGroupFullInfo(inventory.GroupClassName);
-                    }
-                }
-            });
+            handleGetUserGroupsList();
         }
-    }, [authUser]);
+    }, [inventory.GroupClassName, authUser]);
+
+    const handleGetInventoryGroupFullInfo = (groupName: string) => {
+        if (groupName) {
+            const activeGroup = groupClassList.find((group) => group.description === groupName);
+
+            if (activeGroup) {
+                store.inventoryGroupID = activeGroup.itemuid;
+            }
+        }
+    };
 
     useEffect(() => {
         if (!values?.locationuid?.trim() && !!locationList.length) {
@@ -180,7 +212,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     summary: "Success",
                     detail: `${isModel ? "Model" : "Make"} ${record.name} deleted successfully`,
                 });
-                hangeGetAutoMakeModelList();
+                handleGetAutoMakeModelList();
             }
         };
 
