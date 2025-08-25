@@ -105,6 +105,25 @@ export default function Inventories({
 
     const navigate = useNavigate();
 
+    const getInventoryInfo = async () => {
+        if (!authUser) return;
+
+        const [locationsResponse, userGroupsResponse] = await Promise.all([
+            getInventoryLocations(authUser.useruid),
+            getUserGroupList(authUser.useruid),
+        ]);
+
+        if (locationsResponse && Array.isArray(locationsResponse)) {
+            setLocations(locationsResponse);
+        }
+        if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
+            const activeUserGroups = userGroupsResponse.filter(
+                (group) => Boolean(group.enabled) && Boolean(group.itemuid)
+            );
+            setInventoryType(activeUserGroups);
+        }
+    };
+
     useEffect(() => {
         if (dataTableRef.current) {
             const table = dataTableRef.current.getTable();
@@ -133,19 +152,7 @@ export default function Inventories({
     };
 
     useEffect(() => {
-        if (authUser) {
-            Promise.all([
-                getInventoryLocations(authUser.useruid),
-                getUserGroupList(authUser.useruid),
-            ]).then(([locationsResponse, userGroupsResponse]) => {
-                if (locationsResponse && Array.isArray(locationsResponse)) {
-                    setLocations(locationsResponse);
-                }
-                if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
-                    setInventoryType(userGroupsResponse);
-                }
-            });
-        }
+        getInventoryInfo();
         return () => {
             store.isErasingNeeded = true;
             if (originalPath) {
