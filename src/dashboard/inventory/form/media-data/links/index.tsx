@@ -16,6 +16,7 @@ import { Column } from "primereact/column";
 import { Status } from "common/models/base-response";
 import { AxiosError } from "axios";
 import { Tooltip } from "primereact/tooltip";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 enum DIRECTION {
     UP = "up",
@@ -63,11 +64,19 @@ const UrlCell = ({ mediaUrl }: { mediaUrl: string }) => {
     );
 };
 
+enum ModalInfo {
+    TITLE = "Are you sure?",
+    BODY = "Do you really want to delete this link? This process cannot be undone.",
+    ACCEPT = "Delete",
+}
+
 export const LinksMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const toast = useToast();
     const [expandedRows, setExpandedRows] = useState<MediaItem[]>([]);
     const [isUrlValid, setIsUrlValid] = useState<boolean>(true);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [selectedLink, setSelectedLink] = useState<MediaItem | null>(null);
     const {
         saveInventoryLinks,
         uploadFileLinks,
@@ -185,6 +194,11 @@ export const LinksMedia = observer((): ReactElement => {
         }
     };
 
+    const handleModalOpen = (link: MediaItem) => {
+        setSelectedLink(link);
+        setModalVisible(true);
+    };
+
     const handleDeleteLink = async (link: MediaItem) => {
         try {
             await removeMedia(link.itemuid, () => {});
@@ -277,7 +291,7 @@ export const LinksMedia = observer((): ReactElement => {
                     className='inventory-links__delete-button'
                     icon='adms-trash-can'
                     text
-                    onClick={() => handleDeleteLink(rowData)}
+                    onClick={() => handleModalOpen(rowData)}
                 />
             </div>
         );
@@ -410,6 +424,28 @@ export const LinksMedia = observer((): ReactElement => {
                     )}
                 </div>
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title={ModalInfo.TITLE}
+                icon='pi-times-circle'
+                bodyMessage={ModalInfo.BODY}
+                confirmAction={() => {
+                    if (selectedLink) {
+                        handleDeleteLink(selectedLink);
+                        setModalVisible(false);
+                        setSelectedLink(null);
+                    }
+                }}
+                draggable={false}
+                rejectLabel={"Cancel"}
+                acceptLabel={ModalInfo.ACCEPT}
+                className={`media-warning`}
+                onHide={() => {
+                    setModalVisible(false);
+                    setSelectedLink(null);
+                }}
+            />
         </div>
     );
 });
