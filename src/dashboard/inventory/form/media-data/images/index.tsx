@@ -23,6 +23,7 @@ import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -31,6 +32,12 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
+
+enum ModalInfo {
+    TITLE = "Are you sure?",
+    BODY = "Do you really want to delete this image? This process cannot be undone.",
+    ACCEPT = "Delete",
+}
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -52,6 +59,8 @@ export const ImagesMedia = observer((): ReactElement => {
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [itemuid, setItemuid] = useState<string>("");
 
     useEffect(() => {
         fetchImages();
@@ -120,24 +129,24 @@ export const ImagesMedia = observer((): ReactElement => {
         callback();
     };
 
-    const handleUploadFiles = () => {
+    const handleUploadFiles = async () => {
         if (formErrorMessage) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: formErrorMessage,
             });
+            return;
         }
-        saveInventoryImages().then((res) => {
-            if (res) {
-                fileUploadRef.current?.clear();
-                store.resetUploadState();
-                fetchImages();
-                setTotalCount(0);
-                setImagesChecked([]);
-                setChecked(true);
-            }
-        });
+        const res = await saveInventoryImages();
+        if (res) {
+            fileUploadRef.current?.clear();
+            store.resetUploadState();
+            fetchImages();
+            setTotalCount(0);
+            setImagesChecked([]);
+            setChecked(true);
+        }
     };
 
     const handleCheckedChange = (index?: number) => {
@@ -156,6 +165,11 @@ export const ImagesMedia = observer((): ReactElement => {
             updatedCheckboxState[index] = !updatedCheckboxState[index];
             setImagesChecked(updatedCheckboxState);
         }
+    };
+
+    const handleModalOpen = (mediauid: string) => {
+        setItemuid(mediauid);
+        setModalVisible(true);
     };
 
     const handleDeleteImage = (mediauid: string) => {
@@ -408,8 +422,9 @@ export const ImagesMedia = observer((): ReactElement => {
                                         </div>
                                     </div>
                                     <button
+                                        type='button'
                                         className='media-images__close'
-                                        onClick={() => handleDeleteImage(itemuid)}
+                                        onClick={() => handleModalOpen(itemuid)}
                                     >
                                         <i className='pi pi-times' />
                                     </button>
@@ -421,6 +436,22 @@ export const ImagesMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No images added yet.</div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title={ModalInfo.TITLE}
+                icon='pi-times-circle'
+                bodyMessage={ModalInfo.BODY}
+                confirmAction={() => {
+                    handleDeleteImage(itemuid);
+                    setModalVisible(false);
+                }}
+                draggable={false}
+                rejectLabel={"Cancel"}
+                acceptLabel={ModalInfo.ACCEPT}
+                className={`media-warning`}
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 });

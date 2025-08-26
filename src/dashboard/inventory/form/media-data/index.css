@@ -184,3 +184,26 @@
     border: none;
     height: auto;
 }
+
+.media-warning {
+    .confirm-header__icon {
+        padding-bottom: 36px;
+        &::before {
+            font-size: 5.5rem;
+        }
+    }
+
+    .confirm-header__title {
+        padding-bottom: 12px;
+    }
+
+    .p-dialog-content {
+        padding-bottom: 14px;
+    }
+
+    .p-dialog-footer {
+        .p-button {
+            height: 60px;
+        }
+    }
+}

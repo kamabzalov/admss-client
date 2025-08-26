@@ -21,12 +21,19 @@ import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const limitations: MediaLimitations = {
     formats: ["PDF"],
     maxSize: 8,
     maxUpload: 16,
 };
+
+enum ModalInfo {
+    TITLE = "Are you sure?",
+    BODY = "Do you really want to delete this document? This process cannot be undone.",
+    ACCEPT = "Delete",
+}
 
 export const DocumentsMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -43,6 +50,8 @@ export const DocumentsMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
     const [checked, setChecked] = useState<boolean>(true);
     const [documentChecked, setDocumentChecked] = useState<boolean[]>([]);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [itemuid, setItemuid] = useState<string>("");
 
     useEffect(() => {
         fetchDocuments();
@@ -122,6 +131,11 @@ export const DocumentsMedia = observer((): ReactElement => {
 
     const handleDeleteDocument = (mediauid: string) => {
         removeMedia(mediauid, fetchDocuments);
+    };
+
+    const handleModalOpen = (mediauid: string) => {
+        setItemuid(mediauid);
+        setModalVisible(true);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -310,8 +324,9 @@ export const DocumentsMedia = observer((): ReactElement => {
                                     </div>
                                 </div>
                                 <button
+                                    type='button'
                                     className='media-documents__close'
-                                    onClick={() => handleDeleteDocument(itemuid)}
+                                    onClick={() => handleModalOpen(itemuid)}
                                 >
                                     <i className='pi pi-times' />
                                 </button>
@@ -322,6 +337,22 @@ export const DocumentsMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No audio files added yet.</div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title={ModalInfo.TITLE}
+                icon='pi-times-circle'
+                bodyMessage={ModalInfo.BODY}
+                confirmAction={() => {
+                    handleDeleteDocument(itemuid);
+                    setModalVisible(false);
+                }}
+                draggable={false}
+                rejectLabel={"Cancel"}
+                acceptLabel={ModalInfo.ACCEPT}
+                className={`media-warning`}
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 });

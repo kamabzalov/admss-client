@@ -22,6 +22,7 @@ import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -33,6 +34,12 @@ const limitations: MediaLimitations = {
     maxSize: 32,
     maxUpload: 4,
 };
+
+enum ModalInfo {
+    TITLE = "Are you sure?",
+    BODY = "Do you really want to delete this video file? This process cannot be undone.",
+    ACCEPT = "Delete",
+}
 
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -49,6 +56,8 @@ export const VideoMedia = observer((): ReactElement => {
     const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [itemuid, setItemuid] = useState<string>("");
     const videosSet = new Set();
     const uniqueVideos = videos.filter((vid) => {
         if (!vid.itemuid || videosSet.has(vid.itemuid)) return false;
@@ -130,6 +139,11 @@ export const VideoMedia = observer((): ReactElement => {
             updatedCheckboxState[index] = !updatedCheckboxState[index];
             setVideoChecked(updatedCheckboxState);
         }
+    };
+
+    const handleModalOpen = (mediauid: string) => {
+        setItemuid(mediauid);
+        setModalVisible(true);
     };
 
     const handleDeleteVideo = (mediauid: string) => {
@@ -335,8 +349,9 @@ export const VideoMedia = observer((): ReactElement => {
                                     </div>
                                 </div>
                                 <button
+                                    type='button'
                                     className='media-video__close'
-                                    onClick={() => handleDeleteVideo(itemuid)}
+                                    onClick={() => handleModalOpen(itemuid)}
                                 >
                                     <i className='pi pi-times' />
                                 </button>
@@ -347,6 +362,22 @@ export const VideoMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No video files added yet.</div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                position='top'
+                title={ModalInfo.TITLE}
+                icon='pi-times-circle'
+                bodyMessage={ModalInfo.BODY}
+                confirmAction={() => {
+                    handleDeleteVideo(itemuid);
+                    setModalVisible(false);
+                }}
+                draggable={false}
+                rejectLabel={"Cancel"}
+                acceptLabel={ModalInfo.ACCEPT}
+                className={`media-warning`}
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 });
