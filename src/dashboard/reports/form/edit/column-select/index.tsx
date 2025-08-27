@@ -8,6 +8,10 @@ import {
     useReportColumnController,
 } from "dashboard/reports/form/edit/column-select/select-controller";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { DataSetInfoTemplate } from "dashboard/reports/form/edit/column-select/info-panel";
+import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
+import "./index.css";
+
 export const ReportColumnSelect = observer((): ReactElement => {
     const {
         dataSet,
@@ -186,21 +190,30 @@ export const ReportColumnSelect = observer((): ReactElement => {
                                 availableValues.length - 1 || !currentItem
                         )}
                     </div>
-                    <div className='report-control__content'>
-                        <ComboBox
-                            className='report-controls__dropdown'
-                            options={availableDatasets}
-                            value={dataSet}
-                            emptyMessage='-'
-                            disabled={!!report.isdefault}
-                            onChange={(e) => setDataSet(e.value)}
-                            pt={{
-                                wrapper: {
-                                    className: "capitalize",
-                                },
-                            }}
-                            label='Data Set'
-                        />
+                    <div className='report-control__content data-set'>
+                        <div className='data-set__control'>
+                            <ComboBox
+                                className='data-set__dropdown'
+                                options={availableDatasets}
+                                value={dataSet}
+                                emptyMessage='-'
+                                disabled={!!report.isdefault}
+                                onChange={(e) => setDataSet(e.value)}
+                                pt={{
+                                    wrapper: {
+                                        className: "capitalize",
+                                    },
+                                }}
+                                label='Data Set'
+                            />
+                            <InfoOverlayPanel
+                                panelTitle='Note it'
+                                className='data-set__info dataset-info'
+                            >
+                                <DataSetInfoTemplate />
+                            </InfoOverlayPanel>
+                        </div>
+
                         <ReportSelect
                             header='Available'
                             values={availableValues}

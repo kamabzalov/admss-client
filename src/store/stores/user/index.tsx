@@ -30,6 +30,7 @@ export class UserStore {
     private _storedUser: AuthUser | null = null;
     public settings: Settings = new Settings();
     private _isSettingsLoaded: boolean = false;
+    private _visitedPages: Set<string> = new Set();
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -88,5 +89,13 @@ export class UserStore {
 
     public set isSettingsLoaded(value: boolean) {
         this._isSettingsLoaded = value;
+    }
+
+    public isFirstVisit(pageId: string): boolean {
+        return !this._visitedPages.has(pageId);
+    }
+
+    public markPageAsVisited(pageId: string): void {
+        this._visitedPages.add(pageId);
     }
 }

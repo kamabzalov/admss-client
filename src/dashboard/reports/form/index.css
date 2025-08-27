@@ -20,8 +20,6 @@
     max-height: 70vh;
     display: flex;
     justify-content: space-between;
-    overflow-y: scroll;
-    overflow-x: hidden;
 
     .p-tree {
         flex: 0 0 30%;
@@ -188,7 +186,7 @@
     }
 }
 
-.report-controls__dropdown {
+.data-set__dropdown {
     width: var(--column-width);
     text-transform: capitalize;
 }

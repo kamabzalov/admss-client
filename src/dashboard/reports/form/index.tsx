@@ -248,7 +248,7 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
-    const handleDragEnter = (event: React.DragEvent<HTMLDivElement>, node: TreeNode) => {
+    const handleDragEnter = (_: React.DragEvent<HTMLDivElement>, node: TreeNode) => {
         const nodeData = node as TreeNodeEvent;
         if (nodeData.data.document && !currentNodeOrder) {
             setCurrentNodeOrder(nodeData.data.document.order);
