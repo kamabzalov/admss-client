@@ -7,16 +7,19 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { useStore } from "store/hooks";
 import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
-import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ImagePreview } from "dashboard/inventory/form/media-data/watermarking/preview";
 import { useParams } from "react-router-dom";
+import { getReportFonts } from "http/services/reports.service";
+import { ReportFont } from "common/models/reports";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 export const InventoryMediaWatermarking = observer((): ReactElement => {
     const { id } = useParams();
-    const [settingsStore, inventoryStore] = [
+    const [settingsStore, inventoryStore, userStore] = [
         useStore().generalSettingsStore,
         useStore().inventoryStore,
+        useStore().userStore,
     ];
     const {
         settings,
@@ -30,11 +33,20 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
     } = settingsStore;
     const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const [fonts, setFonts] = useState<ReportFont[]>([]);
+
+    const handleGetFonts = async () => {
+        const response = await getReportFonts(userStore.authUser?.useruid ?? "");
+        if (Array.isArray(response)) {
+            setFonts(response);
+        }
+    };
 
     useEffect(() => {
         if (id) {
             getSettings();
             getPostProcessing();
+            handleGetFonts();
         }
     }, [id]);
 
@@ -161,8 +173,9 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         <label className='float-label'>Text String</label>
                     </span>
                     <div className='col-12 p-0 flex align-items-center justify-content-between'>
-                        <span className='p-float-label watermarking__font-input'>
-                            <InputText
+                        <span className='p-float-label watermarking__font-dropdown'>
+                            <ComboBox
+                                options={fonts.map((font) => font.name)}
                                 value={block.fontName || ""}
                                 onChange={(e) => {
                                     const newTextBlocks = [...postProcessing];

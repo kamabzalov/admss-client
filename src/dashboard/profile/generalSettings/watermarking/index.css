@@ -34,9 +34,9 @@
                 height: 50px;
             }
         }
-        .watermarking__font-input {
+        .watermarking__font-dropdown {
             flex: 1 1 610px;
-            .p-inputtext {
+            .p-dropdown {
                 width: 100%;
                 height: 50px;
             }
