@@ -227,7 +227,7 @@ export const Reports = (): ReactElement => {
             const documentKeys = documentChildren.map((node) => node.key);
 
             if (event.dropIndex >= children.length) {
-                dropIndex = documentChildren.length - 1;
+                dropIndex = documentChildren.length;
             } else {
                 const dropChild = children[event.dropIndex];
                 if (dropChild) {
@@ -252,21 +252,14 @@ export const Reports = (): ReactElement => {
                     let collectionCount = 0;
                     for (let i = 0; i < dropPosition; i++) {
                         const child = event.dropNode.children[i];
-                        if (
-                            (child as TreeNodeEvent).type === NODE_TYPES.COLLECTION &&
-                            child.key !== dragNode.key
-                        ) {
+                        if ((child as TreeNodeEvent).type === NODE_TYPES.COLLECTION) {
                             collectionCount++;
                         }
                     }
                     dropIndex = collectionCount;
                 }
             } else {
-                const allCollections = [...favoriteCollections, ...reportCollections];
-                const collectionChildren = allCollections.filter(
-                    (col) => col.itemUID !== dragNode.data?.collection?.itemUID
-                );
-                dropIndex = Math.min(event.dropIndex, collectionChildren.length);
+                dropIndex = event.dropIndex;
             }
         }
 
