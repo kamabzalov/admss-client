@@ -440,7 +440,13 @@ export const DateInput = ({
                         tooltipOptions={{ position: "top" }}
                     />
                 )}
-                <div className='date-item__icon input-icon input-icon-right' onClick={openCalendar}>
+                <div
+                    className='date-item__icon input-icon input-icon-right'
+                    style={{
+                        cursor: props.disabled ? "default" : "pointer",
+                    }}
+                    onClick={props.disabled ? undefined : openCalendar}
+                >
                     <i className='adms-calendar' />
                 </div>
             </div>
