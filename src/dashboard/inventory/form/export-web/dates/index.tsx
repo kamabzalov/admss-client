@@ -25,22 +25,10 @@ export const ExportWebDates = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <DateInput
-                    date={LastModifiedDate}
-                    onChange={({ value }) =>
-                        value && changeExportWeb({ key: "LastModifiedDate", value: Number(value) })
-                    }
-                    name='Last Modified Date'
-                />
+                <DateInput date={LastModifiedDate} disabled name='Last Modified Date' />
             </div>
             <div className='col-3'>
-                <DateInput
-                    date={LastExportDate}
-                    onChange={({ value }) =>
-                        value && changeExportWeb({ key: "LastExportDate", value: Number(value) })
-                    }
-                    name='Last Export Date'
-                />
+                <DateInput date={LastExportDate} disabled name='Last Export Date' />
             </div>
         </div>
     );
