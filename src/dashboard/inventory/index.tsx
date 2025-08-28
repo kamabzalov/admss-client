@@ -117,9 +117,7 @@ export default function Inventories({
             setLocations(locationsResponse);
         }
         if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
-            const activeUserGroups = userGroupsResponse.filter(
-                (group) => Boolean(group.enabled) && Boolean(group.itemuid)
-            );
+            const activeUserGroups = userGroupsResponse.filter((group) => Boolean(group.itemuid));
             setInventoryType(activeUserGroups);
         }
     };
