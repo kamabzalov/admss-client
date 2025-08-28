@@ -111,6 +111,11 @@ export interface ReportCreate extends BaseResponseError {
     description: string;
 }
 
+export interface ReportFont {
+    default_size: number;
+    name: string;
+}
+
 export interface ReportServiceColumns {
     data: string;
     dataset: string;

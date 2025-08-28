@@ -6,6 +6,7 @@ import {
     ReportCollection,
     ReportCollectionUpdate,
     ReportCreate,
+    ReportFont,
     ReportInfo,
     ReportServiceColumns,
     ReportServices,
@@ -204,6 +205,22 @@ export const getReportColumns = async ({
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting report columns",
+            };
+        }
+    }
+};
+
+export const getReportFonts = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | ReportFont[]>(
+            `reports/${useruid}/fonts`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report fonts",
             };
         }
     }
