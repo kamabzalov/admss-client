@@ -28,7 +28,7 @@ import {
     setContactMediaItemData,
 } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
-import { action, makeAutoObservable } from "mobx";
+import { action, makeAutoObservable, runInAction } from "mobx";
 import { RootStore } from "store";
 import { filterPostPayload } from "common/utils";
 
@@ -75,6 +75,18 @@ export class ContactStore {
     private _deleteReason: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
+    private _separateContact: boolean = false;
+    private _initialCoBuyerFields: {
+        firstName: string;
+        lastName: string;
+        middleName: string;
+        businessName: string;
+    } = {
+        firstName: "",
+        lastName: "",
+        middleName: "",
+        businessName: "",
+    };
 
     private _contactDocumentsID: Partial<InventoryMedia>[] = [];
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
@@ -136,6 +148,18 @@ export class ContactStore {
 
     public get coBuyerBackSideDLurl() {
         return this._coBuyerBackSideDLurl;
+    }
+
+    public get separateContact() {
+        const fieldsChanged = this.coBuyerGeneralFieldsChanged;
+        const hasUseruid = !!this._coBayerContact.useruid;
+
+        if (fieldsChanged && !hasUseruid) {
+            runInAction(() => {
+                this._separateContact = false;
+            });
+        }
+        return this._separateContact;
     }
 
     public get isContactChanged() {
@@ -228,6 +252,21 @@ export class ContactStore {
         return otherTabFields.some((field) => field && typeof field === "string" && field.trim());
     }
 
+    public get coBuyerGeneralFieldsChanged() {
+        const currentFirstName = this._contactExtData.CoBuyer_First_Name || "";
+        const currentLastName = this._contactExtData.CoBuyer_Last_Name || "";
+        const currentMiddleName = this._contactExtData.CoBuyer_Middle_Name || "";
+        const currentBusinessName = this._contactExtData.CoBuyer_Emp_Company || "";
+
+        const hasChanged =
+            currentFirstName !== this._initialCoBuyerFields.firstName ||
+            currentLastName !== this._initialCoBuyerFields.lastName ||
+            currentMiddleName !== this._initialCoBuyerFields.middleName ||
+            currentBusinessName !== this._initialCoBuyerFields.businessName;
+
+        return hasChanged;
+    }
+
     public getContact = async (itemuid: string) => {
         this._isLoading = true;
         try {
@@ -243,6 +282,13 @@ export class ContactStore {
                 this._contact = contact || ({} as Contact);
                 this._contactExtData = extdata || ({} as ContactExtData);
                 this._contactProspect = this._contact?.prospect || [];
+
+                this._initialCoBuyerFields = {
+                    firstName: extdata?.CoBuyer_First_Name || "",
+                    lastName: extdata?.CoBuyer_Last_Name || "",
+                    middleName: extdata?.CoBuyer_Middle_Name || "",
+                    businessName: extdata?.CoBuyer_Emp_Company || "",
+                };
             }
             if (this._contact.cobuyeruid) await this.getCoBuyerContact();
         } catch (error) {
@@ -437,6 +483,55 @@ export class ContactStore {
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
                     await Promise.reject(coBuyerContactDataResponse?.error);
                     return coBuyerContactDataResponse;
+                }
+            }
+
+            return { status: Status.OK };
+        } catch (error) {
+            return error as BaseResponseError;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public createSeparateCoBuyerContact = action(async (): Promise<BaseResponseError> => {
+        try {
+            this._isLoading = true;
+
+            const coBuyerContactData: Partial<Contact> = {
+                type: 1,
+                firstName: this._contactExtData.CoBuyer_First_Name || "",
+                middleName: this._contactExtData.CoBuyer_Middle_Name || "",
+                lastName: this._contactExtData.CoBuyer_Last_Name || "",
+                businessName: this._contactExtData.CoBuyer_Emp_Company || "",
+                streetAddress: this._contactExtData.CoBuyer_Res_Address || "",
+                state: this._contactExtData.CoBuyer_State || "",
+                city: this._contactExtData.CoBuyer_City || "",
+                ZIP: this._contactExtData.CoBuyer_Zip_Code || "",
+                mailEmail: this._contactExtData.CoBuyer_EMail || "",
+                phone1: this._contactExtData.CoBuyer_Home_Phone_Number || "",
+                mailPhone: this._contactExtData.CoBuyer_Business_Phone_Number || "",
+                mailState: this._contactExtData.CoBuyer_Mailing_State || "",
+                mailCity: this._contactExtData.CoBuyer_Mailing_City || "",
+                mailZIP: this._contactExtData.CoBuyer_Mailing_Zip || "",
+                mailStreetAddress: this._contactExtData.CoBuyer_Mailing_Address || "",
+                dluidfront: this._contactExtData.CoBuyer_Driver_License_Num || "",
+                dluidback: this._contactExtData.CoBuyer_DL_Exp_Date || "",
+                dl_expiration: this._contactExtData.CoBuyer_DL_Exp_Date || "",
+                dl_issuedate: this._contactExtData.CoBuyer_DL_Exp_Date || "",
+                dl_number: this._contactExtData.CoBuyer_DL_Exp_Date || "",
+            };
+
+            const response = await setContact(null, coBuyerContactData);
+            if (response?.status === Status.ERROR) {
+                await Promise.reject(response?.error);
+                return response;
+            }
+
+            if (this._coBuyerFrontSideDL.size || this._coBuyerBackSideDL.size) {
+                const contactuid = (response as any)?.contactuid;
+                if (contactuid) {
+                    await this.setCoBuyerImagesDL(contactuid);
                 }
             }
 
@@ -788,6 +883,22 @@ export class ContactStore {
 
     public set isContactChanged(state: boolean) {
         this._isContactChanged = state;
+    }
+
+    public set separateContact(state: boolean) {
+        this._separateContact = state;
+        if (state) {
+            this.updateInitialCoBuyerFields();
+        }
+    }
+
+    private updateInitialCoBuyerFields() {
+        this._initialCoBuyerFields = {
+            firstName: this._contactExtData.CoBuyer_First_Name || "",
+            lastName: this._contactExtData.CoBuyer_Last_Name || "",
+            middleName: this._contactExtData.CoBuyer_Middle_Name || "",
+            businessName: this._contactExtData.CoBuyer_Emp_Company || "",
+        };
     }
 
     public set uploadFileDocuments(files: UploadMediaItem) {

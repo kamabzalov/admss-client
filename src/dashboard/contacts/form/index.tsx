@@ -49,7 +49,9 @@ export type PartialContact = Pick<
         | "CoBuyer_Last_Name"
         | "Buyer_Emp_Ext"
         | "Buyer_Emp_Phone"
-    >;
+    > & {
+        separateContact?: boolean;
+    };
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
     [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "businessName"],
@@ -134,8 +136,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_First_Name: Yup.string()
         .trim()
         .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type } = this.parent;
-            if (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
+            const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
+            if (
+                separateContact ||
+                (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()))
+            ) {
                 return !!value?.trim();
             }
             return true;
@@ -152,8 +157,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_Last_Name: Yup.string()
         .trim()
         .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_First_Name, CoBuyer_Middle_Name, type } = this.parent;
-            if (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
+            const { CoBuyer_First_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
+            if (
+                separateContact ||
+                (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()))
+            ) {
                 return !!value?.trim();
             }
             return true;
@@ -162,6 +170,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
+    separateContact: Yup.boolean(),
 });
 
 const DialogBody = (): ReactElement => {
@@ -207,6 +216,7 @@ export const ContactForm = observer((): ReactElement => {
         deleteReason,
         activeTab,
         tabLength,
+        separateContact,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
@@ -356,7 +366,14 @@ export const ContactForm = observer((): ReactElement => {
             const allErrors = { ...errors, ...coBuyerValidationErrors };
 
             if (!Object.keys(allErrors).length) {
-                const response = await saveContact();
+                let response;
+
+                if (store.separateContact) {
+                    response = await store.createSeparateCoBuyerContact();
+                } else {
+                    response = await saveContact();
+                }
+
                 if (response && response.status === Status.OK) {
                     if (memoRoute) {
                         navigate(memoRoute);
@@ -633,6 +650,7 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.CoBuyer_First_Name || "",
                                                     CoBuyer_Last_Name:
                                                         contactExtData.CoBuyer_Last_Name || "",
+                                                    separateContact: separateContact || false,
                                                 } as PartialContact
                                             }
                                             enableReinitialize
