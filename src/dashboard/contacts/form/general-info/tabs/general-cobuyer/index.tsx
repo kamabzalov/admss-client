@@ -16,13 +16,14 @@ import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Loader } from "dashboard/common/loader";
+import "./index.css";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData } = store;
+    const { contactExtData, changeContactExtData, coBuyerContact, separateContact } = store;
 
-    const { setFieldValue, validateField, setFieldTouched, errors } =
+    const { setFieldValue, validateField, setFieldTouched, errors, touched } =
         useFormikContext<ContactExtData>();
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
@@ -46,6 +47,18 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         contactExtData.CoBuyer_Middle_Name,
         contactExtData.CoBuyer_Last_Name,
     ]);
+
+    const isNameRequired = useMemo(() => {
+        return store.isCoBuyerFieldsFilled || separateContact;
+    }, [store.isCoBuyerFieldsFilled, separateContact]);
+
+    const shouldShowNameRequired = useMemo(() => {
+        return isNameRequired && !shouldDisableNameFields;
+    }, [isNameRequired, shouldDisableNameFields]);
+
+    const shouldShowBusinessRequired = useMemo(() => {
+        return isNameRequired && !shouldDisableBusinessName;
+    }, [isNameRequired, shouldDisableBusinessName]);
 
     const handleScanDL = () => {
         fileInputRef.current?.click();
@@ -185,7 +198,21 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className='grid general-info row-gap-2'>
+        <div className='grid general-info row-gap-2 cobuyer-info'>
+            {(!coBuyerContact.useruid || store.coBuyerGeneralFieldsChanged) && (
+                <div className='cobuyer-info__checkbox'>
+                    <Checkbox
+                        checked={separateContact}
+                        onChange={(e) => (store.separateContact = !!e.checked)}
+                        inputId='separate-contact'
+                        name='separate-contact'
+                        title='Save As a Separate Contact'
+                    />
+                    <label htmlFor='separate-contact' className='cobuyer-info__label'>
+                        Save As a Separate Contact
+                    </label>
+                </div>
+            )}
             <div className='col-12 flex gap-4'>
                 <Button
                     type='button'
@@ -233,22 +260,24 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
+                    className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_First_Name && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_First_Name", value, true).then(() => {
                             changeContactExtData("CoBuyer_First_Name", value);
                             validateField("CoBuyer_First_Name");
+                            setFieldTouched("CoBuyer_First_Name", true, true);
                         });
                     }}
                     onBlur={handleOfacCheck}
-                    name={`First Name${store.isCoBuyerFieldsFilled ? " (required)" : ""}`}
+                    name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
                 />
                 <small className='p-error'>
-                    {store.isCoBuyerFieldsFilled &&
+                    {shouldShowNameRequired &&
+                    touched.CoBuyer_First_Name &&
                     (!contactExtData.CoBuyer_First_Name ||
                         !contactExtData.CoBuyer_First_Name.trim())
                         ? ERROR_MESSAGES.REQUIRED
@@ -277,13 +306,14 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Last Name${store.isCoBuyerFieldsFilled ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
+                    name={`Last Name${shouldShowNameRequired ? " (required)" : ""}`}
+                    className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_Last_Name && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
                             changeContactExtData("CoBuyer_Last_Name", value);
                             validateField("CoBuyer_Last_Name");
+                            setFieldTouched("CoBuyer_Last_Name", true, true);
                         });
                     }}
                     onBlur={handleOfacCheck}
@@ -292,7 +322,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     clearButton
                 />
                 <small className='p-error'>
-                    {store.isCoBuyerFieldsFilled &&
+                    {shouldShowNameRequired &&
+                    touched.CoBuyer_Last_Name &&
                     (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim())
                         ? ERROR_MESSAGES.REQUIRED
                         : ""}
@@ -301,20 +332,21 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Business Name${store.isCoBuyerFieldsFilled && !shouldDisableBusinessName ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && !shouldDisableBusinessName && (!contactExtData.CoBuyer_Emp_Company || !contactExtData.CoBuyer_Emp_Company.trim()) ? "p-invalid" : ""}`}
+                    name={`Business Name${shouldShowBusinessRequired ? " (required)" : ""}`}
+                    className={`general-info__text-input w-full ${shouldShowBusinessRequired && touched.CoBuyer_Emp_Company && (!contactExtData.CoBuyer_Emp_Company || !contactExtData.CoBuyer_Emp_Company.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Emp_Company || ""}
                     onChange={({ target: { value } }) => {
                         changeContactExtData("CoBuyer_Emp_Company", value);
                         setFieldValue("CoBuyer_Emp_Company", value);
+                        setFieldTouched("CoBuyer_Emp_Company", true, true);
                     }}
                     tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
                     disabled={shouldDisableBusinessName}
                     clearButton
                 />
                 <small className='p-error'>
-                    {store.isCoBuyerFieldsFilled &&
-                    !shouldDisableBusinessName &&
+                    {shouldShowBusinessRequired &&
+                    touched.CoBuyer_Emp_Company &&
                     (!contactExtData.CoBuyer_Emp_Company ||
                         !contactExtData.CoBuyer_Emp_Company.trim())
                         ? ERROR_MESSAGES.REQUIRED
