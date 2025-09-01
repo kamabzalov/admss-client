@@ -121,6 +121,16 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         setIsPreviewOpen(false);
     };
 
+    const handleFontNameChange = (blockIndex: number, fontName: string) => {
+        const newTextBlocks = [...postProcessing];
+        newTextBlocks[blockIndex] = {
+            ...newTextBlocks[blockIndex],
+            fontName: fontName,
+            fontSize: fonts.find((font) => font.name === fontName)?.default_size || 0,
+        };
+        handlePostProcessingChange(newTextBlocks);
+    };
+
     const renderTextBlocks = () => {
         const header = (blockIndex: number) => (
             <div className='flex align-items-center justify-content-between w-full'>
@@ -178,9 +188,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                                 options={fonts.map((font) => font.name)}
                                 value={block.fontName || ""}
                                 onChange={(e) => {
-                                    const newTextBlocks = [...postProcessing];
-                                    newTextBlocks[index] = { ...block, fontName: e.target.value };
-                                    handlePostProcessingChange(newTextBlocks);
+                                    handleFontNameChange(index, e.target.value);
                                 }}
                             />
                             <label className='float-label'>Font name</label>
