@@ -104,23 +104,37 @@ export const InventoryOptionRow = observer(
                                 icon='pi pi-arrow-circle-up'
                                 rounded
                                 text
-                                severity={isFirst ? "secondary" : "success"}
+                                severity={
+                                    isFirst || item.itemuid === editedItem?.itemuid
+                                        ? "secondary"
+                                        : "success"
+                                }
                                 tooltip='To the top'
                                 className='p-button-text option-control__button'
                                 onClick={() => handleSetOrder(item, index - 1)}
-                                disabled={isFirst || item.itemuid === NEW_ITEM}
+                                disabled={
+                                    isFirst ||
+                                    item.itemuid === NEW_ITEM ||
+                                    item.itemuid === editedItem?.itemuid
+                                }
                             />
                             <Button
                                 icon='pi pi-arrow-circle-down'
                                 rounded
                                 text
                                 severity={
-                                    item.itemuid === NEW_ITEM || index === totalOffset - 1
+                                    item.itemuid === NEW_ITEM ||
+                                    index === totalOffset - 1 ||
+                                    item.itemuid === editedItem?.itemuid
                                         ? "secondary"
                                         : "success"
                                 }
                                 tooltip='To the bottom'
-                                disabled={item.itemuid === NEW_ITEM || index === totalOffset - 1}
+                                disabled={
+                                    item.itemuid === NEW_ITEM ||
+                                    index === totalOffset - 1 ||
+                                    item.itemuid === editedItem?.itemuid
+                                }
                                 onClick={() => handleSetOrder(item, index + 1)}
                                 className='p-button-text option-control__button'
                             />

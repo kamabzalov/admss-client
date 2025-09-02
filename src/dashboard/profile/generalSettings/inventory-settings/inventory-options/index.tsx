@@ -118,6 +118,10 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         option: Partial<GeneralInventoryOptions>,
         newOrder?: number
     ) => {
+        if (option.itemuid === editedItem?.itemuid) {
+            return;
+        }
+
         const currentIndex = inventoryOptions.findIndex((item) => item.itemuid === option.itemuid);
         const updatedOptions = inventoryOptions.map((item, index) => {
             if (item.itemuid === option.itemuid) {
