@@ -19,7 +19,9 @@ import {
     UploadMediaItem,
     MediaItem,
 } from "common/models/inventory";
+import { UserGroup } from "common/models/user";
 import { getAccountPayment } from "http/services/accounts.service";
+import { getUserGroupList } from "http/services/auth-user.service";
 import {
     getInventoryInfo,
     setInventory,
@@ -71,6 +73,7 @@ export class InventoryStore {
     private _inventoryPayments: AccountPayment = {} as AccountPayment;
     private _inventoryAudit: Audit = initialAuditState as Audit;
     private _inventoryGroupID: string = "";
+    private _inventoryGroupClassList: UserGroup[] = [];
 
     private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
@@ -127,7 +130,9 @@ export class InventoryStore {
     public get inventoryGroupID() {
         return this._inventoryGroupID;
     }
-
+    public get inventoryGroupClassList() {
+        return this._inventoryGroupClassList;
+    }
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
@@ -263,6 +268,21 @@ export class InventoryStore {
         } finally {
             this._isLoading = false;
             this._isFormChanged = false;
+        }
+    };
+
+    public getInventoryGroupClassList = async (): Promise<BaseResponseError | undefined> => {
+        if (this._inventoryGroupClassList.length > 0) {
+            return;
+        }
+
+        try {
+            const response = await getUserGroupList(this.rootStore.userStore.authUser!.useruid);
+            if (response && Array.isArray(response)) {
+                this._inventoryGroupClassList = response;
+            }
+        } catch (error) {
+            return { status: Status.ERROR, error: error as string };
         }
     };
 

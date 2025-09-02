@@ -26,23 +26,14 @@ import {
     SEARCH_FORM_TYPE,
     SearchField,
 } from "dashboard/common/dialog/search";
-import {
-    getUserGroupList,
-    getUserSettings,
-    setUserSettings,
-} from "http/services/auth-user.service";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import {
     FilterOptions,
     TableColumnsList,
     columns,
     filterOptions,
 } from "dashboard/inventory/common/data-table";
-import {
-    InventoryUserSettings,
-    ServerUserSettings,
-    TableState,
-    UserGroup,
-} from "common/models/user";
+import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
 import { ReportsColumn } from "common/models/reports";
@@ -95,12 +86,11 @@ export default function Inventories({
     const [currentLocation, setCurrentLocation] = useState<InventoryLocations>(
         {} as InventoryLocations
     );
-    const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
     const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
     const dataTableRef = useRef<DataTable<Inventory[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
-    const { clearInventory } = store;
+    const { clearInventory, inventoryGroupClassList, getInventoryGroupClassList } = store;
     const toast = useToast();
 
     const navigate = useNavigate();
@@ -108,17 +98,13 @@ export default function Inventories({
     const getInventoryInfo = async () => {
         if (!authUser) return;
 
-        const [locationsResponse, userGroupsResponse] = await Promise.all([
-            getInventoryLocations(authUser.useruid),
-            getUserGroupList(authUser.useruid),
-        ]);
-
+        const locationsResponse = await getInventoryLocations(authUser.useruid);
         if (locationsResponse && Array.isArray(locationsResponse)) {
             setLocations(locationsResponse);
         }
-        if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
-            const activeUserGroups = userGroupsResponse.filter((group) => Boolean(group.itemuid));
-            setInventoryType(activeUserGroups);
+        await getInventoryGroupClassList();
+        if (inventoryGroupClassList.length > 0) {
+            setSelectedInventoryType(inventoryGroupClassList.map((group) => group.description));
         }
     };
 
@@ -472,14 +458,14 @@ export default function Inventories({
             <div className='dropdown-header flex pb-1'>
                 <label className='cursor-pointer dropdown-header__label'>
                     <Checkbox
-                        checked={selectedInventoryType.length === inventoryType.length}
+                        checked={selectedInventoryType.length === inventoryGroupClassList.length}
                         onChange={() => {
-                            if (inventoryType.length !== selectedInventoryType.length) {
+                            if (inventoryGroupClassList.length !== selectedInventoryType.length) {
                                 setSelectedInventoryType(
-                                    inventoryType.map(({ description }) => description)
+                                    inventoryGroupClassList.map(({ description }) => description)
                                 );
                                 changeSettings({
-                                    selectedInventoryType: inventoryType.map(
+                                    selectedInventoryType: inventoryGroupClassList.map(
                                         ({ description }) => description
                                     ),
                                 });
@@ -729,7 +715,7 @@ export default function Inventories({
                 <MultiSelect
                     optionValue='description'
                     optionLabel='description'
-                    options={inventoryType}
+                    options={inventoryGroupClassList}
                     value={selectedInventoryType}
                     onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                         stopPropagation();
