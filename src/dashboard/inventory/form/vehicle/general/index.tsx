@@ -20,14 +20,13 @@ import { Audit, Inventory, InventoryLocations, MakesListData } from "common/mode
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { getUserGroupList } from "http/services/auth-user.service";
-import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
+import { UserGroup } from "common/models/user";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
@@ -41,8 +40,14 @@ export const VehicleGeneral = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const toast = useToast();
     const { authUser } = userStore;
-    const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
-        store;
+    const {
+        inventory,
+        currentLocation,
+        changeInventory,
+        inventoryAudit,
+        changeInventoryAudit,
+        inventoryGroupClassList,
+    } = store;
     const { values, errors, setFieldValue, getFieldProps, validateField, setFieldTouched } =
         useFormikContext<Inventory>();
 
@@ -51,12 +56,11 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
-    const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
-    const [initialGroupClassName, setInitialGroupClassName] = useState<string>("");
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
+    const [activeGroupClassList, setActiveGroupClassList] = useState<UserGroup[]>([]);
 
     const handleGetAutoMakeModelList = async () => {
         const response = await getInventoryAutomakesList();
@@ -92,45 +96,40 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const handleGetUserGroupsList = async () => {
-        if (!authUser || groupClassList.length > 0) return;
+        const activeUserGroups = inventoryGroupClassList.filter(
+            (group) =>
+                (group.enabled === 1 && Boolean(group.itemuid)) ||
+                (inventory.GroupClassName && group.description === inventory.GroupClassName)
+        );
 
-        const userGroupsResponse = await getUserGroupList(authUser.useruid);
-        if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
-            if (!initialGroupClassName && inventory.GroupClassName) {
-                setInitialGroupClassName(inventory.GroupClassName);
-            }
-
-            const activeUserGroups = userGroupsResponse.filter(
-                (group) =>
-                    (group.enabled === 1 && Boolean(group.itemuid)) ||
-                    (inventory.GroupClassName && group.description === inventory.GroupClassName) ||
-                    (initialGroupClassName && group.description === initialGroupClassName)
-            );
-
-            setGroupClassList(activeUserGroups);
-
-            if (
-                inventory.GroupClassName &&
-                userGroupsResponse.some((group) => group.description === inventory.GroupClassName)
-            ) {
-                handleGetInventoryGroupFullInfo(inventory.GroupClassName);
-            }
-        }
+        setActiveGroupClassList(activeUserGroups);
     };
 
     useEffect(() => {
         handleGetAutoMakeModelList();
         handleGetColorsList();
         handleGetLocationsList();
+        store.getInventoryGroupClassList();
     }, []);
 
     useEffect(() => {
-        inventory.GroupClassName && handleGetUserGroupsList();
+        if (inventory.GroupClassName) {
+            handleGetUserGroupsList();
+            handleGetInventoryGroupFullInfo(inventory.GroupClassName);
+        }
     }, [inventory.GroupClassName]);
+
+    useEffect(() => {
+        if (inventoryGroupClassList.length > 0) {
+            handleGetUserGroupsList();
+        }
+    }, [inventoryGroupClassList]);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
         if (groupName) {
-            const activeGroup = groupClassList.find((group) => group.description === groupName);
+            const activeGroup = inventoryGroupClassList.find(
+                (group) => group.description === groupName
+            );
 
             if (activeGroup) {
                 store.inventoryGroupID = activeGroup.itemuid;
@@ -384,7 +383,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <ComboBox
                     optionLabel='description'
                     optionValue='description'
-                    options={groupClassList}
+                    options={activeGroupClassList}
                     value={values?.GroupClassName}
                     required
                     onChange={({ value }) => {
