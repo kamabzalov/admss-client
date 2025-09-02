@@ -28,7 +28,7 @@ import {
     setContactMediaItemData,
 } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
-import { action, makeAutoObservable, runInAction } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 import { filterPostPayload } from "common/utils";
 
@@ -151,14 +151,6 @@ export class ContactStore {
     }
 
     public get separateContact() {
-        const fieldsChanged = this.coBuyerGeneralFieldsChanged;
-        const hasUseruid = !!this._coBayerContact.useruid;
-
-        if (fieldsChanged && !hasUseruid) {
-            runInAction(() => {
-                this._separateContact = false;
-            });
-        }
         return this._separateContact;
     }
 
@@ -887,9 +879,6 @@ export class ContactStore {
 
     public set separateContact(state: boolean) {
         this._separateContact = state;
-        if (state) {
-            this.updateInitialCoBuyerFields();
-        }
     }
 
     private updateInitialCoBuyerFields() {
@@ -929,6 +918,7 @@ export class ContactStore {
         this._contactExtData = {} as ContactExtData;
         this._contactOFAC = {} as ContactOFAC;
         this._coBuyerContactOFAC = {} as ContactOFAC;
+        this._separateContact = false;
         this._deleteReason = "";
     };
 }
