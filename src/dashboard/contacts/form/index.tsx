@@ -640,8 +640,12 @@ export const ContactForm = observer((): ReactElement => {
                                                     businessName: contact?.businessName || "",
                                                     email1: contact?.email1 || "",
                                                     email2: contact?.email2 || "",
-                                                    phone1: contact?.phone1 || "",
-                                                    phone2: contact?.phone2 || "",
+                                                    phone1:
+                                                        contact?.phone1?.replace(/[^0-9]/g, "") ||
+                                                        "",
+                                                    phone2:
+                                                        contact?.phone2?.replace(/[^0-9]/g, "") ||
+                                                        "",
                                                     Buyer_Emp_Ext:
                                                         contactExtData.Buyer_Emp_Ext || "",
                                                     Buyer_Emp_Phone:
