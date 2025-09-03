@@ -84,20 +84,23 @@ export const DealWashout = observer((): ReactElement | null => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (cardRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } = cardRef.current;
+            const tabPanels = document.querySelector(
+                ".deal-washout .p-tabview-panels"
+            ) as HTMLElement;
+            if (tabPanels) {
+                const { scrollTop, scrollHeight, clientHeight } = tabPanels;
                 const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
                 setShowOverlay(!isAtBottom);
             }
         };
 
-        const cardElement = cardRef.current;
-        if (cardElement) {
-            cardElement.addEventListener("scroll", handleScroll);
+        const tabPanels = document.querySelector(".deal-washout .p-tabview-panels") as HTMLElement;
+        if (tabPanels) {
+            tabPanels.addEventListener("scroll", handleScroll);
             handleScroll();
 
             return () => {
-                cardElement.removeEventListener("scroll", handleScroll);
+                tabPanels.removeEventListener("scroll", handleScroll);
             };
         }
     }, []);
@@ -137,7 +140,7 @@ export const DealWashout = observer((): ReactElement | null => {
                 onClick={() => navigate(DEALS_PAGE.EDIT(id))}
             />
             <div className='col-12'>
-                <div className='card'>
+                <div className='card deal-washout__card'>
                     <div className='card-header flex'>
                         <h2 className='card-header__title uppercase m-0'>Deal Washout</h2>
                         {id && (
@@ -163,7 +166,7 @@ export const DealWashout = observer((): ReactElement | null => {
                             </div>
                         )}
                     </div>
-                    <div className='card-content deal-washout__card grid' ref={cardRef}>
+                    <div className='card-content grid' ref={cardRef}>
                         <TabView
                             className='deal-washout__tabs'
                             activeIndex={activeIndex}
@@ -184,7 +187,7 @@ export const DealWashout = observer((): ReactElement | null => {
                         </TabView>
                     </div>
                     <div
-                        className={`deal-washout__footer washout-footer form-nav ${showOverlay ? "show-overlay" : "pt-3"}`}
+                        className={`deal-washout__footer washout-footer form-nav ${showOverlay ? "show-overlay" : ""}`}
                     >
                         <div className='washout-footer__controls'>
                             <ControlButton
