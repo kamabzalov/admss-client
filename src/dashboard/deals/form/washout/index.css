@@ -1,11 +1,28 @@
 .deal-washout {
     --input-regular: 40px;
     --input-small: 30px;
+    --washout-content-height: 66vh;
+    @media (max-height: 1100px) {
+        --washout-content-height: 60vh;
+    }
+
+    @media (max-height: 900px) {
+        --washout-content-height: 52vh;
+    }
     --washout-min-height: 800px;
-    --washout-height: 72vh;
+    --washout-content-max-height: 1000px;
+    --washout-max-height: 84vh;
+    --washout-height: 1210px;
+
+    .deal-washout__tabs {
+        width: 100%;
+    }
 
     .p-tabview-panels {
         padding-bottom: 0px;
+        height: var(--washout-content-height);
+        max-height: var(--washout-content-max-height);
+        overflow: scroll;
     }
 
     .info-section__title {
@@ -33,15 +50,15 @@
         margin: 0;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
         position: relative;
 
-        &::after {
+        &::before {
             content: "";
             position: absolute;
             top: -80px;
-            left: 0;
-            right: 0;
+            left: -40px;
+            right: -40px;
             height: 80px;
             background: linear-gradient(
                 to bottom,
@@ -53,14 +70,16 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
-        &.show-overlay::after {
+        &.show-overlay::before {
             opacity: 1;
         }
 
         .washout-footer__controls {
             display: flex;
+            align-items: flex-end;
             gap: 25px;
 
             .p-button {
@@ -83,9 +102,11 @@
 .deal-washout__card {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
     border-radius: 8px;
-    max-height: var(--washout-height);
-    overflow-y: auto;
+    height: var(--washout-height);
+    max-height: var(--washout-max-height);
     position: relative;
     transition: box-shadow 0.3s ease;
 }
@@ -280,7 +301,7 @@
 
 .deal-washout__footer {
     display: flex;
-    justify-content: flex-end;
+    flex-grow: 1;
     gap: 25px;
-    margin-top: 10px;
+    margin-top: auto;
 }

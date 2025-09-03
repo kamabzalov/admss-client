@@ -417,13 +417,23 @@
         gap: 10px;
         padding-bottom: 24px;
 
+        .deal-profit__summary {
+            padding-left: 20px;
+            .deal-profit__label {
+                white-space: nowrap;
+            }
+            .deal-profit__value {
+                flex: 0 0 23%;
+            }
+        }
+
         .deal-profit__label {
             padding-left: 5px;
             flex: 0 0 44%;
         }
 
         .deal-profit__value {
-            flex: 0 0 36%;
+            flex: 0 0 34%;
             text-align: right;
             display: inline-flex;
             justify-content: flex-end;
