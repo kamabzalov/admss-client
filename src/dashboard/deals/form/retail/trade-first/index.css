@@ -1,0 +1,9 @@
+.deal-retail-trade {
+    position: relative;
+    .trade-overwrite {
+        position: absolute;
+        padding-right: 10px;
+        top: -56px;
+        right: 0;
+    }
+}
