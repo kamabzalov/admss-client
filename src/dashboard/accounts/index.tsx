@@ -217,7 +217,12 @@ export const AccountsDataTable = observer(
             setDialogVisible(false);
         };
 
-        const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+        const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
+            const selectedText = window.getSelection()?.toString();
+
+            if (!!selectedText?.length) {
+                return;
+            }
             if (getFullInfo) {
                 getFullInfo(data as AccountInfo);
             }
