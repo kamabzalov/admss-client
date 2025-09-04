@@ -23,6 +23,7 @@ import {
     AdvancedSearchDialog,
     SEARCH_FORM_TYPE,
     SearchField,
+    SEARCH_FIELD_TYPE,
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
@@ -77,14 +78,14 @@ export const AccountsDataTable = observer(
                 key: SEARCH_FORM_FIELDS.ACCOUNT,
                 label: SEARCH_FORM_FIELDS.ACCOUNT,
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.ACCOUNT],
-                type: "text",
+                type: SEARCH_FIELD_TYPE.TEXT,
             },
 
             {
                 key: SEARCH_FORM_FIELDS.DATE,
                 label: SEARCH_FORM_FIELDS.DATE,
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
-                type: "date",
+                type: SEARCH_FIELD_TYPE.DATE_RANGE,
             },
         ];
 
@@ -193,6 +194,10 @@ export const AccountsDataTable = observer(
 
                         case SEARCH_FORM_FIELDS.DATE:
                             keyName = SEARCH_FORM_QUERY.DATE;
+                            if (typeof value === "string" && value.includes("-")) {
+                                const [startDate, endDate] = value.split("-");
+                                return `${startDate}.${endDate}.${keyName}`;
+                            }
                             value = new Date(value).getTime();
                             break;
                     }
