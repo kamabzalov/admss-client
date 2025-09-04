@@ -19,14 +19,22 @@ import {
 } from "common/models/inventory";
 import { BaseResponse } from "common/models/base-response";
 
-export const getContacts = async (uid: string, queryParams?: QueryParams) => {
+export const getContacts = async (
+    uid: string,
+    queryParams?: QueryParams
+): Promise<ContactUser[] | BaseResponseError | undefined> => {
     try {
         const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`, {
             params: queryParams,
         });
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting contacts list",
+            };
+        }
     }
 };
 

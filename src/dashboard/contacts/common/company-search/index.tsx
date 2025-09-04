@@ -63,7 +63,7 @@ export const CompanySearch = ({
         };
         user &&
             getContacts(user.useruid, params).then((response) => {
-                if (response?.length) {
+                if (Array.isArray(response) && response?.length) {
                     const optionsWithName = response.map((contact) => ({
                         ...contact,
                         name:
