@@ -745,7 +745,13 @@ export default function Inventories({
         </div>
     );
 
-    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent): any => {
+        const selectedText = window.getSelection()?.toString();
+
+        if (!!selectedText?.length) {
+            return;
+        }
+
         if (getFullInfo) {
             getFullInfo(data as Inventory);
         }
