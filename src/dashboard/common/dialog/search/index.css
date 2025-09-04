@@ -12,3 +12,13 @@
     font-size: 14px;
     line-height: 1.5;
 }
+
+.dialog-dates {
+    display: flex;
+    gap: 10px;
+    .dialog-dates__input {
+        .p-calendar {
+            flex: 0 0 48%;
+        }
+    }
+}

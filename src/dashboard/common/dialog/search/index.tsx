@@ -14,6 +14,8 @@ import { ListData } from "common/models";
 import { MakesListData } from "common/models/inventory";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useDateRange } from "common/hooks";
+import { validateDates } from "common/helpers";
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
@@ -34,6 +36,7 @@ export enum SEARCH_FIELD_TYPE {
     NUMBER = "number",
     DROPDOWN = "dropdown",
     DATE = "date",
+    DATE_RANGE = "date_range",
     TEXTAREA = "textarea",
 }
 
@@ -65,6 +68,8 @@ export const AdvancedSearchDialog = <T,>({
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const [selectedType, setSelectedType] = useState<string>("");
+    const { startDate, endDate, handleDateChange } = useDateRange();
+    const [dateError, setDateError] = useState<string>("");
 
     const autoMake = fields.find((field) => field.key === "Make")?.value;
 
@@ -108,6 +113,15 @@ export const AdvancedSearchDialog = <T,>({
         }
     }, [handleSelectMake, autoMake]);
 
+    useEffect(() => {
+        if (startDate && endDate) {
+            const validation = validateDates(Number(startDate), Number(endDate));
+            setDateError(validation.isValid ? "" : validation.error || "");
+        } else {
+            setDateError("");
+        }
+    }, [startDate, endDate]);
+
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
             return (
@@ -143,7 +157,7 @@ export const AdvancedSearchDialog = <T,>({
             footer='Search'
             header='Advanced search'
             visible={visible}
-            buttonDisabled={buttonDisabled}
+            buttonDisabled={buttonDisabled || !!dateError}
             action={action}
             onHide={onHide}
             draggable
@@ -165,6 +179,44 @@ export const AdvancedSearchDialog = <T,>({
                                     onInputChange(key, target.value as string);
                                 }}
                             />
+                        );
+                    }
+
+                    if (type === SEARCH_FIELD_TYPE.DATE_RANGE) {
+                        return (
+                            <div key={key} className='dialog-dates'>
+                                <DateInput
+                                    className={`${dateError ? "p-invalid" : ""} dialog-dates__input dialog-dates__input--start`}
+                                    date={Number(startDate)}
+                                    emptyDate
+                                    onClearAction={() => {
+                                        handleDateChange(0, true);
+                                        onInputChange(key, "");
+                                    }}
+                                    name={`Start ${label || key}`}
+                                    onChange={({ target }) => {
+                                        const dateValue = Number(target.value);
+                                        handleDateChange(dateValue, true);
+                                        onInputChange(key, `${dateValue}-${endDate}`);
+                                    }}
+                                />
+                                <DateInput
+                                    className={`${dateError ? "p-invalid" : ""} dialog-dates__input dialog-dates__input--end`}
+                                    date={Number(endDate)}
+                                    emptyDate
+                                    onClearAction={() => {
+                                        handleDateChange(0, false);
+                                        onInputChange(key, "");
+                                    }}
+                                    name={`End ${label || key}`}
+                                    minDate={startDate ? new Date(Number(startDate)) : undefined}
+                                    onChange={({ target }) => {
+                                        const dateValue = Number(target.value);
+                                        handleDateChange(dateValue, false);
+                                        onInputChange(key, `${startDate}-${dateValue}`);
+                                    }}
+                                />
+                            </div>
                         );
                     }
 

@@ -24,6 +24,7 @@ import {
     AdvancedSearchDialog,
     SEARCH_FORM_TYPE,
     SearchField,
+    SEARCH_FIELD_TYPE,
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
@@ -149,25 +150,25 @@ export const DealsDataTable = observer(
                 key: SEARCH_FORM_FIELDS.CUSTOMER,
                 label: "Customer",
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.CUSTOMER],
-                type: "text",
+                type: SEARCH_FIELD_TYPE.TEXT,
             },
             {
                 key: SEARCH_FORM_FIELDS.VIN,
                 label: "VIN",
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.VIN],
-                type: "text",
+                type: SEARCH_FIELD_TYPE.TEXT,
             },
             {
                 key: SEARCH_FORM_FIELDS.STOCK_NO,
                 label: "Stock#",
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.STOCK_NO],
-                type: "text",
+                type: SEARCH_FIELD_TYPE.TEXT,
             },
             {
                 key: SEARCH_FORM_FIELDS.DATE,
                 label: "Date",
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
-                type: "date",
+                type: SEARCH_FIELD_TYPE.DATE_RANGE,
             },
         ];
 
@@ -302,6 +303,10 @@ export const DealsDataTable = observer(
                             break;
                         case SEARCH_FORM_FIELDS.DATE:
                             keyName = SEARCH_FORM_QUERY.DATE;
+                            if (typeof value === "string" && value.includes("-")) {
+                                const [startDate, endDate] = value.split("-");
+                                return `${startDate}.${endDate}.${keyName}`;
+                            }
                             value = new Date(value).getTime();
                             break;
                     }
