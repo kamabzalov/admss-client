@@ -43,6 +43,7 @@ interface AdvancedSearch {
     username: string;
     type: number;
     phone1: string;
+    phone2: string;
 }
 
 interface ContactsDataTableProps {
@@ -87,6 +88,7 @@ export const ContactsDataTable = ({
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const printTableData = async (print: boolean = false) => {
+        if (!authUser) return;
         setIsLoading(true);
         const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
             name: column.header as string,
@@ -97,41 +99,39 @@ export const ContactsDataTable = ({
             date.getMonth() + 1
         }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
-        if (authUser) {
-            const data = contacts.map((item) => {
-                const filteredItem: Record<string, any> = {};
-                columns.forEach((column) => {
-                    if (item.hasOwnProperty(column.data)) {
-                        filteredItem[column.data] = item[column.data as keyof typeof item];
-                    }
-                });
-                return filteredItem;
-            });
-            const JSONreport = {
-                name,
-                itemUID: "0",
-                data,
-                columns,
-                format: "",
-            };
-            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!print) {
-                    link.download = `Report-${name}.pdf`;
-                    link.click();
+        const data = contacts.map((item) => {
+            const filteredItem: Record<string, any> = {};
+            columns.forEach((column) => {
+                if (item.hasOwnProperty(column.data)) {
+                    filteredItem[column.data] = item[column.data as keyof typeof item];
                 }
+            });
+            return filteredItem;
+        });
+        const JSONreport = {
+            name,
+            itemUID: "0",
+            data,
+            columns,
+            format: "",
+        };
+        await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+            const url = new Blob([response], { type: "application/pdf" });
+            let link = document.createElement("a");
+            link.href = window.URL.createObjectURL(url);
+            if (!print) {
+                link.download = `Report-${name}.pdf`;
+                link.click();
+            }
 
-                if (print) {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
-                }
-            });
-        }
+            if (print) {
+                window.open(
+                    link.href,
+                    "_blank",
+                    "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                );
+            }
+        });
         setIsLoading(false);
     };
 
@@ -151,20 +151,19 @@ export const ContactsDataTable = ({
             const updatedParams = { ...params, qry: queryString };
 
             if (total) {
-                getContactsAmount(authUser.useruid, { ...updatedParams, total: 1 }).then(
-                    (response) => {
-                        setTotalRecords(response?.total ?? 0);
-                    }
-                );
+                const response = await getContactsAmount(authUser.useruid, {
+                    ...updatedParams,
+                    total: 1,
+                });
+                setTotalRecords(response?.total ?? 0);
             }
-            getContacts(authUser.useruid, updatedParams).then((response) => {
-                if (Array.isArray(response) && response.length) {
-                    setUserContacts(response);
-                } else {
-                    setUserContacts([]);
-                }
-                setIsLoading(false);
-            });
+            const response = await getContacts(authUser.useruid, updatedParams);
+            if (Array.isArray(response) && response.length) {
+                setUserContacts(response);
+            } else {
+                setUserContacts([]);
+            }
+            setIsLoading(false);
         }
     };
 
@@ -184,6 +183,7 @@ export const ContactsDataTable = ({
     }, [contactCategory]);
 
     useEffect(() => {
+        if (!authUser) return;
         const params: QueryParams = {
             ...(selectedCategory?.id && { param: selectedCategory.id }),
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
@@ -193,57 +193,51 @@ export const ContactsDataTable = ({
             skip: lazyState.first,
             top: lazyState.rows,
         };
-        if (authUser) {
-            if (!selectedCategory && contactCategory) {
-                return;
-            }
-            setIsLoading(true);
-
-            handleGetContactsList(params, true);
+        if (!selectedCategory && contactCategory) {
+            return;
         }
+        setIsLoading(true);
+
+        handleGetContactsList(params, true);
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
     useEffect(() => {
-        if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
-                        }
+        if (!authUser) return;
+        getUserSettings(authUser.useruid).then((response) => {
+            if (response?.profile.length) {
+                let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                if (response.profile) {
+                    try {
+                        allSettings = JSON.parse(response.profile);
+                    } catch (error) {
+                        allSettings = {} as ServerUserSettings;
                     }
-                    setServerSettings(allSettings);
-                    const { contacts: settings } = allSettings;
-                    settings?.activeColumns &&
-                        setActiveColumns(settings.activeColumns as TableColumnProps[]);
-                    settings?.table &&
-                        setLazyState({
-                            first: settings.table.first || initialDataTableQueries.first,
-                            rows: settings.table.rows || initialDataTableQueries.rows,
-                            page: settings.table.page || initialDataTableQueries.page,
-                            column: settings.table.column || initialDataTableQueries.column,
-                            sortField:
-                                settings.table.sortField || initialDataTableQueries.sortField,
-                            sortOrder:
-                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                        });
                 }
-            });
-        }
+                setServerSettings(allSettings);
+                const { contacts: settings } = allSettings;
+                settings?.activeColumns &&
+                    setActiveColumns(settings.activeColumns as TableColumnProps[]);
+                settings?.table &&
+                    setLazyState({
+                        first: settings.table.first || initialDataTableQueries.first,
+                        rows: settings.table.rows || initialDataTableQueries.rows,
+                        page: settings.table.page || initialDataTableQueries.page,
+                        column: settings.table.column || initialDataTableQueries.column,
+                        sortField: settings.table.sortField || initialDataTableQueries.sortField,
+                        sortOrder: settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                    });
+            }
+        });
     }, [authUser]);
 
     const changeSettings = (settings: Partial<ContactsUserSettings>) => {
-        if (authUser) {
-            const newSettings = {
-                ...serverSettings,
-                contacts: { ...serverSettings?.contacts, ...settings },
-            } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
-        }
+        if (!authUser) return;
+        const newSettings = {
+            ...serverSettings,
+            contacts: { ...serverSettings?.contacts, ...settings },
+        } as ServerUserSettings;
+        setServerSettings(newSettings);
+        setUserSettings(authUser.useruid, newSettings);
     };
 
     const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
@@ -288,7 +282,7 @@ export const ContactsDataTable = ({
     const handleAdvancedSearch = () => {
         const searchQuery = Object.entries(advancedSearch)
             .filter(([_, value]) => value)
-            .map(([key, value]) => `${value}.${key.replace(/\d+/g, "")}`)
+            .map(([key, value]) => `${value}.${key}`)
             .join("+");
 
         handleGetContactsList({ qry: searchQuery }, true);
@@ -337,8 +331,14 @@ export const ContactsDataTable = ({
         },
         {
             key: "phone1",
-            label: "Phone number",
+            label: "Work phone",
             value: advancedSearch.phone1,
+            type: SEARCH_FIELD_TYPE.NUMBER,
+        },
+        {
+            key: "phone2",
+            label: "Home phone",
+            value: advancedSearch.phone2,
             type: SEARCH_FIELD_TYPE.NUMBER,
         },
     ];
