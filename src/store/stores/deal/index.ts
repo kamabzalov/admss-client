@@ -70,6 +70,9 @@ export class DealStore {
     private _deleteInventoryOption: boolean = false;
     private _setInventoryAvailableOption: boolean = false;
 
+    private _dealFirstTradeOverwrite: boolean = false;
+    private _dealSecondTradeOverwrite: boolean = false;
+
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
@@ -167,6 +170,14 @@ export class DealStore {
 
     public get setInventoryAvailableOption() {
         return this._setInventoryAvailableOption;
+    }
+
+    public get dealFirstTradeOverwrite() {
+        return this._dealFirstTradeOverwrite;
+    }
+
+    public get dealSecondTradeOverwrite() {
+        return this._dealSecondTradeOverwrite;
     }
 
     public get hasDeleteOptionsSelected() {
@@ -504,6 +515,14 @@ export class DealStore {
 
     public set isFormChanged(value: boolean) {
         this._isFormChanged = value;
+    }
+
+    public set dealFirstTradeOverwrite(value: boolean) {
+        this._dealFirstTradeOverwrite = value;
+    }
+
+    public set dealSecondTradeOverwrite(value: boolean) {
+        this._dealSecondTradeOverwrite = value;
     }
 
     public clearDeal = () => {
