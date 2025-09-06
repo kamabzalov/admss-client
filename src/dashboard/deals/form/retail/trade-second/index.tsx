@@ -47,6 +47,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
             Trade2_Lien_Phone,
         },
         deal: { addToInventory },
+        dealSecondTradeOverwrite,
         changeDealExtData,
         changeAddToInventory,
     } = store;
@@ -57,7 +58,6 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [bodyTypeList, setBodyTypeList] = useState<ListData[]>([]);
-    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const uniqueId = useId();
 
     useEffect(() => {
@@ -138,7 +138,7 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
 
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo) {
-            if (allowOverwrite) {
+            if (dealSecondTradeOverwrite) {
                 handleChangeFormValue({
                     key: "Trade2_Make",
                     value: vinInfo.Make || values.Trade2_Make,
@@ -195,10 +195,10 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
     const tooltipTemplate = (
         <div className='trade-overwrite pb-3'>
             <Checkbox
-                checked={allowOverwrite}
+                checked={dealSecondTradeOverwrite}
                 id='trade-overwrite'
                 className='trade-overwrite__checkbox'
-                onChange={() => setAllowOverwrite(!allowOverwrite)}
+                onChange={() => (store.dealSecondTradeOverwrite = !dealSecondTradeOverwrite)}
             />
             <label className='pl-3 trade-overwrite__label' htmlFor='trade-overwrite'>
                 Overwrite data
