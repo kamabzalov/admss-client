@@ -788,6 +788,9 @@
         .totals-summary {
             color: var(--totals-text-color);
             font-weight: 700;
+            .totals-summary__title {
+                white-space: nowrap;
+            }
             .totals-summary__value {
                 margin-left: var(--padding-left);
             }

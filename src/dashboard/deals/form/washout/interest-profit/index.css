@@ -1,4 +1,10 @@
 .interest-profit {
+    --account-wash-color: var(--admss-app-light-lavender);
+    --account-wash-accent-color: var(--admss-app-lavender);
+
+    --interest-color: var(--admss-app-light-green);
+    --interest-accent-color: var(--admss-app-deep-green);
+
     display: flex;
     gap: 30px;
 
@@ -13,7 +19,6 @@
     .profit-card {
         font-size: 16px;
         font-weight: 600;
-        box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
     }
 
     .profit-card__header {
@@ -25,7 +30,6 @@
         overflow: hidden;
         justify-content: space-between;
         align-items: center;
-        color: var(--admss-app-warning-blue);
     }
 
     .account-wash__body,
@@ -72,6 +76,14 @@
     }
 
     .account-wash {
+        &.profit-card {
+            box-shadow: 0 0 3px 0 var(--account-wash-accent-color);
+
+            .profit-card__header {
+                background-color: var(--account-wash-color);
+                color: var(--account-wash-accent-color);
+            }
+        }
         .deal-profit__label {
             white-space: nowrap;
             width: 292px;
@@ -79,6 +91,16 @@
 
         .deal-profit__value {
             margin-left: 70px;
+        }
+    }
+    .interest-income {
+        &.profit-card {
+            box-shadow: 0 0 3px 0 var(--interest-accent-color);
+
+            .profit-card__header {
+                background-color: var(--interest-color);
+                color: var(--interest-accent-color);
+            }
         }
     }
 }
