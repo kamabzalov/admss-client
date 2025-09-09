@@ -232,7 +232,7 @@ export const DealTotalsProfit = observer(() => {
 
                     <div className='totals-row totals-summary'>
                         <span className='totals-summary__title'>(=) Net F&I Profit:</span>
-                        <span className='totals-summary__value pl-3'>
+                        <span className='totals-summary__value'>
                             {getCurrencyValue(dealWashout.TotalDealCost, true)}
                         </span>
                         <div className='deal-profit__includes' />
