@@ -10,7 +10,7 @@ import {
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import { ReactElement, useState, useRef, useMemo } from "react";
+import { ReactElement, useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { useStore } from "store/hooks";
@@ -32,6 +32,7 @@ export const ActionButtons = ({
 }: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
     const [addedToCollection, setAddedToCollection] = useState(false);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
     const toast = useToast();
     const menu = useRef<Menu>(null!);
     const navigate = useNavigate();
@@ -145,8 +146,27 @@ export const ActionButtons = ({
 
     const handleAddToCollection = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
+        setIsMenuVisible(!isMenuVisible);
         menu.current.toggle(event);
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+            const menuElement = menu.current?.getTarget() as Element;
+            if (isMenuVisible && menuElement && !menuElement.contains(target)) {
+                menu?.current?.hide(event as unknown as React.SyntheticEvent);
+            }
+        };
+
+        if (isMenuVisible) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isMenuVisible]);
 
     return (
         <>
@@ -155,7 +175,9 @@ export const ActionButtons = ({
                     model={items}
                     popup
                     ref={menu}
+                    popupAlignment='right'
                     className='reports-actions__menu'
+                    onHide={() => setIsMenuVisible(false)}
                     pt={{
                         root: {
                             style: {
