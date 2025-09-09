@@ -173,7 +173,6 @@ export const ActionButtons = ({
                     model={items}
                     popup
                     ref={menu}
-                    popupAlignment='right'
                     className='reports-actions__menu'
                     onHide={() => setIsMenuVisible(false)}
                     pt={{
