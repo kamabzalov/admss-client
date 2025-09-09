@@ -6,6 +6,12 @@
     border: none;
 }
 
+.export-web {
+    .column-picker {
+        height: 50px;
+    }
+}
+
 .export-web__body .p-datatable-wrapper {
     height: 62vh;
 }
@@ -109,7 +115,7 @@
 
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
     font-weight: 700;
-    color: var(----admss-app-primary);
+    color: var(--admss-app-primary);
 }
 
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {

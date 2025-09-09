@@ -103,10 +103,6 @@ body {
     margin: auto;
 }
 
-.m-r-20px {
-    margin-right: 20px !important;
-}
-
 ::-webkit-scrollbar {
     width: 4px;
 }

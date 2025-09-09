@@ -5,9 +5,10 @@
     margin-bottom: 45px;
 }
 
-.contact-top-controls {
+.contact-controls {
     display: flex;
     gap: 20px;
+    padding-bottom: 20px;
 }
 
 .contact__accordion {

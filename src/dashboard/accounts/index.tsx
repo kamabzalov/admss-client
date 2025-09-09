@@ -9,7 +9,6 @@ import {
 } from "primereact/datatable";
 import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -27,6 +26,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
+import { GlobalSearchInput } from "dashboard/common/form/inputs";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountnumber", header: "Account" },
@@ -250,40 +250,31 @@ export const AccountsDataTable = observer(
         return (
             <div className='card-content'>
                 <div className='grid datatable-controls'>
-                    <div className='col-6'>
-                        <div className='contact-top-controls'>
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-print'
-                                tooltip='Print accounts form'
-                                onClick={() => printTableData(true)}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-download'
-                                tooltip='Download accounts form'
-                                onClick={() => printTableData()}
-                            />
-                        </div>
-                    </div>
-                    <div className='col-6 text-right'>
-                        <Button
-                            className='contact-top-controls__button m-r-20px'
-                            label='Advanced search'
-                            severity='success'
-                            type='button'
-                            onClick={() => setDialogVisible(true)}
-                        />
-                        <span className='p-input-icon-right'>
-                            <i className='icon adms-search' />
-                            <InputText
-                                value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
-                            />
-                        </span>
-                    </div>
+                    <GlobalSearchInput
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
+                    <Button
+                        className='contact-top-controls__button'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                        onClick={() => setDialogVisible(true)}
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-print'
+                        tooltip='Print accounts form'
+                        onClick={() => printTableData(true)}
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-download'
+                        tooltip='Download accounts form'
+                        onClick={() => printTableData()}
+                    />
                 </div>
                 <div className='grid'>
                     <div className='col-12'>
@@ -343,15 +334,11 @@ export const AccountsDataTable = observer(
 
 export const Accounts = () => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Accounts</h2>
-                    </div>
-                    <AccountsDataTable />
-                </div>
+        <div className='card accounts'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Accounts</h2>
             </div>
+            <AccountsDataTable />
         </div>
     );
 };
