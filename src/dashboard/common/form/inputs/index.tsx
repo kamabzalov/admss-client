@@ -610,3 +610,21 @@ export const PhoneInput = ({
 
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
+
+interface GlobalSearchInputProps extends InputTextProps {
+    onInputChange?: (value: string) => void;
+    onIconClick?: () => void;
+}
+
+export const GlobalSearchInput = ({ ...props }: GlobalSearchInputProps): ReactElement => {
+    const uniqueId = useId();
+    return (
+        <span className='global-search p-input-icon-right p-float-label'>
+            <i className='icon adms-search global-search__icon' />
+            <InputText id={uniqueId} className='global-search__input' {...props} />
+            <label htmlFor={uniqueId} className='global-search__label float-label'>
+                {props.placeholder || "Search"}
+            </label>
+        </span>
+    );
+};

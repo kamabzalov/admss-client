@@ -8,7 +8,6 @@ import {
 } from "primereact/datatable";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { TotalDealsList, getDealsList } from "http/services/deals.service";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -33,6 +32,7 @@ import "./index.css";
 import { DropdownHeaderPanel } from "dashboard/deals/common";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
+import { GlobalSearchInput } from "dashboard/common/form/inputs";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -384,17 +384,112 @@ export const DealsDataTable = observer(
             navigate(DEALS_PAGE.CREATE());
         };
 
+        const filterTemplate = (
+            <span className='p-float-label'>
+                <MultiSelect
+                    optionValue='value'
+                    optionLabel='name'
+                    value={dealSelectedGroup}
+                    options={FILTER_GROUP_LIST}
+                    optionGroupLabel='name'
+                    optionGroupChildren='options'
+                    panelHeaderTemplate={<></>}
+                    display='chip'
+                    className='deals__filter'
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        const newValue = [...e.value];
+                        const lastSelected = newValue[newValue.length - 1];
+
+                        const lastSelectedCategory = FILTER_GROUP_LIST.find((group) =>
+                            group.options.some((option) => option.value === lastSelected)
+                        )?.name;
+
+                        if (
+                            lastSelectedCategory === FILTER_CATEGORIES.TYPE ||
+                            lastSelectedCategory === FILTER_CATEGORIES.STATUS
+                        ) {
+                            const filteredValue = newValue.filter((item) => {
+                                const itemCategory = FILTER_GROUP_LIST.find((group) =>
+                                    group.options.some((option) => option.value === item)
+                                )?.name;
+                                return (
+                                    itemCategory !== lastSelectedCategory || item === lastSelected
+                                );
+                            });
+                            setDealSelectedGroup(filteredValue);
+                        } else {
+                            setDealSelectedGroup(newValue);
+                        }
+                    }}
+                    pt={{
+                        wrapper: {
+                            style: {
+                                width: "230px",
+                                maxHeight: "625px",
+                            },
+                        },
+                    }}
+                />
+                <label className='float-label'>Filter</label>
+            </span>
+        );
+
+        const columnsTemplate = (
+            <span className='p-float-label'>
+                <MultiSelect
+                    value={activeColumns}
+                    options={renderColumnsData}
+                    optionLabel='header'
+                    className='deals__columns'
+                    display='chip'
+                    panelHeaderTemplate={() => (
+                        <DropdownHeaderPanel
+                            columns={renderColumnsData}
+                            activeColumns={activeColumns}
+                            setActiveColumns={setActiveColumns}
+                        />
+                    )}
+                    onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                        stopPropagation();
+                        const sortedValue = value.sort(
+                            (a: TableColumnsList, b: TableColumnsList) => {
+                                const firstIndex = renderColumnsData.findIndex(
+                                    (col) => col.field === a.field
+                                );
+                                const secondIndex = renderColumnsData.findIndex(
+                                    (col) => col.field === b.field
+                                );
+                                return firstIndex - secondIndex;
+                            }
+                        );
+
+                        setActiveColumns(sortedValue);
+                    }}
+                    pt={{
+                        header: {
+                            className: "deals__columns-header",
+                        },
+                        wrapper: {
+                            className: "deals__columns-wrapper",
+                            style: {
+                                width: "230px",
+                                maxHeight: "500px",
+                            },
+                        },
+                    }}
+                />
+                <label className='float-label'>Columns</label>
+            </span>
+        );
+
         return (
             <div className='card-content'>
                 <div className='datatable-controls'>
-                    <span className='p-input-icon-right p-float-label datatable-controls__search'>
-                        <i className='icon adms-search' />
-                        <InputText
-                            value={globalSearch}
-                            onChange={(e) => setGlobalSearch(e.target.value)}
-                        />
-                        <label className='float-label'>Search</label>
-                    </span>
+                    <GlobalSearchInput
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
 
                     <Button
                         className='datatable-controls__search-button'
@@ -404,118 +499,23 @@ export const DealsDataTable = observer(
                         onClick={() => setDialogVisible(true)}
                     />
 
-                    <div className='contact-top-controls'>
-                        <ControlButton
-                            variant={BUTTON_VARIANTS.NEW}
-                            tooltip='Add new deal'
-                            onClick={handleCreateDeal}
-                        />
-                        <ControlButton
-                            variant={BUTTON_VARIANTS.PRINT}
-                            tooltip='Print deals form'
-                            onClick={() => printTableData(true)}
-                        />
-                        <ControlButton
-                            variant={BUTTON_VARIANTS.DOWNLOAD}
-                            tooltip='Download deals form'
-                            onClick={() => printTableData()}
-                        />
-                    </div>
-
-                    <span className='p-float-label'>
-                        <MultiSelect
-                            optionValue='value'
-                            optionLabel='name'
-                            value={dealSelectedGroup}
-                            options={FILTER_GROUP_LIST}
-                            optionGroupLabel='name'
-                            optionGroupChildren='options'
-                            panelHeaderTemplate={<></>}
-                            display='chip'
-                            className='deals__filter'
-                            onChange={(e) => {
-                                e.stopPropagation();
-                                const newValue = [...e.value];
-                                const lastSelected = newValue[newValue.length - 1];
-
-                                const lastSelectedCategory = FILTER_GROUP_LIST.find((group) =>
-                                    group.options.some((option) => option.value === lastSelected)
-                                )?.name;
-
-                                if (
-                                    lastSelectedCategory === FILTER_CATEGORIES.TYPE ||
-                                    lastSelectedCategory === FILTER_CATEGORIES.STATUS
-                                ) {
-                                    const filteredValue = newValue.filter((item) => {
-                                        const itemCategory = FILTER_GROUP_LIST.find((group) =>
-                                            group.options.some((option) => option.value === item)
-                                        )?.name;
-                                        return (
-                                            itemCategory !== lastSelectedCategory ||
-                                            item === lastSelected
-                                        );
-                                    });
-                                    setDealSelectedGroup(filteredValue);
-                                } else {
-                                    setDealSelectedGroup(newValue);
-                                }
-                            }}
-                            pt={{
-                                wrapper: {
-                                    style: {
-                                        width: "230px",
-                                        maxHeight: "625px",
-                                    },
-                                },
-                            }}
-                        />
-                        <label className='float-label'>Filter</label>
-                    </span>
-                    <span className='p-float-label'>
-                        <MultiSelect
-                            value={activeColumns}
-                            options={renderColumnsData}
-                            optionLabel='header'
-                            className='deals__columns'
-                            display='chip'
-                            panelHeaderTemplate={() => (
-                                <DropdownHeaderPanel
-                                    columns={renderColumnsData}
-                                    activeColumns={activeColumns}
-                                    setActiveColumns={setActiveColumns}
-                                />
-                            )}
-                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                                stopPropagation();
-                                const sortedValue = value.sort(
-                                    (a: TableColumnsList, b: TableColumnsList) => {
-                                        const firstIndex = renderColumnsData.findIndex(
-                                            (col) => col.field === a.field
-                                        );
-                                        const secondIndex = renderColumnsData.findIndex(
-                                            (col) => col.field === b.field
-                                        );
-                                        return firstIndex - secondIndex;
-                                    }
-                                );
-
-                                setActiveColumns(sortedValue);
-                            }}
-                            pt={{
-                                header: {
-                                    className: "deals__columns-header",
-                                },
-                                wrapper: {
-                                    className: "deals__columns-wrapper",
-                                    style: {
-                                        width: "230px",
-                                        maxHeight: "500px",
-                                    },
-                                },
-                            }}
-                        />
-                        <label className='float-label'>Columns</label>
-                    </span>
+                    <ControlButton
+                        variant={BUTTON_VARIANTS.NEW}
+                        tooltip='Add new deal'
+                        onClick={handleCreateDeal}
+                    />
+                    <ControlButton
+                        variant={BUTTON_VARIANTS.PRINT}
+                        tooltip='Print deals form'
+                        onClick={() => printTableData(true)}
+                    />
+                    <ControlButton
+                        variant={BUTTON_VARIANTS.DOWNLOAD}
+                        tooltip='Download deals form'
+                        onClick={() => printTableData()}
+                    />
+                    {filterTemplate}
+                    {columnsTemplate}
                 </div>
                 <div className='grid'>
                     <div className='col-12'>

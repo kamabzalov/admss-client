@@ -1,7 +1,12 @@
 .datatable-controls {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: center;
     margin-bottom: 20px;
     padding-left: 10px;
     padding-right: 10px;
+    gap: 20px;
 }
 
 .p-datatable .p-datatable-thead > tr > th {

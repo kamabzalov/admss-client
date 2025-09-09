@@ -17,14 +17,12 @@ import { useStore } from "store/hooks";
 
 interface ActionButtonsProps {
     report: ReportDocument;
-    tooltip?: string;
     currentCollectionUID?: string;
     collectionList?: ReportCollection[];
     refetchCollectionsAction?: () => void;
 }
 
 export const ActionButtons = ({
-    tooltip,
     report,
     currentCollectionUID,
     refetchCollectionsAction,

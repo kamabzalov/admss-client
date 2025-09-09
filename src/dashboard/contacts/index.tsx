@@ -11,7 +11,6 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
@@ -33,6 +32,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { createStringifySearchQuery, formatPhoneNumber, isObjectValuesEmpty } from "common/helpers";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { GlobalSearchInput } from "dashboard/common/form/inputs";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser | "fullName";
@@ -362,72 +362,65 @@ export const ContactsDataTable = ({
 
     return (
         <div className='card-content'>
-            <div className='grid datatable-controls'>
-                <div className='col-6'>
-                    <div className='contact-top-controls'>
-                        <ComboBox
-                            value={selectedCategory}
-                            onChange={(e) => {
-                                if (contactCategory) return;
-                                changeSettings({
-                                    selectedCategoriesOptions: e.value,
-                                });
-                                setSelectedCategory(e.value);
-                            }}
-                            options={categories}
-                            optionLabel='name'
-                            editable
-                            disabled={!!contactCategory}
-                            placeholder='Select Category'
-                            pt={{
-                                wrapper: {
-                                    style: {
-                                        maxHeight: "500px",
-                                    },
-                                },
-                            }}
-                        />
+            <div className='table-controls contact-controls'>
+                <GlobalSearchInput
+                    value={globalSearch}
+                    onChange={(e) => setGlobalSearch(e.target.value)}
+                />
+                <Button
+                    className='contact-top-controls__button m-r-20px'
+                    label='Advanced search'
+                    severity='success'
+                    type='button'
+                    onClick={() => setDialogVisible(true)}
+                />
 
-                        <Button
-                            className='contact-top-controls__button'
-                            icon='icon adms-add-item'
-                            severity='success'
-                            type='button'
-                            tooltip='Add new contact'
-                            onClick={handleCreateContact}
-                        />
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-print'
-                            tooltip='Print contacts form'
-                            onClick={() => printTableData(true)}
-                        />
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-download'
-                            tooltip='Download contacts form'
-                            onClick={() => printTableData()}
-                        />
-                    </div>
-                </div>
-                <div className='col-6 text-right'>
-                    <Button
-                        className='contact-top-controls__button m-r-20px'
-                        label='Advanced search'
-                        severity='success'
-                        type='button'
-                        onClick={() => setDialogVisible(true)}
-                    />
-                    <span className='p-input-icon-right'>
-                        <i className='icon adms-search' />
-                        <InputText
-                            value={globalSearch}
-                            onChange={(e) => setGlobalSearch(e.target.value)}
-                        />
-                    </span>
-                </div>
+                <Button
+                    className='contact-top-controls__button'
+                    icon='icon adms-add-item'
+                    severity='success'
+                    type='button'
+                    tooltip='Add new contact'
+                    onClick={handleCreateContact}
+                />
+                <Button
+                    severity='success'
+                    type='button'
+                    icon='icon adms-print'
+                    tooltip='Print contacts form'
+                    onClick={() => printTableData(true)}
+                />
+                <Button
+                    severity='success'
+                    type='button'
+                    icon='icon adms-download'
+                    tooltip='Download contacts form'
+                    onClick={() => printTableData()}
+                />
+
+                <ComboBox
+                    value={selectedCategory}
+                    onChange={(e) => {
+                        if (contactCategory) return;
+                        changeSettings({
+                            selectedCategoriesOptions: e.value,
+                        });
+                        setSelectedCategory(e.value);
+                    }}
+                    options={categories}
+                    optionLabel='name'
+                    editable
+                    disabled={!!contactCategory}
+                    placeholder='Category'
+                    className='ml-auto'
+                    pt={{
+                        wrapper: {
+                            style: {
+                                maxHeight: "500px",
+                            },
+                        },
+                    }}
+                />
             </div>
             <div className='grid'>
                 <div className='col-12'>

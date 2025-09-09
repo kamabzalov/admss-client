@@ -291,3 +291,10 @@
         font-size: 16px;
     }
 }
+
+.global-search {
+    .global-search__input {
+        height: 50px;
+        width: 200px;
+    }
+}
