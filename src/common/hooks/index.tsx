@@ -50,7 +50,7 @@ export const useDateRange = (): DateRangeResult => {
     };
 };
 
-interface UseFormExitConfirmationProps {
+interface FormExitConfirmationProps {
     isFormChanged: boolean;
     onConfirmExit: () => void;
     confirmTitle?: string;
@@ -75,7 +75,7 @@ export const useFormExitConfirmation = ({
     confirmMessage = ModalMessage.MESSAGE,
     icon = ModalMessage.ICON,
     className,
-}: UseFormExitConfirmationProps) => {
+}: FormExitConfirmationProps) => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
 
     const handleExitClick = useCallback(() => {
