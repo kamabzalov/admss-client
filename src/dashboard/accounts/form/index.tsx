@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useRef } from "react";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountInformation } from "dashboard/accounts/form/information";
 import { AccountDownPayment } from "dashboard/accounts/form/down-payment";
-import { AccountInsurance } from "dashboard/accounts/form/insuranse";
+import { AccountInsurance, AccountInsuranceRef } from "dashboard/accounts/form/insuranse";
 import { AccountManagement } from "dashboard/accounts/form/management";
 import { AccountNotes } from "dashboard/accounts/form/notes";
 import { AccountPaymentHistory } from "dashboard/accounts/form/payment-history";
@@ -17,22 +17,35 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
-import { NoticeAlert } from "./common";
+import { NoticeAlert } from "dashboard/accounts/form/common";
+import { useFormExitConfirmation } from "common/hooks";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TabItem {
     tabName: string;
     component?: ReactElement;
 }
 
+enum TabName {
+    ACCOUNT_INFORMATION = "Account information",
+    ACCOUNT_MANAGEMENT = "Account Management",
+    PAYMENT_HISTORY = "Payment History",
+    DOWN_PAYMENT = "Down Payment",
+    ACCOUNT_SETTINGS = "Account Settings",
+    NOTES = "Notes",
+    PROMISE_TO_PAY = "Promise To Pay",
+    INSURANCE = "Insurance",
+}
+
 const tabItems: TabItem[] = [
-    { tabName: "Account information", component: <AccountInformation /> },
-    { tabName: "Account Management", component: <AccountManagement /> },
-    { tabName: "Payment History", component: <AccountPaymentHistory /> },
-    { tabName: "Down Payment", component: <AccountDownPayment /> },
-    { tabName: "Account Settings", component: <AccountSettings /> },
-    { tabName: "Notes", component: <AccountNotes /> },
-    { tabName: "Promise To Pay", component: <AccountPromiseToPay /> },
-    { tabName: "Insurance", component: <AccountInsurance /> },
+    { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
+    { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
+    { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
+    { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
+    { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
+    { tabName: TabName.NOTES, component: <AccountNotes /> },
+    { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
+    { tabName: TabName.INSURANCE, component: <AccountInsurance /> },
 ];
 
 const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
@@ -52,6 +65,7 @@ export const AccountsForm = observer((): ReactElement => {
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
+    const insuranceRef = useRef<AccountInsuranceRef>(null);
 
     useEffect(() => {
         store.prevPath = `${location.pathname}${location.search}`;
@@ -67,7 +81,7 @@ export const AccountsForm = observer((): ReactElement => {
                         detail: (response?.error as string) || "",
                         life: TOAST_LIFETIME,
                     });
-                    navigate(`/dashboard/accounts`);
+                    navigate(ACCOUNTS_PAGE.MAIN);
                 } else {
                     getNotes(id);
                 }
@@ -87,12 +101,30 @@ export const AccountsForm = observer((): ReactElement => {
         setActiveTab(tabIndex >= 0 ? tabIndex : 0);
     }, [location.search]);
 
+    const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
+        isFormChanged: isAccountChanged,
+        onConfirmExit: () => navigate(ACCOUNTS_PAGE.MAIN),
+        className: "account-confirm-dialog",
+    });
+
     const handleTabChange = (index: number) => {
+        const currentTabIndex = activeTab;
+        const currentTabName = tabItems[currentTabIndex]?.tabName;
+
+        if (currentTabName === TabName.INSURANCE && insuranceRef.current?.hasUnsavedChanges()) {
+            toast.current?.show({
+                severity: "warn",
+                summary: "Warning",
+                detail: `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`,
+                life: TOAST_LIFETIME,
+            });
+        }
+
         setActiveTab(index);
         const tabName = transformTabName(tabItems[index].tabName);
         const queryParams = new URLSearchParams(location.search);
         queryParams.set("tab", tabName);
-        navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
+        navigate(`${ACCOUNTS_PAGE.EDIT(id ?? "")}?${queryParams.toString()}`, { replace: true });
     };
 
     return isLoading ? (
@@ -102,7 +134,7 @@ export const AccountsForm = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate("/dashboard/accounts")}
+                onClick={handleExitClick}
             />
             <div className='col-12'>
                 <div className='card account'>
@@ -137,7 +169,11 @@ export const AccountsForm = observer((): ReactElement => {
                                             key={tabName}
                                             className='account__panel h-full'
                                         >
-                                            {component}
+                                            {tabName === TabName.INSURANCE ? (
+                                                <AccountInsurance ref={insuranceRef} />
+                                            ) : (
+                                                component
+                                            )}
                                         </TabPanel>
                                     );
                                 })}
@@ -172,6 +208,7 @@ export const AccountsForm = observer((): ReactElement => {
                     </div>
                 </div>
             </div>
+            <ConfirmModalComponent />
         </div>
     );
 });

@@ -25,7 +25,8 @@ import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
 import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
-import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useFormExitConfirmation } from "common/hooks";
+import { REPORTS_PAGE } from "common/constants/links";
 
 const COLLECTION_DRAG_DELAY = 1000;
 const DEEPLY_NESTED_LEVEL = 3;
@@ -109,9 +110,14 @@ export const ReportForm = observer((): ReactElement => {
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
-    const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
     const [currentNodeOrder, setCurrentNodeOrder] = useState<number | null>(null);
+
+    const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
+        isFormChanged: isReportChanged,
+        onConfirmExit: () => navigate(REPORTS_PAGE.MAIN),
+        className: "report-confirm-dialog",
+    });
 
     const getCollections = useCallback(async () => {
         if (authUser) {
@@ -420,24 +426,12 @@ export const ReportForm = observer((): ReactElement => {
         getUserReportCollections(true);
     };
 
-    const navigateToReports = () => {
-        navigate("/dashboard/reports");
-    };
-
-    const handleCloseClick = () => {
-        if (isReportChanged) {
-            setConfirmActive(true);
-        } else {
-            navigateToReports();
-        }
-    };
-
     return (
         <div className='grid relative'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={handleCloseClick}
+                onClick={handleExitClick}
             />
             <div className='col-12'>
                 <div className='card report'>
@@ -490,19 +484,7 @@ export const ReportForm = observer((): ReactElement => {
                     <ReportFooter onRefetch={() => getUserReportCollections(true)} />
                 </div>
             </div>
-            <ConfirmModal
-                visible={confirmActive}
-                draggable={false}
-                position='top'
-                className='contact-delete-dialog'
-                title='Quit Editing?'
-                icon='pi-exclamation-triangle'
-                bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
-                rejectLabel='Cancel'
-                acceptLabel='Confirm'
-                confirmAction={navigateToReports}
-                onHide={() => setConfirmActive(false)}
-            />
+            <ConfirmModalComponent />
         </div>
     );
 });
