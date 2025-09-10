@@ -2,12 +2,11 @@ import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { useStore } from "store/hooks";
-import { useState } from "react";
 import { observer } from "mobx-react-lite";
+import { toBinary } from "common/helpers";
 
 export const InterestIncome = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
-    const [addExpectedToTotal, setAddExpectedToTotal] = useState(false);
 
     return (
         <div className='interest-income__body'>
@@ -69,16 +68,15 @@ export const InterestIncome = observer(() => {
                 justify='start'
                 className='deal-profit__item--bold'
             />
-            <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+            <div className='flex align-items-center mt-2'>
                 <Checkbox
                     inputId='add-expected-to-total'
-                    checked={addExpectedToTotal}
+                    checked={!!dealWashout.AddExpectedToTotal}
                     onChange={(e) => {
-                        setAddExpectedToTotal(e.checked!);
-                        changeDealWashout("AddExpectedToTotal", e.checked ? 1 : 0);
+                        changeDealWashout("AddExpectedToTotal", toBinary(Boolean(e.checked)));
                     }}
                 />
-                <label htmlFor='add-expected-to-total' style={{ marginLeft: 8 }}>
+                <label htmlFor='add-expected-to-total' className='ml-2'>
                     Add Expected Interest Amount to Total Profit
                 </label>
             </div>
