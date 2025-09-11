@@ -9,6 +9,7 @@ import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useFormExitConfirmation } from "common/hooks";
 import { checkStockNoAvailability, getVINCheck } from "http/services/inventory-service";
 import { InventoryExportWebData } from "dashboard/inventory/form/export-web";
 
@@ -148,8 +149,19 @@ export const InventoryForm = observer(() => {
     const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
     const [errorSections, setErrorSections] = useState<string[]>([]);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
-    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
-    const [confirmQuitEditVisible, setConfirmQuitEditVisible] = useState<boolean>(false);
+
+    const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
+        isFormChanged,
+        onConfirmExit: () => {
+            if (memoRoute) {
+                navigate(memoRoute);
+                store.memoRoute = "";
+            } else {
+                navigate(INVENTORY_PAGE.MAIN);
+            }
+        },
+        className: "inventory-confirm-dialog",
+    });
 
     const initialVIN = useMemo(() => {
         if (inventory) {
@@ -349,36 +361,6 @@ export const InventoryForm = observer(() => {
         }
     }, [accordionSteps, stepActiveIndex]);
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isFormChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isFormChanged]);
-
-    const handleCloseClick = () => {
-        const performNavigation = () => {
-            if (memoRoute) {
-                navigate(memoRoute);
-                store.memoRoute = "";
-            } else {
-                navigate(INVENTORY_PAGE.MAIN);
-            }
-        };
-
-        if (isFormChanged) {
-            setConfirmAction(() => performNavigation);
-            setConfirmQuitEditVisible(true);
-        } else {
-            performNavigation();
-        }
-    };
-
     const handleOnBackClick = () => {
         setStepActiveIndex((prev) => {
             const newStep = prev - 1;
@@ -483,7 +465,7 @@ export const InventoryForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={handleCloseClick}
+                    onClick={handleExitClick}
                 />
                 <div className='col-12'>
                     <div className='card inventory'>
@@ -724,22 +706,8 @@ export const InventoryForm = observer(() => {
                     </div>
                 </div>
             </div>
-            {confirmQuitEditVisible ? (
-                <ConfirmModal
-                    visible={!!confirmQuitEditVisible}
-                    position='top'
-                    title='Quit Editing?'
-                    icon='pi-exclamation-triangle'
-                    bodyMessage={DIALOG_MESSAGES.QUIT}
-                    confirmAction={confirmAction}
-                    draggable={false}
-                    rejectLabel='Cancel'
-                    acceptLabel='Confirm'
-                    resizable={false}
-                    className='contact-confirm-dialog'
-                    onHide={() => setConfirmQuitEditVisible(false)}
-                />
-            ) : (
+            <ConfirmModalComponent />
+            {confirmDeleteVisible && (
                 <ConfirmModal
                     visible={confirmDeleteVisible}
                     bodyMessage={DIALOG_MESSAGES.DELETE}

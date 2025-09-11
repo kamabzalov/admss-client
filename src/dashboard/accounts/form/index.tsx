@@ -4,7 +4,7 @@ import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountInformation } from "dashboard/accounts/form/information";
 import { AccountDownPayment } from "dashboard/accounts/form/down-payment";
-import { AccountInsurance } from "dashboard/accounts/form/insuranse";
+import { AccountInsurance } from "dashboard/accounts/form/insurance";
 import { AccountManagement } from "dashboard/accounts/form/management";
 import { AccountNotes } from "dashboard/accounts/form/notes";
 import { AccountPaymentHistory } from "dashboard/accounts/form/payment-history";
@@ -13,34 +13,33 @@ import { AccountSettings } from "dashboard/accounts/form/settings";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
-import { NoticeAlert } from "./common";
+import { NoticeAlert } from "dashboard/accounts/form/common";
+import { useFormExitConfirmation, useToastMessage } from "common/hooks";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TabItem {
     tabName: string;
     component?: ReactElement;
 }
 
-const tabItems: TabItem[] = [
-    { tabName: "Account information", component: <AccountInformation /> },
-    { tabName: "Account Management", component: <AccountManagement /> },
-    { tabName: "Payment History", component: <AccountPaymentHistory /> },
-    { tabName: "Down Payment", component: <AccountDownPayment /> },
-    { tabName: "Account Settings", component: <AccountSettings /> },
-    { tabName: "Notes", component: <AccountNotes /> },
-    { tabName: "Promise To Pay", component: <AccountPromiseToPay /> },
-    { tabName: "Insurance", component: <AccountInsurance /> },
-];
+enum TabName {
+    ACCOUNT_INFORMATION = "Account information",
+    ACCOUNT_MANAGEMENT = "Account Management",
+    PAYMENT_HISTORY = "Payment History",
+    DOWN_PAYMENT = "Down Payment",
+    ACCOUNT_SETTINGS = "Account Settings",
+    NOTES = "Notes",
+    PROMISE_TO_PAY = "Promise To Pay",
+    INSURANCE = "Insurance",
+}
 
 const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
 export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const toast = useToast();
+    const { showError, showWarning } = useToastMessage();
     const location = useLocation();
     const store = useStore().accountStore;
     const {
@@ -52,26 +51,39 @@ export const AccountsForm = observer((): ReactElement => {
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
+    const [hasInsuranceUnsavedChanges, setHasInsuranceUnsavedChanges] = useState<boolean>(false);
+
+    const tabItems: TabItem[] = [
+        { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
+        { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
+        { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
+        { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
+        { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
+        { tabName: TabName.NOTES, component: <AccountNotes /> },
+        { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
+        {
+            tabName: TabName.INSURANCE,
+            component: <AccountInsurance onUnsavedChangesChange={setHasInsuranceUnsavedChanges} />,
+        },
+    ];
 
     useEffect(() => {
         store.prevPath = `${location.pathname}${location.search}`;
     }, [location.pathname, location.search, store]);
 
+    const handleGetAccount = async () => {
+        if (!id) return;
+        const response = await getAccount(id);
+        if (response?.error) {
+            showError(response.error as string);
+            navigate(ACCOUNTS_PAGE.MAIN);
+        } else {
+            getNotes(id);
+        }
+    };
+
     useEffect(() => {
-        id &&
-            getAccount(id).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: (response?.error as string) || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(`/dashboard/accounts`);
-                } else {
-                    getNotes(id);
-                }
-            });
+        handleGetAccount();
         return () => {
             accountNote.note = "";
             accountNote.alert = "";
@@ -87,12 +99,27 @@ export const AccountsForm = observer((): ReactElement => {
         setActiveTab(tabIndex >= 0 ? tabIndex : 0);
     }, [location.search]);
 
+    const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
+        isFormChanged: isAccountChanged,
+        onConfirmExit: () => navigate(ACCOUNTS_PAGE.MAIN),
+        className: "account-confirm-dialog",
+    });
+
     const handleTabChange = (index: number) => {
+        const currentTabIndex = activeTab;
+        const currentTabName = tabItems[currentTabIndex]?.tabName;
+
+        if (currentTabName === TabName.INSURANCE && hasInsuranceUnsavedChanges) {
+            showWarning(
+                `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`
+            );
+        }
+
         setActiveTab(index);
         const tabName = transformTabName(tabItems[index].tabName);
         const queryParams = new URLSearchParams(location.search);
         queryParams.set("tab", tabName);
-        navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
+        navigate(`${ACCOUNTS_PAGE.EDIT(id ?? "")}?${queryParams.toString()}`, { replace: true });
     };
 
     return isLoading ? (
@@ -102,7 +129,7 @@ export const AccountsForm = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate("/dashboard/accounts")}
+                onClick={handleExitClick}
             />
             <div className='col-12'>
                 <div className='card account'>
@@ -172,6 +199,7 @@ export const AccountsForm = observer((): ReactElement => {
                     </div>
                 </div>
             </div>
+            <ConfirmModalComponent />
         </div>
     );
 });
