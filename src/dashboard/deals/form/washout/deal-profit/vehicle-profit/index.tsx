@@ -1,6 +1,5 @@
 import { Card } from "primereact/card";
-import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit";
-import { useState } from "react";
+import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { useStore } from "store/hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import { INVENTORY_STEPS } from "dashboard/inventory/form";
@@ -13,9 +12,6 @@ export const DealVehicleProfit = observer(() => {
     const inventoryStore = useStore().inventoryStore;
     const navigate = useNavigate();
     const { pathname } = useLocation();
-
-    const [includeOverallowance, setIncludeOverallowance] = useState<INCLUDE_OPTIONS | null>(null);
-    const [includeVehicleProfit, setIncludeVehicleProfit] = useState<INCLUDE_OPTIONS | null>(null);
 
     const handleNavigateToExpenses = () => {
         inventoryStore.memoRoute = pathname;
@@ -118,8 +114,7 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='-'
                         title='Overallowance:'
                         includes
-                        includeCheckbox={includeOverallowance}
-                        includeCheckboxOnChange={setIncludeOverallowance}
+                        includeCheckboxFieldName='Overallowance'
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         value={Number(dealWashout.Overallowance) || 0}
                         onChange={({ value }) => {
@@ -137,8 +132,7 @@ export const DealVehicleProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         className='deal-profit__item--purple deal-profit__item--bold'
                         includes
-                        includeCheckbox={includeVehicleProfit}
-                        includeCheckboxOnChange={setIncludeVehicleProfit}
+                        includeCheckboxFieldName='VehicleProfit'
                         value={Number(dealWashout.VehicleProfit) || 0}
                         onChange={({ value }) => {
                             changeDealWashout("VehicleProfit", String(value));
