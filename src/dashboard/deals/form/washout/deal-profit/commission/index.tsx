@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/commission/salesman-select-dialog";
-import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit/index";
+import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit/index";
 import { CURRENCY_OPTIONS, DashboardRadio } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
 
@@ -27,9 +27,6 @@ export const DealProfitCommission = observer(() => {
     const [managerOverride, setManagerOverride] = useState<boolean>(false);
     const [s1, setS1] = useState<boolean>(false);
     const [s2, setS2] = useState<boolean>(false);
-    const [includeManagerOverride, setIncludeManagerOverride] = useState<INCLUDE_OPTIONS | null>(
-        null
-    );
 
     return (
         <Card className='profit-card profit-commission'>
@@ -89,8 +86,7 @@ export const DealProfitCommission = observer(() => {
                         value={Number(dealWashout.CommissionMgr) || 0}
                         withInput
                         includes
-                        includeCheckbox={includeManagerOverride}
-                        includeCheckboxOnChange={setIncludeManagerOverride}
+                        includeCheckboxFieldName='CommissionMgrOverride'
                         checkboxValue={managerOverride}
                         checkboxOnChange={setManagerOverride}
                         fieldName='managerOverride'

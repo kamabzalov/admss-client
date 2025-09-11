@@ -40,6 +40,11 @@ export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL_AVAILABLE_FOR_SALE = 'Do you really want to delete the deal with all related options you\'ve selected and set the inventory to "Available for sale"? This action cannot be undone.',
 }
 
+export enum INCLUDE_OPTIONS {
+    COMMISSION1 = "COMMISSION1",
+    COMMISSION = "COMMISSION",
+}
+
 export const NEW_PAYMENT_LABEL = "new_";
 export const EMPTY_PAYMENT_LENGTH = 7;
 
@@ -306,6 +311,44 @@ export class DealStore {
             (dealWashout as Record<typeof key, string | number>)[key] = value;
         }
     });
+
+    public toggleIncludeCheckbox = action((fieldName: string, option: INCLUDE_OPTIONS | null) => {
+        const dealStore = this.rootStore.dealStore;
+        if (dealStore) {
+            const { dealWashout } = dealStore;
+            const check1Field = `${fieldName}Check1` as keyof DealWashout;
+            const check2Field = `${fieldName}Check2` as keyof DealWashout;
+
+            if (option === INCLUDE_OPTIONS.COMMISSION1) {
+                (dealWashout as any)[check1Field] = 1;
+                (dealWashout as any)[check2Field] = 0;
+            } else if (option === INCLUDE_OPTIONS.COMMISSION) {
+                (dealWashout as any)[check1Field] = 0;
+                (dealWashout as any)[check2Field] = 1;
+            } else {
+                (dealWashout as any)[check1Field] = 0;
+                (dealWashout as any)[check2Field] = 0;
+            }
+        }
+    });
+
+    public getIncludeCheckboxValue = (fieldName: string): INCLUDE_OPTIONS | null => {
+        const dealStore = this.rootStore.dealStore;
+        if (dealStore) {
+            const { dealWashout } = dealStore;
+            const check1Field = `${fieldName}Check1` as keyof DealWashout;
+            const check2Field = `${fieldName}Check2` as keyof DealWashout;
+
+            if ((dealWashout as any)[check1Field] === 1) {
+                return INCLUDE_OPTIONS.COMMISSION1;
+            }
+            if ((dealWashout as any)[check2Field] === 1) {
+                return INCLUDE_OPTIONS.COMMISSION;
+            }
+            return null;
+        }
+        return null;
+    };
 
     public resetWashoutChanges = action(() => {
         this._originalDealWashout = JSON.parse(JSON.stringify(this._dealWashout));

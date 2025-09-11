@@ -15,11 +15,8 @@ import { DealVehicleProfit } from "dashboard/deals/form/washout/deal-profit/vehi
 import { DealProfitFinanceWorksheet } from "dashboard/deals/form/washout/deal-profit/finance-worksheet";
 import { DealInterestProfit } from "dashboard/deals/form/washout/deal-profit/interest-profit";
 import { TruncatedText } from "dashboard/common/display";
-
-export enum INCLUDE_OPTIONS {
-    COMMISSION1 = "commission1",
-    COMMISSION = "commission",
-}
+import { useStore } from "store/hooks";
+import { INCLUDE_OPTIONS } from "store/stores/deal";
 
 interface DealProfitItemProps extends InputNumberProps {
     numberSign?: "+" | "-" | "=";
@@ -34,6 +31,7 @@ interface DealProfitItemProps extends InputNumberProps {
     includes?: boolean;
     includeCheckbox?: INCLUDE_OPTIONS | null;
     includeCheckboxOnChange?: (value: INCLUDE_OPTIONS | null) => void;
+    includeCheckboxFieldName?: string;
     additionalValue?: string;
 }
 
@@ -51,11 +49,13 @@ export const DealProfitItem = observer(
         includes = false,
         includeCheckbox,
         includeCheckboxOnChange,
+        includeCheckboxFieldName,
         onCurrencySelect,
         additionalValue,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
+        const { toggleIncludeCheckbox, getIncludeCheckboxValue } = useStore().dealStore;
 
         const handleChange = (event: any) => {
             setFieldChanged(true);
@@ -67,18 +67,36 @@ export const DealProfitItem = observer(
         };
 
         const handleFirstCheckboxChange = () => {
-            if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION1) {
-                includeCheckboxOnChange?.(null);
+            if (includeCheckboxFieldName) {
+                const currentValue = getIncludeCheckboxValue(includeCheckboxFieldName);
+                if (currentValue === INCLUDE_OPTIONS.COMMISSION1) {
+                    toggleIncludeCheckbox(includeCheckboxFieldName, null);
+                } else {
+                    toggleIncludeCheckbox(includeCheckboxFieldName, INCLUDE_OPTIONS.COMMISSION1);
+                }
             } else {
-                includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION1);
+                if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION1) {
+                    includeCheckboxOnChange?.(null);
+                } else {
+                    includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION1);
+                }
             }
         };
 
         const handleSecondCheckboxChange = () => {
-            if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION) {
-                includeCheckboxOnChange?.(null);
+            if (includeCheckboxFieldName) {
+                const currentValue = getIncludeCheckboxValue(includeCheckboxFieldName);
+                if (currentValue === INCLUDE_OPTIONS.COMMISSION) {
+                    toggleIncludeCheckbox(includeCheckboxFieldName, null);
+                } else {
+                    toggleIncludeCheckbox(includeCheckboxFieldName, INCLUDE_OPTIONS.COMMISSION);
+                }
             } else {
-                includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION);
+                if (includeCheckbox === INCLUDE_OPTIONS.COMMISSION) {
+                    includeCheckboxOnChange?.(null);
+                } else {
+                    includeCheckboxOnChange?.(INCLUDE_OPTIONS.COMMISSION);
+                }
             }
         };
 
@@ -151,11 +169,16 @@ export const DealProfitItem = observer(
                 )}
                 {includes && (
                     <div className='deal-profit__includes'>
-                        {includeCheckbox !== undefined && (
+                        {(includeCheckbox !== undefined || includeCheckboxFieldName) && (
                             <>
                                 <Checkbox
                                     inputId={`${fieldName}-includes-1`}
-                                    checked={includeCheckbox === INCLUDE_OPTIONS.COMMISSION1}
+                                    checked={
+                                        includeCheckboxFieldName
+                                            ? getIncludeCheckboxValue(includeCheckboxFieldName) ===
+                                              "COMMISSION1"
+                                            : includeCheckbox === INCLUDE_OPTIONS.COMMISSION1
+                                    }
                                     tooltip='Include in Commission1 Base'
                                     onChange={() => {
                                         handleFirstCheckboxChange();
@@ -163,7 +186,12 @@ export const DealProfitItem = observer(
                                 />
                                 <Checkbox
                                     inputId={`${fieldName}-includes-2`}
-                                    checked={includeCheckbox === INCLUDE_OPTIONS.COMMISSION}
+                                    checked={
+                                        includeCheckboxFieldName
+                                            ? getIncludeCheckboxValue(includeCheckboxFieldName) ===
+                                              "COMMISSION"
+                                            : includeCheckbox === INCLUDE_OPTIONS.COMMISSION
+                                    }
                                     tooltip='Include in Commission Base'
                                     onChange={() => {
                                         handleSecondCheckboxChange();
