@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState, useImperativeHandle, forwardRef } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAccountInsurance, updateAccountInsurance } from "http/services/accounts.service";
 import { Checkbox } from "primereact/checkbox";
@@ -9,20 +9,24 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InsuranceInfoField } from "./insurance-info-item";
 import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
+import { useToastMessage } from "common/hooks";
 import { Loader } from "dashboard/common/loader";
 import { CONTACTS_PAGE } from "common/constants/links";
 
-export interface InsuranceInfoRef {
-    hasUnsavedChanges: () => boolean;
+export interface InsuranceInfoProps {
+    onUnsavedChangesChange?: (hasChanges: boolean) => void;
+}
+
+enum ToastMessage {
+    SUCCESS = "Insurance info updated successfully!",
+    REQUIRED = "Insurance userUID is required",
 }
 
 export const AccountInsuranceInfo = observer(
-    forwardRef<InsuranceInfoRef>((_, ref): ReactElement => {
+    ({ onUnsavedChangesChange }: InsuranceInfoProps): ReactElement => {
         const { id } = useParams();
         const navigate = useNavigate();
-        const toast = useToast();
+        const { showError, showSuccess } = useToastMessage();
         const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
         const store = useStore().accountStore;
         const [insuranceEdit, setInsuranceEdit] = useState<boolean>(true);
@@ -35,71 +39,47 @@ export const AccountInsuranceInfo = observer(
             changeAccountExtData,
         } = store;
 
-        useImperativeHandle(ref, () => ({
-            hasUnsavedChanges: () => hasUnsavedChanges,
-        }));
+        useEffect(() => {
+            onUnsavedChangesChange?.(hasUnsavedChanges);
+        }, [hasUnsavedChanges, onUnsavedChangesChange]);
 
         const handleGetInsuranceHistory = async () => {
-            if (id) {
-                setIsLoading(true);
-                getAccountInsurance(id).then((res) => {
-                    if (res?.status === Status.ERROR) {
-                        toast.current?.show({
-                            severity: "error",
-                            summary: Status.ERROR,
-                            detail: res.error,
-                            life: TOAST_LIFETIME,
-                        });
-                    }
-                    if (res) {
-                        setInsuranceInfo(res as AccountInsurance);
-                        setIsLoading(false);
-                    }
-                });
-            }
+            if (!id) return;
+            setIsLoading(true);
+            getAccountInsurance(id).then((res) => {
+                if (res?.status === Status.ERROR) {
+                    showError(res.error);
+                }
+                if (res) {
+                    setInsuranceInfo(res as AccountInsurance);
+                    setIsLoading(false);
+                }
+            });
         };
 
         useEffect(() => {
             handleGetInsuranceHistory();
         }, [id]);
 
-        const handleChangeInsuranceInfo = () => {
-            if (insuranceInfo) {
-                id &&
-                    updateAccountInsurance(id, insuranceInfo).then((res) => {
-                        if (res?.status === Status.ERROR) {
-                            toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: res.error,
-                                life: TOAST_LIFETIME,
-                            });
-                        } else {
-                            setInsuranceInfo(res as AccountInsurance);
-                            handleGetInsuranceHistory().then(() => {
-                                setInsuranceEdit(true);
-                                setIsButtonDisabled(true);
-                                setHasUnsavedChanges(false);
-                            });
-                            toast.current?.show({
-                                severity: "success",
-                                summary: "Success",
-                                detail: "Insurance info updated successfully!",
-                                life: TOAST_LIFETIME,
-                            });
-                        }
-                    });
+        const handleChangeInsuranceInfo = async () => {
+            if (!insuranceInfo || !id) return;
+
+            const res = await updateAccountInsurance(id, insuranceInfo);
+            if (res?.status === Status.ERROR) {
+                showError(res.error);
+            } else {
+                await handleGetInsuranceHistory();
+                setInsuranceEdit(true);
+                setIsButtonDisabled(true);
+                setHasUnsavedChanges(false);
+
+                showSuccess(ToastMessage.SUCCESS);
             }
         };
 
         const handleChangeInsuranceEdit = () => {
             if (!insuranceInfo?.Insurance_userUID) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "Insurance userUID is required",
-                    life: TOAST_LIFETIME,
-                });
+                showError(ToastMessage.REQUIRED);
             } else {
                 navigate(CONTACTS_PAGE.EDIT(insuranceInfo?.Insurance_userUID));
             }
@@ -232,5 +212,5 @@ export const AccountInsuranceInfo = observer(
                 </div>
             </div>
         );
-    })
+    }
 );

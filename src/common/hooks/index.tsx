@@ -1,6 +1,8 @@
 import { setCursorToStart } from "common/helpers";
 import { RefObject, useCallback, useEffect, useState } from "react";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 export const useCursorToStart = (containerRef: RefObject<HTMLDivElement>) => {
     useEffect(() => {
@@ -126,5 +128,61 @@ export const useFormExitConfirmation = ({
     return {
         handleExitClick,
         ConfirmModalComponent,
+    };
+};
+
+export enum ToastType {
+    SUCCESS = "success",
+    ERROR = "error",
+    WARN = "warn",
+    INFO = "info",
+}
+
+export interface ToastMessageOptions {
+    type: ToastType;
+    message?: string;
+    summary?: string;
+    life?: number;
+}
+
+export const useToastMessage = () => {
+    const toast = useToast();
+
+    const showToast = ({ type, message, summary, life = TOAST_LIFETIME }: ToastMessageOptions) => {
+        const summaryText = summary || getDefaultSummary(type);
+
+        toast.current?.show({
+            severity: type,
+            summary: summaryText,
+            detail: message,
+            life,
+        });
+    };
+
+    const getDefaultSummary = (type: ToastType): string => {
+        switch (type) {
+            case ToastType.SUCCESS:
+                return "Success";
+            case ToastType.ERROR:
+                return "Error";
+            case ToastType.WARN:
+                return "Warning";
+            case ToastType.INFO:
+                return "Info";
+            default:
+                return "Notification";
+        }
+    };
+
+    return {
+        showToast,
+        showSuccess: (message?: string, summary?: string) =>
+            showToast({ type: ToastType.SUCCESS, message, summary }),
+        showError: (message?: string, summary?: string) =>
+            showToast({ type: ToastType.ERROR, message, summary }),
+        showWarning: (message?: string, summary?: string) =>
+            showToast({ type: ToastType.WARN, message, summary }),
+        showInfo: (message?: string, summary?: string) =>
+            showToast({ type: ToastType.INFO, message, summary }),
     };
 };

@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState, useRef } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountInformation } from "dashboard/accounts/form/information";
 import { AccountDownPayment } from "dashboard/accounts/form/down-payment";
-import { AccountInsurance, AccountInsuranceRef } from "dashboard/accounts/form/insuranse";
+import { AccountInsurance } from "dashboard/accounts/form/insurance";
 import { AccountManagement } from "dashboard/accounts/form/management";
 import { AccountNotes } from "dashboard/accounts/form/notes";
 import { AccountPaymentHistory } from "dashboard/accounts/form/payment-history";
@@ -13,12 +13,9 @@ import { AccountSettings } from "dashboard/accounts/form/settings";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
 import { NoticeAlert } from "dashboard/accounts/form/common";
-import { useFormExitConfirmation } from "common/hooks";
+import { useFormExitConfirmation, useToastMessage } from "common/hooks";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TabItem {
@@ -37,23 +34,12 @@ enum TabName {
     INSURANCE = "Insurance",
 }
 
-const tabItems: TabItem[] = [
-    { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
-    { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
-    { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
-    { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
-    { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
-    { tabName: TabName.NOTES, component: <AccountNotes /> },
-    { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
-    { tabName: TabName.INSURANCE, component: <AccountInsurance /> },
-];
-
 const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
 export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const toast = useToast();
+    const { showError, showWarning } = useToastMessage();
     const location = useLocation();
     const store = useStore().accountStore;
     const {
@@ -65,27 +51,39 @@ export const AccountsForm = observer((): ReactElement => {
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
-    const insuranceRef = useRef<AccountInsuranceRef>(null);
+    const [hasInsuranceUnsavedChanges, setHasInsuranceUnsavedChanges] = useState<boolean>(false);
+
+    const tabItems: TabItem[] = [
+        { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
+        { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
+        { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
+        { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
+        { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
+        { tabName: TabName.NOTES, component: <AccountNotes /> },
+        { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
+        {
+            tabName: TabName.INSURANCE,
+            component: <AccountInsurance onUnsavedChangesChange={setHasInsuranceUnsavedChanges} />,
+        },
+    ];
 
     useEffect(() => {
         store.prevPath = `${location.pathname}${location.search}`;
     }, [location.pathname, location.search, store]);
 
+    const handleGetAccount = async () => {
+        if (!id) return;
+        const response = await getAccount(id);
+        if (response?.error) {
+            showError(response.error as string);
+            navigate(ACCOUNTS_PAGE.MAIN);
+        } else {
+            getNotes(id);
+        }
+    };
+
     useEffect(() => {
-        id &&
-            getAccount(id).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: (response?.error as string) || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(ACCOUNTS_PAGE.MAIN);
-                } else {
-                    getNotes(id);
-                }
-            });
+        handleGetAccount();
         return () => {
             accountNote.note = "";
             accountNote.alert = "";
@@ -111,13 +109,10 @@ export const AccountsForm = observer((): ReactElement => {
         const currentTabIndex = activeTab;
         const currentTabName = tabItems[currentTabIndex]?.tabName;
 
-        if (currentTabName === TabName.INSURANCE && insuranceRef.current?.hasUnsavedChanges()) {
-            toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
-                detail: `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`,
-                life: TOAST_LIFETIME,
-            });
+        if (currentTabName === TabName.INSURANCE && hasInsuranceUnsavedChanges) {
+            showWarning(
+                `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`
+            );
         }
 
         setActiveTab(index);
@@ -169,11 +164,7 @@ export const AccountsForm = observer((): ReactElement => {
                                             key={tabName}
                                             className='account__panel h-full'
                                         >
-                                            {tabName === TabName.INSURANCE ? (
-                                                <AccountInsurance ref={insuranceRef} />
-                                            ) : (
-                                                component
-                                            )}
+                                            {component}
                                         </TabPanel>
                                     );
                                 })}
