@@ -179,7 +179,7 @@ export const ActionButtons = ({
                         root: {
                             style: {
                                 width: !collectionList?.length ? "176px" : "240px",
-                                maxHeight: "240px",
+                                maxHeight: "200px",
                                 overflowY: !collectionList?.length ? "hidden" : "auto",
                                 overflowX: "hidden",
                                 paddingTop: 0,
