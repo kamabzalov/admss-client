@@ -766,7 +766,7 @@ export const setLockState = async (accountuid: string, lockState: any) => {
 
 export const updateAccountInsurance = async (
     accountuid: string,
-    insuranceData: AccountInsurance
+    insuranceData: Partial<AccountInsurance>
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
