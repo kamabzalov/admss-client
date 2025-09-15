@@ -48,6 +48,8 @@ export const AccountsForm = observer((): ReactElement => {
         accountNote,
         getNotes,
         account: { accountnumber, accountstatus },
+        saveAccount,
+        clearAccount,
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
@@ -87,6 +89,7 @@ export const AccountsForm = observer((): ReactElement => {
         return () => {
             accountNote.note = "";
             accountNote.alert = "";
+            clearAccount();
         };
     }, [id]);
 
@@ -120,6 +123,15 @@ export const AccountsForm = observer((): ReactElement => {
         const queryParams = new URLSearchParams(location.search);
         queryParams.set("tab", tabName);
         navigate(`${ACCOUNTS_PAGE.EDIT(id ?? "")}?${queryParams.toString()}`, { replace: true });
+    };
+
+    const handleSaveAccount = async () => {
+        const response = await saveAccount();
+        if (response?.error) {
+            showError(response.error);
+        } else {
+            navigate(ACCOUNTS_PAGE.MAIN);
+        }
     };
 
     return isLoading ? (
@@ -185,6 +197,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='uppercase px-6 account__button'
                             onClick={() => handleTabChange(activeTab + 1)}
                             disabled={activeTab === tabItems.length - 1}
+                            severity={activeTab === tabItems.length - 1 ? "secondary" : "success"}
                             outlined
                         >
                             Next
@@ -193,6 +206,7 @@ export const AccountsForm = observer((): ReactElement => {
                             disabled={!isAccountChanged}
                             severity={isAccountChanged ? "success" : "secondary"}
                             className='uppercase px-6 account__button'
+                            onClick={handleSaveAccount}
                         >
                             Update
                         </Button>

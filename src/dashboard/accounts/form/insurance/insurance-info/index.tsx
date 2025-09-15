@@ -27,8 +27,8 @@ export const AccountInsuranceInfo = observer(
         const { id } = useParams();
         const navigate = useNavigate();
         const { showError, showSuccess } = useToastMessage();
-        const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
         const store = useStore().accountStore;
+        const { accountInsurance, setAccountInsurance, changeAccountInsurance } = store;
         const [insuranceEdit, setInsuranceEdit] = useState<boolean>(true);
         const [isLoading, setIsLoading] = useState<boolean>(false);
         const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
@@ -46,29 +46,41 @@ export const AccountInsuranceInfo = observer(
         const handleGetInsuranceHistory = async () => {
             if (!id) return;
             setIsLoading(true);
-            getAccountInsurance(id).then((res) => {
-                if (res?.status === Status.ERROR) {
-                    showError(res.error);
+            const res = await getAccountInsurance(id);
+            if (res?.status === Status.ERROR) {
+                showError(res.error);
+            }
+            if (res) {
+                if (!hasUnsavedChanges) {
+                    setAccountInsurance(res as AccountInsurance);
                 }
-                if (res) {
-                    setInsuranceInfo(res as AccountInsurance);
-                    setIsLoading(false);
-                }
-            });
+                setIsLoading(false);
+            }
         };
 
         useEffect(() => {
-            handleGetInsuranceHistory();
+            if (!accountInsurance || Object.keys(accountInsurance).length === 0) {
+                handleGetInsuranceHistory();
+            }
         }, [id]);
 
         const handleChangeInsuranceInfo = async () => {
-            if (!insuranceInfo || !id) return;
+            if (!accountInsurance || !id) return;
 
-            const res = await updateAccountInsurance(id, insuranceInfo);
+            const res = await updateAccountInsurance(id, accountInsurance);
             if (res?.status === Status.ERROR) {
                 showError(res.error);
             } else {
-                await handleGetInsuranceHistory();
+                setIsLoading(true);
+                const updatedRes = await getAccountInsurance(id);
+                if (updatedRes?.status === Status.ERROR) {
+                    showError(updatedRes.error);
+                }
+                if (updatedRes) {
+                    setAccountInsurance(updatedRes as AccountInsurance);
+                    setIsLoading(false);
+                }
+
                 setInsuranceEdit(true);
                 setIsButtonDisabled(true);
                 setHasUnsavedChanges(false);
@@ -78,17 +90,17 @@ export const AccountInsuranceInfo = observer(
         };
 
         const handleChangeInsuranceEdit = () => {
-            if (!insuranceInfo?.Insurance_userUID) {
+            if (!accountInsurance?.Insurance_userUID) {
                 showError(ToastMessage.REQUIRED);
             } else {
-                navigate(CONTACTS_PAGE.EDIT(insuranceInfo?.Insurance_userUID));
+                navigate(CONTACTS_PAGE.EDIT(accountInsurance?.Insurance_userUID));
             }
         };
 
         const handleChangeInsurance = (field: keyof AccountInsurance, value: string) => {
             setIsButtonDisabled(false);
             setHasUnsavedChanges(true);
-            setInsuranceInfo((prev) => ({ ...prev!, [field]: value }));
+            changeAccountInsurance(field, value);
         };
 
         return (
@@ -101,13 +113,13 @@ export const AccountInsuranceInfo = observer(
                             <div className='insurance-info__item insurance-info--splitter'>
                                 <InsuranceInfoField
                                     label='Insurance Company'
-                                    value={insuranceInfo?.Insurance_Company}
+                                    value={accountInsurance?.Insurance_Company}
                                     onChange={(e) => handleChangeInsurance("Insurance_Company", e)}
                                     editMode={insuranceEdit}
                                 />
                                 <InsuranceInfoField
                                     label='Insurance Agent'
-                                    value={insuranceInfo?.Insurance_Agent_Name}
+                                    value={accountInsurance?.Insurance_Agent_Name}
                                     onChange={(e) =>
                                         handleChangeInsurance("Insurance_Agent_Name", e)
                                     }
@@ -115,7 +127,7 @@ export const AccountInsuranceInfo = observer(
                                 />
                                 <InsuranceInfoField
                                     label='Policy#'
-                                    value={insuranceInfo?.Insurance_Policy_Number}
+                                    value={accountInsurance?.Insurance_Policy_Number}
                                     onChange={(e) =>
                                         handleChangeInsurance("Insurance_Policy_Number", e)
                                     }
@@ -126,15 +138,14 @@ export const AccountInsuranceInfo = observer(
                                     <Checkbox
                                         inputId='account-insurance-policy'
                                         name='account-insurance-policy'
-                                        checked={!!insuranceInfo?.Insurance_Policy_Received}
+                                        checked={!!accountInsurance?.Insurance_Policy_Received}
                                         onClick={() => {
                                             setIsButtonDisabled(false);
                                             setHasUnsavedChanges(true);
-                                            setInsuranceInfo((prev) => ({
-                                                ...prev!,
-                                                Insurance_Policy_Received:
-                                                    !prev?.Insurance_Policy_Received ? 1 : 0,
-                                            }));
+                                            changeAccountInsurance(
+                                                "Insurance_Policy_Received",
+                                                !accountInsurance?.Insurance_Policy_Received ? 1 : 0
+                                            );
                                         }}
                                     />
                                     <label
@@ -146,7 +157,7 @@ export const AccountInsuranceInfo = observer(
                                 </div>
                                 <InsuranceInfoField
                                     label='Expiration Date'
-                                    value={insuranceInfo?.Insurance_Exp_Date}
+                                    value={accountInsurance?.Insurance_Exp_Date}
                                     editMode={insuranceEdit}
                                     inputType='date'
                                 />

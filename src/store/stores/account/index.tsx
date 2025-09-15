@@ -6,6 +6,7 @@ import {
     AccountDrawer,
     AccountMemoNote,
     AccountUpdateTakePayment,
+    AccountInsurance,
 } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -34,6 +35,7 @@ export class AccountStore {
     private _accountID: string = "";
     private _accountNote: AccountNoteData = initialNote;
     private _accountTakePayment: Partial<AccountUpdateTakePayment> = {} as AccountUpdateTakePayment;
+    private _accountInsurance: Partial<AccountInsurance> = {} as AccountInsurance;
     private _isAccountChanged: boolean = false;
     private _isAccountPaymentChanged: boolean = false;
     private _prevPath: string | null = null;
@@ -70,6 +72,10 @@ export class AccountStore {
 
     public get accountTakePayment() {
         return this._accountTakePayment;
+    }
+
+    public get accountInsurance() {
+        return this._accountInsurance;
     }
 
     public get isAccountChanged() {
@@ -170,6 +176,17 @@ export class AccountStore {
         }
     );
 
+    public changeAccountInsurance = action(
+        (key: keyof AccountInsurance, value: string | number) => {
+            this._isAccountChanged = true;
+            this._accountInsurance[key] = value as never;
+        }
+    );
+
+    public setAccountInsurance = action((insurance: AccountInsurance) => {
+        this._accountInsurance = insurance;
+    });
+
     public saveTakePayment = action(async (): Promise<BaseResponseError | undefined> => {
         try {
             this._isLoading = true;
@@ -191,7 +208,7 @@ export class AccountStore {
         }
     });
 
-    public saveAccount = action(async (): Promise<string | undefined> => {
+    public saveAccount = action(async (): Promise<BaseResponseError | undefined> => {
         try {
             this._isLoading = true;
 
@@ -199,16 +216,21 @@ export class AccountStore {
                 ...this._account,
                 extdata: this._accountExtData,
             });
-            await Promise.all([response]).then((response) =>
-                response.forEach((res) => {
-                    if (res?.status === Status.ERROR) {
-                        const { error } = res as BaseResponseError;
-                        throw new Error(error);
-                    }
-                })
-            );
+            const result = await Promise.all([response]);
+            result.forEach((res) => {
+                if (res?.status === Status.ERROR) {
+                    const { error } = res as BaseResponseError;
+                    throw new Error(error);
+                }
+            });
+            return {
+                status: Status.OK,
+            };
         } catch (error) {
-            return error as string;
+            return {
+                status: Status.ERROR,
+                error: error as string,
+            };
         } finally {
             this._isLoading = false;
         }
@@ -236,5 +258,6 @@ export class AccountStore {
         this._accountID = "";
         this._prevPath = null;
         this._accountExtData = {} as AccountExtData;
+        this._accountInsurance = {} as AccountInsurance;
     };
 }
