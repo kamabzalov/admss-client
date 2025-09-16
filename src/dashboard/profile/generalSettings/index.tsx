@@ -17,6 +17,7 @@ import { observer } from "mobx-react-lite";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { DASHBOARD_PAGE } from "common/constants/links";
+import { SettingsExportWeb } from "dashboard/profile/generalSettings/export-web";
 
 interface TabItem {
     settingName: string;
@@ -97,6 +98,11 @@ export const GeneralSettings = observer((): ReactElement => {
             settingName: "Watermarking",
             route: "watermarking",
             component: <SettingsWatermarking />,
+        },
+        {
+            settingName: "Export to Web",
+            route: "export-web",
+            component: <SettingsExportWeb />,
         },
         {
             settingName: "Other",

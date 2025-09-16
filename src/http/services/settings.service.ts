@@ -1,5 +1,6 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { ExportWebList } from "common/models/export-web";
 import {
     GeneralInventoryOptions,
     GeneralSettings,
@@ -101,6 +102,23 @@ export const getPostProcessing = async (useruid: string) => {
     }
 };
 
+export const getUserExportWebList = async (
+    useruid?: string
+): Promise<ExportWebList[] | BaseResponseError | undefined> => {
+    const url = useruid ? `user/${useruid}/listwebexport` : `user/listwebexport`;
+    try {
+        const request = await authorizedUserApiInstance.get<ExportWebList[]>(url);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting user export web list",
+            };
+        }
+    }
+};
+
 export const updatePostProcessing = async (
     useruid: string,
     body?: Partial<WatermarkPostProcessing>[]
@@ -172,6 +190,21 @@ export const restoreInventoryGroupDefaults = async (groupuid: string) => {
                 status: Status.ERROR,
                 error:
                     error.response?.data.error || "Error while restoring inventory group defaults",
+            };
+        }
+    }
+};
+
+export const setUserExportWebList = async (useruid?: string, body?: Partial<ExportWebList>[]) => {
+    const url = useruid ? `user/${useruid}/webexport` : `user/webexport`;
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(url, body);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while setting user export web list",
             };
         }
     }
