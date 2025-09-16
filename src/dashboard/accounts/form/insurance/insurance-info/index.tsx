@@ -158,6 +158,7 @@ export const AccountInsuranceInfo = observer(
                                 <InsuranceInfoField
                                     label='Expiration Date'
                                     value={accountInsurance?.Insurance_Exp_Date}
+                                    onChange={(e) => handleChangeInsurance("Insurance_Exp_Date", e)}
                                     editMode={insuranceEdit}
                                     inputType='date'
                                 />
