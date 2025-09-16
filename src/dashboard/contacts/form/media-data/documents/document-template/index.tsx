@@ -2,10 +2,10 @@ import { TruncatedText } from "dashboard/common/display";
 import { Image } from "primereact/image";
 import { ContactMediaItem } from "common/models/contact";
 import { useStore } from "store/hooks";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { convertDateToLocale } from "common/helpers";
 import { MediaType } from "common/models/enums";
+import { useToastMessage } from "common/hooks";
 
 interface ContactDocumentTemplateProps extends Partial<HTMLDivElement> {
     document: Partial<ContactMediaItem>;
@@ -20,7 +20,7 @@ export const ContactDocumentTemplate = ({
     setIsLoading,
 }: ContactDocumentTemplateProps) => {
     const { removeContactMedia, fetchDocuments, formErrorMessage } = useStore().contactStore;
-    const toast = useToast();
+    const { showSuccess, showError } = useToastMessage();
 
     const handleDeleteDocument = async (mediauid: string) => {
         try {
@@ -29,24 +29,12 @@ export const ContactDocumentTemplate = ({
 
             if (result === Status.OK) {
                 await fetchDocuments();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: SUCCESS_MESSAGE,
-                });
+                showSuccess(SUCCESS_MESSAGE);
             } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: formErrorMessage || ERROR_MESSAGE,
-                });
+                showError(formErrorMessage || ERROR_MESSAGE);
             }
         } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: ERROR_MESSAGE,
-            });
+            showError(ERROR_MESSAGE);
         } finally {
             setIsLoading(false);
         }

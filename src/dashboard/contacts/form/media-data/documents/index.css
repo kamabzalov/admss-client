@@ -212,6 +212,13 @@
     padding-right: 2rem;
 }
 
+.presentation__label-text {
+    width: 124px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .document-info__text--bold {
     font-weight: 600;
 }
