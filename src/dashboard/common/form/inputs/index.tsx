@@ -1,4 +1,5 @@
 import { CSSProperties, LegacyRef, ReactElement, useEffect, useId, useRef, useState } from "react";
+import { debounce } from "common/helpers";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
@@ -614,14 +615,59 @@ export const PhoneInput = ({
 interface GlobalSearchInputProps extends InputTextProps {
     onInputChange?: (value: string) => void;
     onIconClick?: () => void;
+    enableDebounce?: boolean;
 }
 
-export const GlobalSearchInput = ({ ...props }: GlobalSearchInputProps): ReactElement => {
+export const GlobalSearchInput = ({
+    enableDebounce = false,
+    onChange,
+    onInputChange,
+    value,
+    ...props
+}: GlobalSearchInputProps): ReactElement => {
     const uniqueId = useId();
+    const [internalValue, setInternalValue] = useState<string>(value || "");
+
+    const debouncedOnChange = debounce((value: string) => {
+        if (onInputChange) {
+            onInputChange(value);
+        }
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+
+        if (enableDebounce) {
+            setInternalValue(newValue);
+            debouncedOnChange(newValue);
+        } else {
+            if (onChange) {
+                onChange(e);
+            }
+            if (onInputChange) {
+                onInputChange(newValue);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (!enableDebounce) {
+            setInternalValue(value || "");
+        } else {
+            setInternalValue(value || "");
+        }
+    }, [value, enableDebounce]);
+
     return (
         <span className='global-search p-input-icon-right p-float-label'>
             <i className='icon adms-search global-search__icon' />
-            <InputText id={uniqueId} className='global-search__input' {...props} />
+            <InputText
+                id={uniqueId}
+                className='global-search__input'
+                value={enableDebounce ? internalValue : value || ""}
+                onChange={handleChange}
+                {...props}
+            />
             <label htmlFor={uniqueId} className='global-search__label float-label'>
                 {props.placeholder || "Search"}
             </label>
