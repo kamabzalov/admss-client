@@ -1,9 +1,9 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { ExportWebList } from "common/models/export-web";
 import {
     GeneralInventoryOptions,
     GeneralSettings,
+    GeneralSettingsWebExport,
     WatermarkPostProcessing,
 } from "common/models/general-settings";
 import { authorizedUserApiInstance } from "http/index";
@@ -104,10 +104,10 @@ export const getPostProcessing = async (useruid: string) => {
 
 export const getUserExportWebList = async (
     useruid?: string
-): Promise<ExportWebList[] | BaseResponseError | undefined> => {
+): Promise<GeneralSettingsWebExport[] | BaseResponseError | undefined> => {
     const url = useruid ? `user/${useruid}/listwebexport` : `user/listwebexport`;
     try {
-        const request = await authorizedUserApiInstance.get<ExportWebList[]>(url);
+        const request = await authorizedUserApiInstance.get<GeneralSettingsWebExport[]>(url);
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
@@ -195,7 +195,10 @@ export const restoreInventoryGroupDefaults = async (groupuid: string) => {
     }
 };
 
-export const setUserExportWebList = async (useruid?: string, body?: Partial<ExportWebList>[]) => {
+export const setUserExportWebList = async (
+    useruid?: string,
+    body?: Partial<GeneralSettingsWebExport>[]
+) => {
     const url = useruid ? `user/${useruid}/webexport` : `user/webexport`;
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(url, body);

@@ -1,0 +1,41 @@
+.settings-export-web {
+    .settings-export-web__key {
+        max-width: 100%;
+        word-break: break-all;
+        white-space: pre-wrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    table th:first-child + th {
+        border-left: none;
+    }
+
+    table td {
+        &:has(.settings-export-web__key) {
+            width: 400px;
+            max-width: 500px;
+            min-width: 200px;
+        }
+        &:has(.settings-export-web__service) {
+            width: 180px;
+            max-width: 180px;
+            min-width: 180px;
+            border-left: none;
+        }
+        .settings-export-web__copy-button {
+            width: 98px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            .icon {
+                font-size: 20px;
+            }
+        }
+    }
+}
