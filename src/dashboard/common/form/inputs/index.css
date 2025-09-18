@@ -297,4 +297,7 @@
         height: 50px;
         width: 200px;
     }
+    .global-search__label {
+        font-weight: 400;
+    }
 }

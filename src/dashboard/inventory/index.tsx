@@ -6,7 +6,7 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
 import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
@@ -586,162 +586,135 @@ export default function Inventories({
     };
 
     const header = (
-        <div className='grid datatable-controls'>
-            <div className='flex justify-content-between align-items-center gap-3'>
-                <span className='p-input-icon-right inventory-top-controls__search'>
-                    <i
-                        className={`pi pi-${!globalSearch ? "search" : "times cursor-pointer"}`}
-                        onClick={() => setGlobalSearch("")}
-                    />
-                    <InputText
-                        value={globalSearch}
-                        onChange={(e) => setGlobalSearch(e.target.value)}
-                    />
-                </span>
-                <Button
-                    className='inventory-top-controls__search-button'
-                    label='Advanced search'
-                    severity='success'
-                    type='button'
-                    onClick={() => setDialogVisible(true)}
-                />
-            </div>
-            <div className='flex justify-content-between align-items-center gap-3 ml-3'>
-                <div className='inventory-top-controls'>
-                    <Button
-                        className='inventory-top-controls__button new-inventory-button'
-                        icon='icon adms-add-item'
-                        severity='success'
-                        type='button'
-                        tooltip='Add new inventory'
-                        onClick={handleAddNewInventory}
-                    >
-                        New
-                    </Button>
-                    <Button
-                        className='inventory-top-controls__button'
-                        severity='success'
-                        type='button'
-                        icon='icon adms-print'
-                        tooltip='Print inventory form'
-                        onClick={() => printTableData(true)}
-                    />
-                    <Button
-                        className='inventory-top-controls__button'
-                        severity='success'
-                        type='button'
-                        icon='icon adms-download'
-                        tooltip='Download inventory form'
-                        onClick={() => printTableData()}
-                    />
-                </div>
-            </div>
-            <div className='col-2 ml-auto'>
-                <MultiSelect
-                    optionValue='value'
-                    optionLabel='label'
-                    options={filterOptions}
-                    value={selectedFilter}
-                    onChange={({ value }: MultiSelectChangeEvent) => {
-                        const selectedOptions = filterOptions.filter((option) =>
-                            value.includes(option.value)
-                        );
-                        setSelectedFilterOptions(selectedOptions);
+        <div className='datatable-controls'>
+            <GlobalSearchInput
+                value={globalSearch}
+                onInputChange={(value) => setGlobalSearch(value)}
+                enableDebounce
+            />
+            <Button
+                className='inventory-top-controls__button new-inventory-button'
+                icon='icon adms-add-item'
+                severity='success'
+                type='button'
+                tooltip='Add new inventory'
+                onClick={handleAddNewInventory}
+            >
+                New
+            </Button>
+            <Button
+                className='inventory-top-controls__button'
+                severity='success'
+                type='button'
+                icon='icon adms-print'
+                tooltip='Print inventory form'
+                onClick={() => printTableData(true)}
+            />
+            <Button
+                className='inventory-top-controls__button'
+                severity='success'
+                type='button'
+                icon='icon adms-download'
+                tooltip='Download inventory form'
+                onClick={() => printTableData()}
+            />
+            <MultiSelect
+                optionValue='value'
+                optionLabel='label'
+                options={filterOptions}
+                value={selectedFilter}
+                onChange={({ value }: MultiSelectChangeEvent) => {
+                    const selectedOptions = filterOptions.filter((option) =>
+                        value.includes(option.value)
+                    );
+                    setSelectedFilterOptions(selectedOptions);
 
-                        changeSettings({
-                            selectedFilterOptions: selectedOptions,
-                        });
-                    }}
-                    placeholder='Filter'
-                    className='w-full pb-0 flex align-items-center inventory-filter'
-                    display='chip'
-                    selectedItemsLabel='Clear Filter'
-                    panelHeaderTemplate={dropdownFilterHeaderPanel}
-                    pt={{
-                        header: {
-                            className: "inventory-filter__header",
+                    changeSettings({
+                        selectedFilterOptions: selectedOptions,
+                    });
+                }}
+                placeholder='Filter'
+                className='inventory-dropdown inventory-filter ml-auto'
+                display='chip'
+                selectedItemsLabel='Clear Filter'
+                panelHeaderTemplate={dropdownFilterHeaderPanel}
+                pt={{
+                    header: {
+                        className: "inventory-filter__header",
+                    },
+                    wrapper: {
+                        className: "inventory-filter__wrapper",
+                        style: {
+                            maxHeight: "500px",
+                            maxWidth: "230px",
                         },
-                        wrapper: {
-                            className: "inventory-filter__wrapper",
-                            style: {
-                                maxHeight: "500px",
-                            },
-                        },
-                    }}
-                />
-            </div>
-            <div className='col-2'>
-                <MultiSelect
-                    options={columns}
-                    value={activeColumns}
-                    optionLabel='header'
-                    onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                        stopPropagation();
-                        const sortedValue = value.sort(
-                            (a: TableColumnsList, b: TableColumnsList) => {
-                                const firstIndex = columns.findIndex(
-                                    (col) => col.field === a.field
-                                );
-                                const secondIndex = columns.findIndex(
-                                    (col) => col.field === b.field
-                                );
-                                return firstIndex - secondIndex;
-                            }
-                        );
+                    },
+                }}
+            />
+            <MultiSelect
+                options={columns}
+                value={activeColumns}
+                optionLabel='header'
+                onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                    stopPropagation();
+                    const sortedValue = value.sort((a: TableColumnsList, b: TableColumnsList) => {
+                        const firstIndex = columns.findIndex((col) => col.field === a.field);
+                        const secondIndex = columns.findIndex((col) => col.field === b.field);
+                        return firstIndex - secondIndex;
+                    });
 
-                        setActiveColumns(sortedValue);
+                    setActiveColumns(sortedValue);
 
-                        changeSettings({
-                            activeColumns: value.map(({ field }: { field: string }) => field),
-                        });
-                    }}
-                    panelHeaderTemplate={dropdownHeaderPanel}
-                    className='w-full pb-0 h-full flex align-items-center column-picker'
-                    display='chip'
-                    pt={{
-                        header: {
-                            className: "column-picker__header",
+                    changeSettings({
+                        activeColumns: value.map(({ field }: { field: string }) => field),
+                    });
+                }}
+                panelHeaderTemplate={dropdownHeaderPanel}
+                className='inventory-dropdown column-picker'
+                display='chip'
+                pt={{
+                    header: {
+                        className: "column-picker__header",
+                    },
+                    wrapper: {
+                        className: "column-picker__wrapper",
+                        style: {
+                            maxHeight: "500px",
+                            maxWidth: "230px",
                         },
-                        wrapper: {
-                            className: "column-picker__wrapper",
-                            style: {
-                                maxHeight: "500px",
-                            },
+                    },
+                }}
+            />
+            <MultiSelect
+                optionValue='description'
+                optionLabel='description'
+                options={inventoryGroupClassList}
+                value={selectedInventoryType}
+                onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                    stopPropagation();
+                    setSelectedInventoryType(value);
+                    changeSettings({
+                        selectedInventoryType: value,
+                    });
+                }}
+                placeholder='Inventory Type'
+                className='inventory-dropdown inventory-filter'
+                display='chip'
+                selectedItemsLabel='Clear Filter'
+                panelHeaderTemplate={dropdownTypeHeaderPanel}
+                pt={{
+                    header: {
+                        className: "inventory-filter__header",
+                    },
+                    wrapper: {
+                        className: "inventory-filter__wrapper",
+                        style: {
+                            maxHeight: "500px",
+                            maxWidth: "230px",
                         },
-                    }}
-                />
-            </div>
-            <div className='col-2'>
-                <MultiSelect
-                    optionValue='description'
-                    optionLabel='description'
-                    options={inventoryGroupClassList}
-                    value={selectedInventoryType}
-                    onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                        stopPropagation();
-                        setSelectedInventoryType(value);
-                        changeSettings({
-                            selectedInventoryType: value,
-                        });
-                    }}
-                    placeholder='Inventory Type'
-                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
-                    display='chip'
-                    selectedItemsLabel='Clear Filter'
-                    panelHeaderTemplate={dropdownTypeHeaderPanel}
-                    pt={{
-                        header: {
-                            className: "inventory-filter__header",
-                        },
-                        wrapper: {
-                            className: "inventory-filter__wrapper",
-                            style: {
-                                maxHeight: "500px",
-                            },
-                        },
-                    }}
-                />
-            </div>
+                    },
+                }}
+            />
         </div>
     );
 
