@@ -78,3 +78,9 @@ export interface GeneralInventoryOptions extends ListData {
     itemuid: string;
     order: number;
 }
+
+export interface GeneralSettingsWebExport {
+    id: number;
+    name: string;
+    service_name: string;
+}
