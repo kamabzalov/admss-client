@@ -14,10 +14,11 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { useStore } from "store/hooks";
 import { emptyTemplate } from "dashboard/common/form/upload";
-import { useToast } from "dashboard/common/toast";
+import { useToastMessage } from "common/hooks";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
 import { ContactDocumentTemplate } from "./document-template";
+import { TruncatedText } from "dashboard/common/display";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -32,7 +33,7 @@ const isPdf = (file: File) => {
 
 export const ContactsDocuments = observer((): ReactElement => {
     const store = useStore().contactStore;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const {
         saveContactDocuments,
         uploadFileDocuments,
@@ -60,13 +61,9 @@ export const ContactsDocuments = observer((): ReactElement => {
 
     useEffect(() => {
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
         }
-    }, [formErrorMessage, toast]);
+    }, [formErrorMessage, showError]);
 
     const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
         store.uploadFileDocuments = {
@@ -104,11 +101,7 @@ export const ContactsDocuments = observer((): ReactElement => {
     const handleUploadFiles = async () => {
         setIsLoading(true);
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
         }
         const response = await saveContactDocuments();
 
@@ -146,7 +139,15 @@ export const ContactsDocuments = observer((): ReactElement => {
                         />
                     )}
                     <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
+                        <TruncatedText
+                            withTooltip
+                            tooltipOptions={{
+                                position: "top",
+                                content: file.name,
+                            }}
+                            className='presentation__label-text'
+                            text={file.name}
+                        />
                     </span>
                 </div>
                 <Button

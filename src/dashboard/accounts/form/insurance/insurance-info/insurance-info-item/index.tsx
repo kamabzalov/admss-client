@@ -19,8 +19,9 @@ export const InsuranceInfoField = ({
     inputType = "text",
 }: EditableFieldProps): ReactElement => {
     const handleDateChange = (e: CalendarChangeEvent) => {
-        const dateInMs = new Date(e.target.value as string).getTime();
-        if (onChange) {
+        const selectedDate = e.value as Date | null;
+        if (selectedDate && onChange) {
+            const dateInMs = selectedDate.getTime();
             onChange(dateInMs.toString());
         }
     };
@@ -31,7 +32,8 @@ export const InsuranceInfoField = ({
                 className='insurance-info__input w-full'
                 value={value}
                 name={label}
-                date={Number(value) || new Date()}
+                date={value ? Number(value) : undefined}
+                emptyDate
                 onChange={handleDateChange}
             />
         ) : (
