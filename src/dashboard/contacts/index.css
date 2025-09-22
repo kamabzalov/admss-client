@@ -1,3 +1,9 @@
+.contacts {
+    .category-selector {
+        width: 230px;
+    }
+}
+
 .contact__card {
     display: flex;
     flex-direction: column;

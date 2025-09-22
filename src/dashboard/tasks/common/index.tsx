@@ -1,5 +1,5 @@
 import { Task, TaskStatus } from "common/models/tasks";
-import { FilterOptions } from "dashboard/common/filter";
+import { FilterOptions, TableColumn } from "dashboard/common/filter";
 import { Chip } from "primereact/chip";
 import { ColumnProps } from "primereact/column";
 
@@ -7,9 +7,9 @@ export interface TableColumnProps extends ColumnProps {
     field: keyof Task;
 }
 
-type TableColumnsListExtend = { checked?: boolean; isSelectable?: boolean };
-
-export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & TableColumnsListExtend;
+export interface TableColumnsList extends TableColumn {
+    field: keyof Task;
+}
 
 interface TasksFilterOptions {
     name: string;

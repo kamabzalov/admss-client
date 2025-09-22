@@ -42,7 +42,7 @@ export const CompanySearch = ({
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
         if (contactCategory) {
-            getContactsTypeList("0").then((response) => {
+            getContactsTypeList().then((response) => {
                 if (response) {
                     const types = response as ContactType[];
                     const category = types?.find((item) => item.name === contactCategory)?.id;

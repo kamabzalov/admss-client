@@ -1,8 +1,13 @@
 import { ExportWebList } from "common/models/export-web";
 import { Inventory } from "common/models/inventory";
 import { Checkbox } from "primereact/checkbox";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import {
+    MultiSelect,
+    MultiSelectChangeEvent,
+    MultiSelectPanelHeaderTemplateEvent,
+} from "primereact/multiselect";
 import { ReactElement, useState } from "react";
+import "./index.css";
 
 export interface FilterOptions {
     label: string;
@@ -124,6 +129,93 @@ export const TableFilter = ({
                     className: "inventory-filter__wrapper",
                     style: {
                         maxHeight: "500px",
+                    },
+                },
+            }}
+        />
+    );
+};
+
+export interface TableColumn {
+    field: string;
+    header: string;
+    checked: boolean;
+    isSelectable?: boolean;
+}
+
+interface ColumnSelectorProps<T extends TableColumn> {
+    selectableColumns: T[];
+    activeColumns: T[];
+    onColumnsChange: (columns: T[]) => void;
+    className?: string;
+    placeholder?: string;
+    width?: string;
+}
+
+export const ColumnSelector = <T extends TableColumn>({
+    selectableColumns,
+    activeColumns,
+    onColumnsChange,
+    className,
+    width = "230px",
+    placeholder = "Columns",
+}: ColumnSelectorProps<T>): ReactElement => {
+    const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        onChange={() => {
+                            if (selectableColumns.length === activeColumns.length) {
+                                onColumnsChange(selectableColumns.filter(({ checked }) => checked));
+                            } else {
+                                onColumnsChange(selectableColumns);
+                            }
+                        }}
+                        checked={selectableColumns.length === activeColumns.length}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={(e) => {
+                        onColumnsChange(selectableColumns.filter(({ checked }) => checked));
+                        onCloseClick(e);
+                    }}
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
+    return (
+        <MultiSelect
+            options={selectableColumns}
+            value={activeColumns}
+            optionLabel='header'
+            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                stopPropagation();
+                onColumnsChange(value);
+            }}
+            panelHeaderTemplate={dropdownHeaderPanel}
+            className={`${className} column-selector`}
+            display='chip'
+            placeholder={placeholder}
+            pt={{
+                root: {
+                    style: {
+                        width,
+                    },
+                },
+                header: {
+                    className: `${className}__header`,
+                },
+                wrapper: {
+                    className: `${className}__wrapper`,
+                    style: {
+                        maxHeight: "230px",
                     },
                 },
             }}

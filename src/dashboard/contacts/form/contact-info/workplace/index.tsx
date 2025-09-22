@@ -9,7 +9,7 @@ import { PhoneInput } from "dashboard/common/form/inputs";
 export const ContactsWorkplace = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
-    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+    const { values, errors, touched, setFieldValue, setFieldTouched, handleBlur } =
         useFormikContext<ContactExtData>();
     return (
         <div className='grid contacts-workplace row-gap-2'>
@@ -45,6 +45,8 @@ export const ContactsWorkplace = observer((): ReactElement => {
                         className={`contacts-workplace__text-input w-full ${
                             errors.Buyer_Emp_Ext ? "p-invalid" : ""
                         }`}
+                        type='email'
+                        id='Buyer_Emp_Ext'
                         onBlur={handleBlur}
                         value={values.Buyer_Emp_Ext || ""}
                         onChange={async ({ target: { value } }) => {
@@ -62,10 +64,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <PhoneInput
                     name='Phone Number'
                     className={`contacts-workplace__text-input w-full ${
-                        errors.Buyer_Emp_Phone ? "p-invalid" : ""
+                        errors.Buyer_Emp_Phone && touched.Buyer_Emp_Phone ? "p-invalid" : ""
                     }`}
                     onBlur={handleBlur}
-                    value={values.Buyer_Emp_Phone || ""}
+                    value={contactExtData.Buyer_Emp_Phone}
                     onChange={async ({ target: { value } }) => {
                         await setFieldValue("Buyer_Emp_Phone", value);
                         changeContactExtData("Buyer_Emp_Phone", value);

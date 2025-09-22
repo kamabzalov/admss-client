@@ -1,0 +1,6 @@
+.column-selector {
+    .p-multiselect-label-container {
+        display: flex;
+        align-items: center;
+    }
+}

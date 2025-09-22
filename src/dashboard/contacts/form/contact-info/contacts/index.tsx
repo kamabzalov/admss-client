@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { Contact } from "common/models/contact";
-import { InputMask } from "primereact/inputmask";
+import { PhoneInput } from "dashboard/common/form/inputs";
 
 interface SocialInputProps extends InputTextProps {
     social: "Facebook" | "WhatsApp" | "Slack" | "Microsoft Teams";
@@ -105,46 +105,36 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             )}
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputMask
-                        type='tel'
-                        className={`contacts-social__text-input w-full ${
-                            errors.phone1 ? "p-invalid" : ""
-                        }`}
-                        mask='999-999-9999'
-                        onBlur={handleBlur}
-                        value={values?.phone1 ?? ""}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("phone1", value);
-                            value && changeContact("phone1", value);
-                            setFieldTouched("phone1", true, true);
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-                <small className='p-error'>{errors.phone1}</small>
+                <PhoneInput
+                    name='Phone Number'
+                    className={`contacts-social__text-input w-full ${
+                        errors.phone1 ? "p-invalid" : ""
+                    }`}
+                    onBlur={handleBlur}
+                    value={values.phone1 ?? ""}
+                    onChange={async ({ target: { value } }) => {
+                        await setFieldValue("phone1", value);
+                        value && changeContact("phone1", value);
+                        setFieldTouched("phone1", true, true);
+                    }}
+                />
             </div>
             {anotherPhone ? (
                 <div className='col-6 relative'>
-                    <span className='p-float-label'>
-                        <InputMask
-                            type='tel'
-                            mask='999-999-9999'
-                            className={`contacts-social__text-input w-full ${
-                                errors.phone2 ? "p-invalid" : ""
-                            }`}
-                            value={values.phone2 ?? ""}
-                            onBlur={handleBlur}
-                            onChange={async ({ target: { value } }) => {
-                                if (!value?.length) setAnotherPhone(false);
-                                await setFieldValue("phone2", value);
-                                value && changeContact("phone2", value);
-                                setFieldTouched("phone2", true, true);
-                            }}
-                        />
-                        <label className='float-label'>Phone Number</label>
-                    </span>
-                    <small className='p-error'>{errors.phone2}</small>
+                    <PhoneInput
+                        name='Phone Number'
+                        className={`contacts-social__text-input w-full ${
+                            errors.phone2 ? "p-invalid" : ""
+                        }`}
+                        onBlur={handleBlur}
+                        value={values.phone2 ?? ""}
+                        onChange={async ({ target: { value } }) => {
+                            if (!value?.length) setAnotherPhone(false);
+                            await setFieldValue("phone2", value);
+                            value && changeContact("phone2", value);
+                            setFieldTouched("phone2", true, true);
+                        }}
+                    />
                 </div>
             ) : (
                 <div className='col-6'>
