@@ -7,7 +7,7 @@ import App from "App";
 import { Dashboard } from "dashboard";
 import { Accounts } from "dashboard/accounts";
 import { AccountsForm } from "dashboard/accounts/form";
-import Contacts from "dashboard/contacts";
+import { Contacts } from "dashboard/contacts";
 import { ContactForm } from "dashboard/contacts/form";
 import { Deals } from "dashboard/deals";
 import { DealsForm } from "dashboard/deals/form";
