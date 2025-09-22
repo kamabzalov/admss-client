@@ -23,17 +23,14 @@ import { useStore } from "store/hooks";
 import { AdvancedSearch, SEARCH_FORM_FIELDS, SEARCH_FORM_QUERY, Task } from "common/models/tasks";
 import { getAllTasks, getCurrentUserTasks } from "http/services/tasks.service";
 import { useToast } from "dashboard/common/toast";
-import {
-    MultiSelect,
-    MultiSelectChangeEvent,
-    MultiSelectPanelHeaderTemplateEvent,
-} from "primereact/multiselect";
+import { MultiSelect, MultiSelectPanelHeaderTemplateEvent } from "primereact/multiselect";
 import { TableColumnsList, TASKS_STATUS_LIST } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
+import { ColumnSelector } from "dashboard/common/filter";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -243,38 +240,6 @@ export const TasksDataTable = observer((): ReactElement => {
         );
     };
 
-    const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        onChange={() => {
-                            if (selectableColumns.length === activeColumns.length) {
-                                setActiveColumns(
-                                    selectableColumns.filter(({ checked }) => checked)
-                                );
-                            } else {
-                                setActiveColumns(selectableColumns);
-                            }
-                        }}
-                        checked={selectableColumns.length === activeColumns.length}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setActiveColumns(selectableColumns.filter(({ checked }) => checked));
-                        onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
-    };
-
     const handleCreateTask = () => {
         setCurrentTask(null);
         setShowTaskDialog(true);
@@ -362,28 +327,12 @@ export const TasksDataTable = observer((): ReactElement => {
                         }}
                         name='My tasks only'
                     />
-                    <MultiSelect
-                        options={selectableColumns}
-                        value={activeColumns}
-                        optionLabel='header'
-                        onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                            stopPropagation();
-                            setActiveColumns(value);
-                        }}
-                        panelHeaderTemplate={dropdownHeaderPanel}
+                    <ColumnSelector<TableColumnsList>
+                        selectableColumns={selectableColumns}
+                        activeColumns={activeColumns}
+                        onColumnsChange={setActiveColumns}
                         className='tasks-filter'
-                        display='chip'
-                        pt={{
-                            header: {
-                                className: "tasks-filter__header",
-                            },
-                            wrapper: {
-                                className: "tasks-filter__wrapper",
-                                style: {
-                                    maxHeight: "230px",
-                                },
-                            },
-                        }}
+                        placeholder='Columns'
                     />
                 </div>
             </div>

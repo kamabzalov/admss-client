@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useMemo, useState, useEffect } from "react";
 import "./index.css";
 import { useParams } from "react-router-dom";
 import { checkContactOFAC } from "http/services/contacts-service";
@@ -68,6 +68,12 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
             store.contactOFAC = response as ContactOFAC;
         }
     };
+
+    useEffect(() => {
+        if (!isControlDisabled) {
+            handleOfacCheck();
+        }
+    }, []);
 
     return (
         <div className='grid ofac-check row-gap-2'>

@@ -55,7 +55,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
 
     const handleGetTypeList = async () => {
         setIsLoading(true);
-        const response = await getContactsTypeList(id || "0");
+        const response = await getContactsTypeList(id);
         if (response && Array.isArray(response)) {
             setTypeList(response);
         } else {

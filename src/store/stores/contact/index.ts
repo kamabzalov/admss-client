@@ -446,7 +446,7 @@ export class ContactStore {
             ]);
 
             if (contactDataResponse?.status === Status.ERROR) {
-                await Promise.reject(contactDataResponse?.error);
+                await Promise.reject(contactDataResponse?.errors || contactDataResponse?.error);
                 return contactDataResponse;
             }
 
@@ -473,7 +473,9 @@ export class ContactStore {
                 ]);
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
-                    await Promise.reject(coBuyerContactDataResponse?.error);
+                    await Promise.reject(
+                        coBuyerContactDataResponse?.errors || coBuyerContactDataResponse?.error
+                    );
                     return coBuyerContactDataResponse;
                 }
             }

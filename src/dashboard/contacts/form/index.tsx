@@ -17,17 +17,21 @@ import { observer } from "mobx-react-lite";
 import { Form, Formik, FormikProps } from "formik";
 import { Contact, ContactExtData } from "common/models/contact";
 import * as Yup from "yup";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { ContactMediaData } from "dashboard/contacts/form/media-data";
 import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
-import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
+import {
+    EMAIL_REGEX,
+    LETTERS_NUMBERS_SIGNS_REGEX,
+    PHONE_NUMBER_REGEX,
+} from "common/constants/regex";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { useToastMessage } from "common/hooks";
+import { CONTACTS_PAGE } from "common/constants/links";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -112,23 +116,29 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             return value !== 0 && value !== null && value !== undefined;
         })
         .required(ERROR_MESSAGES.REQUIRED),
-    email1: Yup.string().email(ERROR_MESSAGES.EMAIL),
-    email2: Yup.string().email(ERROR_MESSAGES.EMAIL),
+    email1: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
+    email2: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
     phone1: Yup.string()
-        .transform((value) => value.replace(/-/g, ""))
+        .transform((value) => value.replace(/[-+]/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
             message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
     phone2: Yup.string()
-        .transform((value) => value.replace(/-/g, ""))
+        .transform((value) => value.replace(/[-+]/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
             message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
-    Buyer_Emp_Ext: Yup.string().email(ERROR_MESSAGES.EMAIL),
+    Buyer_Emp_Ext: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
     Buyer_Emp_Phone: Yup.string()
-        .transform((value) => value.replace(/-/g, ""))
+        .transform((value) => value.replace(/[-+]/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
             message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
@@ -194,7 +204,7 @@ export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
 
     const [contactSections, setContactSections] = useState<ContactSection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
@@ -265,13 +275,8 @@ export const ContactForm = observer((): ReactElement => {
         if (id) {
             getContact(id).then((response) => {
                 if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: (response?.error as string) || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(`/dashboard/contacts`);
+                    showError(response?.error as string);
+                    navigate(CONTACTS_PAGE.MAIN);
                 }
             });
         } else {
@@ -284,7 +289,7 @@ export const ContactForm = observer((): ReactElement => {
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
-        return `/dashboard/contacts/${currentPath}?step=${activeIndex + 1}`;
+        return `${CONTACTS_PAGE.EDIT(currentPath)}?step=${activeIndex + 1}`;
     };
 
     const handleCloseClick = () => {
@@ -293,7 +298,7 @@ export const ContactForm = observer((): ReactElement => {
                 navigate(memoRoute);
                 store.memoRoute = "";
             } else {
-                navigate(`/dashboard/contacts`);
+                navigate(CONTACTS_PAGE.MAIN);
             }
         };
 
@@ -379,31 +384,18 @@ export const ContactForm = observer((): ReactElement => {
                         navigate(memoRoute);
                         store.memoRoute = "";
                     } else {
-                        navigate(`/dashboard/contacts`);
+                        navigate(CONTACTS_PAGE.MAIN);
                     }
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Contact saved successfully",
-                    });
+                    showSuccess("Contact saved successfully");
                 } else {
-                    const { errorField } = response as BaseResponseError;
-                    if (
-                        errorField &&
-                        Object.keys(tabFields).some((key) =>
-                            tabFields[key as ContactAccordionItems]?.includes(
-                                errorField as keyof PartialContact
-                            )
-                        )
-                    ) {
-                        formikRef.current?.setErrors({ [errorField]: response.error });
+                    if (response && Array.isArray(response)) {
+                        response.forEach((error) => {
+                            formikRef.current?.setErrors({ [error.field]: error.message });
+                            showError(error.message);
+                        });
+                    } else {
+                        showError(response.error);
                     }
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response.error || "Error while saving contact",
-                        life: TOAST_LIFETIME,
-                    });
                 }
             } else {
                 setValidateOnMount(true);

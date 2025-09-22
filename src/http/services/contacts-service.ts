@@ -63,10 +63,10 @@ export const getContactInfo = async (uid: string) => {
     }
 };
 
-export const getContactsTypeList = async (uid: string | "0") => {
+export const getContactsTypeList = async (uid?: string) => {
     try {
         const request = await authorizedUserApiInstance.get<ContactsCategories>(
-            `contacts/${uid}/listtypes`
+            `contacts/${uid || "0"}/listtypes`
         );
         if (request.data.status === Status.OK) {
             return request.data?.contact_types;
@@ -132,7 +132,7 @@ export const setContact = async (
                     error.response?.data.info ||
                     error.response?.data.error ||
                     "Error while setting contact",
-                errorField: error.response?.data.errorField,
+                errors: error.response?.data.errors,
             };
         }
     }

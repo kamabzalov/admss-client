@@ -85,15 +85,15 @@ export const AdvancedSearchDialog = <T,>({
                 }
             });
         }
-        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
-            getContactsTypeList("0").then((response) => {
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS && visible) {
+            getContactsTypeList().then((response) => {
                 if (response) {
                     const types = response as ContactType[];
                     setTypeList(types);
                 }
             });
         }
-    }, [searchForm]);
+    }, [searchForm, visible]);
 
     const handleSelectMake = useCallback(() => {
         if (!autoMake) return;
