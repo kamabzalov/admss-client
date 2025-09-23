@@ -9,16 +9,16 @@ import { BaseResponseError } from "common/models/base-response";
 import { GeneralSettingsWebExport } from "common/models/general-settings";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { Tooltip } from "primereact/tooltip";
 import "./index.css";
+import { TruncatedText } from "dashboard/common/display";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof GeneralSettingsWebExport;
 }
 
 const renderColumnsData: TableColumnProps[] = [
-    { field: "name", header: "Service" },
-    { field: "service_name", header: "Key" },
+    { field: "service_name", header: "Service" },
+    { field: "service_key", header: "Key" },
 ];
 
 export const SettingsExportWeb = (): ReactElement => {
@@ -104,34 +104,19 @@ export const SettingsExportWeb = (): ReactElement => {
 
     const dataColumnBody = (
         field: keyof GeneralSettingsWebExport,
-        value: string | number,
+        value: string,
         rowIndex: number,
         selectedRows: boolean[]
     ): ReactElement => {
         const isSelected = selectedRows[rowIndex];
 
-        if (field === "service_name") {
-            const tooltipClass = `settings-export-web__key--tooltip-${rowIndex}`;
-            return (
-                <>
-                    <div
-                        className={`settings-export-web__key ${tooltipClass} ${isSelected && "row--selected"}`}
-                    >
-                        {value}
-                    </div>
-                    <Tooltip
-                        target={`.${tooltipClass}`}
-                        content={value as string}
-                        position='mouse'
-                    />
-                </>
-            );
-        }
-
         return (
-            <div className={`settings-export-web__service ${isSelected && "row--selected"}`}>
-                {value}
-            </div>
+            <TruncatedText
+                text={value}
+                withTooltip
+                tooltipOptions={{ position: "mouse" }}
+                className={`settings-export-web__${field === "service_key" ? "key" : "service"} ${isSelected ? "row--selected" : ""}`}
+            />
         );
     };
 
@@ -192,8 +177,10 @@ export const SettingsExportWeb = (): ReactElement => {
                         ))}
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            className='account__table-checkbox'
-                            body={({ name, service_name }) => actionColumnBody(name, service_name)}
+                            className='account__table-action'
+                            body={({ service_name, service_key }) =>
+                                actionColumnBody(service_name, service_key)
+                            }
                             pt={{
                                 root: {
                                     style: {

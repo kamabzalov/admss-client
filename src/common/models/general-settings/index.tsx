@@ -81,6 +81,8 @@ export interface GeneralInventoryOptions extends ListData {
 
 export interface GeneralSettingsWebExport {
     id: number;
+    index: number;
     name: string;
     service_name: string;
+    service_key: string;
 }

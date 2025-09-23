@@ -27,7 +27,11 @@ export const TruncatedText = ({
     }, [text]);
 
     return (
-        <div ref={textRef} className={`truncated-text ${className}`} data-tooltip-id={uniqueId}>
+        <div
+            ref={textRef}
+            className={`truncated-text ${className ?? ""}`}
+            data-tooltip-id={uniqueId}
+        >
             {text}
             {isTextTruncated && withTooltip && (
                 <Tooltip

@@ -10,14 +10,18 @@
         -webkit-box-orient: vertical;
     }
 
+    .settings-export-web__service {
+        width: 174px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     table th:first-child + th {
         border-left: none;
     }
 
     table td {
         &:has(.settings-export-web__key) {
-            width: 400px;
-            max-width: 500px;
             min-width: 200px;
         }
         &:has(.settings-export-web__service) {
@@ -25,6 +29,7 @@
             max-width: 180px;
             min-width: 180px;
             border-left: none;
+            padding-left: 0;
         }
         .settings-export-web__copy-button {
             width: 98px;
