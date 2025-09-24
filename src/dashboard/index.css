@@ -527,10 +527,17 @@
     border: none;
 }
 
-.p-autocomplete-dd .p-autocomplete-dropdown,
-.p-autocomplete-dd .p-autocomplete-dropdown:hover {
+.p-autocomplete-dd .p-autocomplete-dropdown {
     background: transparent;
-    color: var(--admss-app-blue-text);
+    color: var(--admss-app-light-grey);
+    &:hover {
+        background: transparent;
+        color: var(--admss-app-lightest-grey);
+    }
+    &:focus {
+        background: transparent;
+        color: var(--admss-app-lightest-grey);
+    }
 }
 
 .p-datepicker:not(.p-datepicker-inline) .p-datepicker-header {

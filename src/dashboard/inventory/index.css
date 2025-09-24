@@ -25,6 +25,11 @@
     .p-multiselect-label {
         margin-top: 0.2rem;
     }
+    .inventory-top-controls__search-button {
+        height: 50px;
+        width: 200px;
+        font-weight: 600;
+    }
 }
 .inventory__title {
     width: auto;

@@ -186,3 +186,5 @@ export const useToastMessage = () => {
             showToast({ type: ToastType.INFO, message, summary }),
     };
 };
+
+export { useCreateReport } from "common/hooks/useCreateReport";
