@@ -16,6 +16,8 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useDateRange } from "common/hooks";
 import { validateDates } from "common/helpers";
+import { AutoComplete } from "primereact/autocomplete";
+import { Button } from "primereact/button";
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
@@ -64,6 +66,7 @@ export const AdvancedSearchDialog = <T,>({
     action,
     searchForm,
 }: AdvancedSearchDialogProps<T>): ReactElement => {
+    const [initialAutomakesList, setInitialAutomakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [typeList, setTypeList] = useState<ContactType[]>([]);
@@ -73,38 +76,52 @@ export const AdvancedSearchDialog = <T,>({
 
     const autoMake = fields.find((field) => field.key === "Make")?.value;
 
-    useEffect(() => {
+    const handleGetAutoMakeList = useCallback(async () => {
         if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
-            getInventoryAutomakesList().then((list) => {
-                if (list) {
-                    const upperCasedList = list.map((item) => ({
-                        ...item,
-                        name: item.name.toUpperCase(),
-                    }));
-                    setAutomakesList(upperCasedList);
-                }
-            });
+            const list = await getInventoryAutomakesList();
+            if (list && Array.isArray(list)) {
+                const upperCasedList = list.map((item) => ({
+                    ...item,
+                    name: item.name.toUpperCase(),
+                }));
+                setInitialAutomakesList(upperCasedList);
+                setAutomakesList(upperCasedList);
+            }
         }
-        if (searchForm === SEARCH_FORM_TYPE.CONTACTS && visible) {
-            getContactsTypeList().then((response) => {
-                if (response) {
-                    const types = response as ContactType[];
-                    setTypeList(types);
-                }
-            });
+    }, [searchForm]);
+
+    const handleGetContactsTypeList = useCallback(async () => {
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
+            const response = await getContactsTypeList();
+            if (response) {
+                const types = response as ContactType[];
+                setTypeList(types);
+            }
+        }
+    }, [searchForm]);
+
+    useEffect(() => {
+        if (!visible) return;
+        if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
+            handleGetAutoMakeList();
+        }
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
+            handleGetContactsTypeList();
         }
     }, [searchForm, visible]);
 
-    const handleSelectMake = useCallback(() => {
-        if (!autoMake) return;
-        const formatedMake = autoMake.toLowerCase().replaceAll(" ", "");
-        getAutoMakeModelList(formatedMake).then((list) => {
-            if (list && Object.keys(list).length) {
-                setAutomakesModelList(list);
-            } else {
-                setAutomakesModelList([]);
-            }
-        });
+    const handleSelectMake = useCallback(async () => {
+        if (!autoMake) {
+            setAutomakesModelList([]);
+            return;
+        }
+        const formatedMake = autoMake.toLowerCase().replaceAll(" ", "_");
+        const list = await getAutoMakeModelList(formatedMake);
+        if (list && Array.isArray(list)) {
+            setAutomakesModelList(list);
+        } else {
+            setAutomakesModelList([]);
+        }
     }, [autoMake]);
 
     useEffect(() => {
@@ -221,7 +238,7 @@ export const AdvancedSearchDialog = <T,>({
                     }
 
                     return (
-                        <span className='p-float-label p-input-icon-right' key={key}>
+                        <span className='p-float-label p-input-icon-right relative' key={key}>
                             {type === SEARCH_FIELD_TYPE.TEXT && (
                                 <InputText
                                     type='tel'
@@ -265,21 +282,59 @@ export const AdvancedSearchDialog = <T,>({
 
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
                                 searchForm === SEARCH_FORM_TYPE.INVENTORY && (
-                                    <ComboBox
-                                        className='w-full'
-                                        optionLabel='name'
-                                        optionValue='name'
-                                        value={value ?? ""}
-                                        editable
-                                        valueTemplate={selectedAutoMakesTemplate}
-                                        itemTemplate={autoMakesOptionTemplate}
-                                        options={
-                                            key === DROPDOWN_TYPE.MAKE
-                                                ? automakesList
-                                                : automakesModelList
-                                        }
-                                        onChange={({ target }) => onInputChange(key, target.value)}
-                                    />
+                                    <>
+                                        {key === DROPDOWN_TYPE.MAKE ? (
+                                            <AutoComplete
+                                                value={value ?? ""}
+                                                suggestions={automakesList}
+                                                completeMethod={({ query }) => {
+                                                    setAutomakesList(
+                                                        initialAutomakesList.filter((item) =>
+                                                            item.name.includes(query.toUpperCase())
+                                                        )
+                                                    );
+                                                }}
+                                                dropdown
+                                                onChange={({ value }) => {
+                                                    const make =
+                                                        typeof value === "string"
+                                                            ? value
+                                                            : value.name;
+                                                    onInputChange(key, make);
+
+                                                    const modelField = fields.find(
+                                                        (field) => field.key === "Model"
+                                                    );
+                                                    if (modelField) {
+                                                        onInputChange("Model" as keyof T, "");
+                                                    }
+                                                }}
+                                                itemTemplate={(option) =>
+                                                    autoMakesOptionTemplate(option)
+                                                }
+                                                selectedItemTemplate={(option) =>
+                                                    selectedAutoMakesTemplate(option, {
+                                                        placeholder: label || key,
+                                                    })
+                                                }
+                                                className={"w-full"}
+                                            />
+                                        ) : (
+                                            <ComboBox
+                                                className='w-full'
+                                                optionLabel='name'
+                                                optionValue='name'
+                                                value={value ?? ""}
+                                                editable
+                                                options={automakesModelList}
+                                                onChange={({ target }) =>
+                                                    onInputChange(key, target.value)
+                                                }
+                                                required
+                                                placeholder={label || key}
+                                            />
+                                        )}
+                                    </>
                                 )}
 
                             {type === SEARCH_FIELD_TYPE.DROPDOWN &&
@@ -318,13 +373,24 @@ export const AdvancedSearchDialog = <T,>({
                             )}
 
                             {value && onSearchClear && (
-                                <i
-                                    className={`pi pi-times cursor-pointer search-dialog__clear ${
-                                        type === SEARCH_FIELD_TYPE.DROPDOWN && "pr-4"
-                                    }`}
+                                <Button
+                                    type='button'
+                                    icon='pi pi-times'
+                                    text
+                                    className={`cursor-pointer search-dialog__clear`}
                                     onClick={() => {
                                         if (key === DROPDOWN_TYPE.TYPE) {
                                             setSelectedType("");
+                                        }
+                                        if (key === DROPDOWN_TYPE.MAKE) {
+                                            const modelField = fields.find(
+                                                (field) => field.key === "Model"
+                                            );
+                                            if (modelField) {
+                                                onInputChange("Model" as keyof T, "");
+                                            }
+                                            setAutomakesList(initialAutomakesList);
+                                            setAutomakesModelList([]);
                                         }
                                         onSearchClear(key);
                                     }}

@@ -7,10 +7,33 @@
         display: inline-flex;
         align-items: center;
     }
+
+    .p-autocomplete-dropdown.p-button {
+        width: 30px;
+        padding-right: 12px;
+        padding-top: 10px;
+        padding-left: 0;
+    }
 }
-.search-dialog__clear {
+.search-dialog__clear.p-button {
     font-size: 14px;
     line-height: 1.5;
+    width: 20px;
+    color: var(--admss-app-light-grey);
+    background-color: transparent;
+    border: none;
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    &:enabled:hover {
+        background-color: transparent;
+        color: var(--admss-app-lightest-grey);
+    }
+    &:enabled:focus {
+        background-color: transparent;
+        color: var(--admss-app-lightest-grey);
+    }
 }
 
 .dialog-dates {
