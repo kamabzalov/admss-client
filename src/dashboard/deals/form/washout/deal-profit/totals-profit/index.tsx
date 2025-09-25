@@ -42,7 +42,7 @@ export const DealTotalsProfit = observer(() => {
                 <section className='totals-controls'>
                     <div className='totals-row totals-misc'>
                         <TextInput
-                            name='(-) Misc. Cost'
+                            name='(+) Misc. Cost'
                             value={dealWashout.MiscProfitDescription}
                             height={32}
                             className='totals-misc__input'
@@ -51,7 +51,6 @@ export const DealTotalsProfit = observer(() => {
                             }
                         />
                         <CurrencyInput
-                            name='(+) Misc. Cost'
                             value={Number(dealWashout.MiscProfit) || 0}
                             className='totals-misc__input'
                             coloredEmptyValue
@@ -63,17 +62,17 @@ export const DealTotalsProfit = observer(() => {
                             <Checkbox
                                 inputId='misc-profit-commission1'
                                 checked={
-                                    getIncludeCheckboxValue("MiscProfit") ===
+                                    getIncludeCheckboxValue("MiscCost") ===
                                     INCLUDE_OPTIONS.COMMISSION1
                                 }
                                 tooltip='Include in Commission1 Base'
                                 onChange={() => {
-                                    const currentValue = getIncludeCheckboxValue("MiscProfit");
+                                    const currentValue = getIncludeCheckboxValue("MiscCost");
                                     if (currentValue === INCLUDE_OPTIONS.COMMISSION1) {
-                                        toggleIncludeCheckbox("MiscProfit", null);
+                                        toggleIncludeCheckbox("MiscCost", null);
                                     } else {
                                         toggleIncludeCheckbox(
-                                            "MiscProfit",
+                                            "MiscCost",
                                             INCLUDE_OPTIONS.COMMISSION1
                                         );
                                     }
@@ -83,17 +82,17 @@ export const DealTotalsProfit = observer(() => {
                             <Checkbox
                                 inputId='misc-profit-commission'
                                 checked={
-                                    getIncludeCheckboxValue("MiscProfit") ===
+                                    getIncludeCheckboxValue("MiscCost") ===
                                     INCLUDE_OPTIONS.COMMISSION
                                 }
                                 tooltip='Include in Commission Base'
                                 onChange={() => {
-                                    const currentValue = getIncludeCheckboxValue("MiscProfit");
+                                    const currentValue = getIncludeCheckboxValue("MiscCost");
                                     if (currentValue === INCLUDE_OPTIONS.COMMISSION) {
-                                        toggleIncludeCheckbox("MiscProfit", null);
+                                        toggleIncludeCheckbox("MiscCost", null);
                                     } else {
                                         toggleIncludeCheckbox(
-                                            "MiscProfit",
+                                            "MiscCost",
                                             INCLUDE_OPTIONS.COMMISSION
                                         );
                                     }
@@ -112,29 +111,28 @@ export const DealTotalsProfit = observer(() => {
                             }
                         />
                         <CurrencyInput
-                            name='Misc. Cost'
-                            value={Number(dealWashout.MiscCost) || 0}
+                            value={Number(dealWashout.MiscCostMinus) || 0}
                             className='totals-misc__input'
                             coloredEmptyValue
                             onChange={(e: InputNumberChangeEvent) =>
-                                changeDealWashout("MiscCost", String(e.value))
+                                changeDealWashout("MiscCostMinus", String(e.value))
                             }
                         />
                         <div className='deal-profit__includes'>
                             <Checkbox
                                 inputId='misc-cost-commission1'
                                 checked={
-                                    getIncludeCheckboxValue("MiscCost") ===
+                                    getIncludeCheckboxValue("MiscCostMinus") ===
                                     INCLUDE_OPTIONS.COMMISSION1
                                 }
                                 tooltip='Include in Commission1 Base'
                                 onChange={() => {
-                                    const currentValue = getIncludeCheckboxValue("MiscCost");
+                                    const currentValue = getIncludeCheckboxValue("MiscCostMinus");
                                     if (currentValue === INCLUDE_OPTIONS.COMMISSION1) {
-                                        toggleIncludeCheckbox("MiscCost", null);
+                                        toggleIncludeCheckbox("MiscCostMinus", null);
                                     } else {
                                         toggleIncludeCheckbox(
-                                            "MiscCost",
+                                            "MiscCostMinus",
                                             INCLUDE_OPTIONS.COMMISSION1
                                         );
                                     }
@@ -143,17 +141,17 @@ export const DealTotalsProfit = observer(() => {
                             <Checkbox
                                 inputId='misc-cost-commission'
                                 checked={
-                                    getIncludeCheckboxValue("MiscCost") ===
+                                    getIncludeCheckboxValue("MiscCostMinus") ===
                                     INCLUDE_OPTIONS.COMMISSION
                                 }
                                 tooltip='Include in Commission Base'
                                 onChange={() => {
-                                    const currentValue = getIncludeCheckboxValue("MiscCost");
+                                    const currentValue = getIncludeCheckboxValue("MiscCostMinus");
                                     if (currentValue === INCLUDE_OPTIONS.COMMISSION) {
-                                        toggleIncludeCheckbox("MiscCost", null);
+                                        toggleIncludeCheckbox("MiscCostMinus", null);
                                     } else {
                                         toggleIncludeCheckbox(
-                                            "MiscCost",
+                                            "MiscCostMinus",
                                             INCLUDE_OPTIONS.COMMISSION
                                         );
                                     }
