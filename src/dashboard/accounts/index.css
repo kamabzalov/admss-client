@@ -10,6 +10,12 @@
         margin-bottom: 45px;
     }
 
+    .accounts-dropdown {
+        width: 230px;
+        height: 50px;
+        align-items: center;
+    }
+
     .account-top-controls {
         display: flex;
         gap: 20px;

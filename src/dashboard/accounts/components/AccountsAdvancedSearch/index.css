@@ -1,0 +1,8 @@
+.accounts-advanced-search {
+    .p-dialog-footer {
+        .p-button {
+            width: 240px;
+            height: 60px;
+        }
+    }
+}
