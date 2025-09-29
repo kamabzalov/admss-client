@@ -65,6 +65,7 @@ export const AdvancedSearchDialog = <T,>({
     fields,
     action,
     searchForm,
+    className,
 }: AdvancedSearchDialogProps<T>): ReactElement => {
     const [initialAutomakesList, setInitialAutomakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -230,7 +231,7 @@ export const AdvancedSearchDialog = <T,>({
 
     return (
         <DashboardDialog
-            className='search-dialog'
+            className={`search-dialog ${className}`}
             footer='Search'
             header='Advanced search'
             visible={visible}

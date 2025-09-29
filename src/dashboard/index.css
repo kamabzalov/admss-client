@@ -166,6 +166,42 @@
     .p-sortable-column.p-highlight:not(.p-sortable-disabled):hover .p-sortable-column-icon {
         color: var(--admss-app-primary);
     }
+
+    .table-edit-button {
+        border: none;
+        background: transparent;
+        width: 24px;
+        height: 24px;
+        color: var(--admss-app-primary-main-green);
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active {
+            background: transparent;
+            color: var(--admss-app-primary-main-green);
+        }
+    }
+
+    tr td:has(.table-edit-button) + td {
+        border-left: none;
+    }
+
+    .table-button {
+        border: none;
+        background: transparent;
+        width: 24px;
+        height: 24px;
+        color: var(--admss-app-primary-main-green);
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active {
+            background: transparent;
+            color: var(--admss-app-primary-main-green);
+        }
+    }
+
+    tr td:has(.table-button) + td {
+        border-left: none;
+    }
 }
 
 .p-datatable-header .p-multiselect .p-multiselect-token,
@@ -395,9 +431,11 @@
     }
 }
 
-.p-dialog .card {
-    box-shadow: none;
-    min-height: 70vh;
+.p-dialog {
+    .card {
+        box-shadow: none;
+        min-height: 70vh;
+    }
 }
 
 .dashboard-loader__wrapper {

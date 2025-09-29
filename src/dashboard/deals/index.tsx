@@ -540,6 +540,30 @@ export const DealsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={({ item }) => {
+                                        return (
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                onClick={() =>
+                                                    navigate(DEALS_PAGE.EDIT(item.dealuid))
+                                                }
+                                            />
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "80px",
+                                            },
+                                        },
+                                    }}
+                                />
                                 {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}

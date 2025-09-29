@@ -35,6 +35,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { ColumnSelector, TableColumn } from "dashboard/common/filter";
 import { DropdownChangeEvent } from "primereact/dropdown";
+import { CONTACTS_PAGE } from "common/constants/links";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -534,6 +535,30 @@ export const ContactsDataTable = ({
                                 }
                             }}
                         >
+                            <Column
+                                bodyStyle={{ textAlign: "center" }}
+                                reorderable={false}
+                                resizeable={false}
+                                body={({ item }) => {
+                                    return (
+                                        <Button
+                                            text
+                                            className='table-edit-button'
+                                            icon='adms-edit-item'
+                                            onClick={() =>
+                                                navigate(CONTACTS_PAGE.EDIT(item.contactuid))
+                                            }
+                                        />
+                                    );
+                                }}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "80px",
+                                        },
+                                    },
+                                }}
+                            />
                             {alwaysActiveColumns.map(({ field, header }, index) => (
                                 <Column
                                     field={field}

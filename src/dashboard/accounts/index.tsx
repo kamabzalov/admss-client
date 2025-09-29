@@ -8,50 +8,21 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
-import { Button } from "primereact/button";
-import { Column, ColumnProps } from "primereact/column";
+import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
-import { makeShortReports } from "http/services/reports.service";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
-import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
-import {
-    AdvancedSearchDialog,
-    SEARCH_FORM_TYPE,
-    SearchField,
-    SEARCH_FIELD_TYPE,
-} from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
-import { GlobalSearchInput } from "dashboard/common/form/inputs";
-
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "accountnumber", header: "Account" },
-    { field: "accounttype", header: "Type" },
-    { field: "name", header: "Name" },
-    { field: "created", header: "Date" },
-];
-
-enum SEARCH_FORM_FIELDS {
-    ACCOUNT = "Account#",
-    DATE = "Date",
-}
-
-enum SEARCH_FORM_QUERY {
-    ACCOUNT = "accountnumber",
-    DATE = "dateeffective",
-}
-
-interface AdvancedSearch {
-    [key: string]: string | number;
-    accountInfo: string;
-    VIN: string;
-    StockNo: string;
-    date: string;
-}
+import AccountsHeader from "dashboard/accounts/components/AccountsHeader";
+import AccountsAdvancedSearch from "dashboard/accounts/components/AccountsAdvancedSearch";
+import { useCreateReport } from "common/hooks";
+import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
+import { ACCOUNTS_PAGE } from "common/constants/links";
+import { Button } from "primereact/button";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -67,75 +38,31 @@ export const AccountsDataTable = observer(
         const [totalRecords, setTotalRecords] = useState<number>(0);
         const [globalSearch, setGlobalSearch] = useState<string>("");
         const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-        const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
-        const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
         const navigate = useNavigate();
-
-        const searchFields = [
-            {
-                key: SEARCH_FORM_FIELDS.ACCOUNT,
-                label: SEARCH_FORM_FIELDS.ACCOUNT,
-                value: advancedSearch?.[SEARCH_FORM_FIELDS.ACCOUNT],
-                type: SEARCH_FIELD_TYPE.TEXT,
-            },
-
-            {
-                key: SEARCH_FORM_FIELDS.DATE,
-                label: SEARCH_FORM_FIELDS.DATE,
-                value: advancedSearch?.[SEARCH_FORM_FIELDS.DATE],
-                type: SEARCH_FIELD_TYPE.DATE_RANGE,
-            },
-        ];
+        const { createReport } = useCreateReport<AccountInfo>();
 
         const printTableData = async (print: boolean = false) => {
+            if (!authUser) return;
+
             setIsLoading(true);
-            const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
-                name: column.header as string,
-                data: column.field as string,
-            }));
-            const date = new Date();
-            const name = `accounts_${
-                date.getMonth() + 1
-            }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-
-            if (authUser) {
-                const data = accounts.map((item) => {
-                    const filteredItem: Record<string, any> = {};
-                    columns.forEach((column) => {
-                        if (item.hasOwnProperty(column.data)) {
-                            filteredItem[column.data] = item[column.data as keyof typeof item];
-                        }
-                    });
-                    return filteredItem;
+            try {
+                await createReport({
+                    userId: authUser.useruid,
+                    items: accounts,
+                    columns: activeColumns.map((column) => ({
+                        field: column.field as keyof AccountInfo,
+                        header: String(column.header),
+                    })),
+                    widths: [],
+                    print,
+                    name: "accounts",
                 });
-                const JSONreport = {
-                    name,
-                    itemUID: "0",
-                    data,
-                    columns,
-                    format: "",
-                };
-                await makeShortReports(authUser.useruid, JSONreport).then((response) => {
-                    const url = new Blob([response], { type: "application/pdf" });
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(url);
-                    if (!print) {
-                        link.download = `Report-${name}.pdf`;
-                        link.click();
-                    }
-
-                    if (print) {
-                        window.open(
-                            link.href,
-                            "_blank",
-                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                        );
-                    }
-                });
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
 
         const pageChanged = (event: DataTablePageEvent) => {
@@ -156,6 +83,10 @@ export const AccountsDataTable = observer(
         }, []);
 
         useEffect(() => {
+            setActiveColumns(columns.filter((column) => column.checked));
+        }, []);
+
+        useEffect(() => {
             const params: QueryParams = {
                 ...(globalSearch && { qry: globalSearch }),
                 ...(lazyState.sortField && { column: lazyState.sortField }),
@@ -172,55 +103,6 @@ export const AccountsDataTable = observer(
                 });
             }
         }, [lazyState, authUser, globalSearch]);
-
-        const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string | number) => {
-            setAdvancedSearch((prevSearch) => {
-                const newSearch = { ...prevSearch, [key]: value };
-                const isAnyValueEmpty = Object.values(newSearch).every((v) => v === "");
-                setButtonDisabled(isAnyValueEmpty);
-                return newSearch;
-            });
-        };
-
-        const handleAdvancedSearch = () => {
-            const searchQuery = Object.entries(advancedSearch)
-                .filter(([_, value]) => value)
-                .map(([key, value]) => {
-                    let keyName: string = key;
-                    switch (key) {
-                        case SEARCH_FORM_FIELDS.ACCOUNT:
-                            keyName = SEARCH_FORM_QUERY.ACCOUNT;
-                            break;
-
-                        case SEARCH_FORM_FIELDS.DATE:
-                            keyName = SEARCH_FORM_QUERY.DATE;
-                            if (typeof value === "string" && value.includes("-")) {
-                                const [startDate, endDate] = value.split("-");
-                                return `${startDate}.${endDate}.${keyName}`;
-                            }
-                            value = new Date(value).getTime();
-                            break;
-                    }
-                    return `${value}.${keyName}`;
-                })
-                .join("+");
-
-            const params: QueryParams = {
-                top: lazyState.first,
-                skip: lazyState.skip,
-                qry: searchQuery,
-            };
-            authUser &&
-                getAccountsList(authUser?.useruid, params).then((response) => {
-                    if (Array.isArray(response)) {
-                        setAccounts(response);
-                    } else {
-                        setAccounts([]);
-                    }
-                });
-
-            setDialogVisible(false);
-        };
 
         const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
             const selectedText = window.getSelection()?.toString();
@@ -239,43 +121,19 @@ export const AccountsDataTable = observer(
             }
         };
 
-        const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
-            setAdvancedSearch((prevSearch) => {
-                const updatedSearch = { ...prevSearch };
-                delete updatedSearch[key];
-                return updatedSearch;
-            });
-        };
-
         return (
             <div className='card-content'>
-                <div className='grid datatable-controls'>
-                    <GlobalSearchInput
-                        value={globalSearch}
-                        onChange={(e) => setGlobalSearch(e.target.value)}
-                    />
-                    <Button
-                        className='contact-top-controls__button'
-                        label='Advanced search'
-                        severity='success'
-                        type='button'
-                        onClick={() => setDialogVisible(true)}
-                    />
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-print'
-                        tooltip='Print accounts form'
-                        onClick={() => printTableData(true)}
-                    />
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-download'
-                        tooltip='Download accounts form'
-                        onClick={() => printTableData()}
-                    />
-                </div>
+                <AccountsHeader
+                    searchValue={globalSearch}
+                    onSearchChange={setGlobalSearch}
+                    onAdvancedSearch={() => setDialogVisible(true)}
+                    onPrint={() => printTableData(true)}
+                    onDownload={() => printTableData()}
+                    isLoading={isLoading}
+                    availableColumns={columns}
+                    activeColumns={activeColumns}
+                    onActiveColumnsChange={setActiveColumns}
+                />
                 <div className='grid'>
                     <div className='col-12'>
                         {isLoading ? (
@@ -301,7 +159,32 @@ export const AccountsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
-                                {renderColumnsData.map(({ field, header }) => (
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={({ item }) => {
+                                        return (
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                onClick={() =>
+                                                    navigate(ACCOUNTS_PAGE.EDIT(item.accountuid))
+                                                }
+                                            />
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "80px",
+                                            },
+                                        },
+                                    }}
+                                />
+
+                                {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}
@@ -314,18 +197,11 @@ export const AccountsDataTable = observer(
                         )}
                     </div>
                 </div>
-                <AdvancedSearchDialog<AdvancedSearch>
+                <AccountsAdvancedSearch
                     visible={dialogVisible}
-                    buttonDisabled={buttonDisabled}
-                    onHide={() => {
-                        setButtonDisabled(true);
-                        setDialogVisible(false);
-                    }}
-                    action={handleAdvancedSearch}
-                    onSearchClear={handleClearAdvancedSearchField}
-                    onInputChange={handleSetAdvancedSearch}
-                    fields={searchFields as SearchField<AdvancedSearch>[]}
-                    searchForm={SEARCH_FORM_TYPE.ACCOUNTS}
+                    onClose={() => setDialogVisible(false)}
+                    onAccountsUpdate={setAccounts}
+                    lazyState={lazyState}
                 />
             </div>
         );
