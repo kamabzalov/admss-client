@@ -170,6 +170,7 @@
     .table-edit-button {
         border: none;
         background: transparent;
+        font-size: 20px;
         width: 24px;
         height: 24px;
         color: var(--admss-app-primary-main-green);
@@ -234,6 +235,14 @@
 
 .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:last-child {
     border-right: none;
+}
+
+.p-datatable .p-datatable-thead > tr > th:first-child:has(.p-column-title:empty) {
+    border: none;
+}
+
+.p-datatable .p-datatable-thead > tr > th:first-child:has(.p-column-title:empty) + th {
+    border-left: none;
 }
 
 .p-datatable.p-datatable-gridlines .p-datatable-tbody > tr:first-child > td {
@@ -849,5 +858,34 @@ figure {
         width: 130px;
         font-size: 20px;
         font-weight: 700;
+    }
+}
+
+.p-menu .p-menuitem-link .p-menuitem-icon,
+.p-menu .p-menuitem-link .p-menuitem-icon:hover,
+.p-button-icon.pi-circle,
+.p-button-icon.pi-circle-fill {
+    &.pi-circle--red {
+        color: var(--admss-app-red);
+    }
+
+    &.pi-circle--yellow {
+        color: var(--admss-app-yellow);
+    }
+
+    &.pi-circle--orange {
+        color: var(--admss-app-warning-yellow);
+    }
+
+    &.pi-circle--blue {
+        color: var(--admss-app-main-blue);
+    }
+
+    &.pi-circle--grey {
+        color: var(--admss-app-medium-grey);
+    }
+
+    &.pi-circle--green {
+        color: var(--admss-app-green);
     }
 }

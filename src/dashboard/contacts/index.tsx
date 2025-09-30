@@ -539,15 +539,15 @@ export const ContactsDataTable = ({
                                 bodyStyle={{ textAlign: "center" }}
                                 reorderable={false}
                                 resizeable={false}
-                                body={({ item }) => {
+                                body={({ contactuid }: ContactUser) => {
                                     return (
                                         <Button
                                             text
                                             className='table-edit-button'
                                             icon='adms-edit-item'
-                                            onClick={() =>
-                                                navigate(CONTACTS_PAGE.EDIT(item.contactuid))
-                                            }
+                                            tooltip='Edit contact'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
                                         />
                                     );
                                 }}

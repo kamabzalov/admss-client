@@ -7,26 +7,6 @@
     font-weight: 700;
 }
 
-.p-menu .p-menuitem-link .p-menuitem-icon,
-.p-menu .p-menuitem-link .p-menuitem-icon:hover,
-.p-button-icon.pi-circle {
-    &.pi-circle--red {
-        color: var(--admss-app-red);
-    }
-
-    &.pi-circle--yellow {
-        color: var(--admss-app-yellow);
-    }
-
-    &.pi-circle--blue {
-        color: var(--admss-app-main-blue);
-    }
-
-    &.pi-circle--grey {
-        color: var(--admss-app-medium-grey);
-    }
-}
-
 .account-promise__table {
     .p-button-icon-only.p-button-text {
         display: inline-flex;

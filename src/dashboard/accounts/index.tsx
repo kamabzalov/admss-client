@@ -163,14 +163,16 @@ export const AccountsDataTable = observer(
                                     bodyStyle={{ textAlign: "center" }}
                                     reorderable={false}
                                     resizeable={false}
-                                    body={({ item }) => {
+                                    body={({ accountuid }: AccountInfo) => {
                                         return (
                                             <Button
                                                 text
                                                 className='table-edit-button'
                                                 icon='adms-edit-item'
+                                                tooltip='Edit account'
+                                                tooltipOptions={{ position: "mouse" }}
                                                 onClick={() =>
-                                                    navigate(ACCOUNTS_PAGE.EDIT(item.accountuid))
+                                                    navigate(ACCOUNTS_PAGE.EDIT(accountuid))
                                                 }
                                             />
                                         );
