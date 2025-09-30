@@ -48,6 +48,18 @@
             flex-shrink: 0;
         }
     }
+
+    .deals__status-icon.p-button {
+        height: 20px;
+        width: 20px;
+        padding: 0;
+        .p-button-icon {
+            font-size: 13px;
+        }
+        .adms-info {
+            color: var(--admss-app-main-blue);
+        }
+    }
 }
 
 .deal__card {

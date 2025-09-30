@@ -513,16 +513,16 @@ export default function Inventories({
                                             bodyStyle={{ textAlign: "center" }}
                                             reorderable={false}
                                             resizeable={false}
-                                            body={({ item }) => {
+                                            body={({ itemuid }: Inventory) => {
                                                 return (
                                                     <Button
                                                         text
                                                         className='table-edit-button'
                                                         icon='adms-edit-item'
+                                                        tooltip='Edit inventory'
+                                                        tooltipOptions={{ position: "mouse" }}
                                                         onClick={() =>
-                                                            navigate(
-                                                                INVENTORY_PAGE.EDIT(item.itemuid)
-                                                            )
+                                                            navigate(INVENTORY_PAGE.EDIT(itemuid))
                                                         }
                                                     />
                                                 );

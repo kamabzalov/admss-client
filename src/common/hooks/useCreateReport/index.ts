@@ -15,7 +15,7 @@ interface CreateReportInput<T> {
     userId: string;
     items: T[];
     columns: ColumnDef<T>[];
-    widths: ColumnWidthEntry[];
+    widths?: ColumnWidthEntry[];
     print?: boolean;
     name?: string;
     itemUID?: string;
@@ -88,7 +88,7 @@ export const useCreateReport = <T>() => {
         format = "",
         valueFormatter,
     }: CreateReportInput<T>) => {
-        const reportColumns = buildColumns(columns, widths);
+        const reportColumns = buildColumns(columns, widths || []);
         const reportName = generateName(name || "report");
         const reportData = shapeData(items, reportColumns, valueFormatter);
         const payload: ReportsPostData = {
