@@ -8,17 +8,61 @@ import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/c
 import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit/index";
 import { CURRENCY_OPTIONS, DashboardRadio } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
+import { toBinary } from "common/helpers";
 
 const COMMISSION_2_OPTIONS: RadioButtonProps[] = [
-    { name: "figureAfterCommission", title: "Figure After Commission", value: 0 },
-    { name: "splitCommission1InHalf", title: "Split Commission 1 in half", value: 1 },
-    { name: "figureSeparately", title: "Figure Separately", value: 2 },
+    {
+        name: "figureAfterCommission",
+        title: "Figure After Commission",
+        value: 0,
+    },
+    {
+        name: "splitCommission1InHalf",
+        title: "Split Commission 1 in half",
+        value: 1,
+    },
+    {
+        name: "figureSeparately",
+        title: "Figure Separately",
+        value: 2,
+    },
 ];
+
+const isOptionSelected = (option: number | string): boolean => {
+    return Number(option) === 1;
+};
 
 export const DealProfitCommission = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
-    const [defaultCommission, setDefaultCommission] = useState<boolean>(false);
+    const [optionAfterIndex, optionSplitIndex, optionSeparatelyIndex] = COMMISSION_2_OPTIONS.map(
+        (option) => option.value
+    );
+
+    const getCurrentCommissionOption = () => {
+        const {
+            Comm2OptFigureAfter: optionAfter,
+            Comm2OptSplitCommInHalf: optionSplit,
+            Comm2OptFigureSeparately: optionSeparately,
+            Comm2Options: optionDefault,
+        } = dealWashout;
+
+        if (isOptionSelected(optionAfter)) return optionAfterIndex;
+        if (isOptionSelected(optionSplit)) return optionSplitIndex;
+        if (isOptionSelected(optionSeparately)) return optionSeparatelyIndex;
+        return optionDefault;
+    };
+
+    const handleCommissionOptionChange = (value: string | number) => {
+        const numericValue = Number(value);
+        changeDealWashout("Comm2OptFigureAfter", toBinary(numericValue === optionAfterIndex));
+        changeDealWashout("Comm2OptSplitCommInHalf", toBinary(numericValue === optionSplitIndex));
+        changeDealWashout(
+            "Comm2OptFigureSeparately",
+            toBinary(numericValue === optionSeparatelyIndex)
+        );
+        changeDealWashout("Comm2Options", numericValue);
+    };
 
     const [salesmanSelectDialogVisible, setSalesmanSelectDialogVisible] = useState<boolean>(false);
     const [manager, setManager] = useState<string>("");
@@ -40,17 +84,18 @@ export const DealProfitCommission = observer(() => {
                         radioArray={COMMISSION_2_OPTIONS}
                         wrapperClassName='commission-settings__radio'
                         rowGap={2}
-                        initialValue={dealWashout.Comm2Options}
-                        onChange={(value) => {
-                            changeDealWashout("Comm2Options", String(value));
-                        }}
+                        initialValue={getCurrentCommissionOption()}
+                        onChange={handleCommissionOptionChange}
                         children={
                             <div className='commission-settings__checkbox'>
                                 <Checkbox
                                     inputId='set-default'
-                                    checked={defaultCommission}
+                                    checked={Number(dealWashout.Comm2OptionsDef) === 1}
                                     onChange={({ checked }) => {
-                                        setDefaultCommission(!!checked);
+                                        changeDealWashout(
+                                            "Comm2OptionsDef",
+                                            String(checked ? 1 : 0)
+                                        );
                                     }}
                                 />
                                 <label htmlFor='set-default'>Set this as the Default</label>

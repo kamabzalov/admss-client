@@ -482,6 +482,10 @@ export interface DealWashout extends BaseResponseError {
     CL_ProfitCheck2: 0 | 1;
     CollectedInterestOther: string;
     Comm2Options: 0 | 1;
+    Comm2OptionsDef: 0 | 1;
+    Comm2OptFigureAfter: 0 | 1;
+    Comm2OptFigureSeparately: 0 | 1;
+    Comm2OptSplitCommInHalf: 0 | 1;
     Commission1: string;
     Commission1Enabled: 0 | 1;
     Commission2: string;
