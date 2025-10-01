@@ -23,6 +23,8 @@ import { useCreateReport } from "common/hooks";
 import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
+import { AccountsUserSettings } from "common/models/user";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -40,7 +42,11 @@ export const AccountsDataTable = observer(
         const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
-        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+        const [selectedAccountType, setSelectedAccountType] = useState<string>("");
+        const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
+            AccountsUserSettings,
+            TableColumnsList
+        >("accounts", columns);
         const navigate = useNavigate();
         const { createReport } = useCreateReport<AccountInfo>();
 
@@ -83,16 +89,21 @@ export const AccountsDataTable = observer(
         }, []);
 
         useEffect(() => {
-            setActiveColumns(columns.filter((column) => column.checked));
-        }, []);
-
-        useEffect(() => {
-            const params: QueryParams = {
-                ...(globalSearch && { qry: globalSearch }),
+            const params: QueryParams & { accounttype?: string } = {
                 ...(lazyState.sortField && { column: lazyState.sortField }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
+            let qry: string = "";
+            if (selectedAccountType) {
+                params.accounttype = selectedAccountType;
+            }
+            if (globalSearch) {
+                qry += globalSearch;
+            }
+            if (qry.length) {
+                params.qry = qry;
+            }
             if (authUser) {
                 getAccountsList(authUser.useruid, params).then((response) => {
                     if (Array.isArray(response)) {
@@ -102,7 +113,7 @@ export const AccountsDataTable = observer(
                     }
                 });
             }
-        }, [lazyState, authUser, globalSearch]);
+        }, [lazyState, authUser, globalSearch, selectedAccountType]);
 
         const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
             const selectedText = window.getSelection()?.toString();
@@ -132,7 +143,11 @@ export const AccountsDataTable = observer(
                     isLoading={isLoading}
                     availableColumns={columns}
                     activeColumns={activeColumns}
-                    onActiveColumnsChange={setActiveColumns}
+                    onActiveColumnsChange={(nextColumns: TableColumnsList[]) => {
+                        setActiveColumnsAndSave(nextColumns);
+                    }}
+                    selectedAccountType={selectedAccountType}
+                    onAccountTypeChange={setSelectedAccountType}
                 />
                 <div className='grid'>
                     <div className='col-12'>
@@ -186,7 +201,7 @@ export const AccountsDataTable = observer(
                                     }}
                                 />
 
-                                {activeColumns.map(({ field, header }) => (
+                                {activeColumns.map(({ field, header }: TableColumnsList) => (
                                     <Column
                                         field={field}
                                         header={header}

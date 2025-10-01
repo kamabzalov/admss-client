@@ -30,6 +30,8 @@ import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { useCreateReport, useToastMessage } from "common/hooks";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
+import { DealsUserSettings } from "common/models/user";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -180,7 +182,10 @@ export const DealsDataTable = observer(
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(renderColumnsData);
+        const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
+            DealsUserSettings,
+            TableColumnsList
+        >("deals", renderColumnsData);
         const navigate = useNavigate();
         const { showError } = useToastMessage();
         const { createReport } = useCreateReport<Deal>();
@@ -455,7 +460,7 @@ export const DealsDataTable = observer(
                         <DropdownHeaderPanel
                             columns={renderColumnsData}
                             activeColumns={activeColumns}
-                            setActiveColumns={setActiveColumns}
+                            setActiveColumns={setActiveColumnsAndSave}
                         />
                     )}
                     onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
@@ -472,7 +477,7 @@ export const DealsDataTable = observer(
                             }
                         );
 
-                        setActiveColumns(sortedValue);
+                        setActiveColumnsAndSave(sortedValue);
                     }}
                     pt={{
                         header: {
@@ -585,7 +590,7 @@ export const DealsDataTable = observer(
                                         },
                                     }}
                                 />
-                                {activeColumns.map(({ field, header }) => (
+                                {activeColumns.map(({ field, header }: TableColumnsList) => (
                                     <Column
                                         field={field}
                                         header={header}

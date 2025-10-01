@@ -12,7 +12,7 @@ export interface TableState extends DataTableState {
     column: string;
 }
 
-interface UserSettings {
+export interface UserSettings {
     activeColumns?: any[];
     columnWidth?: ColumnWidth;
     table?: TableState;
@@ -33,6 +33,14 @@ export interface ExportWebUserSettings extends UserSettings {
     selectedFilterOptions?: FilterOptions[] | any;
 }
 
+export interface AccountsUserSettings extends UserSettings {
+    activeColumns?: string[];
+}
+
+export interface DealsUserSettings extends UserSettings {
+    activeColumns?: string[];
+}
+
 export interface SidebarUserSettings {
     isSidebarCollapsed: boolean;
 }
@@ -40,6 +48,8 @@ export interface SidebarUserSettings {
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
+    accounts?: AccountsUserSettings;
+    deals?: DealsUserSettings;
     exportWeb: ExportWebUserSettings;
     exportSchedule: ExportWebUserSettings;
     exportHistory: ExportWebUserSettings;
