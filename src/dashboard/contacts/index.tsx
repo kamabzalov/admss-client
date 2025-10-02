@@ -20,6 +20,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
@@ -83,7 +84,10 @@ export const ContactsDataTable = ({
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
+    const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
+        ContactsUserSettings,
+        TableColumnsList
+    >("contacts", selectableColumns);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -238,7 +242,7 @@ export const ContactsDataTable = ({
                 setServerSettings(allSettings);
                 const { contacts: settings } = allSettings;
                 settings?.activeColumns &&
-                    setActiveColumns(settings.activeColumns as TableColumnsList[]);
+                    setActiveColumnsAndSave(settings.activeColumns as TableColumnsList[]);
                 if (!contactCategory && settings?.selectedCategoriesOptions) {
                     const savedCategory: ContactType[] = settings.selectedCategoriesOptions;
                     if (Array.isArray(savedCategory) && savedCategory.length) {
@@ -461,10 +465,7 @@ export const ContactsDataTable = ({
                     selectableColumns={selectableColumns}
                     activeColumns={activeColumns}
                     onColumnsChange={(columns) => {
-                        setActiveColumns(columns);
-                        changeSettings({
-                            activeColumns: columns,
-                        });
+                        setActiveColumnsAndSave(columns);
                     }}
                     className='contacts-filter'
                 />
@@ -513,11 +514,7 @@ export const ContactsDataTable = ({
                                             (column): column is TableColumnsList => column !== null
                                         ) as TableColumnsList[];
 
-                                    setActiveColumns(newActiveColumns);
-
-                                    changeSettings({
-                                        activeColumns: newActiveColumns,
-                                    });
+                                    setActiveColumnsAndSave(newActiveColumns);
                                 }
                             }}
                             onColumnResizeEnd={(event) => {
@@ -584,7 +581,7 @@ export const ContactsDataTable = ({
                                 />
                             ))}
 
-                            {activeColumns.map(({ field, header }) => (
+                            {activeColumns.map(({ field, header }: TableColumnsList) => (
                                 <Column
                                     field={field}
                                     header={header}
