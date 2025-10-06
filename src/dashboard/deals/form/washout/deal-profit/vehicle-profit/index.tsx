@@ -8,12 +8,14 @@ import { Button } from "primereact/button";
 import { CURRENCY_OPTIONS, CurrencyInput } from "dashboard/common/form/inputs";
 
 export const DealVehicleProfit = observer(() => {
-    const { dealWashout, inventory, changeDealWashout } = useStore().dealStore;
+    const { dealWashout, inventory, changeDealWashout, preserveWashoutState } =
+        useStore().dealStore;
     const inventoryStore = useStore().inventoryStore;
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
     const handleNavigateToExpenses = () => {
+        preserveWashoutState();
         inventoryStore.memoRoute = pathname;
         navigate(`/dashboard/inventory/${inventory.itemuid}?step=${INVENTORY_STEPS.EXPENSES}`);
     };

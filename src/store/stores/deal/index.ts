@@ -57,6 +57,8 @@ export class DealStore {
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealWashout: DealWashout = {} as DealWashout;
     private _originalDealWashout: DealWashout = {} as DealWashout;
+    private _temporaryWashoutState: DealWashout | null = null;
+    private _isWashoutStatePreserved: boolean = false;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _dealType: number = 0;
@@ -111,6 +113,10 @@ export class DealStore {
         const current = JSON.stringify(this._dealWashout);
         const original = JSON.stringify(this._originalDealWashout);
         return current !== original;
+    }
+
+    public get isWashoutStatePreserved() {
+        return this._isWashoutStatePreserved;
     }
 
     public get dealType() {
@@ -250,8 +256,13 @@ export class DealStore {
             this._dealErrorMessage = "";
             const response = await getDealWashout(dealuid);
             if (response && response.status === Status.OK) {
-                this._dealWashout = response as DealWashout;
-                this._originalDealWashout = JSON.parse(JSON.stringify(response as DealWashout));
+                if (!this._isWashoutStatePreserved) {
+                    this._dealWashout = response as DealWashout;
+                    this._originalDealWashout = JSON.parse(JSON.stringify(response as DealWashout));
+                } else {
+                    this._originalDealWashout = JSON.parse(JSON.stringify(response as DealWashout));
+                    this._isWashoutStatePreserved = false;
+                }
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
@@ -352,6 +363,23 @@ export class DealStore {
 
     public resetWashoutChanges = action(() => {
         this._originalDealWashout = JSON.parse(JSON.stringify(this._dealWashout));
+    });
+
+    public preserveWashoutState = action(() => {
+        this._temporaryWashoutState = JSON.parse(JSON.stringify(this._dealWashout));
+        this._isWashoutStatePreserved = true;
+    });
+
+    public restoreWashoutState = action(() => {
+        if (this._temporaryWashoutState && this._isWashoutStatePreserved) {
+            this._dealWashout = JSON.parse(JSON.stringify(this._temporaryWashoutState));
+            this._temporaryWashoutState = null;
+        }
+    });
+
+    public clearWashoutState = action(() => {
+        this._temporaryWashoutState = null;
+        this._isWashoutStatePreserved = false;
     });
 
     public changeDealPickupPayments = action(

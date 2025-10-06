@@ -1,9 +1,10 @@
 import { DEBOUNCE_TIME } from "common/settings";
 import { FilterOptions } from "dashboard/common/filter";
+import { typeGuards } from "common/utils";
 
 export const isObjectValuesEmpty = (obj: Record<string, string | number>) =>
     Object.values(obj).every((value) =>
-        typeof value === "string" ? !value.trim().length : !value
+        typeGuards.isString(value) ? !value.trim().length : !value
     );
 
 export const filterParams = (
@@ -11,9 +12,7 @@ export const filterParams = (
 ): Record<string, string | number> => {
     return Object.fromEntries(
         Object.entries(obj).filter(([_, value]) =>
-            typeof value === "string"
-                ? value.trim().length > 0
-                : value !== null && value !== undefined
+            typeGuards.isString(value) ? value.trim().length > 0 : typeGuards.isExist(value)
         )
     );
 };
@@ -101,7 +100,7 @@ export const formatCurrency = (
 ): string => {
     const { digitsAfterDecimal = 2 } = options;
 
-    if (typeof value === "string") {
+    if (typeGuards.isString(value)) {
         value = Number(value);
     }
 
@@ -147,11 +146,11 @@ export const formatDateForServer = (date: Date | number): string => {
 export const parseDateFromServer = (dateString: string | number | undefined | null): number => {
     if (!dateString) return 0;
 
-    if (typeof dateString === "number") {
+    if (typeGuards.isNumber(dateString)) {
         return dateString;
     }
 
-    if (typeof dateString !== "string" || dateString.trim() === "") {
+    if (!typeGuards.isString(dateString) || dateString.trim() === "") {
         return 0;
     }
 
@@ -235,9 +234,9 @@ export const toBinary = (value: boolean): 0 | 1 => (value ? 1 : 0);
 export const convertToStandardTimestamp = (dateInput: string | number | Date): number => {
     let date: Date;
 
-    if (typeof dateInput === "string") {
+    if (typeGuards.isString(dateInput)) {
         date = new Date(dateInput);
-    } else if (typeof dateInput === "number") {
+    } else if (typeGuards.isNumber(dateInput)) {
         date = new Date(dateInput);
     } else {
         date = dateInput;

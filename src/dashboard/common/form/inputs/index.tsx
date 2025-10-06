@@ -10,9 +10,9 @@ import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
 import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inputmask";
-import { useCursorToStart } from "common/hooks";
-import { ComboBox } from "../dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
+import { useSelectAllOnFocus } from "common/hooks";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -167,7 +167,7 @@ export const CurrencyInput = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const uniqueId = useId();
 
-    useCursorToStart(containerRef);
+    const handleFocus = useSelectAllOnFocus<HTMLInputElement>(props.onFocus);
 
     return (
         <div
@@ -200,6 +200,7 @@ export const CurrencyInput = ({
                     locale='en-US'
                     value={value || 0}
                     inputClassName={`${coloredEmptyValue && !value ? "currency-item__input--empty" : ""}`}
+                    onFocus={handleFocus}
                     {...props}
                 />
             </div>

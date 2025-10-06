@@ -28,7 +28,8 @@ export const DealWashout = observer((): ReactElement | null => {
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().dealStore;
     const toast = useToast();
-    const { inventory, getDeal, getDealWashout } = store;
+    const { inventory, getDeal, getDealWashout, restoreWashoutState, isWashoutStatePreserved } =
+        store;
     const [showOverlay, setShowOverlay] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +40,9 @@ export const DealWashout = observer((): ReactElement | null => {
         }
 
         getDeal(id);
+        if (isWashoutStatePreserved) {
+            restoreWashoutState();
+        }
         getDealWashout(id);
     }, [id]);
 
@@ -110,6 +114,7 @@ export const DealWashout = observer((): ReactElement | null => {
         const response = await setDealWashout(id, store.dealWashout);
         if (!response?.error) {
             store.resetWashoutChanges();
+            store.clearWashoutState();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -137,7 +142,10 @@ export const DealWashout = observer((): ReactElement | null => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate(DEALS_PAGE.EDIT(id))}
+                onClick={() => {
+                    store.clearWashoutState();
+                    navigate(DEALS_PAGE.EDIT(id));
+                }}
             />
             <div className='col-12'>
                 <div className='card deal-washout__card'>
@@ -204,7 +212,10 @@ export const DealWashout = observer((): ReactElement | null => {
                         <div className='washout-footer__buttons'>
                             <Button
                                 className='uppercase px-6 form-nav__button deal-washout__button'
-                                onClick={() => navigate(DEALS_PAGE.EDIT(id))}
+                                onClick={() => {
+                                    store.clearWashoutState();
+                                    navigate(DEALS_PAGE.EDIT(id));
+                                }}
                                 severity='danger'
                                 outlined
                             >
