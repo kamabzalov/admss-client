@@ -137,6 +137,9 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         fieldName='Discount'
                         justify='start'
                         includes
+                        onChange={({ value }) => {
+                            changeDealWashout("Discount", value?.toString() || "0");
+                        }}
                         includeCheckboxFieldName='Discount'
                         currency={CURRENCY_OPTIONS.DOLLAR}
                     />
@@ -146,6 +149,9 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         withInput
                         justify='start'
                         includes
+                        onChange={({ value }) => {
+                            changeDealWashout("AcquisitionFee", value?.toString() || "0");
+                        }}
                         includeCheckboxFieldName='AcquisitionFee'
                         fieldName='AcquisitionFee'
                         currency={CURRENCY_OPTIONS.DOLLAR}
@@ -159,6 +165,9 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("Reserve_Type", value);
                         }}
                         includes
+                        onChange={({ value }) => {
+                            changeDealWashout("Reserve", value?.toString() || "0");
+                        }}
                         includeCheckboxFieldName='Reserve'
                         withInput
                         fieldName='Reserve'

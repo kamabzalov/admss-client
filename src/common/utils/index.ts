@@ -23,3 +23,21 @@ export const filterPostPayload = <T>(payload: T, options?: FilterPayloadOptions<
         )
     ) as T;
 };
+
+export const typeGuards = {
+    isExist: <T>(value: T): value is NonNullable<T> => {
+        return value !== undefined && value !== null;
+    },
+    isNumber: (value: unknown): value is number => {
+        return typeof value === "number";
+    },
+    isString: (value: unknown): value is string => {
+        return typeof value === "string";
+    },
+    isFunction: <F extends Function = Function>(value: unknown): value is F => {
+        return typeof value === "function";
+    },
+    isArray: (value: unknown): value is Array<unknown> => {
+        return Array.isArray(value);
+    },
+};
