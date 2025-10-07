@@ -127,9 +127,9 @@ export const truncateText = (text: string, maxLength: number = 30) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-export const formatDateForServer = (date: Date | number): string => {
+export const formatDateForServer = (date: Date | number, withTimeZone?: boolean): string => {
     const parsedDate = new Date(date);
-    const pad = (num: number) => num.toString().padStart(2, "0");
+    const padNumber = (num: number) => num.toString().padStart(2, "0");
 
     const { month, day, year, hours, minutes, seconds } = {
         month: parsedDate.getMonth() + 1,
@@ -140,7 +140,18 @@ export const formatDateForServer = (date: Date | number): string => {
         seconds: parsedDate.getSeconds(),
     };
 
-    return `${pad(month)}/${pad(day)}/${year} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    const base = `${padNumber(month)}/${padNumber(day)}/${year} ${padNumber(hours)}:${padNumber(minutes)}:${padNumber(seconds)}`;
+
+    if (!withTimeZone) return base;
+
+    const timeZoneOffsetMinutes = -parsedDate.getTimezoneOffset();
+    const sign = timeZoneOffsetMinutes >= 0 ? "+" : "-";
+    const roundedMinutes = Math.abs(timeZoneOffsetMinutes);
+    const timeZoneHours = Math.floor(roundedMinutes / 60);
+    const timeZoneMinutes = roundedMinutes % 60;
+    const timeZone = `${sign}${padNumber(timeZoneHours)}:${padNumber(timeZoneMinutes)}`;
+
+    return `${base}${timeZone}`;
 };
 
 export const parseDateFromServer = (dateString: string | number | undefined | null): number => {
@@ -231,8 +242,15 @@ export const validateDates = (
 
 export const toBinary = (value: boolean): 0 | 1 => (value ? 1 : 0);
 
-export const convertToStandardTimestamp = (dateInput: string | number | Date): number => {
+export const convertToStandardTimestamp = (
+    dateInput?: string | number | Date,
+    withTimeZone: boolean = true
+): number => {
     let date: Date;
+
+    if (!typeGuards.isExist(dateInput)) {
+        return new Date().getTime();
+    }
 
     if (typeGuards.isString(dateInput)) {
         date = new Date(dateInput);
@@ -242,7 +260,12 @@ export const convertToStandardTimestamp = (dateInput: string | number | Date): n
         date = dateInput;
     }
 
-    date.setHours(12, 0, 0, 0);
+    if (withTimeZone) {
+        date.setHours(12, 0, 0, 0);
+        return date.getTime();
+    }
+
+    date.setUTCHours(12, 0, 0, 0);
     return date.getTime();
 };
 
