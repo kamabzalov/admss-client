@@ -393,6 +393,7 @@ export const AdvancedSearchDialog = <T,>({
                                                 optionLabel='name'
                                                 optionValue='name'
                                                 value={value ?? ""}
+                                                required
                                                 editable
                                                 options={automakesModelList}
                                                 onChange={({ target }) =>
