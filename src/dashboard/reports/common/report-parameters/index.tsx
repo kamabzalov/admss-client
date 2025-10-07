@@ -1,4 +1,4 @@
-import { formatDateForServer } from "common/helpers";
+import { convertToStandardTimestamp, formatDateForServer } from "common/helpers";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportDocument, ReportSetParams } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
@@ -30,17 +30,17 @@ export const reportDownloadForm = async (
 ): Promise<BaseResponseError | undefined> => {
     const payload: ReportSetParams = {
         itemUID: params.itemUID || "0",
-        timestamp_s: formatDateForServer(new Date()),
+        timestamp_s: formatDateForServer(new Date(), true),
         columns: params.columns,
     };
 
     if (!!params.AskForStartAndEndDates || withDate) {
         payload.from_date = params.from_date
-            ? new Date(params.from_date).getTime()
-            : new Date().getTime();
+            ? convertToStandardTimestamp(params.from_date)
+            : convertToStandardTimestamp();
         payload.to_date = params.to_date
-            ? new Date(params.to_date).getTime()
-            : new Date().getTime();
+            ? convertToStandardTimestamp(params.to_date)
+            : convertToStandardTimestamp();
     }
 
     const response = await setReportDocumentTemplate(params.itemUID || "0", payload);
@@ -89,8 +89,8 @@ export const ReportParameters = ({
         const response = await reportDownloadForm(
             {
                 action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
-                from_date: startDate ? new Date(Number(startDate)) : new Date().getTime(),
-                to_date: endDate ? new Date(Number(endDate)) : new Date().getTime(),
+                from_date: startDate ? new Date(Number(startDate)) : convertToStandardTimestamp(),
+                to_date: endDate ? new Date(Number(endDate)) : convertToStandardTimestamp(),
                 ...report,
             },
             true
