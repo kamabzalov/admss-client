@@ -36,18 +36,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         );
     }, [contactExtData.CoBuyer_Emp_Company]);
 
-    const shouldDisableBusinessName = useMemo(() => {
-        return !!(
-            contactExtData.CoBuyer_First_Name?.trim() ||
-            contactExtData.CoBuyer_Middle_Name?.trim() ||
-            contactExtData.CoBuyer_Last_Name?.trim()
-        );
-    }, [
-        contactExtData.CoBuyer_First_Name,
-        contactExtData.CoBuyer_Middle_Name,
-        contactExtData.CoBuyer_Last_Name,
-    ]);
-
     const isNameRequired = useMemo(() => {
         return store.isCoBuyerFieldsFilled || separateContact;
     }, [store.isCoBuyerFieldsFilled, separateContact]);
@@ -55,10 +43,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const shouldShowNameRequired = useMemo(() => {
         return isNameRequired && !shouldDisableNameFields;
     }, [isNameRequired, shouldDisableNameFields]);
-
-    const shouldShowBusinessRequired = useMemo(() => {
-        return isNameRequired && !shouldDisableBusinessName;
-    }, [isNameRequired, shouldDisableBusinessName]);
 
     const handleScanDL = () => {
         fileInputRef.current?.click();
@@ -325,30 +309,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     {shouldShowNameRequired &&
                     touched.CoBuyer_Last_Name &&
                     (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim())
-                        ? ERROR_MESSAGES.REQUIRED
-                        : ""}
-                </small>
-            </div>
-
-            <div className='col-4 relative'>
-                <TextInput
-                    name={`Business Name${shouldShowBusinessRequired ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${shouldShowBusinessRequired && touched.CoBuyer_Emp_Company && (!contactExtData.CoBuyer_Emp_Company || !contactExtData.CoBuyer_Emp_Company.trim()) ? "p-invalid" : ""}`}
-                    value={contactExtData.CoBuyer_Emp_Company || ""}
-                    onChange={({ target: { value } }) => {
-                        changeContactExtData("CoBuyer_Emp_Company", value);
-                        setFieldValue("CoBuyer_Emp_Company", value);
-                        setFieldTouched("CoBuyer_Emp_Company", true, true);
-                    }}
-                    tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
-                    disabled={shouldDisableBusinessName}
-                    clearButton
-                />
-                <small className='p-error'>
-                    {shouldShowBusinessRequired &&
-                    touched.CoBuyer_Emp_Company &&
-                    (!contactExtData.CoBuyer_Emp_Company ||
-                        !contactExtData.CoBuyer_Emp_Company.trim())
                         ? ERROR_MESSAGES.REQUIRED
                         : ""}
                 </small>

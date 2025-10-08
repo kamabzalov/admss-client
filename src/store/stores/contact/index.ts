@@ -80,12 +80,10 @@ export class ContactStore {
         firstName: string;
         lastName: string;
         middleName: string;
-        businessName: string;
     } = {
         firstName: "",
         lastName: "",
         middleName: "",
-        businessName: "",
     };
 
     private _contactDocumentsID: Partial<InventoryMedia>[] = [];
@@ -248,13 +246,11 @@ export class ContactStore {
         const currentFirstName = this._contactExtData.CoBuyer_First_Name || "";
         const currentLastName = this._contactExtData.CoBuyer_Last_Name || "";
         const currentMiddleName = this._contactExtData.CoBuyer_Middle_Name || "";
-        const currentBusinessName = this._contactExtData.CoBuyer_Emp_Company || "";
 
         const hasChanged =
             currentFirstName !== this._initialCoBuyerFields.firstName ||
             currentLastName !== this._initialCoBuyerFields.lastName ||
-            currentMiddleName !== this._initialCoBuyerFields.middleName ||
-            currentBusinessName !== this._initialCoBuyerFields.businessName;
+            currentMiddleName !== this._initialCoBuyerFields.middleName;
 
         return hasChanged;
     }
@@ -279,7 +275,6 @@ export class ContactStore {
                     firstName: extdata?.CoBuyer_First_Name || "",
                     lastName: extdata?.CoBuyer_Last_Name || "",
                     middleName: extdata?.CoBuyer_Middle_Name || "",
-                    businessName: extdata?.CoBuyer_Emp_Company || "",
                 };
             }
             if (this._contact.cobuyeruid) await this.getCoBuyerContact();
@@ -497,7 +492,6 @@ export class ContactStore {
                 firstName: this._contactExtData.CoBuyer_First_Name || "",
                 middleName: this._contactExtData.CoBuyer_Middle_Name || "",
                 lastName: this._contactExtData.CoBuyer_Last_Name || "",
-                businessName: this._contactExtData.CoBuyer_Emp_Company || "",
                 streetAddress: this._contactExtData.CoBuyer_Res_Address || "",
                 state: this._contactExtData.CoBuyer_State || "",
                 city: this._contactExtData.CoBuyer_City || "",
@@ -881,15 +875,6 @@ export class ContactStore {
 
     public set separateContact(state: boolean) {
         this._separateContact = state;
-    }
-
-    private updateInitialCoBuyerFields() {
-        this._initialCoBuyerFields = {
-            firstName: this._contactExtData.CoBuyer_First_Name || "",
-            lastName: this._contactExtData.CoBuyer_Last_Name || "",
-            middleName: this._contactExtData.CoBuyer_Middle_Name || "",
-            businessName: this._contactExtData.CoBuyer_Emp_Company || "",
-        };
     }
 
     public set uploadFileDocuments(files: UploadMediaItem) {

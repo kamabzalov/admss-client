@@ -437,18 +437,7 @@ export const ContactForm = observer((): ReactElement => {
                     !contact.lastName?.trim() &&
                     REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
 
-                const hasCoBuyerBusinessNameOnly =
-                    contactType === BUYER_ID &&
-                    contactExtData.CoBuyer_Emp_Company?.trim() &&
-                    !contactExtData.CoBuyer_First_Name?.trim() &&
-                    !contactExtData.CoBuyer_Last_Name?.trim();
-
-                if (
-                    hasCoBuyerMiddleNameOnly ||
-                    hasMainMiddleNameOnly ||
-                    hasBusinessNameOnly ||
-                    hasCoBuyerBusinessNameOnly
-                ) {
+                if (hasCoBuyerMiddleNameOnly || hasMainMiddleNameOnly || hasBusinessNameOnly) {
                     setConfirmAction(() => {
                         setIsConfirmVisible(false);
                         setIsDataMissingConfirm(true);
