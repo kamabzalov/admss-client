@@ -111,7 +111,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         errors.phone1 ? "p-invalid" : ""
                     }`}
                     onBlur={handleBlur}
-                    value={values.phone1 ?? ""}
+                    value={contact.phone1 ?? ""}
                     onChange={async ({ target: { value } }) => {
                         await setFieldValue("phone1", value);
                         value && changeContact("phone1", value);
@@ -127,7 +127,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             errors.phone2 ? "p-invalid" : ""
                         }`}
                         onBlur={handleBlur}
-                        value={values.phone2 ?? ""}
+                        value={contact.phone2 ?? ""}
                         onChange={async ({ target: { value } }) => {
                             if (!value?.length) setAnotherPhone(false);
                             await setFieldValue("phone2", value);
