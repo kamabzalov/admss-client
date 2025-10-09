@@ -2,6 +2,7 @@ import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import "./index.css";
 import { TruncatedText } from "dashboard/common/display";
+import { useId } from "react";
 
 interface CustomDropdownProps extends DropdownProps {
     filterThreshold?: number;
@@ -16,6 +17,7 @@ export const ComboBox = ({
     ...props
 }: CustomDropdownProps) => {
     const shouldEnableFilter = options && options.length > filterThreshold;
+    const uniqueId = useId();
 
     const dropdownListItem = (option: unknown) => {
         const optionLabel = props?.optionLabel;
@@ -31,6 +33,7 @@ export const ComboBox = ({
     const dropdown = (
         <Dropdown
             {...props}
+            id={props.id || uniqueId}
             showClear={!props.required && props.value}
             className={`${props.className} combo-box`}
             options={options}
@@ -47,7 +50,9 @@ export const ComboBox = ({
     return label ? (
         <span className='p-float-label'>
             {dropdown}
-            <label className='float-label'>{label}</label>
+            <label htmlFor={uniqueId} className='float-label'>
+                {label}
+            </label>
         </span>
     ) : (
         dropdown

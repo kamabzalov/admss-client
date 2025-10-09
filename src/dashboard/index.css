@@ -576,17 +576,17 @@
 
 .p-autocomplete-dd .p-autocomplete-dropdown.p-button {
     background: transparent;
-    color: var(--admss-app-light-grey);
+    color: var(--admss-app-medium-grey);
 }
 
 .p-autocomplete-dd .p-autocomplete-dropdown.p-button:enabled:hover {
     background: transparent;
-    color: var(--admss-app-lightest-grey);
+    color: var(--admss-app-darkest-grey);
 }
 
 .p-autocomplete-dd .p-autocomplete-dropdown.p-button:enabled:focus {
     background: transparent;
-    color: var(--admss-app-lightest-grey);
+    color: var(--admss-app-darkest-grey);
 }
 
 .p-datepicker:not(.p-datepicker-inline) .p-datepicker-header {

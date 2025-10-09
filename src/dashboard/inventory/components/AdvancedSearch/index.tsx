@@ -82,10 +82,23 @@ export function InventoryAdvancedSearch({
         setIsLoading(false);
     };
 
-    const handleApply = () => {
+    const handleApply = async () => {
         setIsLoading(true);
-        const searchParams = createStringifySearchQuery(advancedSearch as Record<string, string>);
-        handleGetInventoryList(
+        const makeWithoutSpaces =
+            (advancedSearch && advancedSearch?.Make?.replaceAll(/ /g, "_").toLowerCase()) || "";
+
+        const modelWithoutSpaces =
+            (advancedSearch && advancedSearch?.Model?.replaceAll(/ /g, "_").toLowerCase()) || "";
+
+        const updatedAdvancedSearch = {
+            ...advancedSearch,
+            Make: makeWithoutSpaces,
+            Model: modelWithoutSpaces,
+        };
+
+        const searchParams = createStringifySearchQuery(updatedAdvancedSearch);
+
+        await handleGetInventoryList(
             { ...filterParams({ top: lazyState.first }), qry: searchParams },
             true
         );

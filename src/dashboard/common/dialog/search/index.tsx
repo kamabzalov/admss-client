@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useId, useRef, useState } from "react";
 import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
@@ -67,6 +67,7 @@ export const AdvancedSearchDialog = <T,>({
     searchForm,
     className,
 }: AdvancedSearchDialogProps<T>): ReactElement => {
+    const uniqueId = useId();
     const [initialAutomakesList, setInitialAutomakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -303,6 +304,7 @@ export const AdvancedSearchDialog = <T,>({
                             {type === SEARCH_FIELD_TYPE.TEXT && (
                                 <InputText
                                     type='tel'
+                                    id={uniqueId}
                                     className='w-full'
                                     value={value ?? ""}
                                     onChange={({ target }) => onInputChange(key, target.value)}
@@ -346,6 +348,7 @@ export const AdvancedSearchDialog = <T,>({
                                     <>
                                         {key === DROPDOWN_TYPE.MAKE ? (
                                             <AutoComplete
+                                                id={uniqueId}
                                                 value={value ?? ""}
                                                 ref={autoCompleteRef}
                                                 suggestions={automakesList}
@@ -392,14 +395,13 @@ export const AdvancedSearchDialog = <T,>({
                                                 className='w-full'
                                                 optionLabel='name'
                                                 optionValue='name'
+                                                id={uniqueId}
                                                 value={value ?? ""}
-                                                required
                                                 editable
                                                 options={automakesModelList}
                                                 onChange={({ target }) =>
                                                     onInputChange(key, target.value)
                                                 }
-                                                placeholder={label || key}
                                             />
                                         )}
                                     </>
@@ -411,6 +413,7 @@ export const AdvancedSearchDialog = <T,>({
                                         className='w-full'
                                         optionLabel='name'
                                         optionValue='id'
+                                        id={uniqueId}
                                         value={
                                             typeList?.find(
                                                 (typeItem) => typeItem?.name === selectedType
@@ -440,12 +443,12 @@ export const AdvancedSearchDialog = <T,>({
                                 />
                             )}
 
-                            {value && onSearchClear && (
+                            {value && onSearchClear && key !== DROPDOWN_TYPE.MODEL && (
                                 <Button
                                     type='button'
                                     icon='pi pi-times'
                                     text
-                                    className={`cursor-pointer search-dialog__clear`}
+                                    className={`cursor-pointer search-dialog__clear ${type === SEARCH_FIELD_TYPE.DROPDOWN ? "search-dialog__clear--dropdown" : ""}`}
                                     onClick={() => {
                                         if (key === DROPDOWN_TYPE.TYPE) {
                                             setSelectedType("");
@@ -460,12 +463,14 @@ export const AdvancedSearchDialog = <T,>({
                                             setAutomakesList(initialAutomakesList);
                                             setAutomakesModelList([]);
                                         }
-                                        onSearchClear(key);
+                                        onSearchClear?.(key);
                                     }}
                                 />
                             )}
 
-                            <label className='float-label'>{label || key}</label>
+                            <label htmlFor={uniqueId} className='float-label'>
+                                {label || key}
+                            </label>
                         </span>
                     );
                 })}

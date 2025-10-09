@@ -1,8 +1,8 @@
 .combo-box {
     .p-dropdown-trigger {
-        color: var(--admss-app-light-grey);
+        color: var(--admss-app-medium-grey);
         &:hover {
-            color: var(--admss-app-lightest-grey);
+            color: var(--admss-app-darkest-grey);
         }
         .p-icon {
             font-size: 14px;
@@ -14,6 +14,10 @@
         width: 14px;
         height: 14px;
         margin-top: -0.4rem;
+        &:hover,
+        &:focus {
+            color: var(--admss-app-darkest-grey);
+        }
     }
 }
 .combo-box__list .combo-box__list-item {
