@@ -117,12 +117,6 @@ export const centsToDollars = (cents: number): number => {
     return Number(dollars.toFixed(2));
 };
 
-export const setCursorToStart = (element: HTMLInputElement | null) => {
-    if (element) {
-        setTimeout(() => element.setSelectionRange(0, 0), 0);
-    }
-};
-
 export const truncateText = (text: string, maxLength: number = 30) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
