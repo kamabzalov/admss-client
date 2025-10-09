@@ -264,7 +264,7 @@ export class GeneralSettingsStore {
             }
             const filteredSettings = Object.fromEntries(
                 Object.entries(this._settings).filter(
-                    ([key]) => !["itemuid", "index", "created", "updated", "status"].includes(key)
+                    ([key]) => !["index", "created", "updated", "status"].includes(key)
                 )
             );
 
