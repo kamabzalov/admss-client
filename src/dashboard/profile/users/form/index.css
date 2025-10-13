@@ -1,0 +1,84 @@
+.user-form-page {
+    --card-height: 83vh;
+    --card-max-height: 983px;
+    --content-height: 600px;
+    --title-height: 63px;
+}
+
+.user-form-page .card {
+    padding: 40px;
+    padding-right: 30px;
+    height: calc(var(--card-height) + var(--title-height));
+    max-height: var(--card-max-height);
+    display: flex;
+    flex-direction: column;
+}
+
+.user-form-page__tabs {
+    display: flex;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.user-form-page__tabs .p-tabview-nav {
+    flex-direction: column;
+    flex: 0 0;
+    width: 343px;
+    border: none;
+    min-height: 527px;
+    height: 100%;
+    gap: 10px;
+}
+
+.user-form-page__tabs .p-tabview-panels {
+    flex: 1;
+    padding: 0;
+    padding-left: 40px;
+    min-height: 566px;
+    border-left: 2px solid var(--admss-app-light-blue);
+    border-radius: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.user-form-page__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.user-form-page__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
+    border-radius: 0;
+}
+
+.user-form-page .card-header__title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-form-page__buttons {
+    display: flex;
+    height: 150px;
+    margin-top: auto;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 25px;
+    padding-right: 30px;
+}
+
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

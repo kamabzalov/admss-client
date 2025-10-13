@@ -100,6 +100,29 @@ export const TASKS_PAGE: Readonly<TasksPage> = {
     MAIN: `${DASHBOARD_PAGE}/tasks`,
 };
 
+interface UsersPage {
+    readonly MAIN: string;
+    CREATE(): string;
+    EDIT(id: string): string;
+}
+
+export const USERS_PAGE: Readonly<UsersPage> = {
+    MAIN: `${DASHBOARD_PAGE}/users`,
+    CREATE() {
+        return `${this.MAIN}${CREATE_PATH}`;
+    },
+    EDIT(id: string) {
+        return `${this.MAIN}/${id}`;
+    },
+};
+
+interface SettingsPage {
+    readonly MAIN: string;
+}
+export const SETTINGS_PAGE: Readonly<SettingsPage> = {
+    MAIN: `${DASHBOARD_PAGE}/settings`,
+};
+
 interface SidebarPage {
     readonly HOME: string;
     readonly INVENTORY: string;

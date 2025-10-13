@@ -6,6 +6,7 @@ import { UserStore } from "store/stores/user";
 import { AccountStore } from "store/stores/account";
 import { ReportStore } from "store/stores/report";
 import { GeneralSettingsStore } from "store/stores/general-settings";
+import { UsersStore } from "store/stores/users";
 
 configure({
     enforceActions: "never",
@@ -16,11 +17,13 @@ export class RootStore {
     public contactStore: ContactStore;
     public dealStore: DealStore;
     public userStore: UserStore;
+    public usersStore: UsersStore;
     public accountStore: AccountStore;
     public reportStore: ReportStore;
     public generalSettingsStore: GeneralSettingsStore;
     public constructor() {
         this.userStore = new UserStore(this);
+        this.usersStore = new UsersStore(this);
         this.inventoryStore = new InventoryStore(this);
         this.contactStore = new ContactStore(this);
         this.dealStore = new DealStore(this);
