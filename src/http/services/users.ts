@@ -2,7 +2,7 @@ import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { UserGroup } from "common/models/user";
-import { User } from "common/models/users";
+import { GenerateNewPasswordResponse, SubUser, User, UserData } from "common/models/users";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -22,10 +22,10 @@ export const getUsersList = async (useruid: string, params?: QueryParams) => {
     }
 };
 
-export const getClientsList = async (useruid: string, params?: QueryParams) => {
+export const getSubUsersList = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | User[]>(
-            `user/${useruid}/listclients`,
+        const request = await authorizedUserApiInstance.get<BaseResponseError | SubUser[]>(
+            `user/${useruid}/subusers`,
             { params }
         );
         return request.data;
@@ -33,7 +33,7 @@ export const getClientsList = async (useruid: string, params?: QueryParams) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting clients list",
+                error: error.response?.data.error || "Error while getting sub users list",
             };
         }
     }
@@ -169,7 +169,7 @@ export const restoreUser = async (uid: string) => {
     }
 };
 
-export const setUserData = async (uid: string, userData: any) => {
+export const setUserData = async (uid: string, userData: Partial<UserData>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `user/${uid}/set`,
@@ -186,7 +186,7 @@ export const setUserData = async (uid: string, userData: any) => {
     }
 };
 
-export const validateUserData = async (uid: string, userData: any) => {
+export const validateUserData = async (uid: string, userData: Partial<UserData>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `user/${uid}/validate`,
@@ -222,7 +222,7 @@ export const validateUserDataGeneral = async (userData: any) => {
 
 export const getUserData = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | UserData>(
             `user/${useruid}/user`
         );
         return request.data;
@@ -236,7 +236,7 @@ export const getUserData = async (useruid: string) => {
     }
 };
 
-export const createUser = async (useruid: string, userData: any) => {
+export const createUser = async (useruid: string, userData: Partial<UserData>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `user/${useruid}/user`,
@@ -255,9 +255,9 @@ export const createUser = async (useruid: string, userData: any) => {
 
 export const generateNewPassword = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<
-            BaseResponseError & { password: string }
-        >(`user/${useruid}/newpassword`);
+        const request = await authorizedUserApiInstance.get<GenerateNewPasswordResponse>(
+            `user/${useruid}/newpassword`
+        );
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {

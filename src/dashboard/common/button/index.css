@@ -28,3 +28,12 @@
 .download-button .icon {
     font-size: 26px;
 }
+
+.switch-button {
+    &.p-inputswitch .p-inputswitch-slider {
+        border-radius: 20px;
+    }
+    &.p-inputswitch .p-inputswitch-slider:before {
+        border-radius: 50%;
+    }
+}
