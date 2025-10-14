@@ -1,5 +1,7 @@
 import { Button, ButtonProps } from "primereact/button";
 import "./index.css";
+import { InputSwitch, InputSwitchProps } from "primereact/inputswitch";
+import { useState } from "react";
 
 export enum BUTTON_VARIANTS {
     NEW = "new",
@@ -40,5 +42,27 @@ export const ControlButton = ({ variant, ...props }: ControlButtonProps) => {
         >
             {props.label || (variant === BUTTON_VARIANTS.NEW && buttonLabel[variant])}
         </Button>
+    );
+};
+
+export const SwitchButton = ({ ...props }: InputSwitchProps) => {
+    const [checked, setChecked] = useState(props.checked || false);
+    const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setChecked(!checked);
+    };
+
+    return (
+        <InputSwitch
+            onClick={handleClick}
+            {...props}
+            className={`switch-button ${props.className || ""}`}
+            checked={checked}
+            onChange={(e) => {
+                setChecked(e.value ?? false);
+                props.onChange?.(e);
+            }}
+        />
     );
 };

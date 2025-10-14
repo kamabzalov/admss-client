@@ -14,7 +14,7 @@ import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
-import { CONTACT_SUPPORT, HELP_PAGE } from "common/constants/links";
+import { CONTACT_SUPPORT, HELP_PAGE, SETTINGS_PAGE, USERS_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -69,11 +69,11 @@ export const Header = observer((): ReactElement => {
                     },
                 },
                 !isSalesPerson
-                    ? { label: "General Settings", command: () => navigate("settings") }
+                    ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
                     : null,
                 { separator: true },
                 showChangeLocation ? { label: "Change Location" } : null,
-                { label: "Users" },
+                { label: "Users", command: () => navigate(USERS_PAGE.MAIN) },
                 { separator: true },
                 {
                     label: "Contact support",

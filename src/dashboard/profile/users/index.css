@@ -1,0 +1,15 @@
+.users {
+    margin: 0;
+}
+
+.users__title {
+    font-weight: 900;
+    font-size: 20px;
+}
+
+.dashboard-loader__wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
