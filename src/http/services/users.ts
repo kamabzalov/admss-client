@@ -223,7 +223,7 @@ export const validateUserDataGeneral = async (userData: any) => {
 export const getUserData = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | UserData>(
-            `user/${useruid}/user`
+            `user/${useruid}/userinfo`
         );
         return request.data;
     } catch (error) {

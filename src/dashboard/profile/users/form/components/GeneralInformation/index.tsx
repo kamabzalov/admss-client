@@ -35,11 +35,7 @@ export const GeneralInformation = observer((): ReactElement => {
     const usersStore = useStore().usersStore;
     const { user, changeUserData } = usersStore;
     const { showError, showSuccess } = useToastMessage();
-    const [firstName, setFirstName] = useState<string>("");
     const [middleName, setMiddleName] = useState<string>("");
-    const [lastName, setLastName] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [phone, setPhone] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
@@ -81,8 +77,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            value={user?.firstName || ""}
+                            onChange={(e) => changeUserData("firstName", e.target.value)}
                         />
                         <label className='float-label'>First Name (required)</label>
                     </span>
@@ -91,7 +87,7 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={middleName}
+                            value={middleName || ""}
                             onChange={(e) => setMiddleName(e.target.value)}
                         />
                         <label className='float-label'>Middle Name</label>
@@ -101,8 +97,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
+                            value={user?.lastName || ""}
+                            onChange={(e) => changeUserData("lastName", e.target.value)}
                         />
                         <label className='float-label'>Last Name (required)</label>
                     </span>
@@ -125,8 +121,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={user?.username || ""}
-                            onChange={(e) => changeUserData("username", e.target.value)}
+                            value={user?.loginName || ""}
+                            onChange={(e) => changeUserData("loginName", e.target.value)}
                         />
                         <label className='float-label'>Login (required)</label>
                     </span>
@@ -135,8 +131,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={user?.email1 || ""}
+                            onChange={(e) => changeUserData("email1", e.target.value)}
                         />
                         <label className='float-label'>Email</label>
                     </span>
@@ -144,8 +140,8 @@ export const GeneralInformation = observer((): ReactElement => {
                 <div className='col-4'>
                     <PhoneInput
                         name='Phone Number (required)'
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        value={user?.phone1 || ""}
+                        onChange={(e) => changeUserData("phone1", e.target.value)}
                     />
                 </div>
             </div>

@@ -41,13 +41,46 @@ export interface GenerateNewPasswordResponse extends BaseResponseError {
 }
 
 export interface UserData extends BaseResponseError {
-    clientuid: string;
+    ZIP: string;
+    canaddcontacts: 0 | 1;
+    canaddinventory: 0 | 1;
+    canbackpayments: 0 | 1;
+    cancreatereports: 0 | 1;
+    candeleteaccounts: 0 | 1;
+    candeletecontacts: 0 | 1;
+    candeleteinventory: 0 | 1;
+    candeleteinventorymedia: 0 | 1;
+    caneditaccounts: 0 | 1;
+    caneditcontacts: 0 | 1;
+    caneditdeals: 0 | 1;
+    caneditinventory: 0 | 1;
+    caneditpayments: 0 | 1;
+    canpartialpayments: 0 | 1;
+    canundeletedeleted: 0 | 1;
+    canviewaccounts: 0 | 1;
+    canviewcontacts: 0 | 1;
+    canviewdeals: 0 | 1;
+    canviewdeleted: 0 | 1;
+    canviewinventory: 0 | 1;
+    canviewreports: 0 | 1;
+    city: string;
+    companyName: string;
     created: string;
-    createdbyuseruid: string;
-    creatorusername: string;
-    enabled: 0 | 1;
-    parentname: string;
+    email1: string;
+    email2: string;
+    firstName: string;
+    index: number;
+    lastName: string;
+    locations: any;
+    loginName: string;
+    messager1: string;
+    messager2: string;
     parentuid: string;
-    username: string;
+    phone1: string;
+    phone2: string;
+    state: string;
+    streetAddress: string;
+    updated: string;
+    userName: string;
     useruid: string;
 }

@@ -5,7 +5,11 @@ import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
 const initialUserData: Partial<UserData> = {
-    username: "",
+    firstName: "",
+    lastName: "",
+    loginName: "",
+    email1: "",
+    phone1: "",
 };
 
 export class UsersStore {
