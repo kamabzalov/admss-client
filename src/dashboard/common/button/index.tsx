@@ -46,11 +46,13 @@ export const ControlButton = ({ variant, ...props }: ControlButtonProps) => {
 };
 
 export const SwitchButton = ({ ...props }: InputSwitchProps) => {
-    const [checked, setChecked] = useState(props.checked || false);
+    const isControlled = typeof props.checked !== "undefined";
+    const [internalChecked, setInternalChecked] = useState(props.checked || false);
+
     const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        setChecked(!checked);
+        props.onClick?.(e);
     };
 
     return (
@@ -58,10 +60,14 @@ export const SwitchButton = ({ ...props }: InputSwitchProps) => {
             onClick={handleClick}
             {...props}
             className={`switch-button ${props.className || ""}`}
-            checked={checked}
+            checked={isControlled ? !!props.checked : internalChecked}
             onChange={(e) => {
-                setChecked(e.value ?? false);
-                props.onChange?.(e);
+                if (isControlled) {
+                    props.onChange?.(e);
+                } else {
+                    setInternalChecked(e.value ?? false);
+                    props.onChange?.(e);
+                }
             }}
         />
     );

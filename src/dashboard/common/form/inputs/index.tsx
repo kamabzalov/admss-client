@@ -32,7 +32,9 @@ interface DashboardRadioProps {
     initialValue?: string | number | null;
     onChange?: (value: string | number) => void;
     wrapperClassName?: string;
+    justifyContent?: "between" | "center" | "start" | "end";
     rowGap?: number;
+    columnGap?: 2 | 3 | 4;
     children?: React.ReactNode;
 }
 
@@ -107,6 +109,8 @@ export const DashboardRadio = ({
     onChange,
     children,
     rowGap = 3,
+    justifyContent = "between",
+    columnGap = 3,
 }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string>("");
 
@@ -123,7 +127,7 @@ export const DashboardRadio = ({
 
     return (
         <section
-            className={`flex flex-wrap row-gap-${rowGap} justify-content-between radio ${wrapperClassName || ""}`}
+            className={`flex flex-wrap row-gap-${rowGap} justify-content-${justifyContent} ${columnGap ? `column-gap-${columnGap}` : ""} radio ${wrapperClassName || ""}`}
         >
             {radioArray.map(({ name, title, value }) => {
                 return (

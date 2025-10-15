@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
-import { getSubUsersList } from "http/services/users";
+import { disableUser, enableUser, getSubUsersList } from "http/services/users";
 import { SubUser } from "common/models/users";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
@@ -16,6 +16,14 @@ import { USERS_PAGE } from "common/constants/links";
 import UsersHeader from "dashboard/profile/users/components/UsersHeader";
 import "./index.css";
 import { SwitchButton } from "dashboard/common/button";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+
+enum USER_MODAL_MESSAGE {
+    TITLE_ENABLED = "Enable user?",
+    TITLE_DISABLED = "Disable user?",
+    ENABLED = "Are you sure you want to enable this user?",
+    DISABLED = "Are you sure you want to disable this user?",
+}
 
 export const Users = observer((): ReactElement => {
     const userStore = useStore().userStore;
@@ -30,6 +38,8 @@ export const Users = observer((): ReactElement => {
     const { showError } = useToastMessage();
     const { createReport } = useCreateReport<SubUser>();
     const navigate = useNavigate();
+    const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
+    const [selectedUser, setSelectedUser] = useState<SubUser | null>(null);
 
     const handleGetUsers = async (params?: QueryParams) => {
         if (!authUser) return;
@@ -80,10 +90,6 @@ export const Users = observer((): ReactElement => {
         navigate(USERS_PAGE.CREATE());
     };
 
-    const handleToggleUser = async (user: SubUser) => {
-        if (!authUser) return;
-    };
-
     const printTableData = async (print: boolean = false) => {
         if (!authUser) return;
         await createReport({
@@ -108,6 +114,26 @@ export const Users = observer((): ReactElement => {
             onDownload={() => printTableData(false)}
         />
     );
+
+    const switchUserEnabled = (user: SubUser) => {
+        if (!user.useruid) return;
+        if (user.enabled) {
+            disableUser(user.useruid);
+        } else {
+            enableUser(user.useruid);
+        }
+        handleGetUsers();
+    };
+
+    const openConfirmToggle = (user: SubUser) => {
+        setSelectedUser(user);
+        setConfirmVisible(true);
+    };
+
+    const closeConfirm = () => {
+        setConfirmVisible(false);
+        setSelectedUser(null);
+    };
 
     return (
         <div className='grid'>
@@ -176,7 +202,10 @@ export const Users = observer((): ReactElement => {
                                             sortable
                                             body={(data: SubUser) => {
                                                 return (
-                                                    <span data-field='username'>
+                                                    <span
+                                                        className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
+                                                        data-field='username'
+                                                    >
                                                         {data.username}
                                                     </span>
                                                 );
@@ -187,7 +216,14 @@ export const Users = observer((): ReactElement => {
                                             header='Role'
                                             sortable
                                             body={(data: SubUser) => {
-                                                return data.rolename;
+                                                return (
+                                                    <span
+                                                        className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
+                                                        data-field='rolename'
+                                                    >
+                                                        {data.rolename}
+                                                    </span>
+                                                );
                                             }}
                                         />
                                         <Column
@@ -196,9 +232,9 @@ export const Users = observer((): ReactElement => {
                                             body={(data: SubUser) => {
                                                 return (
                                                     <SwitchButton
-                                                        checked={true}
+                                                        checked={!!data?.enabled}
                                                         onChange={() => {
-                                                            handleToggleUser(data);
+                                                            openConfirmToggle(data);
                                                         }}
                                                     />
                                                 );
@@ -218,6 +254,30 @@ export const Users = observer((): ReactElement => {
                     </div>
                 </div>
             </div>
+            {selectedUser ? (
+                <ConfirmModal
+                    visible={confirmVisible}
+                    onHide={closeConfirm}
+                    icon='adms-warning'
+                    title={
+                        selectedUser.enabled
+                            ? USER_MODAL_MESSAGE.TITLE_DISABLED
+                            : USER_MODAL_MESSAGE.TITLE_ENABLED
+                    }
+                    bodyMessage={
+                        selectedUser.enabled
+                            ? USER_MODAL_MESSAGE.DISABLED
+                            : USER_MODAL_MESSAGE.ENABLED
+                    }
+                    confirmAction={() => {
+                        switchUserEnabled(selectedUser);
+                    }}
+                    rejectAction={closeConfirm}
+                    rejectLabel='Cancel'
+                    acceptLabel='Confirm'
+                    className='users-confirm-dialog'
+                />
+            ) : null}
         </div>
     );
 });

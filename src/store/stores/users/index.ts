@@ -1,12 +1,16 @@
-import { SubUser } from "common/models/users";
+import { SubUser, UserData } from "common/models/users";
 import { Status } from "common/models/base-response";
 import { getUserData } from "http/services/users";
-import { makeAutoObservable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
+
+const initialUserData: Partial<UserData> = {
+    username: "",
+};
 
 export class UsersStore {
     public rootStore: RootStore;
-    private _user: SubUser | null = null;
+    private _user: Partial<UserData> = initialUserData;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -32,6 +36,23 @@ export class UsersStore {
             this._isLoading = false;
         }
     };
+
+    public changeUserData = action(
+        (
+            keyOrEntries: keyof UserData | [keyof UserData, string | number][],
+            value?: string | number | undefined
+        ) => {
+            if (value === undefined) value = "";
+
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._user[key] = val as never;
+                });
+            } else {
+                this._user[keyOrEntries] = value as never;
+            }
+        }
+    );
 
     public get user() {
         return this._user;

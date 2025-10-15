@@ -25,6 +25,7 @@ export interface SubUser extends BaseResponseError {
     created: string;
     createdbyuid: string;
     creatorusername: string;
+    enabled?: 0 | 1;
     rolename: string;
     roleuid: string;
     updated: string;
