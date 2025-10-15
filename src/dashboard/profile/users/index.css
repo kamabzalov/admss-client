@@ -1,5 +1,9 @@
 .users {
     margin: 0;
+
+    .users-table-row--disabled {
+        color: var(--admss-app-light-grey);
+    }
 }
 
 .users__title {
@@ -12,4 +16,36 @@
     justify-content: center;
     align-items: center;
     min-height: 200px;
+}
+
+.users-confirm-dialog {
+    .confirm-header__icon {
+        font-size: 6rem;
+        padding-bottom: 20px;
+    }
+
+    .confirm-header__title {
+        padding-top: 0px;
+        padding-bottom: 20px;
+        font-size: 26px;
+    }
+
+    .confirm-body {
+        padding-left: 74px;
+        padding-right: 80px;
+    }
+
+    .p-dialog-footer {
+        padding-top: 42px;
+        padding-bottom: 50px;
+        .p-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            width: 130px;
+            height: 60px;
+            font-weight: 600;
+        }
+    }
 }

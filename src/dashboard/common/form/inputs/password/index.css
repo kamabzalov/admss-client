@@ -1,0 +1,53 @@
+.password-field {
+    width: 100%;
+}
+
+.password-field-container {
+    position: relative;
+    .p-error {
+        display: inline-flex;
+        bottom: -6px;
+        left: 0;
+        padding-left: 2px;
+        padding-right: 2px;
+        background-color: var(--admss-app-white);
+        font-size: 12px;
+    }
+}
+
+.password-field__content {
+    max-width: 349px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Open Sans";
+
+    .password-field__content--success {
+        color: var(--admss-app-success);
+    }
+    .password-field__content--error {
+        color: var(--admss-app-red);
+    }
+}
+
+.password-field-panel {
+    background-color: var(--admss-app-white-blue);
+    padding: 10px;
+}
+
+.password-field-input {
+    width: 100%;
+    + i span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 24px;
+        color: var(--admss-app-light-grey);
+        &:hover {
+            color: var(--admss-app-medium-grey);
+        }
+    }
+}
