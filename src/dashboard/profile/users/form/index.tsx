@@ -21,7 +21,7 @@ export const UsersForm = observer((): ReactElement => {
     const { showError } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentUser } = usersStore;
+    const { getCurrentUser, getCurrentUserRoles, currentUserClear } = usersStore;
 
     const handleGetCurrentUser = async (useruid: string) => {
         const response = await getCurrentUser(useruid);
@@ -41,6 +41,10 @@ export const UsersForm = observer((): ReactElement => {
     useEffect(() => {
         if (!id) return;
         handleGetCurrentUser(id);
+        getCurrentUserRoles(id);
+        return () => {
+            currentUserClear();
+        };
     }, [id]);
 
     const tabItems: TabItem[] = [

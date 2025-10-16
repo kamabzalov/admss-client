@@ -35,7 +35,6 @@ export const GeneralInformation = observer((): ReactElement => {
     const usersStore = useStore().usersStore;
     const { user, changeUserData } = usersStore;
     const { showError, showSuccess } = useToastMessage();
-    const [middleName, setMiddleName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
@@ -87,8 +86,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={middleName || ""}
-                            onChange={(e) => setMiddleName(e.target.value)}
+                            value={user?.middleName || ""}
+                            onChange={(e) => changeUserData("middleName", e.target.value)}
                         />
                         <label className='float-label'>Middle Name</label>
                     </span>

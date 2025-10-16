@@ -19,13 +19,13 @@ export default function UsersHeader({
 }: UsersHeaderProps): ReactElement {
     return (
         <div className='flex flex-wrap gap-2 justify-content-between align-items-center mb-3'>
-            <div className='flex flex-wrap gap-2 align-items-center'>
+            <div className='flex flex-wrap gap-3 align-items-center'>
                 <GlobalSearchInput
                     value={searchValue}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
                 <Button
-                    className='inventory-top-controls__button new-inventory-button'
+                    className='table-header-button table-new-button'
                     icon='icon adms-add-item'
                     severity='success'
                     type='button'
@@ -35,7 +35,7 @@ export default function UsersHeader({
                     New
                 </Button>
                 <Button
-                    className='inventory-top-controls__button'
+                    className='table-header-button'
                     severity='success'
                     type='button'
                     icon='icon adms-print'
@@ -43,7 +43,7 @@ export default function UsersHeader({
                     onClick={onPrint}
                 />
                 <Button
-                    className='inventory-top-controls__button'
+                    className='table-header-button'
                     severity='success'
                     type='button'
                     icon='icon adms-download'

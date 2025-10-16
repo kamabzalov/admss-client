@@ -71,8 +71,8 @@ export const PasswordInput = ({
                 onPaste={handlePaste}
                 content={passwordContent}
                 feedback={true}
-                showIcon='adms-show'
-                hideIcon='adms-hide'
+                showIcon='adms-hide'
+                hideIcon='adms-show'
                 panelClassName='password-field-panel'
                 {...props}
             />

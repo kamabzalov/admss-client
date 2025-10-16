@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Tooltip, TooltipProps } from "primereact/tooltip";
+import "./index.css";
 
 interface TruncatedTextProps {
     text: string;
