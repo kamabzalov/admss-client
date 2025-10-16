@@ -891,3 +891,32 @@ figure {
         color: var(--admss-app-green);
     }
 }
+
+.table-header-button {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+    &.table-new-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Open Sans", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1.1;
+        flex-direction: column;
+        height: 50px;
+        width: 50px;
+    }
+
+    &.table-new-button .icon {
+        font-size: 20px;
+    }
+
+    .icon {
+        font-size: 26px;
+    }
+}

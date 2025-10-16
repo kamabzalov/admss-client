@@ -1,4 +1,5 @@
 import { BaseResponseError } from "common/models/base-response";
+import { TypeList } from "common/models";
 
 export interface User extends BaseResponseError {
     index: number;
@@ -70,6 +71,7 @@ export interface UserData extends BaseResponseError {
     email2: string;
     firstName: string;
     index: number;
+    middleName: string;
     lastName: string;
     locations: any;
     loginName: string;
@@ -78,9 +80,26 @@ export interface UserData extends BaseResponseError {
     parentuid: string;
     phone1: string;
     phone2: string;
+    rolename: string;
+    roleuid: string;
     state: string;
     streetAddress: string;
     updated: string;
     userName: string;
+    useruid: string;
+}
+
+export interface Permission extends TypeList {
+    description: string;
+}
+
+export interface UserRole {
+    created: string;
+    deleted: string;
+    isDefault: 0 | 1;
+    permissions: (Permission | null)[];
+    rolename: string;
+    roleuid: string;
+    updated: string;
     useruid: string;
 }

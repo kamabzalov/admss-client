@@ -2,7 +2,13 @@ import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { UserGroup } from "common/models/user";
-import { GenerateNewPasswordResponse, SubUser, User, UserData } from "common/models/users";
+import {
+    GenerateNewPasswordResponse,
+    SubUser,
+    User,
+    UserData,
+    UserRole,
+} from "common/models/users";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -41,7 +47,7 @@ export const getSubUsersList = async (useruid: string, params?: QueryParams) => 
 
 export const getUserRoles = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | UserGroup[]>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | UserRole[]>(
             `user/${useruid}/roles`,
             { params }
         );

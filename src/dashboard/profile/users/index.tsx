@@ -17,6 +17,10 @@ import UsersHeader from "dashboard/profile/users/components/UsersHeader";
 import "./index.css";
 import { SwitchButton } from "dashboard/common/button";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TruncatedText } from "dashboard/common/display";
+import { UsersUserSettings } from "common/models/user";
+import { DataTableColumnResizeEndEvent } from "primereact/datatable";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 
 enum USER_MODAL_MESSAGE {
     TITLE_ENABLED = "Enable user?",
@@ -35,6 +39,13 @@ export const Users = observer((): ReactElement => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const dataTableRef = useRef<DataTable<SubUser[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
+    const { serverSettings, setModuleSettings } = useUserProfileSettings<
+        UsersUserSettings,
+        { field: string; header?: unknown }
+    >("users", [
+        { field: "username", header: "User name" },
+        { field: "rolename", header: "Role" },
+    ]);
     const { showError } = useToastMessage();
     const { createReport } = useCreateReport<SubUser>();
     const navigate = useNavigate();
@@ -43,8 +54,6 @@ export const Users = observer((): ReactElement => {
 
     const handleGetUsers = async (params?: QueryParams) => {
         if (!authUser) return;
-
-        setIsLoading(true);
         try {
             const response = (await getSubUsersList(
                 authUser.useruid,
@@ -86,6 +95,20 @@ export const Users = observer((): ReactElement => {
         setLazyState(event);
     };
 
+    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
+        if (event.column.props.field) {
+            const newColumnWidth = {
+                [event.column.props.field as string]: event.element.offsetWidth,
+            };
+            setModuleSettings({
+                columnWidth: {
+                    ...serverSettings?.users?.columnWidth,
+                    ...newColumnWidth,
+                },
+            });
+        }
+    };
+
     const handleAddNewUser = () => {
         navigate(USERS_PAGE.CREATE());
     };
@@ -115,14 +138,14 @@ export const Users = observer((): ReactElement => {
         />
     );
 
-    const switchUserEnabled = (user: SubUser) => {
+    const switchUserEnabled = async (user: SubUser) => {
         if (!user.useruid) return;
         if (user.enabled) {
-            disableUser(user.useruid);
+            await disableUser(user.useruid);
         } else {
-            enableUser(user.useruid);
+            await enableUser(user.useruid);
         }
-        handleGetUsers();
+        await handleGetUsers();
     };
 
     const openConfirmToggle = (user: SubUser) => {
@@ -133,6 +156,21 @@ export const Users = observer((): ReactElement => {
     const closeConfirm = () => {
         setConfirmVisible(false);
         setSelectedUser(null);
+    };
+
+    const userNameColumn = (data: SubUser) => {
+        return (
+            <TruncatedText
+                className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
+                withTooltip={true}
+                tooltipOptions={{
+                    position: "mouse",
+                    content: data.username,
+                }}
+                data-field='username'
+                text={data.username}
+            />
+        );
     };
 
     return (
@@ -167,8 +205,11 @@ export const Users = observer((): ReactElement => {
                                         sortOrder={lazyState.sortOrder}
                                         sortField={lazyState.sortField}
                                         resizableColumns
+                                        onColumnResizeEnd={handleColumnResize}
                                         header={header}
-                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        rowClassName={() =>
+                                            "hover:text-primary cursor-pointer users-table-row"
+                                        }
                                     >
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}
@@ -200,21 +241,26 @@ export const Users = observer((): ReactElement => {
                                             field='username'
                                             header='User name'
                                             sortable
-                                            body={(data: SubUser) => {
-                                                return (
-                                                    <span
-                                                        className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
-                                                        data-field='username'
-                                                    >
-                                                        {data.username}
-                                                    </span>
-                                                );
+                                            body={userNameColumn}
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: serverSettings?.users?.columnWidth?.[
+                                                            "username"
+                                                        ],
+                                                        maxWidth:
+                                                            serverSettings?.users?.columnWidth?.[
+                                                                "username"
+                                                            ],
+                                                    },
+                                                },
                                             }}
                                         />
                                         <Column
                                             field='rolename'
                                             header='Role'
                                             sortable
+                                            resizeable={false}
                                             body={(data: SubUser) => {
                                                 return (
                                                     <span
@@ -225,14 +271,30 @@ export const Users = observer((): ReactElement => {
                                                     </span>
                                                 );
                                             }}
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: serverSettings?.users?.columnWidth?.[
+                                                            "rolename"
+                                                        ],
+                                                        maxWidth:
+                                                            serverSettings?.users?.columnWidth?.[
+                                                                "rolename"
+                                                            ],
+                                                    },
+                                                },
+                                            }}
                                         />
                                         <Column
-                                            header=''
                                             bodyStyle={{ textAlign: "center" }}
                                             body={(data: SubUser) => {
                                                 return (
                                                     <SwitchButton
                                                         checked={!!data?.enabled}
+                                                        tooltip={
+                                                            data.enabled ? "Disable" : "Enable"
+                                                        }
+                                                        tooltipOptions={{ position: "mouse" }}
                                                         onChange={() => {
                                                             openConfirmToggle(data);
                                                         }}
@@ -241,6 +303,7 @@ export const Users = observer((): ReactElement => {
                                             }}
                                             pt={{
                                                 root: {
+                                                    className: "border-left-none",
                                                     style: {
                                                         width: "120px",
                                                     },

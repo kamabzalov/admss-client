@@ -1,6 +1,6 @@
-import { SubUser, UserData } from "common/models/users";
+import { SubUser, UserData, UserRole } from "common/models/users";
 import { Status } from "common/models/base-response";
-import { getUserData } from "http/services/users";
+import { getUserData, getUserRoles } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
@@ -8,13 +8,17 @@ const initialUserData: Partial<UserData> = {
     firstName: "",
     lastName: "",
     loginName: "",
+    rolename: "",
+    roleuid: "",
     email1: "",
     phone1: "",
+    middleName: "",
 };
 
 export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
+    private _userRoles: UserRole[] = [] as UserRole[];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -41,6 +45,15 @@ export class UsersStore {
         }
     };
 
+    public getCurrentUserRoles = async (useruid: string) => {
+        const response = await getUserRoles(useruid);
+        if (response && Array.isArray(response)) {
+            this._userRoles = response as UserRole[];
+        } else {
+            this._userRoles = [] as UserRole[];
+        }
+    };
+
     public changeUserData = action(
         (
             keyOrEntries: keyof UserData | [keyof UserData, string | number][],
@@ -62,7 +75,16 @@ export class UsersStore {
         return this._user;
     }
 
+    public get userRoles() {
+        return this._userRoles;
+    }
+
     public get isLoading() {
         return this._isLoading;
     }
+
+    public currentUserClear = action(() => {
+        this._user = initialUserData;
+        this._userRoles = [] as UserRole[];
+    });
 }

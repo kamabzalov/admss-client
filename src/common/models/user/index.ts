@@ -45,9 +45,12 @@ export interface SidebarUserSettings {
     isSidebarCollapsed: boolean;
 }
 
+export interface UsersUserSettings extends UserSettings {}
+
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
     contacts: ContactsUserSettings;
+    users?: UsersUserSettings;
     accounts?: AccountsUserSettings;
     deals?: DealsUserSettings;
     exportWeb: ExportWebUserSettings;
