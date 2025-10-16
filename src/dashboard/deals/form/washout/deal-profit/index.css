@@ -740,7 +740,8 @@
                 overflow: visible;
             }
 
-            .p-inputtext:focus + label {
+            .p-inputtext:focus + label,
+            .p-inputtext.p-filled + label {
                 margin-top: -0.5rem;
                 font-size: 8px;
             }
