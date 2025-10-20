@@ -549,10 +549,10 @@ export interface DealWashout extends BaseResponseError {
     TotalDealCost: string;
     TotalInterest: string;
     Total_Profit: string;
-    Trade1Allowance: string;
-    Trade1ACV: string;
-    Trade2Allowance: string;
-    Trade2ACV: string;
+    Trade1_Allowance: string;
+    Trade1_Trade_ACV: string;
+    Trade2_Allowance: string;
+    Trade2_Trade_ACV: string;
     VIN: string;
     VSI: string;
     VSI_Cost: string;

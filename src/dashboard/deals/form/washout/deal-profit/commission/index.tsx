@@ -128,7 +128,7 @@ export const DealProfitCommission = observer(() => {
                     />
                     <DealProfitItem
                         title='Manager Override:'
-                        value={Number(dealWashout.CommissionMgr) || 0}
+                        value={Number(dealWashout.CommissionMgrOverride) || 0}
                         withInput
                         includes
                         includeCheckboxFieldName='CommissionMgrOverride'
@@ -136,7 +136,7 @@ export const DealProfitCommission = observer(() => {
                         checkboxOnChange={setManagerOverride}
                         fieldName='managerOverride'
                         onChange={({ value }) => {
-                            changeDealWashout("CommissionMgr", String(value));
+                            changeDealWashout("CommissionMgrOverride", String(value));
                         }}
                     />
                     <DealProfitItem
