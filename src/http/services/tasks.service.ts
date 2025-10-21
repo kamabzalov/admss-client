@@ -1,7 +1,7 @@
 import { isAxiosError } from "axios";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponseError, Status, TotalListCount } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
+import { News, PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
 import { authorizedUserApiInstance } from "http/index";
 
@@ -122,6 +122,23 @@ export const setTaskStatus = async (taskuid: string, taskStatus: TaskStatus) => 
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || `Error while set task status to ${taskStatus}`,
+            };
+        }
+    }
+};
+
+export const getLatestNews = async (userid: string, params?: QueryParams) => {
+    try {
+        const request = await authorizedUserApiInstance.get<TotalListCount | News[]>(
+            `tasks/${userid}/listnews`,
+            { params }
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting latest news",
             };
         }
     }

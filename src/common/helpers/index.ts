@@ -148,21 +148,38 @@ export const formatDateForServer = (date: Date | number, withTimeZone?: boolean)
     return `${base}${timeZone}`;
 };
 
-export const parseDateFromServer = (dateString: string | number | undefined | null): number => {
-    if (!dateString) return 0;
+export const parseDateFromServer = (
+    date: string | number | undefined | null,
+    returnType: "date" | "date-with-time" | "timestamp" = "timestamp"
+): number | string => {
+    if (!date) return 0;
 
-    if (typeGuards.isNumber(dateString)) {
-        return dateString;
+    if (typeGuards.isNumber(date)) {
+        return date;
     }
 
-    if (!typeGuards.isString(dateString) || dateString.trim() === "") {
+    if (!typeGuards.isString(date) || date.trim() === "") {
         return 0;
     }
 
     try {
-        const parts = dateString.split(" ");
+        const parts = date.split(" ");
         const dateParts = parts[0].split("/");
         const timeParts = parts[1] ? parts[1].split(":") : ["0", "0", "0"];
+
+        if (returnType === "date") {
+            const day = parseInt(dateParts[1]);
+            const month = parseInt(dateParts[0]);
+            const year = parseInt(dateParts[2]);
+
+            const padNumber = (num: number) => num.toString().padStart(2, "0");
+
+            return `${padNumber(day)}.${padNumber(month)}.${year}`;
+        }
+
+        if (returnType === "date-with-time") {
+            return `${dateParts[1]}.${dateParts[0]}.${dateParts[2]} ${timeParts[0]}:${timeParts[1]}:${timeParts[2]}`;
+        }
 
         return new Date(
             parseInt(dateParts[2]),

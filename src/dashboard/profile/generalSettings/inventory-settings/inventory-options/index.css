@@ -54,7 +54,7 @@
     }
 
     .inventory-options__delete.p-button.p-button-text:enabled:hover {
-        color: var(--admss-darkest-grey);
+        color: var(--admss-app-darkest-grey);
 
         background: transparent;
     }
