@@ -81,3 +81,16 @@ export interface AdvancedSearch {
     info: string;
     date: string;
 }
+
+export interface News {
+    info: string;
+    index: number;
+    created: string;
+    updated: string;
+    deadline: string;
+    startdate: string;
+    newstype: number;
+    itemuid: string;
+    description: string;
+    objecttype: number;
+}

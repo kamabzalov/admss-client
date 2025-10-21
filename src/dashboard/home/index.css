@@ -135,6 +135,8 @@
     align-items: center;
 }
 .task-calendar {
+    display: flex;
+    justify-content: center;
     max-width: 380px;
     border-left: 1px solid var(--admss-app-light-blue);
     .p-datepicker-calendar {

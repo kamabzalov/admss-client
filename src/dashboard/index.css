@@ -54,6 +54,7 @@
 .card-header__title {
     font-size: 20px;
     width: 343px;
+    cursor: default;
 }
 
 .card-content__wrapper {

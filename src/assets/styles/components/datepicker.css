@@ -10,7 +10,7 @@
 
 .p-datepicker .p-datepicker-header .p-datepicker-prev,
 .p-datepicker .p-datepicker-header .p-datepicker-next {
-    color: var(--admss-darkest-grey);
+    color: var(--admss-app-darkest-grey);
 }
 
 .p-datepicker-calendar thead th {

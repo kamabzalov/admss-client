@@ -32,7 +32,7 @@
     font-size: 24px;
     max-width: 922px;
     text-align: center;
-    color: var(--admss-darkest-grey);
+    color: var(--admss-app-darkest-grey);
 }
 
 .service-update__image {

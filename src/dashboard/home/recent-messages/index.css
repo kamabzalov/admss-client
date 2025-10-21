@@ -4,12 +4,13 @@
     border: none;
     cursor: pointer;
     text-decoration: underline;
+    text-underline-offset: 3px;
     font-weight: 600;
-    color: var(--admss-darkest-grey);
+    color: var(--admss-app-darkest-grey);
     &:enabled:hover {
         background: none;
         border: none;
-        color: var(--admss-darkest-grey);
+        color: var(--admss-app-darkest-grey);
     }
     &:enabled:focus {
         background: none;
