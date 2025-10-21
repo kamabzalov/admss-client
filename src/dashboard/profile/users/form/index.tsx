@@ -4,7 +4,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { observer } from "mobx-react-lite";
-import { USERS_PAGE } from "common/constants/links";
+import { CREATE_ID, USERS_PAGE } from "common/constants/links";
 import { GeneralInformation } from "./components/GeneralInformation";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
@@ -39,7 +39,7 @@ export const UsersForm = observer((): ReactElement => {
     }, [searchParams, setSearchParams]);
 
     useEffect(() => {
-        if (!id) return;
+        if (!id || id === CREATE_ID) return;
         handleGetCurrentUser(id);
         getCurrentUserRoles(id);
         return () => {
