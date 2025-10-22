@@ -69,9 +69,12 @@ export const getWatermark = async (
     }
 };
 
-export const updateWatermark = async (mediauid: string, body?: any) => {
+export const updateWatermark = async (
+    mediauid: string,
+    body?: Partial<WatermarkPostProcessing>
+) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `media/${mediauid}/watermark`,
             body
         );

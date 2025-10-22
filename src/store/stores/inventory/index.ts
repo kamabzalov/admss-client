@@ -40,6 +40,7 @@ import {
     getInventoryMediaItem,
     deleteMediaImage,
 } from "http/services/media.service";
+import { updateWatermark } from "http/services/settings.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
@@ -466,15 +467,6 @@ export class InventoryStore {
             try {
                 this._isLoading = true;
 
-                const generalSettingsStore = this.rootStore.generalSettingsStore;
-                const useruid = this.rootStore.userStore.authUser?.useruid;
-                if (generalSettingsStore.isSettingsChanged) {
-                    if (useruid) {
-                        generalSettingsStore.saveSettings();
-                    }
-                    generalSettingsStore.isSettingsChanged = false;
-                }
-
                 const inventoryData: Inventory = {
                     ...this.inventory,
                     extdata: {
@@ -494,10 +486,40 @@ export class InventoryStore {
                     Audit: this.inventoryAudit,
                 };
 
-                const [inventoryResponse, webResponse] = await Promise.all([
+                const generalSettingsStore = this.rootStore.generalSettingsStore;
+                const watermarkPromise = generalSettingsStore.isSettingsChanged
+                    ? (async () => {
+                          const useruid = this.rootStore.userStore.authUser?.useruid;
+                          if (useruid) {
+                              const filteredSettings = Object.fromEntries(
+                                  Object.entries(generalSettingsStore.settings).filter(
+                                      ([key]) =>
+                                          !["index", "created", "updated", "status"].includes(key)
+                                  )
+                              );
+
+                              const response = await updateWatermark(
+                                  this._inventory?.itemuid,
+                                  filteredSettings
+                              );
+                              if (response?.status === Status.ERROR) {
+                                  return response;
+                              }
+                          }
+                          generalSettingsStore.isSettingsChanged = false;
+                          return { status: Status.OK };
+                      })()
+                    : Promise.resolve({ status: Status.OK });
+
+                const [inventoryResponse, webResponse, watermarkResponse] = await Promise.all([
                     setInventory(inventoryuid, inventoryData),
                     setInventoryExportWeb(inventoryuid, this._exportWeb),
+                    watermarkPromise,
                 ]);
+
+                if (watermarkResponse?.status === Status.ERROR) {
+                    return watermarkResponse;
+                }
 
                 if (inventoryResponse?.status === Status.OK && webResponse?.status === Status.OK) {
                     if (inventoryuid !== "0") {
