@@ -7,6 +7,7 @@ interface TruncatedTextProps {
     className?: string;
     withTooltip?: boolean;
     tooltipOptions?: TooltipProps;
+    width?: "auto" | "full";
 }
 
 interface SplitterProps {
@@ -21,6 +22,7 @@ export const TruncatedText = ({
     className,
     withTooltip,
     tooltipOptions,
+    width = "full",
 }: TruncatedTextProps) => {
     const [isTextTruncated, setIsTextTruncated] = useState<boolean>(false);
     const textRef = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ export const TruncatedText = ({
     return (
         <div
             ref={textRef}
-            className={`truncated-text ${className ?? ""}`}
+            className={`truncated-text ${width === "auto" ? "w-auto" : "w-full"} ${className ?? ""}`}
             data-tooltip-id={uniqueId}
         >
             {text}

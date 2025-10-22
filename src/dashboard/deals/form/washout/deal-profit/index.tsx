@@ -159,6 +159,7 @@ export const DealProfitItem = observer(
                                           minimumFractionDigits: 2,
                                           maximumFractionDigits: 2,
                                       }) || "",
+                                  width: "auto",
                                   className: "deal-profit__value-text",
                               })
                             : props.value}
