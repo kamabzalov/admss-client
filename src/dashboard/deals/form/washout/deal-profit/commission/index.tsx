@@ -84,6 +84,7 @@ export const DealProfitCommission = observer(() => {
                         radioArray={COMMISSION_2_OPTIONS}
                         wrapperClassName='commission-settings__radio'
                         rowGap={2}
+                        columnGap={2}
                         initialValue={getCurrentCommissionOption()}
                         onChange={handleCommissionOptionChange}
                         children={
