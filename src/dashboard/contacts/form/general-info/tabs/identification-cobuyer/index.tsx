@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
 import { DateInput } from "dashboard/common/form/inputs";
+import { useFormikContext } from "formik";
+import { PartialContact } from "dashboard/contacts/form";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
@@ -29,6 +31,8 @@ import { DLSides, SexList } from "common/constants/contract-options";
 export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+        useFormikContext<PartialContact>();
     const {
         contact,
         contactExtData,
@@ -221,18 +225,25 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                     />
                 </div>
 
-                <div className='col-3'>
+                <div className='col-3 relative'>
                     <span className='p-float-label'>
                         <InputMask
+                            name='CoBuyer_SS_Number'
                             mask='999-99-9999'
-                            className='identification-info__text-input w-full'
-                            value={contactExtData.CoBuyer_SS_Number || ""}
-                            onChange={({ target: { value } }) => {
+                            className={`identification-info__text-input w-full ${
+                                errors.CoBuyer_SS_Number ? "p-invalid" : ""
+                            } ${values.CoBuyer_SS_Number ? "p-filled" : ""}`}
+                            value={values.CoBuyer_SS_Number || ""}
+                            onBlur={handleBlur}
+                            onChange={async ({ target: { value } }) => {
+                                await setFieldValue("CoBuyer_SS_Number", value);
                                 changeContactExtData("CoBuyer_SS_Number", String(value));
+                                setFieldTouched("CoBuyer_SS_Number", true, true);
                             }}
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
+                    <small className='p-error'>{errors.CoBuyer_SS_Number}</small>
                 </div>
 
                 <div className='col-3'>
