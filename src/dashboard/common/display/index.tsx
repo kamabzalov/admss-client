@@ -11,7 +11,7 @@ interface TruncatedTextProps {
 }
 
 interface SplitterProps {
-    title: string;
+    title?: string;
     children?: React.ReactNode;
     padding?: string;
     className?: string;
@@ -58,10 +58,12 @@ export const TruncatedText = ({
 export const Splitter = ({ title, children, padding = "pr-3", className }: SplitterProps) => {
     return (
         <div className={`splitter ${className ?? ""}`}>
-            <h3 className={`splitter__title m-0 ${padding ? "" : "pr-3"}`} style={{ padding }}>
-                {title}
-            </h3>
-            <hr className='splitter__line ml-3 flex-1' />
+            {title && (
+                <h3 className={`splitter__title m-0 ${padding ? "" : "pr-3"}`} style={{ padding }}>
+                    {title}
+                </h3>
+            )}
+            <hr className={`splitter__line ${title ? "ml-3" : ""} flex-1`} />
             {children}
         </div>
     );

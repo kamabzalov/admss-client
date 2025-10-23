@@ -1,11 +1,12 @@
 import "./index.css";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { observer } from "mobx-react-lite";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
-import { GeneralInformation } from "./components/GeneralInformation";
+import { GeneralInformation, ROLE_OPTIONS } from "./components/GeneralInformation";
+import { SalesPersonInformation } from "./components/SalesPersonInformation";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
 
@@ -18,10 +19,11 @@ interface TabItem {
 export const UsersForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { showError } = useToastMessage();
+    const { showError, showInfo } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentUser, getCurrentUserRoles, currentUserClear } = usersStore;
+    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user } = usersStore;
+    const hasShownInfo = useRef(false);
 
     const handleGetCurrentUser = async (useruid: string) => {
         const response = await getCurrentUser(useruid);
@@ -47,16 +49,44 @@ export const UsersForm = observer((): ReactElement => {
         };
     }, [id]);
 
-    const tabItems: TabItem[] = [
-        {
-            settingName: "General Information",
-            route: "general-information",
-            component: <GeneralInformation />,
-        },
-    ];
+    const getTabItems = (): TabItem[] => {
+        const baseTabs: TabItem[] = [
+            {
+                settingName: "General Information",
+                route: "general-information",
+                component: <GeneralInformation />,
+            },
+        ];
+
+        const salesPersonRole = ROLE_OPTIONS.find((option) => option.name === "Salesman");
+        if (user?.rolename === salesPersonRole?.title) {
+            baseTabs.push({
+                settingName: "Sales Person Information",
+                route: "sales-person-information",
+                component: <SalesPersonInformation />,
+            });
+            if (!hasShownInfo.current) {
+                showInfo("New section added to the sidebar – check it out!");
+                hasShownInfo.current = true;
+            }
+        } else {
+            hasShownInfo.current = false;
+        }
+
+        return baseTabs;
+    };
+
+    const tabItems = getTabItems();
 
     const activeTabParam = searchParams.get("section") || tabItems[0].route;
     const activeTabIndex = tabItems.findIndex((section) => section.route === activeTabParam);
+
+    useEffect(() => {
+        if (activeTabIndex === -1) {
+            const [defaultTab] = tabItems;
+            setSearchParams({ section: defaultTab.route });
+        }
+    }, [activeTabIndex, tabItems, setSearchParams]);
 
     const handleTabChange = (index: number) => {
         const selectedTabRoute = tabItems[index].route;

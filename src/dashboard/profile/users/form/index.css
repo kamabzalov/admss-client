@@ -30,7 +30,7 @@
     gap: 10px;
 }
 
-.user-form-page__tabs .p-tabview-panels {
+.user-form-page__tabs > .p-tabview-panels {
     flex: 1;
     padding: 0;
     padding-left: 40px;
