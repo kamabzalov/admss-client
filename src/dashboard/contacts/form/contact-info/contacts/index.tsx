@@ -114,7 +114,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                     value={contact.phone1 ?? ""}
                     onChange={async ({ target: { value } }) => {
                         await setFieldValue("phone1", value);
-                        value && changeContact("phone1", value);
+                        changeContact("phone1", value);
                         setFieldTouched("phone1", true, true);
                     }}
                 />
@@ -131,7 +131,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                         onChange={async ({ target: { value } }) => {
                             if (!value?.length) setAnotherPhone(false);
                             await setFieldValue("phone2", value);
-                            value && changeContact("phone2", value);
+                            changeContact("phone2", value);
                             setFieldTouched("phone2", true, true);
                         }}
                     />
