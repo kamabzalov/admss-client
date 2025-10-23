@@ -11,7 +11,7 @@ import { GenerateNewPasswordResponse } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 
-const ROLE_OPTIONS: RadioButtonProps[] = [
+export const ROLE_OPTIONS: RadioButtonProps[] = [
     {
         name: "Owner",
         title: "Owner (Admin)",
@@ -109,8 +109,16 @@ export const GeneralInformation = observer((): ReactElement => {
                     <DashboardRadio
                         radioArray={ROLE_OPTIONS}
                         justifyContent='start'
-                        initialValue={""}
-                        onChange={() => {}}
+                        initialValue={(() => {
+                            const roleIndex = ROLE_OPTIONS.findIndex(
+                                (option) => option.title === user?.rolename
+                            );
+                            return roleIndex >= 0 ? roleIndex.toString() : "";
+                        })()}
+                        onChange={(value) => {
+                            const selectedOption = ROLE_OPTIONS[parseInt(value as string)];
+                            changeUserData("rolename", selectedOption.title);
+                        }}
                     />
                 </div>
             </div>
