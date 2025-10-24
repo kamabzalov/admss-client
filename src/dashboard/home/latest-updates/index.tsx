@@ -70,7 +70,7 @@ export const LatestUpdates = ({
                 <ul className='latest-updates__list'>
                     {newsData.slice(0, messagesShowCount).map((news) => (
                         <li
-                            className={`latest-updates__item ${news.index <= MAX_NEWS_COUNT_ON_PAGE ? "latest-updates__item--new" : ""}`}
+                            className={`latest-updates__item ${news.read ? "" : "latest-updates__item--new"}`}
                             key={news.itemuid}
                             onClick={() => handleNewsClick(news)}
                         >
