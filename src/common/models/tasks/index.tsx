@@ -93,4 +93,5 @@ export interface News {
     itemuid: string;
     description: string;
     objecttype: number;
+    read: boolean;
 }

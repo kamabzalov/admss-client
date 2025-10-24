@@ -1,7 +1,7 @@
 import { useToastMessage } from "common/hooks";
 import { News } from "common/models/tasks";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { getLatestNews } from "http/services/tasks.service";
+import { getLatestNews, markNewsAsRead } from "http/services/tasks.service";
 import { Column } from "primereact/column";
 import { DataTableValue, DataTableRowClickEvent, DataTable } from "primereact/datatable";
 import { DialogProps } from "primereact/dialog";
@@ -51,6 +51,9 @@ export const LatestUpdatesDialog = ({
         if (visible && selectedNews && newsData.length > 0) {
             const fullNewsData = newsData.find((news) => news.itemuid === selectedNews.itemuid);
             if (fullNewsData) {
+                if (!fullNewsData.read) {
+                    markNewsAsRead(fullNewsData.itemuid);
+                }
                 setExpandedRows([fullNewsData]);
             }
         } else if (visible && !selectedNews) {
@@ -66,11 +69,14 @@ export const LatestUpdatesDialog = ({
         );
     };
 
-    const handleRowClick = (e: DataTableRowClickEvent) => {
+    const handleRowClick = async (e: DataTableRowClickEvent) => {
         const rowData = e.data;
         const isRowExpanded = expandedRows.some((row) => row === rowData);
 
         if (isRowExpanded) {
+            if (!rowData.read) {
+                await markNewsAsRead(rowData.itemuid);
+            }
             setExpandedRows(expandedRows.filter((row) => row !== rowData));
         } else {
             setExpandedRows([...expandedRows, rowData]);
@@ -78,7 +84,7 @@ export const LatestUpdatesDialog = ({
     };
 
     const newsIndicatorTemplate = (news: News) => {
-        const isNew = news.index <= MAX_NEWS_COUNT_ON_PAGE;
+        const isNew = !news.read;
         return (
             <div className='datatable-news__indicator'>
                 <i className={`pi pi-circle-fill pi-circle-fill--${isNew ? "new" : "read"}`} />

@@ -143,3 +143,19 @@ export const getLatestNews = async (userid: string, params?: QueryParams) => {
         }
     }
 };
+
+export const markNewsAsRead = async (newsuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `tasks/${newsuid}/readnews`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while marking news as read",
+            };
+        }
+    }
+};
