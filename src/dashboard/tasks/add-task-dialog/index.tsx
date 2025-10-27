@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputMask } from "primereact/inputmask";
 import { useStore } from "store/hooks";
@@ -20,6 +18,9 @@ import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useToastMessage } from "common/hooks";
+import { ALL_FIELDS } from "common/constants/fields";
+
 enum DATE_TYPE {
     START = "startdate",
     DEADLINE = "deadline",
@@ -48,7 +49,7 @@ export const AddTaskDialog = observer(
     ({ visible, onHide, header, currentTask, onAction }: AddTaskDialogProps) => {
         const userStore = useStore().userStore;
         const { authUser } = userStore;
-        const toast = useToast();
+        const { showSuccess, showError } = useToastMessage();
         const [taskState, setTaskState] = useState<Partial<PostDataTask>>(initializeTaskState());
         const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
         const [dateError, setDateError] = useState<string>("");
@@ -101,25 +102,22 @@ export const AddTaskDialog = observer(
         const handleSaveTaskData = async () => {
             if (!validateDates(taskState.startdate || "", taskState.deadline || "")) return;
 
+            const payload: Partial<PostDataTask> = {
+                ...taskState,
+                accountname: taskState.accountuid ? taskState.accountname : "",
+                dealname: taskState.dealuid ? taskState.dealname : "",
+                contactname: taskState.contactuid ? taskState.contactname : "",
+            };
+
             setIsSaving(true);
 
-            const response = await createTask(taskState, currentTask?.itemuid);
+            const response = await createTask(payload, currentTask?.itemuid);
 
             if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
+                showError(response.error);
                 setDateError("");
             } else {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: `Task ${currentTask ? "updated" : "created"} successfully!`,
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess(`Task ${currentTask ? "updated" : "created"} successfully!`);
                 onHide();
                 onAction?.();
             }
@@ -132,6 +130,13 @@ export const AddTaskDialog = observer(
             handleInputChange("accountname", account.name);
         };
 
+        const handleAccountNameChange = (value: string) => {
+            handleInputChange("accountname", value);
+            if (taskState.accountuid) {
+                handleInputChange("accountuid", "");
+            }
+        };
+
         const handleGetCompanyInfo = (contact: ContactUser) => {
             handleInputChange("contactuid", contact.contactuid);
             handleInputChange(
@@ -142,9 +147,23 @@ export const AddTaskDialog = observer(
             );
         };
 
+        const handleContactNameChange = (value: string) => {
+            handleInputChange("contactname", value);
+            if (taskState.contactuid) {
+                handleInputChange("contactuid", "");
+            }
+        };
+
         const handleGetDealInfo = (deal: Deal) => {
             handleInputChange("dealuid", deal.dealuid);
             handleInputChange("dealname", deal.contactinfo);
+        };
+
+        const handleDealNameChange = (value: string) => {
+            handleInputChange("dealname", value);
+            if (taskState.dealuid) {
+                handleInputChange("dealuid", "");
+            }
         };
 
         return (
@@ -205,22 +224,25 @@ export const AddTaskDialog = observer(
 
                     <AccountSearch
                         value={taskState.accountname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("accountname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetAccountInfo}
+                        onChange={({ target: { value } }) => handleAccountNameChange(value)}
                         name='Account (optional)'
                     />
 
                     <DealSearch
                         value={taskState.dealname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("dealname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetDealInfo}
+                        onChange={({ target: { value } }) => handleDealNameChange(value)}
                         name='Deal (optional)'
                     />
 
                     <CompanySearch
                         value={taskState.contactname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("contactname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetCompanyInfo}
+                        onChange={({ target: { value } }) => handleContactNameChange(value)}
                         name='Contact'
                     />
                     <InputMask
