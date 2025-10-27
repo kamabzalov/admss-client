@@ -69,26 +69,6 @@ export const getWatermark = async (
     }
 };
 
-export const updateWatermark = async (
-    mediauid: string,
-    body?: Partial<WatermarkPostProcessing>
-) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `media/${mediauid}/watermark`,
-            body
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while updating watermark",
-            };
-        }
-    }
-};
-
 export const getPostProcessing = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<WatermarkPostProcessing>(
