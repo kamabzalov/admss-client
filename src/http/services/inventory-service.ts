@@ -3,6 +3,7 @@
 import { AxiosResponse, isAxiosError } from "axios";
 import { ListData } from "common/models";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import { WatermarkPostProcessing } from "common/models/general-settings";
 import {
     Inventory,
     TotalInventoryList,
@@ -443,6 +444,26 @@ export const deleteInventoryModel = async (itemuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error on delete inventory model",
+            };
+        }
+    }
+};
+
+export const updateInventoryWatermark = async (
+    inventoryuid: string,
+    body?: Partial<WatermarkPostProcessing>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${inventoryuid}/watermark`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating watermark",
             };
         }
     }

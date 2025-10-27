@@ -31,6 +31,7 @@ import {
     setInventoryExportWeb,
     getInventoryWebCheck,
     setInventoryWebCheck,
+    updateInventoryWatermark,
 } from "http/services/inventory-service";
 import {
     getInventoryMediaItemList,
@@ -40,7 +41,6 @@ import {
     getInventoryMediaItem,
     deleteMediaImage,
 } from "http/services/media.service";
-import { updateWatermark } from "http/services/settings.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
@@ -498,8 +498,8 @@ export class InventoryStore {
                                   )
                               );
 
-                              const response = await updateWatermark(
-                                  this._inventory?.itemuid,
+                              const response = await updateInventoryWatermark(
+                                  this._inventoryID,
                                   filteredSettings
                               );
                               if (response?.status === Status.ERROR) {
