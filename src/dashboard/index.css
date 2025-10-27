@@ -761,6 +761,10 @@
     text-overflow: ellipsis;
     max-width: calc(100% - 20px);
     line-height: 1.5;
+    &.p-inputtext {
+        display: inline-flex;
+        align-items: center;
+    }
 }
 
 .row--deleted {

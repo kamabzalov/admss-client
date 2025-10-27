@@ -2,18 +2,19 @@ import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { QueryParams } from "common/models/query-params";
 import { useState } from "react";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { Deal } from "common/models/deals";
 import { useStore } from "store/hooks";
 import { DealsDataTable } from "dashboard/deals";
 import { getDealsList } from "http/services/deals.service";
+import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
 const FIELD: keyof Deal = "contactinfo";
 
 interface DealSearchProps extends DropdownProps {
     onRowClick?: (dealName: string) => void;
     originalPath?: string;
-    returnedField?: keyof Deal;
+    returnedField?: RETURNED_FIELD_TYPE<Deal>;
     getFullInfo?: (deal: Deal) => void;
 }
 
@@ -36,7 +37,8 @@ export const DealSearch = ({
         if (!searchValue.trim()) {
             return;
         }
-        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
+        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
+        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
             qry,
         };
@@ -59,17 +61,33 @@ export const DealSearch = ({
         setDialogVisible(false);
     };
 
+    const handleOnChange = (event: DropdownChangeEvent) => {
+        const selectedValue = event.value;
+
+        if (returnedField === ALL_FIELDS) {
+            const selectedDeal = options.find((deal) => deal[FIELD] === selectedValue);
+
+            if (selectedDeal && getFullInfo) {
+                getFullInfo(selectedDeal);
+            }
+        }
+
+        if (onChange) {
+            onChange(event);
+        }
+    };
+
     return (
         <>
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={returnedField || FIELD}
+                optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
                 optionLabel={FIELD}
                 options={options}
                 onInputChange={handleDealInputChange}
                 value={value}
-                onChange={onChange}
+                onChange={handleOnChange}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
@@ -86,7 +104,9 @@ export const DealSearch = ({
                 <DealsDataTable
                     onRowClick={handleOnRowClick}
                     originalPath={originalPath}
-                    returnedField={returnedField}
+                    returnedField={
+                        returnedField === ALL_FIELDS ? undefined : (returnedField as keyof Deal)
+                    }
                     getFullInfo={handleGetFullInfo}
                 />
             </Dialog>

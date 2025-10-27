@@ -2,17 +2,18 @@ import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { QueryParams } from "common/models/query-params";
 import { useState } from "react";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
 import { getAccountsList } from "http/services/accounts.service";
 import { AccountsDataTable } from "dashboard/accounts";
+import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
 const FIELD: keyof AccountInfo = "name";
 
 interface AccountSearchProps extends DropdownProps {
     onRowClick?: (accountName: string) => void;
-    returnedField?: keyof AccountInfo;
+    returnedField?: RETURNED_FIELD_TYPE<AccountInfo>;
     getFullInfo?: (account: AccountInfo) => void;
 }
 
@@ -34,7 +35,8 @@ export const AccountSearch = ({
         if (!searchValue.trim()) {
             return;
         }
-        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
+        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
+        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
             qry,
         };
@@ -57,17 +59,33 @@ export const AccountSearch = ({
         setDialogVisible(false);
     };
 
+    const handleOnChange = (event: DropdownChangeEvent) => {
+        const selectedValue = event.value;
+
+        if (returnedField === ALL_FIELDS) {
+            const selectedAccount = options.find((account) => account[FIELD] === selectedValue);
+
+            if (selectedAccount && getFullInfo) {
+                getFullInfo(selectedAccount);
+            }
+        }
+
+        if (onChange) {
+            onChange(event);
+        }
+    };
+
     return (
         <>
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={returnedField || FIELD}
+                optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
                 optionLabel={FIELD}
                 options={options}
                 onInputChange={handleAccountInputChange}
                 value={value}
-                onChange={onChange}
+                onChange={handleOnChange}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
@@ -83,7 +101,11 @@ export const AccountSearch = ({
             >
                 <AccountsDataTable
                     onRowClick={handleOnRowClick}
-                    returnedField={returnedField}
+                    returnedField={
+                        returnedField === ALL_FIELDS
+                            ? undefined
+                            : (returnedField as keyof AccountInfo)
+                    }
                     getFullInfo={handleGetFullInfo}
                 />
             </Dialog>

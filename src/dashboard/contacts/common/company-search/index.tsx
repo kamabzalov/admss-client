@@ -7,8 +7,9 @@ import { AuthUser } from "http/services/auth.service";
 import { getContacts, getContactsTypeList } from "http/services/contacts-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { ContactsDataTable } from "dashboard/contacts";
+import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
 const FIELD: keyof ContactUser = "companyName";
 
@@ -16,7 +17,7 @@ interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
-    returnedField?: keyof ContactUser;
+    returnedField?: RETURNED_FIELD_TYPE<ContactUser>;
     onChangeGetFullInfo?: (contact: ContactUser) => void;
     getFullInfo?: (contact: ContactUser) => void;
 }
@@ -56,7 +57,8 @@ export const CompanySearch = ({
         if (!searchValue.trim()) {
             return;
         }
-        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
+        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
+        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
             qry,
             ...(currentCategory && { param: currentCategory }),
@@ -88,20 +90,37 @@ export const CompanySearch = ({
         setDialogVisible(false);
     };
 
+    const handleOnChange = (event: DropdownChangeEvent) => {
+        const selectedValue = event.value;
+
+        if (returnedField === ALL_FIELDS) {
+            const selectedContact = options.find((contact) => contact[FIELD] === selectedValue);
+
+            if (selectedContact && getFullInfo) {
+                getFullInfo(selectedContact);
+            }
+        }
+
+        if (onChangeGetFullInfo) {
+            onChangeGetFullInfo(event.target.value);
+        }
+
+        if (onChange) {
+            onChange(event);
+        }
+    };
+
     return (
         <>
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={returnedField || FIELD}
+                optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
                 optionLabel='name'
                 options={options}
                 onInputChange={handleCompanyInputChange}
                 value={value}
-                onChange={(event) => {
-                    onChangeGetFullInfo && onChangeGetFullInfo(event.target.value);
-                    onChange && onChange(event);
-                }}
+                onChange={handleOnChange}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
@@ -119,7 +138,11 @@ export const CompanySearch = ({
                     onRowClick={handleOnRowClick}
                     contactCategory={contactCategory}
                     originalPath={originalPath}
-                    returnedField={returnedField}
+                    returnedField={
+                        returnedField === ALL_FIELDS
+                            ? undefined
+                            : (returnedField as keyof ContactUser)
+                    }
                     getFullInfo={handleGetFullInfo}
                 />
             </Dialog>
