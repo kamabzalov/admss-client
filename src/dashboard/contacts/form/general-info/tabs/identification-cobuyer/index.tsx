@@ -27,6 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import "./index.css";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DLSides, SexList } from "common/constants/contract-options";
+import { TruncatedText } from "dashboard/common/display";
 
 export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -243,7 +244,9 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
-                    <small className='p-error'>{errors.CoBuyer_SS_Number}</small>
+                    <small className='p-error'>
+                        <TruncatedText text={errors?.CoBuyer_SS_Number || ""} />
+                    </small>
                 </div>
 
                 <div className='col-3'>

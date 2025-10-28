@@ -27,6 +27,7 @@ import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DLSides, SexList } from "common/constants/contract-options";
+import { TruncatedText } from "dashboard/common/display";
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -242,7 +243,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         />
                         <label className='float-label'>Social Security Number</label>
                     </span>
-                    <small className='p-error'>{errors.Buyer_SS_Number}</small>
+                    <small className='p-error'>
+                        <TruncatedText text={errors?.Buyer_SS_Number || ""} />
+                    </small>
                 </div>
 
                 <div className='col-3'>
