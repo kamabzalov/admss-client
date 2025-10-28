@@ -28,6 +28,7 @@ import {
     EMAIL_REGEX,
     LETTERS_NUMBERS_SIGNS_REGEX,
     PHONE_NUMBER_REGEX,
+    SSN_REGEX,
 } from "common/constants/regex";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { useToastMessage } from "common/hooks";
@@ -78,8 +79,10 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
-const handleValidationMessage = (text: string) => {
-    return `${text || "This field"} does not match the required format.`;
+const handleValidationMessage = (text: string, isShort?: boolean) => {
+    const defaultMessage = `${text || "This field"} does not match the required format.`;
+    const shortMessage = `${text || "This field"} is invalid.`;
+    return isShort ? shortMessage : defaultMessage;
 };
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
@@ -192,8 +195,14 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
-    Buyer_SS_Number: Yup.string(),
-    CoBuyer_SS_Number: Yup.string(),
+    Buyer_SS_Number: Yup.string().matches(SSN_REGEX, {
+        message: handleValidationMessage("Buyer SSN", true),
+        excludeEmptyString: true,
+    }),
+    CoBuyer_SS_Number: Yup.string().matches(SSN_REGEX, {
+        message: handleValidationMessage("Co-Buyer SSN", true),
+        excludeEmptyString: true,
+    }),
     separateContact: Yup.boolean(),
 });
 
