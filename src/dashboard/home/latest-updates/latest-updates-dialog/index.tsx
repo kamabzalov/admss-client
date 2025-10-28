@@ -107,7 +107,7 @@ export const LatestUpdatesDialog = ({
             <TruncatedText
                 className={`datatable-news__description datatable-news__description--${news.index <= MAX_NEWS_COUNT_ON_PAGE ? "new" : "read"}`}
                 withTooltip
-                text={news.description}
+                text={news.title}
             />
         );
     };
@@ -152,7 +152,7 @@ export const LatestUpdatesDialog = ({
                         },
                     }}
                 />
-                <Column field='description' header='Title' body={newsDescriptionTemplate} />
+                <Column field='title' header='Title' body={newsDescriptionTemplate} />
                 <Column
                     field='created'
                     header='Date'
