@@ -94,4 +94,5 @@ export interface News {
     description: string;
     objecttype: number;
     read: boolean;
+    title: string;
 }

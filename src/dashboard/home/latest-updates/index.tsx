@@ -76,7 +76,7 @@ export const LatestUpdates = ({
                             onClick={() => handleNewsClick(news)}
                         >
                             <span className='latest-updates__item-description'>
-                                <TruncatedText withTooltip text={news.description} />
+                                <TruncatedText withTooltip text={news.title} />
                             </span>
                             <span className='latest-updates__item-created'>
                                 {parseDateFromServer(news.created, "date")}
