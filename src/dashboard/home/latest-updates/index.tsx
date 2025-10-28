@@ -59,6 +59,7 @@ export const LatestUpdates = ({
     const handleDialogHide = () => {
         setDialogActive(false);
         setSelectedNews(null);
+        handleGetLatestNews();
     };
 
     return (

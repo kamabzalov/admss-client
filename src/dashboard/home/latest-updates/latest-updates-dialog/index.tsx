@@ -53,6 +53,11 @@ export const LatestUpdatesDialog = ({
             if (fullNewsData) {
                 if (!fullNewsData.read) {
                     markNewsAsRead(fullNewsData.itemuid);
+                    setNewsData(
+                        newsData.map((news) =>
+                            news.itemuid === fullNewsData.itemuid ? { ...news, read: true } : news
+                        )
+                    );
                 }
                 setExpandedRows([fullNewsData]);
             }
@@ -74,11 +79,16 @@ export const LatestUpdatesDialog = ({
         const isRowExpanded = expandedRows.some((row) => row === rowData);
 
         if (isRowExpanded) {
-            if (!rowData.read) {
-                await markNewsAsRead(rowData.itemuid);
-            }
             setExpandedRows(expandedRows.filter((row) => row !== rowData));
         } else {
+            if (!rowData.read) {
+                await markNewsAsRead(rowData.itemuid);
+                setNewsData(
+                    newsData.map((news) =>
+                        news.itemuid === rowData.itemuid ? { ...news, read: true } : news
+                    )
+                );
+            }
             setExpandedRows([...expandedRows, rowData]);
         }
     };
