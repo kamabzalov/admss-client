@@ -1,8 +1,10 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -70,4 +72,81 @@ export function createApiDashboardInstance(navigate: NavigateFunction) {
         },
         (error) => handleErrorResponse(error, navigate)
     );
+}
+
+export interface ApiRequestOptions {
+    url: string;
+    config?: AxiosRequestConfig;
+    defaultError?: string;
+    returnErrorObject?: boolean;
+}
+
+export interface ApiPostOptions extends Omit<ApiRequestOptions, "config"> {
+    url: string;
+    data?: unknown;
+    config?: AxiosRequestConfig;
+    defaultError?: string;
+    returnErrorObject?: boolean;
+}
+
+export class ApiRequest {
+    private _returnErrorObject: boolean = true;
+
+    constructor(private apiInstance: AxiosInstance = authorizedUserApiInstance) {}
+
+    private handleError(
+        error: unknown,
+        defaultError: string,
+        returnErrorObject: boolean
+    ): BaseResponseError | undefined {
+        if (returnErrorObject) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.error || defaultError
+                : defaultError;
+
+            return {
+                status: Status.ERROR,
+                error: errorMessage,
+            } as BaseResponseError;
+        }
+
+        return undefined;
+    }
+
+    async get<T = BaseResponseError>(
+        options: ApiRequestOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            config,
+            defaultError = ERROR_MESSAGES.API_ERROR,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.get<T>(url, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
+
+    async post<T = BaseResponseError>(
+        options: ApiPostOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            data,
+            config,
+            defaultError = ERROR_MESSAGES.API_ERROR,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.post<T>(url, data, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
 }

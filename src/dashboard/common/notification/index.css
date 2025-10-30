@@ -1,0 +1,62 @@
+.notification {
+    width: 455px;
+    height: 451px;
+
+    .notification-header {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        color: var(--admss-app-blue-text);
+        font-size: 26px;
+        font-weight: 400;
+        font-family: "Open Sans", sans-serif;
+        line-height: 150%;
+    }
+    .notification-header__icon {
+        font-size: 5rem;
+        padding-bottom: 48px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        font-size: 18px;
+        font-weight: 300;
+        font-family: "Open Sans", sans-serif;
+        line-height: 150%;
+    }
+
+    .p-dialog-footer {
+        margin-top: auto;
+        padding: 0;
+        .p-button {
+            width: 355px;
+            height: 60px;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: "Open Sans", sans-serif;
+            line-height: 150%;
+        }
+    }
+}
+
+.notification--info {
+    .notification-header__icon {
+        color: var(--admss-app-main-blue);
+    }
+}
+
+.notification--warning {
+    .notification-header__icon {
+        color: var(--admss-app-warning-yellow);
+    }
+}
+
+.notification--error {
+    .notification-header__icon {
+        color: var(--admss-app-red);
+    }
+}

@@ -30,3 +30,30 @@ export const TITLE_STATUS_LIST: readonly TypeList[] = [
         id: 6,
     },
 ];
+
+export enum NOTIFICATION_TITLE {
+    INFO = "Scheduled Maintenance",
+    WARNING = "Maintenance in Progress",
+    ERROR = "Connection Lost",
+}
+interface NotificationTitle extends TypeList {
+    title: NOTIFICATION_TITLE;
+}
+
+export const NOTIFICATION_TITLE_STATUS: readonly NotificationTitle[] = [
+    {
+        name: "Info",
+        id: 0,
+        title: NOTIFICATION_TITLE.INFO,
+    },
+    {
+        name: "Warning",
+        id: 1,
+        title: NOTIFICATION_TITLE.WARNING,
+    },
+    {
+        name: "Error",
+        id: 2,
+        title: NOTIFICATION_TITLE.ERROR,
+    },
+];
