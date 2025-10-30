@@ -24,7 +24,7 @@ import { PrintForTestDrive } from "dashboard/test-drive";
 import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { Tasks } from "dashboard/tasks";
 import { ErrorBoundary } from "http/routes/ErrorBoundary";
-import { ToastProvider } from "dashboard/common/toast";
+import { AppProvider } from "common/providers/AppProvider";
 import { ServiceUpdate } from "services/service-update";
 import { DealWashout } from "dashboard/deals/form/washout";
 import { Users } from "dashboard/profile/users";
@@ -177,9 +177,9 @@ const AppRouter = (): ReactElement => {
     const router: RemixRouter = createBrowserRouter(routes);
 
     return (
-        <ToastProvider>
+        <AppProvider>
             <RouterProvider router={router} />
-        </ToastProvider>
+        </AppProvider>
     );
 };
 

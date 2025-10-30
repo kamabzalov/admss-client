@@ -6,22 +6,51 @@ import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
+import { getAlerts } from "http/services/tasks.service";
+import { useNotification } from "common/hooks";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
-    useEffect(() => {
-        if (authUser && Object.keys(authUser.permissions).length) {
-            const { permissions } = authUser;
-            const { uaSalesPerson, ...otherPermissions } = permissions;
-            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-                return setIsSalesPerson(false);
+    const [date] = useState<Date | null>(null);
+    const { showNotification } = useNotification();
+    const handleGetGlobalData = async () => {
+        if (!authUser || !Object.keys(authUser.permissions).length) return;
+
+        const alertShownKey = `alert_shown_${authUser.useruid}`;
+        const wasAlertShown = sessionStorage.getItem(alertShownKey);
+
+        if (!wasAlertShown) {
+            const alerts = await getAlerts(authUser.useruid);
+            if (alerts && Array.isArray(alerts)) {
+                const filteredAlerts = alerts.filter(
+                    (alert) => alert.description && !alert.description.includes("string")
+                );
+                const lastAlert = filteredAlerts.sort(
+                    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+                )[0];
+                if (lastAlert) {
+                    showNotification({
+                        type: lastAlert.alerttype,
+                        description: lastAlert.description,
+                    });
+                    sessionStorage.setItem(alertShownKey, "true");
+                }
             }
-            if (!!uaSalesPerson) setIsSalesPerson(true);
         }
+
+        const { permissions } = authUser;
+        const { uaSalesPerson, ...otherPermissions } = permissions;
+        if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+            return setIsSalesPerson(false);
+        }
+        if (!!uaSalesPerson) setIsSalesPerson(true);
+    };
+
+    useEffect(() => {
+        handleGetGlobalData();
     }, [authUser, authUser?.permissions]);
-    const [date] = useState(null);
 
     return (
         <div className='grid home-page'>

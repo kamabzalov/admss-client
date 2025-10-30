@@ -12,6 +12,11 @@ export enum TaskStatus {
     DELETED = "Deleted",
 }
 
+export enum ALERT_TYPE {
+    INFO,
+    WARNING,
+    ERROR,
+}
 export interface Task {
     accountname: string;
     accountnumber: string;
@@ -95,4 +100,17 @@ export interface News {
     objecttype: number;
     read: boolean;
     title: string;
+}
+
+export interface Alert {
+    accepted: string;
+    alerttype: number;
+    created: string;
+    deadline: string;
+    description: string;
+    index: number;
+    itemuid: string;
+    startdate: string;
+    updated: string;
+    useruid: string;
 }

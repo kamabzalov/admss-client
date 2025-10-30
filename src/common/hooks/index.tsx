@@ -178,3 +178,4 @@ export const useToastMessage = () => {
 };
 
 export { useCreateReport } from "common/hooks/useCreateReport";
+export { useNotification } from "dashboard/common/notification";
