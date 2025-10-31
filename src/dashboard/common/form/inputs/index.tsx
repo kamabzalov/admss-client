@@ -12,6 +12,7 @@ import { Button } from "primereact/button";
 import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inputmask";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -89,6 +90,7 @@ interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
     colWidth?: Range<1, 13>;
     onChange?: (e: any) => void;
     onBlur?: (e: any) => void;
+    withValidationMessage?: boolean;
 }
 
 interface StateDropdownProps extends DropdownProps {
@@ -602,6 +604,7 @@ export const PhoneInput = ({
     colWidth,
     onChange,
     onBlur,
+    withValidationMessage = false,
     ...props
 }: PhoneInputProps): ReactElement => {
     const inputRef = useRef(null);
@@ -625,7 +628,7 @@ export const PhoneInput = ({
         const cleanValue = value?.replace(/[^0-9]/g, "");
 
         if (cleanValue && cleanValue.length < 10) {
-            setError("Phone number is not valid");
+            setError(ERROR_MESSAGES.PHONE);
         } else {
             setError("");
         }
@@ -654,7 +657,7 @@ export const PhoneInput = ({
             <label htmlFor={uniqueId} className='float-label'>
                 {name}
             </label>
-            {error && <div className='p-error pt-2'>{error}</div>}
+            {withValidationMessage && error && <div className='p-error pt-2'>{error}</div>}
         </span>
     );
 
