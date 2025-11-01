@@ -3,9 +3,9 @@ import { News } from "common/models/tasks";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { getLatestNews, markNewsAsRead } from "http/services/tasks.service";
 import { Column } from "primereact/column";
-import { DataTableValue, DataTableRowClickEvent, DataTable } from "primereact/datatable";
+import { DataTableRowClickEvent, DataTable, DataTableExpandedRows } from "primereact/datatable";
 import { DialogProps } from "primereact/dialog";
-import { ReactElement, useState, useEffect } from "react";
+import { ReactElement, useState, useEffect, useRef } from "react";
 import { useStore } from "store/hooks";
 import { MAX_NEWS_COUNT_ON_PAGE } from "dashboard/home/latest-updates";
 import { parseDateFromServer } from "common/helpers";
@@ -25,8 +25,9 @@ export const LatestUpdatesDialog = ({
     const store = useStore().userStore;
     const { authUser } = store;
     const [newsData, setNewsData] = useState<News[]>([]);
-    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows>({});
     const { showError } = useToastMessage();
+    const isUpdatingFromClick = useRef(false);
 
     const handleGetNews = async () => {
         if (!authUser) return;
@@ -48,6 +49,11 @@ export const LatestUpdatesDialog = ({
     }, []);
 
     useEffect(() => {
+        if (isUpdatingFromClick.current) {
+            isUpdatingFromClick.current = false;
+            return;
+        }
+
         if (visible && selectedNews && newsData.length > 0) {
             const fullNewsData = newsData.find((news) => news.itemuid === selectedNews.itemuid);
             if (fullNewsData) {
@@ -59,10 +65,10 @@ export const LatestUpdatesDialog = ({
                         )
                     );
                 }
-                setExpandedRows([fullNewsData]);
+                setExpandedRows({ [fullNewsData.itemuid]: true });
             }
         } else if (visible && !selectedNews) {
-            setExpandedRows([]);
+            setExpandedRows({});
         }
     }, [visible, selectedNews, newsData]);
 
@@ -76,12 +82,15 @@ export const LatestUpdatesDialog = ({
 
     const handleRowClick = async (e: DataTableRowClickEvent) => {
         const rowData = e.data;
-        const isRowExpanded = expandedRows.some((row) => row === rowData);
+        const isRowExpanded = expandedRows[rowData.itemuid] === true;
 
         if (isRowExpanded) {
-            setExpandedRows(expandedRows.filter((row) => row !== rowData));
+            setExpandedRows({ ...expandedRows, [rowData.itemuid]: undefined });
         } else {
+            setExpandedRows({ ...expandedRows, [rowData.itemuid]: true });
+
             if (!rowData.read) {
+                isUpdatingFromClick.current = true;
                 await markNewsAsRead(rowData.itemuid);
                 setNewsData(
                     newsData.map((news) =>
@@ -89,7 +98,6 @@ export const LatestUpdatesDialog = ({
                     )
                 );
             }
-            setExpandedRows([...expandedRows, rowData]);
         }
     };
 
@@ -115,7 +123,7 @@ export const LatestUpdatesDialog = ({
     const newsDateTemplate = (news: News) => {
         return (
             <span
-                className={`datatable-news__date datatable-news__date--${news.index <= MAX_NEWS_COUNT_ON_PAGE ? "new" : "read"}`}
+                className={`datatable-news__date datatable-news__date--${news.read ? "read" : "new"}`}
             >
                 {parseDateFromServer(news.created, "date-with-time")}
             </span>
@@ -132,9 +140,9 @@ export const LatestUpdatesDialog = ({
             <DataTable
                 className='datatable-news'
                 value={newsData}
+                dataKey='itemuid'
                 rowExpansionTemplate={rowExpansionTemplate}
                 expandedRows={expandedRows}
-                onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                 onRowClick={handleRowClick}
                 rowHover
                 scrollable
