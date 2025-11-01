@@ -3,7 +3,7 @@
     height: 872px;
 
     .p-dialog-header {
-        padding-bottom: 8px;
+        padding-bottom: 18px;
     }
 
     .p-dialog-content-body {
@@ -42,5 +42,6 @@
 }
 
 .p-dialog .p-dialog-description {
+    width: 100%;
     height: 130px;
 }

@@ -4,8 +4,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { Status } from "common/models/base-response";
-import { DateInput } from "dashboard/common/form/inputs";
-import { InputMask } from "primereact/inputmask";
+import { DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
@@ -57,7 +56,11 @@ export const AddTaskDialog = observer(
         const [isSaving, setIsSaving] = useState<boolean>(false);
 
         const isSubmitDisabled =
-            !taskState.description?.trim() || !!dateError || !isFormChanged || isSaving;
+            !taskState.description?.trim() ||
+            !!dateError ||
+            !isFormChanged ||
+            isSaving ||
+            !taskState.useruid;
 
         const handleGetTasksSubUserList = async () => {
             const response = await getTasksSubUserList(authUser!.useruid);
@@ -100,13 +103,17 @@ export const AddTaskDialog = observer(
         };
 
         const handleSaveTaskData = async () => {
-            if (!validateDates(taskState.startdate || "", taskState.deadline || "")) return;
+            if (
+                !validateDates(taskState.startdate || "", taskState.deadline || "") ||
+                !taskState.useruid
+            )
+                return;
 
             const payload: Partial<PostDataTask> = {
                 ...taskState,
                 accountname: taskState.accountuid ? taskState.accountname : "",
                 dealname: taskState.dealuid ? taskState.dealname : "",
-                contactname: taskState.contactuid ? taskState.contactname : "",
+                contactname: taskState.contactname,
             };
 
             setIsSaving(true);
@@ -179,11 +186,12 @@ export const AddTaskDialog = observer(
             >
                 <>
                     <ComboBox
-                        placeholder='Assign to'
-                        value={taskState.useruid || ""}
+                        label='Assign to (required)'
+                        value={taskState.useruid || authUser?.useruid || ""}
                         options={assignToData || []}
                         optionLabel='username'
                         optionValue='useruid'
+                        required
                         className='flex align-items-center'
                         onChange={(e) => handleInputChange("useruid", e.value)}
                     />
@@ -243,22 +251,23 @@ export const AddTaskDialog = observer(
                         returnedField={ALL_FIELDS}
                         getFullInfo={handleGetCompanyInfo}
                         onChange={({ target: { value } }) => handleContactNameChange(value)}
-                        name='Contact'
+                        name='Contact (optional)'
                     />
-                    <InputMask
-                        type='tel'
-                        mask='999-999-9999'
-                        placeholder='Phone Number (optional)'
+                    <PhoneInput
                         value={taskState.phone || ""}
-                        onChange={(e) => handleInputChange("phone", e.target?.value || "")}
+                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                        name='Phone Number (optional)'
+                        withValidationMessage={false}
                     />
-                    <InputTextarea
-                        placeholder='Description (required)'
-                        required
-                        value={taskState.description || ""}
-                        onChange={(e) => handleInputChange("description", e.target.value)}
-                        className='p-dialog-description'
-                    />
+                    <span className='p-float-label relative'>
+                        <InputTextarea
+                            required
+                            value={taskState.description || ""}
+                            onChange={(e) => handleInputChange("description", e.target.value)}
+                            className='p-dialog-description'
+                        />
+                        <label className='float-label'>Description (required)</label>
+                    </span>
                 </>
             </DashboardDialog>
         );
