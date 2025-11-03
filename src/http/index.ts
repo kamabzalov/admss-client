@@ -101,7 +101,7 @@ export class ApiRequest {
     ): BaseResponseError | undefined {
         if (returnErrorObject) {
             const errorMessage = isAxiosError(error)
-                ? error.response?.data?.error || defaultError
+                ? error.response?.data?.info || error.response?.data?.error || defaultError
                 : defaultError;
 
             return {

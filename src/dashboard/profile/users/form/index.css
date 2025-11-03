@@ -3,6 +3,9 @@
     --card-max-height: 983px;
     --content-height: 600px;
     --title-height: 63px;
+    .general-information {
+        overflow: hidden;
+    }
 }
 
 .user-form-page .card {

@@ -1,7 +1,7 @@
 import { Password, PasswordProps } from "primereact/password";
 import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constants/regex";
 import "./index.css";
-import { useId } from "react";
+import { useId, useMemo } from "react";
 
 interface PasswordInputProps extends PasswordProps {
     label?: string;
@@ -10,6 +10,9 @@ interface PasswordInputProps extends PasswordProps {
     error?: boolean;
     errorMessage?: string;
 }
+
+const getRuleClass = (isCorrect: boolean) =>
+    isCorrect ? "password-field__content--success" : "password-field__content--error";
 
 export const PasswordInput = ({
     label = "Password (required)",
@@ -26,8 +29,9 @@ export const PasswordInput = ({
     const hasNumber = PASSWORD_REGEX.NUMBER_REGEX.test(password || "");
     const hasSpecial = PASSWORD_REGEX.SPECIAL_CHAR_REGEX.test(password || "");
 
-    const getRuleClass = (isCorrect: boolean) =>
-        isCorrect ? "password-field__content--success" : "password-field__content--error";
+    const isPasswordCorrect = useMemo(() => {
+        return hasValidLength && hasLowercase && hasUppercase && hasNumber && hasSpecial;
+    }, [hasValidLength, hasLowercase, hasUppercase, hasNumber, hasSpecial]);
 
     const passwordContent = (
         <section className='password-field__content'>
@@ -48,6 +52,7 @@ export const PasswordInput = ({
         const sanitized = raw.replace(LATIN_PASSWORD_DISALLOWED_REGEX, "");
         setPassword(sanitized);
     };
+
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
         const text = (e.clipboardData?.getData("text") || "").replace(
             LATIN_PASSWORD_DISALLOWED_REGEX,
@@ -63,10 +68,10 @@ export const PasswordInput = ({
                 inputId={id}
                 name='Password'
                 value={password}
-                className={`password-field w-full ${!!error ? "p-invalid" : ""}`}
+                className='password-field'
                 toggleMask
                 autoComplete='new-password'
-                inputClassName={`password-field-input ${!!error ? "p-invalid" : ""}`}
+                inputClassName={`password-field-input ${!!error || (!!password && !isPasswordCorrect) ? "p-invalid" : ""}`}
                 onChange={handleChange}
                 onPaste={handlePaste}
                 content={passwordContent}
