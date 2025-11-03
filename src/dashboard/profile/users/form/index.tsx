@@ -19,12 +19,12 @@ interface TabItem {
 export const UsersForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { showError, showInfo } = useToastMessage();
+    const { showError, showInfo, showSuccess } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user } = usersStore;
+    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user, isFormValid, createUser } =
+        usersStore;
     const hasShownInfo = useRef(false);
-
     const handleGetCurrentUser = async (useruid: string) => {
         const response = await getCurrentUser(useruid);
         if (response && response.error) {
@@ -97,6 +97,18 @@ export const UsersForm = observer((): ReactElement => {
         navigate(USERS_PAGE.MAIN);
     };
 
+    const handleSaveClick = async () => {
+        if (id === CREATE_ID) {
+            const response = await createUser();
+            if (response && response.error) {
+                showError(response?.error);
+            } else {
+                showSuccess("User created successfully");
+                navigate(USERS_PAGE.MAIN);
+            }
+        }
+    };
+
     return (
         <div className='relative user-form-page'>
             <Button
@@ -106,7 +118,9 @@ export const UsersForm = observer((): ReactElement => {
             />
             <div className='card'>
                 <div className='card-header flex'>
-                    <h2 className='card-header__title uppercase m-0'>Create User</h2>
+                    <h2 className='card-header__title uppercase m-0'>
+                        {id === CREATE_ID ? "Create new" : "Edit"} User
+                    </h2>
                 </div>
                 <TabView
                     className='user-form-page__tabs'
@@ -133,8 +147,14 @@ export const UsersForm = observer((): ReactElement => {
                     >
                         Cancel
                     </Button>
-                    <Button className='uppercase px-6 form__button' severity='success' disabled>
-                        Save
+                    <Button
+                        className='uppercase px-6 form__button'
+                        severity={isFormValid ? "success" : "secondary"}
+                        type='submit'
+                        disabled={!isFormValid}
+                        onClick={handleSaveClick}
+                    >
+                        {id === CREATE_ID ? "Create" : "Update"}
                     </Button>
                 </div>
             </div>

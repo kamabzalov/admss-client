@@ -1,276 +1,123 @@
-import { isAxiosError } from "axios";
-import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { UserGroup } from "common/models/user";
-import {
-    GenerateNewPasswordResponse,
-    SubUser,
-    User,
-    UserData,
-    UserRole,
-} from "common/models/users";
-import { authorizedUserApiInstance } from "http/index";
+import { UserData } from "common/models/users";
+import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | User[]>(
-            `user/${useruid}/list`,
-            { params }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting users list",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/list`,
+        config: { params },
+        defaultError: "Error while getting users list",
+    });
 };
 
 export const getSubUsersList = async (useruid: string, params?: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | SubUser[]>(
-            `user/${useruid}/subusers`,
-            { params }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting sub users list",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/subusers`,
+        config: { params },
+        defaultError: "Error while getting sub users list",
+    });
 };
 
 export const getUserRoles = async (useruid: string, params?: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | UserRole[]>(
-            `user/${useruid}/roles`,
-            { params }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting user roles",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/roles`,
+        config: { params },
+        defaultError: "Error while getting user roles",
+    });
 };
 
 export const getUserRole = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | UserGroup>(
-            `user/${useruid}/userrole`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting user role",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/userrole`,
+        defaultError: "Error while getting user role",
+    });
 };
 
 export const getRoleInfo = async (roleuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | UserGroup>(
-            `user/${roleuid}/role`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting role info",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${roleuid}/role`,
+        defaultError: "Error while getting role info",
+    });
 };
 
 export const getRoleUsers = async (roleuid: string, params?: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | any>(
-            `user/${roleuid}/roleusers`,
-            { params }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting role users",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${roleuid}/roleusers`,
+        config: { params },
+        defaultError: "Error while getting role users",
+    });
 };
 
 export const deleteUser = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/delete`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while deleting user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/delete`,
+        defaultError: "Error while deleting user",
+    });
 };
 
 export const enableUser = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/enable`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while enabling user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/enable`,
+        defaultError: "Error while enabling user",
+    });
 };
 
 export const disableUser = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/disable`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while disabling user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/disable`,
+        defaultError: "Error while disabling user",
+    });
 };
 
 export const restoreUser = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/undelete`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while restoring user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/undelete`,
+        defaultError: "Error while restoring user",
+    });
 };
 
 export const setUserData = async (uid: string, userData: Partial<UserData>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/set`,
-            userData
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while setting user data",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/set`,
+        data: userData,
+        defaultError: "Error while setting user data",
+    });
 };
 
 export const validateUserData = async (uid: string, userData: Partial<UserData>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${uid}/validate`,
-            userData
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while validating user data",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${uid}/validate`,
+        data: userData,
+        defaultError: "Error while validating user data",
+    });
 };
 
 export const validateUserDataGeneral = async (userData: any) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/validate`,
-            userData
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while validating user data",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/validate`,
+        data: userData,
+        defaultError: "Error while validating user data",
+    });
 };
 
 export const getUserData = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | UserData>(
-            `user/${useruid}/userinfo`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting user data",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/userinfo`,
+        defaultError: "Error while getting user data",
+    });
 };
 
 export const createUser = async (useruid: string, userData: Partial<UserData>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${useruid}/user`,
-            userData
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while creating user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${useruid}/user`,
+        data: userData,
+        defaultError: "Error while creating user",
+    });
 };
 
 export const generateNewPassword = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<GenerateNewPasswordResponse>(
-            `user/${useruid}/newpassword`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while generating new password",
-            };
-        }
-    }
+    return new ApiRequest().get({
+        url: `user/${useruid}/newpassword`,
+        defaultError: "Error while generating new password",
+    });
 };

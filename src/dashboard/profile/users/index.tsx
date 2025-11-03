@@ -22,6 +22,9 @@ import { UsersUserSettings } from "common/models/user";
 import { DataTableColumnResizeEndEvent } from "primereact/datatable";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 
+const PAGINATOR_HEIGHT = 86;
+const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
+
 enum USER_MODAL_MESSAGE {
     TITLE_ENABLED = "Enable user?",
     TITLE_DISABLED = "Disable user?",
@@ -54,19 +57,16 @@ export const Users = observer((): ReactElement => {
 
     const handleGetUsers = async (params?: QueryParams) => {
         if (!authUser) return;
-        try {
-            const response = (await getSubUsersList(
-                authUser.useruid,
-                params
-            )) as unknown as SubUser[];
+        setIsLoading(true);
+        const response = await getSubUsersList(authUser.useruid, params);
 
-            setSubUsers(response as SubUser[]);
-            setTotalRecords(response?.length || 0);
-        } catch (error: any) {
-            showError(error.message || "Error while getting users list");
-        } finally {
-            setIsLoading(false);
+        if (response && Array.isArray(response)) {
+            setSubUsers(response);
+            setTotalRecords(response.length);
+        } else {
+            showError(response?.error);
         }
+        setIsLoading(false);
     };
 
     useEffect(() => {
@@ -128,16 +128,6 @@ export const Users = observer((): ReactElement => {
         });
     };
 
-    const header = (
-        <UsersHeader
-            searchValue={globalSearch}
-            onSearchChange={(nextValue: string) => setGlobalSearch(nextValue)}
-            onAddNew={handleAddNewUser}
-            onPrint={() => printTableData(true)}
-            onDownload={() => printTableData(false)}
-        />
-    );
-
     const switchUserEnabled = async (user: SubUser) => {
         if (!user.useruid) return;
         if (user.enabled) {
@@ -183,6 +173,17 @@ export const Users = observer((): ReactElement => {
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12'>
+                                <UsersHeader
+                                    searchValue={globalSearch}
+                                    onSearchChange={(nextValue: string) =>
+                                        setGlobalSearch(nextValue)
+                                    }
+                                    onAddNew={handleAddNewUser}
+                                    onPrint={() => printTableData(true)}
+                                    onDownload={() => printTableData(false)}
+                                />
+                            </div>
+                            <div className='col-12'>
                                 {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader />
@@ -206,10 +207,16 @@ export const Users = observer((): ReactElement => {
                                         sortField={lazyState.sortField}
                                         resizableColumns
                                         onColumnResizeEnd={handleColumnResize}
-                                        header={header}
                                         rowClassName={() =>
                                             "hover:text-primary cursor-pointer users-table-row"
                                         }
+                                        pt={{
+                                            resizeHelper: {
+                                                style: {
+                                                    maxHeight: TABLE_HEIGHT,
+                                                },
+                                            },
+                                        }}
                                     >
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}

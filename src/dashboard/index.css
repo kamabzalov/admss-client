@@ -925,3 +925,12 @@ figure {
         font-size: 26px;
     }
 }
+
+.p-password.p-inputwrapper {
+    &.p-input-icon-right > i {
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        transform: translateY(25%);
+    }
+}
