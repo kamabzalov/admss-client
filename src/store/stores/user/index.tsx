@@ -6,7 +6,7 @@ import { getKeyValue, setKey } from "services/local-storage.service";
 import { RootStore } from "store";
 
 class Settings {
-    private _isSidebarCollapsed: boolean = false;
+    private _isSidebarCollapsed: boolean = true;
 
     constructor() {
         makeAutoObservable(this);

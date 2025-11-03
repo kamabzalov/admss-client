@@ -116,11 +116,7 @@ body {
     background: var(--admss-app-medium-blue);
 }
 
-.main.main--collapsed .container {
-    width: calc(var(--admss-app-container-width) - var(--admss-app-aside-expanded-width));
-    max-width: var(--admss-app-container-width-collapsed);
-}
-.main.main--expanded .container {
+.main .container {
     width: calc(var(--admss-app-container-width) - var(--admss-app-aside-collapsed-width));
     max-width: var(--admss-app-container-width-expanded);
 }

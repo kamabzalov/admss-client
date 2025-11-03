@@ -18,7 +18,7 @@ import { CONTACT_SUPPORT, HELP_PAGE, SETTINGS_PAGE, USERS_PAGE } from "common/co
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { authUser, settings, isSettingsLoaded } = store;
+    const { authUser, isSettingsLoaded } = store;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -110,14 +110,8 @@ export const Header = observer((): ReactElement => {
 
     if (menuRight) {
         return (
-            <header
-                className={`header ${settings.isSidebarCollapsed ? "header--collapsed" : "header--expanded"}`}
-            >
-                <img
-                    src={logo}
-                    alt='ADMSS'
-                    className={`header__logo ${settings.isSidebarCollapsed ? "header__logo--collapsed" : "header__logo--expanded"}`}
-                />
+            <header className='header header--collapsed'>
+                <img src={logo} alt='ADMSS' className='header__logo header__logo--collapsed' />
 
                 <div className='header__content'>
                     <div className='header__info'>

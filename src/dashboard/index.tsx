@@ -36,10 +36,9 @@ export const Dashboard = observer((): ReactElement => {
         <Suspense fallback={<Loader overlay />}>
             <Header />
             <Sidebar />
+            {!settings.isSidebarCollapsed && <div className='sidebar-overlay'></div>}
             {isSettingsLoaded ? (
-                <main
-                    className={`main ${settings.isSidebarCollapsed ? "main--expanded" : "main--collapsed"}`}
-                >
+                <main className='main'>
                     <div className='container'>
                         <Outlet />
                     </div>

@@ -82,6 +82,22 @@
     height: 100%;
 }
 
+.sidebar-nav__link span {
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+.sidebar-nav__label--hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.sidebar-nav__label--visible {
+    opacity: 1;
+    visibility: visible;
+}
+
 .sidebar-nav__item:hover .sidebar-nav__link {
     color: var(--admss-app-main-blue);
 }
@@ -91,6 +107,9 @@
     background-position: center;
     background-size: 100%;
     background-repeat: no-repeat;
+    transition:
+        width 0.3s ease,
+        height 0.3s ease;
 }
 
 .sidebar-nav__icon.home {
