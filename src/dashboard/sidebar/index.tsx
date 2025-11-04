@@ -3,10 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
-import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
-import { ServerUserSettings } from "common/models/user";
 import {
     ACCOUNTS_PAGE,
     CONTACTS_PAGE,
@@ -20,47 +17,23 @@ import {
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { authUser, settings, isSettingsLoaded } = store;
+    const { authUser, settings } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
-    const [serverSettings, setServerSettings] = useState<ServerUserSettings | undefined>(undefined);
+    const [isInitialRender, setIsInitialRender] = useState(true);
 
     useEffect(() => {
         if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile?.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    try {
-                        allSettings = JSON.parse(response.profile);
-                    } catch (error) {
-                        allSettings = {} as ServerUserSettings;
-                    }
-                    setServerSettings(allSettings);
-                    if (allSettings?.sidebar?.isSidebarCollapsed !== undefined) {
-                        settings.isSidebarCollapsed = !allSettings.sidebar.isSidebarCollapsed;
-                    }
-                }
-                store.isSettingsLoaded = true;
-            });
+            store.isSettingsLoaded = true;
+            setIsInitialRender(false);
         }
-    }, [settings]);
+    }, [authUser]);
 
-    const changeSettings = (newSidebarSettings: { isSidebarCollapsed: boolean }) => {
-        if (authUser && serverSettings !== undefined) {
-            const updatedSettings: ServerUserSettings = {
-                ...serverSettings,
-                sidebar: {
-                    ...serverSettings?.sidebar,
-                    ...newSidebarSettings,
-                },
-            };
-            setServerSettings(updatedSettings);
-            setUserSettings(authUser.useruid, updatedSettings);
-        }
+    const handleMouseEnter = () => {
+        settings.isSidebarCollapsed = false;
     };
 
-    const handleToggleSidebar = () => {
-        settings.toggleSidebar();
-        changeSettings({ isSidebarCollapsed: !settings.isSidebarCollapsed });
+    const handleMouseLeave = () => {
+        settings.isSidebarCollapsed = true;
     };
 
     useEffect(() => {
@@ -83,33 +56,26 @@ export const Sidebar = observer((): ReactElement => {
                 )}
                 <Link to={to} id={itemId} className='sidebar-nav__link'>
                     <div className={`sidebar-nav__icon ${iconClass}`}></div>
-                    {!settings.isSidebarCollapsed && <span>{label}</span>}
+                    <span
+                        className={
+                            settings.isSidebarCollapsed
+                                ? "sidebar-nav__label--hidden"
+                                : "sidebar-nav__label--visible"
+                        }
+                    >
+                        {label}
+                    </span>
                 </Link>
             </li>
         );
     };
 
-    if (!isSettingsLoaded) {
-        return <></>;
-    }
-
     return (
         <aside
-            className={`sidebar hidden lg:block ${settings.isSidebarCollapsed ? "collapsed" : ""}`}
+            className={`sidebar hidden lg:block ${settings.isSidebarCollapsed ? "collapsed" : ""} ${isInitialRender ? "no-transition" : ""}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
-            <Button
-                className='sidebar-toggle'
-                onClick={handleToggleSidebar}
-                rounded
-                icon='pi pi-angle-left'
-                aria-label={`${settings.isSidebarCollapsed ? "Expand" : "Collapse"} sidebar`}
-                tooltip={`${settings.isSidebarCollapsed ? "Expand" : "Collapse"} sidebar`}
-                pt={{
-                    icon: {
-                        className: `${settings.isSidebarCollapsed ? "pi pi-angle-right" : "pi pi-angle-left"}`,
-                    },
-                }}
-            />
             <ul className='sidebar-nav'>
                 {renderNavItem(DASHBOARD_PAGE, "home", "Home")}
                 {renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
