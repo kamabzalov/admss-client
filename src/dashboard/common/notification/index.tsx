@@ -36,6 +36,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
     const [onAcceptCallback, setOnAcceptCallback] = useState<
         (() => void | Promise<void>) | undefined
     >();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [defaultNotificationTitle] = NOTIFICATION_TITLE_STATUS;
 
@@ -43,6 +44,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
         setNotificationType(options.type || NOTIFICATION_TYPE.INFO);
         setNotificationDescription(options.description || "");
         setOnAcceptCallback(() => options.onAccept);
+        setIsLoading(false);
         setIsVisible(true);
     }, []);
 
@@ -51,10 +53,15 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
     }, []);
 
     const handleAccept = useCallback(async () => {
-        if (onAcceptCallback) {
-            await onAcceptCallback();
+        setIsLoading(true);
+        try {
+            if (onAcceptCallback) {
+                await onAcceptCallback();
+            }
+            hideNotification();
+        } finally {
+            setIsLoading(false);
         }
-        hideNotification();
     }, [onAcceptCallback, hideNotification]);
 
     const getNotificationModifier = () => {
@@ -109,6 +116,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
                 visible={isVisible}
                 action={handleAccept}
                 footer='Got it'
+                buttonDisabled={isLoading}
             />
         </NotificationContext.Provider>
     );
