@@ -108,18 +108,3 @@ export const setAlert = async (alertuid: string) => {
         defaultError: "Error while setting alert",
     });
 };
-
-export const FOR_TESTING_deleteAlert = async (alertuid: string) => {
-    return new ApiRequest().post({
-        url: `tasks/${alertuid}/deletealert`,
-        defaultError: "Error while deleting alert",
-    });
-};
-
-export const FOR_TESTING_createAlert = async (useruid: string, data: Partial<Alert>) => {
-    return new ApiRequest().post<Alert>({
-        url: `tasks/${useruid}/createalert`,
-        data,
-        defaultError: "Error while creating alert",
-    });
-};
