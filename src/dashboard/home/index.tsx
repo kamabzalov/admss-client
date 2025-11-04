@@ -1,13 +1,14 @@
 import { Calendar } from "primereact/calendar";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { TasksWidget } from "dashboard/tasks/widget";
 import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
-import { getAlerts } from "http/services/tasks.service";
+import { getAlerts, setAlert } from "http/services/tasks.service";
 import { useNotification } from "common/hooks";
+import { Alert } from "common/models/tasks";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -15,7 +16,9 @@ export const Home = (): ReactElement => {
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
-    const handleGetGlobalData = async () => {
+    const [pendingAlerts, setPendingAlerts] = useState<Alert[]>([]);
+
+    const handleGetGlobalData = useCallback(async () => {
         if (!authUser || !Object.keys(authUser.permissions).length) return;
 
         const alertShownKey = `alert_shown_${authUser.useruid}`;
@@ -23,20 +26,8 @@ export const Home = (): ReactElement => {
 
         if (!wasAlertShown) {
             const alerts = await getAlerts(authUser.useruid);
-            if (alerts && Array.isArray(alerts)) {
-                const filteredAlerts = alerts.filter(
-                    (alert) => alert.description && !alert.description.includes("string")
-                );
-                const lastAlert = filteredAlerts.sort(
-                    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-                )[0];
-                if (lastAlert) {
-                    showNotification({
-                        type: lastAlert.alerttype,
-                        description: lastAlert.description,
-                    });
-                    sessionStorage.setItem(alertShownKey, "true");
-                }
+            if (alerts && Array.isArray(alerts) && alerts.length > 0) {
+                setPendingAlerts(alerts);
             }
         }
 
@@ -46,11 +37,40 @@ export const Home = (): ReactElement => {
             return setIsSalesPerson(false);
         }
         if (!!uaSalesPerson) setIsSalesPerson(true);
-    };
+    }, [authUser]);
+
+    const showNextAlert = useCallback(
+        async (currentAlert: Alert) => {
+            await setAlert(currentAlert.itemuid);
+
+            setPendingAlerts((previousAlerts) => {
+                const remainingAlerts = previousAlerts.slice(1);
+
+                if (remainingAlerts.length === 0 && authUser) {
+                    const alertShownKey = `alert_shown_${authUser.useruid}`;
+                    sessionStorage.setItem(alertShownKey, "true");
+                }
+
+                return remainingAlerts;
+            });
+        },
+        [authUser]
+    );
+
+    useEffect(() => {
+        if (pendingAlerts.length > 0) {
+            const currentAlert = pendingAlerts[0];
+            showNotification({
+                type: currentAlert.alerttype,
+                description: currentAlert.description,
+                onAccept: () => showNextAlert(currentAlert),
+            });
+        }
+    }, [pendingAlerts, showNotification, showNextAlert]);
 
     useEffect(() => {
         handleGetGlobalData();
-    }, [authUser, authUser?.permissions]);
+    }, [handleGetGlobalData]);
 
     return (
         <div className='grid home-page'>

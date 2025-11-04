@@ -13,6 +13,7 @@ export enum NOTIFICATION_TYPE {
 interface NotificationOptions {
     type?: NOTIFICATION_TYPE;
     description?: string;
+    onAccept?: () => void | Promise<void>;
 }
 
 interface NotificationContextValue {
@@ -32,18 +33,29 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
         NOTIFICATION_TYPE.INFO
     );
     const [notificationDescription, setNotificationDescription] = useState<string>("");
+    const [onAcceptCallback, setOnAcceptCallback] = useState<
+        (() => void | Promise<void>) | undefined
+    >();
 
     const [defaultNotificationTitle] = NOTIFICATION_TITLE_STATUS;
 
     const showNotification = useCallback((options: NotificationOptions = {}) => {
         setNotificationType(options.type || NOTIFICATION_TYPE.INFO);
         setNotificationDescription(options.description || "");
+        setOnAcceptCallback(() => options.onAccept);
         setIsVisible(true);
     }, []);
 
     const hideNotification = useCallback(() => {
         setIsVisible(false);
     }, []);
+
+    const handleAccept = useCallback(async () => {
+        if (onAcceptCallback) {
+            await onAcceptCallback();
+        }
+        hideNotification();
+    }, [onAcceptCallback, hideNotification]);
 
     const getNotificationModifier = () => {
         switch (notificationType) {
@@ -95,7 +107,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
                 onHide={hideNotification}
                 className={`notification ${getNotificationModifier()}`}
                 visible={isVisible}
-                action={hideNotification}
+                action={handleAccept}
                 footer='Got it'
             />
         </NotificationContext.Provider>
