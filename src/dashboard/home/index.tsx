@@ -7,8 +7,10 @@ import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { getAlerts, setAlert } from "http/services/tasks.service";
-import { useNotification } from "common/hooks";
+import { useNotification, useToastMessage } from "common/hooks";
 import { Alert } from "common/models/tasks";
+
+const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -16,12 +18,13 @@ export const Home = (): ReactElement => {
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
+    const { showError } = useToastMessage();
     const [pendingAlerts, setPendingAlerts] = useState<Alert[]>([]);
 
     const handleGetGlobalData = useCallback(async () => {
         if (!authUser || !Object.keys(authUser.permissions).length) return;
 
-        const alertShownKey = `alert_shown_${authUser.useruid}`;
+        const alertShownKey = `${ALERT_SHOWN_KEY}_${authUser.useruid}`;
         const wasAlertShown = sessionStorage.getItem(alertShownKey);
 
         if (!wasAlertShown) {
@@ -41,13 +44,21 @@ export const Home = (): ReactElement => {
 
     const showNextAlert = useCallback(
         async (currentAlert: Alert) => {
-            await setAlert(currentAlert.itemuid);
+            const result = await setAlert(currentAlert.itemuid);
+
+            if (result?.error) {
+                setPendingAlerts([]);
+                const alertShownKey = `${ALERT_SHOWN_KEY}_${authUser!.useruid}`;
+                sessionStorage.setItem(alertShownKey, "true");
+                showError(result.error);
+                return;
+            }
 
             setPendingAlerts((previousAlerts) => {
                 const remainingAlerts = previousAlerts.slice(1);
 
                 if (remainingAlerts.length === 0 && authUser) {
-                    const alertShownKey = `alert_shown_${authUser.useruid}`;
+                    const alertShownKey = `${ALERT_SHOWN_KEY}_${authUser.useruid}`;
                     sessionStorage.setItem(alertShownKey, "true");
                 }
 
