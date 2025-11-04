@@ -44,9 +44,10 @@
     flex-direction: column;
     color: var(--admss-app-white);
     width: 100%;
-    gap: 30px;
+    gap: 5px;
     max-height: calc(100% - 45px);
     overflow-y: auto;
+    overflow-x: hidden;
     &::-webkit-scrollbar {
         width: 0;
     }
@@ -58,11 +59,11 @@
 .sidebar-nav__item {
     flex: 0 0 auto;
     display: inline-flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 90px;
+    height: 60px;
     cursor: pointer;
+    padding-left: 26px;
 }
 
 .sidebar-nav__item:hover {
@@ -71,11 +72,10 @@
 
 .sidebar-nav__link {
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     color: var(--admss-app-white);
     text-decoration: none;
+    gap: 20px;
     font-weight: 700;
     font-size: 14px;
     width: 100%;
@@ -83,6 +83,7 @@
 }
 
 .sidebar-nav__link span {
+    white-space: nowrap;
     transition:
         opacity 0.3s ease,
         visibility 0.3s ease;
@@ -103,38 +104,29 @@
 }
 
 .sidebar-nav__icon {
-    margin-bottom: 5px;
     background-position: center;
-    background-size: 100%;
+    background-size: contain;
     background-repeat: no-repeat;
-    transition:
-        width 0.3s ease,
-        height 0.3s ease;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
 }
 
 .sidebar-nav__icon.home {
-    width: 49px;
-    height: 47px;
     background-image: url("assets/images/icons/sidebar/normal/home_white.svg");
-}
-.sidebar.collapsed .sidebar-nav__icon.home {
-    width: 42px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.home {
     background-image: url("assets/images/icons/sidebar/selected/home_blue.svg");
 }
 
-.sidebar-nav__icon.inventory {
-    width: 66px;
-    height: 47px;
-    background-image: url("assets/images/icons/sidebar/normal/inventory_white.svg");
+.sidebar-nav__link:has(.sidebar-nav__icon.inventory) {
+    gap: 15px;
 }
 
-.sidebar.collapsed .sidebar-nav__icon.inventory {
-    width: 56px;
-    height: 40px;
+.sidebar-nav__icon.inventory {
+    width: 35px;
+    background-image: url("assets/images/icons/sidebar/normal/inventory_white.svg");
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.inventory {
@@ -142,14 +134,7 @@
 }
 
 .sidebar-nav__icon.contacts {
-    width: 40px;
-    height: 47px;
     background-image: url("assets/images/icons/sidebar/normal/contacts_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.contacts {
-    width: 34px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.contacts {
@@ -157,14 +142,7 @@
 }
 
 .sidebar-nav__icon.deals {
-    width: 45px;
-    height: 47px;
     background-image: url("assets/images/icons/sidebar/normal/deals_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.deals {
-    width: 38px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.deals {
@@ -172,14 +150,7 @@
 }
 
 .sidebar-nav__icon.accounts {
-    width: 51px;
-    height: 47px;
     background-image: url("assets/images/icons/sidebar/normal/accounts_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.accounts {
-    width: 43px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.accounts {
@@ -187,14 +158,7 @@
 }
 
 .sidebar-nav__icon.reports {
-    width: 35px;
-    height: 47px;
     background-image: url("assets/images/icons/sidebar/normal/reports_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.reports {
-    width: 30px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.reports {
@@ -202,14 +166,7 @@
 }
 
 .sidebar-nav__icon.tasks {
-    width: 37px;
-    height: 49px;
     background-image: url("assets/images/icons/sidebar/normal/tasks_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.tasks {
-    width: 30px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.tasks {
@@ -217,14 +174,7 @@
 }
 
 .sidebar-nav__icon.export-web {
-    width: 39px;
-    height: 49px;
     background-image: url("assets/images/icons/sidebar/normal/export_to_web_white.svg");
-}
-
-.sidebar.collapsed .sidebar-nav__icon.export-web {
-    width: 32px;
-    height: 40px;
 }
 
 .sidebar-nav__item:hover .sidebar-nav__icon.export-web {
