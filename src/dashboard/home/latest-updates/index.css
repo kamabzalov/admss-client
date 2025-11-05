@@ -117,6 +117,8 @@
     }
 
     .datatable-news__date {
+        white-space: nowrap;
+
         &.datatable-news__date--new {
             font-weight: var(--font-weight-new);
         }
