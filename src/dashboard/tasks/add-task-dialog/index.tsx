@@ -55,12 +55,7 @@ export const AddTaskDialog = observer(
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
 
-        const isSubmitDisabled =
-            !taskState.description?.trim() ||
-            !!dateError ||
-            !isFormChanged ||
-            isSaving ||
-            !taskState.useruid;
+        const isSubmitDisabled = !!dateError || !isFormChanged || isSaving || !taskState.useruid;
 
         const handleGetTasksSubUserList = async () => {
             const response = await getTasksSubUserList(authUser!.useruid);
@@ -261,12 +256,11 @@ export const AddTaskDialog = observer(
                     />
                     <span className='p-float-label relative'>
                         <InputTextarea
-                            required
                             value={taskState.description || ""}
                             onChange={(e) => handleInputChange("description", e.target.value)}
                             className='p-dialog-description'
                         />
-                        <label className='float-label'>Description (required)</label>
+                        <label className='float-label'>Description</label>
                     </span>
                 </>
             </DashboardDialog>
