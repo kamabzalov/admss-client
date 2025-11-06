@@ -33,7 +33,7 @@ export const LatestUpdatesDialog = ({
         if (!authUser) return;
         try {
             const newsResponse = await getLatestNews(authUser.useruid, {
-                top: MAX_NEWS_COUNT_ON_PAGE,
+                top: totalCount > 0 ? totalCount : MAX_NEWS_COUNT_ON_PAGE,
             });
 
             if (newsResponse && Array.isArray(newsResponse)) {
@@ -85,9 +85,9 @@ export const LatestUpdatesDialog = ({
         const isRowExpanded = expandedRows[rowData.itemuid] === true;
 
         if (isRowExpanded) {
-            setExpandedRows({ ...expandedRows, [rowData.itemuid]: undefined });
+            setExpandedRows({});
         } else {
-            setExpandedRows({ ...expandedRows, [rowData.itemuid]: true });
+            setExpandedRows({ [rowData.itemuid]: true });
 
             if (!rowData.read) {
                 isUpdatingFromClick.current = true;
@@ -146,6 +146,8 @@ export const LatestUpdatesDialog = ({
                 onRowClick={handleRowClick}
                 rowHover
                 scrollable
+                paginator={newsData.length > MAX_NEWS_COUNT_ON_PAGE}
+                rows={MAX_NEWS_COUNT_ON_PAGE}
             >
                 <Column
                     body={newsIndicatorTemplate}
