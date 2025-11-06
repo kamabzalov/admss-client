@@ -86,7 +86,7 @@ export const Home = (): ReactElement => {
     return (
         <div className='grid home-page'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card common-tasks'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Common tasks</h2>
                     </div>
@@ -143,7 +143,7 @@ export const Home = (): ReactElement => {
                 </div>
             </div>
             <div className='col-12 lg:col-8 xl:col-7'>
-                <div className='card'>
+                <div className='card home-page__tasks-widget'>
                     <div className='card-content'>
                         <div className='grid lg:justify-content-between md:justify-content-center'>
                             <div className='col-12 lg:col-6 xl:col-7'>
