@@ -40,12 +40,12 @@
     margin: 0;
     padding-left: 0;
     list-style: none;
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     color: var(--admss-app-white);
     width: 100%;
+    height: 100%;
     gap: 5px;
-    max-height: calc(100% - 45px);
     overflow-y: auto;
     overflow-x: hidden;
     &::-webkit-scrollbar {
@@ -179,4 +179,20 @@
 
 .sidebar-nav__item:hover .sidebar-nav__icon.export-web {
     background-image: url("assets/images/icons/sidebar/selected/export_to_web_blue.svg");
+}
+
+.sidebar-nav__item--settings {
+    .sidebar-nav__icon {
+        font-size: 30px;
+    }
+    .sidebar-nav__label--visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    .sidebar-nav__label--hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    margin-top: auto;
+    margin-bottom: 18px;
 }

@@ -13,7 +13,9 @@ import {
     INVENTORY_PAGE,
     REPORTS_PAGE,
     TASKS_PAGE,
+    SETTINGS_PAGE,
 } from "common/constants/links";
+import { typeGuards } from "common/utils";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -47,15 +49,24 @@ export const Sidebar = observer((): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
 
-    const renderNavItem = (to: string, iconClass: string, label: string): ReactElement => {
+    const renderNavItem = (
+        to: string,
+        icon: string | ReactElement,
+        label: string,
+        className: string = ""
+    ): ReactElement => {
         const itemId = `nav-item-${to.replace(/\//g, "-")}`;
         return (
-            <li className='sidebar-nav__item'>
+            <li className={`sidebar-nav__item ${className}`}>
                 {settings.isSidebarCollapsed && (
                     <Tooltip target={`#${itemId}`} content={label} position='right' />
                 )}
                 <Link to={to} id={itemId} className='sidebar-nav__link'>
-                    <div className={`sidebar-nav__icon ${iconClass}`}></div>
+                    {typeGuards.isString(icon) ? (
+                        <div className={`sidebar-nav__icon ${icon}`}></div>
+                    ) : (
+                        icon
+                    )}
                     <span
                         className={
                             settings.isSidebarCollapsed
@@ -88,6 +99,12 @@ export const Sidebar = observer((): ReactElement => {
                         {renderNavItem(TASKS_PAGE.MAIN, "tasks", "Tasks")}
                         {renderNavItem(EXPORT_WEB_PAGE.MAIN, "export-web", "Export to WEB")}
                     </>
+                )}
+                {renderNavItem(
+                    SETTINGS_PAGE.MAIN,
+                    <i className='sidebar-nav__icon adms-settings' />,
+                    "Settings",
+                    "sidebar-nav__item--settings"
                 )}
             </ul>
         </aside>
