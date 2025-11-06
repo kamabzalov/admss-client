@@ -62,8 +62,11 @@
 
 .dialog-news {
     width: 80%;
-    height: 655px;
+    height: 693px;
     overflow: hidden;
+    .p-dialog-content {
+        overflow-y: hidden;
+    }
     .p-dialog-footer {
         margin-bottom: 0;
     }
@@ -78,11 +81,34 @@
 .datatable-news.p-datatable {
     --font-weight-new: 600;
     --font-weight-read: 400;
+    height: 546px;
+    display: flex;
+    flex-direction: column;
 
-    height: 484px;
-    overflow-y: auto;
+    .p-datatable-wrapper {
+        flex: 1 1 auto;
+        overflow: auto;
+        scrollbar-gutter: stable;
+    }
+
+    .p-paginator-bottom {
+        border: none;
+        flex-shrink: 0;
+    }
+
     .p-datatable-thead > tr > th {
         border: none;
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+    }
+
+    .p-datatable-tbody > tr {
+        height: 42px;
+    }
+
+    .p-datatable-tbody > tr > td {
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
     }
 
     .datatable-news__indicator {
