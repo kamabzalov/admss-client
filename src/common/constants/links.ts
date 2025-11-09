@@ -105,6 +105,7 @@ interface UsersPage {
     readonly MAIN: string;
     CREATE(): string;
     EDIT(id: string): string;
+    ROLES(): string;
 }
 
 export const USERS_PAGE: Readonly<UsersPage> = {
@@ -114,6 +115,9 @@ export const USERS_PAGE: Readonly<UsersPage> = {
     },
     EDIT(id: string) {
         return `${this.MAIN}/${id}`;
+    },
+    ROLES() {
+        return `${this.MAIN}/roles`;
     },
 };
 
