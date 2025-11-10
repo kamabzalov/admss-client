@@ -1,5 +1,6 @@
 import { BaseResponseError } from "common/models/base-response";
 import { TypeList } from "common/models";
+import { UserPermissionsResponse } from "../user";
 
 export interface User extends BaseResponseError {
     index: number;
@@ -90,6 +91,7 @@ export interface UserData extends BaseResponseError {
 }
 
 export interface Permission extends TypeList {
+    name: keyof UserPermissionsResponse;
     description: string;
 }
 

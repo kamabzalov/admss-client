@@ -1,169 +1,284 @@
-import "./index.css";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import { DataTable } from "primereact/datatable";
+import { copyUserRole, deleteUserRole, getUserRoles } from "http/services/users";
+import { UserRole } from "common/models/users";
+import { Column, ColumnProps } from "primereact/column";
+import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import { TabPanel, TabView } from "primereact/tabview";
-import { ReactElement, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useStore } from "store/hooks";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { RolesContacts } from "dashboard/profile/users/roles/contacts";
-import { RolesDeals } from "dashboard/profile/users/roles/deals";
-import { RolesInventory } from "dashboard/profile/users/roles/inventory";
-import { RolesAccounts } from "dashboard/profile/users/roles/accounts";
-import { RolesReports } from "dashboard/profile/users/roles/reports";
-import { RolesSettings } from "dashboard/profile/users/roles/settings";
-import { RolesOther } from "dashboard/profile/users/roles/other";
+import { useToastMessage } from "common/hooks";
+import { Loader } from "dashboard/common/loader";
+import "./index.css";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { USERS_PAGE } from "common/constants/links";
+import { TruncatedText } from "dashboard/common/display";
 
-interface TabItem {
-    tabName: string;
-    component: ReactElement;
+export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
+    field?: keyof UserRole;
+};
+
+export const UserRoleColumn = (props: UserRoleColumnProps) => <Column {...props} />;
+
+const PAGINATOR_HEIGHT = 86;
+const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
+
+enum USER_ROLE_MODAL_MESSAGE {
+    COPY_ROLE = "Do you really want to copy this role?",
+    DELETE_ROLE = "Do you really want to delete this role?",
 }
 
-const tabItems: TabItem[] = [
-    { tabName: "CONTACTS", component: <RolesContacts /> },
-    { tabName: "DEALS", component: <RolesDeals /> },
-    { tabName: "INVENTORY", component: <RolesInventory /> },
-    { tabName: "ACCOUNTS", component: <RolesAccounts /> },
-    { tabName: "REPORTS", component: <RolesReports /> },
-    { tabName: "SETTINGS", component: <RolesSettings /> },
-    { tabName: "OTHER", component: <RolesOther /> },
-];
-
-interface Role {
-    roleId: string;
-    roleName: string;
-}
-
-const mockRoles: Role[] = [{ roleId: "new", roleName: "New role" }];
-
-export default observer(function UsersRoles(): ReactElement {
+export const UsersRoles = observer((): ReactElement => {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
+    const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const dataTableRef = useRef<DataTable<UserRole[]>>(null);
+    const { showError } = useToastMessage();
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [selectedRoleId, setSelectedRoleId] = useState<string>("new");
-    const [roleName, setRoleName] = useState<string>("");
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+    const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
+    const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
+    const [confirmMessage, setConfirmMessage] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+
+    const handleGetUserRoles = async () => {
+        if (!authUser) return;
+        setIsLoading(true);
+        const response = await getUserRoles(authUser.useruid);
+
+        if (response && Array.isArray(response)) {
+            setUserRoles(response);
+        } else {
+            showError(response?.error);
+        }
+        setIsLoading(false);
+    };
 
     useEffect(() => {
-        const roleParam = searchParams.get("role");
-        if (roleParam) {
-            setSelectedRoleId(roleParam);
+        handleGetUserRoles();
+    }, []);
+
+    const handleAddNewUserRole = () => {
+        navigate(USERS_PAGE.ROLES_CREATE());
+    };
+
+    const roleNameColumn = (data: UserRole) => {
+        return (
+            <TruncatedText
+                withTooltip={true}
+                tooltipOptions={{
+                    position: "mouse",
+                    content: data.rolename,
+                }}
+                data-field='rolename'
+                className='roles-table-row__rolename'
+                text={data.rolename}
+            />
+        );
+    };
+
+    const executeCopyUserRole = async (data: UserRole) => {
+        setConfirmVisible(false);
+        const response = await copyUserRole(data.roleuid);
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            handleGetUserRoles();
         }
-    }, [searchParams]);
-
-    const handleRoleSelect = (roleId: string) => {
-        setSelectedRoleId(roleId);
-        setSearchParams({ role: roleId });
-        setActiveTabIndex(0);
     };
 
-    const handleTabChange = (changeEvent: { index: number }) => {
-        setActiveTabIndex(changeEvent.index);
+    const executeDeleteUserRole = async (data: UserRole) => {
+        const response = await deleteUserRole(data.roleuid);
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            handleGetUserRoles();
+        }
+        setConfirmVisible(false);
     };
 
-    const handleBackClick = () => {
-        const newIndex = Math.max(activeTabIndex - 1, 0);
-        setActiveTabIndex(newIndex);
+    const handleCopyUserRole = (data: UserRole) => {
+        setSelectedUserRole(data);
+        setConfirmVisible(true);
+        setConfirmMessage(USER_ROLE_MODAL_MESSAGE.COPY_ROLE);
+        setConfirmAction(() => () => executeCopyUserRole(data));
     };
 
-    const handleNextClick = () => {
-        const newIndex = Math.min(activeTabIndex + 1, tabItems.length - 1);
-        setActiveTabIndex(newIndex);
-    };
-
-    const handleSaveClick = () => {};
-
-    const handleCloseClick = () => {
-        navigate(-1);
+    const handleDeleteUserRole = (data: UserRole) => {
+        setSelectedUserRole(data);
+        setConfirmVisible(true);
+        setConfirmMessage(USER_ROLE_MODAL_MESSAGE.DELETE_ROLE);
+        setConfirmAction(() => () => executeDeleteUserRole(data));
     };
 
     return (
-        <div className='grid roles-page'>
-            <Button
-                icon='pi pi-times'
-                className='p-button close-button'
-                onClick={handleCloseClick}
-            />
+        <div className='grid'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card roles'>
                     <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>CREATE NEW ROLE</h2>
+                        <h2 className='card-header__title roles__title uppercase m-0'>Roles</h2>
                     </div>
-                    <div className='roles-content'>
-                        <div className='roles-sidebar'>
-                            <div className='roles-list'>
-                                {mockRoles.map((role) => (
-                                    <div
-                                        key={role.roleId}
-                                        className={`roles-list-item ${selectedRoleId === role.roleId ? "active" : ""}`}
-                                        onClick={() => handleRoleSelect(role.roleId)}
-                                    >
-                                        {role.roleName}
+                    <div className='card-content'>
+                        <div className='grid'>
+                            <div className='col-12 flex justify-content-end'>
+                                <Button
+                                    className='p-button new-role-button'
+                                    onClick={handleAddNewUserRole}
+                                >
+                                    New Role
+                                </Button>
+                            </div>
+                            <div className='col-12'>
+                                {isLoading ? (
+                                    <div className='dashboard-loader__wrapper'>
+                                        <Loader />
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className='roles-main'>
-                            <div className='roles-main__header'>
-                                <span className='p-float-label'>
-                                    <InputText
-                                        value={roleName}
-                                        onChange={(event) => setRoleName(event.target.value)}
-                                        className='roles-main__input'
-                                    />
-                                    <label className='float-label'>Role name (required)</label>
-                                </span>
-                                <label className='roles-main__select-all'>
-                                    <input type='checkbox' />
-                                    <span>Select All</span>
-                                </label>
-                            </div>
-                            <TabView
-                                className='roles-main__tabs'
-                                activeIndex={activeTabIndex}
-                                onTabChange={handleTabChange}
-                            >
-                                {tabItems.map(({ tabName, component }) => {
-                                    return (
-                                        <TabPanel header={tabName} key={tabName}>
-                                            {component}
-                                        </TabPanel>
-                                    );
-                                })}
-                            </TabView>
-                            <div className='roles-main__buttons'>
-                                <Button
-                                    onClick={handleBackClick}
-                                    className='uppercase px-6'
-                                    disabled={activeTabIndex <= 0}
-                                    severity={activeTabIndex <= 0 ? "secondary" : "success"}
-                                    outlined
-                                >
-                                    Back
-                                </Button>
-                                <Button
-                                    onClick={handleNextClick}
-                                    disabled={activeTabIndex >= tabItems.length - 1}
-                                    severity={
-                                        activeTabIndex >= tabItems.length - 1
-                                            ? "secondary"
-                                            : "success"
-                                    }
-                                    className='uppercase px-6'
-                                    outlined
-                                >
-                                    Next
-                                </Button>
-                                <Button
-                                    onClick={handleSaveClick}
-                                    className='uppercase px-6'
-                                    severity='success'
-                                >
-                                    Save
-                                </Button>
+                                ) : (
+                                    <DataTable
+                                        ref={dataTableRef}
+                                        showGridlines
+                                        value={userRoles}
+                                        paginator
+                                        scrollable
+                                        scrollHeight='70vh'
+                                        rows={10}
+                                        className='roles-table'
+                                        rowClassName={() =>
+                                            "hover:text-primary cursor-pointer roles-table-row"
+                                        }
+                                        tableStyle={{ tableLayout: "fixed", width: "100%" }}
+                                        pt={{
+                                            resizeHelper: {
+                                                style: {
+                                                    maxHeight: TABLE_HEIGHT,
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        <Column
+                                            bodyStyle={{ textAlign: "center" }}
+                                            resizeable={false}
+                                            body={({ roleuid, isDefault }: UserRole) => {
+                                                return (
+                                                    <Button
+                                                        text
+                                                        className='table-edit-button'
+                                                        disabled={!!isDefault}
+                                                        severity={
+                                                            !!isDefault ? "secondary" : "success"
+                                                        }
+                                                        icon='adms-edit-item'
+                                                        tooltip='Edit role'
+                                                        tooltipOptions={{ position: "mouse" }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(
+                                                                USERS_PAGE.ROLES_EDIT(roleuid)
+                                                            );
+                                                        }}
+                                                    />
+                                                );
+                                            }}
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: "40px",
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                        <UserRoleColumn
+                                            field='rolename'
+                                            header='Role'
+                                            body={roleNameColumn}
+                                            className='roles-table-row__rolename'
+                                            style={{ width: "20%", maxWidth: "20%" }}
+                                        />
+                                        <UserRoleColumn
+                                            field='isDefault'
+                                            body={({ isDefault }: UserRole) => {
+                                                return <span>{isDefault ? "System" : null}</span>;
+                                            }}
+                                            header='Created By'
+                                            style={{ width: "30%" }}
+                                        />
+                                        <UserRoleColumn
+                                            field='created'
+                                            header='Date'
+                                            style={{ width: "30%" }}
+                                        />
+                                        <UserRoleColumn
+                                            bodyStyle={{ textAlign: "center" }}
+                                            body={(data: UserRole) => {
+                                                return (
+                                                    <>
+                                                        <Button
+                                                            text
+                                                            className='table-copy-button'
+                                                            disabled={!!data.isDefault}
+                                                            icon='adms-copy'
+                                                            tooltip='Copy role'
+                                                            severity={
+                                                                !!data.isDefault
+                                                                    ? "secondary"
+                                                                    : "success"
+                                                            }
+                                                            tooltipOptions={{ position: "mouse" }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleCopyUserRole(data);
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            text
+                                                            className='table-delete-button'
+                                                            disabled={!!data.isDefault}
+                                                            icon='adms-trash-can'
+                                                            tooltip='Delete role'
+                                                            severity={
+                                                                !!data.isDefault
+                                                                    ? "secondary"
+                                                                    : "danger"
+                                                            }
+                                                            tooltipOptions={{ position: "mouse" }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteUserRole(data);
+                                                            }}
+                                                        />
+                                                    </>
+                                                );
+                                            }}
+                                            pt={{
+                                                root: {
+                                                    className: "border-left-none",
+                                                    style: {
+                                                        width: "120px",
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    </DataTable>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {selectedUserRole ? (
+                <ConfirmModal
+                    visible={confirmVisible}
+                    onHide={() => setConfirmVisible(false)}
+                    icon='adms-warning'
+                    title={`Are you sure?`}
+                    bodyMessage={confirmMessage}
+                    confirmAction={confirmAction}
+                    rejectAction={() => setConfirmVisible(false)}
+                    rejectLabel='Cancel'
+                    acceptLabel='Confirm'
+                    className='users-confirm-dialog'
+                />
+            ) : null}
         </div>
     );
 });
