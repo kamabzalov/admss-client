@@ -105,6 +105,9 @@ interface UsersPage {
     readonly MAIN: string;
     CREATE(): string;
     EDIT(id: string): string;
+    ROLES(): string;
+    ROLES_CREATE(): string;
+    ROLES_EDIT(id: string): string;
 }
 
 export const USERS_PAGE: Readonly<UsersPage> = {
@@ -114,6 +117,15 @@ export const USERS_PAGE: Readonly<UsersPage> = {
     },
     EDIT(id: string) {
         return `${this.MAIN}/${id}`;
+    },
+    ROLES() {
+        return `${this.MAIN}/roles`;
+    },
+    ROLES_CREATE() {
+        return `${this.MAIN}/roles${CREATE_PATH}`;
+    },
+    ROLES_EDIT(id: string) {
+        return `${this.MAIN}/roles/${id}`;
     },
 };
 

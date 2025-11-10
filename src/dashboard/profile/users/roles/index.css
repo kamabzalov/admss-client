@@ -1,0 +1,17 @@
+.roles {
+    .new-role-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 245px;
+        height: 54px;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .roles-table .p-datatable-tbody > tr.roles-table-row > td {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+}
