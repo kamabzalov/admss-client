@@ -112,156 +112,181 @@ export const UsersRoles = observer((): ReactElement => {
     };
 
     return (
-        <div className='grid'>
+        <div className='grid roles-page'>
             <div className='col-12'>
-                <div className='card roles'>
+                <div className='card'>
                     <div className='card-header'>
-                        <h2 className='card-header__title roles__title uppercase m-0'>Roles</h2>
+                        <h2 className='card-header__title uppercase m-0'>Roles</h2>
                     </div>
-                    <div className='card-content'>
-                        <div className='grid'>
-                            <div className='col-12 flex justify-content-end'>
-                                <Button
-                                    className='p-button new-role-button'
-                                    onClick={handleAddNewUserRole}
-                                >
-                                    New Role
-                                </Button>
+                    <div className='roles-content'>
+                        <div className='roles-sidebar'>
+                            <div className='roles-list'>
+                                <div className='roles-list-item active'>Roles</div>
                             </div>
-                            <div className='col-12'>
-                                {isLoading ? (
-                                    <div className='dashboard-loader__wrapper'>
-                                        <Loader />
-                                    </div>
-                                ) : (
-                                    <DataTable
-                                        ref={dataTableRef}
-                                        showGridlines
-                                        value={userRoles}
-                                        paginator
-                                        scrollable
-                                        scrollHeight='70vh'
-                                        rows={10}
-                                        className='roles-table'
-                                        rowClassName={() =>
-                                            "hover:text-primary cursor-pointer roles-table-row"
-                                        }
-                                        tableStyle={{ tableLayout: "fixed", width: "100%" }}
-                                        pt={{
-                                            resizeHelper: {
-                                                style: {
-                                                    maxHeight: TABLE_HEIGHT,
-                                                },
-                                            },
-                                        }}
+                        </div>
+                        <div className='roles-main'>
+                            <div className='grid'>
+                                <div className='col-12 flex justify-content-end'>
+                                    <Button
+                                        className='p-button new-role-button'
+                                        onClick={handleAddNewUserRole}
                                     >
-                                        <Column
-                                            bodyStyle={{ textAlign: "center" }}
-                                            resizeable={false}
-                                            body={({ roleuid, isDefault }: UserRole) => {
-                                                return (
-                                                    <Button
-                                                        text
-                                                        className='table-edit-button'
-                                                        disabled={!!isDefault}
-                                                        severity={
-                                                            !!isDefault ? "secondary" : "success"
-                                                        }
-                                                        icon='adms-edit-item'
-                                                        tooltip='Edit role'
-                                                        tooltipOptions={{ position: "mouse" }}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate(
-                                                                USERS_PAGE.ROLES_EDIT(roleuid)
-                                                            );
-                                                        }}
-                                                    />
-                                                );
-                                            }}
+                                        New Role
+                                    </Button>
+                                </div>
+                                <div className='col-12'>
+                                    {isLoading ? (
+                                        <div className='dashboard-loader__wrapper'>
+                                            <Loader />
+                                        </div>
+                                    ) : (
+                                        <DataTable
+                                            ref={dataTableRef}
+                                            showGridlines
+                                            value={userRoles}
+                                            paginator
+                                            scrollable
+                                            scrollHeight='70vh'
+                                            rows={10}
+                                            className='roles-table'
+                                            rowClassName={() =>
+                                                "hover:text-primary cursor-pointer roles-table-row"
+                                            }
+                                            tableStyle={{ tableLayout: "fixed", width: "100%" }}
                                             pt={{
-                                                root: {
+                                                resizeHelper: {
                                                     style: {
-                                                        width: "40px",
+                                                        maxHeight: TABLE_HEIGHT,
                                                     },
                                                 },
                                             }}
-                                        />
-                                        <UserRoleColumn
-                                            field='rolename'
-                                            header='Role'
-                                            body={roleNameColumn}
-                                            className='roles-table-row__rolename'
-                                            style={{ width: "20%", maxWidth: "20%" }}
-                                        />
-                                        <UserRoleColumn
-                                            field='isDefault'
-                                            body={({ isDefault }: UserRole) => {
-                                                return <span>{isDefault ? "System" : null}</span>;
-                                            }}
-                                            header='Created By'
-                                            style={{ width: "30%" }}
-                                        />
-                                        <UserRoleColumn
-                                            field='created'
-                                            header='Date'
-                                            style={{ width: "30%" }}
-                                        />
-                                        <UserRoleColumn
-                                            bodyStyle={{ textAlign: "center" }}
-                                            body={(data: UserRole) => {
-                                                return (
-                                                    <>
+                                        >
+                                            <Column
+                                                bodyStyle={{ textAlign: "center" }}
+                                                resizeable={false}
+                                                body={({ roleuid, isDefault }: UserRole) => {
+                                                    return (
                                                         <Button
                                                             text
-                                                            className='table-copy-button'
-                                                            disabled={!!data.isDefault}
-                                                            icon='adms-copy'
-                                                            tooltip='Copy role'
+                                                            className='table-edit-button'
+                                                            disabled={!!isDefault}
                                                             severity={
-                                                                !!data.isDefault
+                                                                !!isDefault
                                                                     ? "secondary"
                                                                     : "success"
                                                             }
-                                                            tooltipOptions={{ position: "mouse" }}
+                                                            icon='adms-edit-item'
+                                                            tooltip='Edit role'
+                                                            tooltipOptions={{
+                                                                position: "mouse",
+                                                            }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleCopyUserRole(data);
+                                                                navigate(
+                                                                    USERS_PAGE.ROLES_EDIT(roleuid)
+                                                                );
                                                             }}
                                                         />
-                                                        <Button
-                                                            text
-                                                            className='table-delete-button'
-                                                            disabled={!!data.isDefault}
-                                                            icon='adms-trash-can'
-                                                            tooltip='Delete role'
-                                                            severity={
-                                                                !!data.isDefault
-                                                                    ? "secondary"
-                                                                    : "danger"
-                                                            }
-                                                            tooltipOptions={{ position: "mouse" }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDeleteUserRole(data);
-                                                            }}
-                                                        />
-                                                    </>
-                                                );
-                                            }}
-                                            pt={{
-                                                root: {
-                                                    className: "border-left-none",
-                                                    style: {
-                                                        width: "120px",
+                                                    );
+                                                }}
+                                                pt={{
+                                                    root: {
+                                                        style: {
+                                                            width: "40px",
+                                                        },
                                                     },
-                                                },
-                                            }}
-                                        />
-                                    </DataTable>
-                                )}
+                                                }}
+                                            />
+                                            <UserRoleColumn
+                                                field='rolename'
+                                                header='Role'
+                                                body={roleNameColumn}
+                                                className='roles-table-row__rolename'
+                                                style={{ width: "20%", maxWidth: "20%" }}
+                                            />
+                                            <UserRoleColumn
+                                                field='isDefault'
+                                                body={({ isDefault }: UserRole) => {
+                                                    return (
+                                                        <span>{isDefault ? "System" : null}</span>
+                                                    );
+                                                }}
+                                                header='Created By'
+                                                style={{ width: "30%" }}
+                                            />
+                                            <UserRoleColumn
+                                                field='created'
+                                                header='Date'
+                                                style={{ width: "30%" }}
+                                            />
+                                            <UserRoleColumn
+                                                bodyStyle={{ textAlign: "center" }}
+                                                body={(data: UserRole) => {
+                                                    return (
+                                                        <>
+                                                            <Button
+                                                                text
+                                                                className='table-copy-button'
+                                                                disabled={!!data.isDefault}
+                                                                icon='adms-copy'
+                                                                tooltip='Copy role'
+                                                                severity={
+                                                                    !!data.isDefault
+                                                                        ? "secondary"
+                                                                        : "success"
+                                                                }
+                                                                tooltipOptions={{
+                                                                    position: "mouse",
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleCopyUserRole(data);
+                                                                }}
+                                                            />
+                                                            <Button
+                                                                text
+                                                                className='table-delete-button'
+                                                                disabled={!!data.isDefault}
+                                                                icon='adms-trash-can'
+                                                                tooltip='Delete role'
+                                                                severity={
+                                                                    !!data.isDefault
+                                                                        ? "secondary"
+                                                                        : "danger"
+                                                                }
+                                                                tooltipOptions={{
+                                                                    position: "mouse",
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteUserRole(data);
+                                                                }}
+                                                            />
+                                                        </>
+                                                    );
+                                                }}
+                                                pt={{
+                                                    root: {
+                                                        className: "border-left-none",
+                                                        style: {
+                                                            width: "120px",
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </DataTable>
+                                    )}
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <div className='roles-main__buttons'>
+                        <Button className='p-button form__button' outlined severity='danger'>
+                            Cancel
+                        </Button>
+                        <Button className='p-button form__button' severity='secondary' disabled>
+                            Save
+                        </Button>
                     </div>
                 </div>
             </div>

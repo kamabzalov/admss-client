@@ -1,32 +1,30 @@
+import { PermissionKey } from "common/constants/permissions";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { CheckboxChangeEvent } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
+import { useStore } from "store/hooks";
+
+const accountsPermissions: readonly PermissionKey[] = [
+    "uaViewAccounts",
+    "uaAllowBackdatingPayments",
+    "uaAllowPartialPayments",
+    "uaAllowPaymentCalculator",
+    "uaAllowPaymentQuote",
+    "uaChangePayments",
+    "uaDeleteAccounts",
+    "uaEditInsuranceOnly",
+    "uaEditPaidComissions",
+];
 
 export const RolesAccounts = observer((): ReactElement => {
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [viewAccounts, setViewAccounts] = useState<boolean>(false);
-    const [allowBackDatingPayments, setAllowBackDatingPayments] = useState<boolean>(false);
-    const [allowPartialPayments, setAllowPartialPayments] = useState<boolean>(false);
-    const [allowPaymentCalculator, setAllowPaymentCalculator] = useState<boolean>(false);
-    const [allowPaymentQuote, setAllowPaymentQuote] = useState<boolean>(false);
-    const [changePayments, setChangePayments] = useState<boolean>(false);
-    const [deleteAccounts, setDeleteAccounts] = useState<boolean>(false);
-    const [editInsuranceOnly, setEditInsuranceOnly] = useState<boolean>(false);
-    const [editPaidCommissions, setEditPaidCommissions] = useState<boolean>(false);
+    const { togglePermission, hasRolePermission, togglePermissionsGroup } = useStore().usersStore;
 
-    const handleSelectAllChange = (event: CheckboxChangeEvent) => {
-        setSelectAll(event.checked ?? false);
-        setViewAccounts(event.checked ?? false);
-        setAllowBackDatingPayments(event.checked ?? false);
-        setAllowPartialPayments(event.checked ?? false);
-        setAllowPaymentCalculator(event.checked ?? false);
-        setAllowPaymentQuote(event.checked ?? false);
-        setChangePayments(event.checked ?? false);
-        setDeleteAccounts(event.checked ?? false);
-        setEditInsuranceOnly(event.checked ?? false);
-        setEditPaidCommissions(event.checked ?? false);
+    const selectAll = accountsPermissions.every((permission) => hasRolePermission(permission));
+
+    const handleSelectAllChange = () => {
+        togglePermissionsGroup(accountsPermissions);
     };
+
     return (
         <section className='grid roles-accounts'>
             <div className='col-3'>
@@ -39,64 +37,64 @@ export const RolesAccounts = observer((): ReactElement => {
             <div className='col-3'>
                 <BorderedCheckbox
                     name='View Accounts'
-                    checked={viewAccounts}
-                    onChange={() => setViewAccounts(!viewAccounts)}
+                    checked={hasRolePermission("uaViewAccounts")}
+                    onChange={() => togglePermission("uaViewAccounts")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Allow Back Dating Payments'
-                    checked={allowBackDatingPayments}
-                    onChange={() => setAllowBackDatingPayments(!allowBackDatingPayments)}
+                    checked={hasRolePermission("uaAllowBackdatingPayments")}
+                    onChange={() => togglePermission("uaAllowBackdatingPayments")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Allow Partial Payments'
-                    checked={allowPartialPayments}
-                    onChange={() => setAllowPartialPayments(!allowPartialPayments)}
+                    checked={hasRolePermission("uaAllowPartialPayments")}
+                    onChange={() => togglePermission("uaAllowPartialPayments")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Allow Payment Calculator'
-                    checked={allowPaymentCalculator}
-                    onChange={() => setAllowPaymentCalculator(!allowPaymentCalculator)}
+                    checked={hasRolePermission("uaAllowPaymentCalculator")}
+                    onChange={() => togglePermission("uaAllowPaymentCalculator")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Allow Payment Quote'
-                    checked={allowPaymentQuote}
-                    onChange={() => setAllowPaymentQuote(!allowPaymentQuote)}
+                    checked={hasRolePermission("uaAllowPaymentQuote")}
+                    onChange={() => togglePermission("uaAllowPaymentQuote")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Change Payments'
-                    checked={changePayments}
-                    onChange={() => setChangePayments(!changePayments)}
+                    checked={hasRolePermission("uaChangePayments")}
+                    onChange={() => togglePermission("uaChangePayments")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Delete Accounts'
-                    checked={deleteAccounts}
-                    onChange={() => setDeleteAccounts(!deleteAccounts)}
+                    checked={hasRolePermission("uaDeleteAccounts")}
+                    onChange={() => togglePermission("uaDeleteAccounts")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Insurance Only'
-                    checked={editInsuranceOnly}
-                    onChange={() => setEditInsuranceOnly(!editInsuranceOnly)}
+                    checked={hasRolePermission("uaEditInsuranceOnly")}
+                    onChange={() => togglePermission("uaEditInsuranceOnly")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Edit Paid Commissions'
-                    checked={editPaidCommissions}
-                    onChange={() => setEditPaidCommissions(!editPaidCommissions)}
+                    checked={hasRolePermission("uaEditPaidComissions")}
+                    onChange={() => togglePermission("uaEditPaidComissions")}
                 />
             </div>
         </section>

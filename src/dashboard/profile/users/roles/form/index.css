@@ -1,12 +1,12 @@
-.roles-page {
+.role-page {
     --card-height: 83vh;
     --card-max-height: 983px;
     --content-height: 600px;
-    --sidebar-width: 343px;
+    --sidebar-width: 440px;
     --title-height: 63px;
 }
 
-.roles-page .card {
+.role-page .card {
     padding: 40px;
     padding-right: 30px;
     height: calc(var(--card-height) + var(--title-height));
@@ -15,17 +15,17 @@
     flex-direction: column;
 }
 
-.roles-page .card-header__title {
+.role-page .card-header__title {
     font-size: 20px;
     font-weight: 700;
 }
 
-.roles-content {
+.role-content {
     display: flex;
     border-right: 2px solid var(--admss-app-light-blue);
 }
 
-.roles-sidebar {
+.role-sidebar {
     flex-direction: column;
     flex: 0 0 var(--sidebar-width);
     width: var(--sidebar-width);
@@ -34,26 +34,26 @@
     height: 100%;
 }
 
-.roles-list {
+.role-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.roles-list-item {
+.role-list-item {
     padding: 15px 20px;
     cursor: pointer;
     color: var(--admss-app-primary);
     border: none;
 }
 
-.roles-list-item.active {
+.role-list-item.active {
     color: var(--admss-app-primary);
     background: var(--admss-app-light-blue);
     border-radius: 0;
 }
 
-.roles-main {
+.role-main {
     flex: 1;
     padding: 0;
     padding-left: 40px;
@@ -66,7 +66,7 @@
     flex-direction: column;
 }
 
-.roles-main__header {
+.role-main__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -75,11 +75,11 @@
     padding-right: 30px;
 }
 
-.roles-main__input {
+.role-main__input {
     flex: 1;
 }
 
-.roles-main__select-all {
+.role-main__select-all {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -88,13 +88,13 @@
     white-space: nowrap;
 }
 
-.roles-main__select-all input[type="checkbox"] {
+.role-main__select-all input[type="checkbox"] {
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
 
-.roles-main__tabs {
+.role-main__tabs {
     padding-top: 0;
     padding-left: 0;
     max-height: 712px;
@@ -104,18 +104,18 @@
     flex-direction: column;
 }
 
-.roles-main__tabs .p-tabview-nav-content {
+.role-main__tabs .p-tabview-nav-content {
     background-color: var(--admss-app-white);
     height: 60px;
     z-index: 11;
 }
 
-.roles-main__tabs .p-tabview-nav-container {
+.role-main__tabs .p-tabview-nav-container {
     height: 35px;
     padding-bottom: 40px;
 }
 
-.roles-main__tabs .p-tabview-nav {
+.role-main__tabs .p-tabview-nav {
     display: flex;
     height: auto;
     min-height: auto;
@@ -131,7 +131,7 @@
     margin-right: 14px;
 }
 
-.roles-main__tabs .p-tabview-panels {
+.role-main__tabs .p-tabview-panels {
     flex: 1;
     padding-top: 40px;
     padding-left: 0;
@@ -139,14 +139,14 @@
     border: none;
 }
 
-.roles-main__tabs .p-tabview-nav-container a.p-tabview-nav-link {
+.role-main__tabs .p-tabview-nav-container a.p-tabview-nav-link {
     color: var(--admss-app-primary);
     border: none;
     font-size: 18px;
     font-weight: 700;
 }
 
-.roles-main__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+.role-main__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-main-blue);
     border-radius: 0;
     border-bottom: 2px solid var(--admss-app-main-blue);
@@ -156,7 +156,7 @@
     box-shadow: none;
 }
 
-.roles-main__buttons {
+.role-main__buttons {
     display: flex;
     height: 150px;
     margin-top: auto;

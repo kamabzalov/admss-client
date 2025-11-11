@@ -1,31 +1,28 @@
+import { PermissionKey } from "common/constants/permissions";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { CheckboxChangeEvent } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
+import { useStore } from "store/hooks";
+
+const dealsPermissions: readonly PermissionKey[] = [
+    "uaAddCreditsAndFees",
+    "uaAddDeals",
+    "uaAddExpenses",
+    "uaEditDealWashout",
+    "uaEditDeals",
+    "uaPrintDealsForms",
+    "uaViewDeals",
+    "uaViewCostsAndExpenses",
+    "uaDeleteDeal",
+];
 
 export const RolesDeals = observer((): ReactElement => {
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [addCreditAndFees, setAddCreditAndFees] = useState<boolean>(false);
-    const [addDeals, setAddDeals] = useState<boolean>(false);
-    const [addExpenses, setAddExpenses] = useState<boolean>(false);
-    const [editDealWashout, setEditDealWashout] = useState<boolean>(false);
-    const [editDeals, setEditDeals] = useState<boolean>(false);
-    const [printDealsForms, setPrintDealsForms] = useState<boolean>(false);
-    const [viewDeals, setViewDeals] = useState<boolean>(false);
-    const [viewCostsAndExpenses, setViewCostsAndExpenses] = useState<boolean>(false);
-    const [deleteDeal, setDeleteDeal] = useState<boolean>(false);
+    const { togglePermission, hasRolePermission, togglePermissionsGroup } = useStore().usersStore;
 
-    const handleSelectAllChange = (event: CheckboxChangeEvent) => {
-        setSelectAll(event.checked ?? false);
-        setAddCreditAndFees(event.checked ?? false);
-        setAddDeals(event.checked ?? false);
-        setAddExpenses(event.checked ?? false);
-        setEditDealWashout(event.checked ?? false);
-        setEditDeals(event.checked ?? false);
-        setPrintDealsForms(event.checked ?? false);
-        setViewDeals(event.checked ?? false);
-        setViewCostsAndExpenses(event.checked ?? false);
-        setDeleteDeal(event.checked ?? false);
+    const selectAll = dealsPermissions.every((permission) => hasRolePermission(permission));
+
+    const handleSelectAllChange = () => {
+        togglePermissionsGroup(dealsPermissions);
     };
 
     return (
@@ -40,64 +37,64 @@ export const RolesDeals = observer((): ReactElement => {
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Add Credit and Fees'
-                    checked={addCreditAndFees}
-                    onChange={() => setAddCreditAndFees(!addCreditAndFees)}
+                    checked={hasRolePermission("uaAddCreditsAndFees")}
+                    onChange={() => togglePermission("uaAddCreditsAndFees")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Add Deals'
-                    checked={addDeals}
-                    onChange={() => setAddDeals(!addDeals)}
+                    checked={hasRolePermission("uaAddDeals")}
+                    onChange={() => togglePermission("uaAddDeals")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Add Expenses'
-                    checked={addExpenses}
-                    onChange={() => setAddExpenses(!addExpenses)}
+                    checked={hasRolePermission("uaAddExpenses")}
+                    onChange={() => togglePermission("uaAddExpenses")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Deal Washout'
-                    checked={editDealWashout}
-                    onChange={() => setEditDealWashout(!editDealWashout)}
+                    checked={hasRolePermission("uaEditDealWashout")}
+                    onChange={() => togglePermission("uaEditDealWashout")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Deals'
-                    checked={editDeals}
-                    onChange={() => setEditDeals(!editDeals)}
+                    checked={hasRolePermission("uaEditDeals")}
+                    onChange={() => togglePermission("uaEditDeals")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Print Deals Forms'
-                    checked={printDealsForms}
-                    onChange={() => setPrintDealsForms(!printDealsForms)}
+                    checked={hasRolePermission("uaPrintDealsForms")}
+                    onChange={() => togglePermission("uaPrintDealsForms")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='View Deals'
-                    checked={viewDeals}
-                    onChange={() => setViewDeals(!viewDeals)}
+                    checked={hasRolePermission("uaViewDeals")}
+                    onChange={() => togglePermission("uaViewDeals")}
                 />
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
                     name='View Costs and Expenses'
-                    checked={viewCostsAndExpenses}
-                    onChange={() => setViewCostsAndExpenses(!viewCostsAndExpenses)}
+                    checked={hasRolePermission("uaViewCostsAndExpenses")}
+                    onChange={() => togglePermission("uaViewCostsAndExpenses")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Delete Deal'
-                    checked={deleteDeal}
-                    onChange={() => setDeleteDeal(!deleteDeal)}
+                    checked={hasRolePermission("uaDeleteDeal")}
+                    onChange={() => togglePermission("uaDeleteDeal")}
                 />
             </div>
         </section>
