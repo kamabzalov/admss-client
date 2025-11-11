@@ -1,17 +1,18 @@
+import { PermissionKey } from "common/constants/permissions";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { CheckboxChangeEvent } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
+import { useStore } from "store/hooks";
+
+const reportsPermissions: readonly PermissionKey[] = ["uaAllowReports"];
 
 export const RolesReports = observer((): ReactElement => {
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [allowReports, setAllowReports] = useState<boolean>(false);
-    const [createReports, setCreateReports] = useState<boolean>(false);
+    const { togglePermission, hasRolePermission, togglePermissionsGroup } = useStore().usersStore;
 
-    const handleSelectAllChange = (event: CheckboxChangeEvent) => {
-        setSelectAll(event.checked ?? false);
-        setAllowReports(event.checked ?? false);
-        setCreateReports(event.checked ?? false);
+    const selectAll = reportsPermissions.every((permission) => hasRolePermission(permission));
+
+    const handleSelectAllChange = () => {
+        togglePermissionsGroup(reportsPermissions);
     };
 
     return (
@@ -26,16 +27,12 @@ export const RolesReports = observer((): ReactElement => {
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Allow Reports'
-                    checked={allowReports}
-                    onChange={() => setAllowReports(!allowReports)}
+                    checked={hasRolePermission("uaAllowReports")}
+                    onChange={() => togglePermission("uaAllowReports")}
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox
-                    name='Create Reports'
-                    checked={createReports}
-                    onChange={() => setCreateReports(!createReports)}
-                />
+                <BorderedCheckbox name='Create Reports' checked disabled />
             </div>
         </section>
     );

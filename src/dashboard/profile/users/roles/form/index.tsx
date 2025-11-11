@@ -15,6 +15,7 @@ import { RolesOther } from "dashboard/profile/users/roles/form/other";
 import { useStore } from "store/hooks";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
+import { useToastMessage } from "common/hooks";
 
 interface TabItem {
     tabName: string;
@@ -35,11 +36,21 @@ export const UsersRolesForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentRole, currentRole, changeCurrentRole } = usersStore;
+    const { showError, showSuccess } = useToastMessage();
+    const {
+        getCurrentRole,
+        currentRole,
+        changeCurrentRole,
+        saveCurrentRole,
+        createNewRole,
+        togglePermissionsGroup,
+    } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
     useEffect(() => {
-        if (id && id !== CREATE_ID) {
+        if (id === CREATE_ID) {
+            createNewRole();
+        } else if (id) {
             getCurrentRole(id);
         }
     }, [id]);
@@ -61,14 +72,25 @@ export const UsersRolesForm = observer((): ReactElement => {
         setActiveTabIndex(newIndex);
     };
 
-    const handleSaveClick = () => {};
+    const handleSaveClick = async () => {
+        if (!currentRole) return;
+        const response = await saveCurrentRole();
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            showSuccess(
+                id === CREATE_ID ? "Role created successfully" : "Role updated successfully"
+            );
+            navigate(USERS_PAGE.ROLES());
+        }
+    };
 
     const handleCloseClick = () => {
         navigate(-1);
     };
 
     return (
-        <div className='grid roles-page'>
+        <div className='grid role-page relative'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
@@ -81,9 +103,9 @@ export const UsersRolesForm = observer((): ReactElement => {
                             {id === CREATE_ID ? "Create new" : "Edit"} Role
                         </h2>
                     </div>
-                    <div className='roles-content'>
-                        <div className='roles-sidebar'>
-                            <div className='roles-list pr-2'>
+                    <div className='role-content'>
+                        <div className='role-sidebar'>
+                            <div className='role-list pr-2'>
                                 <TruncatedText
                                     text={
                                         id === CREATE_ID ? "New role" : currentRole?.rolename || ""
@@ -97,25 +119,28 @@ export const UsersRolesForm = observer((): ReactElement => {
                                 />
                             </div>
                         </div>
-                        <div className='roles-main'>
-                            <div className='roles-main__header'>
+                        <div className='role-main'>
+                            <div className='role-main__header'>
                                 <span className='p-float-label'>
                                     <InputText
                                         value={currentRole?.rolename}
                                         onChange={(event) =>
                                             changeCurrentRole("rolename", event.target.value)
                                         }
-                                        className='roles-main__input'
+                                        className='role-main__input'
                                     />
                                     <label className='float-label'>Role name (required)</label>
                                 </span>
-                                <label className='roles-main__select-all'>
-                                    <input type='checkbox' />
+                                <label className='role-main__select-all'>
+                                    <input
+                                        type='checkbox'
+                                        onChange={() => togglePermissionsGroup()}
+                                    />
                                     <span>Select All</span>
                                 </label>
                             </div>
                             <TabView
-                                className='roles-main__tabs'
+                                className='role-main__tabs'
                                 activeIndex={activeTabIndex}
                                 onTabChange={handleTabChange}
                             >
@@ -128,8 +153,8 @@ export const UsersRolesForm = observer((): ReactElement => {
                                 })}
                             </TabView>
                         </div>
-                    </div>{" "}
-                    <div className='roles-main__buttons'>
+                    </div>
+                    <div className='role-main__buttons'>
                         <Button
                             onClick={handleBackClick}
                             className='form__button uppercase'

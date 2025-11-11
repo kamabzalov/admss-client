@@ -1,24 +1,20 @@
+import { PermissionKey } from "common/constants/permissions";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { CheckboxChangeEvent } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
+import { useStore } from "store/hooks";
+
+const otherPermissions: readonly PermissionKey[] = ["uaAllowReports", "uaAllowPrinting"];
 
 export const RolesOther = observer((): ReactElement => {
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [allowMobile, setAllowMobile] = useState<boolean>(false);
-    const [allowPrinting, setAllowPrinting] = useState<boolean>(false);
-    const [allowWeb, setAllowWeb] = useState<boolean>(false);
-    const [viewDeleted, setViewDeleted] = useState<boolean>(false);
-    const [undeleteDeleted, setUndeleteDeleted] = useState<boolean>(false);
+    const { togglePermission, hasRolePermission, togglePermissionsGroup } = useStore().usersStore;
 
-    const handleSelectAllChange = (event: CheckboxChangeEvent) => {
-        setSelectAll(event.checked ?? false);
-        setAllowMobile(event.checked ?? false);
-        setAllowPrinting(event.checked ?? false);
-        setAllowWeb(event.checked ?? false);
-        setViewDeleted(event.checked ?? false);
-        setUndeleteDeleted(event.checked ?? false);
+    const selectAll = otherPermissions.every((permission) => hasRolePermission(permission));
+
+    const handleSelectAllChange = () => {
+        togglePermissionsGroup(otherPermissions);
     };
+
     return (
         <section className='grid roles-other'>
             <div className='col-3'>
@@ -29,39 +25,23 @@ export const RolesOther = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox
-                    name='Allow Mobile'
-                    checked={allowMobile}
-                    onChange={() => setAllowMobile(!allowMobile)}
-                />
+                <BorderedCheckbox name='Allow Mobile' checked disabled />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Allow Printing'
-                    checked={allowPrinting}
-                    onChange={() => setAllowPrinting(!allowPrinting)}
+                    checked={hasRolePermission("uaAllowPrinting")}
+                    onChange={() => togglePermission("uaAllowPrinting")}
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox
-                    name='Allow Web'
-                    checked={allowWeb}
-                    onChange={() => setAllowWeb(!allowWeb)}
-                />
+                <BorderedCheckbox name='Allow Web' checked disabled />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox
-                    name='View Deleted'
-                    checked={viewDeleted}
-                    onChange={() => setViewDeleted(!viewDeleted)}
-                />
+                <BorderedCheckbox name='View Deleted' checked disabled />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox
-                    name='Undelete Deleted'
-                    checked={undeleteDeleted}
-                    onChange={() => setUndeleteDeleted(!undeleteDeleted)}
-                />
+                <BorderedCheckbox name='Undelete Deleted' checked disabled />
             </div>
         </section>
     );

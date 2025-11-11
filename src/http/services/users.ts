@@ -1,6 +1,6 @@
 import { BaseResponseError } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { UserData, UserRole } from "common/models/users";
+import { UserData, UserRole, UserRolePayload } from "common/models/users";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -134,5 +134,13 @@ export const copyUserRole = async (roleuid: string) => {
     return new ApiRequest().post({
         url: `user/${roleuid}/copyrole`,
         defaultError: "Error while copying user role",
+    });
+};
+
+export const createOrUpdateRole = async (roleuid: string, roleData: UserRolePayload) => {
+    return new ApiRequest().post({
+        url: `user/${roleuid || 0}/role`,
+        data: roleData,
+        defaultError: "Error while creating or updating role",
     });
 };

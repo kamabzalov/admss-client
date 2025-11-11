@@ -1,27 +1,26 @@
+import { PermissionKey } from "common/constants/permissions";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { CheckboxChangeEvent } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
+import { useStore } from "store/hooks";
+
+const inventoryPermissions: readonly PermissionKey[] = [
+    "uaAddInventory",
+    "uaEditInventory",
+    "uaViewInventory",
+    "uaDeleteInventory",
+    "uaEditExpenses",
+    "uaEditPayments",
+    "uaDeletePayments",
+];
 
 export const RolesInventory = observer((): ReactElement => {
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [addInventory, setAddInventory] = useState<boolean>(false);
-    const [editInventory, setEditInventory] = useState<boolean>(false);
-    const [viewInventory, setViewInventory] = useState<boolean>(false);
-    const [deleteInventory, setDeleteInventory] = useState<boolean>(false);
-    const [editExpenses, setEditExpenses] = useState<boolean>(false);
-    const [editPayments, setEditPayments] = useState<boolean>(false);
-    const [deletePayments, setDeletePayments] = useState<boolean>(false);
+    const { togglePermission, hasRolePermission, togglePermissionsGroup } = useStore().usersStore;
 
-    const handleSelectAllChange = (event: CheckboxChangeEvent) => {
-        setSelectAll(event.checked ?? false);
-        setAddInventory(event.checked ?? false);
-        setEditInventory(event.checked ?? false);
-        setViewInventory(event.checked ?? false);
-        setDeleteInventory(event.checked ?? false);
-        setEditExpenses(event.checked ?? false);
-        setEditPayments(event.checked ?? false);
-        setDeletePayments(event.checked ?? false);
+    const selectAll = inventoryPermissions.every((permission) => hasRolePermission(permission));
+
+    const handleSelectAllChange = () => {
+        togglePermissionsGroup(inventoryPermissions);
     };
     return (
         <section className='grid roles-inventory'>
@@ -35,50 +34,50 @@ export const RolesInventory = observer((): ReactElement => {
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Add Inventory'
-                    checked={addInventory}
-                    onChange={() => setAddInventory(!addInventory)}
+                    checked={hasRolePermission("uaAddInventory")}
+                    onChange={() => togglePermission("uaAddInventory")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Inventory'
-                    checked={editInventory}
-                    onChange={() => setEditInventory(!editInventory)}
+                    checked={hasRolePermission("uaEditInventory")}
+                    onChange={() => togglePermission("uaEditInventory")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='View Inventory'
-                    checked={viewInventory}
-                    onChange={() => setViewInventory(!viewInventory)}
+                    checked={hasRolePermission("uaViewInventory")}
+                    onChange={() => togglePermission("uaViewInventory")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Delete Inventory'
-                    checked={deleteInventory}
-                    onChange={() => setDeleteInventory(!deleteInventory)}
+                    checked={hasRolePermission("uaDeleteInventory")}
+                    onChange={() => togglePermission("uaDeleteInventory")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Expenses'
-                    checked={editExpenses}
-                    onChange={() => setEditExpenses(!editExpenses)}
+                    checked={hasRolePermission("uaEditExpenses")}
+                    onChange={() => togglePermission("uaEditExpenses")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Edit Payments'
-                    checked={editPayments}
-                    onChange={() => setEditPayments(!editPayments)}
+                    checked={hasRolePermission("uaEditPayments")}
+                    onChange={() => togglePermission("uaEditPayments")}
                 />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Delete Payments'
-                    checked={deletePayments}
-                    onChange={() => setDeletePayments(!deletePayments)}
+                    checked={hasRolePermission("uaDeletePayments")}
+                    onChange={() => togglePermission("uaDeletePayments")}
                 />
             </div>
         </section>
