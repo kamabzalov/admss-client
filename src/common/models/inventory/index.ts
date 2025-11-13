@@ -252,6 +252,7 @@ export interface Inventory extends BaseResponseError {
     ExteriorColor: string;
     FactoryCertified: number;
     GroupClass: number;
+    GroupClassId: string;
     GroupClassName: string;
     InteriorColor: string;
     Make: string;
