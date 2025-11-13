@@ -200,7 +200,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         "ssnFormat",
         handleValidationMessage("Buyer SSN", true),
         function (value) {
-            if (!value || value.trim() === "") return true;
+            if (!value || !value.trim().length) return true;
             const digitsOnly = value.replace(/\D/g, "");
             if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
             return SSN_REGEX.test(value);
@@ -210,7 +210,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         "ssnFormat",
         handleValidationMessage("Co-Buyer SSN", true),
         function (value) {
-            if (!value || value.trim() === "") return true;
+            if (!value || !value.trim().length) return true;
             const digitsOnly = value.replace(/\D/g, "");
             if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
             return SSN_REGEX.test(value);
