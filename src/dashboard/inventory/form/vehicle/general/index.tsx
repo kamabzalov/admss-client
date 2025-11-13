@@ -1,6 +1,6 @@
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
     deleteInventoryMake,
     deleteInventoryModel,
@@ -27,6 +27,7 @@ import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
 import { UserGroup } from "common/models/user";
+import { DropdownChangeEvent } from "primereact/dropdown";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
@@ -68,6 +69,16 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
     const [activeGroupClassList, setActiveGroupClassList] = useState<UserGroup[]>([]);
+
+    const groupClassId = useMemo<string>(() => {
+        return (
+            inventory.GroupClassId ||
+            activeGroupClassList.find((group) => {
+                return group.description === inventory.GroupClassName;
+            })?.itemuid ||
+            ""
+        );
+    }, [inventory.GroupClassId, activeGroupClassList, inventory.GroupClassName]);
 
     const handleGetAutoMakeModelList = async () => {
         const response = await getInventoryAutomakesList();
@@ -357,6 +368,21 @@ export const VehicleGeneral = observer((): ReactElement => {
         setSelectedAuditKey(value);
     };
 
+    const handleGroupClassChange = ({ value }: DropdownChangeEvent) => {
+        try {
+            changeInventory({ key: "GroupClassId", value });
+            const group = activeGroupClassList.find((group) => group.itemuid === value) || null;
+            if (group && group.description) {
+                const { description: value } = group;
+                changeInventory({ key: "GroupClass", value });
+                changeInventory({ key: "GroupClassName", value });
+            }
+        } finally {
+            setIsGroupClassFocused(false);
+            handleGetInventoryGroupFullInfo(value);
+        }
+    };
+
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6 relative'>
@@ -383,18 +409,11 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <ComboBox
                     optionLabel='description'
-                    optionValue='description'
+                    optionValue='itemuid'
                     options={activeGroupClassList}
-                    value={values?.GroupClassName}
+                    value={groupClassId}
                     required
-                    onChange={({ value }) => {
-                        setFieldValue("GroupClassName", value);
-                        changeInventory({
-                            key: "GroupClassName",
-                            value,
-                        });
-                        handleGetInventoryGroupFullInfo(value);
-                    }}
+                    onChange={handleGroupClassChange}
                     onFocus={() => setIsGroupClassFocused(true)}
                     onBlur={() => setIsGroupClassFocused(false)}
                     className={`w-full vehicle-general__dropdown ${
