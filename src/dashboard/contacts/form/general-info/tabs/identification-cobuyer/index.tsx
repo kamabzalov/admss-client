@@ -231,6 +231,7 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                         <InputMask
                             name='CoBuyer_SS_Number'
                             mask='999-99-9999'
+                            autoClear={false}
                             className={`identification-info__text-input w-full ${
                                 errors.CoBuyer_SS_Number ? "p-invalid" : ""
                             } ${values.CoBuyer_SS_Number ? "p-filled" : ""}`}

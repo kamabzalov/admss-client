@@ -29,6 +29,7 @@ import {
     LETTERS_NUMBERS_SIGNS_REGEX,
     PHONE_NUMBER_REGEX,
     SSN_REGEX,
+    SSN_VALID_LENGTH,
 } from "common/constants/regex";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { useToastMessage } from "common/hooks";
@@ -195,14 +196,26 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
-    Buyer_SS_Number: Yup.string().matches(SSN_REGEX, {
-        message: handleValidationMessage("Buyer SSN", true),
-        excludeEmptyString: true,
-    }),
-    CoBuyer_SS_Number: Yup.string().matches(SSN_REGEX, {
-        message: handleValidationMessage("Co-Buyer SSN", true),
-        excludeEmptyString: true,
-    }),
+    Buyer_SS_Number: Yup.string().test(
+        "ssnFormat",
+        handleValidationMessage("Buyer SSN", true),
+        function (value) {
+            if (!value || !value.trim().length) return true;
+            const digitsOnly = value.replace(/\D/g, "");
+            if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
+            return SSN_REGEX.test(value);
+        }
+    ),
+    CoBuyer_SS_Number: Yup.string().test(
+        "ssnFormat",
+        handleValidationMessage("Co-Buyer SSN", true),
+        function (value) {
+            if (!value || !value.trim().length) return true;
+            const digitsOnly = value.replace(/\D/g, "");
+            if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
+            return SSN_REGEX.test(value);
+        }
+    ),
     separateContact: Yup.boolean(),
 });
 
