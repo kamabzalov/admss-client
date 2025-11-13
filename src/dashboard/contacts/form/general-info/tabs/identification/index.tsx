@@ -230,6 +230,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         <InputMask
                             name='Buyer_SS_Number'
                             mask='999-99-9999'
+                            autoClear={false}
                             className={`identification-info__text-input w-full ${
                                 errors.Buyer_SS_Number ? "p-invalid" : ""
                             } ${values.Buyer_SS_Number ? "p-filled" : ""}`}
