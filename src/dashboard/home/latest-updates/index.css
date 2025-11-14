@@ -62,7 +62,7 @@
 
 .dialog-news {
     width: 80%;
-    height: 693px;
+    height: 696px;
     overflow: hidden;
     .p-dialog-content {
         overflow-y: hidden;
@@ -88,6 +88,7 @@
     .p-datatable-wrapper {
         flex: 1 1 auto;
         overflow: auto;
+        overflow-y: hidden;
         scrollbar-gutter: stable;
     }
 
