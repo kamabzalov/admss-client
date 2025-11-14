@@ -162,7 +162,12 @@ export const LatestUpdatesDialog = ({
                         },
                     }}
                 />
-                <Column field='title' header='Title' body={newsDescriptionTemplate} />
+                <Column
+                    field='title'
+                    header='Title'
+                    body={newsDescriptionTemplate}
+                    pt={{ root: { style: { maxWidth: "300px" } } }}
+                />
                 <Column
                     field='created'
                     header='Date'
