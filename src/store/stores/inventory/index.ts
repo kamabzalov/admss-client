@@ -486,6 +486,15 @@ export class InventoryStore {
                     Audit: this.inventoryAudit,
                 };
 
+                if (inventoryData.GroupClassName && !inventoryData.GroupClassId) {
+                    const activeGroup = this._inventoryGroupClassList.find(
+                        (group) => group.description === inventoryData.GroupClassName
+                    );
+                    if (activeGroup?.itemuid) {
+                        inventoryData.GroupClassId = activeGroup.itemuid;
+                    }
+                }
+
                 const generalSettingsStore = this.rootStore.generalSettingsStore;
                 const watermarkPromise = generalSettingsStore.isSettingsChanged
                     ? (async () => {
