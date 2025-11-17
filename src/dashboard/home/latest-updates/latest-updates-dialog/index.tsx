@@ -148,6 +148,13 @@ export const LatestUpdatesDialog = ({
                 scrollable
                 paginator={newsData.length > MAX_NEWS_COUNT_ON_PAGE}
                 rows={MAX_NEWS_COUNT_ON_PAGE}
+                pt={{
+                    root: {
+                        style: {
+                            overflowY: !Object.keys(expandedRows).length ? "hidden" : "auto",
+                        },
+                    },
+                }}
             >
                 <Column
                     body={newsIndicatorTemplate}

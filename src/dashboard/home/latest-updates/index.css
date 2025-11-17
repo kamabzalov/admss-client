@@ -88,7 +88,6 @@
     .p-datatable-wrapper {
         flex: 1 1 auto;
         overflow: auto;
-        overflow-y: hidden;
         scrollbar-gutter: stable;
     }
 
