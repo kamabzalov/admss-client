@@ -29,8 +29,7 @@ import { ServiceUpdate } from "services/service-update";
 import { DealWashout } from "dashboard/deals/form/washout";
 import { Users } from "dashboard/profile/users";
 import { UsersForm } from "dashboard/profile/users/form";
-import { UsersRoles } from "dashboard/profile/users/roles";
-import { UsersRolesForm } from "dashboard/profile/users/roles/form";
+import { UsersRolesForm } from "dashboard/profile/generalSettings/roles/form";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -124,9 +123,14 @@ const AppRouter = (): ReactElement => {
                             path: "settings",
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
-                                    <GeneralSettings />
+                                    <Outlet />
                                 </ProtectedRoute>
                             ),
+                            children: [
+                                { path: "", element: <GeneralSettings /> },
+                                { path: "roles", element: <UsersRolesForm /> },
+                                { path: "roles/:id", element: <UsersRolesForm /> },
+                            ],
                         },
                         {
                             path: "users",
@@ -138,8 +142,6 @@ const AppRouter = (): ReactElement => {
                             children: [
                                 { path: "", element: <Users /> },
                                 { path: ":id", element: <UsersForm /> },
-                                { path: "roles", element: <UsersRoles /> },
-                                { path: "roles/:id", element: <UsersRolesForm /> },
                             ],
                         },
                         {

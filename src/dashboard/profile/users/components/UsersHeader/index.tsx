@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { Button } from "primereact/button";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
-import { USERS_PAGE } from "common/constants/links";
+import { SETTINGS_PAGE } from "common/constants/links";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 
@@ -59,7 +59,7 @@ export default function UsersHeader({
                 type='button'
                 icon='icon adms-roles'
                 label='Roles'
-                onClick={() => navigate(USERS_PAGE.ROLES())}
+                onClick={() => navigate(SETTINGS_PAGE.ROLES())}
             />
         </div>
     );

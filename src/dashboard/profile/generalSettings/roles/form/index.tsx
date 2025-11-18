@@ -5,15 +5,15 @@ import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { RolesContacts } from "dashboard/profile/users/roles/form/contacts";
-import { RolesDeals } from "dashboard/profile/users/roles/form/deals";
-import { RolesInventory } from "dashboard/profile/users/roles/form/inventory";
-import { RolesAccounts } from "dashboard/profile/users/roles/form/accounts";
-import { RolesReports } from "dashboard/profile/users/roles/form/reports";
-import { RolesSettings } from "dashboard/profile/users/roles/form/settings";
-import { RolesOther } from "dashboard/profile/users/roles/form/other";
+import { RolesContacts } from "dashboard/profile/generalSettings/roles/form/contacts";
+import { RolesDeals } from "dashboard/profile/generalSettings/roles/form/deals";
+import { RolesInventory } from "dashboard/profile/generalSettings/roles/form/inventory";
+import { RolesAccounts } from "dashboard/profile/generalSettings/roles/form/accounts";
+import { RolesReports } from "dashboard/profile/generalSettings/roles/form/reports";
+import { RolesSettings } from "dashboard/profile/generalSettings/roles/form/settings";
+import { RolesOther } from "dashboard/profile/generalSettings/roles/form/other";
 import { useStore } from "store/hooks";
-import { CREATE_ID, USERS_PAGE } from "common/constants/links";
+import { CREATE_ID, SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { useToastMessage } from "common/hooks";
 
@@ -63,7 +63,7 @@ export const UsersRolesForm = observer((): ReactElement => {
         const newIndex = Math.max(activeTabIndex - 1, 0);
         setActiveTabIndex(newIndex);
         if (newIndex <= 0) {
-            navigate(USERS_PAGE.ROLES());
+            navigate(SETTINGS_PAGE.ROLES());
         }
     };
 
@@ -81,7 +81,7 @@ export const UsersRolesForm = observer((): ReactElement => {
             showSuccess(
                 id === CREATE_ID ? "Role created successfully" : "Role updated successfully"
             );
-            navigate(USERS_PAGE.ROLES());
+            navigate(SETTINGS_PAGE.ROLES());
         }
     };
 
