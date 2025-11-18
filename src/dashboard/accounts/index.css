@@ -75,7 +75,18 @@
     }
 }
 
-.accounts-filter__item {
+.audit-filter {
+    width: 300px;
+}
+
+.audit-filter__panel {
+    .p-dropdown-item .accounts-filter__item {
+        white-space: nowrap;
+    }
+}
+
+.accounts-filter__item,
+.audit-filter__item {
     width: 180px;
     white-space: normal;
     line-height: 1.2;
@@ -118,4 +129,45 @@
 .accounts-filter-wrapper {
     position: relative;
     height: 50px;
+}
+
+.accounts .col-12 .p-datatable-wrapper {
+    height: 62vh;
+}
+
+.accounts .col-12 .p-tabview-panels {
+    padding-bottom: 0;
+}
+
+.accounts .card-header {
+    align-items: stretch;
+}
+
+.accounts .p-tabview .p-tabview-nav {
+    margin: 0 1.25rem;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.accounts__header .p-tabview-nav-link {
+    font-weight: 700;
+    color: var(--admss-app-primary);
+}
+
+.p-tabview .p-tabview-nav li.accounts__header .p-tabview-nav-link {
+    border: none;
+    border-bottom: 2px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight.accounts__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.p-tabview
+    .p-tabview-nav
+    li.accounts__header:not(.p-highlight):not(.p-disabled):hover
+    .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-color: transparent;
+    border-bottom-color: var(--admss-app-light-grey);
 }

@@ -371,7 +371,7 @@ export class InventoryStore {
         try {
             const response = await getAccountPayment(id);
             if (response) {
-                this._inventoryPayments = response;
+                this._inventoryPayments = response as AccountPayment;
             }
         } catch (error) {}
     };
