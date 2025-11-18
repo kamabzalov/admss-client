@@ -1,6 +1,5 @@
 .general-settings {
-    --card-height: 83vh;
-    --card-max-height: 983px;
+    --card-height: 983px;
     --content-height: 600px;
     --title-height: 63px;
 }
