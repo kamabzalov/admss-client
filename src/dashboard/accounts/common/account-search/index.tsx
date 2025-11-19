@@ -9,10 +9,12 @@ import { getAccountsList } from "http/services/accounts.service";
 import { AccountsDataTable } from "dashboard/accounts";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 import { useToastMessage } from "common/hooks";
+import "./index.css";
 
 const FIELD: keyof AccountInfo = "name";
 const TIMEOUT_DELAY = 300;
 enum ACCOUNT_MESSAGE {
+    NOT_FOUND_CLASS_NAME = "not-found",
     NOT_FOUND = "Account not found.",
     NOT_FOUND_SELECTED = "Account not found. Only existing accounts can be selected in this field.",
 }
@@ -85,7 +87,7 @@ export const AccountSearch = ({
     const handleOnChange = (event: DropdownChangeEvent) => {
         const selectedValue = event.value;
 
-        if (selectedValue === "Account not found") {
+        if (selectedValue === ACCOUNT_MESSAGE.NOT_FOUND) {
             return;
         }
 
@@ -129,12 +131,22 @@ export const AccountSearch = ({
     };
 
     const displayOptions =
-        validateOnBlur && isSearched && options.length === 0
+        validateOnBlur && (isLoading || (isSearched && options.length === 0))
             ? [{ [FIELD]: ACCOUNT_MESSAGE.NOT_FOUND } as AccountInfo]
             : options;
 
+    const itemTemplate = (option: AccountInfo) => {
+        const isNotFound = option[FIELD] === ACCOUNT_MESSAGE.NOT_FOUND;
+        const classNames = [isNotFound && ACCOUNT_MESSAGE.NOT_FOUND_CLASS_NAME]
+            .filter(Boolean)
+            .join(" ");
+        return <span className={classNames || undefined}>{option[FIELD]}</span>;
+    };
+
+    const emptyMessageText = validateOnBlur ? "" : ACCOUNT_MESSAGE.NOT_FOUND;
+
     return (
-        <>
+        <div className='account-search'>
             <SearchInput
                 name={name}
                 title={name}
@@ -145,9 +157,12 @@ export const AccountSearch = ({
                 value={value}
                 onChange={handleOnChange}
                 onBlur={validateOnBlur ? handleBlur : undefined}
+                emptyMessage={emptyMessageText}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
+                panelClassName='account-search__panel'
+                itemTemplate={itemTemplate}
                 {...props}
             />
             <Dialog
@@ -168,6 +183,6 @@ export const AccountSearch = ({
                     getFullInfo={handleGetFullInfo}
                 />
             </Dialog>
-        </>
+        </div>
     );
 };

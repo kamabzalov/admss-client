@@ -1,0 +1,6 @@
+.account-search__panel {
+    .not-found,
+    .p-dropdown-empty-message {
+        color: var(--admss-app-medium-grey);
+    }
+}
