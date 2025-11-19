@@ -9,10 +9,12 @@ import { DealsDataTable } from "dashboard/deals";
 import { getDealsList } from "http/services/deals.service";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 import { useToastMessage } from "common/hooks";
+import "./index.css";
 
 const FIELD: keyof Deal = "contactinfo";
 const TIMEOUT_DELAY = 300;
 enum DEAL_MESSAGE {
+    NOT_FOUND_CLASS_NAME = "not-found",
     NOT_FOUND = "Deal not found.",
     NOT_FOUND_SELECTED = "Deal not found. Only existing deals can be selected in this field.",
 }
@@ -87,7 +89,7 @@ export const DealSearch = ({
     const handleOnChange = (event: DropdownChangeEvent) => {
         const selectedValue = event.value;
 
-        if (selectedValue === "Deal not found") {
+        if (selectedValue === DEAL_MESSAGE.NOT_FOUND) {
             return;
         }
 
@@ -131,12 +133,22 @@ export const DealSearch = ({
     };
 
     const displayOptions =
-        validateOnBlur && isSearched && options.length === 0
+        validateOnBlur && (isLoading || (isSearched && options.length === 0))
             ? [{ [FIELD]: DEAL_MESSAGE.NOT_FOUND } as Deal]
             : options;
 
+    const itemTemplate = (option: Deal) => {
+        const isNotFound = option[FIELD] === DEAL_MESSAGE.NOT_FOUND;
+        const classNames = [isNotFound && DEAL_MESSAGE.NOT_FOUND_CLASS_NAME]
+            .filter(Boolean)
+            .join(" ");
+        return <span className={classNames || undefined}>{option[FIELD]}</span>;
+    };
+
+    const emptyMessageText = validateOnBlur ? "" : DEAL_MESSAGE.NOT_FOUND;
+
     return (
-        <>
+        <div className='deal-search'>
             <SearchInput
                 name={name}
                 title={name}
@@ -147,10 +159,19 @@ export const DealSearch = ({
                 value={value}
                 onChange={handleOnChange}
                 onBlur={validateOnBlur ? handleBlur : undefined}
+                emptyMessage={emptyMessageText}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
+                panelClassName='deal-search__panel'
+                itemTemplate={itemTemplate}
                 {...props}
+                pt={{
+                    ...props.pt,
+                    emptyMessage: {
+                        className: DEAL_MESSAGE.NOT_FOUND_CLASS_NAME,
+                    },
+                }}
             />
             <Dialog
                 header={<div className='uppercase'>Choose a Deal</div>}
@@ -169,6 +190,6 @@ export const DealSearch = ({
                     getFullInfo={handleGetFullInfo}
                 />
             </Dialog>
-        </>
+        </div>
     );
 };
