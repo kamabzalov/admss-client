@@ -163,6 +163,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         .trim()
         .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
             if (
                 separateContact ||
                 (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()))
@@ -171,19 +172,25 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-            message: handleValidationMessage("First name"),
-            excludeEmptyString: true,
+        .test("coBuyerFirstNameFormat", handleValidationMessage("First name"), function (value) {
+            const { type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
+            if (!value || !value.trim()) return true;
+            return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
     CoBuyer_Middle_Name: Yup.string()
         .trim()
-        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-            message: handleValidationMessage("Middle name"),
+        .test("coBuyerMiddleNameFormat", handleValidationMessage("Middle name"), function (value) {
+            const { type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
+            if (!value || !value.trim()) return true;
+            return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
     CoBuyer_Last_Name: Yup.string()
         .trim()
         .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_First_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
             if (
                 separateContact ||
                 (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()))
@@ -192,9 +199,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-            message: handleValidationMessage("Last name"),
-            excludeEmptyString: true,
+        .test("coBuyerLastNameFormat", handleValidationMessage("Last name"), function (value) {
+            const { type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
+            if (!value || !value.trim()) return true;
+            return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
     Buyer_SS_Number: Yup.string().test(
         "ssnFormat",
@@ -210,6 +219,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         "ssnFormat",
         handleValidationMessage("Co-Buyer SSN", true),
         function (value) {
+            const { type, separateContact } = this.parent;
+            if (type !== BUYER_ID && !separateContact) return true;
             if (!value || !value.trim().length) return true;
             const digitsOnly = value.replace(/\D/g, "");
             if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
@@ -407,6 +418,15 @@ export const ContactForm = observer((): ReactElement => {
             const allErrors = { ...errors, ...coBuyerValidationErrors };
 
             if (!Object.keys(allErrors).length) {
+                if (contact.type !== BUYER_ID && !store.separateContact) {
+                    store.changeContactExtData([
+                        ["CoBuyer_First_Name", ""],
+                        ["CoBuyer_Middle_Name", ""],
+                        ["CoBuyer_Last_Name", ""],
+                        ["CoBuyer_SS_Number", ""],
+                    ]);
+                }
+
                 let response;
 
                 if (store.separateContact) {
