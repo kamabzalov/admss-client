@@ -1,15 +1,14 @@
-import { DialogProps } from "primereact/dialog";
+import { Dialog, DialogProps } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
-import { DashboardDialog } from "dashboard/common/dialog";
 import { Status } from "common/models/base-response";
 import { DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
-import { PostDataTask, Task, TaskUser } from "common/models/tasks";
+import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 import { formatDateForServer, validateDates } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
@@ -19,6 +18,10 @@ import { Account } from "common/models/accounts";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToastMessage } from "common/hooks";
 import { ALL_FIELDS } from "common/constants/fields";
+import { SplitButton } from "primereact/splitbutton";
+import { TASKS_STATUS_LIST } from "dashboard/tasks/common";
+import { FilterOptions } from "dashboard/common/filter";
+import { Button } from "primereact/button";
 
 enum DATE_TYPE {
     START = "startdate",
@@ -42,6 +45,7 @@ const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
     contactname: task?.contactname || "",
     phone: task?.phone || "",
     description: task?.description || "",
+    status: task?.task_status as TaskStatus,
 });
 
 export const AddTaskDialog = observer(
@@ -178,18 +182,35 @@ export const AddTaskDialog = observer(
             handleInputChange("dealuid", "");
         };
 
+        const taskFilterOptions = (): FilterOptions[] => {
+            return TASKS_STATUS_LIST.map((status) => ({
+                label: status.name,
+                value: status.value,
+                icon: "pi pi-circle",
+                iconClassName: `pi-circle--${status.value}`,
+                command: () => {
+                    setTaskState((prev) => ({ ...prev, status: status.name as TaskStatus }));
+                    setIsFormChanged(true);
+                },
+            }));
+        };
+
+        const getStatusClassName = (): string => {
+            if (!taskState.status) return "";
+            const statusName = taskState.status.toLowerCase().replace(/ /g, "-");
+            return `task-status--${statusName}`;
+        };
+
         return (
-            <DashboardDialog
+            <Dialog
+                draggable={false}
                 position='top'
                 onHide={onHide}
                 visible={visible}
                 header={header}
-                className={"dialog__add-task"}
-                footer='Save'
-                action={handleSaveTaskData}
-                buttonDisabled={isSubmitDisabled}
+                className='dialog dialog__add-task task-dialog'
             >
-                <>
+                <div className='p-dialog-content-body' tabIndex={0}>
                     <ComboBox
                         label='Assign to (required)'
                         value={taskState.useruid || authUser?.useruid || ""}
@@ -278,8 +299,26 @@ export const AddTaskDialog = observer(
                         />
                         <label className='float-label'>Description</label>
                     </span>
-                </>
-            </DashboardDialog>
+                </div>
+
+                <div className='task-dialog__footer'>
+                    <SplitButton
+                        outlined
+                        label={`${taskState.status ? taskState.status : "Status"}`}
+                        dropdownIcon='adms-arrow-bottom'
+                        model={taskFilterOptions()}
+                        className={`task-dialog__status-button status-button ${getStatusClassName()}`}
+                        menuStyle={{ transformOrigin: "bottom", top: "auto" }}
+                        appendTo='self'
+                    />
+                    <Button
+                        label={`${currentTask ? "Update" : "Save"}`}
+                        onClick={handleSaveTaskData}
+                        className='task-dialog__save-button'
+                        disabled={isSubmitDisabled}
+                    />
+                </div>
+            </Dialog>
         );
     }
 );

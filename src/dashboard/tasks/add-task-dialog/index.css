@@ -1,4 +1,6 @@
 .dialog__add-task {
+    --admss-app-dialog-button-width: 220px;
+    --admss-app-dialog-button-height: 59px;
     width: 660px;
     height: 872px;
 
@@ -22,7 +24,7 @@
     }
 
     .p-calendar.p-inputwrapper {
-        width: 220px;
+        width: var(--admss-app-dialog-button-width);
     }
 
     .p-dialog-footer {
@@ -35,13 +37,172 @@
 
     .p-dialog-footer .p-button {
         display: inline-flex;
-        width: 220px;
-        height: 59px;
-        margin-bottom: 10px;
+        width: var(--admss-app-dialog-button-width);
+        height: var(--admss-app-dialog-button-height);
+    }
+
+    .status-button {
+        width: var(--admss-app-dialog-button-width);
+        height: var(--admss-app-dialog-button-height);
+        flex-direction: row-reverse;
+        .p-button.p-splitbutton-defaultbutton {
+            font-weight: 700;
+            font-size: 22px;
+            height: 100%;
+            border-left: none;
+            border-right: 1px solid;
+            border-radius: 0 5px 5px 0;
+            &:active,
+            &:focus,
+            &:hover {
+                box-shadow: none;
+            }
+            &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 80%;
+                width: 1px;
+                background-color: currentColor;
+            }
+        }
+        .p-button.p-splitbutton-menubutton {
+            width: 60px;
+            border-left: 1px solid;
+            border-right: none;
+            border-radius: 5px 0 0 5px;
+            height: 100%;
+            &:active,
+            &:focus,
+            &:hover {
+                box-shadow: none;
+            }
+            .p-button-icon {
+                width: 20px;
+                height: 20px;
+                transition: transform 0.3s ease;
+            }
+            &[aria-expanded="true"] .p-button-icon {
+                transform: rotate(180deg);
+            }
+        }
+
+        .p-splitbutton-defaultbutton,
+        .p-splitbutton-menubutton {
+            color: var(--admss-app-statuses-created);
+            &:hover:enabled {
+                border-color: color-mix(
+                    in srgb,
+                    var(--admss-app-statuses-created) 85%,
+                    var(--admss-app-statuses-created)
+                );
+                color: color-mix(
+                    in srgb,
+                    var(--admss-app-statuses-created) 85%,
+                    var(--admss-app-statuses-created)
+                );
+                background: color-mix(in srgb, var(--admss-app-statuses-created) 5%, transparent);
+            }
+        }
+
+        .p-menu {
+            bottom: 100%;
+            top: auto !important;
+        }
+
+        &[class*="task-status--"] {
+            .p-splitbutton-defaultbutton,
+            .p-splitbutton-menubutton {
+                border-color: inherit;
+                color: inherit;
+
+                .p-button-icon {
+                    color: inherit;
+                }
+
+                &:hover:enabled {
+                    border-color: color-mix(in srgb, currentColor 85%, transparent);
+                    color: color-mix(in srgb, currentColor 85%, transparent);
+                    background: color-mix(in srgb, currentColor 5%, transparent);
+                }
+            }
+        }
+    }
+    .task-dialog__footer {
+        padding-top: 34px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        .task-dialog__save-button.p-button {
+            font-weight: 700;
+            font-size: 22px;
+            width: var(--admss-app-dialog-button-width);
+            height: var(--admss-app-dialog-button-height);
+        }
     }
 }
 
 .p-dialog .p-dialog-description {
     width: 100%;
     height: 130px;
+}
+
+.p-menu {
+    .p-menuitem-link {
+        &:not(.p-disabled):hover {
+            background: var(--admss-app-light-green);
+        }
+        height: 44px;
+        .p-menuitem-icon {
+            font-size: 12px;
+        }
+        &[aria-label="Default"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-default) !important;
+            }
+        }
+        &[aria-label="Started"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-started) !important;
+            }
+        }
+        &[aria-label="In Progress"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-in-progress) !important;
+            }
+        }
+        &[aria-label="Cancelled"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-cancelled) !important;
+            }
+        }
+        &[aria-label="Postponed"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-postponed) !important;
+            }
+        }
+        &[aria-label="Paused"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-paused) !important;
+            }
+        }
+        &[aria-label="Completed"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-completed) !important;
+            }
+        }
+        &[aria-label="Outdated"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-outdated) !important;
+            }
+        }
+        &[aria-label="Deleted"] {
+            .p-menuitem-icon {
+                color: var(--admss-app-statuses-deleted) !important;
+            }
+        }
+    }
 }
