@@ -1,5 +1,3 @@
-import { BaseResponseError } from "common/models/base-response";
-
 export enum TaskStatus {
     DEFAULT = "Default",
     STARTED = "Started",
@@ -50,14 +48,14 @@ export interface TaskUser {
     useruid: string;
 }
 
-export interface PostDataTask extends BaseResponseError {
+export interface PostDataTask {
     index: number;
     created: string;
     updated: string;
     startdate: string;
     deadline: string;
     statuscode: number;
-    task_status: TaskStatus;
+    status: TaskStatus;
     itemuid: string;
     parentuid: string;
     useruid: string;
