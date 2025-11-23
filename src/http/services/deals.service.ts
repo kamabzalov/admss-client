@@ -5,6 +5,7 @@ import {
     Deal,
     DealDelete,
     DealFinance,
+    DealFinanceRecalculatePayload,
     DealPaymentsTotal,
     DealPickupPayment,
     DealPrintFormResponse,
@@ -145,11 +146,13 @@ export const setDeal = async (
 };
 
 export const dealFinancesRecalculate = async (
-    dealuid: string
+    dealuid: string,
+    payload?: DealFinanceRecalculatePayload
 ): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/recalculate`
+            `deals/${dealuid || 0}/recalculate`,
+            payload || undefined
         );
 
         if (response.status === 200) {

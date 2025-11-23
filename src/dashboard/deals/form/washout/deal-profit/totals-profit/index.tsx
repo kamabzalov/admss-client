@@ -43,7 +43,7 @@ export const DealTotalsProfit = observer(() => {
                     <div className='totals-row totals-misc'>
                         <TextInput
                             name='(+) Misc. Cost'
-                            value={dealWashout.MiscProfitDescription}
+                            value={dealWashout.MiscProfitDescription || ""}
                             height={32}
                             className='totals-misc__input'
                             onChange={(e) =>
@@ -104,7 +104,7 @@ export const DealTotalsProfit = observer(() => {
                         <TextInput
                             name='(-) Misc. Cost'
                             height={32}
-                            value={dealWashout.MiscCostDescription}
+                            value={dealWashout.MiscCostDescription || ""}
                             className='totals-misc__input'
                             onChange={(e) =>
                                 changeDealWashout("MiscCostDescription", e.target.value)
