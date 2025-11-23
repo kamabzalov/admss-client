@@ -407,6 +407,26 @@ export interface DealFinance {
     userUID: string;
 }
 
+export type DealFinanceRecalculatePayload = Partial<
+    Pick<
+        DealFinance,
+        | "CashPrice"
+        | "TradeAllowance"
+        | "TaxRate"
+        | "Taxes"
+        | "Accessory"
+        | "Tags"
+        | "Title"
+        | "LicenseAndReg"
+        | "Warranty"
+        | "Gap"
+        | "DocFee"
+        | "TradeInPayoff"
+        | "NetTradeAllowance"
+        | "CashDown"
+    >
+>;
+
 export interface DealPrintForm extends PrintForm {}
 
 export type DealPrintFormResponse = BaseResponse & {
