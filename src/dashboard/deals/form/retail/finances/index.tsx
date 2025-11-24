@@ -3,7 +3,6 @@ import { ReactElement, useEffect } from "react";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
-import { dealFinancesRecalculate } from "http/services/deals.service";
 import { useNavigate, useParams } from "react-router-dom";
 import { DealFinance } from "common/models/deals";
 import { useStore } from "store/hooks";
@@ -12,7 +11,8 @@ import { CREATE_ID, DEALS_PAGE } from "common/constants/links";
 export const DealRetailFinances = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().dealStore;
-    const { dealFinances, getDealFinances, changeDealFinances } = store;
+    const { dealFinances, getDealFinances, changeDealFinances, recalculateAndUpdateWashout } =
+        store;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                         type='button'
                         outlined
                         onClick={() => {
-                            id && dealFinancesRecalculate(id);
+                            id && recalculateAndUpdateWashout(id);
                         }}
                         className='finances__button bold px-6'
                     >
