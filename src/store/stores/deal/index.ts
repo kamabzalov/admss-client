@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
-import { convertToStandardTimestamp } from "common/helpers";
+import { convertToStandardTimestamp, debounce } from "common/helpers";
+import { DEBOUNCE_TIME } from "common/settings";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
@@ -22,7 +23,6 @@ import {
     setDeal,
     setDealFinance,
     setDealPayments,
-    setDealWashout,
 } from "http/services/deals.service";
 import { getInventoryInfo } from "http/services/inventory-service";
 import { action, makeAutoObservable } from "mobx";
@@ -83,7 +83,9 @@ export class DealStore {
     private _dealFirstTradeOverwrite: boolean = false;
     private _dealSecondTradeOverwrite: boolean = false;
 
-    private readonly _recalculateKeys: (keyof DealFinanceRecalculatePayload)[] = [
+    private _debouncedRecalculate: (dealuid: string) => void;
+
+    private readonly _recalculateKeys: (keyof DealFinance)[] = [
         "CashPrice",
         "TradeAllowance",
         "TaxRate",
@@ -103,6 +105,10 @@ export class DealStore {
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
+        this._debouncedRecalculate = debounce(
+            (dealuid: string) => this.recalculateAndUpdateWashout(dealuid),
+            DEBOUNCE_TIME
+        );
     }
 
     public get deal() {
@@ -326,47 +332,24 @@ export class DealStore {
     );
 
     public changeDealFinances = action(
-        async ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
+        ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore && dealStore._dealID) {
-                const isRecalculateField = this._recalculateKeys.includes(
-                    key as keyof DealFinanceRecalculatePayload
-                );
-
-                if (isRecalculateField) {
-                    const currentWashoutState = JSON.parse(JSON.stringify(dealStore.dealWashout));
-                    const saveResponse = await setDealWashout(
-                        dealStore._dealID,
-                        currentWashoutState
-                    );
-
-                    if (saveResponse?.error) {
-                        return;
-                    }
-                }
-
+                this._isFormChanged = true;
                 const { dealFinances } = dealStore;
                 (dealFinances as Record<typeof key, string | number>)[key] = value;
-
-                await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
             }
         }
     );
 
-    public changeDealWashout = action(async (key: keyof DealWashout, value: string | number) => {
+    public changeDealWashout = action((key: keyof DealWashout, value: string | number) => {
         const dealStore = this.rootStore.dealStore;
         if (dealStore) {
             const { dealWashout } = dealStore;
             (dealWashout as Record<typeof key, string | number>)[key] = value;
 
             if (dealStore._dealID) {
-                const isRecalculateField = this._recalculateKeys.includes(
-                    key as keyof DealFinanceRecalculatePayload
-                );
-
-                if (isRecalculateField) {
-                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
-                }
+                dealStore._debouncedRecalculate(dealStore._dealID);
             }
         }
     });
@@ -375,13 +358,6 @@ export class DealStore {
         async (fieldName: string, option: INCLUDE_OPTIONS | null) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore && dealStore._dealID) {
-                const currentWashoutState = JSON.parse(JSON.stringify(dealStore.dealWashout));
-                const saveResponse = await setDealWashout(dealStore._dealID, currentWashoutState);
-
-                if (saveResponse?.error) {
-                    return;
-                }
-
                 const { dealWashout } = dealStore;
                 const check1Field = `${fieldName}Check1` as keyof DealWashout;
                 const check2Field = `${fieldName}Check2` as keyof DealWashout;
@@ -447,10 +423,19 @@ export class DealStore {
         try {
             this._isLoading = true;
             this._dealErrorMessage = "";
-            const payload = this._recalculateKeys.reduce((accumulator, key) => {
-                accumulator[key] = this._dealFinances[key];
-                return accumulator;
-            }, {} as DealFinanceRecalculatePayload);
+            const financePayload: Partial<DealFinance> = this._recalculateKeys.reduce(
+                (accumulator, key) => {
+                    accumulator[key] = this._dealFinances[key];
+                    return accumulator;
+                },
+                {} as Record<string, string | number>
+            );
+
+            const payload: DealFinanceRecalculatePayload = {
+                ...financePayload,
+                washout: this._dealWashout,
+            };
+
             const response = await dealFinancesRecalculate(dealuid, payload);
             if (response && response.status === Status.OK) {
                 this._dealFinances = response as DealFinance;
@@ -474,13 +459,10 @@ export class DealStore {
             const washoutResponse = await getDealWashout(dealuid);
             if (washoutResponse && washoutResponse.status === Status.OK) {
                 const updatedWashout = washoutResponse as DealWashout;
-                const checkboxFields = Object.keys(currentWashoutState).filter(
-                    (key) => key.endsWith("Check1") || key.endsWith("Check2")
-                );
-                checkboxFields.forEach((field) => {
-                    (updatedWashout as unknown as Record<typeof field, number>)[field] = (
-                        currentWashoutState as unknown as Record<typeof field, number>
-                    )[field];
+                Object.keys(currentWashoutState).forEach((key) => {
+                    (updatedWashout as unknown as Record<string, string | number>)[key] = (
+                        currentWashoutState as unknown as Record<string, string | number>
+                    )[key];
                 });
                 this._dealWashout = updatedWashout;
             }
