@@ -33,9 +33,17 @@ interface AddTaskDialogProps extends DialogProps {
     onAction?: () => void;
 }
 
+const getDefaultDeadlineDate = (): Date => {
+    const date = new Date();
+    date.setHours(23, 59, 0, 0);
+    return date;
+};
+
 const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
     startdate: formatDateForServer(task?.startdate ? new Date(task.startdate) : new Date()),
-    deadline: formatDateForServer(task?.deadline ? new Date(task.deadline) : new Date()),
+    deadline: formatDateForServer(
+        task?.deadline ? new Date(task.deadline) : getDefaultDeadlineDate()
+    ),
     useruid: task?.useruid || "",
     accountuid: task?.accountuid || "",
     accountname: task?.accountname || "",
@@ -240,10 +248,16 @@ export const AddTaskDialog = observer(
                         <div className='p-inputgroup'>
                             <DateInput
                                 value={
-                                    new Date(taskState.deadline || formatDateForServer(new Date()))
+                                    new Date(
+                                        taskState.deadline ||
+                                            formatDateForServer(getDefaultDeadlineDate())
+                                    )
                                 }
                                 date={
-                                    new Date(taskState.deadline || formatDateForServer(new Date()))
+                                    new Date(
+                                        taskState.deadline ||
+                                            formatDateForServer(getDefaultDeadlineDate())
+                                    )
                                 }
                                 name='Due Date'
                                 showTime
