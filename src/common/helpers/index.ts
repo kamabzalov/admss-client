@@ -2,6 +2,28 @@ import { DEBOUNCE_TIME } from "common/settings";
 import { FilterOptions } from "dashboard/common/filter";
 import { typeGuards } from "common/utils";
 
+export enum DateFormat {
+    MM_DD_YYYY = "MM/DD/YYYY",
+    DD_MM_YYYY = "DD/MM/YYYY",
+}
+
+export enum DateSeparator {
+    DOT = ".",
+    SLASH = "/",
+}
+
+export enum DateReturnType {
+    DATE = "date",
+    DATE_WITH_TIME = "date-with-time",
+    TIMESTAMP = "timestamp",
+}
+
+export interface DateFormatOptions {
+    returnType?: DateReturnType;
+    separator?: DateSeparator;
+    format?: DateFormat;
+}
+
 export const isObjectValuesEmpty = (obj: Record<string, string | number>) =>
     Object.values(obj).every((value) =>
         typeGuards.isString(value) ? !value.trim().length : !value
@@ -150,7 +172,11 @@ export const formatDateForServer = (date: Date | number, withTimeZone?: boolean)
 
 export const parseDateFromServer = (
     date: string | number | undefined | null,
-    returnType: "date" | "date-with-time" | "timestamp" = "timestamp"
+    options: DateFormatOptions = {
+        returnType: DateReturnType.TIMESTAMP,
+        separator: DateSeparator.SLASH,
+        format: DateFormat.DD_MM_YYYY,
+    }
 ): number | string => {
     if (!date) return 0;
 
@@ -167,17 +193,17 @@ export const parseDateFromServer = (
         const dateParts = parts[0].split("/");
         const timeParts = parts[1] ? parts[1].split(":") : ["0", "0", "0"];
 
-        if (returnType === "date") {
-            const day = parseInt(dateParts[1]);
-            const month = parseInt(dateParts[0]);
-            const year = parseInt(dateParts[2]);
+        if (options.returnType === DateReturnType.DATE) {
+            const day = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 1 : 0]);
+            const month = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 0 : 1]);
+            const year = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 2 : 1]);
 
             const padNumber = (num: number) => num.toString().padStart(2, "0");
 
-            return `${padNumber(day)}.${padNumber(month)}.${year}`;
+            return `${padNumber(day)}${options.separator}${padNumber(month)}${options.separator}${year}`;
         }
 
-        if (returnType === "date-with-time") {
+        if (options.returnType === DateReturnType.DATE_WITH_TIME) {
             return `${dateParts[1]}.${dateParts[0]}.${dateParts[2]} ${timeParts[0]}:${timeParts[1]}:${timeParts[2]}`;
         }
 

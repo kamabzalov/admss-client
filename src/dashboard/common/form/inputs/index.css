@@ -301,3 +301,9 @@
         font-weight: 400;
     }
 }
+
+.text-input {
+    .p-error {
+        bottom: -16px;
+    }
+}
