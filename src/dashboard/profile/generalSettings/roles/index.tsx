@@ -13,6 +13,7 @@ import "./index.css";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
+import { DateFormat, DateReturnType, DateSeparator, parseDateFromServer } from "common/helpers";
 
 export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
     field?: keyof UserRole;
@@ -24,8 +25,9 @@ const PAGINATOR_HEIGHT = 86;
 const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
 
 enum USER_ROLE_MODAL_MESSAGE {
-    COPY_ROLE = "Do you really want to copy this role?",
-    DELETE_ROLE = "Do you really want to delete this role?",
+    COPY_ROLE = "Do you really want to duplicate this role?",
+    DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
+    DELETE_ROLE_SUCCESS = "Role is successfully deleted!",
 }
 
 export const UsersRoles = observer((): ReactElement => {
@@ -34,16 +36,16 @@ export const UsersRoles = observer((): ReactElement => {
     const [userRoles, setUserRoles] = useState<UserRole[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const dataTableRef = useRef<DataTable<UserRole[]>>(null);
-    const { showError } = useToastMessage();
+    const { showError, showSuccess } = useToastMessage();
     const navigate = useNavigate();
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
     const [confirmMessage, setConfirmMessage] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
 
-    const handleGetUserRoles = async () => {
+    const handleGetUserRoles = async (withLoading: boolean = true) => {
         if (!authUser) return;
-        setIsLoading(true);
+        if (withLoading) setIsLoading(true);
         const response = await getUserRoles(authUser.useruid);
 
         if (response && Array.isArray(response)) {
@@ -92,7 +94,8 @@ export const UsersRoles = observer((): ReactElement => {
         if (response && response.error) {
             showError(response?.error);
         } else {
-            handleGetUserRoles();
+            handleGetUserRoles(false);
+            showSuccess(USER_ROLE_MODAL_MESSAGE.DELETE_ROLE_SUCCESS);
         }
         setConfirmVisible(false);
     };
@@ -116,7 +119,7 @@ export const UsersRoles = observer((): ReactElement => {
             {isLoading && <Loader overlay />}
             <div className='settings-form__title'>Roles</div>
             <div className='flex justify-content-end mb-4'>
-                <Button className='settings-form__button' outlined onClick={handleAddNewUserRole}>
+                <Button className='settings-form__button' onClick={handleAddNewUserRole}>
                     New Role
                 </Button>
             </div>
@@ -184,18 +187,33 @@ export const UsersRoles = observer((): ReactElement => {
                         header='Created By'
                         style={{ width: "30%" }}
                     />
-                    <UserRoleColumn field='created' header='Date' style={{ width: "30%" }} />
+                    <UserRoleColumn
+                        field='created'
+                        header='Date'
+                        body={(data: UserRole) => {
+                            return (
+                                <span>
+                                    {parseDateFromServer(data.created, {
+                                        returnType: DateReturnType.DATE,
+                                        separator: DateSeparator.SLASH,
+                                        format: DateFormat.MM_DD_YYYY,
+                                    })}
+                                </span>
+                            );
+                        }}
+                        style={{ width: "30%" }}
+                    />
                     <UserRoleColumn
                         bodyStyle={{ textAlign: "center" }}
                         body={(data: UserRole) => {
                             return (
-                                <>
+                                <div className='roles-table-row__buttons'>
                                     <Button
                                         text
                                         className='table-copy-button'
                                         disabled={!!data.isDefault}
                                         icon='adms-copy'
-                                        tooltip='Copy role'
+                                        tooltip='Duplicate role'
                                         severity={!!data.isDefault ? "secondary" : "success"}
                                         tooltipOptions={{
                                             position: "mouse",
@@ -220,14 +238,14 @@ export const UsersRoles = observer((): ReactElement => {
                                             handleDeleteUserRole(data);
                                         }}
                                     />
-                                </>
+                                </div>
                             );
                         }}
                         pt={{
                             root: {
                                 className: "border-left-none",
                                 style: {
-                                    width: "120px",
+                                    width: "60px",
                                 },
                             },
                         }}
@@ -238,14 +256,14 @@ export const UsersRoles = observer((): ReactElement => {
                 <ConfirmModal
                     visible={confirmVisible}
                     onHide={() => setConfirmVisible(false)}
-                    icon='adms-warning'
+                    icon='adms-error'
                     title={`Are you sure?`}
                     bodyMessage={confirmMessage}
                     confirmAction={confirmAction}
                     rejectAction={() => setConfirmVisible(false)}
                     rejectLabel='Cancel'
-                    acceptLabel='Confirm'
-                    className='users-confirm-dialog'
+                    acceptLabel='OK'
+                    className='roles-confirm-dialog'
                 />
             ) : null}
         </div>

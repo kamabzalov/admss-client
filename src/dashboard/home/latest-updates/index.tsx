@@ -6,7 +6,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 import { TruncatedText } from "dashboard/common/display";
-import { parseDateFromServer } from "common/helpers";
+import { DateReturnType, parseDateFromServer } from "common/helpers";
 import { LatestUpdatesDialog } from "./latest-updates-dialog";
 
 export const MAX_NEWS_COUNT_ON_PAGE = 10;
@@ -79,7 +79,9 @@ export const LatestUpdates = ({
                                 <TruncatedText withTooltip text={news.title} />
                             </span>
                             <span className='latest-updates__item-created'>
-                                {parseDateFromServer(news.created, "date")}
+                                {parseDateFromServer(news.created, {
+                                    returnType: DateReturnType.DATE,
+                                })}
                             </span>
                         </li>
                     ))}

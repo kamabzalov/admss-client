@@ -1,10 +1,9 @@
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { TabPanel, TabView } from "primereact/tabview";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { RolesContacts } from "dashboard/profile/generalSettings/roles/form/contacts";
 import { RolesDeals } from "dashboard/profile/generalSettings/roles/form/deals";
 import { RolesInventory } from "dashboard/profile/generalSettings/roles/form/inventory";
@@ -16,11 +15,23 @@ import { useStore } from "store/hooks";
 import { CREATE_ID, SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { useToastMessage } from "common/hooks";
+import { Form, Formik, FormikProps } from "formik";
+import * as Yup from "yup";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { TextInput } from "dashboard/common/form/inputs";
 
 interface TabItem {
     tabName: string;
     component: ReactElement;
 }
+
+interface RoleFormValues {
+    rolename: string;
+}
+
+const RoleFormSchema = Yup.object().shape({
+    rolename: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+});
 
 const tabItems: TabItem[] = [
     { tabName: "CONTACTS", component: <RolesContacts /> },
@@ -46,6 +57,7 @@ export const UsersRolesForm = observer((): ReactElement => {
         togglePermissionsGroup,
     } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+    const formikRef = useRef<FormikProps<RoleFormValues>>(null);
 
     useEffect(() => {
         if (id === CREATE_ID) {
@@ -73,7 +85,15 @@ export const UsersRolesForm = observer((): ReactElement => {
     };
 
     const handleSaveClick = async () => {
-        if (!currentRole) return;
+        if (!currentRole || !formikRef.current) return;
+
+        const errors = await formikRef.current.validateForm();
+        formikRef.current.setTouched({ rolename: true });
+
+        if (Object.keys(errors).length > 0) {
+            return;
+        }
+
         const response = await saveCurrentRole();
         if (response && response.error) {
             showError(response?.error);
@@ -90,99 +110,140 @@ export const UsersRolesForm = observer((): ReactElement => {
     };
 
     return (
-        <div className='grid role-page relative'>
-            <Button
-                icon='pi pi-times'
-                className='p-button close-button'
-                onClick={handleCloseClick}
-            />
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>
-                            {id === CREATE_ID ? "Create new" : "Edit"} Role
-                        </h2>
-                    </div>
-                    <div className='role-content'>
-                        <div className='role-sidebar'>
-                            <div className='role-list pr-2'>
-                                <TruncatedText
-                                    text={
-                                        id === CREATE_ID ? "New role" : currentRole?.rolename || ""
-                                    }
-                                    withTooltip={true}
-                                    tooltipOptions={{
-                                        position: "mouse",
-                                        content:
-                                            id === CREATE_ID ? "New role" : currentRole?.rolename,
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className='role-main'>
-                            <div className='role-main__header'>
-                                <span className='p-float-label'>
-                                    <InputText
-                                        value={currentRole?.rolename}
-                                        onChange={(event) =>
-                                            changeCurrentRole("rolename", event.target.value)
+        <Formik
+            innerRef={formikRef}
+            validationSchema={RoleFormSchema}
+            initialValues={{
+                rolename: currentRole?.rolename || "",
+            }}
+            enableReinitialize={true}
+            onSubmit={handleSaveClick}
+        >
+            {({ errors, touched, values, setFieldValue, setFieldTouched }) => (
+                <Form>
+                    <div className='grid role-page relative'>
+                        <Button
+                            icon='pi pi-times'
+                            className='p-button close-button'
+                            onClick={handleCloseClick}
+                            type='button'
+                        />
+                        <div className='col-12'>
+                            <div className='card'>
+                                <div className='card-header'>
+                                    <h2 className='card-header__title uppercase m-0'>
+                                        {id === CREATE_ID ? "Create new" : "Edit"} Role
+                                    </h2>
+                                </div>
+                                <div className='role-content'>
+                                    <div className='role-sidebar'>
+                                        <div className='role-list pr-2'>
+                                            <TruncatedText
+                                                text={
+                                                    id === CREATE_ID
+                                                        ? "New role"
+                                                        : currentRole?.rolename || ""
+                                                }
+                                                withTooltip={true}
+                                                tooltipOptions={{
+                                                    position: "mouse",
+                                                    content:
+                                                        id === CREATE_ID
+                                                            ? "New role"
+                                                            : currentRole?.rolename,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='role-main'>
+                                        <div className='role-main__header'>
+                                            <div className='flex flex-column'>
+                                                <TextInput
+                                                    name='Role name (required)'
+                                                    value={values.rolename}
+                                                    onChange={(event) => {
+                                                        const newValue = event.target.value;
+                                                        setFieldValue("rolename", newValue);
+                                                        changeCurrentRole("rolename", newValue);
+                                                    }}
+                                                    onBlur={() => setFieldTouched("rolename", true)}
+                                                    className={`role-main__input ${
+                                                        errors.rolename && touched.rolename
+                                                            ? "p-invalid"
+                                                            : ""
+                                                    }`}
+                                                    errorMessage={
+                                                        errors.rolename && touched.rolename
+                                                            ? errors.rolename
+                                                            : undefined
+                                                    }
+                                                />
+                                            </div>
+                                            <label className='role-main__select-all'>
+                                                <input
+                                                    type='checkbox'
+                                                    onChange={() => togglePermissionsGroup()}
+                                                />
+                                                <span>Select All</span>
+                                            </label>
+                                        </div>
+                                        <TabView
+                                            className='role-main__tabs'
+                                            activeIndex={activeTabIndex}
+                                            onTabChange={handleTabChange}
+                                        >
+                                            {tabItems.map(({ tabName, component }) => {
+                                                return (
+                                                    <TabPanel header={tabName} key={tabName}>
+                                                        {component}
+                                                    </TabPanel>
+                                                );
+                                            })}
+                                        </TabView>
+                                    </div>
+                                </div>
+                                <div className='role-main__buttons'>
+                                    <Button
+                                        onClick={handleBackClick}
+                                        className='form__button uppercase'
+                                        outlined
+                                        disabled={activeTabIndex <= 0}
+                                        severity={activeTabIndex <= 0 ? "secondary" : "success"}
+                                        type='button'
+                                    >
+                                        Back
+                                    </Button>
+                                    <Button
+                                        onClick={handleNextClick}
+                                        disabled={activeTabIndex >= tabItems.length - 1}
+                                        severity={
+                                            activeTabIndex >= tabItems.length - 1
+                                                ? "secondary"
+                                                : "success"
                                         }
-                                        className='role-main__input'
-                                    />
-                                    <label className='float-label'>Role name (required)</label>
-                                </span>
-                                <label className='role-main__select-all'>
-                                    <input
-                                        type='checkbox'
-                                        onChange={() => togglePermissionsGroup()}
-                                    />
-                                    <span>Select All</span>
-                                </label>
+                                        className='form__button uppercase'
+                                        outlined
+                                        type='button'
+                                    >
+                                        Next
+                                    </Button>
+                                    <Button
+                                        onClick={handleSaveClick}
+                                        className='form__button uppercase'
+                                        type='button'
+                                        disabled={Object.keys(errors).length > 0}
+                                        severity={
+                                            Object.keys(errors).length > 0 ? "secondary" : "success"
+                                        }
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
                             </div>
-                            <TabView
-                                className='role-main__tabs'
-                                activeIndex={activeTabIndex}
-                                onTabChange={handleTabChange}
-                            >
-                                {tabItems.map(({ tabName, component }) => {
-                                    return (
-                                        <TabPanel header={tabName} key={tabName}>
-                                            {component}
-                                        </TabPanel>
-                                    );
-                                })}
-                            </TabView>
                         </div>
                     </div>
-                    <div className='role-main__buttons'>
-                        <Button
-                            onClick={handleBackClick}
-                            className='form__button uppercase'
-                            outlined
-                        >
-                            Back
-                        </Button>
-                        <Button
-                            onClick={handleNextClick}
-                            disabled={activeTabIndex >= tabItems.length - 1}
-                            severity={
-                                activeTabIndex >= tabItems.length - 1 ? "secondary" : "success"
-                            }
-                            className='form__button uppercase'
-                            outlined
-                        >
-                            Next
-                        </Button>
-                        <Button
-                            onClick={handleSaveClick}
-                            className='form__button uppercase'
-                            severity='success'
-                        >
-                            Save
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </Form>
+            )}
+        </Formik>
     );
 });

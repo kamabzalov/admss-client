@@ -84,6 +84,7 @@ interface TextInputProps extends InputTextProps {
     ref?: React.RefObject<HTMLInputElement>;
     wrapperClassName?: string;
     infoText?: string;
+    errorMessage?: string;
 }
 
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
@@ -515,6 +516,7 @@ export const TextInput = ({
     ref,
     wrapperClassName,
     infoText,
+    errorMessage,
     ...props
 }: TextInputProps): ReactElement => {
     const [value, setValue] = useState<string>(props.value || "");
@@ -537,7 +539,9 @@ export const TextInput = ({
     };
 
     const content = (
-        <span className={`p-float-label relative ${wrapperClassName || ""}`}>
+        <span
+            className={`p-float-label text-input ${errorMessage ? "p-invalid" : ""} relative ${wrapperClassName || ""}`}
+        >
             <InputText
                 ref={ref}
                 id={uniqueId}
@@ -573,6 +577,7 @@ export const TextInput = ({
                     {infoText}
                 </small>
             )}
+            {errorMessage && <small className='p-error'>{errorMessage}</small>}
             <label htmlFor={uniqueId} className='float-label'>
                 {name}
             </label>

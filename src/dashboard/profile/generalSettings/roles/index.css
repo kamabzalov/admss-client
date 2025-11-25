@@ -83,8 +83,7 @@
     font-weight: 700;
     line-height: 1;
 }
-
-.roles-page .roles-table .p-datatable-tbody > tr.roles-table-row > td {
+.roles-table .p-datatable-tbody > tr.roles-table-row > td {
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;
 }
@@ -96,5 +95,64 @@
     gap: 20px;
     .p-button {
         text-transform: uppercase;
+    }
+}
+
+.roles-table-row {
+    .roles-table-row__buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .p-button {
+        padding: 0;
+        width: 30px;
+        &.table-delete-button {
+            color: var(--admss-app-light-grey);
+        }
+        &.p-button-text:enabled:hover {
+            &:enabled:hover,
+            &:enabled:focus,
+            &:enabled:active {
+                background: transparent;
+                box-shadow: none;
+                &.table-copy-button {
+                    color: var(--admss-app-statuses-default);
+                }
+                &.table-delete-button {
+                    color: var(--admss-app-dark-blue);
+                }
+            }
+        }
+    }
+}
+
+.roles-confirm-dialog {
+    .confirm-header__icon {
+        font-size: 5.5rem;
+        padding-bottom: 30px;
+    }
+    .confirm-header__title {
+        font-size: 26px;
+    }
+
+    .p-dialog-content {
+        padding-top: 30px;
+        padding-bottom: 10px;
+    }
+    .confirm-body {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .p-dialog-footer {
+        .p-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 130px;
+            height: 60px;
+            font-size: 20px;
+        }
     }
 }

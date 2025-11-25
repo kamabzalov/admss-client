@@ -8,7 +8,7 @@ import { DialogProps } from "primereact/dialog";
 import { ReactElement, useState, useEffect, useRef } from "react";
 import { useStore } from "store/hooks";
 import { MAX_NEWS_COUNT_ON_PAGE } from "dashboard/home/latest-updates";
-import { parseDateFromServer } from "common/helpers";
+import { DateReturnType, parseDateFromServer } from "common/helpers";
 import { TruncatedText } from "dashboard/common/display";
 
 interface LatestUpdatesDialogProps extends DialogProps {
@@ -125,7 +125,9 @@ export const LatestUpdatesDialog = ({
             <span
                 className={`datatable-news__date datatable-news__date--${news.read ? "read" : "new"}`}
             >
-                {parseDateFromServer(news.created, "date-with-time")}
+                {parseDateFromServer(news.created, {
+                    returnType: DateReturnType.DATE_WITH_TIME,
+                })}
             </span>
         );
     };
