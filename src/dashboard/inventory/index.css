@@ -1,5 +1,5 @@
 .inventory {
-    --inventory-navigate-width: 343px;
+    --inventory-navigate-width: var(--admss-app-card-sidebar-width);
     --inventory-content-max-height: 705px;
     --inventory-content-height: 54vh;
 

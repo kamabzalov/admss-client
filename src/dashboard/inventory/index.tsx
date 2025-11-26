@@ -131,10 +131,11 @@ export default function Inventories({
     }, []);
 
     useEffect(() => {
-        if (authUser && locations.length > 0) {
-            setIsLoading(true);
-            getUserSettings(authUser.useruid)
-                .then((response) => {
+        const loadSettings = async () => {
+            if (authUser && locations.length > 0) {
+                setIsLoading(true);
+                try {
+                    const response = await getUserSettings(authUser.useruid);
                     if (response?.profile.length) {
                         let allSettings: ServerUserSettings = {} as ServerUserSettings;
                         if (response.profile) {
@@ -183,9 +184,13 @@ export default function Inventories({
                         }
                         setSettingsInitialized(true);
                     }
-                })
-                .finally(() => setIsLoading(false));
-        }
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadSettings();
     }, [authUser, locations, store, initialDataTableQueries]);
 
     const printTableData = async (print: boolean = false) => {
@@ -535,7 +540,10 @@ export default function Inventories({
                                                 },
                                             }}
                                         />
-                                        {activeColumns.map(({ field, header }) => {
+                                        {activeColumns.map(({ field, header }, index) => {
+                                            const savedWidth =
+                                                serverSettings?.inventory?.columnWidth?.[field];
+
                                             return (
                                                 <Column
                                                     field={field}
@@ -557,15 +565,17 @@ export default function Inventories({
                                                     }}
                                                     pt={{
                                                         root: {
-                                                            style: {
-                                                                width: serverSettings?.inventory
-                                                                    ?.columnWidth?.[field],
-                                                                maxWidth:
-                                                                    serverSettings?.inventory
-                                                                        ?.columnWidth?.[field],
-                                                                overflow: "hidden",
-                                                                textOverflow: "ellipsis",
-                                                            },
+                                                            style: savedWidth
+                                                                ? {
+                                                                      width: `${savedWidth}px`,
+                                                                      maxWidth: `${savedWidth}px`,
+                                                                      overflow: "hidden",
+                                                                      textOverflow: "ellipsis",
+                                                                  }
+                                                                : {
+                                                                      overflow: "hidden",
+                                                                      textOverflow: "ellipsis",
+                                                                  },
                                                         },
                                                     }}
                                                 />

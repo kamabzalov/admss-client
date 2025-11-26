@@ -76,7 +76,7 @@
 
 .deal__accordion {
     border: none;
-    width: 343px;
+    width: var(--admss-app-card-sidebar-width);
 }
 
 .deal__accordion .p-accordion-header .p-accordion-header-link,
@@ -171,7 +171,7 @@
 }
 
 .card-content__wrapper:has(.deal__accordion) {
-    flex: 0 0 343px;
+    flex: 0 0 var(--admss-app-card-sidebar-width);
 }
 
 .deal__delete-nav {

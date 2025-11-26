@@ -9,7 +9,7 @@ export const AccountNewAmounts = observer((): ReactElement => {
         accountPaymentsInfo: { NewAmounts },
     } = store;
     return (
-        <div className='take-payment__card mt-3'>
+        <div className='take-payment__card'>
             <h3 className='take-payment__title'>New Amounts</h3>
 
             <span className='p-float-label mt-2'>

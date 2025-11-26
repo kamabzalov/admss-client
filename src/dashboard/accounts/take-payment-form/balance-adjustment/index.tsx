@@ -8,19 +8,17 @@ import { AccountAdjustments } from "./adjusments";
 
 export const AccountBalanceAdjustment = observer((): ReactElement => {
     return (
-        <div className='grid balance-adjustment'>
-            <div className='col-12 md:col-4'>
+        <div className='balance-adjustment'>
+            <div className='take-payment__control balance-adjustment__control'>
                 <AccountOriginalAmounts />
                 <AccountNewAmounts />
             </div>
 
-            <div className='col-12 md:col-4'>
+            <div className='take-payment__control balance-adjustment__control'>
                 <AccountAdjustments />
             </div>
 
-            <div className='col-12 md:col-4'>
-                <TakePaymentInfo />
-            </div>
+            <TakePaymentInfo />
         </div>
     );
 });

@@ -293,7 +293,9 @@ export const ExportHistory = (): ReactElement => {
                         onColReorder={handleColumnReorder}
                         onColumnResizeEnd={handleColumnResize}
                     >
-                        {activeHistoryColumns.map(({ field, header }) => {
+                        {activeHistoryColumns.map(({ field, header }, index) => {
+                            const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
+
                             return (
                                 <Column
                                     field={field}
@@ -303,17 +305,17 @@ export const ExportHistory = (): ReactElement => {
                                     reorderable={false}
                                     pt={{
                                         root: {
-                                            style: {
-                                                width: serverSettings?.exportHistory?.columnWidth?.[
-                                                    field
-                                                ],
-                                                maxWidth:
-                                                    serverSettings?.exportHistory?.columnWidth?.[
-                                                        field
-                                                    ],
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                            },
+                                            style: savedWidth
+                                                ? {
+                                                      width: `${savedWidth}px`,
+                                                      maxWidth: `${savedWidth}px`,
+                                                      overflow: "hidden",
+                                                      textOverflow: "ellipsis",
+                                                  }
+                                                : {
+                                                      overflow: "hidden",
+                                                      textOverflow: "ellipsis",
+                                                  },
                                         },
                                     }}
                                 />

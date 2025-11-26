@@ -9,7 +9,7 @@ export const WhiteOffsInfo = observer((): ReactElement => {
         accountPaymentsInfo: { WriteOff },
     } = store;
     return (
-        <div className='take-payment__card mt-3'>
+        <div className='take-payment__card'>
             <h3 className='take-payment__title'>White Offs</h3>
             <div className='take-payment__item justify-content-start align-items-start'>
                 <Checkbox checked inputId='whiteOffs' disabled className='mt-1' />

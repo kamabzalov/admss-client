@@ -4,13 +4,6 @@
         gap: 20px;
     }
 
-    .account__card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        margin-bottom: 45px;
-    }
-
     .accounts-dropdown {
         width: 230px;
         height: 50px;
@@ -24,7 +17,7 @@
 
     .account__accordion {
         border: none;
-        width: 343px;
+        width: var(--admss-app-card-sidebar-width);
     }
 
     .account__accordion .p-accordion-header .p-accordion-header-link,

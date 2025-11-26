@@ -31,6 +31,8 @@ import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TotalListCount } from "common/models/base-response";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 import { ColumnSelector } from "dashboard/common/filter";
+import { ServerUserSettings, TasksUserSettings } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -64,6 +66,7 @@ export const TasksDataTable = observer((): ReactElement => {
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
     const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
     const [onlyCurrentUserTasks, setOnlyCurrentUserTasks] = useState<boolean>(false);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const handleGetTasks = async (params?: QueryParams) => {
         let responseTotal: TotalListCount = {} as TotalListCount;
@@ -114,6 +117,38 @@ export const TasksDataTable = observer((): ReactElement => {
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
     };
+
+    const changeSettings = (settings: Partial<TasksUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                tasks: { ...serverSettings?.tasks, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            if (authUser) {
+                const response = await getUserSettings(authUser.useruid);
+                if (response?.profile.length) {
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
+                    setServerSettings(allSettings);
+                }
+            }
+        };
+
+        loadSettings();
+    }, [authUser]);
 
     useEffect(() => {
         const params: QueryParams = {
@@ -361,6 +396,20 @@ export const TasksDataTable = observer((): ReactElement => {
                             expandedRows={expandedRows}
                             onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
                             rowExpansionTemplate={rowExpansionTemplate}
+                            onColumnResizeEnd={(event) => {
+                                if (authUser && event) {
+                                    const newColumnWidth = {
+                                        [event.column?.props?.field as string]:
+                                            event.element?.offsetWidth,
+                                    };
+                                    changeSettings({
+                                        columnWidth: {
+                                            ...serverSettings?.tasks?.columnWidth,
+                                            ...newColumnWidth,
+                                        },
+                                    });
+                                }
+                            }}
                         >
                             <Column
                                 bodyStyle={{ textAlign: "center" }}
@@ -390,42 +439,75 @@ export const TasksDataTable = observer((): ReactElement => {
                                     },
                                 }}
                             />
-                            {alwaysActiveColumns.map(({ field, header }, index) => (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    body={(data) => {
-                                        let value: string | number;
-                                        value = data[field];
-                                        return <div>{value}</div>;
-                                    }}
-                                    headerClassName='cursor-move'
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                borderLeft: !index ? "none" : "",
-                                            },
-                                        },
-                                    }}
-                                />
-                            ))}
+                            {alwaysActiveColumns.map(({ field, header }, index) => {
+                                const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
 
-                            {activeColumns.map(({ field, header }) => (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    body={(data) => {
-                                        let value: string | number;
-                                        value = data[field];
-                                        return <div>{value}</div>;
-                                    }}
-                                    headerClassName='cursor-move'
-                                />
-                            ))}
+                                return (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        body={(data) => {
+                                            let value: string | number;
+                                            value = data[field];
+                                            return <div>{value}</div>;
+                                        }}
+                                        headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: savedWidth
+                                                    ? {
+                                                          width: `${savedWidth}px`,
+                                                          maxWidth: `${savedWidth}px`,
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                          borderLeft: !index ? "none" : "",
+                                                      }
+                                                    : {
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                          borderLeft: !index ? "none" : "",
+                                                      },
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
+
+                            {activeColumns.map(({ field, header }) => {
+                                const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
+
+                                return (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        body={(data) => {
+                                            let value: string | number;
+                                            value = data[field];
+                                            return <div>{value}</div>;
+                                        }}
+                                        headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: savedWidth
+                                                    ? {
+                                                          width: `${savedWidth}px`,
+                                                          maxWidth: `${savedWidth}px`,
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      }
+                                                    : {
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      },
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
                         </DataTable>
                     )}
                 </div>

@@ -9,7 +9,7 @@ export const AccountPaymentDistribution = observer((): ReactElement => {
     } = store;
 
     return (
-        <div className='take-payment__card'>
+        <div className='take-payment__card payment-distribution'>
             <h3 className='take-payment__title'>Payment Distribution</h3>
             <div className='take-payment__item'>
                 <label className='take-payment__label color-dusty-blue'>Down/ Pickup Pmt:</label>

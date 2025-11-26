@@ -1,12 +1,7 @@
-.quick-pay {
-    display: grid;
-    grid-template-columns: 32.66% 32.66% 30.41%;
-    column-gap: 2.1%;
-}
-
 .quick-pay__column {
     display: flex;
     flex-direction: column;
+    max-width: 494px;
     row-gap: 30px;
 }
 
@@ -44,4 +39,8 @@
         background: var(--admss-app-light-grey);
         color: var(--admss-app-medium-grey);
     }
+}
+
+.take-payment__card.payment-distribution {
+    row-gap: 12px;
 }

@@ -182,10 +182,8 @@ export const DealsDataTable = observer(
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-        const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
-            DealsUserSettings,
-            TableColumnsList
-        >("deals", renderColumnsData);
+        const { activeColumns, setActiveColumnsAndSave, serverSettings, saveColumnWidth } =
+            useUserProfileSettings<DealsUserSettings, TableColumnsList>("deals", renderColumnsData);
         const navigate = useNavigate();
         const { showError } = useToastMessage();
         const { createReport } = useCreateReport<Deal>();
@@ -552,6 +550,17 @@ export const DealsDataTable = observer(
                                 resizableColumns
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
+                                onColumnResizeEnd={(event) => {
+                                    if (
+                                        event?.column?.props?.field &&
+                                        event?.element?.offsetWidth
+                                    ) {
+                                        saveColumnWidth(
+                                            event.column.props.field as string,
+                                            event.element.offsetWidth
+                                        );
+                                    }
+                                }}
                             >
                                 <Column
                                     bodyStyle={{ textAlign: "center" }}
@@ -590,15 +599,34 @@ export const DealsDataTable = observer(
                                         },
                                     }}
                                 />
-                                {activeColumns.map(({ field, header }: TableColumnsList) => (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        headerClassName='cursor-move'
-                                    />
-                                ))}
+                                {activeColumns.map(({ field, header }: TableColumnsList) => {
+                                    const savedWidth = serverSettings?.deals?.columnWidth?.[field];
+
+                                    return (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                            pt={{
+                                                root: {
+                                                    style: savedWidth
+                                                        ? {
+                                                              width: `${savedWidth}px`,
+                                                              maxWidth: `${savedWidth}px`,
+                                                              overflow: "hidden",
+                                                              textOverflow: "ellipsis",
+                                                          }
+                                                        : {
+                                                              overflow: "hidden",
+                                                              textOverflow: "ellipsis",
+                                                          },
+                                                },
+                                            }}
+                                        />
+                                    );
+                                })}
                             </DataTable>
                         )}
                     </div>

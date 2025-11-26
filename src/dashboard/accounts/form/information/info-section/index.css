@@ -15,7 +15,7 @@
 .info-section__details {
     display: grid;
     grid-template-columns: auto 1fr;
-    column-gap: 20px;
+    column-gap: 3rem;
     row-gap: 10px;
 }
 

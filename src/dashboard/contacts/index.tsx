@@ -556,54 +556,67 @@ export const ContactsDataTable = ({
                                     },
                                 }}
                             />
-                            {alwaysActiveColumns.map(({ field, header }, index) => (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    body={bodyDataRender(field)}
-                                    headerClassName='cursor-move'
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                width: serverSettings?.contacts?.columnWidth?.[
-                                                    field
-                                                ],
-                                                maxWidth:
-                                                    serverSettings?.contacts?.columnWidth?.[field],
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                                borderLeft: !index ? "none" : "",
-                                            },
-                                        },
-                                    }}
-                                />
-                            ))}
+                            {alwaysActiveColumns.map(({ field, header }, index) => {
+                                const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
 
-                            {activeColumns.map(({ field, header }: TableColumnsList) => (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    headerClassName='cursor-move'
-                                    body={bodyDataRender(field)}
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                width: serverSettings?.contacts?.columnWidth?.[
-                                                    field
-                                                ],
-                                                maxWidth:
-                                                    serverSettings?.contacts?.columnWidth?.[field],
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
+                                return (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        body={bodyDataRender(field)}
+                                        headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: savedWidth
+                                                    ? {
+                                                          width: `${savedWidth}px`,
+                                                          maxWidth: `${savedWidth}px`,
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                          borderLeft: !index ? "none" : "",
+                                                      }
+                                                    : {
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                          borderLeft: !index ? "none" : "",
+                                                      },
                                             },
-                                        },
-                                    }}
-                                />
-                            ))}
+                                        }}
+                                    />
+                                );
+                            })}
+
+                            {activeColumns.map(({ field, header }: TableColumnsList, index) => {
+                                const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
+
+                                return (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        headerClassName='cursor-move'
+                                        body={bodyDataRender(field)}
+                                        pt={{
+                                            root: {
+                                                style: savedWidth
+                                                    ? {
+                                                          width: `${savedWidth}px`,
+                                                          maxWidth: `${savedWidth}px`,
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      }
+                                                    : {
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      },
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
                         </DataTable>
                     )}
                 </div>

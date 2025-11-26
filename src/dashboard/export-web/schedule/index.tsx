@@ -343,7 +343,9 @@ export const ExportSchedule = (): ReactElement => {
                         onColReorder={handleColumnReorder}
                         onColumnResizeEnd={handleColumnResize}
                     >
-                        {activeScheduleColumns.map(({ field, header }) => {
+                        {activeScheduleColumns.map(({ field, header }, index) => {
+                            const savedWidth = serverSettings?.exportSchedule?.columnWidth?.[field];
+
                             return (
                                 <Column
                                     field={field}
@@ -353,16 +355,17 @@ export const ExportSchedule = (): ReactElement => {
                                     reorderable={false}
                                     pt={{
                                         root: {
-                                            style: {
-                                                width: serverSettings?.exportSchedule
-                                                    ?.columnWidth?.[field],
-                                                maxWidth:
-                                                    serverSettings?.exportSchedule?.columnWidth?.[
-                                                        field
-                                                    ],
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                            },
+                                            style: savedWidth
+                                                ? {
+                                                      width: `${savedWidth}px`,
+                                                      maxWidth: `${savedWidth}px`,
+                                                      overflow: "hidden",
+                                                      textOverflow: "ellipsis",
+                                                  }
+                                                : {
+                                                      overflow: "hidden",
+                                                      textOverflow: "ellipsis",
+                                                  },
                                         },
                                     }}
                                 />

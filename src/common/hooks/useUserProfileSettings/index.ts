@@ -20,6 +20,7 @@ interface UserProfileSettingsResult<
     activeColumns: TColumn[];
     setActiveColumnsAndSave: (columns: TColumn[]) => void;
     setModuleSettings: (settings: Partial<TModuleSettings>) => void;
+    saveColumnWidth: (field: string, width: number) => void;
     settingsLoaded: boolean;
 }
 
@@ -37,9 +38,11 @@ export const useUserProfileSettings = <
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!authUser) return;
-        getUserSettings(authUser.useruid)
-            .then((response) => {
+        const loadSettings = async () => {
+            if (!authUser) return;
+
+            try {
+                const response = await getUserSettings(authUser.useruid);
                 if (response?.profile?.length) {
                     let allSettings: ServerUserSettings = {} as ServerUserSettings;
                     try {
@@ -75,8 +78,12 @@ export const useUserProfileSettings = <
                         availableColumns.filter(({ checked }) => checked) as TColumn[]
                     );
                 }
-            })
-            .finally(() => setSettingsLoaded(true));
+            } finally {
+                setSettingsLoaded(true);
+            }
+        };
+
+        loadSettings();
     }, [authUser]);
 
     const moduleSettings = useMemo(() => {
@@ -110,12 +117,23 @@ export const useUserProfileSettings = <
         }
     };
 
+    const saveColumnWidth = (field: string, width: number) => {
+        const currentColumnWidth = moduleSettings?.columnWidth || {};
+        setModuleSettings({
+            columnWidth: {
+                ...currentColumnWidth,
+                [field]: width,
+            },
+        } as unknown as Partial<TModuleSettings>);
+    };
+
     return {
         serverSettings,
         moduleSettings,
         activeColumns,
         setActiveColumnsAndSave,
         setModuleSettings,
+        saveColumnWidth,
         settingsLoaded,
     };
 };
