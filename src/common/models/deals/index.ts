@@ -576,6 +576,12 @@ export interface DealWashout extends BaseResponseError {
     Warranty_Profit: string;
     Warranty_ProfitCheck1: 0 | 1;
     Warranty_ProfitCheck2: 0 | 1;
+    accountInfo: string;
+    price: string;
+    salesperson1uid: string;
+    salesperson1name: string;
+    salesperson2uid: string;
+    salesperson2name: string;
     name: string;
     requestuid: string;
 }

@@ -170,7 +170,7 @@ export const DealProfitCommission = observer(() => {
                     </div>
 
                     <DealProfitItem
-                        title='(=) Commission Profit:'
+                        title='(=) Commission Total:'
                         value={Number(dealWashout.CommissionTotal) || 0}
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         className='deal-profit__summary deal-profit__item--blue deal-profit__item--bold'
