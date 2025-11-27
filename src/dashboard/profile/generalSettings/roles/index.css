@@ -83,6 +83,12 @@
     font-weight: 700;
     line-height: 1;
 }
+
+.roles-table .p-datatable-wrapper {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 .roles-table .p-datatable-tbody > tr.roles-table-row > td {
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;

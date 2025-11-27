@@ -1,6 +1,6 @@
 .general-settings {
     --card-height: 983px;
-    --content-height: 600px;
+    --content-height: 680px;
     --title-height: 63px;
 }
 
@@ -43,6 +43,11 @@
     border-radius: 0;
     overflow: hidden;
     overflow-y: scroll;
+}
+
+.general-settings__tabs .p-tabview-panel:has(.roles-settings-form) {
+    overflow: hidden;
+    height: 100%;
 }
 
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {

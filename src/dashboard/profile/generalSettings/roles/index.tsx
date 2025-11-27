@@ -21,9 +21,6 @@ export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
 
 export const UserRoleColumn = (props: UserRoleColumnProps) => <Column {...props} />;
 
-const PAGINATOR_HEIGHT = 86;
-const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
-
 enum USER_ROLE_MODAL_MESSAGE {
     COPY_ROLE = "Do you really want to duplicate this role?",
     DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
@@ -115,7 +112,7 @@ export const UsersRoles = observer((): ReactElement => {
     };
 
     return (
-        <div className='settings-form'>
+        <div className='settings-form roles-settings-form'>
             {isLoading && <Loader overlay />}
             <div className='settings-form__title'>Roles</div>
             <div className='flex justify-content-end mb-4'>
@@ -123,24 +120,16 @@ export const UsersRoles = observer((): ReactElement => {
                     New Role
                 </Button>
             </div>
-            <div className='col-12'>
+            <div className='roles-table-container'>
                 <DataTable
                     ref={dataTableRef}
                     showGridlines
                     value={userRoles}
-                    paginator
                     scrollable
-                    rows={10}
+                    scrollHeight='flex'
                     className='roles-table'
                     rowClassName={() => "hover:text-primary cursor-pointer roles-table-row"}
                     tableStyle={{ tableLayout: "fixed", width: "100%" }}
-                    pt={{
-                        resizeHelper: {
-                            style: {
-                                maxHeight: TABLE_HEIGHT,
-                            },
-                        },
-                    }}
                 >
                     <Column
                         bodyStyle={{ textAlign: "center" }}
