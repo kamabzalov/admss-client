@@ -99,71 +99,63 @@ export const AccountTakePayment = observer((): ReactElement => {
     };
 
     return (
-        <div className='grid relative take-payment'>
+        <div className='relative take-payment'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
                 onClick={() => navigate(prevPath || `/dashboard/accounts/${id}`)}
             />
-            <div className='col-12'>
-                <div className='card account'>
-                    <div className='card-header flex'>
-                        <h2 className='card-header__title uppercase m-0'>Take Payment</h2>
-                        {id && (
-                            <div className='card-header-info'>
-                                Account Number
-                                <span className='card-header-info__data'>{accountnumber}</span>
-                                Status
-                                <span className='card-header-info__data uppercase'>
-                                    {accountstatus}
-                                </span>
-                                Overdue Status
-                                <span className='card-header-info__data'>54</span>
-                            </div>
-                        )}
-                    </div>
-                    <div className='card-content account__card grid'>
-                        <TabView
-                            className='take-payment__tabs'
-                            activeIndex={activeIndex}
-                            onTabChange={handleTabChange}
-                        >
-                            <TabPanel header='QuickPay' headerClassName='account-tab__header'>
-                                <AccountQuickPay />
-                            </TabPanel>
-                            <TabPanel
-                                header='Pay Off Account'
-                                headerClassName='account-tab__header'
-                            >
-                                <AccountPayOff />
-                            </TabPanel>
-                            <TabPanel
-                                header='Balance Adjustment'
-                                headerClassName='account-tab__header'
-                            >
-                                <AccountBalanceAdjustment />
-                            </TabPanel>
-                        </TabView>
-                    </div>
-                    <div className='account__footer gap-3 ml-auto mr-3'>
-                        <Button
-                            className='uppercase px-6 account__button'
-                            onClick={() => navigate(-1)}
-                            severity='danger'
-                            outlined
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type='button'
-                            onClick={handleSaveTakePayment}
-                            disabled={!isAccountPaymentChanged}
-                            severity={isAccountPaymentChanged ? "success" : "secondary"}
-                            className='uppercase px-6 account__button'
-                        >
-                            Save
-                        </Button>
-                    </div>
+            <div className='card account'>
+                <div className='card-header flex'>
+                    <h2 className='card-header__title uppercase m-0'>Take Payment</h2>
+                    {id && (
+                        <div className='card-header-info'>
+                            Account Number
+                            <span className='card-header-info__data'>{accountnumber}</span>
+                            Status
+                            <span className='card-header-info__data uppercase'>
+                                {accountstatus}
+                            </span>
+                            Overdue Status
+                            <span className='card-header-info__data'>54</span>
+                        </div>
+                    )}
+                </div>
+                <div className='card-content account__card grid'>
+                    <TabView
+                        className='take-payment__tabs'
+                        activeIndex={activeIndex}
+                        onTabChange={handleTabChange}
+                    >
+                        <TabPanel header='QuickPay' headerClassName='account-tab__header'>
+                            <AccountQuickPay />
+                        </TabPanel>
+                        <TabPanel header='Pay Off Account' headerClassName='account-tab__header'>
+                            <AccountPayOff />
+                        </TabPanel>
+                        <TabPanel header='Balance Adjustment' headerClassName='account-tab__header'>
+                            <AccountBalanceAdjustment />
+                        </TabPanel>
+                    </TabView>
+                </div>
+                <div className='account__footer gap-3 ml-auto mr-3'>
+                    <Button
+                        className='uppercase px-6 account__button'
+                        onClick={() => navigate(-1)}
+                        severity='danger'
+                        outlined
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type='button'
+                        onClick={handleSaveTakePayment}
+                        disabled={!isAccountPaymentChanged}
+                        severity={isAccountPaymentChanged ? "success" : "secondary"}
+                        className='uppercase px-6 account__button'
+                    >
+                        Save
+                    </Button>
                 </div>
             </div>
         </div>

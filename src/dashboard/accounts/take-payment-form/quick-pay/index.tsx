@@ -11,19 +11,17 @@ import { AccountTotalAmount } from "./total-amount";
 export const AccountQuickPay = observer((): ReactElement => {
     return (
         <div className='quick-pay'>
-            <div className='quick-pay__column'>
+            <div className='take-payment__control quick-pay__control'>
                 <AccountDownPaymentInfo />
                 <AccountTotalAmount />
             </div>
 
-            <div className='quick-pay__column'>
+            <div className='take-payment__control quick-pay__control'>
                 <AccountAuditInfo />
                 <AccountPaymentDistribution />
             </div>
 
-            <div className='take-payment__column'>
-                <TakePaymentInfo />
-            </div>
+            <TakePaymentInfo />
         </div>
     );
 });

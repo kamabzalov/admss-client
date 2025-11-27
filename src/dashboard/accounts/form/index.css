@@ -13,7 +13,7 @@
 .account__tabs > .p-tabview-nav-container .p-tabview-nav {
     flex-direction: column;
     flex: 0 0;
-    width: 342px;
+    width: var(--admss-app-card-sidebar-width);
     border: none;
     min-height: 527px;
 }

@@ -27,7 +27,7 @@
 .general-settings__tabs .p-tabview-nav {
     flex-direction: column;
     flex: 0 0;
-    width: 343px;
+    width: var(--admss-app-card-sidebar-width);
     border: none;
     min-height: 527px;
     height: 100%;

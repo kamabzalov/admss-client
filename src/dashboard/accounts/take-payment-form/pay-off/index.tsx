@@ -14,10 +14,10 @@ export const AccountPayOff = observer((): ReactElement => {
         accountPaymentsInfo: { CashDealPayoff },
     } = store;
     return (
-        <div className='grid pay-off'>
-            <div className='col-12 md:col-4'>
+        <div className='pay-off'>
+            <div className='take-payment__control pay-off__control'>
                 <AccountCashDealInfo />
-                <div className='take-payment__card mt-3'>
+                <div className='take-payment__card'>
                     <h3 className='take-payment__title'>Unearned Interest</h3>
 
                     <div className='take-payment__item'>
@@ -38,14 +38,12 @@ export const AccountPayOff = observer((): ReactElement => {
                 </div>
             </div>
 
-            <div className='col-12 md:col-4'>
+            <div className='take-payment__control pay-off__control'>
                 <PayOffInfo />
                 <WhiteOffsInfo />
             </div>
 
-            <div className='col-12 md:col-4'>
-                <TakePaymentInfo />
-            </div>
+            <TakePaymentInfo />
         </div>
     );
 });

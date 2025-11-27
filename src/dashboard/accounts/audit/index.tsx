@@ -9,6 +9,8 @@ import { useStore } from "store/hooks";
 import AuditHeader from "./components/AuditHeader";
 import { useCreateReport, useToastMessage } from "common/hooks";
 import { AuditRecord, getAccountAudit } from "http/services/accounts.service";
+import { AccountsAuditUserSettings, ServerUserSettings } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 
 const columns = [
     { field: "name", header: "Account" },
@@ -29,6 +31,7 @@ export const AccountsAudit = observer((): ReactElement => {
     const [isLoading] = useState<boolean>(false);
     const { createReport } = useCreateReport<AuditRecord>();
     const [auditRecords, setAuditRecords] = useState<AuditRecord[]>([]);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const getAuditRecords = async () => {
         if (!authUser) return;
@@ -69,6 +72,38 @@ export const AccountsAudit = observer((): ReactElement => {
         setLazyState(event);
     };
 
+    const changeSettings = (settings: Partial<AccountsAuditUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                accountsAudit: { ...serverSettings?.accountsAudit, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            if (authUser) {
+                const response = await getUserSettings(authUser.useruid);
+                if (response?.profile.length) {
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
+                    setServerSettings(allSettings);
+                }
+            }
+        };
+
+        loadSettings();
+    }, [authUser]);
+
     return (
         <div className='card-content'>
             <AuditHeader
@@ -104,16 +139,50 @@ export const AccountsAudit = observer((): ReactElement => {
                             sortField={lazyState.sortField}
                             rowClassName={() => "hover:text-primary cursor-pointer"}
                             emptyMessage='No data selected to display. Please use the filter field to select the necessary data table.'
+                            onColumnResizeEnd={(event) => {
+                                if (authUser && event) {
+                                    const newColumnWidth = {
+                                        [event.column?.props?.field as string]:
+                                            event.element?.offsetWidth,
+                                    };
+                                    changeSettings({
+                                        columnWidth: {
+                                            ...serverSettings?.accountsAudit?.columnWidth,
+                                            ...newColumnWidth,
+                                        },
+                                    });
+                                }
+                            }}
                         >
-                            {columns.map(({ field, header }) => (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    headerClassName='cursor-move'
-                                />
-                            ))}
+                            {columns.map(({ field, header }) => {
+                                const savedWidth =
+                                    serverSettings?.accountsAudit?.columnWidth?.[field];
+
+                                return (
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: savedWidth
+                                                    ? {
+                                                          width: `${savedWidth}px`,
+                                                          maxWidth: `${savedWidth}px`,
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      }
+                                                    : {
+                                                          overflow: "hidden",
+                                                          textOverflow: "ellipsis",
+                                                      },
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
                         </DataTable>
                     )}
                 </div>

@@ -5,6 +5,17 @@
     .info-section__title {
         color: var(--admss-app-main-blue);
     }
+
+    .take-payment__control {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 492px;
+        gap: 30px;
+    }
+
+    .take-payment__info {
+        flex: 1;
+    }
 }
 
 .take-payment .p-tabview-nav-content {
@@ -14,15 +25,19 @@
 .take-payment__card {
     display: flex;
     flex-direction: column;
+    max-width: 494px;
     row-gap: 18px;
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--admss-app-light-grey);
     box-shadow: 0 0 3px 0 var(--admss-app-main-blue);
+}
 
-    &.pay-off {
-        row-gap: 11px;
-    }
+.pay-off,
+.balance-adjustment,
+.quick-pay {
+    display: flex;
+    column-gap: 30px;
 }
 
 .take-payment__title {
@@ -80,7 +95,6 @@
 }
 
 .take-payment__item {
-
     .currency-item__input:not(.take-payment__input--small) .p-inputnumber-input,
     .date-item__input .p-inputtext {
         height: var(--input-regular);
@@ -153,7 +167,6 @@
 }
 
 .take-payment__item {
-
     .currency-item__input .input-icon,
     .date-item__icon {
         height: var(--input-regular);
@@ -175,14 +188,11 @@
     .account-note:first-child {
         margin-bottom: 30px;
     }
-
-
 }
 
 .take-payment .form-line {
     margin: 12px 0;
 }
-
 
 .take-payment__info .info-section {
     margin-bottom: 30px;
@@ -199,4 +209,14 @@
 .p-tabview .p-tabview-nav li.p-highlight.account-tab__header .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
     border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.account {
+    .account__card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 45px;
+        width: 100%;
+    }
 }
