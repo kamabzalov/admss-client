@@ -55,7 +55,8 @@ export const DealProfitItem = observer(
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
-        const { toggleIncludeCheckbox, getIncludeCheckboxValue } = useStore().dealStore;
+        const { dealWashout, toggleIncludeCheckbox, getIncludeCheckboxValue } =
+            useStore().dealStore;
 
         const handleChange = (event: any) => {
             setFieldChanged(true);
@@ -143,6 +144,7 @@ export const DealProfitItem = observer(
                             }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
+                            disabled={!checkboxValue}
                             coloredEmptyValue
                             onChange={handleChange}
                         />
@@ -193,7 +195,8 @@ export const DealProfitItem = observer(
                                               "COMMISSION"
                                             : includeCheckbox === INCLUDE_OPTIONS.COMMISSION
                                     }
-                                    tooltip='Include in Commission Base'
+                                    tooltip='Include in Commission2 Base'
+                                    disabled={!dealWashout.salesperson2uid}
                                     onChange={() => {
                                         handleSecondCheckboxChange();
                                     }}
