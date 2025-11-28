@@ -80,7 +80,7 @@ export const LatestUpdates = ({
                             </span>
                             <span className='latest-updates__item-created'>
                                 {parseDateFromServer(news.created, {
-                                    returnType: DateReturnType.DATE,
+                                    returnType: DateReturnType.DATE_WITH_TIME,
                                 })}
                             </span>
                         </li>
