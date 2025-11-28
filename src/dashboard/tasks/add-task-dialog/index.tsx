@@ -1,5 +1,5 @@
 import { Dialog, DialogProps } from "primereact/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { Status } from "common/models/base-response";
@@ -39,12 +39,12 @@ const getDefaultDeadlineDate = (): Date => {
     return date;
 };
 
-const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
+const initializeTaskState = (task?: Task, defaultUseruid?: string): Partial<PostDataTask> => ({
     startdate: formatDateForServer(task?.startdate ? new Date(task.startdate) : new Date()),
     deadline: formatDateForServer(
         task?.deadline ? new Date(task.deadline) : getDefaultDeadlineDate()
     ),
-    useruid: task?.useruid || "",
+    useruid: task?.useruid || defaultUseruid || "",
     accountuid: task?.accountuid || "",
     accountname: task?.accountname || "",
     dealuid: task?.dealuid || "",
@@ -67,12 +67,28 @@ export const AddTaskDialog = observer(
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
 
+        const currentUser: TaskUser = useMemo(
+            () => ({
+                useruid: authUser?.useruid || "",
+                username: authUser?.loginname || authUser?.username || "",
+                updated: authUser?.modified || "",
+                created: authUser?.started || "",
+                createdbyuid: authUser?.sessionuid || "",
+            }),
+            [authUser]
+        );
+
         const isSubmitDisabled = !!dateError || !isFormChanged || isSaving || !taskState.useruid;
 
         const handleGetTasksSubUserList = async () => {
             const response = await getTasksSubUserList(authUser!.useruid);
-            if (response && Array.isArray(response)) setAssignToData(response);
-            setTaskState(initializeTaskState(currentTask));
+            if (response && Array.isArray(response)) setAssignToData([currentUser, ...response]);
+
+            const newTaskState = initializeTaskState(currentTask, authUser?.useruid);
+            setTaskState(newTaskState);
+            if (!currentTask && newTaskState.useruid) {
+                setIsFormChanged(true);
+            }
         };
 
         useEffect(() => {
@@ -83,12 +99,12 @@ export const AddTaskDialog = observer(
 
         useEffect(() => {
             if (!visible) {
-                setTaskState(initializeTaskState());
+                setTaskState(initializeTaskState(undefined, authUser?.useruid));
                 setDateError("");
                 setIsFormChanged(false);
                 setAssignToData(null);
             }
-        }, [visible]);
+        }, [visible, authUser?.useruid]);
 
         const handleDateChange = (key: DATE_TYPE, date: Date) => {
             const formattedDate = formatDateForServer(date);

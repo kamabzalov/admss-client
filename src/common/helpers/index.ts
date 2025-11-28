@@ -200,7 +200,7 @@ export const parseDateFromServer = (
 
             const padNumber = (num: number) => num.toString().padStart(2, "0");
 
-            return `${padNumber(day)}${options.separator}${padNumber(month)}${options.separator}${year}`;
+            return `${padNumber(day)}${options.separator || DateSeparator.SLASH}${padNumber(month)}${options.separator || DateSeparator.SLASH}${year}`;
         }
 
         if (options.returnType === DateReturnType.DATE_WITH_TIME) {
