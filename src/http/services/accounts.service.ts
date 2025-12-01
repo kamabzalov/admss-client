@@ -1,3 +1,4 @@
+import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import {
     AccountDetails,
     AccountDownPayments,
@@ -34,7 +35,7 @@ export interface AuditRecord {
 
 export interface AuditType {
     name: string;
-    value: string;
+    value: ACCOUNT_AUDIT_TYPES;
 }
 
 export const getAccountsList = async (uid: string, queryParams: QueryParams) => {
@@ -45,7 +46,7 @@ export const getAccountsList = async (uid: string, queryParams: QueryParams) => 
     });
 };
 
-export const getAccountAudit = async (auditid: string) => {
+export const getAccountAudit = async (auditid: ACCOUNT_AUDIT_TYPES) => {
     return new ApiRequest().get<AuditRecord[] | BaseResponseError>({
         url: `accounts/${auditid}/audit`,
         defaultError: "Error while getting audit info",

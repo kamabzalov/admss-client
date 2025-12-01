@@ -38,7 +38,9 @@ export interface AccountsUserSettings extends UserSettings {
     activeColumns?: string[];
 }
 
-export interface AccountsAuditUserSettings extends UserSettings {}
+export interface AccountsAuditUserSettings extends UserSettings {
+    selectedAuditType?: number;
+}
 
 export interface DealsUserSettings extends UserSettings {
     activeColumns?: string[];
