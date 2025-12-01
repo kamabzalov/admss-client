@@ -9,8 +9,10 @@ import { useStore } from "store/hooks";
 import AuditHeader from "./components/AuditHeader";
 import { useCreateReport, useToastMessage } from "common/hooks";
 import { AuditRecord, getAccountAudit } from "http/services/accounts.service";
-import { AccountsAuditUserSettings, ServerUserSettings } from "common/models/user";
-import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { AccountsAuditUserSettings } from "common/models/user";
+import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
+import { TableColumn } from "dashboard/common/filter";
 
 const columns = [
     { field: "name", header: "Account" },
@@ -31,11 +33,15 @@ export const AccountsAudit = observer((): ReactElement => {
     const [isLoading] = useState<boolean>(false);
     const { createReport } = useCreateReport<AuditRecord>();
     const [auditRecords, setAuditRecords] = useState<AuditRecord[]>([]);
-    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const { moduleSettings, setModuleSettings, saveColumnWidth, settingsLoaded } =
+        useUserProfileSettings<AccountsAuditUserSettings, TableColumn>("accountsAudit", []);
+    const [selectedAuditType, setSelectedAuditType] = useState<ACCOUNT_AUDIT_TYPES | undefined>(
+        undefined
+    );
 
-    const getAuditRecords = async () => {
+    const getAuditRecords = async (type: ACCOUNT_AUDIT_TYPES) => {
         if (!authUser) return;
-        const response = await getAccountAudit(authUser.useruid);
+        const response = await getAccountAudit(type);
         if (Array.isArray(response)) {
             setAuditRecords(response);
         } else {
@@ -45,8 +51,18 @@ export const AccountsAudit = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        getAuditRecords();
-    }, []);
+        if (settingsLoaded) {
+            const typeToLoad =
+                moduleSettings?.selectedAuditType ?? ACCOUNT_AUDIT_TYPES.ACTIVITY_FOR_TODAY;
+            setSelectedAuditType(typeToLoad);
+        }
+    }, [settingsLoaded]);
+
+    useEffect(() => {
+        if (selectedAuditType !== undefined && authUser) {
+            getAuditRecords(selectedAuditType);
+        }
+    }, [selectedAuditType, authUser]);
 
     const printTableData = async (print: boolean = false) => {
         if (!authUser) return;
@@ -72,37 +88,10 @@ export const AccountsAudit = observer((): ReactElement => {
         setLazyState(event);
     };
 
-    const changeSettings = (settings: Partial<AccountsAuditUserSettings>) => {
-        if (authUser) {
-            const newSettings = {
-                ...serverSettings,
-                accountsAudit: { ...serverSettings?.accountsAudit, ...settings },
-            } as ServerUserSettings;
-            setServerSettings(newSettings);
-            setUserSettings(authUser.useruid, newSettings);
-        }
+    const handleAuditTypeChange = (type: ACCOUNT_AUDIT_TYPES) => {
+        setSelectedAuditType(type);
+        setModuleSettings({ selectedAuditType: type });
     };
-
-    useEffect(() => {
-        const loadSettings = async () => {
-            if (authUser) {
-                const response = await getUserSettings(authUser.useruid);
-                if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
-                        }
-                    }
-                    setServerSettings(allSettings);
-                }
-            }
-        };
-
-        loadSettings();
-    }, [authUser]);
 
     return (
         <div className='card-content'>
@@ -112,8 +101,8 @@ export const AccountsAudit = observer((): ReactElement => {
                 onPrint={() => printTableData(true)}
                 onDownload={() => printTableData()}
                 isLoading={isLoading}
-                selectedAccountType={""}
-                onAccountTypeChange={() => {}}
+                selectedAccountType={selectedAuditType}
+                onAccountTypeChange={handleAuditTypeChange}
             />
             <div className='grid'>
                 <div className='col-12'>
@@ -140,23 +129,16 @@ export const AccountsAudit = observer((): ReactElement => {
                             rowClassName={() => "hover:text-primary cursor-pointer"}
                             emptyMessage='No data selected to display. Please use the filter field to select the necessary data table.'
                             onColumnResizeEnd={(event) => {
-                                if (authUser && event) {
-                                    const newColumnWidth = {
-                                        [event.column?.props?.field as string]:
-                                            event.element?.offsetWidth,
-                                    };
-                                    changeSettings({
-                                        columnWidth: {
-                                            ...serverSettings?.accountsAudit?.columnWidth,
-                                            ...newColumnWidth,
-                                        },
-                                    });
+                                if (authUser && event && event.column?.props?.field) {
+                                    saveColumnWidth(
+                                        event.column.props.field as string,
+                                        event.element?.offsetWidth || 0
+                                    );
                                 }
                             }}
                         >
                             {columns.map(({ field, header }) => {
-                                const savedWidth =
-                                    serverSettings?.accountsAudit?.columnWidth?.[field];
+                                const savedWidth = moduleSettings?.columnWidth?.[field];
 
                                 return (
                                     <Column

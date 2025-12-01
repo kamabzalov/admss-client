@@ -3,6 +3,7 @@ import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
+import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 
 interface AuditHeaderProps {
     searchValue: string;
@@ -10,8 +11,8 @@ interface AuditHeaderProps {
     onPrint: () => void;
     onDownload: () => void;
     isLoading: boolean;
-    selectedAccountType: string;
-    onAccountTypeChange: (type: string) => void;
+    selectedAccountType: ACCOUNT_AUDIT_TYPES | undefined;
+    onAccountTypeChange: (type: ACCOUNT_AUDIT_TYPES) => void;
 }
 
 export default function AuditHeader({
@@ -24,16 +25,16 @@ export default function AuditHeader({
     onAccountTypeChange,
 }: AuditHeaderProps): ReactElement {
     const accountTypeOptions = [
-        { name: "Activity For Today", value: "Activity For Today" },
-        { name: "Activity In Past 7 Days", value: "Activity In Past 7 Days" },
-        { name: "Activity In Past 31 Days", value: "Activity In Past 31 Days" },
-        { name: "Insurance Missing", value: "Insurance Missing" },
-        { name: "Missing Policies", value: "Missing Policies" },
-        { name: "Missing Titles", value: "Missing Titles" },
-        { name: "Notes Taken Today", value: "Notes Taken Today" },
-        { name: "Notes Taken Yesterday", value: "Notes Taken Yesterday" },
-        { name: "Promises Taken Today", value: "Promises Taken Today" },
-        { name: "Promises Taken Yesterday", value: "Promises Taken Yesterday" },
+        { name: "Activity For Today", value: ACCOUNT_AUDIT_TYPES.ACTIVITY_FOR_TODAY },
+        { name: "Activity In Past 7 Days", value: ACCOUNT_AUDIT_TYPES.ACTIVITY_IN_PAST_7_DAYS },
+        { name: "Activity In Past 31 Days", value: ACCOUNT_AUDIT_TYPES.ACTIVITY_IN_PAST_31_DAYS },
+        { name: "Insurance Missing", value: ACCOUNT_AUDIT_TYPES.INSURANCE_MISSING },
+        { name: "Missing Policies", value: ACCOUNT_AUDIT_TYPES.MISSING_POLICIES },
+        { name: "Missing Titles", value: ACCOUNT_AUDIT_TYPES.MISSING_TITLES },
+        { name: "Notes Taken Today", value: ACCOUNT_AUDIT_TYPES.NOTES_TAKEN_TODAY },
+        { name: "Notes Taken Yesterday", value: ACCOUNT_AUDIT_TYPES.NOTES_TAKEN_YESTERDAY },
+        { name: "Promises Taken Today", value: ACCOUNT_AUDIT_TYPES.PROMISES_TAKEN_TODAY },
+        { name: "Promises Taken Yesterday", value: ACCOUNT_AUDIT_TYPES.PROMISES_TAKEN_YESTERDAY },
     ];
 
     const accountTypeItemTemplate = (option: { name: string; value: string }) => {
@@ -67,14 +68,6 @@ export default function AuditHeader({
                 <label className='float-label' htmlFor='account-type-input'>
                     Filter by
                 </label>
-                {selectedAccountType && (
-                    <Button
-                        icon='pi pi-times'
-                        type='button'
-                        className='audit-filter__clear-button'
-                        onClick={() => onAccountTypeChange("")}
-                    />
-                )}
             </span>
             <Button
                 severity='success'

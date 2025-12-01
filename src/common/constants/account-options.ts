@@ -97,3 +97,16 @@ export const ADJUSTMENT_TYPES: Readonly<string[]> = [
     "ChargeOff",
     "Manual",
 ];
+
+export enum ACCOUNT_AUDIT_TYPES {
+    ACTIVITY_FOR_TODAY = 0,
+    ACTIVITY_IN_PAST_7_DAYS = 1,
+    ACTIVITY_IN_PAST_31_DAYS = 2,
+    INSURANCE_MISSING = 3,
+    MISSING_POLICIES = 4,
+    MISSING_TITLES = 5,
+    NOTES_TAKEN_TODAY = 6,
+    NOTES_TAKEN_YESTERDAY = 7,
+    PROMISES_TAKEN_TODAY = 8,
+    PROMISES_TAKEN_YESTERDAY = 9,
+}
