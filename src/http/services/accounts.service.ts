@@ -14,6 +14,8 @@ import {
     AccountPromise,
     AccountUpdateTakePayment,
     AccountUpdateTotalInfo,
+    AuditRecord,
+    AuditType,
 } from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { InventoryExtData } from "common/models/inventory";
@@ -22,20 +24,6 @@ import { ApiRequest } from "http/index";
 
 export interface TotalAccountList extends BaseResponse {
     total: number;
-}
-
-export interface AuditRecord {
-    accountName: string;
-    lineNumber: string;
-    user: string;
-    date: string;
-    debit: string;
-    credit: string;
-}
-
-export interface AuditType {
-    name: string;
-    value: ACCOUNT_AUDIT_TYPES;
 }
 
 export const getAccountsList = async (uid: string, queryParams: QueryParams) => {

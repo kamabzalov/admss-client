@@ -1,3 +1,4 @@
+import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import { BaseResponseError, Status } from "../base-response";
 
 export interface Account {
@@ -629,4 +630,38 @@ export interface AccountFeeData {
     amount: number;
     description: string;
     reason: string;
+}
+
+export interface AuditRecord {
+    accountnumber: string;
+    accountstatus: string;
+    accounttype: string;
+    accountuid: string;
+    alert: string;
+    contactuid: string;
+    created: string;
+    dateclosing: string;
+    dateeffective: string;
+    datesold: string;
+    dealuid: string;
+    downpayment: string;
+    index: number;
+    insurance: AccountInsurance;
+    inventoryuid: string;
+    isactive: number;
+    isdeleted: number;
+    itemuid: string;
+    lockDate: number;
+    lockStatus: number;
+    lockUserUID: string;
+    name: string;
+    notes: string;
+    startingballance: string;
+    updated: string;
+    useruid: string;
+}
+
+export interface AuditType {
+    name: string;
+    value: ACCOUNT_AUDIT_TYPES;
 }
