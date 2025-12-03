@@ -401,10 +401,12 @@ export class ContactStore {
 
             const filteredContact = filterPostPayload(this.contact, {
                 includeOnlyKeys: CONTACT_FORM_FIELDS,
+                includeKeys: [...CONTACT_FORM_FIELDS],
             });
 
             const filteredExtData = filterPostPayload(this.contactExtData, {
                 includeOnlyKeys: CONTACT_EXT_DATA_FORM_FIELDS,
+                includeKeys: [...CONTACT_EXT_DATA_FORM_FIELDS],
             });
 
             const contactData: Contact = {
@@ -428,10 +430,12 @@ export class ContactStore {
             if (this._contact.cobuyeruid) {
                 const filteredCoBuyerContact = filterPostPayload(this.coBuyerContact, {
                     includeOnlyKeys: CONTACT_FORM_FIELDS,
+                    includeKeys: [...CONTACT_FORM_FIELDS],
                 });
 
                 const filteredCoBuyerExtData = filterPostPayload(this.contactExtData, {
                     includeOnlyKeys: CONTACT_EXT_DATA_FORM_FIELDS,
+                    includeKeys: [...CONTACT_EXT_DATA_FORM_FIELDS],
                 });
 
                 const coBuyerContactData: Contact = {
@@ -854,6 +858,7 @@ export class ContactStore {
 
     public set separateContact(state: boolean) {
         this._separateContact = state;
+        this._isContactChanged = true;
     }
 
     public set uploadFileDocuments(files: UploadMediaItem) {

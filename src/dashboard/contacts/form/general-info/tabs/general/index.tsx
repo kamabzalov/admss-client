@@ -53,6 +53,19 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isScanning, setIsScanning] = useState<boolean>(false);
 
+    const handleFieldChange = async (
+        field: keyof Omit<Contact, "extdata">,
+        value: string,
+        shouldTouch?: boolean
+    ) => {
+        changeContact(field, value);
+        await setFieldValue(field, value, true);
+        await validateField(field);
+        if (shouldTouch) {
+            setFieldTouched(field, true, true);
+        }
+    };
+
     const handleGetTypeList = async () => {
         setIsLoading(true);
         const response = await getContactsTypeList(id);
@@ -316,12 +329,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                 <TextInput
                                     className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
                                     value={contact.firstName || ""}
-                                    onChange={({ target: { value } }) => {
-                                        setFieldValue("firstName", value, true).then(() => {
-                                            changeContact("firstName", value);
-                                            validateField("firstName");
-                                        });
-                                    }}
+                                    onChange={({ target: { value } }) =>
+                                        handleFieldChange("firstName", value)
+                                    }
                                     onBlur={handleOfacCheck}
                                     name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
                                     tooltip={
@@ -342,13 +352,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                     name='Middle Name'
                                     className={`general-info__text-input ${errors.middleName ? "p-invalid" : ""}`}
                                     value={contact.middleName || ""}
-                                    onChange={({ target: { value } }) => {
-                                        setFieldValue("middleName", value, true).then(() => {
-                                            changeContact("middleName", value);
-                                            validateField("middleName");
-                                            setFieldTouched("middleName", true, true);
-                                        });
-                                    }}
+                                    onChange={({ target: { value } }) =>
+                                        handleFieldChange("middleName", value, true)
+                                    }
                                     tooltip={
                                         isBusinessNameRequired
                                             ? TOOLTIP_MESSAGE.ONLY_BUSINESS
@@ -367,12 +373,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                     name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
                                     className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
                                     value={contact.lastName || ""}
-                                    onChange={({ target: { value } }) => {
-                                        setFieldValue("lastName", value, true).then(() => {
-                                            changeContact("lastName", value);
-                                            validateField("lastName");
-                                        });
-                                    }}
+                                    onChange={({ target: { value } }) =>
+                                        handleFieldChange("lastName", value)
+                                    }
                                     onBlur={handleOfacCheck}
                                     disabled={shouldDisableNameFields}
                                     tooltip={

@@ -6,9 +6,7 @@ import { Contact, ContactExtData, ContactOFAC, ScanBarcodeDL } from "common/mode
 import { checkContactOFAC, scanContactDL } from "http/services/contacts-service";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
@@ -17,6 +15,7 @@ import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/gener
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Loader } from "dashboard/common/loader";
 import "./index.css";
+import { useToastMessage } from "common/hooks";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -25,10 +24,17 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     const { setFieldValue, validateField, setFieldTouched, errors, touched } =
         useFormikContext<ContactExtData>();
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
+
+    const handleFieldChange = async (field: keyof ContactExtData, value: string) => {
+        changeContactExtData(field, value);
+        await setFieldValue(field, value, true);
+        await validateField(field);
+        setFieldTouched(field, true, true);
+    };
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -135,15 +141,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
             }
             handleOfacCheck();
         } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to parse date from driver license",
-                life: TOAST_LIFETIME,
-            });
+            showError(
+                error instanceof Error ? error.message : "Failed to parse date from driver license"
+            );
         } finally {
             setIsScanning(false);
             event.target.value = "";
@@ -170,12 +170,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         };
         const response = await checkContactOFAC(id, contactData as Contact);
         if (response?.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: response.error,
-                life: TOAST_LIFETIME,
-            });
+            showError(response.error);
         } else {
             store.coBuyerContactOFAC = response as ContactOFAC;
         }
@@ -246,13 +241,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 <TextInput
                     className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_First_Name && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_First_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_First_Name", value);
-                            validateField("CoBuyer_First_Name");
-                            setFieldTouched("CoBuyer_First_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_First_Name", value)
+                    }
                     onBlur={handleOfacCheck}
                     name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
@@ -274,13 +265,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     name='Middle Name'
                     className={`general-info__text-input w-full ${errors.CoBuyer_Middle_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Middle_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Middle_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_Middle_Name", value);
-                            validateField("CoBuyer_Middle_Name");
-                            setFieldTouched("CoBuyer_Middle_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_Middle_Name", value)
+                    }
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
@@ -293,13 +280,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     name={`Last Name${shouldShowNameRequired ? " (required)" : ""}`}
                     className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_Last_Name && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_Last_Name", value);
-                            validateField("CoBuyer_Last_Name");
-                            setFieldTouched("CoBuyer_Last_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_Last_Name", value)
+                    }
                     onBlur={handleOfacCheck}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
