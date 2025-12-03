@@ -24,6 +24,7 @@ import { observer } from "mobx-react-lite";
 import { MenuItem } from "primereact/menuitem";
 import { TypeList } from "common/models";
 import { Tooltip } from "primereact/tooltip";
+import { rowExpansionTemplate } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -235,15 +236,6 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         },
     ];
 
-    const rowExpansionTemplate = (data: AccountPromise) => {
-        return (
-            <div className='expanded-row'>
-                <div className='expanded-row__label'>Note: </div>
-                <div className='expanded-row__text'>{data.notes || ""}</div>
-            </div>
-        );
-    };
-
     const controlColumnHeader = (): ReactElement => (
         <Checkbox
             checked={selectedRows.every((checkbox) => !!checkbox)}
@@ -427,7 +419,9 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
-                        rowExpansionTemplate={rowExpansionTemplate}
+                        rowExpansionTemplate={(data: AccountPromise) =>
+                            rowExpansionTemplate({ text: data.notes, label: "Note: " })
+                        }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         rowClassName={(data) => (!!data.deleted ? "row--deleted" : "")}

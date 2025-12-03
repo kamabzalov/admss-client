@@ -1,0 +1,39 @@
+.expansion-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    .expansion-column__button.p-button {
+        color: var(--admss-app-primary-main-green);
+        background: transparent;
+        width: 20px;
+        height: 20px;
+        border: none;
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--admss-app-primary-main-green);
+            background: transparent;
+            outline: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.p-datatable.p-datatable-gridlines:has(.p-datatable-thead):has(.p-datatable-tbody)
+    .p-datatable-tbody
+    > tr
+    > td.expansion-column-cell
+    + td {
+    border-left: none;
+}
+
+.expanded-row {
+    width: 100%;
+    display: flex;
+    padding-left: var(--expanded-row-left-padding, 60px);
+    column-gap: 20px;
+    .expanded-row__label {
+        font-weight: 700;
+    }
+}

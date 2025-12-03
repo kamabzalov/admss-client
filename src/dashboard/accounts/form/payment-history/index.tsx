@@ -23,6 +23,7 @@ import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { observer } from "mobx-react-lite";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { rowExpansionTemplate } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -260,15 +261,6 @@ export const AccountPaymentHistory = observer((): ReactElement => {
         );
     };
 
-    const rowExpansionTemplate = (data: AccountHistory) => {
-        return (
-            <div className='expanded-row'>
-                <div className='expanded-row__label'>Payment comment: </div>
-                <div className='expanded-row__text'>{data.Comment || ""}</div>
-            </div>
-        );
-    };
-
     const handleRowExpansionClick = (data: AccountHistory) => {
         if (expandedRows.includes(data)) {
             setExpandedRows(expandedRows.filter((item) => item !== data));
@@ -412,7 +404,9 @@ export const AccountPaymentHistory = observer((): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
-                        rowExpansionTemplate={rowExpansionTemplate}
+                        rowExpansionTemplate={(data: AccountHistory) =>
+                            rowExpansionTemplate({ text: data.Comment, label: "Payment comment: " })
+                        }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                     >

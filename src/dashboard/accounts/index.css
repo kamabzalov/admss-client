@@ -66,6 +66,14 @@
         width: 250px;
         height: 50px;
     }
+
+    .p-datatable.p-datatable-gridlines:has(.p-datatable-thead):has(.p-datatable-tbody)
+        .p-datatable-tbody
+        > tr.p-datatable-emptymessage
+        > td {
+        border-bottom: none;
+        border-width: 0;
+    }
 }
 
 .audit-filter {

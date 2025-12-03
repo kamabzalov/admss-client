@@ -21,6 +21,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { NoteEditor } from "dashboard/accounts/form/common";
+import { rowExpansionTemplate } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -70,15 +71,6 @@ export const AccountNotes = observer((): ReactElement => {
             setModalVisible(false);
             handleGetNotes();
         }
-    };
-
-    const rowExpansionTemplate = (data: AccountNote) => {
-        return (
-            <div className='expanded-row'>
-                <div className='expanded-row__label'>Note: </div>
-                <div className='expanded-row__text'>{data.Note || ""}</div>
-            </div>
-        );
     };
 
     const handleRowExpansionClick = (data: AccountNote) => {
@@ -199,7 +191,9 @@ export const AccountNotes = observer((): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
-                        rowExpansionTemplate={rowExpansionTemplate}
+                        rowExpansionTemplate={(data: AccountNote) =>
+                            rowExpansionTemplate({ text: data.Note, label: "Note: " })
+                        }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         scrollHeight='310px'
