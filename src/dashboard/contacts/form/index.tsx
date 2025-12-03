@@ -80,6 +80,20 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
+enum ERROR_TYPE {
+    MISSING,
+    INVALID,
+}
+
+enum DIALOG_ERROR_MESSAGES {
+    MISSING_TITLE = "Required data is missing",
+    INVALID_TITLE = "Invalid data format",
+    MISSING_MESSAGE = "The form cannot be saved as it missing required data.",
+    INVALID_MESSAGE = "The form cannot be saved because some fields have an invalid format.",
+    MISSING_BUTTON = "Please fill in the required fields and try again.",
+    INVALID_BUTTON = "Please correct the invalid fields and try again.",
+}
+
 const handleValidationMessage = (text: string, isShort?: boolean) => {
     const defaultMessage = `${text || "This field"} does not match the required format.`;
     const shortMessage = `${text || "This field"} is invalid.`;
@@ -230,18 +244,26 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     separateContact: Yup.boolean(),
 });
 
-const DialogBody = (): ReactElement => {
+const DialogBody = ({ type }: { type: ERROR_TYPE }): ReactElement => {
     return (
         <>
             <div className='confirm-header'>
                 <i className='pi pi-exclamation-triangle confirm-header__icon' />
-                <div className='confirm-header__title'>Required data is missing</div>
+                <div className='confirm-header__title'>
+                    {type === ERROR_TYPE.MISSING
+                        ? DIALOG_ERROR_MESSAGES.MISSING_TITLE
+                        : DIALOG_ERROR_MESSAGES.INVALID_TITLE}
+                </div>
             </div>
             <div className='text-center w-full confirm-body'>
-                The form cannot be saved as it missing required data.
+                {type === ERROR_TYPE.MISSING
+                    ? DIALOG_ERROR_MESSAGES.MISSING_MESSAGE
+                    : DIALOG_ERROR_MESSAGES.INVALID_MESSAGE}
             </div>
             <div className='text-center w-full confirm-body--bold'>
-                Please fill in the required fields and try again.
+                {type === ERROR_TYPE.MISSING
+                    ? DIALOG_ERROR_MESSAGES.MISSING_BUTTON
+                    : DIALOG_ERROR_MESSAGES.INVALID_BUTTON}
             </div>
         </>
     );
@@ -284,6 +306,7 @@ export const ContactForm = observer((): ReactElement => {
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     const [isDataMissingConfirm, setIsDataMissingConfirm] = useState<boolean>(false);
+    const [validationErrorType, setValidationErrorType] = useState<ERROR_TYPE>(ERROR_TYPE.MISSING);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
@@ -498,6 +521,11 @@ export const ContactForm = observer((): ReactElement => {
                 });
 
                 setErrorSections(currentSectionsWithErrors);
+
+                const hasFormatErrors = Object.values(allErrors).some(
+                    (error) => error !== ERROR_MESSAGES.REQUIRED
+                );
+                setValidationErrorType(hasFormatErrors ? ERROR_TYPE.INVALID : ERROR_TYPE.MISSING);
 
                 const hasCoBuyerMiddleNameOnly =
                     contactType === BUYER_ID &&
@@ -811,8 +839,12 @@ export const ContactForm = observer((): ReactElement => {
                                         className='form-nav__button'
                                         type='button'
                                         onClick={handleSaveContactForm}
-                                        disabled={!isContactChanged}
-                                        severity={isContactChanged ? "success" : "secondary"}
+                                        disabled={!isContactChanged || !contact.type}
+                                        severity={
+                                            isContactChanged && contact.type
+                                                ? "success"
+                                                : "secondary"
+                                        }
                                     >
                                         {id ? "Update" : "Save"}
                                     </Button>
@@ -858,7 +890,7 @@ export const ContactForm = observer((): ReactElement => {
                 footer='Got it'
                 action={() => setIsDataMissingConfirm(false)}
             >
-                <DialogBody />
+                <DialogBody type={validationErrorType} />
             </DashboardDialog>
         </Suspense>
     );
