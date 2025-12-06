@@ -20,7 +20,7 @@ import { useToastMessage } from "common/hooks";
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData, coBuyerContact, separateContact } = store;
+    const { contactExtData, changeContactExtData } = store;
 
     const { setFieldValue, validateField, setFieldTouched, errors, touched } =
         useFormikContext<ContactExtData>();
@@ -43,8 +43,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     }, [contactExtData.CoBuyer_Emp_Company]);
 
     const isNameRequired = useMemo(() => {
-        return store.isCoBuyerFieldsFilled || separateContact;
-    }, [store.isCoBuyerFieldsFilled, separateContact]);
+        return store.isCoBuyerFieldsFilled;
+    }, [store.isCoBuyerFieldsFilled]);
 
     const shouldShowNameRequired = useMemo(() => {
         return isNameRequired && !shouldDisableNameFields;
@@ -178,20 +178,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     return (
         <div className='grid general-info row-gap-2 cobuyer-info'>
-            {(!coBuyerContact.useruid || store.coBuyerGeneralFieldsChanged) && (
-                <div className='cobuyer-info__checkbox'>
-                    <Checkbox
-                        checked={separateContact}
-                        onChange={(e) => (store.separateContact = !!e.checked)}
-                        inputId='separate-contact'
-                        name='separate-contact'
-                        title='Save As a Separate Contact'
-                    />
-                    <label htmlFor='separate-contact' className='cobuyer-info__label'>
-                        Save As a Separate Contact
-                    </label>
-                </div>
-            )}
             <div className='col-12 flex gap-4'>
                 <Button
                     type='button'

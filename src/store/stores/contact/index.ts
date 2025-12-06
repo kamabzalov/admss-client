@@ -76,7 +76,6 @@ export class ContactStore {
     private _deleteReason: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
-    private _separateContact: boolean = false;
     private _initialCoBuyerFields: {
         firstName: string;
         lastName: string;
@@ -147,10 +146,6 @@ export class ContactStore {
 
     public get coBuyerBackSideDLurl() {
         return this._coBuyerBackSideDLurl;
-    }
-
-    public get separateContact() {
-        return this._separateContact;
     }
 
     public get isContactChanged() {
@@ -455,54 +450,6 @@ export class ContactStore {
                         coBuyerContactDataResponse?.errors || coBuyerContactDataResponse?.error
                     );
                     return coBuyerContactDataResponse;
-                }
-            }
-
-            return { status: Status.OK };
-        } catch (error) {
-            return error as BaseResponseError;
-        } finally {
-            this._isLoading = false;
-        }
-    });
-
-    public createSeparateCoBuyerContact = action(async (): Promise<BaseResponseError> => {
-        try {
-            this._isLoading = true;
-
-            const coBuyerContactData: Partial<Contact> = {
-                type: 1,
-                firstName: this._contactExtData.CoBuyer_First_Name || "",
-                middleName: this._contactExtData.CoBuyer_Middle_Name || "",
-                lastName: this._contactExtData.CoBuyer_Last_Name || "",
-                streetAddress: this._contactExtData.CoBuyer_Res_Address || "",
-                state: this._contactExtData.CoBuyer_State || "",
-                city: this._contactExtData.CoBuyer_City || "",
-                ZIP: this._contactExtData.CoBuyer_Zip_Code || "",
-                mailEmail: this._contactExtData.CoBuyer_EMail || "",
-                phone1: this._contactExtData.CoBuyer_Home_Phone_Number || "",
-                mailPhone: this._contactExtData.CoBuyer_Business_Phone_Number || "",
-                mailState: this._contactExtData.CoBuyer_Mailing_State || "",
-                mailCity: this._contactExtData.CoBuyer_Mailing_City || "",
-                mailZIP: this._contactExtData.CoBuyer_Mailing_Zip || "",
-                mailStreetAddress: this._contactExtData.CoBuyer_Mailing_Address || "",
-                dluidfront: this._contactExtData.CoBuyer_Driver_License_Num || "",
-                dluidback: this._contactExtData.CoBuyer_DL_Exp_Date || "",
-                dl_expiration: this._contactExtData.CoBuyer_DL_Exp_Date || "",
-                dl_issuedate: this._contactExtData.CoBuyer_DL_Exp_Date || "",
-                dl_number: this._contactExtData.CoBuyer_DL_Exp_Date || "",
-            };
-
-            const response = await setContact(null, coBuyerContactData);
-            if (response?.status === Status.ERROR) {
-                await Promise.reject(response?.error);
-                return response;
-            }
-
-            if (this._coBuyerFrontSideDL.size || this._coBuyerBackSideDL.size) {
-                const contactuid = (response as any)?.contactuid;
-                if (contactuid) {
-                    await this.setCoBuyerImagesDL(contactuid);
                 }
             }
 
@@ -856,11 +803,6 @@ export class ContactStore {
         this._isContactChanged = state;
     }
 
-    public set separateContact(state: boolean) {
-        this._separateContact = state;
-        this._isContactChanged = true;
-    }
-
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
@@ -889,7 +831,6 @@ export class ContactStore {
         this._contactExtData = {} as ContactExtData;
         this._contactOFAC = {} as ContactOFAC;
         this._coBuyerContactOFAC = {} as ContactOFAC;
-        this._separateContact = false;
         this._deleteReason = "";
     };
 }
