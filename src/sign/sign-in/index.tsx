@@ -7,10 +7,9 @@ import "../index.css";
 import { auth } from "http/services/auth.service";
 import { useState } from "react";
 import { APP_TYPE, APP_VERSION } from "http/index";
-import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
+import { useToastMessage } from "common/hooks";
 
 export interface LoginForm {
     username: string;
@@ -22,8 +21,8 @@ export interface LoginForm {
 
 export const SignIn = () => {
     const navigate = useNavigate();
-    const toast = useToast();
     const userStore = useStore().userStore;
+    const { showError } = useToastMessage();
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
     const formik = useFormik<LoginForm>({
@@ -57,32 +56,21 @@ export const SignIn = () => {
                     }
                     try {
                         userStore.storedUser = response;
-                        navigate("/dashboard");
+                        if (userStore.twoFactorAuth.isEnabled) {
+                            navigate("/2fa");
+                        } else {
+                            navigate("/dashboard");
+                        }
                     } catch (error) {
-                        toast.current?.show({
-                            severity: "error",
-                            life: TOAST_LIFETIME,
-                            summary: Status.ERROR,
-                            detail: String(error),
-                        });
+                        showError(String(error));
                         return;
                     }
                 } else {
-                    toast.current?.show({
-                        severity: "error",
-                        life: TOAST_LIFETIME,
-                        summary: Status.ERROR,
-                        detail: response?.error || String(response),
-                    });
+                    showError(response?.error || String(response));
                 }
             } catch (error) {
                 const errorMessage = "An unexpected error occurred during login";
-                toast.current?.show({
-                    severity: "error",
-                    life: TOAST_LIFETIME,
-                    summary: Status.ERROR,
-                    detail: error instanceof Error ? error.message || errorMessage : errorMessage,
-                });
+                showError(error instanceof Error ? error.message : errorMessage);
             }
         },
     });
@@ -156,7 +144,14 @@ export const SignIn = () => {
                                     checked={formik.values.rememberme}
                                     onChange={(e) => formik.setFieldValue("rememberme", e.checked)}
                                 />
-                                <label htmlFor='rememberme' className='ml-2 user-help__label'>
+                                <label
+                                    htmlFor='rememberme'
+                                    onClick={() =>
+                                        (userStore.twoFactorAuth.isEnabled =
+                                            !userStore.twoFactorAuth.isEnabled)
+                                    }
+                                    className='ml-2 user-help__label'
+                                >
                                     Remember me
                                 </label>
                             </div>

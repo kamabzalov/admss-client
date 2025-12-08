@@ -15,6 +15,7 @@ import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";
 import { InventoryForm } from "dashboard/inventory/form";
 import { SignIn } from "sign/sign-in";
+import { TwoFactorAuth } from "sign/two-factor-auth";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";
@@ -41,6 +42,10 @@ const AppRouter = (): ReactElement => {
             errorElement: <ErrorBoundary />,
             children: [
                 { path: "", element: <SignIn /> },
+                {
+                    path: "2fa",
+                    element: <TwoFactorAuth />,
+                },
                 {
                     path: "service-update",
                     element: <ServiceUpdate />,

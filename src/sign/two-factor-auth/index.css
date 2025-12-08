@@ -1,0 +1,328 @@
+.two-factor-auth {
+    background: var(--admss-app-white);
+    width: 522px;
+    min-height: 478px;
+    border-radius: 15px;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.two-factor-auth--success {
+    width: 476px;
+    height: 793px;
+
+    .two-factor-auth__progress {
+        margin-bottom: 40px;
+    }
+
+    .two-factor-auth__description {
+        padding-top: 6px;
+        width: 394px;
+        font-size: 18px;
+    }
+}
+
+.two-factor-auth--compact {
+    width: 450px;
+    height: 480px;
+    min-height: 480px;
+}
+
+.two-factor-auth-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding-top: 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.two-factor-auth__progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.two-factor-auth__progress-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--admss-app-light-grey);
+}
+
+.two-factor-auth__progress-dot--active {
+    background: var(--admss-app-primary-main-green);
+}
+
+.two-factor-auth__icon {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.two-factor-auth__icon-devices {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.two-factor-auth__icon-device {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--admss-app-main-blue);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--admss-app-white);
+}
+
+.two-factor-auth__icon-device i {
+    color: var(--admss-app-main-blue);
+    font-size: 20px;
+}
+
+.two-factor-auth__icon-lock {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--admss-app-white);
+    z-index: 1;
+}
+
+.two-factor-auth__icon-lock i {
+    color: var(--admss-app-main-blue);
+    font-size: 24px;
+}
+
+.two-factor-auth__title {
+    margin: 10px;
+    color: var(--admss-app-main-blue);
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.two-factor-auth__title--success {
+    color: var(--admss-app-primary-main-green);
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.two-factor-auth__description {
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    font-family: "Open Sans", sans-serif;
+    :not(.two-factor-auth__description--success) {
+        max-width: 338px;
+    }
+    &.two-factor-auth__description--verification {
+        max-width: 326px;
+    }
+}
+
+.two-factor-auth__input {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.two-factor-auth__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 340px;
+    height: 60px;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.two-factor-auth__code-inputs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.two-factor-auth__code-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 400;
+    border-radius: 15px;
+    border: none;
+    background: var(--admss-app-light-green);
+}
+
+.two-factor-auth__code-input--empty {
+    background: var(--admss-app-lightest-grey);
+    border-color: var(--admss-app-lightest-grey);
+}
+
+.two-factor-auth__code-input:focus {
+    border: 1px solid var(--admss-app-primary-main-green);
+    outline: none;
+}
+
+.two-factor-auth__code-input::selection {
+    background: transparent;
+    color: inherit;
+}
+
+.two-factor-auth__code-input::-moz-selection {
+    background: transparent;
+    color: inherit;
+}
+
+.two-factor-auth__resend {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 12px;
+    cursor: default;
+}
+
+.two-factor-auth__resend-timer {
+    color: var(--admss-app-main-blue);
+}
+
+.two-factor-auth__resend-link {
+    background: none;
+    border: none;
+    color: var(--admss-app-main-blue);
+    cursor: pointer;
+}
+
+.two-factor-auth__resend-link:hover {
+    text-decoration: none;
+    color: var(--admss-app-primary-main-green);
+    text-shadow: 0.5px 0 0 currentColor;
+}
+
+.two-factor-auth__success-icon {
+    padding-top: 10px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--admss-app-primary-main-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.two-factor-auth__success-icon i {
+    color: var(--admss-app-white);
+    font-size: 40px;
+}
+
+.two-factor-auth__backup-codes {
+    width: 341px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    background: var(--admss-app-light-green);
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
+    height: 214px;
+    margin: 0 auto;
+    overflow-y: hidden;
+}
+
+.two-factor-auth__backup-code {
+    font-size: 18px;
+    color: var(--admss-app-primary);
+    text-align: center;
+    padding: 5px 2px;
+}
+
+.two-factor-auth__backup-actions {
+    display: flex;
+    justify-content: center;
+    width: 341px;
+    gap: 0;
+    margin: 0 auto 40px;
+    border-top: 1px solid var(--admss-app-primary-main-green);
+}
+
+.two-factor-auth__backup-action {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    height: 50px;
+    background: var(--admss-app-light-green);
+    border: none;
+    border-right: 1px solid var(--admss-app-primary-main-green);
+    color: var(--admss-app-primary-main-green);
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.two-factor-auth__backup-action:last-child {
+    border-right: none;
+}
+
+.two-factor-auth__backup-action:hover {
+    background: var(--admss-app-focus-light-green);
+}
+
+.auth-verification {
+    .two-factor-auth__button {
+        width: 350px;
+    }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .two-factor-auth,
+    .two-factor-auth * {
+        visibility: visible;
+    }
+
+    .two-factor-auth {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .two-factor-auth__progress,
+    .two-factor-auth__success-icon,
+    .two-factor-auth__backup-actions,
+    .two-factor-auth__button {
+        display: none;
+    }
+
+    .two-factor-auth__title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .two-factor-auth__backup-codes {
+        max-height: none;
+        overflow: visible;
+        background: white;
+        border: 1px solid #ccc;
+    }
+}
