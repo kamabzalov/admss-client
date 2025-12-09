@@ -10,6 +10,7 @@ import { APP_TYPE, APP_VERSION } from "http/index";
 import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
+import { DASHBOARD_PAGE } from "common/constants/links";
 
 export interface LoginForm {
     username: string;
@@ -27,9 +28,9 @@ export const SignIn = () => {
 
     const formik = useFormik<LoginForm>({
         initialValues: {
-            username: "",
-            password: "",
-            rememberme: false,
+            username: userStore.rememberMe?.username || "",
+            password: userStore.getDecryptedPassword() || "",
+            rememberme: !!userStore.rememberMe?.username,
             application: APP_TYPE,
             version: APP_VERSION,
         },
@@ -56,10 +57,18 @@ export const SignIn = () => {
                     }
                     try {
                         userStore.storedUser = response;
+                        if (formik.values.rememberme) {
+                            userStore.setRememberMeWithPassword(
+                                formik.values.username,
+                                formik.values.password
+                            );
+                        } else {
+                            userStore.rememberMe = null;
+                        }
                         if (userStore.twoFactorAuth.isEnabled) {
                             navigate("/2fa");
                         } else {
-                            navigate("/dashboard");
+                            navigate(DASHBOARD_PAGE);
                         }
                     } catch (error) {
                         showError(String(error));
@@ -74,6 +83,15 @@ export const SignIn = () => {
             }
         },
     });
+
+    const handleRememberMeChange = (checked: boolean) => {
+        formik.setFieldValue("rememberme", checked);
+        if (checked && formik.values.username && formik.values.password) {
+            userStore.setRememberMeWithPassword(formik.values.username, formik.values.password);
+        } else if (!checked) {
+            userStore.rememberMe = null;
+        }
+    };
 
     return (
         <section className='sign'>
@@ -142,16 +160,9 @@ export const SignIn = () => {
                                     name='rememberme'
                                     value={formik.values.rememberme}
                                     checked={formik.values.rememberme}
-                                    onChange={(e) => formik.setFieldValue("rememberme", e.checked)}
+                                    onChange={(e) => handleRememberMeChange(e.checked || false)}
                                 />
-                                <label
-                                    htmlFor='rememberme'
-                                    onClick={() =>
-                                        (userStore.twoFactorAuth.isEnabled =
-                                            !userStore.twoFactorAuth.isEnabled)
-                                    }
-                                    className='ml-2 user-help__label'
-                                >
+                                <label htmlFor='rememberme' className='ml-2 user-help__label'>
                                     Remember me
                                 </label>
                             </div>
