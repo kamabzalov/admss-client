@@ -530,7 +530,19 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }}
                         dropdown
                         onChange={({ value }) => {
-                            const make = typeof value === "string" ? value : value.name;
+                            let make = typeof value === "string" ? value : value.name;
+
+                            if (make.trim()) {
+                                const normalizedInput = make.trim();
+                                const matchingMake = initialAutoMakesList.find(
+                                    (item) =>
+                                        item.name.toLowerCase() === normalizedInput.toLowerCase()
+                                );
+                                if (matchingMake) {
+                                    make = matchingMake.name;
+                                }
+                            }
+
                             setFieldValue("Make", make);
                             changeInventory({ key: "Make", value: make });
                         }}
@@ -558,8 +570,20 @@ export const VehicleGeneral = observer((): ReactElement => {
                     options={automakesModelList}
                     required
                     onChange={({ value }) => {
-                        setFieldValue("Model", value);
-                        changeInventory({ key: "Model", value });
+                        let model = value;
+
+                        if (model && model.trim() && !!automakesModelList.length) {
+                            const normalizedInput = model.trim();
+                            const matchingModel = automakesModelList.find(
+                                (item) => item.name.toLowerCase() === normalizedInput.toLowerCase()
+                            );
+                            if (matchingModel) {
+                                model = matchingModel.name;
+                            }
+                        }
+
+                        setFieldValue("Model", model);
+                        changeInventory({ key: "Model", value: model });
                     }}
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
