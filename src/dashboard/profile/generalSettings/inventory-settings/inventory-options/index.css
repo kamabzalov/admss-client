@@ -23,6 +23,9 @@
         .settings-inventory__name {
             flex: 1;
         }
+        background: var(--admss-app-light-blue);
+        font-weight: 600;
+        height: 60px;
     }
     .option-control {
         display: flex;
