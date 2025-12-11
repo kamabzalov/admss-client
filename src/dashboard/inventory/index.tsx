@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import {
     DataTable,
     DataTableColReorderEvent,
+    DataTableColumnResizeEndEvent,
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
@@ -14,7 +15,7 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import InventoryHeader from "dashboard/inventory/components/InventoryHeader";
-import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
+import { ROWS_PER_PAGE } from "common/settings";
 import { InventoryAdvancedSearch } from "dashboard/inventory/components/AdvancedSearch";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import {
@@ -24,12 +25,11 @@ import {
     filterOptions,
 } from "dashboard/inventory/common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { useCreateReport } from "common/hooks";
+import { useCreateReport, useToastMessage } from "common/hooks";
 import { createStringifyFilterQuery } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
-import { useToast } from "dashboard/common/toast";
 import { INVENTORY_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
 
@@ -41,6 +41,8 @@ interface InventoriesProps {
     getFullInfo?: (inventory: Inventory) => void;
     originalPath?: string;
 }
+
+const UPPER_CASE_FIELDS = ["Make", "Model", "VIN"];
 
 export default function Inventories({
     onRowClick,
@@ -74,7 +76,7 @@ export default function Inventories({
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
     const { clearInventory, inventoryGroupClassList, getInventoryGroupClassList } = store;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const { createReport } = useCreateReport<Inventory>();
 
     const navigate = useNavigate();
@@ -271,12 +273,7 @@ export default function Inventories({
                 setInventories(response);
             }
         } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: String(error) || "Failed to load inventory data",
-                life: TOAST_LIFETIME,
-            });
+            showError(String(error) || "Failed to load inventory data");
         } finally {
             setIsLoading(false);
         }
@@ -345,6 +342,17 @@ export default function Inventories({
         navigate(INVENTORY_PAGE.CREATE());
     };
 
+    const handleFormatField = (field: string, value: string) => {
+        const currentCurrencySymbol = "$";
+        if (UPPER_CASE_FIELDS.includes(field)) {
+            return value.toUpperCase();
+        }
+        if (field === "Price" && !value.includes(currentCurrencySymbol)) {
+            return `${currentCurrencySymbol} ${value}`;
+        }
+        return value;
+    };
+
     const header = (
         <InventoryHeader
             searchValue={globalSearch}
@@ -374,6 +382,54 @@ export default function Inventories({
         />
     );
 
+    const columnHeader = (title: string, field: string) => {
+        return <span data-field={field}>{title}</span>;
+    };
+
+    const columnEditButton = (itemuid: string) => {
+        return (
+            <Button
+                text
+                className='table-edit-button'
+                icon='adms-edit-item'
+                tooltip='Edit inventory'
+                tooltipOptions={{ position: "mouse" }}
+                onClick={() => navigate(INVENTORY_PAGE.EDIT(itemuid))}
+            />
+        );
+    };
+
+    const handleColumnReorder = (event: DataTableColReorderEvent) => {
+        if (Array.isArray(event.columns)) {
+            const orderArray = event.columns?.map((column: Column) => column.props.field);
+
+            const newActiveColumns = orderArray
+                .map((field: string | undefined) => {
+                    return activeColumns.find((column) => column.field === field) || null;
+                })
+                .filter(
+                    (column: TableColumnsList | null): column is TableColumnsList => column !== null
+                );
+
+            setActiveColumns(newActiveColumns);
+
+            changeSettings({
+                activeColumns: newActiveColumns.map(({ field }) => field),
+            });
+        }
+    };
+
+    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
+        if (event.column.props.field) {
+            const newColumnWidth = {
+                [event.column.props.field as string]: event.element.offsetWidth,
+            };
+            changeSettings({
+                columnWidth: { ...serverSettings?.inventory?.columnWidth, ...newColumnWidth },
+            });
+        }
+    };
+
     const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
         const selectedText = window.getSelection()?.toString();
 
@@ -390,10 +446,6 @@ export default function Inventories({
         } else {
             navigate(data.itemuid);
         }
-    };
-
-    const columnHeader = (title: string, field: string) => {
-        return <span data-field={field}>{title}</span>;
     };
 
     return (
@@ -468,70 +520,15 @@ export default function Inventories({
                                         resizableColumns
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        onColReorder={handleColumnReorder}
+                                        onColumnResizeEnd={handleColumnResize}
                                         onRowClick={handleOnRowClick}
-                                        onColReorder={(event: DataTableColReorderEvent) => {
-                                            if (authUser && Array.isArray(event.columns)) {
-                                                const orderArray = event.columns?.map(
-                                                    (column: Column) => column.props.field
-                                                );
-
-                                                const newActiveColumns = orderArray
-                                                    .map((field: string | undefined) => {
-                                                        return (
-                                                            activeColumns.find(
-                                                                (column) => column.field === field
-                                                            ) || null
-                                                        );
-                                                    })
-                                                    .filter(
-                                                        (
-                                                            column: TableColumnsList | null
-                                                        ): column is TableColumnsList =>
-                                                            column !== null
-                                                    );
-
-                                                setActiveColumns(newActiveColumns);
-
-                                                changeSettings({
-                                                    activeColumns: newActiveColumns.map(
-                                                        ({ field }) => field
-                                                    ),
-                                                });
-                                            }
-                                        }}
-                                        onColumnResizeEnd={(event) => {
-                                            if (authUser && event) {
-                                                const newColumnWidth = {
-                                                    [event.column?.props?.field as string]:
-                                                        event.element?.offsetWidth,
-                                                };
-                                                changeSettings({
-                                                    columnWidth: {
-                                                        ...serverSettings?.inventory?.columnWidth,
-                                                        ...newColumnWidth,
-                                                    },
-                                                });
-                                            }
-                                        }}
                                     >
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}
                                             reorderable={false}
                                             resizeable={false}
-                                            body={({ itemuid }: Inventory) => {
-                                                return (
-                                                    <Button
-                                                        text
-                                                        className='table-edit-button'
-                                                        icon='adms-edit-item'
-                                                        tooltip='Edit inventory'
-                                                        tooltipOptions={{ position: "mouse" }}
-                                                        onClick={() =>
-                                                            navigate(INVENTORY_PAGE.EDIT(itemuid))
-                                                        }
-                                                    />
-                                                );
-                                            }}
+                                            body={columnEditButton}
                                             pt={{
                                                 root: {
                                                     style: {
@@ -555,13 +552,10 @@ export default function Inventories({
                                                     reorderable
                                                     headerClassName='cursor-move'
                                                     body={(data) => {
-                                                        if (field === "VIN") {
-                                                            return data[field].toUpperCase();
-                                                        }
-                                                        if (field === "Price") {
-                                                            return `$ ${data[field]}`;
-                                                        }
-                                                        return data[field];
+                                                        return handleFormatField(
+                                                            field,
+                                                            data[field]
+                                                        );
                                                     }}
                                                     pt={{
                                                         root: {
