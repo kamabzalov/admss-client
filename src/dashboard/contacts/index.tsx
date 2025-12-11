@@ -37,6 +37,7 @@ import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { ColumnSelector, TableColumn } from "dashboard/common/filter";
 import { DropdownChangeEvent } from "primereact/dropdown";
 import { CONTACTS_PAGE } from "common/constants/links";
+import { TruncatedText } from "dashboard/common/display";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -387,15 +388,23 @@ export const ContactsDataTable = ({
     ];
 
     const bodyDataRender = (field: keyof ContactUser | "fullName") => {
-        switch (field) {
-            case "fullName":
-                return renderFullName;
-            case "phone1":
-            case "phone2":
-                return (rowData: ContactUser) => formatPhoneNumber(rowData[field]);
-            default:
-                return undefined;
-        }
+        return (rowData: ContactUser) => {
+            let value = "";
+
+            switch (field) {
+                case "fullName":
+                    value = renderFullName(rowData);
+                    break;
+                case "phone1":
+                case "phone2":
+                    value = formatPhoneNumber(rowData[field]);
+                    break;
+                default:
+                    value = String(rowData[field] || "");
+            }
+
+            return <TruncatedText text={value} withTooltip />;
+        };
     };
 
     const handleChangeCategory = (e: DropdownChangeEvent) => {
@@ -494,7 +503,7 @@ export const ContactsDataTable = ({
                             sortField={lazyState.sortField}
                             resizableColumns
                             reorderableColumns
-                            rowClassName={() => "hover:text-primary cursor-pointer"}
+                            rowClassName={() => "table-row"}
                             onRowClick={handleOnRowClick}
                             onColReorder={(event) => {
                                 if (authUser && Array.isArray(event.columns)) {

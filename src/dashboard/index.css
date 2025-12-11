@@ -134,6 +134,13 @@
 }
 
 .p-datatable {
+    .table-row {
+        cursor: pointer;
+        &:hover {
+            background-color: var(--admss-app-light-green);
+        }
+    }
+
     .p-datatable-header {
         border: none;
         box-shadow: none;

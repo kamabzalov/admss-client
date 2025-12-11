@@ -32,6 +32,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { INVENTORY_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
+import { TruncatedText } from "dashboard/common/display";
 
 const DATA_FIELD = "data-field";
 
@@ -519,7 +520,7 @@ export default function Inventories({
                                         reorderableColumns
                                         resizableColumns
                                         header={header}
-                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        rowClassName={() => "table-row"}
                                         onColReorder={handleColumnReorder}
                                         onColumnResizeEnd={handleColumnResize}
                                         onRowClick={handleOnRowClick}
@@ -529,13 +530,7 @@ export default function Inventories({
                                             reorderable={false}
                                             resizeable={false}
                                             body={columnEditButton}
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: "80px",
-                                                    },
-                                                },
-                                            }}
+                                            className='table-edit-button-column'
                                         />
                                         {activeColumns.map(({ field, header }, index) => {
                                             const savedWidth =
@@ -552,9 +547,15 @@ export default function Inventories({
                                                     reorderable
                                                     headerClassName='cursor-move'
                                                     body={(data) => {
-                                                        return handleFormatField(
+                                                        const value = handleFormatField(
                                                             field,
                                                             data[field]
+                                                        );
+                                                        return (
+                                                            <TruncatedText
+                                                                text={value}
+                                                                withTooltip
+                                                            />
                                                         );
                                                     }}
                                                     pt={{

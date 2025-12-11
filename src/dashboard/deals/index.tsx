@@ -29,6 +29,7 @@ import { DropdownHeaderPanel } from "dashboard/deals/common";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
+import { TruncatedText } from "dashboard/common/display";
 import { useCreateReport, useToastMessage } from "common/hooks";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { DealsUserSettings } from "common/models/user";
@@ -548,7 +549,7 @@ export const DealsDataTable = observer(
                                 onSort={sortData}
                                 reorderableColumns
                                 resizableColumns
-                                rowClassName={() => "hover:text-primary cursor-pointer"}
+                                rowClassName={() => "table-row"}
                                 onRowClick={handleOnRowClick}
                                 onColumnResizeEnd={(event) => {
                                     if (
@@ -609,6 +610,10 @@ export const DealsDataTable = observer(
                                             key={field}
                                             sortable
                                             headerClassName='cursor-move'
+                                            body={(data) => {
+                                                const value = String(data[field] || "");
+                                                return <TruncatedText text={value} withTooltip />;
+                                            }}
                                             pt={{
                                                 root: {
                                                     style: savedWidth
