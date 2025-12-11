@@ -27,6 +27,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TruncatedText } from "dashboard/common/display";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -332,6 +333,7 @@ export const ExportSchedule = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         className='export-web-table'
+                        rowClassName={() => "table-row"}
                         paginator
                         first={lazyState.first}
                         rows={lazyState.rows}
@@ -353,6 +355,10 @@ export const ExportSchedule = (): ReactElement => {
                                     sortable
                                     header={header}
                                     reorderable={false}
+                                    body={(data) => {
+                                        const value = String(data[field] || "");
+                                        return <TruncatedText text={value} withTooltip />;
+                                    }}
                                     pt={{
                                         root: {
                                             style: savedWidth

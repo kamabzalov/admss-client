@@ -30,6 +30,11 @@
         width: 200px;
         font-weight: 600;
     }
+
+    .p-datatable-tbody > tr > td.table-edit-button-column {
+        padding: 0;
+        width: 50px;
+    }
 }
 .inventory__title {
     width: auto;

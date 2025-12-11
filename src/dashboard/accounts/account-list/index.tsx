@@ -24,6 +24,7 @@ import { ACCOUNTS_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
 import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
+import { TruncatedText } from "dashboard/common/display";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -168,7 +169,7 @@ export const AccountsDataTable = observer(
                                 resizableColumns
                                 sortOrder={lazyState.sortOrder}
                                 sortField={lazyState.sortField}
-                                rowClassName={() => "hover:text-primary cursor-pointer"}
+                                rowClassName={() => "table-row"}
                                 onRowClick={handleOnRowClick}
                                 onColumnResizeEnd={(event) => {
                                     if (
@@ -220,6 +221,10 @@ export const AccountsDataTable = observer(
                                             key={field}
                                             sortable
                                             headerClassName='cursor-move'
+                                            body={(data) => {
+                                                const value = String(data[field] || "");
+                                                return <TruncatedText text={value} withTooltip />;
+                                            }}
                                             pt={{
                                                 root: {
                                                     style: savedWidth

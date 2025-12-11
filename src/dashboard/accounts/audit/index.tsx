@@ -24,6 +24,7 @@ import { Task } from "common/models/tasks";
 import { ExpansionColumn, rowExpansionTemplate } from "dashboard/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { useNavigate } from "react-router-dom";
+import { TruncatedText } from "dashboard/common/display";
 
 type AuditColumn = { field: keyof AuditRecord; header: string };
 
@@ -272,7 +273,7 @@ export const AccountsAudit = observer((): ReactElement => {
                             resizableColumns
                             sortOrder={lazyState.sortOrder}
                             sortField={lazyState.sortField}
-                            rowClassName={() => "hover:text-primary cursor-pointer"}
+                            rowClassName={() => "table-row"}
                             onRowClick={({ data }: DataTableRowClickEvent) =>
                                 navigate(ACCOUNTS_PAGE.EDIT(data.accountuid))
                             }
@@ -295,6 +296,10 @@ export const AccountsAudit = observer((): ReactElement => {
                                         header={header}
                                         key={field}
                                         sortable
+                                        body={(data) => {
+                                            const value = String(data[field] || "");
+                                            return <TruncatedText text={value} withTooltip />;
+                                        }}
                                         pt={{
                                             root: {
                                                 style: savedWidth
