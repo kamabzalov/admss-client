@@ -18,8 +18,7 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
-import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ContactsUserSettings, TableState } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
@@ -84,13 +83,17 @@ export const ContactsDataTable = ({
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
-        ContactsUserSettings,
-        TableColumnsList
-    >("contacts", selectableColumns);
+    const {
+        activeColumns,
+        setActiveColumnsAndSave,
+        serverSettings,
+        setModuleSettings,
+        settingsLoaded,
+    } = useUserProfileSettings<ContactsUserSettings, TableColumnsList>(
+        "contacts",
+        selectableColumns
+    );
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const navigate = useNavigate();
     const store = useStore().contactStore;
     const userStore = useStore().userStore;
@@ -227,56 +230,33 @@ export const ContactsDataTable = ({
         handleGetContactsList(params, true);
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory, settingsLoaded]);
 
-    const handleGetUserSettings = useCallback(async () => {
-        if (!authUser) return;
-        const response = await getUserSettings(authUser.useruid);
-        if (response?.profile.length) {
-            if (response?.profile.length) {
-                let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                if (response.profile) {
-                    try {
-                        allSettings = JSON.parse(response.profile);
-                    } catch (error) {
-                        allSettings = {} as ServerUserSettings;
-                    }
-                }
-                setServerSettings(allSettings);
-                const { contacts: settings } = allSettings;
-                settings?.activeColumns &&
-                    setActiveColumnsAndSave(settings.activeColumns as TableColumnsList[]);
-                if (!contactCategory && settings?.selectedCategoriesOptions) {
-                    const savedCategory: ContactType[] = settings.selectedCategoriesOptions;
-                    if (Array.isArray(savedCategory) && savedCategory.length) {
-                        setSelectedCategory(savedCategory[0]);
-                    } else {
-                        setSelectedCategory(savedCategory as unknown as ContactType);
-                    }
-                }
-                settings?.table &&
-                    setLazyState({
-                        first: settings.table.first || initialDataTableQueries.first,
-                        rows: settings.table.rows || initialDataTableQueries.rows,
-                        page: settings.table.page || initialDataTableQueries.page,
-                        column: settings.table.column || initialDataTableQueries.column,
-                        sortField: settings.table.sortField || initialDataTableQueries.sortField,
-                        sortOrder: settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                    });
+    useEffect(() => {
+        if (!settingsLoaded || !serverSettings) return;
+
+        const moduleSettings = serverSettings?.contacts;
+        if (!contactCategory && moduleSettings?.selectedCategoriesOptions) {
+            const savedCategory: ContactType[] = moduleSettings.selectedCategoriesOptions;
+            if (Array.isArray(savedCategory) && savedCategory.length) {
+                setSelectedCategory(savedCategory[0]);
+            } else {
+                setSelectedCategory(savedCategory as unknown as ContactType);
             }
         }
-    }, [authUser]);
-
-    useEffect(() => {
-        handleGetUserSettings().finally(() => setSettingsLoaded(true));
-    }, []);
+        if (moduleSettings?.table) {
+            setLazyState({
+                first: moduleSettings.table.first || initialDataTableQueries.first,
+                rows: moduleSettings.table.rows || initialDataTableQueries.rows,
+                page: moduleSettings.table.page || initialDataTableQueries.page,
+                column: moduleSettings.table.column || initialDataTableQueries.column,
+                sortField: moduleSettings.table.sortField || initialDataTableQueries.sortField,
+                sortOrder: moduleSettings.table.sortOrder || initialDataTableQueries.sortOrder,
+            });
+        }
+    }, [settingsLoaded, serverSettings, contactCategory]);
 
     const changeSettings = (settings: Partial<ContactsUserSettings>) => {
         if (!authUser) return;
-        const newSettings = {
-            ...serverSettings,
-            contacts: { ...serverSettings?.contacts, ...settings },
-        } as ServerUserSettings;
-        setServerSettings(newSettings);
-        setUserSettings(authUser.useruid, newSettings);
+        setModuleSettings(settings);
     };
 
     const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
@@ -474,7 +454,9 @@ export const ContactsDataTable = ({
                     selectableColumns={selectableColumns}
                     activeColumns={activeColumns}
                     onColumnsChange={(columns) => {
-                        setActiveColumnsAndSave(columns);
+                        if (settingsLoaded) {
+                            setActiveColumnsAndSave(columns);
+                        }
                     }}
                     className='contacts-filter'
                 />
@@ -506,7 +488,7 @@ export const ContactsDataTable = ({
                             rowClassName={() => "table-row"}
                             onRowClick={handleOnRowClick}
                             onColReorder={(event) => {
-                                if (authUser && Array.isArray(event.columns)) {
+                                if (authUser && Array.isArray(event.columns) && settingsLoaded) {
                                     const orderArray = event.columns?.map(
                                         (column: any) => column.props.field
                                     );
