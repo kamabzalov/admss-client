@@ -51,6 +51,9 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
                 dob: contactExtData.CoBuyer_Date_Of_Birth,
                 exp: contactExtData.CoBuyer_DL_Exp_Date,
             };
+            if (!contactData.firstName || !contactData.lastName) {
+                return;
+            }
         } else {
             contactData = contactFullInfo;
         }

@@ -230,7 +230,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     onChange={({ target: { value } }) =>
                         handleFieldChange("CoBuyer_First_Name", value)
                     }
-                    onBlur={handleOfacCheck}
                     name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
@@ -269,7 +268,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     onChange={({ target: { value } }) =>
                         handleFieldChange("CoBuyer_Last_Name", value)
                     }
-                    onBlur={handleOfacCheck}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
