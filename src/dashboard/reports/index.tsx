@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState, useCallback } from "react";
+import React, { ReactElement, useEffect, useState, useCallback, useRef } from "react";
 import {
     createReportCollection,
     getUserFavoriteReportList,
@@ -12,8 +12,6 @@ import { Button } from "primereact/button";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { Panel } from "primereact/panel";
 import {
     NODE_TYPES,
@@ -30,7 +28,12 @@ import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 import { TreeNodeEvent } from "common/models";
 import { buildTreeNodes, transformLabel } from "./common/drag-and-drop";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ReportsUserSettings, ServerUserSettings } from "common/models/user";
 import "./index.css";
+import { typeGuards } from "common/utils";
+import { useToastMessage } from "common/hooks";
+import { CREATE_ID, REPORTS_PAGE } from "common/constants/links";
 
 const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
 const OPEN_PARAMETERS_CLASSES: Readonly<string[]> = [
@@ -43,7 +46,7 @@ export const Reports = (): ReactElement => {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
 
     const [reportSearch, setReportSearch] = useState<string>("");
     const [reportCollections, setReportCollections] = useState<ReportCollection[]>([]);
@@ -55,17 +58,47 @@ export const Reports = (): ReactElement => {
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
+    const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
+    const latestExpandedKeys = useRef<{ [key: string]: boolean }>({});
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const savedScrollTopRef = useRef<number | null>(null);
+    const latestScrollTopRef = useRef<number>(0);
+
+    const saveReportsSettings = useCallback(async () => {
+        if (!authUser) return;
+
+        const scrollTop = latestScrollTopRef.current;
+
+        const response = await getUserSettings(authUser.useruid);
+        let allSettings: ServerUserSettings = {} as ServerUserSettings;
+
+        if (response?.profile) {
+            try {
+                allSettings = JSON.parse(response.profile);
+            } catch {
+                allSettings = {} as ServerUserSettings;
+            }
+        }
+
+        const currentReportsSettings: ReportsUserSettings = allSettings.reports || {};
+
+        const updatedSettings: ServerUserSettings = {
+            ...allSettings,
+            reports: {
+                ...currentReportsSettings,
+                scrollTop,
+                expandedKeys: latestExpandedKeys.current,
+            },
+        };
+
+        await setUserSettings(authUser.useruid, updatedSettings);
+    }, [authUser]);
 
     const getReportCollections = useCallback(async () => {
         const response = await getUserReportCollectionsContent(authUser!.useruid);
         const { error } = response as BaseResponseError;
-        if (error && toast.current) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: error,
-                life: TOAST_LIFETIME,
-            });
+        if (error) {
+            showError(error);
         }
         if (Array.isArray(response)) {
             const collectionsWithoutFavorite = response.filter(
@@ -79,7 +112,7 @@ export const Reports = (): ReactElement => {
         } else {
             setReportCollections([]);
         }
-    }, [authUser, toast]);
+    }, [authUser]);
 
     const getFavoriteReportCollections = useCallback(async () => {
         const response = await getUserFavoriteReportList(authUser!.useruid);
@@ -99,23 +132,73 @@ export const Reports = (): ReactElement => {
         }
     }, [authUser, handleGetUserReportCollections]);
 
-    const showError = (detail: string) => {
-        toast.current?.show({
-            severity: "error",
-            summary: TOAST_MESSAGES.ERROR,
-            detail,
-            life: TOAST_LIFETIME,
-        });
-    };
+    useEffect(() => {
+        const loadSettings = async () => {
+            if (!authUser) return;
 
-    const showSuccess = (detail: string) => {
-        toast.current?.show({
-            severity: "success",
-            summary: TOAST_MESSAGES.SUCCESS,
-            detail,
-            life: TOAST_LIFETIME,
-        });
-    };
+            const response = await getUserSettings(authUser.useruid);
+            if (response?.profile?.length) {
+                let allSettings: ServerUserSettings = {} as ServerUserSettings;
+
+                if (response.profile) {
+                    try {
+                        allSettings = JSON.parse(response.profile);
+                    } catch {
+                        allSettings = {} as ServerUserSettings;
+                    }
+                }
+
+                if (allSettings.reports?.expandedKeys) {
+                    setExpandedKeys(allSettings.reports.expandedKeys);
+                }
+
+                if (typeGuards.isNumber(allSettings.reports?.scrollTop)) {
+                    savedScrollTopRef.current = allSettings.reports?.scrollTop ?? 0;
+                }
+            }
+        };
+
+        loadSettings();
+    }, [authUser]);
+
+    useEffect(() => {
+        latestExpandedKeys.current = expandedKeys;
+    }, [expandedKeys]);
+
+    useEffect(() => {
+        if (savedScrollTopRef.current != null && containerRef.current) {
+            const value = savedScrollTopRef.current;
+            savedScrollTopRef.current = null;
+
+            window.requestAnimationFrame(() => {
+                if (containerRef.current) {
+                    containerRef.current.scrollTop = value;
+                }
+            });
+        }
+    }, [reportCollections, favoriteCollections]);
+
+    useEffect(() => {
+        const element = containerRef.current;
+        if (!element) return;
+
+        const handleScroll = () => {
+            latestScrollTopRef.current = element.scrollTop;
+        };
+
+        handleScroll();
+        element.addEventListener("scroll", handleScroll);
+
+        return () => {
+            element.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            void saveReportsSettings();
+        };
+    }, [saveReportsSettings]);
 
     const allNodes: TreeNode[] = [
         ...buildTreeNodes(favoriteCollections, true),
@@ -129,21 +212,11 @@ export const Reports = (): ReactElement => {
             documents: newCollectionsReports,
         });
         const { error } = response as BaseResponseError;
-        if (error && toast.current) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: error,
-                life: TOAST_LIFETIME,
-            });
+        if (error) {
+            showError(error);
         } else {
             await handleGetUserReportCollections();
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: "New collection is successfully created!",
-                life: TOAST_LIFETIME,
-            });
+            showSuccess("New collection is successfully created!");
             setCollectionName("");
             setNewCollectionsReports([]);
         }
@@ -160,21 +233,11 @@ export const Reports = (): ReactElement => {
                 itemuid: collectionUid,
             });
             const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
+            if (error) {
+                showError(error);
             } else {
                 await handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Collection is successfully updated!",
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess("Collection is successfully updated!");
                 setCollectionName("");
                 setSelectedReports([]);
                 setIsCollectionEditing(null);
@@ -439,7 +502,7 @@ export const Reports = (): ReactElement => {
                     <div
                         className='reports__list-item reports__list-item--inner'
                         onClick={(event) => handleOpenParameters(event, currentReport)}
-                        onDoubleClick={(event: React.MouseEvent<HTMLElement>) => {
+                        onDoubleClick={async (event: React.MouseEvent<HTMLElement>) => {
                             event.stopPropagation();
                             const target = event.target as HTMLElement;
                             if (
@@ -447,7 +510,8 @@ export const Reports = (): ReactElement => {
                                     target.classList.contains(cls)
                                 )
                             ) {
-                                navigate(`/dashboard/reports/${currentReport.documentUID}`);
+                                await saveReportsSettings();
+                                navigate(REPORTS_PAGE.EDIT(currentReport.documentUID));
                             }
                         }}
                     >
@@ -464,6 +528,7 @@ export const Reports = (): ReactElement => {
                             )}
                             refetchCollectionsAction={handleGetUserReportCollections}
                             currentCollectionUID={data.parentCollectionUID}
+                            onBeforeEdit={saveReportsSettings}
                         />
                     </div>
                     {isParametersEditing?.documentUID === currentReport.documentUID && (
@@ -476,7 +541,7 @@ export const Reports = (): ReactElement => {
     };
 
     return (
-        <div className='card reports'>
+        <div className='card reports' ref={containerRef}>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Reports</h2>
             </div>
@@ -487,7 +552,7 @@ export const Reports = (): ReactElement => {
                             headerTemplate={(options) =>
                                 ReportsPanelHeader({
                                     options,
-                                    navigatePath: "create",
+                                    navigatePath: CREATE_ID,
                                     state: reportSearch,
                                     isConfirm: !!selectedReports.length || !!collectionName.length,
                                     setStateAction: setReportSearch,
@@ -514,6 +579,10 @@ export const Reports = (): ReactElement => {
                             onDragDrop={handleDragDrop}
                             value={allNodes}
                             nodeTemplate={nodeTemplate}
+                            expandedKeys={expandedKeys}
+                            onToggle={(e) => {
+                                setExpandedKeys(e.value);
+                            }}
                             filter={false}
                         />
                     </div>
