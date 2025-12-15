@@ -50,6 +50,11 @@ export interface TasksUserSettings extends UserSettings {
     activeColumns?: string[];
 }
 
+export interface ReportsUserSettings {
+    scrollTop?: number;
+    expandedKeys?: { [key: string]: boolean };
+}
+
 export interface SidebarUserSettings {
     isSidebarCollapsed: boolean;
 }
@@ -68,6 +73,7 @@ export interface ServerUserSettings {
     exportSchedule: ExportWebUserSettings;
     exportHistory: ExportWebUserSettings;
     sidebar?: SidebarUserSettings;
+    reports?: ReportsUserSettings;
 }
 
 export interface UserGroup {
