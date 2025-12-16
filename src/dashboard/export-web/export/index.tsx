@@ -41,6 +41,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -798,8 +799,11 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 },
                             }}
                         />
-                        {activeColumns.map(({ field, header }) =>
-                            serviceColumns.some(
+                        {activeColumns.map(({ field, header }, index) => {
+                            const savedWidth = serverSettings?.exportWeb?.columnWidth?.[field];
+                            const isLastColumn = index === activeColumns.length - 1;
+
+                            return serviceColumns.some(
                                 (serviceColumn) => serviceColumn.field === field
                             ) ? (
                                 <Column
@@ -911,22 +915,10 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         );
                                     }}
                                     headerClassName='cursor-move'
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                width: serverSettings?.exportWeb?.columnWidth?.[
-                                                    field
-                                                ],
-                                                maxWidth:
-                                                    serverSettings?.exportWeb?.columnWidth?.[field],
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                            },
-                                        },
-                                    }}
+                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                 />
-                            )
-                        )}
+                            );
+                        })}
                     </DataTable>
                 </div>
             </div>

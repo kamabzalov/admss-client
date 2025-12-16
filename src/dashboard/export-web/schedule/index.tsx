@@ -28,6 +28,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -347,6 +348,7 @@ export const ExportSchedule = (): ReactElement => {
                     >
                         {activeScheduleColumns.map(({ field, header }, index) => {
                             const savedWidth = serverSettings?.exportSchedule?.columnWidth?.[field];
+                            const isLastColumn = index === activeScheduleColumns.length - 1;
 
                             return (
                                 <Column
@@ -359,21 +361,7 @@ export const ExportSchedule = (): ReactElement => {
                                         const value = String(data[field] || "");
                                         return <TruncatedText text={value} withTooltip />;
                                     }}
-                                    pt={{
-                                        root: {
-                                            style: savedWidth
-                                                ? {
-                                                      width: `${savedWidth}px`,
-                                                      maxWidth: `${savedWidth}px`,
-                                                      overflow: "hidden",
-                                                      textOverflow: "ellipsis",
-                                                  }
-                                                : {
-                                                      overflow: "hidden",
-                                                      textOverflow: "ellipsis",
-                                                  },
-                                        },
-                                    }}
+                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                 />
                             );
                         })}

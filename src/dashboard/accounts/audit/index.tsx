@@ -21,7 +21,11 @@ import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TableColumn } from "dashboard/common/filter";
 import { Task } from "common/models/tasks";
-import { ExpansionColumn, rowExpansionTemplate } from "dashboard/common/data-table";
+import {
+    ExpansionColumn,
+    rowExpansionTemplate,
+    getColumnPtStyles,
+} from "dashboard/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { useNavigate } from "react-router-dom";
 import { TruncatedText } from "dashboard/common/display";
@@ -287,8 +291,9 @@ export const AccountsAudit = observer((): ReactElement => {
                             }}
                         >
                             {ExpansionColumn({ handleRowExpansion })}
-                            {currentColumns.map(({ field, header }) => {
+                            {currentColumns.map(({ field, header }, index) => {
                                 const savedWidth = moduleSettings?.columnWidth?.[field];
+                                const isLastColumn = index === currentColumns.length - 1;
 
                                 return (
                                     <Column
@@ -300,21 +305,7 @@ export const AccountsAudit = observer((): ReactElement => {
                                             const value = String(data[field] || "");
                                             return <TruncatedText text={value} withTooltip />;
                                         }}
-                                        pt={{
-                                            root: {
-                                                style: savedWidth
-                                                    ? {
-                                                          width: `${savedWidth}px`,
-                                                          maxWidth: `${savedWidth}px`,
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                      }
-                                                    : {
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                      },
-                                            },
-                                        }}
+                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                     />
                                 );
                             })}

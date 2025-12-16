@@ -21,6 +21,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -297,6 +298,7 @@ export const ExportHistory = (): ReactElement => {
                     >
                         {activeHistoryColumns.map(({ field, header }, index) => {
                             const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
+                            const isLastColumn = index === activeHistoryColumns.length - 1;
 
                             return (
                                 <Column
@@ -309,21 +311,7 @@ export const ExportHistory = (): ReactElement => {
                                         const value = String(data[field] || "");
                                         return <TruncatedText text={value} withTooltip />;
                                     }}
-                                    pt={{
-                                        root: {
-                                            style: savedWidth
-                                                ? {
-                                                      width: `${savedWidth}px`,
-                                                      maxWidth: `${savedWidth}px`,
-                                                      overflow: "hidden",
-                                                      textOverflow: "ellipsis",
-                                                  }
-                                                : {
-                                                      overflow: "hidden",
-                                                      textOverflow: "ellipsis",
-                                                  },
-                                        },
-                                    }}
+                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                 />
                             );
                         })}
