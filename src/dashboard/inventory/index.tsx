@@ -33,6 +33,7 @@ import { useStore } from "store/hooks";
 import { INVENTORY_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 const DATA_FIELD = "data-field";
 
@@ -535,6 +536,7 @@ export default function Inventories({
                                         {activeColumns.map(({ field, header }, index) => {
                                             const savedWidth =
                                                 serverSettings?.inventory?.columnWidth?.[field];
+                                            const isLastColumn = index === activeColumns.length - 1;
 
                                             return (
                                                 <Column
@@ -558,21 +560,10 @@ export default function Inventories({
                                                             />
                                                         );
                                                     }}
-                                                    pt={{
-                                                        root: {
-                                                            style: savedWidth
-                                                                ? {
-                                                                      width: `${savedWidth}px`,
-                                                                      maxWidth: `${savedWidth}px`,
-                                                                      overflow: "hidden",
-                                                                      textOverflow: "ellipsis",
-                                                                  }
-                                                                : {
-                                                                      overflow: "hidden",
-                                                                      textOverflow: "ellipsis",
-                                                                  },
-                                                        },
-                                                    }}
+                                                    pt={getColumnPtStyles({
+                                                        savedWidth,
+                                                        isLastColumn,
+                                                    })}
                                                 />
                                             );
                                         })}

@@ -25,6 +25,7 @@ import { Button } from "primereact/button";
 import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -210,9 +211,10 @@ export const AccountsDataTable = observer(
                                     }}
                                 />
 
-                                {activeColumns.map(({ field, header }: TableColumnsList) => {
+                                {activeColumns.map(({ field, header }: TableColumnsList, index) => {
                                     const savedWidth =
                                         serverSettings?.accounts?.columnWidth?.[field];
+                                    const isLastColumn = index === activeColumns.length - 1;
 
                                     return (
                                         <Column
@@ -225,21 +227,7 @@ export const AccountsDataTable = observer(
                                                 const value = String(data[field] || "");
                                                 return <TruncatedText text={value} withTooltip />;
                                             }}
-                                            pt={{
-                                                root: {
-                                                    style: savedWidth
-                                                        ? {
-                                                              width: `${savedWidth}px`,
-                                                              maxWidth: `${savedWidth}px`,
-                                                              overflow: "hidden",
-                                                              textOverflow: "ellipsis",
-                                                          }
-                                                        : {
-                                                              overflow: "hidden",
-                                                              textOverflow: "ellipsis",
-                                                          },
-                                                },
-                                            }}
+                                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                         />
                                     );
                                 })}

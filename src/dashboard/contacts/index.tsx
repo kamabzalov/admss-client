@@ -37,6 +37,7 @@ import { ColumnSelector, TableColumn } from "dashboard/common/filter";
 import { DropdownChangeEvent } from "primereact/dropdown";
 import { CONTACTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -549,6 +550,9 @@ export const ContactsDataTable = ({
                             />
                             {alwaysActiveColumns.map(({ field, header }, index) => {
                                 const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
+                                const isLastColumn =
+                                    index === alwaysActiveColumns.length - 1 &&
+                                    activeColumns.length === 0;
 
                                 return (
                                     <Column
@@ -558,29 +562,18 @@ export const ContactsDataTable = ({
                                         sortable
                                         body={bodyDataRender(field)}
                                         headerClassName='cursor-move'
-                                        pt={{
-                                            root: {
-                                                style: savedWidth
-                                                    ? {
-                                                          width: `${savedWidth}px`,
-                                                          maxWidth: `${savedWidth}px`,
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                          borderLeft: !index ? "none" : "",
-                                                      }
-                                                    : {
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                          borderLeft: !index ? "none" : "",
-                                                      },
-                                            },
-                                        }}
+                                        pt={getColumnPtStyles({
+                                            savedWidth,
+                                            isLastColumn,
+                                            additionalStyles: { borderLeft: !index ? "none" : "" },
+                                        })}
                                     />
                                 );
                             })}
 
                             {activeColumns.map(({ field, header }: TableColumnsList, index) => {
                                 const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
+                                const isLastColumn = index === activeColumns.length - 1;
 
                                 return (
                                     <Column
@@ -590,21 +583,7 @@ export const ContactsDataTable = ({
                                         sortable
                                         headerClassName='cursor-move'
                                         body={bodyDataRender(field)}
-                                        pt={{
-                                            root: {
-                                                style: savedWidth
-                                                    ? {
-                                                          width: `${savedWidth}px`,
-                                                          maxWidth: `${savedWidth}px`,
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                      }
-                                                    : {
-                                                          overflow: "hidden",
-                                                          textOverflow: "ellipsis",
-                                                      },
-                                            },
-                                        }}
+                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                     />
                                 );
                             })}
