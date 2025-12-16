@@ -166,17 +166,19 @@ export const Reports = (): ReactElement => {
     }, [expandedKeys]);
 
     useEffect(() => {
-        if (savedScrollTopRef.current != null && containerRef.current) {
+        if (
+            savedScrollTopRef.current != null &&
+            containerRef.current &&
+            !!reportCollections.length
+        ) {
             const value = savedScrollTopRef.current;
             savedScrollTopRef.current = null;
 
-            window.requestAnimationFrame(() => {
-                if (containerRef.current) {
-                    containerRef.current.scrollTop = value;
-                }
-            });
+            if (containerRef.current) {
+                containerRef.current.scrollTop = value;
+            }
         }
-    }, [reportCollections, favoriteCollections]);
+    }, [reportCollections, favoriteCollections, expandedKeys]);
 
     useEffect(() => {
         const element = containerRef.current;
