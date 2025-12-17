@@ -3,10 +3,8 @@ import { ReactElement, useRef } from "react";
 import { ReportSelect } from "dashboard/reports/form/common";
 import { observer } from "mobx-react-lite";
 import { ReportServiceColumns } from "common/models/reports";
-import {
-    MOVE_DIRECTION,
-    useReportColumnController,
-} from "dashboard/reports/form/edit/column-select/select-controller";
+import { useReportColumnController } from "dashboard/reports/form/edit/column-select/select-controller";
+import { MOVE_DIRECTION } from "common/constants/report-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DataSetInfoTemplate } from "dashboard/reports/form/edit/column-select/info-panel";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";

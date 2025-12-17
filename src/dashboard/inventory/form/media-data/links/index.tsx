@@ -17,11 +17,7 @@ import { Status } from "common/models/base-response";
 import { AxiosError } from "axios";
 import { Tooltip } from "primereact/tooltip";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-
-enum DIRECTION {
-    UP = "up",
-    DOWN = "down",
-}
+import { MOVE_DIRECTION } from "common/constants/report-options";
 
 const isValidUrl = (url: string): boolean => {
     if (!url) return false;
@@ -228,9 +224,10 @@ export const LinksMedia = observer((): ReactElement => {
         }
     };
 
-    const handleChangeOrder = async (link: MediaItem, direction: DIRECTION) => {
+    const handleChangeOrder = async (link: MediaItem, direction: MOVE_DIRECTION) => {
         const order = link.info?.order ?? 0;
-        const newOrder = direction === DIRECTION.UP ? (order === 0 ? 0 : order - 1) : order + 1;
+        const newOrder =
+            direction === MOVE_DIRECTION.UP ? (order === 0 ? 0 : order - 1) : order + 1;
         try {
             const response = await changeInventoryLinksOrder({
                 itemuid: link.itemuid,
@@ -335,7 +332,7 @@ export const LinksMedia = observer((): ReactElement => {
                     tooltip='Up'
                     className='p-button-text link-control__button'
                     disabled={isFirst}
-                    onClick={() => handleChangeOrder(rowData, DIRECTION.UP)}
+                    onClick={() => handleChangeOrder(rowData, MOVE_DIRECTION.UP)}
                 />
                 <Button
                     icon='pi pi-arrow-circle-down'
@@ -346,7 +343,7 @@ export const LinksMedia = observer((): ReactElement => {
                     disabled={isLast}
                     tooltip='Down'
                     className='p-button-text link-control__button'
-                    onClick={() => handleChangeOrder(rowData, DIRECTION.DOWN)}
+                    onClick={() => handleChangeOrder(rowData, MOVE_DIRECTION.DOWN)}
                 />
             </div>
         );
