@@ -10,10 +10,9 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { Layout, Responsive, ResponsiveProps, WidthProvider } from "react-grid-layout";
 import { useToastMessage } from "common/hooks";
+import { MOVE_DIRECTION, NEW_ITEM } from "common/constants/report-options";
 
 const ResponsiveReactGridLayout = WidthProvider<ResponsiveProps>(Responsive);
-
-const NEW_ITEM = "new";
 
 export const SettingsInventoryGroups = observer((): ReactElement => {
     const store = useStore().generalSettingsStore;
@@ -23,6 +22,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
     const { authUser } = userStore;
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
     const [layoutKey, setLayoutKey] = useState<boolean>(false);
+    const [isMoving, setIsMoving] = useState<boolean>(false);
 
     const layouts = useMemo(() => {
         return {
@@ -36,14 +36,24 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
         };
     }, [inventoryGroups]);
 
-    const handleMoveItem = async (currentItem: UserGroup, direction: "up" | "down") => {
-        if (currentItem) {
-            const order = direction === "up" ? --currentItem.order : ++currentItem.order;
-            await addUserGroupList(authUser!.useruid, {
-                ...currentItem,
-                order,
-            });
-            getUserGroupList();
+    const handleMoveItem = async (currentItem: UserGroup, direction: MOVE_DIRECTION) => {
+        if (currentItem && !isMoving) {
+            setIsMoving(true);
+            try {
+                const order =
+                    direction === MOVE_DIRECTION.UP ? --currentItem.order : ++currentItem.order;
+                await addUserGroupList(authUser!.useruid, {
+                    ...currentItem,
+                    order,
+                });
+                await getUserGroupList();
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error ? error.message : "Failed to move group";
+                showError(errorMessage);
+            } finally {
+                setIsMoving(false);
+            }
         }
     };
 
@@ -103,11 +113,13 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
     const handleDragItem = async (layout: Layout[], oldItem: Layout, newItem: Layout) => {
         if (
             (oldItem.x === newItem.x && oldItem.y === newItem.y) ||
-            oldItem.i === editedItem?.itemuid
+            oldItem.i === editedItem?.itemuid ||
+            isMoving
         ) {
             return;
         }
 
+        setIsMoving(true);
         const sortedLayout = [...layout].sort((a, b) => a.y - b.y);
 
         const updatedGroups = sortedLayout
@@ -131,12 +143,14 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                     order: group.order,
                 });
             }
-            getUserGroupList();
+            await getUserGroupList();
         } catch (error) {
             const errorMessage =
                 error instanceof Error ? error.message : "Failed to update group order";
             showError(errorMessage);
             setLayoutKey(!layoutKey);
+        } finally {
+            setIsMoving(false);
         }
     };
 
@@ -185,7 +199,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                         width={600}
                         margin={[0, 0]}
                         compactType='vertical'
-                        isDraggable={!editedItem || !Object.keys(editedItem).length}
+                        isDraggable={(!editedItem || !Object.keys(editedItem).length) && !isMoving}
                         isDroppable={!editedItem || Object.keys(editedItem).length === 0}
                         onDragStop={handleDragItem}
                         draggableCancel='.p-button, .row-edit'
@@ -203,8 +217,12 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         severity='success'
                                         tooltip='Move up'
                                         className='p-button-text inventory-group__navigation__button'
-                                        onClick={() => handleMoveItem(item as UserGroup, "up")}
-                                        disabled={index === 0 || item.itemuid === NEW_ITEM}
+                                        onClick={() =>
+                                            handleMoveItem(item as UserGroup, MOVE_DIRECTION.UP)
+                                        }
+                                        disabled={
+                                            index === 0 || item.itemuid === NEW_ITEM || isMoving
+                                        }
                                     />
                                     <Button
                                         icon='pi pi-arrow-circle-down'
@@ -213,10 +231,13 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         severity='success'
                                         tooltip='Move down'
                                         className='p-button-text inventory-group__navigation__button'
-                                        onClick={() => handleMoveItem(item as UserGroup, "down")}
+                                        onClick={() =>
+                                            handleMoveItem(item as UserGroup, MOVE_DIRECTION.DOWN)
+                                        }
                                         disabled={
                                             index === inventoryGroups.length - 1 ||
-                                            item.itemuid === NEW_ITEM
+                                            item.itemuid === NEW_ITEM ||
+                                            isMoving
                                         }
                                     />
                                 </div>

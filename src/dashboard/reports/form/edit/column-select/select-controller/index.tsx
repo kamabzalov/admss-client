@@ -27,15 +27,6 @@ const initialDataSetsData: Record<ReportServices, ReportServiceColumns[]> = {
     [ReportServices.ACCOUNTS]: [],
 };
 
-export enum MOVE_DIRECTION {
-    LEFT = "left",
-    RIGHT = "right",
-    TOP = "top",
-    BOTTOM = "bottom",
-    UP = "up",
-    DOWN = "down",
-}
-
 const getCompatibleDatasets = (
     selectedDatasets: ReportServices[],
     allDatasets: Dataset[]
