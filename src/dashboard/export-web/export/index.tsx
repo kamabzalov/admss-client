@@ -602,9 +602,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     return (
-        <div className='card-content'>
-            <div className='grid datatable-controls'>
-                <div className='col-12 export-web-controls'>
+        <section className='card-content'>
+            <div className='datatable-controls'>
+                <div className='export-web-controls'>
                     <Button
                         className='export-web-controls__button px-6 uppercase'
                         severity='success'
@@ -715,213 +715,194 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     </span>
                 </div>
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    {isLoading && <Loader overlay />}
-                    <DataTable
-                        showGridlines
-                        value={exportsToWeb}
-                        lazy
-                        paginator
-                        scrollable
-                        scrollHeight='70vh'
-                        first={lazyState.first}
-                        rows={lazyState.rows}
-                        rowsPerPageOptions={ROWS_PER_PAGE}
-                        totalRecords={totalRecords || 1}
-                        onPage={pageChanged}
-                        onSort={sortData}
-                        rowExpansionTemplate={rowExpansionTemplate}
-                        expandedRows={expandedRows}
-                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
-                        reorderableColumns
-                        resizableColumns
-                        sortOrder={lazyState.sortOrder}
-                        className='export-web-table'
-                        rowClassName={() => "table-row"}
-                        sortField={lazyState.sortField}
-                        onColReorder={handleColumnReorder}
-                        onColumnResizeEnd={handleColumnResize}
-                    >
-                        <Column
-                            bodyStyle={{ textAlign: "center" }}
-                            header={
+            {isLoading && <Loader overlay />}
+            <DataTable
+                showGridlines
+                value={exportsToWeb}
+                lazy
+                paginator
+                scrollable
+                scrollHeight='auto'
+                first={lazyState.first}
+                rows={lazyState.rows}
+                rowsPerPageOptions={ROWS_PER_PAGE}
+                totalRecords={totalRecords || 1}
+                onPage={pageChanged}
+                onSort={sortData}
+                rowExpansionTemplate={rowExpansionTemplate}
+                expandedRows={expandedRows}
+                onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                reorderableColumns
+                resizableColumns
+                sortOrder={lazyState.sortOrder}
+                className='export-web-table'
+                rowClassName={() => "table-row"}
+                sortField={lazyState.sortField}
+                onColReorder={handleColumnReorder}
+                onColumnResizeEnd={handleColumnResize}
+            >
+                <Column
+                    bodyStyle={{ textAlign: "center" }}
+                    header={
+                        <Checkbox
+                            checked={selectedInventories.every((checkbox) => !!checkbox)}
+                            onClick={({ checked }) => {
+                                setSelectedInventories(selectedInventories.map(() => !!checked));
+                            }}
+                        />
+                    }
+                    reorderable={false}
+                    resizeable={false}
+                    body={(options, { rowIndex }) => {
+                        return (
+                            <div
+                                className={`flex gap-3 align-items-center  ${
+                                    selectedInventories[rowIndex] && "row--selected"
+                                }`}
+                            >
                                 <Checkbox
-                                    checked={selectedInventories.every((checkbox) => !!checkbox)}
-                                    onClick={({ checked }) => {
+                                    checked={selectedInventories[rowIndex]}
+                                    onClick={() => {
                                         setSelectedInventories(
-                                            selectedInventories.map(() => !!checked)
+                                            selectedInventories.map((state, index) =>
+                                                index === rowIndex ? !state : state
+                                            )
                                         );
                                     }}
                                 />
-                            }
-                            reorderable={false}
-                            resizeable={false}
-                            body={(options, { rowIndex }) => {
+
+                                <Button
+                                    className='text export-web__icon-button'
+                                    icon='icon adms-edit-item'
+                                    onClick={() => {
+                                        inventoryStore.memoRoute = currentPath;
+                                        navigate(`/dashboard/inventory/${options.itemuid}`);
+                                    }}
+                                />
+                                <Button
+                                    className='text export-web__icon-button'
+                                    icon='pi pi-angle-down'
+                                    onClick={() => handleRowExpansionClick(options)}
+                                />
+                            </div>
+                        );
+                    }}
+                    pt={{
+                        root: {
+                            style: {
+                                width: "100px",
+                            },
+                        },
+                    }}
+                />
+                {activeColumns.map(({ field, header }, index) => {
+                    const savedWidth = serverSettings?.exportWeb?.columnWidth?.[field];
+                    const isLastColumn = index === activeColumns.length - 1;
+
+                    return serviceColumns.some((serviceColumn) => serviceColumn.field === field) ? (
+                        <Column
+                            field={field}
+                            header={() => (
+                                <div className='flex gap-3'>
+                                    <Checkbox
+                                        checked={handleCheckboxCheck(field, "all")}
+                                        onClick={() => handleCheckboxChange(field, "all")}
+                                    />
+                                    {header?.toString()}
+                                </div>
+                            )}
+                            headerTooltip={field}
+                            body={(_, { rowIndex }) => {
                                 return (
                                     <div
-                                        className={`flex gap-3 align-items-center  ${
-                                            selectedInventories[rowIndex] && "row--selected"
+                                        className={`export-web-service ${
+                                            selectedInventories[rowIndex] ? "row--selected" : ""
                                         }`}
                                     >
                                         <Checkbox
-                                            checked={selectedInventories[rowIndex]}
-                                            onClick={() => {
-                                                setSelectedInventories(
-                                                    selectedInventories.map((state, index) =>
-                                                        index === rowIndex ? !state : state
-                                                    )
-                                                );
-                                            }}
+                                            checked={handleCheckboxCheck(field, rowIndex)}
+                                            onClick={() => handleCheckboxChange(field, rowIndex)}
                                         />
-
-                                        <Button
-                                            className='text export-web__icon-button'
-                                            icon='icon adms-edit-item'
-                                            onClick={() => {
-                                                inventoryStore.memoRoute = currentPath;
-                                                navigate(`/dashboard/inventory/${options.itemuid}`);
-                                            }}
-                                        />
-                                        <Button
-                                            className='text export-web__icon-button'
-                                            icon='pi pi-angle-down'
-                                            onClick={() => handleRowExpansionClick(options)}
+                                        <InputNumber
+                                            maxFractionDigits={2}
+                                            minFractionDigits={2}
+                                            disabled={
+                                                !selectedServices.find(
+                                                    (item) => item.field === field
+                                                )?.selected[rowIndex]
+                                            }
+                                            value={
+                                                selectedServices.find(
+                                                    (item) => item.field === field
+                                                )?.price[rowIndex] || 0
+                                            }
+                                            onChange={({ value }) =>
+                                                value && handlePriceChange(field, rowIndex, value)
+                                            }
+                                            className='export-web-service__input'
                                         />
                                     </div>
                                 );
                             }}
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "100px",
-                                    },
-                                },
-                            }}
+                            key={field}
                         />
-                        {activeColumns.map(({ field, header }, index) => {
-                            const savedWidth = serverSettings?.exportWeb?.columnWidth?.[field];
-                            const isLastColumn = index === activeColumns.length - 1;
+                    ) : (
+                        <Column
+                            field={field}
+                            header={header}
+                            key={field}
+                            sortable
+                            body={(data, { rowIndex }) => {
+                                let value: string | number;
+                                if (field === "VIN") {
+                                    value = data[field].toUpperCase();
+                                } else {
+                                    value = data[field];
+                                }
 
-                            return serviceColumns.some(
-                                (serviceColumn) => serviceColumn.field === field
-                            ) ? (
-                                <Column
-                                    field={field}
-                                    header={() => (
-                                        <div className='flex gap-3'>
-                                            <Checkbox
-                                                checked={handleCheckboxCheck(field, "all")}
-                                                onClick={() => handleCheckboxChange(field, "all")}
+                                return (
+                                    <div
+                                        className={`${
+                                            selectedInventories[rowIndex] ? "row--selected" : ""
+                                        }`}
+                                    >
+                                        {field === "ListPrice" ? (
+                                            <InputNumber
+                                                key={forceUpdate}
+                                                maxFractionDigits={2}
+                                                minFractionDigits={2}
+                                                className='export-web__input-price'
+                                                value={Number(value)}
+                                                onChange={({ value }) => {
+                                                    setPriceChanged(true);
+                                                    if (
+                                                        !initialPrice ||
+                                                        initialPrice !== String(value)
+                                                    ) {
+                                                        setInitialPrice(data.ListPrice);
+                                                    }
+                                                    setCurrentInventory({
+                                                        ...data,
+                                                        ListPrice: value?.toString() || "",
+                                                    });
+                                                }}
+                                                onKeyDown={(evt) =>
+                                                    evt.key === "Enter" && handleChangePrice()
+                                                }
+                                                onBlur={handleChangePrice}
                                             />
-                                            {header?.toString()}
-                                        </div>
-                                    )}
-                                    headerTooltip={field}
-                                    body={(_, { rowIndex }) => {
-                                        return (
-                                            <div
-                                                className={`export-web-service ${
-                                                    selectedInventories[rowIndex]
-                                                        ? "row--selected"
-                                                        : ""
-                                                }`}
-                                            >
-                                                <Checkbox
-                                                    checked={handleCheckboxCheck(field, rowIndex)}
-                                                    onClick={() =>
-                                                        handleCheckboxChange(field, rowIndex)
-                                                    }
-                                                />
-                                                <InputNumber
-                                                    maxFractionDigits={2}
-                                                    minFractionDigits={2}
-                                                    disabled={
-                                                        !selectedServices.find(
-                                                            (item) => item.field === field
-                                                        )?.selected[rowIndex]
-                                                    }
-                                                    value={
-                                                        selectedServices.find(
-                                                            (item) => item.field === field
-                                                        )?.price[rowIndex] || 0
-                                                    }
-                                                    onChange={({ value }) =>
-                                                        value &&
-                                                        handlePriceChange(field, rowIndex, value)
-                                                    }
-                                                    className='export-web-service__input'
-                                                />
-                                            </div>
-                                        );
-                                    }}
-                                    key={field}
-                                />
-                            ) : (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    body={(data, { rowIndex }) => {
-                                        let value: string | number;
-                                        if (field === "VIN") {
-                                            value = data[field].toUpperCase();
-                                        } else {
-                                            value = data[field];
-                                        }
-
-                                        return (
-                                            <div
-                                                className={`${
-                                                    selectedInventories[rowIndex]
-                                                        ? "row--selected"
-                                                        : ""
-                                                }`}
-                                            >
-                                                {field === "ListPrice" ? (
-                                                    <InputNumber
-                                                        key={forceUpdate}
-                                                        maxFractionDigits={2}
-                                                        minFractionDigits={2}
-                                                        className='export-web__input-price'
-                                                        value={Number(value)}
-                                                        onChange={({ value }) => {
-                                                            setPriceChanged(true);
-                                                            if (
-                                                                !initialPrice ||
-                                                                initialPrice !== String(value)
-                                                            ) {
-                                                                setInitialPrice(data.ListPrice);
-                                                            }
-                                                            setCurrentInventory({
-                                                                ...data,
-                                                                ListPrice: value?.toString() || "",
-                                                            });
-                                                        }}
-                                                        onKeyDown={(evt) =>
-                                                            evt.key === "Enter" &&
-                                                            handleChangePrice()
-                                                        }
-                                                        onBlur={handleChangePrice}
-                                                    />
-                                                ) : (
-                                                    <TruncatedText
-                                                        text={String(value || "")}
-                                                        withTooltip
-                                                    />
-                                                )}
-                                            </div>
-                                        );
-                                    }}
-                                    headerClassName='cursor-move'
-                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                />
-                            );
-                        })}
-                    </DataTable>
-                </div>
-            </div>
+                                        ) : (
+                                            <TruncatedText text={String(value || "")} withTooltip />
+                                        )}
+                                    </div>
+                                );
+                            }}
+                            headerClassName='cursor-move'
+                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                        />
+                    );
+                })}
+            </DataTable>
             <ConfirmModal
                 visible={confirmActive}
                 position='top'
@@ -936,6 +917,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 className='price-change-confirm-dialog'
                 onHide={() => setConfirmActive(false)}
             />
-        </div>
+        </section>
     );
 };

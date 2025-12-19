@@ -37,7 +37,7 @@ import { ColumnSelector, TableColumn } from "dashboard/common/filter";
 import { DropdownChangeEvent } from "primereact/dropdown";
 import { CONTACTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -462,135 +462,128 @@ export const ContactsDataTable = ({
                     className='contacts-filter'
                 />
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    {isLoading ? (
-                        <div className='dashboard-loader__wrapper'>
-                            <Loader />
-                        </div>
-                    ) : (
-                        <DataTable
-                            showGridlines
-                            value={contacts}
-                            lazy
-                            scrollable
-                            scrollHeight='70vh'
-                            paginator
-                            first={lazyState.first}
-                            rows={lazyState.rows}
-                            rowsPerPageOptions={ROWS_PER_PAGE}
-                            totalRecords={totalRecords || 1}
-                            onPage={pageChanged}
-                            onSort={sortData}
-                            sortOrder={lazyState.sortOrder}
-                            sortField={lazyState.sortField}
-                            resizableColumns
-                            reorderableColumns
-                            rowClassName={() => "table-row"}
-                            onRowClick={handleOnRowClick}
-                            onColReorder={(event) => {
-                                if (authUser && Array.isArray(event.columns) && settingsLoaded) {
-                                    const orderArray = event.columns?.map(
-                                        (column: any) => column.props.field
-                                    );
-
-                                    const newActiveColumns = orderArray
-                                        .map((field: string) => {
-                                            return (
-                                                activeColumns.find(
-                                                    (column) => column.field === field
-                                                ) || null
-                                            );
-                                        })
-                                        .filter(
-                                            (column): column is TableColumnsList => column !== null
-                                        ) as TableColumnsList[];
-
-                                    setActiveColumnsAndSave(newActiveColumns);
-                                }
-                            }}
-                            onColumnResizeEnd={(event) => {
-                                if (authUser && event) {
-                                    const newColumnWidth = {
-                                        [event.column.props.field as string]:
-                                            event.element.offsetWidth,
-                                    };
-                                    changeSettings({
-                                        columnWidth: {
-                                            ...serverSettings?.contacts?.columnWidth,
-                                            ...newColumnWidth,
-                                        },
-                                    });
-                                }
-                            }}
-                        >
-                            <Column
-                                bodyStyle={{ textAlign: "center" }}
-                                reorderable={false}
-                                resizeable={false}
-                                body={({ contactuid }: ContactUser) => {
-                                    return (
-                                        <Button
-                                            text
-                                            className='table-edit-button'
-                                            icon='adms-edit-item'
-                                            tooltip='Edit contact'
-                                            tooltipOptions={{ position: "mouse" }}
-                                            onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
-                                        />
-                                    );
-                                }}
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: "80px",
-                                        },
-                                    },
-                                }}
-                            />
-                            {alwaysActiveColumns.map(({ field, header }, index) => {
-                                const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
-                                const isLastColumn =
-                                    index === alwaysActiveColumns.length - 1 &&
-                                    activeColumns.length === 0;
-
-                                return (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        body={bodyDataRender(field)}
-                                        headerClassName='cursor-move'
-                                        pt={getColumnPtStyles({
-                                            savedWidth,
-                                            isLastColumn,
-                                            additionalStyles: { borderLeft: !index ? "none" : "" },
-                                        })}
-                                    />
-                                );
-                            })}
-
-                            {activeColumns.map(({ field, header }: TableColumnsList, index) => {
-                                const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
-                                const isLastColumn = index === activeColumns.length - 1;
-
-                                return (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        headerClassName='cursor-move'
-                                        body={bodyDataRender(field)}
-                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                    />
-                                );
-                            })}
-                        </DataTable>
-                    )}
+            {isLoading ? (
+                <div className='dashboard-loader__wrapper'>
+                    <Loader />
                 </div>
-            </div>
+            ) : (
+                <DataTable
+                    showGridlines
+                    value={contacts}
+                    lazy
+                    scrollable
+                    scrollHeight='auto'
+                    paginator
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    sortOrder={lazyState.sortOrder}
+                    sortField={lazyState.sortField}
+                    resizableColumns
+                    reorderableColumns
+                    rowClassName={() => "table-row"}
+                    onRowClick={handleOnRowClick}
+                    onColReorder={(event) => {
+                        if (authUser && Array.isArray(event.columns) && settingsLoaded) {
+                            const orderArray = event.columns?.map(
+                                (column: any) => column.props.field
+                            );
+
+                            const newActiveColumns = orderArray
+                                .map((field: string) => {
+                                    return (
+                                        activeColumns.find((column) => column.field === field) ||
+                                        null
+                                    );
+                                })
+                                .filter(
+                                    (column): column is TableColumnsList => column !== null
+                                ) as TableColumnsList[];
+
+                            setActiveColumnsAndSave(newActiveColumns);
+                        }
+                    }}
+                    onColumnResizeEnd={(event) => {
+                        if (authUser && event) {
+                            const newColumnWidth = {
+                                [event.column.props.field as string]: event.element.offsetWidth,
+                            };
+                            changeSettings({
+                                columnWidth: {
+                                    ...serverSettings?.contacts?.columnWidth,
+                                    ...newColumnWidth,
+                                },
+                            });
+                        }
+                    }}
+                >
+                    <Column
+                        bodyStyle={{ textAlign: "center" }}
+                        reorderable={false}
+                        resizeable={false}
+                        body={({ contactuid }: ContactUser) => {
+                            return (
+                                <Button
+                                    text
+                                    className='table-edit-button'
+                                    icon='adms-edit-item'
+                                    tooltip='Edit contact'
+                                    tooltipOptions={{ position: "mouse" }}
+                                    onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
+                                />
+                            );
+                        }}
+                        pt={{
+                            root: {
+                                style: {
+                                    width: "80px",
+                                },
+                            },
+                        }}
+                    />
+                    {alwaysActiveColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
+                        const isLastColumn =
+                            index === alwaysActiveColumns.length - 1 && activeColumns.length === 0;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                body={bodyDataRender(field)}
+                                headerClassName='cursor-move'
+                                pt={getColumnPtStyles({
+                                    savedWidth,
+                                    isLastColumn,
+                                    additionalStyles: { borderLeft: !index ? "none" : "" },
+                                })}
+                            />
+                        );
+                    })}
+
+                    {activeColumns.map(({ field, header }: TableColumnsList, index) => {
+                        const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
+                        const isLastColumn = index === activeColumns.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                headerClassName='cursor-move'
+                                body={bodyDataRender(field)}
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                </DataTable>
+            )}
             <AdvancedSearchDialog<AdvancedSearch>
                 visible={dialogVisible}
                 buttonDisabled={buttonDisabled}
@@ -610,11 +603,11 @@ export const ContactsDataTable = ({
 
 export const Contacts = () => {
     return (
-        <div className='card contacts'>
+        <DataTableWrapper className='card contacts'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Contacts</h2>
             </div>
             <ContactsDataTable />
-        </div>
+        </DataTableWrapper>
     );
 };

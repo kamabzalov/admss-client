@@ -1,6 +1,6 @@
 .role-page {
     --card-height: 83vh;
-    --card-max-height: 983px;
+    --card-max-height: var(--admss-app-default-card-height);
     --content-height: 600px;
     --sidebar-width: 440px;
     --title-height: 63px;

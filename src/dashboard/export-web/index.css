@@ -24,6 +24,11 @@
             text-wrap: wrap;
         }
     }
+
+    .p-tabview .p-tabview-panels {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 .export-web__body .p-datatable-wrapper {
@@ -106,7 +111,7 @@
 }
 
 .export-web .p-tabview .p-tabview-nav {
-    margin: 0 1.25rem;
+    margin: 0;
     border-bottom: 2px solid var(--admss-app-light-grey);
 }
 

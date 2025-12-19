@@ -1,6 +1,12 @@
 .reports.card {
-    height: 986px;
+    height: var(--admss-app-default-card-height);
     overflow-y: auto;
+    border-radius: 15px;
+    padding: 40px;
+
+    .card-header {
+        padding-top: 0;
+    }
 }
 
 .p-tree.reports__tree {

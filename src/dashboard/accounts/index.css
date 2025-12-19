@@ -74,6 +74,11 @@
         border-bottom: none;
         border-width: 0;
     }
+
+    .p-tabview .p-tabview-panels {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 .audit-filter {
@@ -145,7 +150,6 @@
 }
 
 .accounts .p-tabview .p-tabview-nav {
-    margin: 0 1.25rem;
     border-bottom: 2px solid var(--admss-app-light-grey);
 }
 

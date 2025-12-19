@@ -1,7 +1,5 @@
 .inventory {
     --inventory-navigate-width: var(--admss-app-card-sidebar-width);
-    --inventory-content-max-height: 705px;
-    --inventory-content-height: 54vh;
 
     .form-line {
         margin: 15px 0;
@@ -55,15 +53,11 @@
 
 .inventory__card-content {
     border-right: 2px solid var(--admss-app-light-blue);
-    height: var(--inventory-content-height);
-    max-height: var(--inventory-content-max-height);
     overflow-y: hidden;
 }
 
 .inventory__navigation {
     padding: 0;
-    height: var(--inventory-content-height);
-    max-height: var(--inventory-content-max-height);
     flex: 0 0 var(--inventory-navigate-width);
     overflow-y: scroll;
     overflow-x: hidden;

@@ -1,9 +1,9 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
-import { ReactElement, CSSProperties } from "react";
+import { ReactElement, CSSProperties, ReactNode } from "react";
 import { truncateText } from "common/helpers";
-import { DEFAULT_MAX_COLUMN_WIDTH } from "common/settings";
+import { DEFAULT_MAX_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "common/settings";
 import "./index.css";
 
 interface GetColumnPtStylesOptions {
@@ -115,5 +115,33 @@ export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
                 },
             }}
         />
+    );
+};
+
+interface DataTableWrapperProps {
+    children: ReactNode;
+    className?: string;
+    rowsCount?: number;
+    rowHeight?: number;
+}
+
+export const DataTableWrapper = ({
+    children,
+    className,
+    rowsCount = 10,
+    rowHeight = DEFAULT_ROW_HEIGHT,
+}: DataTableWrapperProps): ReactElement => {
+    return (
+        <div
+            className={`data-table-wrapper ${className || ""}`}
+            style={
+                {
+                    "--data-table-rows-count": rowsCount,
+                    "--data-table-row-height": `${rowHeight}px`,
+                } as CSSProperties
+            }
+        >
+            {children}
+        </div>
     );
 };
