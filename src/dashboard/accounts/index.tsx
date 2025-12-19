@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountsDataTable } from "./account-list";
 import { AccountsAudit } from "./audit";
+import { DataTableWrapper } from "dashboard/common/data-table";
 
 export { AccountsDataTable } from "./account-list";
 
@@ -40,19 +41,17 @@ export const Accounts = () => {
     };
 
     return (
-        <div className='grid accounts'>
-            <div className='col-12'>
-                <TabView className='card' activeIndex={activeIndex} onTabChange={handleTabChange}>
-                    {tabItems.map(({ tabName, component }) => (
-                        <TabPanel
-                            header={tabName}
-                            headerClassName='card-header accounts__header uppercase m-0'
-                            children={component}
-                            key={tabName}
-                        />
-                    ))}
-                </TabView>
-            </div>
-        </div>
+        <DataTableWrapper className='card accounts'>
+            <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
+                {tabItems.map(({ tabName, component }) => (
+                    <TabPanel
+                        header={tabName}
+                        headerClassName='card-header accounts__header uppercase m-0'
+                        children={component}
+                        key={tabName}
+                    />
+                ))}
+            </TabView>
+        </DataTableWrapper>
     );
 };

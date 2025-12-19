@@ -1,5 +1,5 @@
 .general-settings {
-    --card-height: 983px;
+    --card-height: var(--admss-app-default-card-height);
     --content-height: 680px;
     --title-height: 63px;
 }

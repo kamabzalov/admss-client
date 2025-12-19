@@ -34,7 +34,7 @@ import { ColumnSelector } from "dashboard/common/filter";
 import { ServerUserSettings, TasksUserSettings } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -303,7 +303,7 @@ export const TasksDataTable = observer((): ReactElement => {
     };
 
     return (
-        <div className='card-content tasks'>
+        <section className='card-content'>
             <div className='datatable-controls flex flex-wrap justify-content-between align-items-center gap-3'>
                 <div className='flex align-items-center gap-3 flex-wrap'>
                     <span className='p-input-icon-right tasks-search'>
@@ -373,124 +373,120 @@ export const TasksDataTable = observer((): ReactElement => {
                     />
                 </div>
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    {isLoading ? (
-                        <div className='dashboard-loader__wrapper'>
-                            <Loader overlay />
-                        </div>
-                    ) : (
-                        <DataTable
-                            showGridlines
-                            value={tasks}
-                            lazy
-                            paginator
-                            first={lazyState.first}
-                            rows={lazyState.rows}
-                            rowsPerPageOptions={ROWS_PER_PAGE}
-                            totalRecords={totalRecords || 1}
-                            onPage={pageChanged}
-                            onSort={sortData}
-                            reorderableColumns
-                            resizableColumns
-                            sortOrder={lazyState.sortOrder}
-                            sortField={lazyState.sortField}
-                            expandedRows={expandedRows}
-                            rowClassName={() => "table-row"}
-                            onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
-                            rowExpansionTemplate={rowExpansionTemplate}
-                            onColumnResizeEnd={(event) => {
-                                if (authUser && event) {
-                                    const newColumnWidth = {
-                                        [event.column?.props?.field as string]:
-                                            event.element?.offsetWidth,
-                                    };
-                                    changeSettings({
-                                        columnWidth: {
-                                            ...serverSettings?.tasks?.columnWidth,
-                                            ...newColumnWidth,
-                                        },
-                                    });
-                                }
-                            }}
-                        >
-                            <Column
-                                bodyStyle={{ textAlign: "center" }}
-                                reorderable={false}
-                                resizeable={false}
-                                body={(task) => {
-                                    return (
-                                        <div className={`flex gap-3 align-items-center`}>
-                                            <Button
-                                                className='text export-web__icon-button'
-                                                icon='icon adms-edit-item'
-                                                onClick={() => handleEditTask(task)}
-                                            />
-                                            <Button
-                                                className='text export-web__icon-button'
-                                                icon='pi pi-angle-down'
-                                                onClick={() => handleRowExpansion(task)}
-                                            />
-                                        </div>
-                                    );
-                                }}
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: "80px",
-                                        },
-                                    },
-                                }}
-                            />
-                            {alwaysActiveColumns.map(({ field, header }, index) => {
-                                const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
-                                const isLastColumn =
-                                    index === alwaysActiveColumns.length - 1 &&
-                                    activeColumns.length === 0;
-
-                                return (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        body={(data) => {
-                                            const value = String(data[field] || "");
-                                            return <TruncatedText text={value} withTooltip />;
-                                        }}
-                                        headerClassName='cursor-move'
-                                        pt={getColumnPtStyles({
-                                            savedWidth,
-                                            isLastColumn,
-                                            additionalStyles: { borderLeft: !index ? "none" : "" },
-                                        })}
-                                    />
-                                );
-                            })}
-
-                            {activeColumns.map(({ field, header }, index) => {
-                                const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
-                                const isLastColumn = index === activeColumns.length - 1;
-
-                                return (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        body={(data) => {
-                                            const value = String(data[field] || "");
-                                            return <TruncatedText text={value} withTooltip />;
-                                        }}
-                                        headerClassName='cursor-move'
-                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                    />
-                                );
-                            })}
-                        </DataTable>
-                    )}
+            {isLoading ? (
+                <div className='dashboard-loader__wrapper'>
+                    <Loader overlay />
                 </div>
-            </div>
+            ) : (
+                <DataTable
+                    showGridlines
+                    value={tasks}
+                    lazy
+                    paginator
+                    scrollable
+                    scrollHeight='auto'
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    reorderableColumns
+                    resizableColumns
+                    sortOrder={lazyState.sortOrder}
+                    sortField={lazyState.sortField}
+                    expandedRows={expandedRows}
+                    rowClassName={() => "table-row"}
+                    onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
+                    rowExpansionTemplate={rowExpansionTemplate}
+                    onColumnResizeEnd={(event) => {
+                        if (authUser && event) {
+                            const newColumnWidth = {
+                                [event.column?.props?.field as string]: event.element?.offsetWidth,
+                            };
+                            changeSettings({
+                                columnWidth: {
+                                    ...serverSettings?.tasks?.columnWidth,
+                                    ...newColumnWidth,
+                                },
+                            });
+                        }
+                    }}
+                >
+                    <Column
+                        bodyStyle={{ textAlign: "center" }}
+                        reorderable={false}
+                        resizeable={false}
+                        body={(task) => {
+                            return (
+                                <div className={`flex gap-3 align-items-center`}>
+                                    <Button
+                                        className='text export-web__icon-button'
+                                        icon='icon adms-edit-item'
+                                        onClick={() => handleEditTask(task)}
+                                    />
+                                    <Button
+                                        className='text export-web__icon-button'
+                                        icon='pi pi-angle-down'
+                                        onClick={() => handleRowExpansion(task)}
+                                    />
+                                </div>
+                            );
+                        }}
+                        pt={{
+                            root: {
+                                style: {
+                                    width: "80px",
+                                },
+                            },
+                        }}
+                    />
+                    {alwaysActiveColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
+                        const isLastColumn =
+                            index === alwaysActiveColumns.length - 1 && activeColumns.length === 0;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                body={(data) => {
+                                    const value = String(data[field] || "");
+                                    return <TruncatedText text={value} withTooltip />;
+                                }}
+                                headerClassName='cursor-move'
+                                pt={getColumnPtStyles({
+                                    savedWidth,
+                                    isLastColumn,
+                                    additionalStyles: { borderLeft: !index ? "none" : "" },
+                                })}
+                            />
+                        );
+                    })}
+
+                    {activeColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.tasks?.columnWidth?.[field];
+                        const isLastColumn = index === activeColumns.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                body={(data) => {
+                                    const value = String(data[field] || "");
+                                    return <TruncatedText text={value} withTooltip />;
+                                }}
+                                headerClassName='cursor-move'
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                </DataTable>
+            )}
             <AddTaskDialog
                 visible={showTaskDialog}
                 onHide={() => setShowTaskDialog(false)}
@@ -511,21 +507,17 @@ export const TasksDataTable = observer((): ReactElement => {
                 fields={searchFields as SearchField<AdvancedSearch>[]}
                 searchForm={SEARCH_FORM_TYPE.ACCOUNTS}
             />
-        </div>
+        </section>
     );
 });
 
 export const Tasks = (): ReactElement => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Tasks</h2>
-                    </div>
-                    <TasksDataTable />
-                </div>
+        <DataTableWrapper className='card tasks'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Tasks</h2>
             </div>
-        </div>
+            <TasksDataTable />
+        </DataTableWrapper>
     );
 };

@@ -84,6 +84,7 @@
     --admss-app-statuses-cancelled: #de0000;
     --admss-app-statuses-outdated: #5f5f5f;
     --admss-app-statuses-deleted: #000000;
+    --admss-app-default-card-height: 983px;
 }
 
 html {

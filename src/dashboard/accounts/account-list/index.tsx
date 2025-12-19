@@ -132,7 +132,7 @@ export const AccountsDataTable = observer(
         };
 
         return (
-            <div className='card-content'>
+            <section className='card-content'>
                 <AccountsHeader
                     searchValue={globalSearch}
                     onSearchChange={setGlobalSearch}
@@ -148,100 +148,92 @@ export const AccountsDataTable = observer(
                     selectedAccountType={selectedAccountType}
                     onAccountTypeChange={setSelectedAccountType}
                 />
-                <div className='grid'>
-                    <div className='col-12'>
-                        {isLoading ? (
-                            <div className='dashboard-loader__wrapper'>
-                                <Loader overlay />
-                            </div>
-                        ) : (
-                            <DataTable
-                                showGridlines
-                                value={accounts}
-                                lazy
-                                paginator
-                                first={lazyState.first}
-                                rows={lazyState.rows}
-                                rowsPerPageOptions={ROWS_PER_PAGE}
-                                totalRecords={totalRecords || 1}
-                                onPage={pageChanged}
-                                onSort={sortData}
-                                reorderableColumns
-                                resizableColumns
-                                sortOrder={lazyState.sortOrder}
-                                sortField={lazyState.sortField}
-                                rowClassName={() => "table-row"}
-                                onRowClick={handleOnRowClick}
-                                onColumnResizeEnd={(event) => {
-                                    if (
-                                        event?.column?.props?.field &&
-                                        event?.element?.offsetWidth
-                                    ) {
-                                        saveColumnWidth(
-                                            event.column.props.field as string,
-                                            event.element.offsetWidth
-                                        );
-                                    }
-                                }}
-                            >
-                                <Column
-                                    bodyStyle={{ textAlign: "center" }}
-                                    reorderable={false}
-                                    resizeable={false}
-                                    body={({ accountuid }: AccountInfo) => {
-                                        return (
-                                            <Button
-                                                text
-                                                className='table-edit-button'
-                                                icon='adms-edit-item'
-                                                tooltip='Edit account'
-                                                tooltipOptions={{ position: "mouse" }}
-                                                onClick={() =>
-                                                    navigate(ACCOUNTS_PAGE.EDIT(accountuid))
-                                                }
-                                            />
-                                        );
-                                    }}
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                width: "80px",
-                                            },
-                                        },
-                                    }}
-                                />
-
-                                {activeColumns.map(({ field, header }: TableColumnsList, index) => {
-                                    const savedWidth =
-                                        serverSettings?.accounts?.columnWidth?.[field];
-                                    const isLastColumn = index === activeColumns.length - 1;
-
-                                    return (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                            body={(data) => {
-                                                const value = String(data[field] || "");
-                                                return <TruncatedText text={value} withTooltip />;
-                                            }}
-                                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                        />
-                                    );
-                                })}
-                            </DataTable>
-                        )}
+                {isLoading ? (
+                    <div className='dashboard-loader__wrapper'>
+                        <Loader overlay />
                     </div>
-                </div>
+                ) : (
+                    <DataTable
+                        showGridlines
+                        value={accounts}
+                        lazy
+                        paginator
+                        scrollable
+                        scrollHeight='auto'
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        rowsPerPageOptions={ROWS_PER_PAGE}
+                        totalRecords={totalRecords || 1}
+                        onPage={pageChanged}
+                        onSort={sortData}
+                        reorderableColumns
+                        resizableColumns
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
+                        rowClassName={() => "table-row"}
+                        onRowClick={handleOnRowClick}
+                        onColumnResizeEnd={(event) => {
+                            if (event?.column?.props?.field && event?.element?.offsetWidth) {
+                                saveColumnWidth(
+                                    event.column.props.field as string,
+                                    event.element.offsetWidth
+                                );
+                            }
+                        }}
+                    >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={({ accountuid }: AccountInfo) => {
+                                return (
+                                    <Button
+                                        text
+                                        className='table-edit-button'
+                                        icon='adms-edit-item'
+                                        tooltip='Edit account'
+                                        tooltipOptions={{ position: "mouse" }}
+                                        onClick={() => navigate(ACCOUNTS_PAGE.EDIT(accountuid))}
+                                    />
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "80px",
+                                    },
+                                },
+                            }}
+                        />
+
+                        {activeColumns.map(({ field, header }: TableColumnsList, index) => {
+                            const savedWidth = serverSettings?.accounts?.columnWidth?.[field];
+                            const isLastColumn = index === activeColumns.length - 1;
+
+                            return (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    sortable
+                                    headerClassName='cursor-move'
+                                    body={(data) => {
+                                        const value = String(data[field] || "");
+                                        return <TruncatedText text={value} withTooltip />;
+                                    }}
+                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                                />
+                            );
+                        })}
+                    </DataTable>
+                )}
                 <AccountsAdvancedSearch
                     visible={dialogVisible}
                     onClose={() => setDialogVisible(false)}
                     onAccountsUpdate={setAccounts}
                     lazyState={lazyState}
                 />
-            </div>
+            </section>
         );
     }
 );

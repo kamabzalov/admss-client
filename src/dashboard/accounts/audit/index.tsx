@@ -242,7 +242,7 @@ export const AccountsAudit = observer((): ReactElement => {
     };
 
     return (
-        <div className='card-content'>
+        <section className='card-content'>
             <AuditHeader
                 searchValue={globalSearch}
                 onSearchChange={setGlobalSearch}
@@ -252,67 +252,65 @@ export const AccountsAudit = observer((): ReactElement => {
                 selectedAccountType={selectedAuditType}
                 onAccountTypeChange={handleAuditTypeChange}
             />
-            <div className='grid'>
-                <div className='col-12'>
-                    {isLoading ? (
-                        <div className='dashboard-loader__wrapper'>
-                            <Loader overlay />
-                        </div>
-                    ) : (
-                        <DataTable
-                            key={selectedAuditType}
-                            showGridlines
-                            value={auditRecords}
-                            lazy
-                            paginator
-                            first={lazyState.first}
-                            rows={lazyState.rows}
-                            rowsPerPageOptions={ROWS_PER_PAGE}
-                            totalRecords={totalRecords || 1}
-                            onPage={pageChanged}
-                            onSort={sortData}
-                            reorderableColumns
-                            expandedRows={expandedRows}
-                            rowExpansionTemplate={renderRowExpansionTemplate}
-                            resizableColumns
-                            sortOrder={lazyState.sortOrder}
-                            sortField={lazyState.sortField}
-                            rowClassName={() => "table-row"}
-                            onRowClick={({ data }: DataTableRowClickEvent) =>
-                                navigate(ACCOUNTS_PAGE.EDIT(data.accountuid))
-                            }
-                            onColumnResizeEnd={(event) => {
-                                if (authUser && event && event.column?.props?.field) {
-                                    saveColumnWidth(
-                                        event.column.props.field as string,
-                                        event.element?.offsetWidth || 0
-                                    );
-                                }
-                            }}
-                        >
-                            {ExpansionColumn({ handleRowExpansion })}
-                            {currentColumns.map(({ field, header }, index) => {
-                                const savedWidth = moduleSettings?.columnWidth?.[field];
-                                const isLastColumn = index === currentColumns.length - 1;
-
-                                return (
-                                    <Column
-                                        field={field}
-                                        header={header}
-                                        key={field}
-                                        sortable
-                                        body={(data) => {
-                                            const value = String(data[field] || "");
-                                            return <TruncatedText text={value} withTooltip />;
-                                        }}
-                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                    />
-                                );
-                            })}
-                        </DataTable>
-                    )}
+            {isLoading ? (
+                <div className='dashboard-loader__wrapper'>
+                    <Loader overlay />
                 </div>
-            </div>
-        </div>
+            ) : (
+                <DataTable
+                    key={selectedAuditType}
+                    showGridlines
+                    value={auditRecords}
+                    lazy
+                    paginator
+                    scrollable
+                    scrollHeight='auto'
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    reorderableColumns
+                    expandedRows={expandedRows}
+                    rowExpansionTemplate={renderRowExpansionTemplate}
+                    resizableColumns
+                    sortOrder={lazyState.sortOrder}
+                    sortField={lazyState.sortField}
+                    rowClassName={() => "table-row"}
+                    onRowClick={({ data }: DataTableRowClickEvent) =>
+                        navigate(ACCOUNTS_PAGE.EDIT(data.accountuid))
+                    }
+                    onColumnResizeEnd={(event) => {
+                        if (authUser && event && event.column?.props?.field) {
+                            saveColumnWidth(
+                                event.column.props.field as string,
+                                event.element?.offsetWidth || 0
+                            );
+                        }
+                    }}
+                >
+                    {ExpansionColumn({ handleRowExpansion })}
+                    {currentColumns.map(({ field, header }, index) => {
+                        const savedWidth = moduleSettings?.columnWidth?.[field];
+                        const isLastColumn = index === currentColumns.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                body={(data) => {
+                                    const value = String(data[field] || "");
+                                    return <TruncatedText text={value} withTooltip />;
+                                }}
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                </DataTable>
+            )}
+        </section>
     );
 });

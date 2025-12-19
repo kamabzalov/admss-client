@@ -33,7 +33,7 @@ import { TruncatedText } from "dashboard/common/display";
 import { useCreateReport, useToastMessage } from "common/hooks";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { DealsUserSettings } from "common/models/user";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -497,7 +497,7 @@ export const DealsDataTable = observer(
         );
 
         return (
-            <div className='card-content'>
+            <section className='card-content'>
                 <div className='datatable-controls'>
                     <GlobalSearchInput
                         value={globalSearch}
@@ -530,100 +530,95 @@ export const DealsDataTable = observer(
                     {filterTemplate}
                     {columnsTemplate}
                 </div>
-                <div className='grid'>
-                    <div className='col-12'>
-                        {isLoading ? (
-                            <div className='dashboard-loader__wrapper'>
-                                <Loader overlay />
-                            </div>
-                        ) : (
-                            <DataTable
-                                showGridlines
-                                value={deals}
-                                lazy
-                                paginator
-                                first={lazyState.first}
-                                rows={lazyState.rows}
-                                rowsPerPageOptions={ROWS_PER_PAGE}
-                                totalRecords={totalRecords || 1}
-                                onPage={pageChanged}
-                                onSort={sortData}
-                                reorderableColumns
-                                resizableColumns
-                                rowClassName={() => "table-row"}
-                                onRowClick={handleOnRowClick}
-                                onColumnResizeEnd={(event) => {
-                                    if (
-                                        event?.column?.props?.field &&
-                                        event?.element?.offsetWidth
-                                    ) {
-                                        saveColumnWidth(
-                                            event.column.props.field as string,
-                                            event.element.offsetWidth
-                                        );
-                                    }
-                                }}
-                            >
-                                <Column
-                                    bodyStyle={{ textAlign: "center" }}
-                                    reorderable={false}
-                                    resizeable={false}
-                                    body={(rowDeal: Deal) => {
-                                        const statusIcon = getDealStatusIcon(rowDeal.dealstatus);
-                                        const statusLabel = getDealStatusLabel(rowDeal.dealstatus);
-                                        return (
-                                            <div className={`flex gap-3 align-items-center`}>
-                                                <Button
-                                                    text
-                                                    className='table-edit-button'
-                                                    icon='adms-edit-item'
-                                                    tooltip='Edit deal'
-                                                    tooltipOptions={{ position: "mouse" }}
-                                                    onClick={() =>
-                                                        navigate(DEALS_PAGE.EDIT(rowDeal.dealuid))
-                                                    }
-                                                />
-                                                <Button
-                                                    icon={statusIcon}
-                                                    className='deals__status-icon'
-                                                    text
-                                                    tooltip={statusLabel}
-                                                    tooltipOptions={{ position: "mouse" }}
-                                                />
-                                            </div>
-                                        );
-                                    }}
-                                    pt={{
-                                        root: {
-                                            style: {
-                                                width: "100px",
-                                            },
-                                        },
-                                    }}
-                                />
-                                {activeColumns.map(({ field, header }: TableColumnsList, index) => {
-                                    const savedWidth = serverSettings?.deals?.columnWidth?.[field];
-                                    const isLastColumn = index === activeColumns.length - 1;
-
-                                    return (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                            body={(data) => {
-                                                const value = String(data[field] || "");
-                                                return <TruncatedText text={value} withTooltip />;
-                                            }}
-                                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                        />
-                                    );
-                                })}
-                            </DataTable>
-                        )}
+                {isLoading ? (
+                    <div className='dashboard-loader__wrapper'>
+                        <Loader overlay />
                     </div>
-                </div>
+                ) : (
+                    <DataTable
+                        showGridlines
+                        value={deals}
+                        lazy
+                        paginator
+                        scrollable
+                        scrollHeight='auto'
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        rowsPerPageOptions={ROWS_PER_PAGE}
+                        totalRecords={totalRecords || 1}
+                        onPage={pageChanged}
+                        onSort={sortData}
+                        reorderableColumns
+                        resizableColumns
+                        rowClassName={() => "table-row"}
+                        onRowClick={handleOnRowClick}
+                        onColumnResizeEnd={(event) => {
+                            if (event?.column?.props?.field && event?.element?.offsetWidth) {
+                                saveColumnWidth(
+                                    event.column.props.field as string,
+                                    event.element.offsetWidth
+                                );
+                            }
+                        }}
+                    >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={(rowDeal: Deal) => {
+                                const statusIcon = getDealStatusIcon(rowDeal.dealstatus);
+                                const statusLabel = getDealStatusLabel(rowDeal.dealstatus);
+                                return (
+                                    <div className={`flex gap-3 align-items-center`}>
+                                        <Button
+                                            text
+                                            className='table-edit-button'
+                                            icon='adms-edit-item'
+                                            tooltip='Edit deal'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            onClick={() =>
+                                                navigate(DEALS_PAGE.EDIT(rowDeal.dealuid))
+                                            }
+                                        />
+                                        <Button
+                                            icon={statusIcon}
+                                            className='deals__status-icon'
+                                            text
+                                            tooltip={statusLabel}
+                                            tooltipOptions={{ position: "mouse" }}
+                                        />
+                                    </div>
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "100px",
+                                    },
+                                },
+                            }}
+                        />
+                        {activeColumns.map(({ field, header }: TableColumnsList, index) => {
+                            const savedWidth = serverSettings?.deals?.columnWidth?.[field];
+                            const isLastColumn = index === activeColumns.length - 1;
+
+                            return (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    sortable
+                                    headerClassName='cursor-move'
+                                    body={(data) => {
+                                        const value = String(data[field] || "");
+                                        return <TruncatedText text={value} withTooltip />;
+                                    }}
+                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                                />
+                            );
+                        })}
+                    </DataTable>
+                )}
                 <AdvancedSearchDialog<AdvancedSearch>
                     visible={dialogVisible}
                     buttonDisabled={buttonDisabled}
@@ -637,18 +632,18 @@ export const DealsDataTable = observer(
                     fields={searchFields as SearchField<AdvancedSearch>[]}
                     searchForm={SEARCH_FORM_TYPE.DEALS}
                 />
-            </div>
+            </section>
         );
     }
 );
 
 export const Deals = () => {
     return (
-        <div className='card deals'>
+        <DataTableWrapper className='card deals'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Deals</h2>
             </div>
             <DealsDataTable />
-        </div>
+        </DataTableWrapper>
     );
 };

@@ -5,6 +5,8 @@ import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { ExportSchedule } from "./schedule";
 import { ExportHistory } from "./history";
+import { DEFAULT_ROW_HEIGHT } from "common/settings";
+import { DataTableWrapper } from "dashboard/common/data-table";
 
 interface TabItem {
     tabName: string;
@@ -67,9 +69,9 @@ export const ExportToWeb = (): ReactElement => {
     };
 
     return (
-        <div className='grid export-web'>
-            <div className='col-12 export-web__body'>
-                <TabView className='card' activeIndex={activeIndex} onTabChange={handleTabChange}>
+        <DataTableWrapper className='export-web card' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+            <div className='export-web__body'>
+                <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
                     {tabItems.map(({ tabName, component, headerCount }) => (
                         <TabPanel
                             header={
@@ -90,6 +92,6 @@ export const ExportToWeb = (): ReactElement => {
                     ))}
                 </TabView>
             </div>
-        </div>
+        </DataTableWrapper>
     );
 };
