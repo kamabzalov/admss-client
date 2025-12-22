@@ -318,3 +318,28 @@ export const convertDateToLocale = (date: string | number | undefined) => {
         hour12: true,
     }).format(dateObj);
 };
+
+type TimeUnit = "seconds" | "minutes" | "hours";
+
+export const convertTimeToMilliseconds = (
+    timeValue: number,
+    timeUnit: TimeUnit = "hours"
+): number => {
+    if (!Number.isFinite(timeValue) || timeValue <= 0) {
+        return 0;
+    }
+
+    const millisecondsInSecond = 1000;
+    const secondsInMinute = 60;
+    const minutesInHour = 60;
+
+    if (timeUnit === "seconds") {
+        return timeValue * millisecondsInSecond;
+    }
+
+    if (timeUnit === "minutes") {
+        return timeValue * secondsInMinute * millisecondsInSecond;
+    }
+
+    return timeValue * minutesInHour * secondsInMinute * millisecondsInSecond;
+};

@@ -1,15 +1,16 @@
-import { Sidebar } from "./sidebar";
-import { Header } from "./header";
+import { Sidebar } from "dashboard/sidebar";
+import { Header } from "dashboard/header";
 import { Outlet, useNavigate } from "react-router-dom";
-import "./index.css";
+import "dashboard/index.css";
 import { ReactElement, Suspense, useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "http/services/auth.service";
-import { createApiDashboardInstance } from "../http/index";
+import { createApiDashboardInstance } from "http/index";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { Loader } from "./common/loader";
+import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { RouteTracker } from "dashboard/common/route-tracker";
 
 export const Dashboard = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -34,6 +35,7 @@ export const Dashboard = observer((): ReactElement => {
 
     return (
         <Suspense fallback={<Loader overlay />}>
+            <RouteTracker />
             <Header />
             <Sidebar />
             {!settings.isSidebarCollapsed && <div className='sidebar-overlay'></div>}
