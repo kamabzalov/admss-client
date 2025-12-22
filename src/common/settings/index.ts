@@ -6,6 +6,7 @@ interface AppSettings {
     DEBOUNCE_TIME: number;
     DEFAULT_ROW_HEIGHT: number;
     DEFAULT_CARD_HEIGHT: number;
+    ROUTE_RESTORE_TIMEOUT_HOURS: number;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
     DEBOUNCE_TIME,
     DEFAULT_ROW_HEIGHT,
     DEFAULT_CARD_HEIGHT,
+    ROUTE_RESTORE_TIMEOUT_HOURS,
 }: AppSettings = {
     ROWS_PER_PAGE: [10, 20, 50, 100, 1000],
     TOAST_LIFETIME: 3000,
@@ -24,6 +26,7 @@ const {
     DEFAULT_ROW_HEIGHT: 60,
     DEFAULT_CARD_HEIGHT: 983,
     DEBOUNCE_TIME: 1000,
+    ROUTE_RESTORE_TIMEOUT_HOURS: 8,
 };
 
 export {
@@ -34,4 +37,5 @@ export {
     DEBOUNCE_TIME,
     DEFAULT_ROW_HEIGHT,
     DEFAULT_CARD_HEIGHT,
+    ROUTE_RESTORE_TIMEOUT_HOURS,
 };

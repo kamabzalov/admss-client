@@ -11,6 +11,9 @@ import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
 import { DASHBOARD_PAGE } from "common/constants/links";
+import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
+import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
+import { convertTimeToMilliseconds } from "common/helpers";
 
 export interface LoginForm {
     username: string;
@@ -68,6 +71,35 @@ export const SignIn = () => {
                         if (userStore.twoFactorAuth.isEnabled) {
                             navigate("/2fa");
                         } else {
+                            const storedRouteDataString = localStorage.getItem(LS_LAST_ROUTE);
+                            if (storedRouteDataString) {
+                                try {
+                                    const storedRouteData: LastRouteData =
+                                        JSON.parse(storedRouteDataString);
+                                    if (
+                                        storedRouteData.path &&
+                                        storedRouteData.timestamp &&
+                                        storedRouteData.useruid &&
+                                        storedRouteData.useruid === response.useruid
+                                    ) {
+                                        const currentTime = Date.now();
+                                        const storedTime = storedRouteData.timestamp;
+                                        const routeAgeInMilliseconds = currentTime - storedTime;
+                                        const routeRestoreTimeoutInMilliseconds =
+                                            convertTimeToMilliseconds(ROUTE_RESTORE_TIMEOUT_HOURS);
+                                        if (
+                                            storedTime > 0 &&
+                                            routeAgeInMilliseconds > 0 &&
+                                            routeAgeInMilliseconds <=
+                                                routeRestoreTimeoutInMilliseconds
+                                        ) {
+                                            navigate(storedRouteData.path);
+                                            return;
+                                        }
+                                    }
+                                } catch {}
+                            }
+                            localStorage.removeItem(LS_LAST_ROUTE);
                             navigate(DASHBOARD_PAGE);
                         }
                     } catch (error) {
