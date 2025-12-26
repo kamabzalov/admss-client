@@ -1,14 +1,7 @@
 import { LoginForm } from "sign/sign-in";
-import { authorizedUserApiInstance, nonAuthorizedUserApiInstance } from "../index";
-import { BaseResponse } from "common/models/base-response";
+import { ApiRequest, nonAuthorizedUserApiInstance } from "../index";
+import { BaseResponseError } from "common/models/base-response";
 import { UserPermissionsResponse } from "common/models/user";
-import { AxiosError } from "axios";
-
-export interface AppError {
-    status: "Error";
-    error?: string;
-    message?: string;
-}
 
 export interface AuthUser {
     companyname: string;
@@ -31,73 +24,30 @@ export interface AuthUser {
     permissions: UserPermissionsResponse;
 }
 
-export const auth = async ({
-    username,
-    password,
-    rememberme,
-    application,
-    version,
-}: LoginForm): Promise<AuthUser | AppError> => {
-    try {
-        const response = await nonAuthorizedUserApiInstance.post<AuthUser | AppError>("user", {
+export const auth = async ({ username, password, rememberme, application, version }: LoginForm) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post<AuthUser | BaseResponseError>({
+        url: "user",
+        data: {
             user: username,
             secret: password,
             rememberme,
             application,
             version,
-        });
-
-        return response.data;
-    } catch (error) {
-        const axiosError = error as AxiosError<AppError>;
-
-        if (axiosError.response) {
-            return {
-                status: "Error",
-                error: axiosError.response.data.error || "Authentication failed",
-                message: axiosError.response.data.message || axiosError.message,
-            };
-        } else if (axiosError.request) {
-            return {
-                status: "Error",
-                error: "No response from server",
-                message: axiosError.message,
-            };
-        } else {
-            return {
-                status: "Error",
-                error: "Request setup error",
-                message: axiosError.message,
-            };
-        }
-    }
+        },
+        defaultError: "Authentication failed",
+    });
 };
 
-export const logout = async (uid: string): Promise<BaseResponse | AppError> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/logout`);
-        return response.data;
-    } catch (error) {
-        const axiosError = error as AxiosError<AppError>;
+export const logout = async (useruid: string) => {
+    return new ApiRequest().post({
+        url: `user/${useruid}/logout`,
+        defaultError: "Logout failed",
+    });
+};
 
-        if (axiosError.response) {
-            return {
-                status: "Error",
-                error: axiosError.response.data.error || "Logout failed",
-                message: axiosError.response.data.message || axiosError.message,
-            };
-        } else if (axiosError.request) {
-            return {
-                status: "Error",
-                error: "No response from server during logout",
-                message: axiosError.message,
-            };
-        } else {
-            return {
-                status: "Error",
-                error: "Logout request setup error",
-                message: axiosError.message,
-            };
-        }
-    }
+export const checkToken = async (token: string) => {
+    return new ApiRequest().get({
+        url: `sites/${token}/checktoken`,
+        defaultError: "Token validation failed",
+    });
 };
