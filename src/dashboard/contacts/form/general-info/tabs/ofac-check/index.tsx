@@ -34,9 +34,7 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
 
     const handleOfacCheck = async () => {
         let contactData: Partial<Contact> = {} as Contact;
-        if (!contact.firstName || !contact.lastName) {
-            return;
-        }
+
         if (type === GENERAL_CONTACT_TYPE.CO_BUYER) {
             contactData = {
                 firstName: contactExtData.CoBuyer_First_Name,
@@ -55,6 +53,9 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
                 return;
             }
         } else {
+            if (!contact.firstName || !contact.lastName) {
+                return;
+            }
             contactData = contactFullInfo;
         }
         const response = await checkContactOFAC(id, contactData as Contact);
@@ -75,6 +76,22 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
         }
     }, []);
 
+    useEffect(() => {
+        if (type === GENERAL_CONTACT_TYPE.CO_BUYER) {
+            if (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_Last_Name) {
+                store.contactOFAC = {} as ContactOFAC;
+            }
+        }
+    }, [contactExtData.CoBuyer_First_Name, contactExtData.CoBuyer_Last_Name, type]);
+
+    useEffect(() => {
+        if (type !== GENERAL_CONTACT_TYPE.CO_BUYER) {
+            if (!contact.firstName || !contact.lastName) {
+                store.contactOFAC = {} as ContactOFAC;
+            }
+        }
+    }, [contact.firstName, contact.lastName, type]);
+
     return (
         <div className='grid ofac-check row-gap-2'>
             <div className='col-3 px-0'>
@@ -89,8 +106,10 @@ export const ContactsOfacCheck = observer(({ type }: ContactsOfacCheckProps): Re
             </div>
 
             <div className='col-12 ofac-check__field'>
-                {contactOFAC.check_status === OFAC_CHECK_STATUS.PASSED && <OFACCheckPassedLayout />}
-                {contactOFAC.check_status === OFAC_CHECK_STATUS.FAILED && (
+                {contactOFAC?.check_status === OFAC_CHECK_STATUS.PASSED && (
+                    <OFACCheckPassedLayout />
+                )}
+                {contactOFAC?.check_status === OFAC_CHECK_STATUS.FAILED && (
                     <OFACCheckFailedLayout info={contactOFAC} />
                 )}
             </div>
