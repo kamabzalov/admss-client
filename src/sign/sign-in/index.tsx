@@ -5,15 +5,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
 import { auth } from "http/services/auth.service";
-import { useState } from "react";
-import { APP_TYPE, APP_VERSION } from "http/index";
+import { useState, useEffect } from "react";
+import { APP_TYPE, APP_VERSION, createApiDashboardInstance } from "http/index";
 import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
 import { DASHBOARD_PAGE } from "common/constants/links";
-import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
+import { LS_LAST_ROUTE, LastRouteData, LS_APP_USER } from "common/constants/localStorage";
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
+import { getKeyValue } from "services/local-storage.service";
 
 export interface LoginForm {
     username: string;
@@ -28,6 +29,13 @@ export const SignIn = () => {
     const userStore = useStore().userStore;
     const { showError } = useToastMessage();
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+
+    useEffect(() => {
+        const storedUser = getKeyValue(LS_APP_USER);
+        if (storedUser && storedUser.token) {
+            navigate(DASHBOARD_PAGE, { replace: true });
+        }
+    }, [navigate]);
 
     const formik = useFormik<LoginForm>({
         initialValues: {
@@ -53,13 +61,18 @@ export const SignIn = () => {
         onSubmit: async () => {
             try {
                 const response = await auth(formik.values);
-                if (response.status === Status.OK) {
+                if (!response) {
+                    showError("Authentication failed");
+                    return;
+                }
+                if (response.status === Status.OK && "token" in response) {
                     if (!response.token) {
                         await Promise.reject(new Error("Invalid credentials"));
                         return;
                     }
                     try {
                         userStore.storedUser = response;
+                        createApiDashboardInstance(navigate);
                         if (formik.values.rememberme) {
                             userStore.setRememberMeWithPassword(
                                 formik.values.username,
@@ -93,14 +106,15 @@ export const SignIn = () => {
                                             routeAgeInMilliseconds <=
                                                 routeRestoreTimeoutInMilliseconds
                                         ) {
-                                            navigate(storedRouteData.path);
+                                            localStorage.removeItem(LS_LAST_ROUTE);
+                                            navigate(storedRouteData.path, { replace: true });
                                             return;
                                         }
                                     }
                                 } catch {}
                             }
                             localStorage.removeItem(LS_LAST_ROUTE);
-                            navigate(DASHBOARD_PAGE);
+                            navigate(DASHBOARD_PAGE, { replace: true });
                         }
                     } catch (error) {
                         showError(String(error));

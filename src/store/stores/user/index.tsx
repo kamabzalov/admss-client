@@ -285,11 +285,11 @@ export class UserStore {
                 setKey(LS_APP_USER, JSON.stringify(this._storedUser));
             } else {
                 this._storedUser = null;
-                localStorage.removeItem(LS_APP_USER);
+                localStorageClear(LS_APP_USER);
             }
         } catch {
             this._storedUser = null;
-            localStorage.removeItem(LS_APP_USER);
+            localStorageClear(LS_APP_USER);
         }
     }
 
@@ -322,5 +322,10 @@ export class UserStore {
 
     public markPageAsVisited(pageId: string): void {
         this._visitedPages.add(pageId);
+    }
+
+    public clearStoredUser(): void {
+        this._storedUser = null;
+        localStorageClear(LS_APP_USER);
     }
 }
