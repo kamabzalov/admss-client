@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
 import { getKeyValue, localStorageClear } from "services/local-storage.service";
-import { AuthUser } from "./services/auth.service";
+import { AuthUser } from "common/models/user";
 import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";

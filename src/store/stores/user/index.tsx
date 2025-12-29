@@ -1,10 +1,11 @@
-import { LS_APP_USER, LS_REMEMBER_ME } from "common/constants/localStorage";
-import { UserPermissionsResponse } from "common/models/user";
-import { AuthUser } from "http/services/auth.service";
-import { makeAutoObservable } from "mobx";
+import { LS_APP_USER, LS_DEVICE_UID, LS_REMEMBER_ME } from "common/constants/localStorage";
+import { AuthUser, TWO_FACTOR_METHOD, UserPermissionsResponse } from "common/models/user";
+import { setup2FA, verify2FA } from "http/services/auth.service";
+import { makeAutoObservable, runInAction } from "mobx";
 import { getKeyValue, localStorageClear, setKey } from "services/local-storage.service";
 import { RootStore } from "store";
 import { decryptPassword, encryptPassword } from "services/encryption.service";
+import { v4 as uuidv4 } from "uuid";
 
 export interface RememberMeData {
     username: string;
@@ -46,6 +47,9 @@ class TwoFactorAuth {
     private _resendTimer: number = 60;
     private _codeInputRefs: (HTMLInputElement | null)[] = [];
     private _isEnabled: boolean = false;
+    private _twoFactorSessionUID: string = "";
+    private _verificationToken: string = "";
+    private _phoneMasked: string = "";
 
     constructor() {
         makeAutoObservable(this);
@@ -73,6 +77,18 @@ class TwoFactorAuth {
 
     public get codeInputRefs() {
         return this._codeInputRefs;
+    }
+
+    public get twoFactorSessionUID() {
+        return this._twoFactorSessionUID;
+    }
+
+    public get verificationToken() {
+        return this._verificationToken;
+    }
+
+    public get phoneMasked() {
+        return this._phoneMasked;
     }
 
     public set currentStep(step: TwoFactorAuthStep) {
@@ -103,6 +119,18 @@ class TwoFactorAuth {
         this._resendTimer = value;
     }
 
+    public set twoFactorSessionUID(value: string) {
+        this._twoFactorSessionUID = value;
+    }
+
+    public set verificationToken(value: string) {
+        this._verificationToken = value;
+    }
+
+    public set phoneMasked(value: string) {
+        this._phoneMasked = value;
+    }
+
     public setCodeInputRef(index: number, ref: HTMLInputElement | null) {
         this._codeInputRefs[index] = ref;
     }
@@ -113,14 +141,30 @@ class TwoFactorAuth {
         }
     }
 
-    public handlePhoneNumberSubmit(phoneNumber: string) {
+    public async handlePhoneNumberSubmit(phoneNumber: string) {
         const cleanPhoneNumber = phoneNumber.replace(/\D/g, "");
         this._phoneNumber = cleanPhoneNumber;
-        this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
-        this._resendTimer = 60;
-        setTimeout(() => {
-            this._codeInputRefs[0]?.focus();
-        }, 100);
+        try {
+            const response = await setup2FA({
+                method: TWO_FACTOR_METHOD.SMS,
+                phone: cleanPhoneNumber,
+            });
+            if (response && "2fasessionuid" in response) {
+                runInAction(() => {
+                    this._twoFactorSessionUID = response["2fasessionuid"];
+                    this._phoneMasked = response.phone_masked || "";
+                    this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
+                    this._resendTimer = 60;
+                });
+                setTimeout(() => {
+                    this._codeInputRefs[0]?.focus();
+                }, 100);
+                return true;
+            }
+        } catch (error) {
+            return false;
+        }
+        return false;
     }
 
     public handleCodeChange(index: number, value: string) {
@@ -146,19 +190,41 @@ class TwoFactorAuth {
         }
     }
 
-    public handleVerificationCodeSubmit() {
-        const generatedBackupCodes = Array.from({ length: 15 }, () => {
-            return Array.from({ length: 6 }, () => Math.floor(Math.random() * 10))
-                .join("")
-                .replace(/(\d{3})(\d{3})/, "$1 $2");
-        });
-        this._backupCodes = generatedBackupCodes;
-        this._currentStep = TwoFactorAuthStep.SUCCESS;
+    public async handleVerificationCodeSubmit() {
+        const code = this._verificationCode.join("");
+        try {
+            const response = await verify2FA({
+                "2fasessionuid": this._twoFactorSessionUID,
+                code,
+            });
+
+            if (response && "verification_token" in response) {
+                runInAction(() => {
+                    this._verificationToken = response.verification_token;
+                    if (response.backup_codes && response.backup_codes.length > 0) {
+                        this._backupCodes = response.backup_codes;
+                        this._currentStep = TwoFactorAuthStep.SUCCESS;
+                    }
+                });
+                return true;
+            }
+        } catch (error) {
+            return false;
+        }
+        return false;
     }
 
-    public handleResendCode() {
+    public async handleResendCode() {
         if (this._resendTimer === 0) {
-            this._resendTimer = 60;
+            try {
+                await setup2FA({
+                    "2fasessionuid": this._twoFactorSessionUID,
+                    method: TWO_FACTOR_METHOD.SMS,
+                });
+                runInAction(() => {
+                    this._resendTimer = 60;
+                });
+            } catch (error) {}
         }
     }
 
@@ -194,6 +260,9 @@ class TwoFactorAuth {
         this._backupCodes = [];
         this._resendTimer = 60;
         this._codeInputRefs = [];
+        this._twoFactorSessionUID = "";
+        this._verificationToken = "";
+        this._phoneMasked = "";
     }
 }
 
@@ -205,12 +274,14 @@ export class UserStore {
     public twoFactorAuth: TwoFactorAuth = new TwoFactorAuth();
     private _isSettingsLoaded: boolean = false;
     private _visitedPages: Set<string> = new Set();
+    private _deviceUID: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
         this.initializeStoredUser();
         this.initializeRememberMe();
+        this.initializeDeviceUID();
     }
 
     private initializeStoredUser() {
@@ -240,6 +311,25 @@ export class UserStore {
         } catch {
             this._rememberMe = null;
         }
+    }
+
+    private initializeDeviceUID() {
+        try {
+            const storedUID = localStorage.getItem(LS_DEVICE_UID);
+            if (storedUID) {
+                this._deviceUID = storedUID;
+            } else {
+                const newUID = uuidv4();
+                localStorage.setItem(LS_DEVICE_UID, newUID);
+                this._deviceUID = newUID;
+            }
+        } catch {
+            this._deviceUID = uuidv4();
+        }
+    }
+
+    public get deviceUID() {
+        return this._deviceUID;
     }
 
     public get authUser() {

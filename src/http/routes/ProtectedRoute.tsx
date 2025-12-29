@@ -5,10 +5,9 @@ import { observer } from "mobx-react-lite";
 import { getUserPermissions } from "http/services/auth-user.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { UserPermissionsResponse } from "common/models/user";
+import { AuthUser, UserPermissionsResponse } from "common/models/user";
 import { Loader } from "dashboard/common/loader";
 import { createApiDashboardInstance } from "http/index";
-import { AuthUser } from "http/services/auth.service";
 
 interface UserRoles {
     admin: boolean;

@@ -4,17 +4,19 @@ import { Checkbox } from "primereact/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
-import { auth } from "http/services/auth.service";
+import { auth, check2FA, setup2FA } from "http/services/auth.service";
 import { useState, useEffect } from "react";
 import { APP_TYPE, APP_VERSION, createApiDashboardInstance } from "http/index";
 import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
+import { TwoFactorAuthStep } from "store/stores/user";
 import { useToastMessage } from "common/hooks";
 import { DASHBOARD_PAGE } from "common/constants/links";
 import { LS_LAST_ROUTE, LastRouteData, LS_APP_USER } from "common/constants/localStorage";
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 import { getKeyValue } from "services/local-storage.service";
+import { TWO_FACTOR_METHOD } from "common/models/user";
 
 export interface LoginForm {
     username: string;
@@ -22,6 +24,9 @@ export interface LoginForm {
     rememberme: boolean;
     application: "admin" | "crm" | "client" | string;
     version: string;
+    deviceuid?: string;
+    devicename?: string;
+    verification_token?: string;
 }
 
 export const SignIn = () => {
@@ -44,6 +49,8 @@ export const SignIn = () => {
             rememberme: !!userStore.rememberMe?.username,
             application: APP_TYPE,
             version: APP_VERSION,
+            deviceuid: userStore.deviceUID,
+            devicename: navigator.userAgent.substring(0, 100),
         },
         validate: (data: { username: string; password: string }) => {
             let errors: any = {};
@@ -60,6 +67,32 @@ export const SignIn = () => {
         },
         onSubmit: async () => {
             try {
+                const checkResponse = await check2FA({
+                    user: formik.values.username,
+                    deviceuid: userStore.deviceUID,
+                });
+
+                if (
+                    checkResponse &&
+                    "tfa_required" in checkResponse &&
+                    checkResponse.tfa_required
+                ) {
+                    const setupResponse = await setup2FA({
+                        user: formik.values.username,
+                        method: checkResponse.tfa_method || TWO_FACTOR_METHOD.SMS,
+                    });
+
+                    if (setupResponse && "2fasessionuid" in setupResponse) {
+                        userStore.twoFactorAuth.reset();
+                        userStore.twoFactorAuth.twoFactorSessionUID =
+                            setupResponse["2fasessionuid"];
+                        userStore.twoFactorAuth.phoneMasked = setupResponse.phone_masked || "";
+                        userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
+                        navigate("/2fa", { state: formik.values });
+                        return;
+                    }
+                }
+
                 const response = await auth(formik.values);
                 if (!response) {
                     showError("Authentication failed");
@@ -81,41 +114,36 @@ export const SignIn = () => {
                         } else {
                             userStore.rememberMe = null;
                         }
-                        if (userStore.twoFactorAuth.isEnabled) {
-                            navigate("/2fa");
-                        } else {
-                            const storedRouteDataString = localStorage.getItem(LS_LAST_ROUTE);
-                            if (storedRouteDataString) {
-                                try {
-                                    const storedRouteData: LastRouteData =
-                                        JSON.parse(storedRouteDataString);
+                        const storedRouteDataString = localStorage.getItem(LS_LAST_ROUTE);
+                        if (storedRouteDataString) {
+                            try {
+                                const storedRouteData: LastRouteData =
+                                    JSON.parse(storedRouteDataString);
+                                if (
+                                    storedRouteData.path &&
+                                    storedRouteData.timestamp &&
+                                    storedRouteData.useruid &&
+                                    storedRouteData.useruid === response.useruid
+                                ) {
+                                    const currentTime = Date.now();
+                                    const storedTime = storedRouteData.timestamp;
+                                    const routeAgeInMilliseconds = currentTime - storedTime;
+                                    const routeRestoreTimeoutInMilliseconds =
+                                        convertTimeToMilliseconds(ROUTE_RESTORE_TIMEOUT_HOURS);
                                     if (
-                                        storedRouteData.path &&
-                                        storedRouteData.timestamp &&
-                                        storedRouteData.useruid &&
-                                        storedRouteData.useruid === response.useruid
+                                        storedTime > 0 &&
+                                        routeAgeInMilliseconds > 0 &&
+                                        routeAgeInMilliseconds <= routeRestoreTimeoutInMilliseconds
                                     ) {
-                                        const currentTime = Date.now();
-                                        const storedTime = storedRouteData.timestamp;
-                                        const routeAgeInMilliseconds = currentTime - storedTime;
-                                        const routeRestoreTimeoutInMilliseconds =
-                                            convertTimeToMilliseconds(ROUTE_RESTORE_TIMEOUT_HOURS);
-                                        if (
-                                            storedTime > 0 &&
-                                            routeAgeInMilliseconds > 0 &&
-                                            routeAgeInMilliseconds <=
-                                                routeRestoreTimeoutInMilliseconds
-                                        ) {
-                                            localStorage.removeItem(LS_LAST_ROUTE);
-                                            navigate(storedRouteData.path, { replace: true });
-                                            return;
-                                        }
+                                        localStorage.removeItem(LS_LAST_ROUTE);
+                                        navigate(storedRouteData.path, { replace: true });
+                                        return;
                                     }
-                                } catch {}
-                            }
-                            localStorage.removeItem(LS_LAST_ROUTE);
-                            navigate(DASHBOARD_PAGE, { replace: true });
+                                }
+                            } catch {}
                         }
+                        localStorage.removeItem(LS_LAST_ROUTE);
+                        navigate(DASHBOARD_PAGE, { replace: true });
                     } catch (error) {
                         showError(String(error));
                         return;

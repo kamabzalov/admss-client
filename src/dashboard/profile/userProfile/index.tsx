@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { AuthUser } from "http/services/auth.service";
+import { AuthUser } from "common/models/user";
 import { Password } from "primereact/password";
 
 interface UserProfileDialogProps extends DialogProps {
