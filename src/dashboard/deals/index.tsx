@@ -34,6 +34,7 @@ import { useCreateReport, useToastMessage } from "common/hooks";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { DealsUserSettings } from "common/models/user";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -560,6 +561,7 @@ export const DealsDataTable = observer(
                                 );
                             }
                         }}
+                        emptyMessage={ERROR_MESSAGES.NO_DATA}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}

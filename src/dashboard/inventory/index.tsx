@@ -35,6 +35,7 @@ import { Button } from "primereact/button";
 import { TruncatedText } from "dashboard/common/display";
 import { DataTableWrapper } from "dashboard/common/data-table";
 import { getColumnPtStyles } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 const DATA_FIELD = "data-field";
 
@@ -527,6 +528,7 @@ export default function Inventories({
                         onColReorder={handleColumnReorder}
                         onColumnResizeEnd={handleColumnResize}
                         onRowClick={handleOnRowClick}
+                        emptyMessage={ERROR_MESSAGES.NO_DATA}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}

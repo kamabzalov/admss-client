@@ -22,6 +22,7 @@ import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -293,6 +294,7 @@ export const ExportHistory = (): ReactElement => {
                 sortField={lazyState.sortField}
                 onColReorder={handleColumnReorder}
                 onColumnResizeEnd={handleColumnResize}
+                emptyMessage={ERROR_MESSAGES.NO_DATA}
             >
                 {activeHistoryColumns.map(({ field, header }, index) => {
                     const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];

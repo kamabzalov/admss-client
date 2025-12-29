@@ -42,6 +42,7 @@ import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -735,6 +736,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 reorderableColumns
                 resizableColumns
                 sortOrder={lazyState.sortOrder}
+                emptyMessage={ERROR_MESSAGES.NO_DATA}
                 className='export-web-table'
                 rowClassName={() => "table-row"}
                 sortField={lazyState.sortField}

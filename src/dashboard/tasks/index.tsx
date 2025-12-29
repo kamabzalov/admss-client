@@ -35,6 +35,7 @@ import { ServerUserSettings, TasksUserSettings } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -412,6 +413,7 @@ export const TasksDataTable = observer((): ReactElement => {
                             });
                         }
                     }}
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
                 >
                     <Column
                         bodyStyle={{ textAlign: "center" }}

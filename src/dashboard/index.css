@@ -144,6 +144,13 @@
         }
     }
 
+    .p-datatable-emptymessage.p-datatable-emptymessage {
+        color: var(--admss-app-medium-grey);
+        & > td {
+            border: none;
+        }
+    }
+
     .p-datatable-header {
         border: none;
         box-shadow: none;
