@@ -98,4 +98,8 @@
         overflow-y: auto;
         scrollbar-gutter: stable;
     }
+
+    .p-datatable.p-datatable-gridlines .p-datatable-tbody > tr:last-child > td {
+        border-bottom: none;
+    }
 }
