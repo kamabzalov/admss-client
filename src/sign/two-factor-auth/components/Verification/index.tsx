@@ -57,9 +57,10 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
             <h1 className='two-factor-auth__title'>Authentication</h1>
             <p className='two-factor-auth__description two-factor-auth__description--verification'>
                 Enter the code we just sent <br /> to &nbsp;
-                {twoFactorAuthStore.phoneNumber
-                    ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
-                    : "your phone"}
+                {twoFactorAuthStore.phoneMasked ||
+                    (twoFactorAuthStore.phoneNumber
+                        ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
+                        : "your phone")}
                 &nbsp; to verify your identity.
             </p>
             <form className='auth-verification' onSubmit={formik.handleSubmit}>

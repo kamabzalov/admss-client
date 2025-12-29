@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
-import { getKeyValue } from "services/local-storage.service";
-import { AuthUser } from "./services/auth.service";
+import { getKeyValue, localStorageClear } from "services/local-storage.service";
+import { AuthUser } from "common/models/user";
 import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
@@ -38,6 +38,7 @@ const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
             localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
         }
         localStorage.removeItem("useruid");
+        localStorageClear(LS_APP_USER);
         navigate("/");
         return Promise.reject(error.response);
     } else if (error.response && error.response.status === 500) {

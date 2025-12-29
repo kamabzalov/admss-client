@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { AuthUser } from "http/services/auth.service";
+import { AuthUser } from "common/models/user";
 
 export const RouteTracker = () => {
     const location = useLocation();

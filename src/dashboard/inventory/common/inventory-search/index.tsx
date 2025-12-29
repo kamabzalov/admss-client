@@ -2,7 +2,7 @@ import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { QueryParams } from "common/models/query-params";
-import { AuthUser } from "http/services/auth.service";
+import { AuthUser } from "common/models/user";
 import { getInventoryList } from "http/services/inventory-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";

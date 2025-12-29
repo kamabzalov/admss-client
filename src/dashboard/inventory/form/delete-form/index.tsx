@@ -2,7 +2,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToast } from "dashboard/common/toast";
-import { AuthUser } from "http/services/auth.service";
+import { AuthUser } from "common/models/user";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { DropdownProps } from "primereact/dropdown";
