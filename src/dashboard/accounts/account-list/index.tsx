@@ -26,6 +26,7 @@ import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -172,6 +173,7 @@ export const AccountsDataTable = observer(
                         sortField={lazyState.sortField}
                         rowClassName={() => "table-row"}
                         onRowClick={handleOnRowClick}
+                        emptyMessage={ERROR_MESSAGES.NO_DATA}
                         onColumnResizeEnd={(event) => {
                             if (event?.column?.props?.field && event?.element?.offsetWidth) {
                                 saveColumnWidth(

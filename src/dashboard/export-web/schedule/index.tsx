@@ -29,6 +29,7 @@ import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -343,6 +344,7 @@ export const ExportSchedule = (): ReactElement => {
                 sortField={lazyState.sortField}
                 onColReorder={handleColumnReorder}
                 onColumnResizeEnd={handleColumnResize}
+                emptyMessage={ERROR_MESSAGES.NO_DATA}
             >
                 {activeScheduleColumns.map(({ field, header }, index) => {
                     const savedWidth = serverSettings?.exportSchedule?.columnWidth?.[field];

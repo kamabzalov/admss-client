@@ -29,6 +29,7 @@ import {
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { useNavigate } from "react-router-dom";
 import { TruncatedText } from "dashboard/common/display";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 type AuditColumn = { field: keyof AuditRecord; header: string };
 
@@ -281,6 +282,7 @@ export const AccountsAudit = observer((): ReactElement => {
                     onRowClick={({ data }: DataTableRowClickEvent) =>
                         navigate(ACCOUNTS_PAGE.EDIT(data.accountuid))
                     }
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
                     onColumnResizeEnd={(event) => {
                         if (authUser && event && event.column?.props?.field) {
                             saveColumnWidth(

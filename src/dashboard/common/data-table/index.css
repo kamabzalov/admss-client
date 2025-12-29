@@ -40,14 +40,16 @@
 
 .data-table-wrapper {
     max-width: 1670px;
-    height: var(--admss-app-default-card-height);
-    max-height: 80vh;
+    height: var(--data-table-wrapper-height, var(--admss-app-default-card-height));
+    max-height: calc(
+        100vh - var(--admss-app-header-height) - var(--admss-app-content-top-margin) - 20px
+    );
     border-radius: 15px;
     overflow: hidden;
-    padding: 40px;
+    padding: var(--data-table-padding, 40px);
 
     .p-paginator {
-        padding-top: 42px;
+        padding-top: var(--data-table-paginator-padding-top, 42px);
         padding-bottom: 10px;
         .p-paginator-pages .p-paginator-page {
             width: 50px;

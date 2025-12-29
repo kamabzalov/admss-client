@@ -38,6 +38,7 @@ import { DropdownChangeEvent } from "primereact/dropdown";
 import { CONTACTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -483,6 +484,7 @@ export const ContactsDataTable = ({
                     sortOrder={lazyState.sortOrder}
                     sortField={lazyState.sortField}
                     resizableColumns
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
                     reorderableColumns
                     rowClassName={() => "table-row"}
                     onRowClick={handleOnRowClick}
