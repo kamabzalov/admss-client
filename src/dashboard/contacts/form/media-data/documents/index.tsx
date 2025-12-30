@@ -247,7 +247,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded documents</h2>
                 <span
                     className={`media-uploaded__label mx-2 uploaded-count ${

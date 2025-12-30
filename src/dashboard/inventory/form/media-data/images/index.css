@@ -1,87 +1,25 @@
-.media-images {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 25px 15px;
-    padding-top: 50px;
-    color: var(--admss-app-light-grey);
-}
-
 .media-images__image {
     border-radius: 5px;
+    .presentation {
+        height: 100%;
+    }
 }
 
 .media-images__item {
-    display: flex;
-    box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
-    padding: 15px;
-    align-items: center;
-    border-radius: 5px;
-    position: relative;
+    & > .media-uploaded__checkbox {
+        margin-left: 0;
+    }
+    .media-info {
+        margin-left: 10px;
+        gap: 4px;
+        .media-info__item {
+            font-size: 16px;
+        }
+    }
 }
 
-.image-info {
-    margin-left: 10px;
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    gap: 4px;
-    overflow: hidden;
-}
-
-.image-info__item {
-    color: var(--admss-app-primary);
-    font-size: 16px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
-.media-images__item > .media-uploaded__checkbox {
-    margin-left: 0;
-}
-
-.image-info__icon {
+.media-close.media-close--green {
     color: var(--admss-app-primary-main-green);
-}
-
-.image-info__icon .icon {
-    font-size: 14px;
-}
-
-.image-info__text {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.image-info__text--bold {
-    font-weight: 600;
-}
-
-.media-images__close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    cursor: pointer;
-    border: none;
-    color: var(--admss-app-medium-grey);
-    background-color: transparent;
-}
-
-.media-images__close i {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.media-images__close:hover {
-    color: var(--admss-app-light-grey);
-}
-
-.image-choose,
-.image-choose__selected > .media__button {
-    font-size: 16px;
 }
 
 .media .p-fileupload-content > div:nth-child(2) {
@@ -100,6 +38,18 @@
     border-radius: 5px;
     font-size: 14px;
     padding: 0 4px;
+    .presentation__content {
+        display: flex;
+        align-items: center;
+        width: 88%;
+        gap: 10px;
+        .presentation__label {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
 }
 
 .presentation__image {
@@ -126,7 +76,7 @@
     height: auto;
 }
 
-.image-choose .info-panel__panel {
+.media-choose .info-panel__panel {
     min-width: 418px;
 }
 

@@ -20,10 +20,11 @@ import { InventoryMediaPostData, MediaLimitations } from "common/models/inventor
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
-import { useToast } from "dashboard/common/toast";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useToastMessage } from "common/hooks";
+import { TruncatedText } from "dashboard/common/display";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -31,6 +32,7 @@ const limitations: MediaLimitations = {
     maxResolution: "8192x8192",
     maxSize: 8,
     maxUpload: 16,
+    maxMediaCount: 99,
 };
 
 enum ModalInfo {
@@ -43,7 +45,6 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const toast = useToast();
     const {
         saveInventoryImages,
         uploadFileImages,
@@ -61,6 +62,7 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [itemuid, setItemuid] = useState<string>("");
+    const { showError } = useToastMessage();
 
     useEffect(() => {
         fetchImages();
@@ -79,13 +81,9 @@ export const ImagesMedia = observer((): ReactElement => {
 
     useEffect(() => {
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
         }
-    }, [formErrorMessage, toast]);
+    }, [formErrorMessage, showError]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = {
@@ -131,11 +129,7 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const handleUploadFiles = async () => {
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
             return;
         }
         const res = await saveInventoryImages();
@@ -180,7 +174,7 @@ export const ImagesMedia = observer((): ReactElement => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
+                <div className='presentation__content'>
                     <img
                         alt={file.name}
                         src={URL.createObjectURL(file)}
@@ -189,9 +183,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         height={29}
                         className='presentation__image'
                     />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
+                    <TruncatedText className='presentation__label' text={file.name} withTooltip />
                 </div>
                 <Button
                     type='button'
@@ -205,9 +197,9 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 image-choose'>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
                 {totalCount ? (
-                    <div className='image-choose__selected flex align-items-center'>
+                    <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop images
                         <span className='bold mx-3'>or</span>
                         {chooseButton}
@@ -324,14 +316,14 @@ export const ImagesMedia = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
                 <span
                     className={`media-uploaded__label mx-2 uploaded-count ${
                         images.length && "uploaded-count--blue"
                     }`}
                 >
-                    ({images.length})
+                    ({images.length}/{limitations.maxMediaCount})
                 </span>
                 <hr className='media-uploaded__line flex-1' />
                 <label className='cursor-pointer media-uploaded__label'>
@@ -343,7 +335,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     Export to Web
                 </label>
             </div>
-            <div className='media-images'>
+            <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && images?.length ? (
                     <ResponsiveReactGridLayout
@@ -355,7 +347,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
                         draggableCancel='
                         .media-uploaded__checkbox,
-                        .media-images__close,
+                        .media-close,
                         .p-image,
                         .p-image-mask,
                         .media-images__preview'
@@ -363,7 +355,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     >
                         {images.map(({ itemuid, src, info }, index: number) => {
                             return (
-                                <div key={itemuid} className='media-images__item'>
+                                <div key={itemuid} className='media-item media-images__item'>
                                     {checked && (
                                         <Checkbox
                                             checked={imagesChecked[index]}
@@ -390,12 +382,12 @@ export const ImagesMedia = observer((): ReactElement => {
                                             },
                                         }}
                                     />
-                                    <div className='media-images__info image-info'>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
+                                    <div className='media-info'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
                                                 <i className='icon adms-category' />
                                             </span>
-                                            <span className='image-info__text--bold'>
+                                            <span className='media-info__text--bold'>
                                                 {
                                                     CATEGORIES.find(
                                                         (category) =>
@@ -404,26 +396,26 @@ export const ImagesMedia = observer((): ReactElement => {
                                                 }
                                             </span>
                                         </div>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
-                                                <span className='image-info__icon'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
+                                                <span className='media-info__icon'>
                                                     <i className='icon adms-comment' />
                                                 </span>
                                             </span>
-                                            <span className='image-info__text'>{info?.notes}</span>
+                                            <span className='media-info__text'>{info?.notes}</span>
                                         </div>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
                                                 <i className='icon adms-calendar' />
                                             </span>
-                                            <span className='image-info__text'>
+                                            <span className='media-info__text'>
                                                 {info?.created}
                                             </span>
                                         </div>
                                     </div>
                                     <button
                                         type='button'
-                                        className='media-images__close'
+                                        className={`media-close ${imagesChecked[index] ? "media-close--green" : ""}`}
                                         onClick={() => handleModalOpen(itemuid)}
                                     >
                                         <i className='pi pi-times' />

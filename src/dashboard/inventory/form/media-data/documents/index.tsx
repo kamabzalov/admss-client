@@ -27,6 +27,7 @@ const limitations: MediaLimitations = {
     formats: ["PDF"],
     maxSize: 8,
     maxUpload: 16,
+    maxMediaCount: 50,
 };
 
 enum ModalInfo {
@@ -167,9 +168,9 @@ export const DocumentsMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 document-choose'>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
                 {totalCount ? (
-                    <div className='document-choose__selected flex align-items-center'>
+                    <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop documents
                         <span className='bold mx-3'>or</span>
                         {chooseButton}
@@ -267,16 +268,23 @@ export const DocumentsMedia = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded documents</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        documents.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({documents.length}/{limitations.maxMediaCount})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
-            <div className='media-documents'>
+            <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && uniqueDocuments.length ? (
                     uniqueDocuments.map(({ itemuid, src, info }, index: number) => {
                         return (
-                            <div key={itemuid} className='media-documents__item'>
+                            <div key={itemuid} className='media-item media-documents__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={documentChecked[index]}
@@ -295,12 +303,12 @@ export const DocumentsMedia = observer((): ReactElement => {
                                         },
                                     }}
                                 />
-                                <div className='media-documents__info document-info'>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
+                                <div className='media-info'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='document-info__text--bold'>
+                                        <span className='media-info__text--bold'>
                                             {
                                                 CATEGORIES.find(
                                                     (category) => category.id === info?.contenttype
@@ -308,24 +316,24 @@ export const DocumentsMedia = observer((): ReactElement => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
-                                            <span className='document-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
+                                            <span className='media-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='document-info__text'>{info?.notes}</span>
+                                        <span className='media-info__text'>{info?.notes}</span>
                                     </div>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='document-info__text'>{info?.created}</span>
+                                        <span className='media-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button
                                     type='button'
-                                    className='media-documents__close'
+                                    className='media-close'
                                     onClick={() => handleModalOpen(itemuid)}
                                 >
                                     <i className='pi pi-times' />
@@ -337,6 +345,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No audio files added yet.</div>
                 )}
             </div>
+
             <ConfirmModal
                 visible={!!modalVisible}
                 position='top'

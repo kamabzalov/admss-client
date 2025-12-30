@@ -33,6 +33,7 @@ const limitations: MediaLimitations = {
     maxDuration: 300,
     maxSize: 32,
     maxUpload: 4,
+    maxMediaCount: 4,
 };
 
 enum ModalInfo {
@@ -174,9 +175,9 @@ export const VideoMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 video-choose'>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
                 {totalCount ? (
-                    <div className='video-choose__selected flex align-items-center'>
+                    <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop video files
                         <span className='bold mx-3'>or</span>
                         {chooseButton}
@@ -282,8 +283,15 @@ export const VideoMedia = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded video files</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        videos.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({videos.length}/{limitations.maxMediaCount})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
                 <label className='cursor-pointer media-uploaded__label'>
                     <Checkbox
@@ -296,12 +304,12 @@ export const VideoMedia = observer((): ReactElement => {
                     Export to Web
                 </label>
             </div>
-            <div className='media-video'>
+            <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && uniqueVideos.length ? (
                     uniqueVideos.map(({ itemuid, src, info }, index: number) => {
                         return (
-                            <div key={itemuid} className='media-video__item'>
+                            <div key={itemuid} className='media-item media-video__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={videoChecked[index]}
@@ -320,12 +328,12 @@ export const VideoMedia = observer((): ReactElement => {
                                         },
                                     }}
                                 />
-                                <div className='media-video__info video-info'>
-                                    <div className='video-info__item'>
-                                        <span className='video-info__icon'>
+                                <div className='media-info'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='video-info__text--bold'>
+                                        <span className='media-info__text--bold'>
                                             {
                                                 CATEGORIES.find(
                                                     (category) => category.id === info?.contenttype
@@ -333,24 +341,24 @@ export const VideoMedia = observer((): ReactElement => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='video-info__item'>
-                                        <span className='video-info__icon'>
-                                            <span className='video-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
+                                            <span className='media-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='video-info__text'>{info?.notes}</span>
+                                        <span className='media-info__text'>{info?.notes}</span>
                                     </div>
-                                    <div className='video-info__item'>
-                                        <span className='video-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='video-info__text'>{info?.created}</span>
+                                        <span className='media-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button
                                     type='button'
-                                    className='media-video__close'
+                                    className='media-close'
                                     onClick={() => handleModalOpen(itemuid)}
                                 >
                                     <i className='pi pi-times' />
@@ -362,6 +370,7 @@ export const VideoMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No video files added yet.</div>
                 )}
             </div>
+
             <ConfirmModal
                 visible={!!modalVisible}
                 position='top'
