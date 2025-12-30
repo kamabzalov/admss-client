@@ -29,6 +29,7 @@ const limitations: MediaLimitations = {
     maxDuration: 300,
     maxSize: 8,
     maxUpload: 8,
+    maxMediaCount: 8,
 };
 
 enum ModalInfo {
@@ -175,9 +176,9 @@ export const AudioMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 audio-choose'>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
                 {totalCount ? (
-                    <div className='audio-choose__selected flex align-items-center'>
+                    <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop audio files
                         <span className='bold mx-3'>or</span>
                         {chooseButton}
@@ -273,16 +274,23 @@ export const AudioMedia = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded audio files</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        audios.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({audios.length}/{limitations.maxMediaCount})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
-            <div className='media-audio'>
+            <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && uniqueAudio.length ? (
                     uniqueAudio.map(({ itemuid, src, info }, index: number) => {
                         return (
-                            <div key={itemuid} className='media-audio__item'>
+                            <div key={itemuid} className='media-item media-audio__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={audioChecked[index]}
@@ -301,12 +309,12 @@ export const AudioMedia = observer((): ReactElement => {
                                         },
                                     }}
                                 />
-                                <div className='media-audio__info audio-info'>
-                                    <div className='audio-info__item'>
-                                        <span className='audio-info__icon'>
+                                <div className='media-info'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-th-large' />
                                         </span>
-                                        <span className='audio-info__text--bold'>
+                                        <span className='media-info__text--bold'>
                                             {
                                                 CATEGORIES.find(
                                                     (category) => category.id === info?.contenttype
@@ -314,24 +322,24 @@ export const AudioMedia = observer((): ReactElement => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='audio-info__item'>
-                                        <span className='audio-info__icon'>
-                                            <span className='audio-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
+                                            <span className='media-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='audio-info__text'>{info?.notes}</span>
+                                        <span className='media-info__text'>{info?.notes}</span>
                                     </div>
-                                    <div className='audio-info__item'>
-                                        <span className='audio-info__icon'>
+                                    <div className='media-info__item'>
+                                        <span className='media-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='audio-info__text'>{info?.created}</span>
+                                        <span className='media-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
                                 <button
                                     type='button'
-                                    className='media-audio__close'
+                                    className='media-close'
                                     onClick={() => handleModalOpen(itemuid)}
                                 >
                                     <i className='pi pi-times' />
@@ -343,6 +351,7 @@ export const AudioMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No audio files added yet.</div>
                 )}
             </div>
+
             <ConfirmModal
                 visible={!!modalVisible}
                 position='top'
