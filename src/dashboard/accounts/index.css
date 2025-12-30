@@ -151,6 +151,7 @@
 
 .accounts .p-tabview .p-tabview-nav {
     border-bottom: 2px solid var(--admss-app-light-grey);
+    margin-bottom: 30px;
 }
 
 .p-tabview .p-tabview-nav li.accounts__header .p-tabview-nav-link {

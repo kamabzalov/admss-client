@@ -113,6 +113,7 @@
 .export-web .p-tabview .p-tabview-nav {
     margin: 0;
     border-bottom: 2px solid var(--admss-app-light-grey);
+    margin-bottom: 30px;
 }
 
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {

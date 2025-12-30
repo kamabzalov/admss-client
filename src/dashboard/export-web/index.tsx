@@ -1,11 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ExportWeb } from "./export";
-import "./index.css";
+import { ExportWeb } from "dashboard/export-web/export";
+import "dashboard/export-web/index.css";
 import { TabPanel, TabView } from "primereact/tabview";
-import { ExportSchedule } from "./schedule";
-import { ExportHistory } from "./history";
-import { DEFAULT_ROW_HEIGHT } from "common/settings";
+import { ExportSchedule } from "dashboard/export-web/schedule";
+import { ExportHistory } from "dashboard/export-web/history";
 import { DataTableWrapper } from "dashboard/common/data-table";
 
 interface TabItem {
@@ -69,7 +68,7 @@ export const ExportToWeb = (): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='export-web card' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+        <DataTableWrapper className='export-web card'>
             <div className='export-web__body'>
                 <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
                     {tabItems.map(({ tabName, component, headerCount }) => (
