@@ -19,7 +19,7 @@ export const Dashboard = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
 
     const store = useStore().userStore;
-    const { authUser, settings, isSettingsLoaded, clearStoredUser } = store;
+    const { authUser, settings, isSettingsLoaded } = store;
 
     useEffect(() => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -59,11 +59,11 @@ export const Dashboard = observer((): ReactElement => {
                             useruid: storedUser.useruid,
                         };
                         localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
-                        clearStoredUser();
+                        store.clearStoredUser();
                         navigate("/");
                     }
                 } else {
-                    clearStoredUser();
+                    store.clearStoredUser();
                     navigate("/");
                 }
             }
