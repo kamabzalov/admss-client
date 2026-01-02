@@ -11,8 +11,6 @@ export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
 export const APP_MAGIC: string = process.env.REACT_APP_MAGIC || "avansoft";
 export const APP_API_URL: string = process.env.REACT_APP_API_URL || "https://app.admss.com/api/v1/";
 
-export let authorizedUserApiInstance: AxiosInstance;
-
 function getToken() {
     const authUser: AuthUser = getKeyValue(LS_APP_USER);
     if (authUser) {
@@ -23,6 +21,31 @@ function getToken() {
 
 export const nonAuthorizedUserApiInstance = axios.create({
     baseURL: APP_API_URL,
+});
+
+export const authorizedUserApiInstance = axios.create({
+    baseURL: APP_API_URL,
+});
+
+authorizedUserApiInstance.interceptors.request.use((config) => {
+    const token = getToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (config.params) {
+        const params: URLSearchParams = new URLSearchParams();
+
+        for (const [key, value] of Object.entries(config.params)) {
+            if (value !== "" && value !== null && value !== undefined) {
+                params.append(key, value as string);
+            }
+        }
+
+        config.params = params;
+    }
+
+    return config;
 });
 
 const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
@@ -50,29 +73,6 @@ const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
 };
 
 export function createApiDashboardInstance(navigate: NavigateFunction) {
-    authorizedUserApiInstance = axios.create({
-        baseURL: APP_API_URL,
-        headers: {
-            common: { Authorization: `Bearer ${getToken()}` },
-        },
-    });
-
-    authorizedUserApiInstance.interceptors.request.use((config) => {
-        if (config.params) {
-            const params: URLSearchParams = new URLSearchParams();
-
-            for (const [key, value] of Object.entries(config.params)) {
-                if (value !== "" && value !== null && value !== undefined) {
-                    params.append(key, value as string);
-                }
-            }
-
-            config.params = params;
-        }
-
-        return config;
-    });
-
     authorizedUserApiInstance.interceptors.response.use(
         (response) => {
             if (response.status === 200) {

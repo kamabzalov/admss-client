@@ -67,17 +67,27 @@ export const TwoFactorAuth = observer(() => {
         },
         onSubmit: async () => {
             if (twoFactorAuthStore.currentStep === TwoFactorAuthStep.PHONE_NUMBER) {
-                await twoFactorAuthStore.handlePhoneNumberSubmit(formik.values.phoneNumber);
+                const response = (await twoFactorAuthStore.handlePhoneNumberSubmit(
+                    formik.values.phoneNumber,
+                    loginData?.username
+                )) as any;
+                if (response && response.status === Status.ERROR) {
+                    showError(response.error || "Failed to setup SMS 2FA");
+                }
             } else if (twoFactorAuthStore.currentStep === TwoFactorAuthStep.VERIFICATION_CODE) {
-                const success = await twoFactorAuthStore.handleVerificationCodeSubmit();
-                if (success) {
+                const response = (await twoFactorAuthStore.handleVerificationCodeSubmit()) as any;
+                if (response && "verification_token" in response) {
                     if (loginData) {
                         try {
-                            const response = await auth({
+                            const authResponse = await auth({
                                 ...loginData,
                                 verification_token: twoFactorAuthStore.verificationToken,
                             });
-                            if (response && response.status === Status.OK && "token" in response) {
+                            if (
+                                authResponse &&
+                                authResponse.status === Status.OK &&
+                                "token" in authResponse
+                            ) {
                                 userStore.storedUser = response;
                                 createApiDashboardInstance(navigate);
 
@@ -115,14 +125,14 @@ export const TwoFactorAuth = observer(() => {
                                 localStorage.removeItem(LS_LAST_ROUTE);
                                 navigate(DASHBOARD_PAGE, { replace: true });
                             } else {
-                                showError(response?.error || "Login failed after 2FA");
+                                showError(authResponse?.error || "Login failed after 2FA");
                             }
                         } catch (error) {
                             showError("An error occurred during login after 2FA");
                         }
                     }
                 } else {
-                    showError("Invalid verification code");
+                    showError(response?.error || "Invalid verification code");
                 }
             }
         },

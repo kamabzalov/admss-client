@@ -41,7 +41,9 @@ export enum TwoFactorAuthStep {
 
 class TwoFactorAuth {
     private _currentStep: TwoFactorAuthStep = TwoFactorAuthStep.INTRODUCTION;
+    private _selectedMethod: TWO_FACTOR_METHOD | null = null;
     private _phoneNumber: string = "";
+    private _email: string = "";
     private _verificationCode: string[] = ["", "", "", "", "", ""];
     private _backupCodes: string[] = [];
     private _resendTimer: number = 60;
@@ -50,6 +52,7 @@ class TwoFactorAuth {
     private _twoFactorSessionUID: string = "";
     private _verificationToken: string = "";
     private _phoneMasked: string = "";
+    private _emailMasked: string = "";
 
     constructor() {
         makeAutoObservable(this);
@@ -59,8 +62,16 @@ class TwoFactorAuth {
         return this._currentStep;
     }
 
+    public get selectedMethod() {
+        return this._selectedMethod;
+    }
+
     public get phoneNumber() {
         return this._phoneNumber;
+    }
+
+    public get email() {
+        return this._email;
     }
 
     public get verificationCode() {
@@ -91,12 +102,24 @@ class TwoFactorAuth {
         return this._phoneMasked;
     }
 
+    public get emailMasked() {
+        return this._emailMasked;
+    }
+
     public set currentStep(step: TwoFactorAuthStep) {
         this._currentStep = step;
     }
 
+    public set selectedMethod(method: TWO_FACTOR_METHOD | null) {
+        this._selectedMethod = method;
+    }
+
     public set phoneNumber(value: string) {
         this._phoneNumber = value;
+    }
+
+    public set email(value: string) {
+        this._email = value;
     }
 
     public get isEnabled() {
@@ -131,40 +154,48 @@ class TwoFactorAuth {
         this._phoneMasked = value;
     }
 
+    public set emailMasked(value: string) {
+        this._emailMasked = value;
+    }
+
     public setCodeInputRef(index: number, ref: HTMLInputElement | null) {
         this._codeInputRefs[index] = ref;
     }
 
-    public handleContinue() {
+    public async handleContinue(username?: string) {
         if (this._currentStep === TwoFactorAuthStep.INTRODUCTION) {
-            this._currentStep = TwoFactorAuthStep.PHONE_NUMBER;
+            if (this._selectedMethod === TWO_FACTOR_METHOD.SMS) {
+                this._currentStep = TwoFactorAuthStep.PHONE_NUMBER;
+                return true;
+            } else if (this._selectedMethod === TWO_FACTOR_METHOD.EMAIL) {
+                return await this.handleEmailSubmit(username);
+            }
         }
+        return false;
     }
 
-    public async handlePhoneNumberSubmit(phoneNumber: string) {
-        const cleanPhoneNumber = phoneNumber.replace(/\D/g, "");
-        this._phoneNumber = cleanPhoneNumber;
+    public async handleEmailSubmit(username?: string) {
         try {
             const response = await setup2FA({
-                method: TWO_FACTOR_METHOD.SMS,
-                phone: cleanPhoneNumber,
+                method: TWO_FACTOR_METHOD.EMAIL,
+                user: username,
             });
             if (response && "2fasessionuid" in response) {
                 runInAction(() => {
                     this._twoFactorSessionUID = response["2fasessionuid"];
-                    this._phoneMasked = response.phone_masked || "";
+                    this._emailMasked = response.email_masked || "";
                     this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
                     this._resendTimer = 60;
                 });
                 setTimeout(() => {
                     this._codeInputRefs[0]?.focus();
                 }, 100);
-                return true;
+                return response;
             }
+            return response;
         } catch (error) {
-            return false;
+            return error;
         }
-        return false;
     }
 
     public handleCodeChange(index: number, value: string) {
@@ -206,25 +237,57 @@ class TwoFactorAuth {
                         this._currentStep = TwoFactorAuthStep.SUCCESS;
                     }
                 });
-                return true;
+                return response;
             }
+            return response;
         } catch (error) {
-            return false;
+            return error;
         }
-        return false;
+    }
+
+    public async handlePhoneNumberSubmit(phoneNumber: string, username?: string) {
+        const cleanPhoneNumber = phoneNumber.replace(/\D/g, "");
+        this._phoneNumber = cleanPhoneNumber;
+        try {
+            const response = await setup2FA({
+                method: TWO_FACTOR_METHOD.SMS,
+                phone: cleanPhoneNumber,
+                user: username,
+            });
+            if (response && "2fasessionuid" in response) {
+                runInAction(() => {
+                    this._twoFactorSessionUID = response["2fasessionuid"];
+                    this._phoneMasked = response.phone_masked || "";
+                    this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
+                    this._resendTimer = 60;
+                });
+                setTimeout(() => {
+                    this._codeInputRefs[0]?.focus();
+                }, 100);
+                return response;
+            }
+            return response;
+        } catch (error) {
+            return error;
+        }
     }
 
     public async handleResendCode() {
         if (this._resendTimer === 0) {
             try {
-                await setup2FA({
+                const response = await setup2FA({
                     "2fasessionuid": this._twoFactorSessionUID,
-                    method: TWO_FACTOR_METHOD.SMS,
+                    method: this._selectedMethod || TWO_FACTOR_METHOD.SMS,
                 });
-                runInAction(() => {
-                    this._resendTimer = 60;
-                });
-            } catch (error) {}
+                if (response && "2fasessionuid" in response) {
+                    runInAction(() => {
+                        this._resendTimer = 60;
+                    });
+                }
+                return response;
+            } catch (error) {
+                return error;
+            }
         }
     }
 
@@ -255,7 +318,9 @@ class TwoFactorAuth {
 
     public reset() {
         this._currentStep = TwoFactorAuthStep.INTRODUCTION;
+        this._selectedMethod = null;
         this._phoneNumber = "";
+        this._email = "";
         this._verificationCode = ["", "", "", "", "", ""];
         this._backupCodes = [];
         this._resendTimer = 60;
@@ -263,6 +328,7 @@ class TwoFactorAuth {
         this._twoFactorSessionUID = "";
         this._verificationToken = "";
         this._phoneMasked = "";
+        this._emailMasked = "";
     }
 }
 
