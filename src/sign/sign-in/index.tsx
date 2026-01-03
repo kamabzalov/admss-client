@@ -4,7 +4,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
-import { auth, check2FA, setup2FA } from "http/services/auth.service";
+import { auth, check2FA } from "http/services/auth.service";
 import { useState, useEffect } from "react";
 import { APP_TYPE, APP_VERSION, createApiDashboardInstance } from "http/index";
 import { Status } from "common/models/base-response";
@@ -16,7 +16,7 @@ import { LS_LAST_ROUTE, LastRouteData, LS_APP_USER } from "common/constants/loca
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 import { getKeyValue } from "services/local-storage.service";
-import { TWO_FACTOR_METHOD } from "common/models/user";
+import { TwoFactorCheckResponse } from "common/models/user";
 
 export interface LoginForm {
     username: string;
@@ -67,30 +67,23 @@ export const SignIn = () => {
         },
         onSubmit: async () => {
             try {
-                const checkResponse = await check2FA({
+                const checkResponse = (await check2FA({
                     user: formik.values.username,
                     deviceuid: userStore.deviceUID,
-                });
+                })) as TwoFactorCheckResponse;
 
                 if (
                     checkResponse &&
-                    "tfa_required" in checkResponse &&
-                    checkResponse.tfa_required
+                    ("required" in checkResponse || "tfa_required" in checkResponse) &&
+                    (checkResponse.required || checkResponse.tfa_required)
                 ) {
-                    const setupResponse = await setup2FA({
-                        user: formik.values.username,
-                        method: checkResponse.tfa_method || TWO_FACTOR_METHOD.SMS,
-                    });
-
-                    if (setupResponse && "2fasessionuid" in setupResponse) {
-                        userStore.twoFactorAuth.reset();
-                        userStore.twoFactorAuth.twoFactorSessionUID =
-                            setupResponse["2fasessionuid"];
-                        userStore.twoFactorAuth.phoneMasked = setupResponse.phone_masked || "";
-                        userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
-                        navigate("/2fa", { state: formik.values });
-                        return;
+                    userStore.twoFactorAuth.reset();
+                    userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.INTRODUCTION;
+                    if (checkResponse.tfa_method) {
+                        userStore.twoFactorAuth.selectedMethod = checkResponse.tfa_method;
                     }
+                    navigate("/2fa", { state: formik.values });
+                    return;
                 }
 
                 const response = await auth(formik.values);

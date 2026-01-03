@@ -116,16 +116,20 @@ export enum TWO_FACTOR_METHOD {
 }
 
 export interface TwoFactorCheckResponse {
-    tfa_required: boolean;
+    required: boolean;
+    tfa_required?: boolean;
     phone_masked?: string;
     email_masked?: string;
     tfa_method?: TWO_FACTOR_METHOD;
     trusted_until?: number;
+    trust_expires_in?: number;
+    trusted_device?: boolean;
 }
 
 export interface TwoFASetupResponse {
     "2fasessionuid": string;
     phone_masked?: string;
+    email_masked?: string;
     expires_in: number;
     backup_codes?: string[];
 }

@@ -126,8 +126,9 @@
     line-height: 1.5;
     margin-bottom: 30px;
     font-family: "Open Sans", sans-serif;
+    color: var(--admss-app-medium-grey);
     :not(.two-factor-auth__description--success) {
-        max-width: 338px;
+        max-width: 400px;
     }
     &.two-factor-auth__description--verification {
         max-width: 326px;
@@ -140,6 +141,91 @@
     position: relative;
 }
 
+.two-factor-auth__methods {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 40px;
+    justify-content: center;
+}
+
+.two-factor-auth__method {
+    flex: 1;
+    max-width: 180px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(41, 93, 194, 0.1);
+    color: var(--admss-app-primary);
+    border-radius: 20px;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    background: var(--admss-app-white);
+}
+
+.two-factor-auth__method:hover {
+    box-shadow: 0 6px 20px rgba(41, 93, 194, 0.15);
+}
+
+.two-factor-auth__method--selected {
+    box-shadow: 0 8px 25px rgba(13, 181, 100, 0.15);
+    background: var(--admss-app-lightest-green);
+}
+
+.two-factor-auth__method-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.two-factor-auth__method-icon-email,
+.two-factor-auth__method-icon-sms {
+    width: 40px;
+    height: 40px;
+    background-color: var(--admss-app-main-blue);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition: background-color 0.2s ease;
+}
+
+.two-factor-auth__method-icon-email {
+    -webkit-mask-image: url("../../assets/images/2fa_email.svg");
+    mask-image: url("../../assets/images/2fa_email.svg");
+}
+
+.two-factor-auth__method-icon-sms {
+    -webkit-mask-image: url("../../assets/images/2fa_mobile.svg");
+    mask-image: url("../../assets/images/2fa_mobile.svg");
+}
+
+.two-factor-auth__method--selected .two-factor-auth__method-icon-email,
+.two-factor-auth__method--selected .two-factor-auth__method-icon-sms {
+    background-color: var(--admss-app-green);
+}
+
+.two-factor-auth__method-title {
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--admss-app-primary);
+    margin-bottom: 8px;
+}
+
+.two-factor-auth__method-description {
+    font-size: 11px;
+    color: var(--admss-app-medium-grey);
+    line-height: 1.3;
+}
+
 .two-factor-auth__button {
     display: inline-flex;
     align-items: center;
@@ -148,6 +234,30 @@
     height: 60px;
     font-weight: 700;
     font-size: 24px;
+    border-radius: 8px;
+}
+
+.two-factor-auth__button:disabled {
+    background: var(--admss-app-lightest-grey) !important;
+    border-color: var(--admss-app-lightest-grey) !important;
+    color: var(--admss-app-white);
+    opacity: 1;
+}
+
+.two-factor-auth__try-another {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--admss-app-main-blue);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.two-factor-auth__try-another:hover {
+    text-decoration: underline;
 }
 
 .two-factor-auth__code-inputs {

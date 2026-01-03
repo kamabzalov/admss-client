@@ -4,6 +4,10 @@ import { FormikProps } from "formik";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { ProgressIndicator } from "../ProgressIndicator";
+import { TWO_FACTOR_METHOD } from "common/models/user";
+import { TwoFactorAuthStep } from "store/stores/user";
+import { useToastMessage } from "common/hooks";
+import { Status } from "common/models/base-response";
 
 interface TwoFactorAuthForm {
     phoneNumber: string;
@@ -17,6 +21,7 @@ interface VerificationCodeStepProps {
 
 export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepProps) => {
     const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
+    const { showError } = useToastMessage();
 
     const formatPhoneNumber = (phone: string): string => {
         const digits = phone.replace(/\D/g, "");
@@ -51,17 +56,29 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
         }
     };
 
+    const handleResendCode = async () => {
+        const response = (await twoFactorAuthStore.handleResendCode()) as any;
+        if (response && response.status === Status.ERROR) {
+            showError(response.error || "Failed to resend code");
+        }
+    };
+
     return (
         <>
             <ProgressIndicator currentStep={2} />
             <h1 className='two-factor-auth__title'>Authentication</h1>
             <p className='two-factor-auth__description two-factor-auth__description--verification'>
                 Enter the code we just sent <br /> to &nbsp;
-                {twoFactorAuthStore.phoneMasked ||
-                    (twoFactorAuthStore.phoneNumber
-                        ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
-                        : "your phone")}
+                {twoFactorAuthStore.selectedMethod === TWO_FACTOR_METHOD.EMAIL
+                    ? twoFactorAuthStore.emailMasked || "your email"
+                    : twoFactorAuthStore.phoneMasked ||
+                      (twoFactorAuthStore.phoneNumber
+                          ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
+                          : "your phone")}
                 &nbsp; to verify your identity.
+            </p>
+            <p className='two-factor-auth__description two-factor-auth__description--verification'>
+                If you can't find it, check your inbox or spam folder.
             </p>
             <form className='auth-verification' onSubmit={formik.handleSubmit}>
                 <div className='two-factor-auth__code-inputs'>
@@ -111,12 +128,21 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
                         <button
                             type='button'
                             className='two-factor-auth__resend-link'
-                            onClick={() => twoFactorAuthStore.handleResendCode()}
+                            onClick={handleResendCode}
                         >
                             Resend code
                         </button>
                     )}
                 </div>
+                <button
+                    type='button'
+                    className='two-factor-auth__try-another'
+                    onClick={() =>
+                        (twoFactorAuthStore.currentStep = TwoFactorAuthStep.INTRODUCTION)
+                    }
+                >
+                    Try another method
+                </button>
             </form>
         </>
     );

@@ -3,6 +3,8 @@ import { FormikProps } from "formik";
 import { observer } from "mobx-react-lite";
 import { PhoneInput } from "dashboard/common/form/inputs";
 import { ProgressIndicator } from "../ProgressIndicator";
+import { useStore } from "store/hooks";
+import { TwoFactorAuthStep } from "store/stores/user";
 
 interface TwoFactorAuthForm {
     phoneNumber: string;
@@ -15,6 +17,8 @@ interface PhoneNumberStepProps {
 }
 
 export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
+    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
+
     return (
         <>
             <ProgressIndicator currentStep={1} />
@@ -55,6 +59,15 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
                     type='submit'
                     className='two-factor-auth__button mt-4'
                 />
+                <button
+                    type='button'
+                    className='two-factor-auth__try-another'
+                    onClick={() =>
+                        (twoFactorAuthStore.currentStep = TwoFactorAuthStep.INTRODUCTION)
+                    }
+                >
+                    Try another method
+                </button>
             </form>
         </>
     );
