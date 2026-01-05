@@ -397,7 +397,7 @@ export default function Inventories({
         return <span data-field={field}>{title}</span>;
     };
 
-    const columnEditButton = (itemuid: string) => {
+    const columnEditButton = ({ itemuid }: Inventory) => {
         return (
             <Button
                 text
