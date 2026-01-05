@@ -166,7 +166,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 {totalCount ? (
                     <div className='document-choose__selected flex align-items-center'>
                         To upload more drag and drop documents
-                        <span className='bold mx-3'>or</span>
+                        <span className='font-semibold mx-3'>or</span>
                         {chooseButton}
                     </div>
                 ) : (

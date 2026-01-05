@@ -201,7 +201,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 {totalCount ? (
                     <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop images
-                        <span className='bold mx-3'>or</span>
+                        <span className='font-semibold mx-3'>or</span>
                         {chooseButton}
                     </div>
                 ) : (
