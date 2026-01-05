@@ -157,7 +157,7 @@ export const VideoMedia = observer((): ReactElement => {
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
                     <div className='media-preview'>
-                        <i className='icon adms-play-prev media-preview__icon' />
+                        <i className='icon adms-play-button media-preview__icon' />
                     </div>
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
@@ -179,7 +179,7 @@ export const VideoMedia = observer((): ReactElement => {
                 {totalCount ? (
                     <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop video files
-                        <span className='bold mx-3'>or</span>
+                        <span className='font-semibold mx-3'>or</span>
                         {chooseButton}
                     </div>
                 ) : (
@@ -256,7 +256,9 @@ export const VideoMedia = observer((): ReactElement => {
                 onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12 video-upload'
+                className={`col-12 video-upload ${
+                    totalCount === 1 ? "video-upload--center" : "video-upload--start"
+                }`}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox
