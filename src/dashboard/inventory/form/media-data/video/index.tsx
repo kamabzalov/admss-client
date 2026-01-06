@@ -1,5 +1,5 @@
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
@@ -23,6 +23,7 @@ import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { generateVideoThumbnailFromFirstSeconds } from "common/utils/video-thumbnail";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -58,13 +59,21 @@ export const VideoMedia = observer((): ReactElement => {
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [videoPlayerVisible, setVideoPlayerVisible] = useState<boolean>(false);
+    const [activeVideoSrc, setActiveVideoSrc] = useState<string>("");
     const [itemuid, setItemuid] = useState<string>("");
-    const videosSet = new Set();
-    const uniqueVideos = videos.filter((vid) => {
-        if (!vid.itemuid || videosSet.has(vid.itemuid)) return false;
-        videosSet.add(vid.itemuid);
-        return true;
-    });
+    const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
+    const [loadingThumbnails, setLoadingThumbnails] = useState<Set<string>>(new Set());
+    const generatingThumbnailsRef = useRef<Set<string>>(new Set());
+
+    const uniqueVideos = useMemo(() => {
+        const videosSet = new Set();
+        return videos.filter((vid) => {
+            if (!vid.itemuid || videosSet.has(vid.itemuid)) return false;
+            videosSet.add(vid.itemuid);
+            return true;
+        });
+    }, [videos]);
 
     useEffect(() => {
         fetchVideos();
@@ -73,6 +82,60 @@ export const VideoMedia = observer((): ReactElement => {
             clearMedia();
         };
     }, []);
+
+    useEffect(() => {
+        const uniqueVideosCount = uniqueVideos.length;
+        if (uniqueVideosCount !== videoChecked.length) {
+            const newCheckedState = new Array(uniqueVideosCount).fill(true);
+            setVideoChecked(newCheckedState);
+        }
+    }, [uniqueVideos.length, videoChecked.length]);
+
+    useEffect(() => {
+        const generateThumbnails = async () => {
+            for (const video of uniqueVideos) {
+                if (!video.itemuid || !video.src) continue;
+
+                setThumbnails((prev) => {
+                    if (prev[video.itemuid]) {
+                        generatingThumbnailsRef.current.delete(video.itemuid);
+                        return prev;
+                    }
+                    return prev;
+                });
+
+                if (generatingThumbnailsRef.current.has(video.itemuid)) continue;
+
+                generatingThumbnailsRef.current.add(video.itemuid);
+                setLoadingThumbnails((prev) => new Set(prev).add(video.itemuid));
+
+                try {
+                    const thumbnail = await generateVideoThumbnailFromFirstSeconds(video.src, 5);
+                    if (thumbnail) {
+                        setThumbnails((prev) => {
+                            if (prev[video.itemuid]) return prev;
+                            return {
+                                ...prev,
+                                [video.itemuid]: thumbnail,
+                            };
+                        });
+                    }
+                } catch (error) {
+                } finally {
+                    generatingThumbnailsRef.current.delete(video.itemuid);
+                    setLoadingThumbnails((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(video.itemuid);
+                        return newSet;
+                    });
+                }
+            }
+        };
+
+        if (uniqueVideos.length > 0) {
+            generateThumbnails();
+        }
+    }, [uniqueVideos]);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileVideos = {
@@ -145,6 +208,16 @@ export const VideoMedia = observer((): ReactElement => {
     const handleModalOpen = (mediauid: string) => {
         setItemuid(mediauid);
         setModalVisible(true);
+    };
+
+    const handleVideoPlayerOpen = (src: string) => {
+        setActiveVideoSrc(src);
+        setVideoPlayerVisible(true);
+    };
+
+    const handleVideoPlayerClose = () => {
+        setVideoPlayerVisible(false);
+        setActiveVideoSrc("");
     };
 
     const handleDeleteVideo = (mediauid: string) => {
@@ -319,17 +392,28 @@ export const VideoMedia = observer((): ReactElement => {
                                         className='media-uploaded__checkbox'
                                     />
                                 )}
-                                <Image
-                                    src={src}
-                                    alt='inventory-item'
-                                    width='75'
-                                    height='75'
-                                    pt={{
-                                        image: {
-                                            className: "media-video__image",
-                                        },
-                                    }}
-                                />
+                                {loadingThumbnails.has(itemuid) ? (
+                                    <div className='media-video__placeholder'>
+                                        <i className='icon adms-play-prev media-video__placeholder-icon' />
+                                    </div>
+                                ) : (
+                                    <div
+                                        className='media-video__clickable'
+                                        onClick={() => handleVideoPlayerOpen(src)}
+                                    >
+                                        <Image
+                                            src={thumbnails[itemuid] || src}
+                                            alt='inventory-item'
+                                            width='75'
+                                            height='75'
+                                            pt={{
+                                                image: {
+                                                    className: "media-video__image",
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                )}
                                 <div className='media-info'>
                                     <div className='media-info__item'>
                                         <span className='media-info__icon'>
@@ -389,6 +473,24 @@ export const VideoMedia = observer((): ReactElement => {
                 className={`media-warning`}
                 onHide={() => setModalVisible(false)}
             />
+
+            {videoPlayerVisible && (
+                <div className='video-modal' onClick={handleVideoPlayerClose}>
+                    <div className='video-modal__content' onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type='button'
+                            className='video-modal__close'
+                            onClick={handleVideoPlayerClose}
+                        >
+                            <i className='pi pi-times' />
+                        </button>
+                        <video className='video-modal__video' controls autoPlay>
+                            <source src={activeVideoSrc} type='video/mp4' />
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            )}
         </div>
     );
 });
