@@ -339,6 +339,7 @@ export interface InventoryMediaPostData {
 export interface InventoryMedia extends InventoryMediaItemID {
     contenttype: ContentType;
     created: string;
+    duration?: number;
     index: number;
     notes: string;
     type: number;

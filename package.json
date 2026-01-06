@@ -27,6 +27,7 @@
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
+    "wavesurfer.js": "^7.12.1",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"
   },
@@ -62,7 +63,10 @@
       "no-unused-vars": "warn",
       "no-console": "error",
       "react-hooks/exhaustive-deps": "off",
-      "eol-last": ["error", "always"]
+      "eol-last": [
+        "error",
+        "always"
+      ]
     }
   },
   "browserslist": {
