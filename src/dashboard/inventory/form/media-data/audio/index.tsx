@@ -180,7 +180,7 @@ export const AudioMedia = observer((): ReactElement => {
                 {totalCount ? (
                     <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop audio files
-                        <span className='bold mx-3'>or</span>
+                        <span className='font-semibold mx-3'>or</span>
                         {chooseButton}
                     </div>
                 ) : (
