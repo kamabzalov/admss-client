@@ -25,7 +25,7 @@ import { Button } from "primereact/button";
 import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface AccountsDataTableProps {
@@ -133,109 +133,111 @@ export const AccountsDataTable = observer(
         };
 
         return (
-            <section className='card-content'>
-                <AccountsHeader
-                    searchValue={globalSearch}
-                    onSearchChange={setGlobalSearch}
-                    onAdvancedSearch={() => setDialogVisible(true)}
-                    onPrint={() => printTableData(true)}
-                    onDownload={() => printTableData()}
-                    isLoading={isLoading}
-                    availableColumns={columns}
-                    activeColumns={activeColumns}
-                    onActiveColumnsChange={(nextColumns: TableColumnsList[]) => {
-                        setActiveColumnsAndSave(nextColumns);
-                    }}
-                    selectedAccountType={selectedAccountType}
-                    onAccountTypeChange={setSelectedAccountType}
-                />
-                {isLoading ? (
-                    <div className='dashboard-loader__wrapper'>
-                        <Loader overlay />
-                    </div>
-                ) : (
-                    <DataTable
-                        showGridlines
-                        value={accounts}
-                        lazy
-                        paginator
-                        scrollable
-                        scrollHeight='auto'
-                        first={lazyState.first}
-                        rows={lazyState.rows}
-                        rowsPerPageOptions={ROWS_PER_PAGE}
-                        totalRecords={totalRecords || 1}
-                        onPage={pageChanged}
-                        onSort={sortData}
-                        reorderableColumns
-                        resizableColumns
-                        sortOrder={lazyState.sortOrder}
-                        sortField={lazyState.sortField}
-                        rowClassName={() => "table-row"}
-                        onRowClick={handleOnRowClick}
-                        emptyMessage={ERROR_MESSAGES.NO_DATA}
-                        onColumnResizeEnd={(event) => {
-                            if (event?.column?.props?.field && event?.element?.offsetWidth) {
-                                saveColumnWidth(
-                                    event.column.props.field as string,
-                                    event.element.offsetWidth
-                                );
-                            }
+            <DataTableWrapper className='p-0'>
+                <section className='card-content'>
+                    <AccountsHeader
+                        searchValue={globalSearch}
+                        onSearchChange={setGlobalSearch}
+                        onAdvancedSearch={() => setDialogVisible(true)}
+                        onPrint={() => printTableData(true)}
+                        onDownload={() => printTableData()}
+                        isLoading={isLoading}
+                        availableColumns={columns}
+                        activeColumns={activeColumns}
+                        onActiveColumnsChange={(nextColumns: TableColumnsList[]) => {
+                            setActiveColumnsAndSave(nextColumns);
                         }}
-                    >
-                        <Column
-                            bodyStyle={{ textAlign: "center" }}
-                            reorderable={false}
-                            resizeable={false}
-                            body={({ accountuid }: AccountInfo) => {
+                        selectedAccountType={selectedAccountType}
+                        onAccountTypeChange={setSelectedAccountType}
+                    />
+                    {isLoading ? (
+                        <div className='dashboard-loader__wrapper'>
+                            <Loader overlay />
+                        </div>
+                    ) : (
+                        <DataTable
+                            showGridlines
+                            value={accounts}
+                            lazy
+                            paginator
+                            scrollable
+                            scrollHeight='auto'
+                            first={lazyState.first}
+                            rows={lazyState.rows}
+                            rowsPerPageOptions={ROWS_PER_PAGE}
+                            totalRecords={totalRecords || 1}
+                            onPage={pageChanged}
+                            onSort={sortData}
+                            reorderableColumns
+                            resizableColumns
+                            sortOrder={lazyState.sortOrder}
+                            sortField={lazyState.sortField}
+                            rowClassName={() => "table-row"}
+                            onRowClick={handleOnRowClick}
+                            emptyMessage={ERROR_MESSAGES.NO_DATA}
+                            onColumnResizeEnd={(event) => {
+                                if (event?.column?.props?.field && event?.element?.offsetWidth) {
+                                    saveColumnWidth(
+                                        event.column.props.field as string,
+                                        event.element.offsetWidth
+                                    );
+                                }
+                            }}
+                        >
+                            <Column
+                                bodyStyle={{ textAlign: "center" }}
+                                reorderable={false}
+                                resizeable={false}
+                                body={({ accountuid }: AccountInfo) => {
+                                    return (
+                                        <Button
+                                            text
+                                            className='table-edit-button'
+                                            icon='adms-edit-item'
+                                            tooltip='Edit account'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            onClick={() => navigate(ACCOUNTS_PAGE.EDIT(accountuid))}
+                                        />
+                                    );
+                                }}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "80px",
+                                        },
+                                    },
+                                }}
+                            />
+
+                            {activeColumns.map(({ field, header }: TableColumnsList, index) => {
+                                const savedWidth = serverSettings?.accounts?.columnWidth?.[field];
+                                const isLastColumn = index === activeColumns.length - 1;
+
                                 return (
-                                    <Button
-                                        text
-                                        className='table-edit-button'
-                                        icon='adms-edit-item'
-                                        tooltip='Edit account'
-                                        tooltipOptions={{ position: "mouse" }}
-                                        onClick={() => navigate(ACCOUNTS_PAGE.EDIT(accountuid))}
+                                    <Column
+                                        field={field}
+                                        header={header}
+                                        key={field}
+                                        sortable
+                                        headerClassName='cursor-move'
+                                        body={(data) => {
+                                            const value = String(data[field] || "");
+                                            return <TruncatedText text={value} withTooltip />;
+                                        }}
+                                        pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                                     />
                                 );
-                            }}
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "80px",
-                                    },
-                                },
-                            }}
-                        />
-
-                        {activeColumns.map(({ field, header }: TableColumnsList, index) => {
-                            const savedWidth = serverSettings?.accounts?.columnWidth?.[field];
-                            const isLastColumn = index === activeColumns.length - 1;
-
-                            return (
-                                <Column
-                                    field={field}
-                                    header={header}
-                                    key={field}
-                                    sortable
-                                    headerClassName='cursor-move'
-                                    body={(data) => {
-                                        const value = String(data[field] || "");
-                                        return <TruncatedText text={value} withTooltip />;
-                                    }}
-                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                />
-                            );
-                        })}
-                    </DataTable>
-                )}
-                <AccountsAdvancedSearch
-                    visible={dialogVisible}
-                    onClose={() => setDialogVisible(false)}
-                    onAccountsUpdate={setAccounts}
-                    lazyState={lazyState}
-                />
-            </section>
+                            })}
+                        </DataTable>
+                    )}
+                    <AccountsAdvancedSearch
+                        visible={dialogVisible}
+                        onClose={() => setDialogVisible(false)}
+                        onAccountsUpdate={setAccounts}
+                        lazyState={lazyState}
+                    />
+                </section>
+            </DataTableWrapper>
         );
     }
 );

@@ -21,7 +21,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface HistoryColumnProps extends ColumnProps {
@@ -229,93 +229,95 @@ export const ExportHistory = (): ReactElement => {
     };
 
     return (
-        <section className='card-content history'>
-            <div className='datatable-controls'>
-                <GlobalSearchInput
-                    value={globalSearch}
-                    onChange={(e) => setGlobalSearch(e.target.value)}
-                />
-
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-print'
-                    tooltip='Print export to web form'
-                />
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-download'
-                    tooltip='Download export to web form'
-                />
-
-                <div className='export-web-controls__input ml-auto'>
-                    <MultiSelect
-                        showSelectAll={false}
-                        value={activeHistoryColumns}
-                        optionLabel='header'
-                        options={historyColumns}
-                        onChange={handleColumnToggle}
-                        className='w-full pb-0 flex align-items-center column-picker'
-                        panelHeaderTemplate={dropdownHeaderPanel}
-                        display='chip'
-                        pt={{
-                            header: {
-                                className: "column-picker__header",
-                            },
-                            wrapper: {
-                                className: "column-picker__wrapper",
-                                style: {
-                                    maxHeight: "500px",
-                                },
-                            },
-                        }}
+        <DataTableWrapper className='p-0'>
+            <section className='card-content history'>
+                <div className='datatable-controls'>
+                    <GlobalSearchInput
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
                     />
-                </div>
-            </div>
-            <DataTable
-                showGridlines
-                lazy
-                value={historyList}
-                scrollable
-                scrollHeight='auto'
-                rowsPerPageOptions={ROWS_PER_PAGE}
-                reorderableColumns
-                resizableColumns
-                className='export-web-table'
-                rowClassName={() => "table-row"}
-                paginator
-                first={lazyState.first}
-                rows={lazyState.rows}
-                totalRecords={totalRecords || 1}
-                onPage={pageChanged}
-                onSort={sortData}
-                sortOrder={lazyState.sortOrder}
-                sortField={lazyState.sortField}
-                onColReorder={handleColumnReorder}
-                onColumnResizeEnd={handleColumnResize}
-                emptyMessage={ERROR_MESSAGES.NO_DATA}
-            >
-                {activeHistoryColumns.map(({ field, header }, index) => {
-                    const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
-                    const isLastColumn = index === activeHistoryColumns.length - 1;
 
-                    return (
-                        <Column
-                            field={field}
-                            key={field}
-                            sortable
-                            header={header}
-                            reorderable={false}
-                            body={(data) => {
-                                const value = String(data[field] || "");
-                                return <TruncatedText text={value} withTooltip />;
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-print'
+                        tooltip='Print export to web form'
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-download'
+                        tooltip='Download export to web form'
+                    />
+
+                    <div className='export-web-controls__input ml-auto'>
+                        <MultiSelect
+                            showSelectAll={false}
+                            value={activeHistoryColumns}
+                            optionLabel='header'
+                            options={historyColumns}
+                            onChange={handleColumnToggle}
+                            className='w-full pb-0 flex align-items-center column-picker'
+                            panelHeaderTemplate={dropdownHeaderPanel}
+                            display='chip'
+                            pt={{
+                                header: {
+                                    className: "column-picker__header",
+                                },
+                                wrapper: {
+                                    className: "column-picker__wrapper",
+                                    style: {
+                                        maxHeight: "500px",
+                                    },
+                                },
                             }}
-                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
                         />
-                    );
-                })}
-            </DataTable>
-        </section>
+                    </div>
+                </div>
+                <DataTable
+                    showGridlines
+                    lazy
+                    value={historyList}
+                    scrollable
+                    scrollHeight='auto'
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    reorderableColumns
+                    resizableColumns
+                    className='export-web-table'
+                    rowClassName={() => "table-row"}
+                    paginator
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    sortOrder={lazyState.sortOrder}
+                    sortField={lazyState.sortField}
+                    onColReorder={handleColumnReorder}
+                    onColumnResizeEnd={handleColumnResize}
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
+                >
+                    {activeHistoryColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
+                        const isLastColumn = index === activeHistoryColumns.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                key={field}
+                                sortable
+                                header={header}
+                                reorderable={false}
+                                body={(data) => {
+                                    const value = String(data[field] || "");
+                                    return <TruncatedText text={value} withTooltip />;
+                                }}
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                </DataTable>
+            </section>
+        </DataTableWrapper>
     );
 };

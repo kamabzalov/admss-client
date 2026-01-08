@@ -28,7 +28,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface ScheduleColumnProps extends ColumnProps {
@@ -283,151 +283,156 @@ export const ExportSchedule = (): ReactElement => {
     };
 
     return (
-        <section className='card-content schedule'>
-            <div className='datatable-controls'>
-                <div className='export-web-controls'>
-                    <div className='export-web-controls__input'>
-                        <MultiSelect
-                            showSelectAll={false}
-                            value={activeScheduleColumns}
-                            optionLabel='header'
-                            options={scheduleColumns}
-                            onChange={handleColumnToggle}
-                            className='w-full pb-0 h-full flex align-items-center column-picker'
-                            panelHeaderTemplate={dropdownHeaderPanel}
-                            display='chip'
+        <DataTableWrapper className='p-0'>
+            <section className='card-content schedule'>
+                <div className='datatable-controls'>
+                    <div className='export-web-controls'>
+                        <div className='export-web-controls__input'>
+                            <MultiSelect
+                                showSelectAll={false}
+                                value={activeScheduleColumns}
+                                optionLabel='header'
+                                options={scheduleColumns}
+                                onChange={handleColumnToggle}
+                                className='w-full pb-0 h-full flex align-items-center column-picker'
+                                panelHeaderTemplate={dropdownHeaderPanel}
+                                display='chip'
+                                pt={{
+                                    header: {
+                                        className: "column-picker__header",
+                                    },
+                                    wrapper: {
+                                        className: "column-picker__wrapper",
+                                        style: {
+                                            maxHeight: "500px",
+                                        },
+                                    },
+                                }}
+                            />
+                        </div>
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-print'
+                            tooltip='Print export to web form'
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-download'
+                            tooltip='Download export to web form'
+                        />
+                    </div>
+                </div>
+                <DataTable
+                    showGridlines
+                    lazy
+                    value={scheduleList}
+                    scrollable
+                    scrollHeight='auto'
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    reorderableColumns
+                    resizableColumns
+                    className='export-web-table'
+                    rowClassName={() => "table-row"}
+                    paginator
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    sortOrder={lazyState.sortOrder}
+                    sortField={lazyState.sortField}
+                    onColReorder={handleColumnReorder}
+                    onColumnResizeEnd={handleColumnResize}
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
+                >
+                    {activeScheduleColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.exportSchedule?.columnWidth?.[field];
+                        const isLastColumn = index === activeScheduleColumns.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                key={field}
+                                sortable
+                                header={header}
+                                reorderable={false}
+                                body={(data) => {
+                                    const value = String(data[field] || "");
+                                    return <TruncatedText text={value} withTooltip />;
+                                }}
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                    {!!scheduleList.length && (
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={({ taskuid }: ExportWebScheduleList) => {
+                                return (
+                                    <div className='schedule-control'>
+                                        <Button
+                                            outlined
+                                            tooltip='Pause'
+                                            className='text schedule-button'
+                                            icon='icon adms-pause'
+                                            onClick={() =>
+                                                handleTaskAction(
+                                                    taskuid,
+                                                    ExportWebScheduleAction.PAUSE
+                                                )
+                                            }
+                                        />
+                                        <Button
+                                            outlined
+                                            tooltip='Play'
+                                            className='text schedule-button'
+                                            icon='icon adms-play-prev'
+                                            onClick={() =>
+                                                handleTaskAction(
+                                                    taskuid,
+                                                    ExportWebScheduleAction.CONTINUE
+                                                )
+                                            }
+                                        />
+                                        <Button
+                                            outlined
+                                            tooltip='Delete'
+                                            className='text schedule-button'
+                                            icon='icon adms-trash-can'
+                                            onClick={() => setDeletedId(taskuid)}
+                                        />
+                                    </div>
+                                );
+                            }}
                             pt={{
-                                header: {
-                                    className: "column-picker__header",
-                                },
-                                wrapper: {
-                                    className: "column-picker__wrapper",
+                                root: {
                                     style: {
-                                        maxHeight: "500px",
+                                        width: "100px",
+                                        padding: "0 15px",
                                     },
                                 },
                             }}
                         />
-                    </div>
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-print'
-                        tooltip='Print export to web form'
-                    />
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-download'
-                        tooltip='Download export to web form'
-                    />
-                </div>
-            </div>
-            <DataTable
-                showGridlines
-                lazy
-                value={scheduleList}
-                scrollable
-                scrollHeight='auto'
-                rowsPerPageOptions={ROWS_PER_PAGE}
-                reorderableColumns
-                resizableColumns
-                className='export-web-table'
-                rowClassName={() => "table-row"}
-                paginator
-                first={lazyState.first}
-                rows={lazyState.rows}
-                totalRecords={totalRecords || 1}
-                onPage={pageChanged}
-                onSort={sortData}
-                sortOrder={lazyState.sortOrder}
-                sortField={lazyState.sortField}
-                onColReorder={handleColumnReorder}
-                onColumnResizeEnd={handleColumnResize}
-                emptyMessage={ERROR_MESSAGES.NO_DATA}
-            >
-                {activeScheduleColumns.map(({ field, header }, index) => {
-                    const savedWidth = serverSettings?.exportSchedule?.columnWidth?.[field];
-                    const isLastColumn = index === activeScheduleColumns.length - 1;
-
-                    return (
-                        <Column
-                            field={field}
-                            key={field}
-                            sortable
-                            header={header}
-                            reorderable={false}
-                            body={(data) => {
-                                const value = String(data[field] || "");
-                                return <TruncatedText text={value} withTooltip />;
-                            }}
-                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                        />
-                    );
-                })}
-                {!!scheduleList.length && (
-                    <Column
-                        bodyStyle={{ textAlign: "center" }}
-                        reorderable={false}
-                        resizeable={false}
-                        body={({ taskuid }: ExportWebScheduleList) => {
-                            return (
-                                <div className='schedule-control'>
-                                    <Button
-                                        outlined
-                                        tooltip='Pause'
-                                        className='text schedule-button'
-                                        icon='icon adms-pause'
-                                        onClick={() =>
-                                            handleTaskAction(taskuid, ExportWebScheduleAction.PAUSE)
-                                        }
-                                    />
-                                    <Button
-                                        outlined
-                                        tooltip='Play'
-                                        className='text schedule-button'
-                                        icon='icon adms-play-prev'
-                                        onClick={() =>
-                                            handleTaskAction(
-                                                taskuid,
-                                                ExportWebScheduleAction.CONTINUE
-                                            )
-                                        }
-                                    />
-                                    <Button
-                                        outlined
-                                        tooltip='Delete'
-                                        className='text schedule-button'
-                                        icon='icon adms-trash-can'
-                                        onClick={() => setDeletedId(taskuid)}
-                                    />
-                                </div>
-                            );
-                        }}
-                        pt={{
-                            root: {
-                                style: {
-                                    width: "100px",
-                                    padding: "0 15px",
-                                },
-                            },
-                        }}
-                    />
-                )}
-            </DataTable>
-            <ConfirmModal
-                visible={!!deletedId}
-                bodyMessage='Do you really want to delete this record? 
+                    )}
+                </DataTable>
+                <ConfirmModal
+                    visible={!!deletedId}
+                    bodyMessage='Do you really want to delete this record? 
                 This process cannot be undone.'
-                confirmAction={() =>
-                    deletedId && handleTaskAction(deletedId, ExportWebScheduleAction.DELETE)
-                }
-                draggable={false}
-                rejectLabel='Cancel'
-                acceptLabel='Delete'
-                className='schedule-confirm-dialog'
-                onHide={() => setDeletedId(null)}
-            />
-        </section>
+                    confirmAction={() =>
+                        deletedId && handleTaskAction(deletedId, ExportWebScheduleAction.DELETE)
+                    }
+                    draggable={false}
+                    rejectLabel='Cancel'
+                    acceptLabel='Delete'
+                    className='schedule-confirm-dialog'
+                    onHide={() => setDeletedId(null)}
+                />
+            </section>
+        </DataTableWrapper>
     );
 };

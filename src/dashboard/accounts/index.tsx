@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountsDataTable } from "./account-list";
 import { AccountsAudit } from "./audit";
-import { DataTableWrapper } from "dashboard/common/data-table";
 
 export { AccountsDataTable } from "./account-list";
 
@@ -41,7 +40,7 @@ export const Accounts = () => {
     };
 
     return (
-        <DataTableWrapper className='card accounts'>
+        <section className='card accounts'>
             <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
                 {tabItems.map(({ tabName, component }) => (
                     <TabPanel
@@ -52,6 +51,6 @@ export const Accounts = () => {
                     />
                 ))}
             </TabView>
-        </DataTableWrapper>
+        </section>
     );
 };

@@ -41,7 +41,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface TableColumnProps extends ColumnProps {
@@ -603,322 +603,335 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     return (
-        <section className='card-content'>
-            <div className='datatable-controls'>
-                <div className='export-web-controls'>
-                    <Button
-                        className='export-web-controls__button px-6 uppercase'
-                        severity='success'
-                        type='button'
-                        disabled={selectedInventories.filter(Boolean).length === 0}
-                        onClick={() => handleExport()}
-                    >
-                        Export now
-                    </Button>
-                    <Button
-                        className='export-web-controls__button px-6 uppercase'
-                        severity='success'
-                        type='button'
-                        disabled={selectedInventories.filter(Boolean).length === 0}
-                        onClick={() => handleExport(true)}
-                        tooltip='Add to schedule'
-                    >
-                        Add to
-                        <i className='icon adms-schedule export-web-controls__button-icon' />
-                    </Button>
-                    <div className='export-web-controls__input'>
-                        <MultiSelect
-                            optionValue='value'
-                            optionLabel='label'
-                            options={exportWebFilterOptions}
-                            value={selectedFilter}
-                            onChange={handleChangeFilter}
-                            placeholder='Filter'
-                            className='w-full pb-0 h-full flex align-items-center inventory-filter'
-                            display='chip'
-                            selectedItemsLabel='Clear Filter'
-                            panelHeaderTemplate={dropdownFilterHeaderPanel}
-                            pt={{
-                                header: {
-                                    className: "inventory-filter__header",
-                                },
-                                wrapper: {
-                                    className: "inventory-filter__wrapper",
-                                    style: {
-                                        maxHeight: "500px",
+        <DataTableWrapper className='p-0'>
+            <section className='card-content'>
+                <div className='datatable-controls'>
+                    <div className='export-web-controls'>
+                        <Button
+                            className='export-web-controls__button px-6 uppercase'
+                            severity='success'
+                            type='button'
+                            disabled={selectedInventories.filter(Boolean).length === 0}
+                            onClick={() => handleExport()}
+                        >
+                            Export now
+                        </Button>
+                        <Button
+                            className='export-web-controls__button px-6 uppercase'
+                            severity='success'
+                            type='button'
+                            disabled={selectedInventories.filter(Boolean).length === 0}
+                            onClick={() => handleExport(true)}
+                            tooltip='Add to schedule'
+                        >
+                            Add to
+                            <i className='icon adms-schedule export-web-controls__button-icon' />
+                        </Button>
+                        <div className='export-web-controls__input'>
+                            <MultiSelect
+                                optionValue='value'
+                                optionLabel='label'
+                                options={exportWebFilterOptions}
+                                value={selectedFilter}
+                                onChange={handleChangeFilter}
+                                placeholder='Filter'
+                                className='w-full pb-0 h-full flex align-items-center inventory-filter'
+                                display='chip'
+                                selectedItemsLabel='Clear Filter'
+                                panelHeaderTemplate={dropdownFilterHeaderPanel}
+                                pt={{
+                                    header: {
+                                        className: "inventory-filter__header",
                                     },
-                                },
-                            }}
-                        />
-                    </div>
-                    <div className='export-web-controls__input'>
-                        <MultiSelect
-                            options={groupedColumns}
-                            value={activeColumns}
-                            optionGroupChildren='items'
-                            optionLabel='header'
-                            optionGroupLabel='label'
-                            panelHeaderTemplate={dropdownHeaderPanel}
-                            onChange={handleChangeColumn}
-                            showSelectAll={false}
-                            className='w-full pb-0 h-full flex align-items-center column-picker'
-                            display='chip'
-                            pt={{
-                                header: {
-                                    className: "column-picker__header",
-                                },
-                                wrapper: {
-                                    className: "column-picker__wrapper",
-                                    style: {
-                                        maxHeight: "500px",
+                                    wrapper: {
+                                        className: "inventory-filter__wrapper",
+                                        style: {
+                                            maxHeight: "500px",
+                                        },
                                     },
-                                },
-                            }}
+                                }}
+                            />
+                        </div>
+                        <div className='export-web-controls__input'>
+                            <MultiSelect
+                                options={groupedColumns}
+                                value={activeColumns}
+                                optionGroupChildren='items'
+                                optionLabel='header'
+                                optionGroupLabel='label'
+                                panelHeaderTemplate={dropdownHeaderPanel}
+                                onChange={handleChangeColumn}
+                                showSelectAll={false}
+                                className='w-full pb-0 h-full flex align-items-center column-picker'
+                                display='chip'
+                                pt={{
+                                    header: {
+                                        className: "column-picker__header",
+                                    },
+                                    wrapper: {
+                                        className: "column-picker__wrapper",
+                                        style: {
+                                            maxHeight: "500px",
+                                        },
+                                    },
+                                }}
+                            />
+                        </div>
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-print'
+                            tooltip='Print export to web form'
+                            onClick={() =>
+                                authUser &&
+                                printExportTableData({
+                                    useruid: authUser.useruid,
+                                    activeColumns,
+                                    exportsToWeb,
+                                    print: true,
+                                })
+                            }
                         />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-download'
+                            tooltip='Download export to web form'
+                            onClick={() =>
+                                authUser &&
+                                printExportTableData({
+                                    useruid: authUser.useruid,
+                                    activeColumns,
+                                    exportsToWeb,
+                                    print: false,
+                                })
+                            }
+                        />
+                        <span className='p-input-icon-right export-web__search ml-auto'>
+                            <i className='icon adms-search' />
+                            <InputText
+                                value={globalSearch}
+                                placeholder='Search'
+                                onChange={(e) => setGlobalSearch(e.target.value)}
+                            />
+                        </span>
                     </div>
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-print'
-                        tooltip='Print export to web form'
-                        onClick={() =>
-                            authUser &&
-                            printExportTableData({
-                                useruid: authUser.useruid,
-                                activeColumns,
-                                exportsToWeb,
-                                print: true,
-                            })
-                        }
-                    />
-                    <Button
-                        severity='success'
-                        type='button'
-                        icon='icon adms-download'
-                        tooltip='Download export to web form'
-                        onClick={() =>
-                            authUser &&
-                            printExportTableData({
-                                useruid: authUser.useruid,
-                                activeColumns,
-                                exportsToWeb,
-                                print: false,
-                            })
-                        }
-                    />
-                    <span className='p-input-icon-right export-web__search ml-auto'>
-                        <i className='icon adms-search' />
-                        <InputText
-                            value={globalSearch}
-                            placeholder='Search'
-                            onChange={(e) => setGlobalSearch(e.target.value)}
-                        />
-                    </span>
                 </div>
-            </div>
-            {isLoading && <Loader overlay />}
-            <DataTable
-                showGridlines
-                value={exportsToWeb}
-                lazy
-                paginator
-                scrollable
-                scrollHeight='auto'
-                first={lazyState.first}
-                rows={lazyState.rows}
-                rowsPerPageOptions={ROWS_PER_PAGE}
-                totalRecords={totalRecords || 1}
-                onPage={pageChanged}
-                onSort={sortData}
-                rowExpansionTemplate={rowExpansionTemplate}
-                expandedRows={expandedRows}
-                onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
-                reorderableColumns
-                resizableColumns
-                sortOrder={lazyState.sortOrder}
-                emptyMessage={ERROR_MESSAGES.NO_DATA}
-                className='export-web-table'
-                rowClassName={() => "table-row"}
-                sortField={lazyState.sortField}
-                onColReorder={handleColumnReorder}
-                onColumnResizeEnd={handleColumnResize}
-            >
-                <Column
-                    bodyStyle={{ textAlign: "center" }}
-                    header={
-                        <Checkbox
-                            checked={selectedInventories.every((checkbox) => !!checkbox)}
-                            onClick={({ checked }) => {
-                                setSelectedInventories(selectedInventories.map(() => !!checked));
-                            }}
-                        />
-                    }
-                    reorderable={false}
-                    resizeable={false}
-                    body={(options, { rowIndex }) => {
-                        return (
-                            <div
-                                className={`flex gap-3 align-items-center  ${
-                                    selectedInventories[rowIndex] && "row--selected"
-                                }`}
-                            >
-                                <Checkbox
-                                    checked={selectedInventories[rowIndex]}
-                                    onClick={() => {
-                                        setSelectedInventories(
-                                            selectedInventories.map((state, index) =>
-                                                index === rowIndex ? !state : state
-                                            )
-                                        );
-                                    }}
-                                />
-
-                                <Button
-                                    className='text export-web__icon-button'
-                                    icon='icon adms-edit-item'
-                                    onClick={() => {
-                                        inventoryStore.memoRoute = currentPath;
-                                        navigate(`/dashboard/inventory/${options.itemuid}`);
-                                    }}
-                                />
-                                <Button
-                                    className='text export-web__icon-button'
-                                    icon='pi pi-angle-down'
-                                    onClick={() => handleRowExpansionClick(options)}
-                                />
-                            </div>
-                        );
-                    }}
-                    pt={{
-                        root: {
-                            style: {
-                                width: "100px",
-                            },
-                        },
-                    }}
-                />
-                {activeColumns.map(({ field, header }, index) => {
-                    const savedWidth = serverSettings?.exportWeb?.columnWidth?.[field];
-                    const isLastColumn = index === activeColumns.length - 1;
-
-                    return serviceColumns.some((serviceColumn) => serviceColumn.field === field) ? (
-                        <Column
-                            field={field}
-                            header={() => (
-                                <div className='flex gap-3'>
+                {isLoading && <Loader overlay />}
+                <DataTable
+                    showGridlines
+                    value={exportsToWeb}
+                    lazy
+                    paginator
+                    scrollable
+                    scrollHeight='auto'
+                    first={lazyState.first}
+                    rows={lazyState.rows}
+                    rowsPerPageOptions={ROWS_PER_PAGE}
+                    totalRecords={totalRecords || 1}
+                    onPage={pageChanged}
+                    onSort={sortData}
+                    rowExpansionTemplate={rowExpansionTemplate}
+                    expandedRows={expandedRows}
+                    onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                    reorderableColumns
+                    resizableColumns
+                    sortOrder={lazyState.sortOrder}
+                    emptyMessage={ERROR_MESSAGES.NO_DATA}
+                    className='export-web-table'
+                    rowClassName={() => "table-row"}
+                    sortField={lazyState.sortField}
+                    onColReorder={handleColumnReorder}
+                    onColumnResizeEnd={handleColumnResize}
+                >
+                    <Column
+                        bodyStyle={{ textAlign: "center" }}
+                        header={
+                            <Checkbox
+                                checked={selectedInventories.every((checkbox) => !!checkbox)}
+                                onClick={({ checked }) => {
+                                    setSelectedInventories(
+                                        selectedInventories.map(() => !!checked)
+                                    );
+                                }}
+                            />
+                        }
+                        reorderable={false}
+                        resizeable={false}
+                        body={(options, { rowIndex }) => {
+                            return (
+                                <div
+                                    className={`flex gap-3 align-items-center  ${
+                                        selectedInventories[rowIndex] && "row--selected"
+                                    }`}
+                                >
                                     <Checkbox
-                                        checked={handleCheckboxCheck(field, "all")}
-                                        onClick={() => handleCheckboxChange(field, "all")}
+                                        checked={selectedInventories[rowIndex]}
+                                        onClick={() => {
+                                            setSelectedInventories(
+                                                selectedInventories.map((state, index) =>
+                                                    index === rowIndex ? !state : state
+                                                )
+                                            );
+                                        }}
                                     />
-                                    {header?.toString()}
-                                </div>
-                            )}
-                            headerTooltip={field}
-                            body={(_, { rowIndex }) => {
-                                return (
-                                    <div
-                                        className={`export-web-service ${
-                                            selectedInventories[rowIndex] ? "row--selected" : ""
-                                        }`}
-                                    >
-                                        <Checkbox
-                                            checked={handleCheckboxCheck(field, rowIndex)}
-                                            onClick={() => handleCheckboxChange(field, rowIndex)}
-                                        />
-                                        <InputNumber
-                                            maxFractionDigits={2}
-                                            minFractionDigits={2}
-                                            disabled={
-                                                !selectedServices.find(
-                                                    (item) => item.field === field
-                                                )?.selected[rowIndex]
-                                            }
-                                            value={
-                                                selectedServices.find(
-                                                    (item) => item.field === field
-                                                )?.price[rowIndex] || 0
-                                            }
-                                            onChange={({ value }) =>
-                                                value && handlePriceChange(field, rowIndex, value)
-                                            }
-                                            className='export-web-service__input'
-                                        />
-                                    </div>
-                                );
-                            }}
-                            key={field}
-                        />
-                    ) : (
-                        <Column
-                            field={field}
-                            header={header}
-                            key={field}
-                            sortable
-                            body={(data, { rowIndex }) => {
-                                let value: string | number;
-                                if (field === "VIN") {
-                                    value = data[field].toUpperCase();
-                                } else {
-                                    value = data[field];
-                                }
 
-                                return (
-                                    <div
-                                        className={`${
-                                            selectedInventories[rowIndex] ? "row--selected" : ""
-                                        }`}
-                                    >
-                                        {field === "ListPrice" ? (
+                                    <Button
+                                        className='text export-web__icon-button'
+                                        icon='icon adms-edit-item'
+                                        onClick={() => {
+                                            inventoryStore.memoRoute = currentPath;
+                                            navigate(`/dashboard/inventory/${options.itemuid}`);
+                                        }}
+                                    />
+                                    <Button
+                                        className='text export-web__icon-button'
+                                        icon='pi pi-angle-down'
+                                        onClick={() => handleRowExpansionClick(options)}
+                                    />
+                                </div>
+                            );
+                        }}
+                        pt={{
+                            root: {
+                                className: "export-web-actions-column",
+                                style: {
+                                    width: "100px",
+                                },
+                            },
+                        }}
+                    />
+                    {activeColumns.map(({ field, header }, index) => {
+                        const savedWidth = serverSettings?.exportWeb?.columnWidth?.[field];
+                        const isLastColumn = index === activeColumns.length - 1;
+
+                        return serviceColumns.some(
+                            (serviceColumn) => serviceColumn.field === field
+                        ) ? (
+                            <Column
+                                field={field}
+                                header={() => (
+                                    <div className='flex gap-3'>
+                                        <Checkbox
+                                            checked={handleCheckboxCheck(field, "all")}
+                                            onClick={() => handleCheckboxChange(field, "all")}
+                                        />
+                                        {header?.toString()}
+                                    </div>
+                                )}
+                                headerTooltip={field}
+                                body={(_, { rowIndex }) => {
+                                    return (
+                                        <div
+                                            className={`export-web-service ${
+                                                selectedInventories[rowIndex] ? "row--selected" : ""
+                                            }`}
+                                        >
+                                            <Checkbox
+                                                checked={handleCheckboxCheck(field, rowIndex)}
+                                                onClick={() =>
+                                                    handleCheckboxChange(field, rowIndex)
+                                                }
+                                            />
                                             <InputNumber
-                                                key={forceUpdate}
                                                 maxFractionDigits={2}
                                                 minFractionDigits={2}
-                                                className='export-web__input-price'
-                                                value={Number(value)}
-                                                onChange={({ value }) => {
-                                                    setPriceChanged(true);
-                                                    if (
-                                                        !initialPrice ||
-                                                        initialPrice !== String(value)
-                                                    ) {
-                                                        setInitialPrice(data.ListPrice);
-                                                    }
-                                                    setCurrentInventory({
-                                                        ...data,
-                                                        ListPrice: value?.toString() || "",
-                                                    });
-                                                }}
-                                                onKeyDown={(evt) =>
-                                                    evt.key === "Enter" && handleChangePrice()
+                                                disabled={
+                                                    !selectedServices.find(
+                                                        (item) => item.field === field
+                                                    )?.selected[rowIndex]
                                                 }
-                                                onBlur={handleChangePrice}
+                                                value={
+                                                    selectedServices.find(
+                                                        (item) => item.field === field
+                                                    )?.price[rowIndex] || 0
+                                                }
+                                                onChange={({ value }) =>
+                                                    value &&
+                                                    handlePriceChange(field, rowIndex, value)
+                                                }
+                                                className='export-web-service__input'
                                             />
-                                        ) : (
-                                            <TruncatedText text={String(value || "")} withTooltip />
-                                        )}
-                                    </div>
-                                );
-                            }}
-                            headerClassName='cursor-move'
-                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                        />
-                    );
-                })}
-            </DataTable>
-            <ConfirmModal
-                visible={confirmActive}
-                position='top'
-                title='Save new price?'
-                bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
-                rejectAction={handleRejectSavePrice}
-                confirmAction={handleConfirmSavePrice}
-                draggable={false}
-                icon='pi pi-save'
-                rejectLabel='Cancel'
-                acceptLabel='Save'
-                className='price-change-confirm-dialog'
-                onHide={() => setConfirmActive(false)}
-            />
-        </section>
+                                        </div>
+                                    );
+                                }}
+                                key={field}
+                            />
+                        ) : (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                body={(data, { rowIndex }) => {
+                                    let value: string | number;
+                                    if (field === "VIN") {
+                                        value = data[field].toUpperCase();
+                                    } else {
+                                        value = data[field];
+                                    }
+
+                                    return (
+                                        <div
+                                            className={`${
+                                                selectedInventories[rowIndex] ? "row--selected" : ""
+                                            }`}
+                                        >
+                                            {field === "ListPrice" ? (
+                                                <InputNumber
+                                                    key={forceUpdate}
+                                                    maxFractionDigits={2}
+                                                    minFractionDigits={2}
+                                                    className='export-web__input-price'
+                                                    value={Number(value)}
+                                                    onChange={({ value }) => {
+                                                        setPriceChanged(true);
+                                                        if (
+                                                            !initialPrice ||
+                                                            initialPrice !== String(value)
+                                                        ) {
+                                                            setInitialPrice(data.ListPrice);
+                                                        }
+                                                        setCurrentInventory({
+                                                            ...data,
+                                                            ListPrice: value?.toString() || "",
+                                                        });
+                                                    }}
+                                                    onKeyDown={(evt) =>
+                                                        evt.key === "Enter" && handleChangePrice()
+                                                    }
+                                                    onBlur={handleChangePrice}
+                                                />
+                                            ) : (
+                                                <TruncatedText
+                                                    text={String(value || "")}
+                                                    withTooltip
+                                                />
+                                            )}
+                                        </div>
+                                    );
+                                }}
+                                headerClassName='cursor-move'
+                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                            />
+                        );
+                    })}
+                </DataTable>
+                <ConfirmModal
+                    visible={confirmActive}
+                    position='top'
+                    title='Save new price?'
+                    bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
+                    rejectAction={handleRejectSavePrice}
+                    confirmAction={handleConfirmSavePrice}
+                    draggable={false}
+                    icon='pi pi-save'
+                    rejectLabel='Cancel'
+                    acceptLabel='Save'
+                    className='price-change-confirm-dialog'
+                    onHide={() => setConfirmActive(false)}
+                />
+            </section>
+        </DataTableWrapper>
     );
 };

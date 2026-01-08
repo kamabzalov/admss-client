@@ -5,7 +5,6 @@ import "dashboard/export-web/index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { ExportSchedule } from "dashboard/export-web/schedule";
 import { ExportHistory } from "dashboard/export-web/history";
-import { DataTableWrapper } from "dashboard/common/data-table";
 
 interface TabItem {
     tabName: string;
@@ -68,29 +67,29 @@ export const ExportToWeb = (): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='export-web card'>
-            <div className='export-web__body'>
-                <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
-                    {tabItems.map(({ tabName, component, headerCount }) => (
-                        <TabPanel
-                            header={
-                                headerCount ? (
-                                    <TabHeader
-                                        tabName={tabName}
-                                        count={selectedInventories}
-                                        isActive={selectedInventories > 0}
-                                    />
-                                ) : (
-                                    tabName
-                                )
-                            }
-                            headerClassName='card-header export-web__header uppercase m-0'
-                            children={component}
-                            key={tabName}
-                        />
-                    ))}
-                </TabView>
-            </div>
-        </DataTableWrapper>
+        <TabView
+            activeIndex={activeIndex}
+            className='card export-web'
+            onTabChange={handleTabChange}
+        >
+            {tabItems.map(({ tabName, component, headerCount }) => (
+                <TabPanel
+                    header={
+                        headerCount ? (
+                            <TabHeader
+                                tabName={tabName}
+                                count={selectedInventories}
+                                isActive={selectedInventories > 0}
+                            />
+                        ) : (
+                            tabName
+                        )
+                    }
+                    headerClassName='card-header export-web__header uppercase m-0'
+                    children={component}
+                    key={tabName}
+                />
+            ))}
+        </TabView>
     );
 };
