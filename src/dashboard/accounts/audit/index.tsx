@@ -25,6 +25,7 @@ import {
     ExpansionColumn,
     rowExpansionTemplate,
     getColumnPtStyles,
+    DataTableWrapper,
 } from "dashboard/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { useNavigate } from "react-router-dom";
@@ -243,7 +244,7 @@ export const AccountsAudit = observer((): ReactElement => {
     };
 
     return (
-        <section className='card-content'>
+        <DataTableWrapper className='p-0'>
             <AuditHeader
                 searchValue={globalSearch}
                 onSearchChange={setGlobalSearch}
@@ -313,6 +314,6 @@ export const AccountsAudit = observer((): ReactElement => {
                     })}
                 </DataTable>
             )}
-        </section>
+        </DataTableWrapper>
     );
 });

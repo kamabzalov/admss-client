@@ -25,9 +25,9 @@
         }
     }
 
-    .p-tabview .p-tabview-panels {
-        padding-left: 0;
-        padding-right: 0;
+    .p-tabview-panels {
+        padding: 0;
+        padding-top: 20px;
     }
 }
 
@@ -116,6 +116,10 @@
     margin-bottom: 30px;
 }
 
+.export-web .data-table-wrapper {
+    height: calc(var(--data-table-wrapper-height, var(--admss-app-default-card-height)) - 132px);
+}
+
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
     font-weight: 700;
     color: var(--admss-app-primary);
@@ -166,6 +170,22 @@
     height: 34px;
     padding: 0.25rem;
     border: 1px solid var(--admss-app-light-grey);
+}
+
+.p-datatable.p-datatable-gridlines:has(.p-datatable-thead):has(.p-datatable-tbody)
+    .p-datatable-tbody
+    > tr
+    > td.export-web-actions-column
+    + td {
+    border-left: none;
+}
+
+.p-datatable.p-datatable-gridlines:has(.p-datatable-thead):has(.p-datatable-tbody)
+    .p-datatable-thead
+    > tr
+    > th.export-web-actions-column
+    + th {
+    border-left: none;
 }
 
 .price-change-confirm-dialog {

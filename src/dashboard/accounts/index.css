@@ -154,6 +154,10 @@
     margin-bottom: 30px;
 }
 
+.accounts.card .data-table-wrapper {
+    height: calc(var(--data-table-wrapper-height, var(--admss-app-default-card-height)) - 187px);
+}
+
 .p-tabview .p-tabview-nav li.accounts__header .p-tabview-nav-link {
     font-weight: 700;
     color: var(--admss-app-primary);
