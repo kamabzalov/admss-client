@@ -7,3 +7,10 @@ export const CATEGORIES: readonly TypeList[] = [
     { name: "Document", id: ContentType.ctDocument },
     { name: "General", id: ContentType.ctGeneral },
 ];
+
+export enum UPLOAD_TEXT {
+    VIDEO = "Fill the fields below to save uploaded video files",
+    AUDIO = "Fill the fields below to save uploaded audio files",
+    DOCUMENTS = "Fill the fields below to save uploaded documents",
+    IMAGES = "Fill the fields below to save uploaded images",
+}
