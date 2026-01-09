@@ -1,6 +1,7 @@
 import "./index.css";
 import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
 import {
@@ -19,6 +20,7 @@ import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
 import { ContactDocumentTemplate } from "./document-template";
 import { TruncatedText } from "dashboard/common/display";
+import { UPLOAD_TEXT } from "common/constants/media-categories";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -32,6 +34,7 @@ const isPdf = (file: File) => {
 };
 
 export const ContactsDocuments = observer((): ReactElement => {
+    const { id } = useParams();
     const store = useStore().contactStore;
     const { showError } = useToastMessage();
     const {
@@ -41,12 +44,18 @@ export const ContactsDocuments = observer((): ReactElement => {
         fetchDocuments,
         clearContactMedia,
         formErrorMessage,
+        contact,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        if (!id || !contact?.contactuid) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         const handleFetchDocuments = async () => {
             await fetchDocuments();
@@ -57,7 +66,7 @@ export const ContactsDocuments = observer((): ReactElement => {
         return () => {
             clearContactMedia();
         };
-    }, []);
+    }, [id, contact?.contactuid]);
 
     useEffect(() => {
         if (formErrorMessage) {
@@ -126,7 +135,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 <div className='flex align-items-center'>
                     {isPdf(file) ? (
                         <div className='presentation__icon'>
-                            <i className='pi pi-file-pdf' />
+                            <i className='adms-pdf' />
                         </div>
                     ) : (
                         <img
@@ -229,6 +238,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
+                style={{ "--upload-text": `"${UPLOAD_TEXT.IMAGES}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <InputText
