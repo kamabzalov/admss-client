@@ -18,3 +18,11 @@ export enum ContentType {
     ctExterior,
     ctDocument,
 }
+
+export enum MEDIA_EXTENSION {
+    JPEG = "jpeg",
+    JPG = "jpg",
+    PNG = "png",
+    PDF = "pdf",
+    TIFF = "tiff",
+}

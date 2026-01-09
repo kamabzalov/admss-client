@@ -581,6 +581,9 @@ export class ContactStore {
 
     private getContactMedia = async (): Promise<Status> => {
         try {
+            if (!this._contactID) {
+                return Status.ERROR;
+            }
             const mediaList = await getContactMediaItemList(this._contactID);
             if (mediaList) {
                 (mediaList as InventoryMedia[]).forEach((media) => {
