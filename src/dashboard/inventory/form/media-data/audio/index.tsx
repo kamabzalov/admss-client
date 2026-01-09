@@ -16,7 +16,7 @@ import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
 import WaveSurfer from "wavesurfer.js";
-import { CATEGORIES } from "common/constants/media-categories";
+import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { AppColors } from "common/models/css-variables";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
@@ -266,6 +266,7 @@ export const AudioMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
+                style={{ "--upload-text": `"${UPLOAD_TEXT.AUDIO}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox

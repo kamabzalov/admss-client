@@ -165,6 +165,21 @@
     width: 100%;
 }
 
+.media .p-fileupload-content {
+    padding-top: 1rem;
+}
+
+.media .p-fileupload-content:has(.p-fileupload-row)::before {
+    content: var(--upload-text);
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    color: var(--admss-app-primary);
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
 .media .p-fileupload-content > div:nth-child(2) {
     display: flex;
     flex-wrap: wrap;

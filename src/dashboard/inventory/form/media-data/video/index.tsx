@@ -18,7 +18,7 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
-import { CATEGORIES } from "common/constants/media-categories";
+import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -329,9 +329,8 @@ export const VideoMedia = observer((): ReactElement => {
                 onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className={`col-12 video-upload ${
-                    totalCount === 1 ? "video-upload--center" : "video-upload--start"
-                }`}
+                className='col-12 video-upload'
+                style={{ "--upload-text": `"${UPLOAD_TEXT.VIDEO}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox
