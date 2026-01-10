@@ -5,6 +5,7 @@ import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/loca
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { HOME_PAGE, SERVICE_UPDATE_PAGE } from "common/constants/links";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -50,9 +51,11 @@ authorizedUserApiInstance.interceptors.request.use((config) => {
 
 const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
     if (error.response && error.response.status === 401) {
+        const currentPath = window.location.pathname + window.location.search;
         const authUser: AuthUser | null = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            const currentPath = window.location.pathname + window.location.search;
+        localStorage.removeItem("useruid");
+        localStorageClear(LS_APP_USER);
+        if (authUser && currentPath !== HOME_PAGE) {
             const routeData: LastRouteData = {
                 path: currentPath,
                 timestamp: Date.now(),
@@ -60,12 +63,10 @@ const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
             };
             localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
         }
-        localStorage.removeItem("useruid");
-        localStorageClear(LS_APP_USER);
-        navigate("/");
+        navigate(HOME_PAGE);
         return Promise.reject(error.response);
     } else if (error.response && error.response.status === 500) {
-        navigate("/service-update");
+        navigate(SERVICE_UPDATE_PAGE);
         return Promise.reject(error.response);
     } else {
         return Promise.reject(error);

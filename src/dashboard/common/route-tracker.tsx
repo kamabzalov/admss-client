@@ -4,6 +4,7 @@ import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "common/models/user";
+import { HOME_PAGE } from "common/constants/links";
 
 export const RouteTracker = () => {
     const location = useLocation();
@@ -13,12 +14,14 @@ export const RouteTracker = () => {
         if (authUser) {
             const { useruid } = authUser;
             const currentPath = location.pathname + location.search;
-            const routeData: LastRouteData = {
-                path: currentPath,
-                timestamp: Date.now(),
-                useruid,
-            };
-            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+            if (currentPath !== HOME_PAGE) {
+                const routeData: LastRouteData = {
+                    path: currentPath,
+                    timestamp: Date.now(),
+                    useruid,
+                };
+                localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+            }
         }
     }, [location.pathname, location.search]);
 

@@ -17,6 +17,7 @@ import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 import { getKeyValue } from "services/local-storage.service";
 import { TwoFactorCheckResponse } from "common/models/user";
+import { observer } from "mobx-react-lite";
 
 export interface LoginForm {
     username: string;
@@ -29,7 +30,48 @@ export interface LoginForm {
     verification_token?: string;
 }
 
-export const SignIn = () => {
+const parseLastRoute = (routeDataString: string): LastRouteData | null => {
+    try {
+        return JSON.parse(routeDataString);
+    } catch {
+        return null;
+    }
+};
+
+const isRouteValid = (routeData: LastRouteData, expectedUseruid: string): boolean => {
+    return Boolean(
+        routeData.path &&
+            routeData.timestamp &&
+            routeData.useruid &&
+            routeData.useruid === expectedUseruid
+    );
+};
+
+const isRouteExpired = (timestamp: number): boolean => {
+    const currentTime = Date.now();
+    const routeAgeInMilliseconds = currentTime - timestamp;
+    const routeRestoreTimeoutInMilliseconds = convertTimeToMilliseconds(
+        ROUTE_RESTORE_TIMEOUT_HOURS
+    );
+
+    return (
+        routeAgeInMilliseconds <= 0 || routeAgeInMilliseconds > routeRestoreTimeoutInMilliseconds
+    );
+};
+
+const getRestoredPath = (routeData: LastRouteData | null, useruid: string): string | null => {
+    if (!routeData || !isRouteValid(routeData, useruid)) {
+        return null;
+    }
+
+    if (isRouteExpired(routeData.timestamp)) {
+        return null;
+    }
+
+    return routeData.path;
+};
+
+export const SignIn = observer(() => {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { showError } = useToastMessage();
@@ -37,10 +79,29 @@ export const SignIn = () => {
 
     useEffect(() => {
         const storedUser = getKeyValue(LS_APP_USER);
-        if (storedUser && storedUser.token) {
-            navigate(DASHBOARD_PAGE, { replace: true });
+        if (!storedUser?.token) {
+            return;
         }
-    }, [navigate]);
+
+        let targetPath = DASHBOARD_PAGE;
+        const storedRouteDataString = localStorage.getItem(LS_LAST_ROUTE);
+
+        if (storedRouteDataString) {
+            const storedRouteData = parseLastRoute(storedRouteDataString);
+            const restoredPath = getRestoredPath(storedRouteData, storedUser.useruid);
+
+            if (restoredPath) {
+                targetPath = restoredPath;
+                localStorage.removeItem(LS_LAST_ROUTE);
+            }
+        }
+
+        if (targetPath === DASHBOARD_PAGE) {
+            localStorage.removeItem(LS_LAST_ROUTE);
+        }
+
+        navigate(targetPath, { replace: true });
+    }, [navigate, userStore.authUser]);
 
     const formik = useFormik<LoginForm>({
         initialValues: {
@@ -107,36 +168,6 @@ export const SignIn = () => {
                         } else {
                             userStore.rememberMe = null;
                         }
-                        const storedRouteDataString = localStorage.getItem(LS_LAST_ROUTE);
-                        if (storedRouteDataString) {
-                            try {
-                                const storedRouteData: LastRouteData =
-                                    JSON.parse(storedRouteDataString);
-                                if (
-                                    storedRouteData.path &&
-                                    storedRouteData.timestamp &&
-                                    storedRouteData.useruid &&
-                                    storedRouteData.useruid === response.useruid
-                                ) {
-                                    const currentTime = Date.now();
-                                    const storedTime = storedRouteData.timestamp;
-                                    const routeAgeInMilliseconds = currentTime - storedTime;
-                                    const routeRestoreTimeoutInMilliseconds =
-                                        convertTimeToMilliseconds(ROUTE_RESTORE_TIMEOUT_HOURS);
-                                    if (
-                                        storedTime > 0 &&
-                                        routeAgeInMilliseconds > 0 &&
-                                        routeAgeInMilliseconds <= routeRestoreTimeoutInMilliseconds
-                                    ) {
-                                        localStorage.removeItem(LS_LAST_ROUTE);
-                                        navigate(storedRouteData.path, { replace: true });
-                                        return;
-                                    }
-                                }
-                            } catch {}
-                        }
-                        localStorage.removeItem(LS_LAST_ROUTE);
-                        navigate(DASHBOARD_PAGE, { replace: true });
                     } catch (error) {
                         showError(String(error));
                         return;
@@ -250,4 +281,4 @@ export const SignIn = () => {
             </div>
         </section>
     );
-};
+});

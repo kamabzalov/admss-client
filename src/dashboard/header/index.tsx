@@ -48,15 +48,15 @@ export const Header = observer((): ReactElement => {
     }, [authUser?.useruid]);
 
     const signOut = ({ useruid }: AuthUser) => {
+        const currentPath = window.location.pathname + window.location.search;
+        const routeData: LastRouteData = {
+            path: currentPath,
+            timestamp: Date.now(),
+            useruid,
+        };
+        localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+        localStorageClear(LS_APP_USER);
         logout(useruid).finally(() => {
-            const currentPath = location.pathname + location.search;
-            const routeData: LastRouteData = {
-                path: currentPath,
-                timestamp: Date.now(),
-                useruid,
-            };
-            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
-            localStorageClear(LS_APP_USER);
             navigate("/");
         });
     };
