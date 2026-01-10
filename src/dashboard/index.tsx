@@ -13,6 +13,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { RouteTracker } from "dashboard/common/route-tracker";
 import { Status } from "common/models/base-response";
+import { HOME_PAGE } from "common/constants/links";
 
 export const Dashboard = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -53,13 +54,16 @@ export const Dashboard = observer((): ReactElement => {
                     const response = await checkToken(storedUser.token);
                     if (!response || response.status !== Status.OK) {
                         const currentPath = window.location.pathname + window.location.search;
-                        const routeData: LastRouteData = {
-                            path: currentPath,
-                            timestamp: Date.now(),
-                            useruid: storedUser.useruid,
-                        };
-                        localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+                        const useruuid = storedUser.useruid;
                         store.clearStoredUser();
+                        if (currentPath !== HOME_PAGE) {
+                            const routeData: LastRouteData = {
+                                path: currentPath,
+                                timestamp: Date.now(),
+                                useruid: useruuid,
+                            };
+                            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+                        }
                         navigate("/");
                     }
                 } else {
