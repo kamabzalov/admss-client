@@ -1,131 +1,107 @@
-import { DashboardDialog } from "dashboard/common/dialog";
-import { InputText } from "primereact/inputtext";
-import { useState } from "react";
-import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { AuthUser } from "common/models/user";
-import { Password } from "primereact/password";
+import { ReactElement, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { TabView, TabPanel } from "primereact/tabview";
+import { Button } from "primereact/button";
+import { PersonalInformation } from "dashboard/profile/userProfile/personal-information";
+import { Security } from "dashboard/profile/userProfile/security";
+import { Payments } from "dashboard/profile/userProfile/payments";
+import { DASHBOARD_PAGE } from "common/constants/links";
+import { observer } from "mobx-react-lite";
+import { DataTableWrapper } from "dashboard/common/data-table";
 
-interface UserProfileDialogProps extends DialogProps {
-    authUser: AuthUser;
+interface TabItem {
+    settingName: string;
+    component: ReactElement;
+    route: string;
 }
 
-export const UserProfileDialog = ({
-    visible,
-    onHide,
-    authUser,
-}: UserProfileDialogProps): JSX.Element => {
-    const [user, setUser] = useState<AuthUser>(authUser);
-    const [newPassword, setNewPassword] = useState<boolean>(false);
+export const UserProfile = observer((): ReactElement => {
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const handleSendSupportContact = (): void => {
+    const tabItems: TabItem[] = [
+        {
+            settingName: "Personal information",
+            route: "personal-information",
+            component: <PersonalInformation />,
+        },
+        {
+            settingName: "Security",
+            route: "security",
+            component: <Security />,
+        },
+        {
+            settingName: "Payments",
+            route: "payments",
+            component: <Payments />,
+        },
+    ];
+
+    useEffect(() => {
+        const defaultTabRoute = tabItems[0].route;
+        const currentTab = searchParams.get("section");
+        if (!currentTab) {
+            setSearchParams({ section: defaultTabRoute });
+        }
+    }, [searchParams, setSearchParams]);
+
+    const activeTabParam = searchParams.get("section") || tabItems[0].route;
+    const activeTabIndex = tabItems.findIndex((section) => section.route === activeTabParam);
+
+    const handleTabChange = (index: number) => {
+        const selectedTabRoute = tabItems[index].route;
+        setSearchParams({ section: selectedTabRoute });
+    };
+
+    const handleCloseClick = () => {
+        navigate(DASHBOARD_PAGE);
+    };
+
+    const handleSave = () => {
         return;
     };
 
-    const handleCloseDialog = () => {
-        setNewPassword(false);
-        onHide();
-    };
-
     return (
-        <DashboardDialog
-            className='dialog__user-profile user-profile'
-            footer='Save changes'
-            header='My profile'
-            visible={visible}
-            onHide={handleCloseDialog}
-            action={handleSendSupportContact}
-        >
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>User name</div>
-                <div className='profile-row__value'>{authUser.loginname}</div>
-            </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Company name</div>
-                <div className='profile-row__value'>
-                    <InputText
-                        placeholder='Company name'
-                        value={user.companyname}
-                        onChange={(event) =>
-                            setUser((prev) => ({ ...prev, companyname: event.target.value }))
-                        }
-                    />
-                </div>
-            </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Location</div>
-                <div className='profile-row__value'>
-                    <InputText placeholder='Location' value={"Arizona"} onChange={(event) => {}} />
-                </div>
-            </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Address</div>
-                <div className='profile-row__value'>
-                    <InputText
-                        placeholder='Address'
-                        value={"40377 Cit Crest"}
-                        onChange={(event) => {}}
-                    />
-                </div>
-            </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Phone</div>
-                <div className='profile-row__value'>
-                    <InputText placeholder='Phone' value='536-587-1865' onChange={(event) => {}} />
-                </div>
-            </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Current password</div>
-                <div className='profile-row__value'>
-                    <Password
-                        className='w-100'
-                        value={"password"}
-                        onChange={(e) => {}}
-                        toggleMask
-                    />
-                </div>
-            </div>
-            {newPassword || (
-                <div className='user-profile__row profile-row'>
-                    <div className='profile__change-password' onClick={() => setNewPassword(true)}>
-                        Change password
+        <DataTableWrapper className='grid user-profile'>
+            <Button
+                icon='pi pi-times'
+                className='user-profile__close-button'
+                onClick={handleCloseClick}
+            />
+            <div className='col-12'>
+                <div className='card user-profile__card'>
+                    <div className='card-header user-profile__header'>
+                        <h2 className='user-profile__title'>MY PROFILE</h2>
+                    </div>
+                    <TabView
+                        className='user-profile__tabs'
+                        activeIndex={activeTabIndex}
+                        onTabChange={(e) => handleTabChange(e.index)}
+                    >
+                        {tabItems.map(({ settingName, component }) => {
+                            return (
+                                <TabPanel
+                                    header={settingName}
+                                    children={component}
+                                    key={settingName}
+                                    className='user-profile__panel'
+                                />
+                            );
+                        })}
+                    </TabView>
+                    <div className='user-profile__buttons'>
+                        <Button
+                            className='user-profile__update-button form-nav__button'
+                            onClick={handleSave}
+                            disabled
+                            severity='secondary'
+                        >
+                            UPDATE
+                        </Button>
                     </div>
                 </div>
-            )}
-            {newPassword && (
-                <>
-                    <div className='user-profile__row profile-row'>
-                        <div className='profile-row__label'>New password</div>
-                        <div className='profile-row__value'>
-                            <Password
-                                className='w-100'
-                                value={""}
-                                onChange={(e) => {}}
-                                toggleMask
-                            />
-                        </div>
-                    </div>
-                    <div className='user-profile__row profile-row'>
-                        <div className='profile-row__label'>Confirm password</div>
-                        <div className='profile-row__value'>
-                            <Password
-                                className='w-100'
-                                value={""}
-                                onChange={(e) => {}}
-                                toggleMask
-                            />
-                        </div>
-                    </div>
-                </>
-            )}
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Next payment</div>
-                <div className='profile-row__value'>16 of May, 2023</div>
             </div>
-            <div className='user-profile__row profile-row'>
-                <div className='profile-row__label'>Last login</div>
-                <div className='profile-row__value'>04/26/2023 10:45:39 PM</div>
-            </div>
-        </DashboardDialog>
+        </DataTableWrapper>
     );
-};
+});
