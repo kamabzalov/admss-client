@@ -1,39 +1,133 @@
 .user-profile {
-    width: 567px;
+    --card-height: calc(var(--admss-app-default-card-height) - 75px);
+    --content-height: 680px;
+    --title-height: 63px;
+    position: relative;
+    padding: 0;
 }
 
-.profile-row {
+.user-profile.data-table-wrapper .p-tabview {
+    flex-direction: row;
+}
+
+.user-profile__card {
+    padding: 40px;
+    padding-right: 30px;
+    height: calc(var(--card-height) + var(--title-height));
+    max-height: var(--card-max-height);
     display: flex;
-    align-items: center;
-    width: 462px;
-    font-size: 18px;
+    flex-direction: column;
 }
 
-.profile-row__label {
-    flex: 0 1 40%;
-    font-weight: 600;
-    text-align: right;
-    padding-right: 25px;
+.user-profile__header {
+    display: flex;
+    margin-bottom: 30px;
 }
 
-.profile-row__value {
-    flex: 0 1 300px;
-    height: 50px;
-    display: inline-flex;
-    align-items: center;
+.user-profile__title {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
 }
 
-.profile-row__value .p-inputtext,
-.profile-row__value > .profile-row__value,
-.profile-row__value .p-inputwrapper {
-    width: 100%;
+.user-profile__close-button {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    padding: 20px;
+    right: 30px;
+    top: 30px;
+    border-radius: 50%;
+    color: var(--admss-app-primary);
+    background-color: transparent;
+    border-color: transparent;
+    transition: color 0.3s;
 }
 
-.profile__change-password {
-    color: var(--admss-app-main-blue);
-    cursor: pointer;
-    font-size: 14px;
-    margin-left: auto;
-    margin-top: -20px;
-    border-bottom: 1px var(--admss-app-main-blue) dashed;
+.user-profile__close-button .p-button-icon {
+    font-size: 22px;
+}
+
+.user-profile__close-button:hover,
+.user-profile__close-button:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--admss-app-primary);
+}
+
+.user-profile__tabs {
+    display: flex;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.user-profile__tabs .p-tabview-nav {
+    flex-direction: column;
+    flex: 0 0;
+    width: var(--admss-app-card-sidebar-width);
+    border: none;
+    min-height: 527px;
+    height: 100%;
+    gap: 10px;
+}
+
+.user-profile__tabs .p-tabview-panels {
+    flex: 1;
+    padding: 0;
+    padding-left: 40px;
+    min-height: 566px;
+    border-left: 2px solid var(--admss-app-light-blue);
+    border-radius: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.user-profile__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.user-profile__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
+    border-radius: 0;
+}
+
+.user-profile__buttons {
+    display: flex;
+    margin-top: auto;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 25px;
+    padding-right: 30px;
+}
+
+.user-profile__update-button {
+    text-transform: uppercase;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.user-profile__content {
+    padding: 0 2rem;
+}
+
+.user-profile__section {
+    margin-bottom: 40px;
+}
+
+.user-profile__section:last-child {
+    margin-bottom: 0;
+}
+
+.user-profile__section-title {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: var(--admss-app-primary);
 }

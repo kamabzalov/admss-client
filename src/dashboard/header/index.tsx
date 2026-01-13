@@ -11,11 +11,16 @@ import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
-import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
-import { CONTACT_SUPPORT, HELP_PAGE, SETTINGS_PAGE, USERS_PAGE } from "common/constants/links";
+import {
+    CONTACT_SUPPORT,
+    HELP_PAGE,
+    SETTINGS_PAGE,
+    USERS_PAGE,
+    USER_PROFILE_PAGE,
+} from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -27,7 +32,6 @@ export const Header = observer((): ReactElement => {
         new URLSearchParams(location.search).has(CONTACT_SUPPORT)
     );
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
-    const [userProfile, setUserProfile] = useState<boolean>(false);
     const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
@@ -72,9 +76,7 @@ export const Header = observer((): ReactElement => {
             [
                 {
                     label: "My Profile",
-                    command() {
-                        setUserProfile(true);
-                    },
+                    command: () => navigate(USER_PROFILE_PAGE.MAIN),
                 },
                 !isSalesPerson
                     ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
@@ -140,11 +142,6 @@ export const Header = observer((): ReactElement => {
                 </div>
                 {authUser && (
                     <>
-                        <UserProfileDialog
-                            onHide={() => setUserProfile(false)}
-                            visible={userProfile}
-                            authUser={authUser}
-                        />
                         <SupportContactDialog
                             onHide={() => {
                                 setSupportContact(false);

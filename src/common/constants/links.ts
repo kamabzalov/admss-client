@@ -2,6 +2,7 @@ export const HELP_PAGE: string = "https://www.admss.com/";
 export const CONTACT_SUPPORT: string = "contact-support";
 export const SERVICE_UPDATE_PAGE: string = "/service-update";
 export const CREATE_ID: string = "create";
+export const USER_PROFILE_PAGE_ID: string = "user-profile";
 export const HOME_PAGE: string = "/";
 
 export const DASHBOARD_PAGE: string = "/dashboard";
@@ -136,6 +137,13 @@ export const SETTINGS_PAGE: Readonly<SettingsPage> = {
     ROLES_EDIT(id: string) {
         return `${this.MAIN}/roles/${id}`;
     },
+};
+
+interface UserProfilePage {
+    readonly MAIN: string;
+}
+export const USER_PROFILE_PAGE: Readonly<UserProfilePage> = {
+    MAIN: `${DASHBOARD_PAGE}/${USER_PROFILE_PAGE_ID}`,
 };
 
 interface SidebarPage {

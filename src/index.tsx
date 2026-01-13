@@ -31,6 +31,7 @@ import { DealWashout } from "dashboard/deals/form/washout";
 import { Users } from "dashboard/profile/users";
 import { UsersForm } from "dashboard/profile/users/form";
 import { UsersRolesForm } from "dashboard/profile/generalSettings/roles/form";
+import { UserProfile } from "dashboard/profile/userProfile";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -178,6 +179,14 @@ const AppRouter = (): ReactElement => {
                                 </ProtectedRoute>
                             ),
                             children: [{ path: "", element: <Tasks /> }],
+                        },
+                        {
+                            path: "user-profile",
+                            element: (
+                                <ProtectedRoute>
+                                    <UserProfile />
+                                </ProtectedRoute>
+                            ),
                         },
                     ],
                 },

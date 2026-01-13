@@ -1,0 +1,49 @@
+.user-profile__content .user-profile__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.user-profile-personal {
+    margin-top: 20px;
+}
+
+.user-profile-personal__info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.user-profile-personal__avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-profile-contact {
+    margin-top: 20px;
+}
+
+.user-profile-info-message {
+    margin-top: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 5px;
+    color: var(--admss-app-dark-blue);
+}
+
+.user-profile-info-message__icon {
+    font-size: 40px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.user-profile-info-message__text {
+    font-size: 18px;
+    font-weight: 400;
+    font-family: "Open Sans", sans-serif;
+    font-style: italic;
+}
