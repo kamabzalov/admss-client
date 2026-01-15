@@ -125,9 +125,11 @@
 }
 
 .user-profile__section-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
+    margin-top: 0;
     margin-bottom: 20px;
     color: var(--admss-app-primary);
+    font-family: "Open Sans", sans-serif;
 }

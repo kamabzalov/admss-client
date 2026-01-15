@@ -3,13 +3,14 @@
 }
 
 .user-profile-password__forgot {
-    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .user-profile-password__forgot-link {
-    color: var(--admss-app-main-blue);
-    font-size: 14px;
-    text-decoration: none;
+    color: var(--admss-app-deep-blue);
+    font-size: 10px;
+    text-decoration: underline;
     cursor: pointer;
 }
 
@@ -29,8 +30,8 @@
 }
 
 .user-profile-two-factor__text {
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 150%;
     color: var(--admss-app-primary);
     margin: 0;
 }

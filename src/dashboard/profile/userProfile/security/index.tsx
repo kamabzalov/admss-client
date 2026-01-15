@@ -2,12 +2,14 @@ import { ReactElement, useState } from "react";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import { Button } from "primereact/button";
 import { Splitter } from "dashboard/common/display";
+import { SupportContactDialog } from "dashboard/profile/supportContact";
 import "./index.css";
 
 export const Security = (): ReactElement => {
     const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [supportContactVisible, setSupportContactVisible] = useState<boolean>(false);
 
     const passwordsMismatch = newPassword !== confirmPassword && confirmPassword.length > 0;
 
@@ -15,12 +17,16 @@ export const Security = (): ReactElement => {
         return;
     };
 
+    const handleContactSupportClick = () => {
+        setSupportContactVisible(true);
+    };
+
     return (
         <div className='user-profile__content'>
             <div className='user-profile__header'>
                 <h3 className='user-profile__section-title'>Security</h3>
             </div>
-            <Splitter className='col-12' title='Change Password' />
+            <Splitter className='col-12 px-0' title='Change Password' />
 
             <div className='user-profile-password grid'>
                 <div className='col-3'>
@@ -66,16 +72,26 @@ export const Security = (): ReactElement => {
                 </div>
             </div>
 
-            <Splitter className='col-12' title='Two-Factor Authentication' />
+            <Splitter className='col-12 mt-2 px-0' title='Two-Factor Authentication' />
 
             <div className='user-profile-two-factor'>
                 <p className='user-profile-two-factor__text'>
                     For security reasons, two-factor authentication (2FA) cannot be disabled. If you
-                    need to <strong>reset</strong> your 2FA settings, please{" "}
-                    <span className='user-profile-two-factor__link'>contact our support team</span>{" "}
+                    need to <strong>reset</strong> your 2FA settings, please
+                    <span
+                        className='user-profile-two-factor__link'
+                        onClick={handleContactSupportClick}
+                    >
+                        contact our support team
+                    </span>
                     for assistance. We're here to help ensure your account remains secure.
                 </p>
             </div>
+
+            <SupportContactDialog
+                visible={supportContactVisible}
+                onHide={() => setSupportContactVisible(false)}
+            />
         </div>
     );
 };
