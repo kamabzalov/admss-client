@@ -51,6 +51,21 @@
     display: flex;
     flex-direction: column;
 
+    .p-datatable.p-datatable-gridlines:has(.p-datatable-emptymessage) .p-datatable-thead > tr > th {
+        border-left: none;
+        border-right: none;
+        pointer-events: none;
+        cursor: default;
+
+        &:hover {
+            background: transparent;
+        }
+
+        .p-column-resizer {
+            display: none;
+        }
+    }
+
     .p-paginator {
         margin-top: auto;
         padding-top: var(--data-table-paginator-padding-top, 50px);
