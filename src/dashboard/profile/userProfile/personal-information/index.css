@@ -7,6 +7,7 @@
 
 .user-profile-personal {
     margin-top: 20px;
+    height: 240px;
 }
 
 .user-profile-personal__info {
@@ -16,6 +17,7 @@
 }
 
 .user-profile-personal__avatar {
+    transform: translateY(-20%);
     display: flex;
     justify-content: center;
     align-items: center;

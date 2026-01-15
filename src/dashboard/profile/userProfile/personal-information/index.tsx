@@ -14,7 +14,6 @@ export const PersonalInformation = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
 
-    const [username, setUsername] = useState<string>(authUser?.loginname || "");
     const [companyName, setCompanyName] = useState<string>(authUser?.companyname || "");
     const [location, setLocation] = useState<string>(authUser?.locationname || "");
     const [address, setAddress] = useState<string>("");
@@ -30,11 +29,7 @@ export const PersonalInformation = observer((): ReactElement => {
             </div>
             <div className='user-profile-personal grid'>
                 <div className='col-6 user-profile-personal__info'>
-                    <TextInput
-                        name='Username'
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
-                    />
+                    <TextInput name='Username' value={authUser?.loginname || ""} disabled />
                     <TextInput
                         name='Company Name'
                         value={companyName}
