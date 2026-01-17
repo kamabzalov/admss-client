@@ -180,3 +180,8 @@ export const useToastMessage = () => {
 export { useCreateReport } from "common/hooks/useCreateReport";
 export { useNotification } from "dashboard/common/notification";
 export { useWindowSize } from "common/hooks/useWindowSize";
+export {
+    useGooglePlacesAutocomplete,
+    type AddressSuggestion,
+    type ParsedAddress,
+} from "common/hooks/useGooglePlacesAutocomplete";
