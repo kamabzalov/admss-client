@@ -5,6 +5,7 @@ import { PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inpu
 import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import "./index.css";
 import { Splitter } from "dashboard/common/display";
+import InfoIcon from "assets/images/info-icon.svg";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. 
 Without this information, two-factor authentication cannot be set up for the user in the future. 
@@ -84,7 +85,7 @@ export const PersonalInformation = observer((): ReactElement => {
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <div className='col-12 user-profile-info-message'>
-                    <i className='adms-info user-profile-info-message__icon' />
+                    <img src={InfoIcon} alt='info' className='user-profile-info-message__icon' />
                     <span className='user-profile-info-message__text'>{INFO_MESSAGE}</span>
                 </div>
             </div>
