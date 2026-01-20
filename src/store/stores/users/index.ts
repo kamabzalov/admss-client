@@ -241,11 +241,14 @@ export class UsersStore {
     });
 
     public get isFormValid(): boolean {
+        const hasValidPhone = PHONE_NUMBER_REGEX.test(this._user.phone1 || "");
+        const hasEmail = !!this._user.email1;
+
         return (
             !!this._user.firstName &&
             !!this._user.lastName &&
             !!this._user.loginName &&
-            PHONE_NUMBER_REGEX.test(this._user.phone1 || "") &&
+            (hasValidPhone || hasEmail) &&
             !this._passwordMismatch
         );
     }
