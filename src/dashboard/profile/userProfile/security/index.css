@@ -23,6 +23,11 @@
 .user-profile-password__button {
     width: 100%;
     height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 22px;
 }
 
 .user-profile-two-factor {

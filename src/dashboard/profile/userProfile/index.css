@@ -4,6 +4,11 @@
     --title-height: 63px;
     position: relative;
     padding: 0;
+
+    .splitter {
+        padding: 20px 0;
+        letter-spacing: -1px;
+    }
 }
 
 .user-profile.data-table-wrapper .p-tabview {
@@ -17,6 +22,13 @@
     max-height: var(--card-max-height);
     display: flex;
     flex-direction: column;
+    border-radius: 15px;
+}
+
+.user-profile__panel .user-profile__content .user-profile__header {
+    margin-bottom: 0px;
+    letter-spacing: -0.7px;
+    font-stretch: condensed;
 }
 
 .user-profile__header {
@@ -29,15 +41,16 @@
     font-weight: 700;
     text-transform: uppercase;
     margin: 0;
+    
 }
 
 .user-profile__close-button {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     padding: 20px;
-    right: 30px;
-    top: 30px;
+    right: 40px;
+    top: 40px;
     border-radius: 50%;
     color: var(--admss-app-primary);
     background-color: transparent;
@@ -68,7 +81,6 @@
     border: none;
     min-height: 527px;
     height: 100%;
-    gap: 10px;
 }
 
 .user-profile__tabs .p-tabview-panels {
@@ -84,6 +96,7 @@
 
 .user-profile__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
     color: var(--admss-app-primary);
+    height: 50px;
     border: none;
 }
 
@@ -94,7 +107,7 @@
 .user-profile__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-primary);
     background: var(--admss-app-light-blue);
-    border-radius: 0;
+    border-radius: 5px 0 0 5px;
 }
 
 .user-profile__buttons {
