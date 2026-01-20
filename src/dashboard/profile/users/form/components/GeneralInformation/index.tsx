@@ -1,8 +1,9 @@
 import { ReactElement, useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Splitter } from "dashboard/common/display";
-import { DashboardRadio, PhoneInput } from "dashboard/common/form/inputs";
+import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
@@ -10,6 +11,10 @@ import { generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
+import InfoIcon from "assets/images/info-icon.svg";
+import { SETTINGS_PAGE } from "common/constants/links";
+
+const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
 export const ROLE_OPTIONS: RadioButtonProps[] = [
     {
@@ -30,6 +35,7 @@ export const ROLE_OPTIONS: RadioButtonProps[] = [
 ];
 
 export const GeneralInformation = observer((): ReactElement => {
+    const navigate = useNavigate();
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
     const usersStore = useStore().usersStore;
@@ -37,6 +43,9 @@ export const GeneralInformation = observer((): ReactElement => {
     const { showError, showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
+
+    const hasEmail = !!user?.email1;
+    const hasPhone = !!user?.phone1;
 
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
@@ -70,10 +79,14 @@ export const GeneralInformation = observer((): ReactElement => {
         showSuccess("Password copied to clipboard");
     };
 
+    const handleCustomRoleClick = () => {
+        navigate(SETTINGS_PAGE.ROLES_CREATE());
+    };
+
     return (
         <div className='user-form general-information'>
             <h3 className='general-information__title user-form__title'>General Information</h3>
-            <Splitter title='Personal Data' className='my-5' />
+            <Splitter title='Personal Data' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
                     <span className='p-float-label'>
@@ -106,9 +119,16 @@ export const GeneralInformation = observer((): ReactElement => {
                     </span>
                 </div>
             </div>
-            <Splitter title='Role' className='my-5' />
+            <div className='general-information__role-header'>
+                <div className='general-information__role-title'>
+                    <Splitter title='Role' />
+                </div>
+                <div className='general-information__custom-role' onClick={handleCustomRoleClick}>
+                    Custom role
+                </div>
+            </div>
             <div className='grid'>
-                <div className='col-12 mt-1'>
+                <div className='col-12'>
                     <DashboardRadio
                         radioArray={ROLE_OPTIONS}
                         justifyContent='start'
@@ -125,7 +145,7 @@ export const GeneralInformation = observer((): ReactElement => {
                     />
                 </div>
             </div>
-            <Splitter title='Contact & Login Information' className='my-5' />
+            <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
                     <span className='p-float-label'>
@@ -138,24 +158,25 @@ export const GeneralInformation = observer((): ReactElement => {
                     </span>
                 </div>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <InputText
-                            className='w-full'
-                            value={user?.email1 || ""}
-                            onChange={(e) => changeUserData("email1", e.target.value)}
-                        />
-                        <label className='float-label'>Email</label>
-                    </span>
+                    <EmailInput
+                        name={`Email ${!hasPhone ? "(required)" : ""}`}
+                        value={user?.email1 || ""}
+                        onChange={(e) => changeUserData("email1", e.target.value)}
+                    />
                 </div>
                 <div className='col-4'>
                     <PhoneInput
-                        name='Phone Number (required)'
+                        name={`Phone Number ${!hasEmail ? "(required)" : ""}`}
                         value={user?.phone1 || ""}
                         onChange={(e) => changeUserData("phone1", e.target.value)}
                     />
                 </div>
+                <div className='col-12 user-profile-info-message'>
+                    <img src={InfoIcon} alt='info' className='user-profile-info-message__icon' />
+                    <span className='user-profile-info-message__text'>{INFO_MESSAGE}</span>
+                </div>
             </div>
-            <Splitter title='Password Setup' className='my-5' />
+            <Splitter title='Password Setup' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
                     <PasswordInput

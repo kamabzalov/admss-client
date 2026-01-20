@@ -13,6 +13,7 @@ import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inpu
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { EMAIL_REGEX } from "common/constants/regex";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -88,6 +89,13 @@ interface TextInputProps extends InputTextProps {
 }
 
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
+    colWidth?: Range<1, 13>;
+    onChange?: (e: any) => void;
+    onBlur?: (e: any) => void;
+    withValidationMessage?: boolean;
+}
+
+interface EmailInputProps extends Omit<InputTextProps, "onChange" | "onBlur"> {
     colWidth?: Range<1, 13>;
     onChange?: (e: any) => void;
     onBlur?: (e: any) => void;
@@ -657,6 +665,54 @@ export const PhoneInput = ({
                 unmask={false}
                 onChange={(e) => validateAndHandle(e)}
                 onBlur={(e) => validateAndHandle(e as unknown as InputMaskChangeEvent, true)}
+                {...props}
+            />
+            <label htmlFor={uniqueId} className='float-label'>
+                {name}
+            </label>
+            {withValidationMessage && error && <div className='p-error pt-2'>{error}</div>}
+        </span>
+    );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
+};
+
+export const EmailInput = ({
+    name,
+    colWidth,
+    onChange,
+    onBlur,
+    withValidationMessage = false,
+    ...props
+}: EmailInputProps): ReactElement => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [error, setError] = useState<string>("");
+    const uniqueId = useId();
+
+    const validateAndHandle = (e: React.ChangeEvent<HTMLInputElement>, isBlur = false) => {
+        const { value } = e.target;
+
+        if (value && !EMAIL_REGEX.test(value)) {
+            setError(ERROR_MESSAGES.EMAIL);
+        } else {
+            setError("");
+        }
+
+        if (onChange) onChange(e);
+        if (isBlur && onBlur) onBlur(e);
+    };
+
+    const content = (
+        <span className='p-float-label relative email-input'>
+            <InputText
+                type='email'
+                ref={inputRef}
+                className={`w-full email-input__input ${error ? "p-invalid" : ""}`}
+                style={{ height: `${props.height || 50}px` }}
+                id={uniqueId}
+                tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
+                onChange={(e) => validateAndHandle(e)}
+                onBlur={(e) => validateAndHandle(e, true)}
                 {...props}
             />
             <label htmlFor={uniqueId} className='float-label'>
