@@ -9,6 +9,7 @@ import { Payments } from "dashboard/profile/userProfile/payments";
 import { DASHBOARD_PAGE } from "common/constants/links";
 import { observer } from "mobx-react-lite";
 import { DataTableWrapper } from "dashboard/common/data-table";
+import { useStore } from "store/hooks";
 
 interface TabItem {
     settingName: string;
@@ -17,6 +18,8 @@ interface TabItem {
 }
 
 export const UserProfile = observer((): ReactElement => {
+    const store = useStore().profileStore;
+    const { isProfileChanged } = store;
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -94,10 +97,10 @@ export const UserProfile = observer((): ReactElement => {
                         <Button
                             className='user-profile__update-button form-nav__button'
                             onClick={handleSave}
-                            disabled
-                            severity='secondary'
+                            disabled={!isProfileChanged}
+                            severity={isProfileChanged ? "success" : "secondary"}
                         >
-                            UPDATE
+                            Update
                         </Button>
                     </div>
                 </div>

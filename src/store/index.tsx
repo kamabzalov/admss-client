@@ -7,6 +7,7 @@ import { AccountStore } from "store/stores/account";
 import { ReportStore } from "store/stores/report";
 import { GeneralSettingsStore } from "store/stores/general-settings";
 import { UsersStore } from "store/stores/users";
+import { ProfileStore } from "store/stores/profile";
 
 configure({
     enforceActions: "never",
@@ -21,6 +22,7 @@ export class RootStore {
     public accountStore: AccountStore;
     public reportStore: ReportStore;
     public generalSettingsStore: GeneralSettingsStore;
+    public profileStore: ProfileStore;
     public constructor() {
         this.userStore = new UserStore(this);
         this.usersStore = new UsersStore(this);
@@ -30,6 +32,7 @@ export class RootStore {
         this.accountStore = new AccountStore(this);
         this.reportStore = new ReportStore(this);
         this.generalSettingsStore = new GeneralSettingsStore(this);
+        this.profileStore = new ProfileStore();
     }
 }
 
