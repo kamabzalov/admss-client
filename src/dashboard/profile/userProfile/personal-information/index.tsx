@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
@@ -12,16 +12,10 @@ Without this information, two-factor authentication cannot be set up for the use
 If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
 export const PersonalInformation = observer((): ReactElement => {
-    const store = useStore().userStore;
-    const { authUser } = store;
-
-    const [companyName, setCompanyName] = useState<string>(authUser?.companyname || "");
-    const [location, setLocation] = useState<string>(authUser?.locationname || "");
-    const [address, setAddress] = useState<string>("");
-    const [state, setState] = useState<string>("");
-    const [zipCode, setZipCode] = useState<string>("");
-    const [phoneNumber, setPhoneNumber] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
+    const profileStore = useStore().profileStore;
+    const user = useStore().userStore;
+    const { profile, changeProfile } = profileStore;
+    const { authUser } = user;
 
     return (
         <div className='user-profile__content'>
@@ -30,16 +24,20 @@ export const PersonalInformation = observer((): ReactElement => {
             </div>
             <div className='user-profile-personal grid'>
                 <div className='col-6 user-profile-personal__info'>
-                    <TextInput name='Username' value={authUser?.loginname || ""} disabled />
+                    <TextInput
+                        name='Username'
+                        value={authUser?.loginname || profile?.loginname || ""}
+                        disabled
+                    />
                     <TextInput
                         name='Company Name'
-                        value={companyName}
-                        onChange={(event) => setCompanyName(event.target.value)}
+                        value={authUser?.companyname || profile?.companyname || ""}
+                        onChange={(event) => changeProfile("companyname", event.target.value)}
                     />
                     <TextInput
                         name='Location (city/state)'
-                        value={location}
-                        onChange={(event) => setLocation(event.target.value)}
+                        value={profile?.locationname}
+                        onChange={(event) => changeProfile("locationname", event.target.value)}
                     />
                 </div>
                 <div className='col-6 user-profile-personal__avatar'>
@@ -53,36 +51,36 @@ export const PersonalInformation = observer((): ReactElement => {
                 <TextInput
                     name='Location (address)'
                     colWidth={6}
-                    value={address}
-                    onChange={(event) => setAddress(event.target.value)}
+                    value={profile.address}
+                    onChange={(event) => changeProfile("address", event.target.value)}
                 />
 
                 <StateDropdown
                     name='State'
-                    showClear={!!state}
+                    showClear={!!profile.state}
                     colWidth={3}
-                    value={state}
-                    onChange={({ value }) => setState(value || "")}
+                    value={profile.state}
+                    onChange={({ value }) => changeProfile("state", value || "")}
                 />
                 <TextInput
                     name='Zip Code'
                     colWidth={3}
-                    value={zipCode}
-                    onChange={(event) => setZipCode(event.target.value)}
+                    value={profile.zipCode}
+                    onChange={(event) => changeProfile("zipCode", event.target.value)}
                 />
                 <PhoneInput
                     name='Phone Number'
                     colWidth={3}
                     required
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    value={profile.phoneNumber}
+                    onChange={(e) => changeProfile("phoneNumber", e.target.value)}
                 />
                 <TextInput
                     name='E-mail'
                     colWidth={6}
                     type='email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={profile.email}
+                    onChange={(e) => changeProfile("email", e.target.value)}
                 />
                 <div className='col-12 user-profile-info-message'>
                     <img src={InfoIcon} alt='info' className='user-profile-info-message__icon' />
