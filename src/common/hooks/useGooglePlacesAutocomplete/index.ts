@@ -1,5 +1,10 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useMapsLibrary, useApiIsLoaded, useApiLoadingStatus } from "@vis.gl/react-google-maps";
+import {
+    useMapsLibrary,
+    useApiIsLoaded,
+    useApiLoadingStatus,
+    APILoadingStatus,
+} from "@vis.gl/react-google-maps";
 
 const MIN_QUERY_LENGTH = 3;
 
@@ -26,7 +31,7 @@ export const useGooglePlacesAutocomplete = () => {
     const places = useMapsLibrary("places");
     const autocompleteSuggestionAvailableRef = useRef<boolean>(false);
     const newApiFailedRef = useRef<boolean>(false);
-    const apiLoadingStatus = useApiLoadingStatus();
+    const apiLoadingStatus: APILoadingStatus = useApiLoadingStatus();
 
     useEffect(() => {
         if (
@@ -66,7 +71,11 @@ export const useGooglePlacesAutocomplete = () => {
             return;
         }
 
-        if (apiLoadingStatus) {
+        if (
+            apiLoadingStatus === APILoadingStatus.LOADING ||
+            apiLoadingStatus === APILoadingStatus.NOT_LOADED ||
+            apiLoadingStatus === APILoadingStatus.AUTH_FAILURE
+        ) {
             console.warn(`Google Maps API status: ${apiLoadingStatus}`);
         }
 
