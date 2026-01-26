@@ -2,6 +2,7 @@ import { ReactElement, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
+import { Skeleton } from "primereact/skeleton";
 import { Splitter } from "dashboard/common/display";
 import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
@@ -16,36 +17,46 @@ import { SETTINGS_PAGE } from "common/constants/links";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
-export const ROLE_OPTIONS: RadioButtonProps[] = [
-    {
-        name: "Owner",
-        title: "Owner (Admin)",
-        value: 0,
-    },
-    {
-        name: "Manager",
-        title: "Manager",
-        value: 1,
-    },
-    {
-        name: "Salesman",
-        title: "Sales Person",
-        value: 2,
-    },
+interface RoleOption extends RadioButtonProps {
+    roleuid: string;
+    apiRoleName: string;
+}
+
+export const ROLE_MAPPING = [
+    { keyword: "owner", displayTitle: "Owner (Admin)", displayName: "Owner" },
+    { keyword: "manager", displayTitle: "Manager", displayName: "Manager" },
+    { keyword: "sales", displayTitle: "Sales Person", displayName: "Salesman" },
 ];
 
-export const GeneralInformation = observer((): ReactElement => {
+export const SALES_PERSON_ROLE = ROLE_MAPPING[2];
+
+export const GeneralInformation = observer((): ReactElement | null => {
     const navigate = useNavigate();
+    const usersStore = useStore().usersStore;
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
-    const usersStore = useStore().usersStore;
-    const { user, changeUserData, password } = usersStore;
-    const { showError, showSuccess } = useToastMessage();
+    const { user, changeUserData, password, availableRoles, isLoading } = usersStore;
+    const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
 
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
+
+    const roleOptions: RoleOption[] = ROLE_MAPPING.map((mapping, index) => {
+        const apiRole = availableRoles.find((role) =>
+            role.rolename.toLowerCase().includes(mapping.keyword)
+        );
+        return apiRole
+            ? {
+                  name: mapping.displayName,
+                  title: mapping.displayTitle,
+                  value: index,
+                  roleuid: apiRole.roleuid,
+                  apiRoleName: apiRole.rolename,
+              }
+            : null;
+    }).filter(Boolean) as RoleOption[];
 
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
@@ -69,8 +80,6 @@ export const GeneralInformation = observer((): ReactElement => {
             setPasswordsMismatch(false);
             usersStore.passwordMismatch = false;
             showSuccess(`Password generated successfully: ${data.password}`);
-        } else {
-            showError(response?.error);
         }
     };
 
@@ -127,24 +136,43 @@ export const GeneralInformation = observer((): ReactElement => {
                     Custom role
                 </div>
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    <DashboardRadio
-                        radioArray={ROLE_OPTIONS}
-                        justifyContent='start'
-                        initialValue={(() => {
-                            const roleIndex = ROLE_OPTIONS.findIndex(
-                                (option) => option.title === user?.rolename
-                            );
-                            return roleIndex >= 0 ? roleIndex.toString() : "";
-                        })()}
-                        onChange={(value) => {
-                            const selectedOption = ROLE_OPTIONS[parseInt(value as string)];
-                            changeUserData("rolename", selectedOption.title);
-                        }}
-                    />
+            {isLoading ? (
+                <div className='grid'>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className='grid'>
+                    <div className='col-12'>
+                        <DashboardRadio
+                            radioArray={roleOptions}
+                            justifyContent='start'
+                            initialValue={(() => {
+                                const roleIndex = roleOptions.findIndex(
+                                    (option) =>
+                                        option.roleuid === user?.roleuid ||
+                                        option.title === user?.rolename
+                                );
+                                return roleIndex >= 0 ? roleIndex.toString() : "";
+                            })()}
+                            onChange={(value) => {
+                                const selectedOption = roleOptions[parseInt(value as string)];
+                                changeUserData([
+                                    ["rolename", selectedOption.title as string],
+                                    ["roleuid", selectedOption.roleuid as string],
+                                ]);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
             <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
