@@ -1,12 +1,12 @@
 import "./index.css";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { observer } from "mobx-react-lite";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
-import { GeneralInformation, ROLE_OPTIONS } from "./components/GeneralInformation";
-import { SalesPersonInformation } from "./components/SalesPersonInformation";
+import { GeneralInformation } from "./components/GeneralInformation";
+import { AdditionalSettings } from "./components/AdditionalSettings";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
 
@@ -19,12 +19,19 @@ interface TabItem {
 export const UsersForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { showError, showInfo, showSuccess } = useToastMessage();
+    const { showError, showSuccess } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user, isFormValid, createUser } =
-        usersStore;
-    const hasShownInfo = useRef(false);
+    const authUserStore = useStore().userStore;
+    const { authUser } = authUserStore;
+    const {
+        getCurrentUser,
+        getCurrentUserRoles,
+        currentUserClear,
+        isFormValid,
+        createUser,
+        loadAvailableRoles,
+    } = usersStore;
     const handleGetCurrentUser = async (useruid: string) => {
         const response = await getCurrentUser(useruid);
         if (response && response.error) {
@@ -41,6 +48,12 @@ export const UsersForm = observer((): ReactElement => {
     }, [searchParams, setSearchParams]);
 
     useEffect(() => {
+        if (authUser) {
+            loadAvailableRoles(authUser.useruid);
+        }
+    }, [authUser]);
+
+    useEffect(() => {
         if (!id || id === CREATE_ID) return;
         handleGetCurrentUser(id);
         getCurrentUserRoles(id);
@@ -50,30 +63,18 @@ export const UsersForm = observer((): ReactElement => {
     }, [id]);
 
     const getTabItems = (): TabItem[] => {
-        const baseTabs: TabItem[] = [
+        return [
             {
                 settingName: "General Information",
                 route: "general-information",
                 component: <GeneralInformation />,
             },
+            {
+                settingName: "Additional Settings",
+                route: "additional-settings",
+                component: <AdditionalSettings />,
+            },
         ];
-
-        const salesPersonRole = ROLE_OPTIONS.find((option) => option.name === "Salesman");
-        if (user?.rolename === salesPersonRole?.title) {
-            baseTabs.push({
-                settingName: "Sales Person Information",
-                route: "sales-person-information",
-                component: <SalesPersonInformation />,
-            });
-            if (!hasShownInfo.current) {
-                showInfo("New section added to the sidebar – check it out!");
-                hasShownInfo.current = true;
-            }
-        } else {
-            hasShownInfo.current = false;
-        }
-
-        return baseTabs;
     };
 
     const tabItems = getTabItems();
