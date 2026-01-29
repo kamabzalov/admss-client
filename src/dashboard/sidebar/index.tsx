@@ -16,9 +16,11 @@ import {
     SETTINGS_PAGE,
 } from "common/constants/links";
 import { typeGuards } from "common/utils";
+import { usePermissions } from "common/hooks/usePermissions";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
+    const { inventoryPermissions } = usePermissions();
     const { authUser, settings } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [isInitialRender, setIsInitialRender] = useState(true);
@@ -89,7 +91,8 @@ export const Sidebar = observer((): ReactElement => {
         >
             <ul className='sidebar-nav'>
                 {renderNavItem(DASHBOARD_PAGE, "home", "Home")}
-                {renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
+                {inventoryPermissions.canSeeInMenu() &&
+                    renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
                 {isSalesPerson || (
                     <>
                         {renderNavItem(CONTACTS_PAGE.MAIN, "contacts", "Contacts")}

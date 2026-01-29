@@ -33,3 +33,25 @@
     margin: 0 10px;
     font-weight: 600;
 }
+
+.purchase-payments__table-button {
+    &.p-button {
+        &:enabled:hover {
+            background: transparent;
+        }
+        &:enabled:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.purchase-payments__delete-button.p-button {
+    color: var(--admss-app-light-grey);
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+}

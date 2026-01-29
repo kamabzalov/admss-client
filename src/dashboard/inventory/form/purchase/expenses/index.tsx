@@ -24,6 +24,7 @@ import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
 import { convertToStandardTimestamp } from "common/helpers";
 import { Status } from "common/models/base-response";
+import { usePermissions } from "common/hooks/usePermissions";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
@@ -31,6 +32,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const inventoryStore = useStore().inventoryStore;
     const { authUser } = userStore;
+    const { inventoryPermissions } = usePermissions();
+    const { canAddExpenses, canEditExpenses } = inventoryPermissions;
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
@@ -179,7 +182,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     };
 
     const handleEditExpenses = (expense: Expenses) => {
-        if (expense) {
+        if (expense && canEditExpenses()) {
             setCurrentEditExpense({ ...expense, amount: expense.amount / 100 });
         }
     };
@@ -293,15 +296,18 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             Cancel
                         </Button>
                     )}
-                    <Button
-                        className='purchase-expenses-controls__button'
-                        type='button'
-                        disabled={handleCompareData}
-                        severity={handleCompareData ? "secondary" : "success"}
-                        onClick={() => handleExpenseSubmit(currentEditExpense?.itemuid)}
-                    >
-                        {currentEditExpense?.itemuid ? "Update" : "Save"}
-                    </Button>
+                    {((currentEditExpense?.itemuid && canEditExpenses()) ||
+                        (!currentEditExpense?.itemuid && canAddExpenses())) && (
+                        <Button
+                            className='purchase-expenses-controls__button'
+                            type='button'
+                            disabled={handleCompareData}
+                            severity={handleCompareData ? "secondary" : "success"}
+                            onClick={() => handleExpenseSubmit(currentEditExpense?.itemuid)}
+                        >
+                            {currentEditExpense?.itemuid ? "Update" : "Save"}
+                        </Button>
+                    )}
                 </div>
             </div>
             <div className='grid'>
@@ -336,14 +342,16 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 });
                                 return (
                                     <div className='purchase-expenses__table-controls-container'>
-                                        <Button
-                                            type='button'
-                                            icon='icon adms-edit-item'
-                                            tooltip='Edit'
-                                            tooltipOptions={{ showDelay: 300 }}
-                                            className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
-                                            onClick={() => handleEditExpenses(options)}
-                                        />
+                                        {canEditExpenses() && (
+                                            <Button
+                                                type='button'
+                                                icon='icon adms-edit-item'
+                                                tooltip='Edit'
+                                                tooltipOptions={{ showDelay: 300 }}
+                                                className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
+                                                onClick={() => handleEditExpenses(options)}
+                                            />
+                                        )}
                                         <Button
                                             type='button'
                                             icon='pi pi-angle-down'
@@ -365,7 +373,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             pt={{
                                 root: {
                                     style: {
-                                        width: "70px",
+                                        width: `${canEditExpenses() ? "70px" : "30px"}`,
                                     },
                                 },
                             }}

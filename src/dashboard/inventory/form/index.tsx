@@ -9,7 +9,7 @@ import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { useFormExitConfirmation, useToastMessage } from "common/hooks";
+import { useFormExitConfirmation, useToastMessage, usePermissions } from "common/hooks";
 import { checkStockNoAvailability, getVINCheck } from "http/services/inventory-service";
 import { InventoryExportWebData } from "dashboard/inventory/form/export-web";
 
@@ -111,6 +111,7 @@ export const InventoryForm = observer(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const { showError, showSuccess } = useToastMessage();
+    const { inventoryPermissions } = usePermissions();
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -552,12 +553,15 @@ export const InventoryForm = observer(() => {
                                             Print forms
                                         </Button>
                                     )}
-                                    {id && (
+                                    {id && inventoryPermissions.canDelete() && (
                                         <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
+                                            onClick={() =>
+                                                inventoryPermissions.canDelete() &&
+                                                setStepActiveIndex(deleteActiveIndex)
+                                            }
                                         >
                                             Delete inventory
                                         </Button>

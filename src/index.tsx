@@ -17,6 +17,7 @@ import { InventoryForm } from "dashboard/inventory/form";
 import { SignIn } from "sign/sign-in";
 import { TwoFactorAuth } from "sign/two-factor-auth";
 import ProtectedRoute from "http/routes/ProtectedRoute";
+import { InventoryProtectedRoute } from "http/routes/InventoryProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
@@ -79,9 +80,30 @@ const AppRouter = (): ReactElement => {
                                 </ProtectedRoute>
                             ),
                             children: [
-                                { path: "", element: <Inventory /> },
-                                { path: "create", element: <InventoryForm /> },
-                                { path: ":id", element: <InventoryForm /> },
+                                {
+                                    path: "",
+                                    element: (
+                                        <InventoryProtectedRoute>
+                                            <Inventory />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: "create",
+                                    element: (
+                                        <InventoryProtectedRoute requireCreate>
+                                            <InventoryForm />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: ":id",
+                                    element: (
+                                        <InventoryProtectedRoute requireEdit>
+                                            <InventoryForm />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {

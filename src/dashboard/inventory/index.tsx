@@ -25,7 +25,7 @@ import {
     filterOptions,
 } from "dashboard/inventory/common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { useCreateReport, useToastMessage } from "common/hooks";
+import { useCreateReport, useToastMessage, usePermissions } from "common/hooks";
 import { createStringifyFilterQuery } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
@@ -56,6 +56,7 @@ export default function Inventories({
 }: InventoriesProps): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
+    const { inventoryPermissions } = usePermissions();
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
@@ -350,7 +351,9 @@ export default function Inventories({
     ]);
 
     const handleAddNewInventory = () => {
-        navigate(INVENTORY_PAGE.CREATE());
+        if (inventoryPermissions.canCreate()) {
+            navigate(INVENTORY_PAGE.CREATE());
+        }
     };
 
     const handleFormatField = (field: string, value: string) => {
@@ -369,7 +372,7 @@ export default function Inventories({
             searchValue={globalSearch}
             onSearchChange={(nextValue: string) => setGlobalSearch(nextValue)}
             onAdvancedSearch={() => setDialogVisible(true)}
-            onAddNew={handleAddNewInventory}
+            onAddNew={inventoryPermissions.canCreate() ? handleAddNewInventory : undefined}
             onPrint={() => printTableData(true)}
             onDownload={() => printTableData(false)}
             filterOptions={filterOptions}
@@ -398,6 +401,9 @@ export default function Inventories({
     };
 
     const columnEditButton = ({ itemuid }: Inventory) => {
+        if (!inventoryPermissions.canEdit()) {
+            return null;
+        }
         return (
             <Button
                 text
@@ -455,7 +461,9 @@ export default function Inventories({
             const value = returnedField ? data[returnedField] : data.Make;
             onRowClick(value);
         } else {
-            navigate(data.itemuid);
+            if (inventoryPermissions.canOpenDetails()) {
+                navigate(data.itemuid);
+            }
         }
     };
 
