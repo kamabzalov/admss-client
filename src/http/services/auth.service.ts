@@ -49,13 +49,6 @@ export const logout = async (useruid: string) => {
     });
 };
 
-export const checkToken = async (token: string) => {
-    return new ApiRequest().get({
-        url: `sites/${token}/checktoken`,
-        defaultError: "Token validation failed",
-    });
-};
-
 export const resend2FA = async (data?: TwoFactorResendRequest) => {
     return new ApiRequest(nonAuthorizedUserApiInstance).post({
         url: "user/2fa-resend",
