@@ -7,13 +7,14 @@ import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { getAlerts, setAlert } from "http/services/tasks.service";
-import { useNotification, useToastMessage } from "common/hooks";
+import { useNotification, usePermissions, useToastMessage } from "common/hooks";
 import { Alert } from "common/models/tasks";
 
 const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
+    const { inventoryPermissions } = usePermissions();
     const { authUser } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
@@ -109,17 +110,22 @@ export const Home = (): ReactElement => {
                                 </Link>
                             </>
                         )}
-                        <Link
-                            to='inventory/create'
-                            className='common-tasks-menu__item cursor-pointer'
-                        >
-                            <div className='common-tasks-menu__icon new-inventory'></div>
-                            New inventory
-                        </Link>
-                        <Link to='inventory' className='common-tasks-menu__item cursor-pointer'>
-                            <div className='common-tasks-menu__icon browser-all-inventory'></div>
-                            Browse <br /> all inventory
-                        </Link>
+                        {inventoryPermissions.canSeeInMenu() &&
+                            inventoryPermissions.canCreate() && (
+                                <Link
+                                    to='inventory/create'
+                                    className='common-tasks-menu__item cursor-pointer'
+                                >
+                                    <div className='common-tasks-menu__icon new-inventory'></div>
+                                    New inventory
+                                </Link>
+                            )}
+                        {inventoryPermissions.canSeeInMenu() && (
+                            <Link to='inventory' className='common-tasks-menu__item cursor-pointer'>
+                                <div className='common-tasks-menu__icon browser-all-inventory'></div>
+                                Browse <br /> all inventory
+                            </Link>
+                        )}
                         {isSalesPerson || (
                             <>
                                 <Link

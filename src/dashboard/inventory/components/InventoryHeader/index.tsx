@@ -13,7 +13,7 @@ interface InventoryHeaderProps {
     searchValue: string;
     onSearchChange: (value: string) => void;
     onAdvancedSearch: () => void;
-    onAddNew: () => void;
+    onAddNew?: () => void;
     onPrint: () => void;
     onDownload: () => void;
     filterOptions: FilterOptions[];
@@ -149,16 +149,18 @@ export default function InventoryHeader({
                 type='button'
                 onClick={onAdvancedSearch}
             />
-            <Button
-                className='inventory-top-controls__button new-inventory-button'
-                icon='icon adms-add-item'
-                severity='success'
-                type='button'
-                tooltip='Add new inventory'
-                onClick={onAddNew}
-            >
-                New
-            </Button>
+            {onAddNew && (
+                <Button
+                    className='inventory-top-controls__button new-inventory-button'
+                    icon='icon adms-add-item'
+                    severity='success'
+                    type='button'
+                    tooltip='Add new inventory'
+                    onClick={onAddNew}
+                >
+                    New
+                </Button>
+            )}
             <Button
                 className='inventory-top-controls__button'
                 severity='success'

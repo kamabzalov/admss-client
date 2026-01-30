@@ -9,6 +9,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
 import { Inventory } from "common/models/inventory";
 import Inventories from "dashboard/inventory";
+import { usePermissions } from "common/hooks";
 
 const FIELD: keyof Inventory = "Make";
 
@@ -29,6 +30,7 @@ export const InventorySearch = ({
     originalPath,
     ...props
 }: InventorySearchProps) => {
+    const { inventoryPermissions } = usePermissions();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<Inventory[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -62,6 +64,8 @@ export const InventorySearch = ({
         setDialogVisible(false);
     };
 
+    const canSelectInventory = inventoryPermissions.canSelectInInputs();
+
     return (
         <>
             <SearchInput
@@ -73,26 +77,33 @@ export const InventorySearch = ({
                 onInputChange={handleInventoryInputChange}
                 value={value}
                 onChange={onChange}
-                onIconClick={() => {
-                    setDialogVisible(true);
-                }}
+                onIconClick={
+                    canSelectInventory
+                        ? () => {
+                              setDialogVisible(true);
+                          }
+                        : undefined
+                }
+                disabled={!canSelectInventory}
                 {...props}
             />
-            <Dialog
-                header={<div className='uppercase'>Choose an Inventory</div>}
-                visible={dialogVisible}
-                style={{ width: "75vw" }}
-                maximizable
-                modal
-                onHide={() => setDialogVisible(false)}
-            >
-                <Inventories
-                    returnedField={returnedField}
-                    getFullInfo={handleGetFullInfo}
-                    onRowClick={handleOnRowClick}
-                    originalPath={originalPath}
-                />
-            </Dialog>
+            {canSelectInventory && (
+                <Dialog
+                    header={<div className='uppercase'>Choose an Inventory</div>}
+                    visible={dialogVisible}
+                    style={{ width: "75vw" }}
+                    maximizable
+                    modal
+                    onHide={() => setDialogVisible(false)}
+                >
+                    <Inventories
+                        returnedField={returnedField}
+                        getFullInfo={handleGetFullInfo}
+                        onRowClick={handleOnRowClick}
+                        originalPath={originalPath}
+                    />
+                </Dialog>
+            )}
         </>
     );
 };

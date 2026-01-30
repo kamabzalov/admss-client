@@ -185,3 +185,4 @@ export {
     type AddressSuggestion,
     type ParsedAddress,
 } from "common/hooks/useGooglePlacesAutocomplete";
+export { usePermissions } from "common/hooks/usePermissions";

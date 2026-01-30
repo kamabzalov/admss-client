@@ -3,7 +3,7 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import { InventoryPaymentBack } from "common/models/inventory";
 import { Status } from "common/models/base-response";
 import { Checkbox } from "primereact/checkbox";
 import { useToast } from "dashboard/common/toast";
+import { usePermissions } from "common/hooks/usePermissions";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof InventoryPaymentBack;
@@ -22,12 +23,15 @@ type TableColumnsList = Pick<TableColumnProps, "header" | "field" | "body">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
+    const { inventoryPermissions } = usePermissions();
+    const { canDeletePayments, canEditPayments } = inventoryPermissions;
     const [expensesList, setExpensesList] = useState<InventoryPaymentBack[]>([]);
     const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
     const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
     const [paid, setPaid] = useState<0 | 1>(0);
     const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
     const [description, setDescription] = useState<string>("");
+    const [expandedRows, setExpandedRows] = useState<Record<string, any>[]>([]);
     const toast = useToast();
 
     const fetchInventoryPaymentBack = async () => {
@@ -93,6 +97,27 @@ export const PurchasePayments = observer((): ReactElement => {
         }
     };
 
+    const rowExpansionTemplate = (data: InventoryPaymentBack) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Description: </div>
+                <div className='expanded-row__text'>{data.payRemarks}</div>
+            </div>
+        );
+    };
+
+    const deleteTemplate = () => {
+        return (
+            <Button
+                type='button'
+                icon='icon adms-trash-can'
+                tooltip='Delete'
+                tooltipOptions={{ showDelay: 300 }}
+                className='purchase-payments__delete-button p-button-text'
+            />
+        );
+    };
+
     return (
         <>
             <div className='grid purchase-payments row-gap-2'>
@@ -156,7 +181,49 @@ export const PurchasePayments = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                     >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            bodyClassName='purchase-payments__table-controls'
+                            body={(options) => {
+                                const isRowExpanded = expandedRows.some((item) => {
+                                    return item === options;
+                                });
+                                return (
+                                    <div className='purchase-payments__table-controls-container'>
+                                        {canEditPayments() && (
+                                            <Button
+                                                type='button'
+                                                icon='icon adms-edit-item'
+                                                tooltip='Edit'
+                                                tooltipOptions={{ showDelay: 300 }}
+                                                className='purchase-payments__table-button p-button-text'
+                                            />
+                                        )}
+                                        <Button
+                                            type='button'
+                                            icon='adms-arrow-bottom'
+                                            tooltipOptions={{ showDelay: 300 }}
+                                            disabled={!options?.payRemarks}
+                                            className={`purchase-payments__table-button p-button-text ${
+                                                isRowExpanded && "table-button-active"
+                                            }`}
+                                        />
+                                    </div>
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: `${canEditPayments() ? "70px" : "30px"}`,
+                                        padding: "0",
+                                    },
+                                },
+                            }}
+                        />
                         {renderColumnsData.map(({ field, header, body }) => (
                             <Column
                                 field={field}
@@ -171,6 +238,20 @@ export const PurchasePayments = observer((): ReactElement => {
                                 }}
                             />
                         ))}
+                        {canDeletePayments() && (
+                            <Column
+                                body={deleteTemplate}
+                                frozen
+                                alignFrozen='right'
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "20px",
+                                        },
+                                    },
+                                }}
+                            />
+                        )}
                     </DataTable>
                 </div>
                 <div className='total-sum'>
