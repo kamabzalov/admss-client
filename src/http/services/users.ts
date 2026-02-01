@@ -1,6 +1,6 @@
 import { BaseResponseError } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { UserData, UserRole, UserRolePayload } from "common/models/users";
+import { CheckPasswordResponse, UserData, UserRole, UserRolePayload } from "common/models/users";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -142,5 +142,13 @@ export const createOrUpdateRole = async (roleuid: string, roleData: UserRolePayl
         url: `user/${roleuid || 0}/role`,
         data: roleData,
         defaultError: "Error while creating or updating role",
+    });
+};
+
+export const checkPassword = async (useruid: string, password: string) => {
+    return new ApiRequest().post<CheckPasswordResponse>({
+        url: `user/${useruid}/checkpassword`,
+        data: { password },
+        defaultError: "Password is incorrect",
     });
 };
