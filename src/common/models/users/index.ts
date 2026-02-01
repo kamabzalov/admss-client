@@ -118,3 +118,8 @@ export interface UserRolePayload {
     rolename: string;
     permissions: Record<PermissionKey, 0 | 1>;
 }
+
+export interface CheckPasswordResponse extends BaseResponseError {
+    valid: boolean;
+    message: string;
+}

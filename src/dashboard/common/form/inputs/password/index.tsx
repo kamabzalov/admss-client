@@ -9,6 +9,7 @@ interface PasswordInputProps extends PasswordProps {
     setPassword: (password: string) => void;
     error?: boolean;
     errorMessage?: string;
+    skipValidation?: boolean;
 }
 
 const getRuleClass = (isCorrect: boolean) =>
@@ -20,6 +21,7 @@ export const PasswordInput = ({
     setPassword,
     error = false,
     errorMessage = "Passwords do not match. Please check and try again.",
+    skipValidation = false,
     ...props
 }: PasswordInputProps) => {
     const id = useId();
@@ -30,8 +32,9 @@ export const PasswordInput = ({
     const hasSpecial = PASSWORD_REGEX.SPECIAL_CHAR_REGEX.test(password || "");
 
     const isPasswordCorrect = useMemo(() => {
+        if (skipValidation) return true;
         return hasValidLength && hasLowercase && hasUppercase && hasNumber && hasSpecial;
-    }, [hasValidLength, hasLowercase, hasUppercase, hasNumber, hasSpecial]);
+    }, [skipValidation, hasValidLength, hasLowercase, hasUppercase, hasNumber, hasSpecial]);
 
     const passwordContent = (
         <section className='password-field__content'>
