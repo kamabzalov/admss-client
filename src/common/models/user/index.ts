@@ -88,25 +88,34 @@ export interface UserGroup {
 }
 
 export interface AuthUser {
+    "2fasessionuid": string;
     companyname: string;
+    dealer_id: string;
+    device_trust_days: number;
+    device_trusted: boolean;
+    expires_in: number;
     firstname: string;
+    is_super_admin: boolean;
     isadmin: 0 | 1;
     islocaladmin: 0 | 1;
     ismanager: 0 | 1;
     issalesperson: 0 | 1;
+    iswebsiteadmin: 0 | 1;
     lastname: string;
-    loginname: string;
     locationname: string;
     locationuid: string;
-    modified: string;
+    loginname: string;
+    middlename: string;
+    permissions: UserPermissionsResponse;
+    sandbox_mode: boolean;
     sessionuid: string;
-    started: string;
     status: "OK";
     token: string;
+    token_type: string;
     username: string;
     useruid: string;
-    permissions: UserPermissionsResponse;
-    device_trusted?: boolean;
+    modified?: string;
+    started?: string;
     trusted_until?: number;
 }
 

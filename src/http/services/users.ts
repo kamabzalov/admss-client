@@ -108,9 +108,9 @@ export const getUserData = async (useruid: string) => {
     });
 };
 
-export const createUser = async (useruid: string, userData: Partial<UserData>) => {
+export const createUser = async (dealer_id: string, userData: Partial<UserData>) => {
     return new ApiRequest().post({
-        url: `user/${useruid}/user`,
+        url: `user/${dealer_id}/user`,
         data: userData,
         defaultError: "Error while creating user",
     });
