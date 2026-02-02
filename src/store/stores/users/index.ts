@@ -259,7 +259,7 @@ export class UsersStore {
             loginname: this._user.loginName || "",
             loginpassword: this._password,
             enabled: this._user.enabled || 1,
-            dealer_id: this.rootStore.userStore.authUser?.useruid || "",
+            dealer_id: this.rootStore.userStore.authUser?.dealer_id || "0",
             roleuid: this._user.roleuid || "",
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
@@ -274,8 +274,8 @@ export class UsersStore {
         };
 
         const response = await createUser(
-            this.rootStore.userStore.authUser?.useruid || "",
-            userData as any
+            this.rootStore.userStore.authUser?.dealer_id || "",
+            userData as Partial<UserData>
         );
         if (response && response.status === Status.ERROR) {
             return {
