@@ -14,9 +14,8 @@ const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
-    const { inventoryPermissions } = usePermissions();
+    const { inventoryPermissions, salesPermissions } = usePermissions();
     const { authUser } = store;
-    const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
     const { showError } = useToastMessage();
@@ -34,13 +33,6 @@ export const Home = (): ReactElement => {
                 setPendingAlerts(alerts);
             }
         }
-
-        const { permissions } = authUser;
-        const { uaSalesPerson, ...otherPermissions } = permissions;
-        if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-            return setIsSalesPerson(false);
-        }
-        if (!!uaSalesPerson) setIsSalesPerson(true);
     }, [authUser]);
 
     const showNextAlert = useCallback(
@@ -92,7 +84,7 @@ export const Home = (): ReactElement => {
                         <h2 className='card-header__title uppercase m-0'>Common tasks</h2>
                     </div>
                     <div className='card-content common-tasks-menu flex flex-wrap lg:justify-content-between md:justify-content-center gap-6'>
-                        {isSalesPerson || (
+                        {salesPermissions.canShowContacts() && (
                             <>
                                 <Link
                                     to='contacts/create'
@@ -126,7 +118,7 @@ export const Home = (): ReactElement => {
                                 Browse <br /> all inventory
                             </Link>
                         )}
-                        {isSalesPerson || (
+                        {salesPermissions.canShowDeals() && (
                             <>
                                 <Link
                                     to='deals/create'
