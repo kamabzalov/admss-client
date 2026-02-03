@@ -90,11 +90,47 @@ export const usePermissions = () => {
         canEditLeaseHerePayHere: (): boolean => hasPermission("uaAddCreditsAndFees"),
     };
 
+    const isSalesperson = (): boolean => {
+        if (!authUser || !authUser.permissions) return false;
+        return authUser.permissions.uaSalesPerson === 1;
+    };
+
+    const salesPermissions = {
+        canShowContacts: (): boolean => {
+            return !isSalesperson();
+        },
+
+        canShowDeals: (): boolean => {
+            return !isSalesperson();
+        },
+
+        canShowAccounts: (): boolean => {
+            return !isSalesperson();
+        },
+
+        canShowReports: (): boolean => {
+            return !isSalesperson();
+        },
+
+        canShowTasks: (): boolean => {
+            return !isSalesperson();
+        },
+
+        canShowExportWeb: (): boolean => {
+            return !isSalesperson();
+        },
+
+        shouldShowManagerMenu: (): boolean => {
+            return !isSalesperson();
+        },
+    };
+
     return {
         hasPermission,
         hasAnyPermission,
         hasAllPermissions,
         isSalespersonOnly,
         inventoryPermissions,
+        salesPermissions,
     };
 };
