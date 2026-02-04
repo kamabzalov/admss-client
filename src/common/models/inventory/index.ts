@@ -279,6 +279,7 @@ export interface Inventory extends BaseResponseError {
     updated: string;
     useruid: string;
     locationuid: string;
+    dealer_id?: string;
     extdata?: InventoryExtData;
     Audit?: Audit;
 }

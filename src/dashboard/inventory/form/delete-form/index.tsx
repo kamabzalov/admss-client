@@ -1,16 +1,15 @@
-import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { useToast } from "dashboard/common/toast";
-import { AuthUser } from "common/models/user";
 import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getKeyValue } from "services/local-storage.service";
 import { useStore } from "store/hooks";
+import { ListData } from "common/models";
+import { INVENTORY_PAGE } from "common/constants/links";
+import { useToastMessage } from "common/hooks";
 
 interface DeleteFormProps extends DropdownProps {
     isDeleteConfirm: boolean;
@@ -19,39 +18,37 @@ interface DeleteFormProps extends DropdownProps {
 
 export const DeleteForm = observer(
     ({ isDeleteConfirm, attemptedSubmit }: DeleteFormProps): ReactElement => {
-        const toast = useToast();
+        const userStore = useStore().userStore;
+        const { authUser } = userStore;
         const navigate = useNavigate();
         const { id } = useParams();
         const store = useStore().inventoryStore;
+        const { showError, showSuccess } = useToastMessage();
 
         const { deleteReason } = store;
 
-        const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+        const [deleteReasonsList, setDeleteReasonsList] = useState<ListData[]>([]);
         const [comment, setComment] = useState<string>("");
 
+        const handleGetDeleteReasonsList = async () => {
+            const res = await getInventoryDeleteReasonsList(authUser!.useruid);
+            Array.isArray(res) && setDeleteReasonsList(res);
+        };
+
         useEffect(() => {
-            const authUser: AuthUser = getKeyValue(LS_APP_USER);
-            if (authUser) {
-                getInventoryDeleteReasonsList(authUser.useruid).then((res) => {
-                    Array.isArray(res) && setDeleteReasonsList(res);
-                });
-            }
+            handleGetDeleteReasonsList();
         }, []);
 
-        const handleDeleteInventory = () => {
+        const handleDeleteInventory = async () => {
             if (id && deleteReason) {
-                deleteInventory(id, { reason: deleteReason, comment }).then((response) => {
-                    if (response?.status === Status.ERROR) {
-                        const { error } = response as BaseResponseError;
-                        toast.current?.show({
-                            severity: "error",
-                            summary: "Error",
-                            detail: error || "Error while deleting inventory",
-                        });
-                    } else {
-                        navigate("/dashboard/inventory");
-                    }
-                });
+                const response = await deleteInventory(id, { reason: deleteReason, comment });
+                if (response?.status === Status.ERROR) {
+                    const { error } = response as BaseResponseError;
+                    showError(error || "Error while deleting inventory");
+                } else {
+                    navigate(INVENTORY_PAGE.MAIN);
+                    showSuccess("Inventory deleted successfully");
+                }
             }
         };
 

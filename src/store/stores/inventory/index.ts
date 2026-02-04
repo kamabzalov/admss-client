@@ -24,7 +24,8 @@ import { getAccountPayment } from "http/services/accounts.service";
 import { getUserGroupList } from "http/services/auth-user.service";
 import {
     getInventoryInfo,
-    setInventory,
+    updateInventory,
+    createInventory,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
@@ -463,7 +464,7 @@ export class InventoryStore {
     );
 
     public saveInventory = action(
-        async (inventoryuid: string = "0"): Promise<string | BaseResponseError> => {
+        async (inventoryuid: string | undefined): Promise<string | BaseResponseError> => {
             try {
                 this._isLoading = true;
 
@@ -520,9 +521,24 @@ export class InventoryStore {
                       })()
                     : Promise.resolve({ status: Status.OK });
 
-                const [inventoryResponse, webResponse, watermarkResponse] = await Promise.all([
-                    setInventory(inventoryuid, inventoryData),
-                    setInventoryExportWeb(inventoryuid, this._exportWeb),
+                const isNewInventory = !inventoryuid || inventoryuid === "0";
+
+                if (isNewInventory) {
+                    const dealer_id =
+                        this.rootStore.userStore.authUser?.dealer_id ||
+                        this.rootStore.userStore.authUser?.useruid;
+                    if (dealer_id) {
+                        inventoryData.dealer_id = dealer_id;
+                    }
+                }
+
+                const request_id = inventoryuid || "0";
+                const inventoryResponse = isNewInventory
+                    ? await createInventory(inventoryData)
+                    : await updateInventory(inventoryuid!, inventoryData);
+
+                const [webResponse, watermarkResponse] = await Promise.all([
+                    setInventoryExportWeb(request_id, this._exportWeb),
                     watermarkPromise,
                 ]);
 
@@ -531,11 +547,9 @@ export class InventoryStore {
                 }
 
                 if (inventoryResponse?.status === Status.OK && webResponse?.status === Status.OK) {
-                    if (inventoryuid !== "0") {
-                        await setInventoryWebCheck(inventoryuid, {
-                            enabled: !!this._exportWebActive ? 1 : 0,
-                        });
-                    }
+                    await setInventoryWebCheck(request_id, {
+                        enabled: !!this._exportWebActive ? 1 : 0,
+                    });
                     return Status.OK;
                 }
 
