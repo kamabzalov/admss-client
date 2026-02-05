@@ -1,6 +1,6 @@
 import { ApiRequest } from "http/index";
 import { QueryParams } from "common/models/query-params";
-import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import {
     Deal,
     DealDelete,
@@ -13,7 +13,6 @@ import {
     HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
-import { AxiosError } from "axios";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
