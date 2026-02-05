@@ -1,46 +1,23 @@
-import { isAxiosError } from "axios";
-import { BaseResponseError, Status, TotalListCount } from "common/models/base-response";
+import { BaseResponseError, TotalListCount } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { Alert, News, PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
-import { ApiRequest, authorizedUserApiInstance } from "http/index";
+import { ApiRequest } from "http/index";
 
 export const getAllTasks = async (useruid: string, params?: QueryParams) => {
-    try {
-        const response = await authorizedUserApiInstance
-            .get<Task[] & BaseResponseError>(`tasks/${useruid}/list`, {
-                params,
-            })
-            .then((response) => response.data)
-            .catch((err) => err.response.data);
-        return response;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting tasks",
-            };
-        }
-    }
+    return new ApiRequest().get<Task[] | BaseResponseError>({
+        url: `tasks/${useruid}/list`,
+        config: { params },
+        defaultError: "Error while getting tasks",
+    });
 };
 
 export const getCurrentUserTasks = async (useruid: string, params?: QueryParams) => {
-    try {
-        const response = await authorizedUserApiInstance
-            .get<Task[] & BaseResponseError>(`tasks/${useruid}/listcurrent`, {
-                params,
-            })
-            .then((response) => response.data)
-            .catch((err) => err.response.data);
-        return response;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting current user tasks",
-            };
-        }
-    }
+    return new ApiRequest().get<Task[] | BaseResponseError>({
+        url: `tasks/${useruid}/listcurrent`,
+        config: { params },
+        defaultError: "Error while getting current user tasks",
+    });
 };
 
 export const createTask = async (taskData: Partial<PostDataTask>, taskuid?: string | undefined) => {

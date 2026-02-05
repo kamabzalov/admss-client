@@ -1,6 +1,6 @@
-import { authorizedUserApiInstance } from "http/index";
+import { ApiRequest } from "http/index";
 import { QueryParams } from "common/models/query-params";
-import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import {
     Deal,
     DealDelete,
@@ -13,43 +13,27 @@ import {
     HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
-import { AxiosError, isAxiosError } from "axios";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
 }
 
-export const getDealsList = async (uid: string, queryParams: QueryParams) => {
-    try {
-        const request = await authorizedUserApiInstance.get<Deal[] | TotalDealsList>(
-            `deals/${uid}/list`,
-            {
-                params: queryParams,
-            }
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deals list",
-        };
-    }
+export const getDealsList = async (
+    uid: string,
+    queryParams: QueryParams
+): Promise<Deal[] | TotalDealsList | BaseResponseError | undefined> => {
+    return new ApiRequest().get<Deal[] | TotalDealsList>({
+        url: `deals/${uid}/list`,
+        config: { params: queryParams },
+        defaultError: "Error while getting deals list",
+    });
 };
 
 export const getDealInfo = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<Deal>(`deals/${uid}/info`);
-        if (request.data.status === Status.OK) {
-            return request.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting deal info",
-            };
-        }
-    }
+    return new ApiRequest().get<Deal>({
+        url: `deals/${uid}/info`,
+        defaultError: "Error while getting deal info",
+    });
 };
 
 interface DealTypeResponse extends BaseResponse {
@@ -66,414 +50,238 @@ interface InventoryStatusResponse extends BaseResponse {
 }
 
 export const getDealTypes = async () => {
-    try {
-        const request =
-            await authorizedUserApiInstance.get<DealTypeResponse>("deals/listdealtypes");
-        return request.data.deal_types;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while get deal types",
-        };
+    const response = await new ApiRequest().get<DealTypeResponse>({
+        url: "deals/listdealtypes",
+        defaultError: "Error while get deal types",
+    });
+
+    if (response && "deal_types" in response) {
+        return response.deal_types;
     }
+
+    return undefined;
 };
 
 export const getDealStatuses = async () => {
-    try {
-        const request =
-            await authorizedUserApiInstance.get<DealStatusList>("deals/listdealstatuses");
-        return request.data.deal_status;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while get deal statuses",
-        };
+    const response = await new ApiRequest().get<DealStatusList>({
+        url: "deals/listdealstatuses",
+        defaultError: "Error while get deal statuses",
+    });
+
+    if (response && "deal_status" in response) {
+        return response.deal_status;
     }
+
+    return undefined;
 };
 
 export const getSaleTypes = async () => {
-    try {
-        const request =
-            await authorizedUserApiInstance.get<SaleTypeResponse>("deals/listsaletypes");
-        return request.data.sale_types;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while get deal sale types",
-        };
+    const response = await new ApiRequest().get<SaleTypeResponse>({
+        url: "deals/listsaletypes",
+        defaultError: "Error while get deal sale types",
+    });
+
+    if (response && "sale_types" in response) {
+        return response.sale_types;
     }
+
+    return undefined;
 };
 
 export const getDealInventoryStatuses = async () => {
-    try {
-        const request = await authorizedUserApiInstance.get<InventoryStatusResponse>(
-            "deals/listinventorystatuses"
-        );
-        return request.data.inventory_status;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while get deal inventory statuses",
-        };
+    const response = await new ApiRequest().get<InventoryStatusResponse>({
+        url: "deals/listinventorystatuses",
+        defaultError: "Error while get deal inventory statuses",
+    });
+
+    if (response && "inventory_status" in response) {
+        return response.inventory_status;
     }
+
+    return undefined;
 };
 
-export const setDeal = async (
+export const createDeal = async (
+    dealData: Partial<Deal>
+): Promise<BaseResponseError | undefined> => {
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/0/set`,
+        data: dealData,
+        defaultError: "Error while creating deal",
+    });
+};
+
+export const updateDeal = async (
     dealuid: string,
     dealData: Partial<Deal>
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/set`,
-            dealData
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error:
-                    error.response?.data.info ||
-                    error.response?.data.error ||
-                    "Error while set deal",
-                errors: error.response?.data.errors,
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/${dealuid}/set`,
+        data: dealData,
+        defaultError: "Error while updating deal",
+    });
 };
 
 export const dealFinancesRecalculate = async (
     dealuid: string,
     payload?: DealFinanceRecalculatePayload
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/recalculate`,
-            payload || undefined
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while recalculate deal finance",
-        };
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/${dealuid || 0}/recalculate`,
+        data: payload || undefined,
+        defaultError: "Error while recalculate deal finance",
+        returnErrorObject: false,
+    });
 };
 
 export const getDealFinance = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<DealFinance | BaseResponseError>(
-            `deals/${dealuid || 0}/finance`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal finance",
-        };
-    }
+    return new ApiRequest().get<DealFinance | BaseResponseError>({
+        url: `deals/${dealuid || 0}/finance`,
+        defaultError: "Error while getting deal finance",
+    });
 };
 
 export const getDealWashout = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<DealWashout>(
-            `deals/${dealuid || 0}/washout`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal washout",
-        };
-    }
+    return new ApiRequest().get<DealWashout>({
+        url: `deals/${dealuid || 0}/washout`,
+        defaultError: "Error while getting deal washout",
+    });
 };
 
 export const setDealFinance = async (
     dealuid: string,
     dealFinanceData: Partial<DealFinance>
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/finance`,
-            dealFinanceData
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while setting deal finance",
-        };
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/${dealuid || 0}/finance`,
+        data: dealFinanceData,
+        defaultError: "Error while setting deal finance",
+        returnErrorObject: false,
+    });
 };
 
 export const getDealPayments = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<
-            DealPickupPayment[] | BaseResponseError
-        >(`deals/${dealuid || 0}/ppayments`);
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting user report collections",
-        };
-    }
+    return new ApiRequest().get<DealPickupPayment[] | BaseResponseError>({
+        url: `deals/${dealuid || 0}/ppayments`,
+        defaultError: "Error while getting deal payments",
+    });
 };
 
 export const setDealPayments = async (
     dealuid: string,
     dealPaymentData: Partial<DealPickupPayment>
 ) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid}/ppayment`,
-            dealPaymentData
-        );
-
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while setting deal payments",
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/${dealuid}/ppayment`,
+        data: dealPaymentData,
+        defaultError: "Error while setting deal payments",
+    });
 };
 
 export const getDealPaymentsTotal = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<DealPaymentsTotal>(
-            `deals/${dealuid || 0}/ppaymenttotal`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting deal payments total",
-            };
-        }
-    }
+    return new ApiRequest().get<DealPaymentsTotal>({
+        url: `deals/${dealuid || 0}/ppaymenttotal`,
+        defaultError: "Error while getting deal payments total",
+    });
 };
 
 export const getDealPrintForms = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<DealPrintFormResponse>(
-            `print/${dealuid}/deallistforms `
-        );
-        if (request.data.status === Status.OK) {
-            const { status, ...dataWithoutStatus } = request.data;
-            return dataWithoutStatus;
-        }
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal print forms",
-        };
+    const response = await new ApiRequest().get<DealPrintFormResponse>({
+        url: `print/${dealuid}/deallistforms `,
+        defaultError: "Error while getting deal print forms",
+        returnErrorObject: false,
+    });
+
+    if (response && "status" in response) {
+        const { status, ...dataWithoutStatus } = response;
+        return dataWithoutStatus;
     }
+
+    return undefined;
 };
 
 export const getDealPrintFormTemplate = async (
     dealuid: string,
     templateuid: string
-): Promise<Blob | BaseResponseError> => {
-    const printErrorMessage = "Error while getting deal print form template";
-    try {
-        const request = await authorizedUserApiInstance.get<Blob>(
-            `print/${dealuid}/${templateuid}/dealform`,
-            {
-                responseType: "blob",
-            }
-        );
+): Promise<Blob | BaseResponseError | undefined> => {
+    const response = await new ApiRequest().get<Blob>({
+        url: `print/${dealuid}/${templateuid}/dealform`,
+        config: { responseType: "blob" },
+        defaultError: "Error while getting deal print form template",
+        returnErrorObject: false,
+    });
 
-        const contentType = request.headers["content-type"];
-        if (contentType.includes("application/json")) {
-            const textResponse = await request.data.text();
-            const errorResponse: BaseResponseError = JSON.parse(textResponse);
-            return errorResponse;
-        }
-
-        return request.data;
-    } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            debugger;
-            return {
-                status: Status.ERROR,
-                error: error.response.data?.message || printErrorMessage,
-            };
-        }
-
-        return {
-            status: Status.ERROR,
-            error: printErrorMessage,
-        };
-    }
+    return response as Blob | undefined;
 };
 
 export const getHowToKnowList = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<HowToKnow[]>(
-            `user/${useruid}/howtoknow`
-        );
-        if (request.status === 200) {
-            return request.data;
-        } else {
-            throw new Error("Error while getting how to know list");
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting how to know list",
-            };
-        }
-    }
+    return new ApiRequest().get<HowToKnow[]>({
+        url: `user/${useruid}/howtoknow`,
+        defaultError: "Error while getting how to know list",
+        returnErrorObject: false,
+    }) as Promise<HowToKnow[] | undefined>;
 };
 
 export const setHowToKnow = async (
     useruid: string,
     howToKnowData: Partial<HowToKnow>
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${useruid}/howtoknow`,
-            howToKnowData
-        );
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error:
-                    error.response?.data.info ||
-                    error.response?.data.error ||
-                    "Error while setting how to know item",
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `user/${useruid}/howtoknow`,
+        data: howToKnowData,
+        defaultError: "Error while setting how to know item",
+        returnErrorObject: false,
+    });
 };
 
 export const deleteHowToKnow = async (itemuid: string): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${itemuid}/deletehowtoknow`
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error:
-                    error.response?.data.info ||
-                    error.response?.data.error ||
-                    "Error while deleting how to know item",
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `user/${itemuid}/deletehowtoknow`,
+        defaultError: "Error while deleting how to know item",
+        returnErrorObject: false,
+    });
 };
 
 export const getDealDeleteReasonsList = async (useruid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<string[] | BaseResponseError>(
-            `deals/${useruid}/listdeletionreasons`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal delete reasons list",
-        };
-    }
+    return new ApiRequest().get<string[] | BaseResponseError>({
+        url: `deals/${useruid}/listdeletionreasons`,
+        defaultError: "Error while getting deal delete reasons list",
+    });
 };
 
 export const deleteDeal = async (
     dealuid: string,
     data: Partial<DealDelete>
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponseError>(
-            `deals/${dealuid}/delete`,
-            data
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error:
-                    error.response?.data.info ||
-                    error.response?.data.error ||
-                    "Error while deleting deal",
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponseError>({
+        url: `deals/${dealuid}/delete`,
+        data,
+        defaultError: "Error while deleting deal",
+    });
 };
 
 export const deleteDealPayment = async (itemuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
-            `deals/${itemuid}/deleteppayment`
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while deleting payment",
-            };
-        }
-    }
+    return new ApiRequest().post<BaseResponseError>({
+        url: `deals/${itemuid}/deleteppayment`,
+        defaultError: "Error while deleting payment",
+    });
 };
 
 export const setDealWashout = async (
     dealuid: string,
     dealWashoutData?: Partial<DealWashout>
 ): Promise<BaseResponseError | undefined> => {
-    try {
-        const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `deals/${dealuid || 0}/washout`,
-            dealWashoutData
-        );
-
-        if (response.status === 200) {
-            return response.data;
-        }
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while washout deal finance",
-        };
-    }
+    return new ApiRequest().post<BaseResponse>({
+        url: `deals/${dealuid || 0}/washout`,
+        data: dealWashoutData,
+        defaultError: "Error while washout deal finance",
+        returnErrorObject: false,
+    });
 };
 
 export const createDealWashout = async (dealuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `print/${dealuid}/dealwash`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while creating deal washout",
-        };
-    }
+    return new ApiRequest().post<BaseResponseError>({
+        url: `print/${dealuid}/dealwash`,
+        defaultError: "Error while creating deal washout",
+    });
 };

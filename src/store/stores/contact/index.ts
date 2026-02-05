@@ -7,6 +7,7 @@ import {
     ContactOFAC,
     ContactProspect,
     ContactType,
+    SetContactResponse,
 } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
@@ -20,7 +21,8 @@ import {
     deleteContactBackDL,
     getContactInfo,
     setContactDL,
-    setContact,
+    createContact,
+    updateContact,
     getContactMediaItemList,
     getContactMediaItem,
     uploadContactMedia,
@@ -410,16 +412,32 @@ export class ContactStore {
                 prospect: newProspect as ContactProspect[],
             };
 
-            const [contactDataResponse] = await Promise.all([
-                setContact(this._contactID, contactData),
-                this._frontSiteDL.size || this._backSiteDL.size
-                    ? this.setImagesDL(this._contactID)
-                    : Promise.resolve(),
-            ]);
+            const isNewContact = !this._contactID;
+
+            if (isNewContact) {
+                const dealer_id =
+                    this.rootStore.userStore.authUser?.dealer_id ||
+                    this.rootStore.userStore.authUser?.useruid;
+                if (dealer_id) {
+                    contactData.dealer_id = dealer_id;
+                }
+            }
+
+            const contactDataResponse = isNewContact
+                ? await createContact(contactData)
+                : await updateContact(this._contactID, contactData);
 
             if (contactDataResponse?.status === Status.ERROR) {
                 await Promise.reject(contactDataResponse?.errors || contactDataResponse?.error);
-                return contactDataResponse;
+                return contactDataResponse as BaseResponseError;
+            }
+
+            const contactUidToUse = isNewContact
+                ? (contactDataResponse as SetContactResponse)?.contactuid || this._contactID
+                : this._contactID;
+
+            if (this._frontSiteDL.size || this._backSiteDL.size) {
+                await this.setImagesDL(contactUidToUse);
             }
 
             if (this._contact.cobuyeruid) {
@@ -438,18 +456,20 @@ export class ContactStore {
                     extdata: filteredCoBuyerExtData,
                 };
 
-                const [coBuyerContactDataResponse] = await Promise.all([
-                    setContact(this._contact.cobuyeruid, coBuyerContactData),
-                    this._coBuyerFrontSideDL.size || this._coBuyerBackSideDL.size
-                        ? this.setCoBuyerImagesDL(this._contact.cobuyeruid)
-                        : Promise.resolve(),
-                ]);
+                const coBuyerContactDataResponse = await updateContact(
+                    this._contact.cobuyeruid,
+                    coBuyerContactData
+                );
 
                 if (coBuyerContactDataResponse?.status === Status.ERROR) {
                     await Promise.reject(
                         coBuyerContactDataResponse?.errors || coBuyerContactDataResponse?.error
                     );
-                    return coBuyerContactDataResponse;
+                    return coBuyerContactDataResponse as BaseResponseError;
+                }
+
+                if (this._coBuyerFrontSideDL.size || this._coBuyerBackSideDL.size) {
+                    await this.setCoBuyerImagesDL(this._contact.cobuyeruid);
                 }
             }
 

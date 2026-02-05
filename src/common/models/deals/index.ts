@@ -41,6 +41,7 @@ export interface Deal {
     updated: string;
     useruid: string;
     warnOverdueDays: number;
+    dealer_id?: string;
 }
 
 export interface IndexedDealList extends TypeList {

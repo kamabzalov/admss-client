@@ -20,7 +20,8 @@ import {
     getDealPayments,
     getDealPrintForms,
     getDealWashout,
-    setDeal,
+    createDeal,
+    updateDeal,
     setDealFinance,
     setDealPayments,
 } from "http/services/deals.service";
@@ -533,6 +534,9 @@ export class DealStore {
     public saveDeal = action(async (): Promise<string | undefined | BaseResponseError> => {
         try {
             this._isLoading = true;
+
+            const isNewDeal = !this._dealID || this._dealID === "0";
+
             const dealData: Deal = {
                 ...this.filterOutTimestampKeys(this._deal),
                 datepurchase: convertToStandardTimestamp(this._deal.datepurchase),
@@ -540,19 +544,38 @@ export class DealStore {
                 extdata: this.filterOutTimestampKeys(this._dealExtData),
                 finance: this.filterOutTimestampKeys(this._dealFinances),
             };
-            const dealResponse = await setDeal(this._dealID, dealData).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    throw response;
+
+            if (isNewDeal) {
+                const dealer_id =
+                    this.rootStore.userStore.authUser?.dealer_id ||
+                    this.rootStore.userStore.authUser?.useruid;
+                if (dealer_id) {
+                    dealData.dealer_id = dealer_id;
                 }
-                return response;
-            });
-            const financesResponse = await setDealFinance(this._dealID, this._dealFinances);
+            }
+
+            const dealResponse = isNewDeal
+                ? await createDeal(dealData).then((response) => {
+                      if (response?.status === Status.ERROR) {
+                          throw response;
+                      }
+                      return response;
+                  })
+                : await updateDeal(this._dealID, dealData).then((response) => {
+                      if (response?.status === Status.ERROR) {
+                          throw response;
+                      }
+                      return response;
+                  });
+
+            const request_id = this._dealID || "0";
+            const financesResponse = await setDealFinance(request_id, this._dealFinances);
             const paymentsResponse = await this._dealPickupPayments
                 .filter((item) => item.changed)
                 .forEach((item) => {
                     const { itemuid, changed, ...payment } = item;
                     const id = itemuid.startsWith(NEW_PAYMENT_LABEL) ? "0" : itemuid;
-                    setDealPayments(this._dealID, { itemuid: id, ...payment });
+                    setDealPayments(request_id, { itemuid: id, ...payment });
                 });
             await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
                 (response) => (response ? this._dealID : undefined)
@@ -577,9 +600,8 @@ export class DealStore {
     public getPrintList = action(async (dealuid = this._dealID) => {
         try {
             const response = await getDealPrintForms(dealuid);
-            if (response) {
-                const { error, status, ...printCollection } = response;
-                this._printList = printCollection;
+            if (response && typeof response === "object") {
+                this._printList = response as DealPrintCollection;
             }
         } finally {
             this._isLoading = false;
@@ -603,7 +625,7 @@ export class DealStore {
                         }) as DealPickupPayment
                 );
                 this._dealPickupPayments = [...response, ...emptyPayments];
-            } else {
+            } else if (response && "error" in response) {
                 this._dealErrorMessage = response.error as string;
             }
         } finally {

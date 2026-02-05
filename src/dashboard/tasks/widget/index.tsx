@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentUserTasks, setTaskStatus } from "http/services/tasks.service";
 import { Checkbox } from "primereact/checkbox";
-import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
@@ -12,6 +11,7 @@ import "./index.css";
 import { renderTaskStatus } from "dashboard/tasks/common";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useNavigate } from "react-router-dom";
+import { useToastMessage } from "common/hooks";
 
 const DEFAULT_TASK_COUNT = 4;
 
@@ -28,7 +28,7 @@ export const TasksWidget = observer(() => {
     const [checkboxStates, setCheckboxStates] = useState<{ [key: string]: boolean }>({});
     const [allTasksCount, setAllTasksCount] = useState<number>(0);
 
-    const toast = useRef<Toast>(null);
+    const { showError, showInfo } = useToastMessage();
 
     const getTasks = async (taskCount = DEFAULT_TASK_COUNT) => {
         try {
@@ -37,20 +37,19 @@ export const TasksWidget = observer(() => {
                 getCurrentUserTasks(authUser!.useruid, { top: taskCount }),
             ]);
 
-            if (totalCountResponse && !Array.isArray(totalCountResponse)) {
-                setAllTasksCount(totalCountResponse.total);
+            if (
+                totalCountResponse &&
+                !Array.isArray(totalCountResponse) &&
+                "total" in totalCountResponse
+            ) {
+                setAllTasksCount(totalCountResponse.total as number);
             }
 
             if (tasksResponse && Array.isArray(tasksResponse)) {
                 setTasks(tasksResponse);
             }
         } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: error as string,
-                life: 3000,
-            });
+            showError(error as string);
         }
     };
 
@@ -74,19 +73,9 @@ export const TasksWidget = observer(() => {
 
         const response = await setTaskStatus(taskuid, TaskStatus.COMPLETED);
         if (response?.error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: response.error,
-                life: 3000,
-            });
+            showError(response.error);
         } else {
-            toast.current?.show({
-                severity: "info",
-                summary: "Confirmed",
-                detail: "The task marked as completed",
-                life: 3000,
-            });
+            showInfo("The task marked as completed", "Confirmed");
             getTasks();
         }
 
@@ -199,8 +188,6 @@ export const TasksWidget = observer(() => {
                     className='tasks-widget__confirm-modal'
                 />
             </div>
-
-            <Toast ref={toast} />
         </div>
     );
 });
