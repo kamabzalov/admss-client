@@ -11,11 +11,10 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { TestDriver } from "./form-data";
 import { useStore } from "store/hooks";
 import { printTestDrive } from "http/services/print";
-import { useToast } from "dashboard/common/toast";
+import { useToastMessage } from "common/hooks";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { ContactTypeNameList, ContactUser } from "common/models/contact";
-import { setContact } from "http/services/contacts-service";
+import { createContact } from "http/services/contacts-service";
 import { Form, Formik } from "formik";
 import { Inventory } from "common/models/inventory";
 
@@ -47,7 +46,7 @@ const getCurrentDate = () => {
 export const PrintForTestDrive = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
     const navigate = useNavigate();
 
     const handlePrintForm = async (values: TestDriver, action?: TEST_DRIVE_ACTIONS) => {
@@ -55,12 +54,7 @@ export const PrintForTestDrive = (): ReactElement => {
             const response = await printTestDrive(authUser.useruid, values);
             if (response.status === Status.ERROR) {
                 const { error } = response;
-                return toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: error || "Error while print for test drive",
-                    life: TOAST_LIFETIME,
-                });
+                return showError(error || "Error while print for test drive");
             }
             setTimeout(() => {
                 const url = new Blob([response], { type: "application/pdf" });
@@ -93,7 +87,7 @@ export const PrintForTestDrive = (): ReactElement => {
         }
     };
 
-    const handleAddToContact = (values: TestDriver) => {
+    const handleAddToContact = async (values: TestDriver) => {
         const newContact: Partial<ContactUser> = {
             firstName: values.customerName.trim(),
             lastName: values.customerLastName.trim(),
@@ -103,29 +97,13 @@ export const PrintForTestDrive = (): ReactElement => {
             dl_expiration: values.dlExpirationDate.trim(),
         };
         if (!newContact.firstName || !newContact.lastName) {
-            return toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: "Please fill all required fields",
-                life: TOAST_LIFETIME,
-            });
+            return showError("Please fill all required fields");
         }
-        setContact(null, newContact).then((response) => {
-            if (response?.status === Status.ERROR) {
-                return toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Contact added successfully",
-                life: TOAST_LIFETIME,
-            });
-        });
+        const response = await createContact(newContact);
+        if (response?.status === Status.ERROR) {
+            return showError(response.error);
+        }
+        showSuccess("Contact added successfully");
     };
 
     return (

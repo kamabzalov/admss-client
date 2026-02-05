@@ -35,6 +35,10 @@ export const PrintDealForms = observer((): ReactElement => {
             try {
                 const response = await getDealPrintFormTemplate(id, templateuid);
 
+                if (!response) {
+                    throw new Error(errorMessage);
+                }
+
                 if ("error" in response) {
                     throw new Error(response.error);
                 }

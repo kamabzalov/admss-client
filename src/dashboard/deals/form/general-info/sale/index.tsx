@@ -14,8 +14,6 @@ import {
 import { HowToKnow, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
-import { BaseResponseError } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
 import { ContactUser } from "common/models/contact";
@@ -25,13 +23,14 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { Button } from "primereact/button";
 import { parseDateFromServer } from "common/helpers";
 import { DEALS_PAGE } from "common/constants/links";
+import { useToastMessage } from "common/hooks";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
     const { id } = useParams();
     const store = useStore().dealStore;
     const userStore = useStore().userStore;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const location = useLocation();
     const currentPath = location.pathname + location.search;
     const navigate = useNavigate();
@@ -46,54 +45,34 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     useEffect(() => {
         getDealTypes().then((res) => {
-            const { error } = res as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                });
-            } else {
-                setDealTypesList(res as IndexedDealList[]);
+            if (res && Array.isArray(res)) {
+                setDealTypesList(res);
+            } else if (!res) {
+                showError("Error while getting deal types");
             }
         });
         getSaleTypes().then((res) => {
-            const { error } = res as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                });
-            } else {
-                setSaleTypesList(res as IndexedDealList[]);
+            if (res && Array.isArray(res)) {
+                setSaleTypesList(res);
+            } else if (!res) {
+                showError("Error while getting sale types");
             }
         });
         getDealStatuses().then((res) => {
-            const { error } = res as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                });
-            } else {
-                setDealStatusesList(res as IndexedDealList[]);
+            if (res && Array.isArray(res)) {
+                setDealStatusesList(res);
+            } else if (!res) {
+                showError("Error while getting deal statuses");
             }
         });
         getDealInventoryStatuses().then((res) => {
-            const { error } = res as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                });
-            } else {
-                setInventoryStatusesList(res as IndexedDealList[]);
+            if (res && Array.isArray(res)) {
+                setInventoryStatusesList(res);
+            } else if (!res) {
+                showError("Error while getting inventory statuses");
             }
         });
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         if (authUser?.useruid) {
@@ -101,7 +80,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                 if (Array.isArray(res) && res.length) setHowToKnowList(res);
             });
         }
-    }, [authUser, toast]);
+    }, [authUser]);
 
     const handleGetCompanyInfo = (contact: ContactUser) => {
         setFieldValue(

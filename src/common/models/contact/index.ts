@@ -286,6 +286,7 @@ export interface Contact extends BaseResponseError {
     updated: string;
     userName: string;
     useruid: string;
+    dealer_id?: string;
 }
 
 export enum OFAC_CHECK_STATUS {

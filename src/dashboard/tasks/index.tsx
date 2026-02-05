@@ -22,13 +22,11 @@ import {
 import { useStore } from "store/hooks";
 import { AdvancedSearch, SEARCH_FORM_FIELDS, SEARCH_FORM_QUERY, Task } from "common/models/tasks";
 import { getAllTasks, getCurrentUserTasks } from "http/services/tasks.service";
-import { useToast } from "dashboard/common/toast";
 import { MultiSelect, MultiSelectPanelHeaderTemplateEvent } from "primereact/multiselect";
 import { TableColumnsList, TASKS_STATUS_LIST } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
-import { TotalListCount } from "common/models/base-response";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 import { ColumnSelector } from "dashboard/common/filter";
 import { ServerUserSettings, TasksUserSettings } from "common/models/user";
@@ -36,6 +34,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { useToastMessage } from "common/hooks";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -52,7 +51,7 @@ const selectableColumns: TableColumnsList[] = [
 ];
 
 export const TasksDataTable = observer((): ReactElement => {
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const userStore = useStore().userStore;
     const [tasks, setTasks] = useState<Task[]>([]);
     const { authUser } = userStore;
@@ -72,8 +71,9 @@ export const TasksDataTable = observer((): ReactElement => {
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const handleGetTasks = async (params?: QueryParams) => {
-        let responseTotal: TotalListCount = {} as TotalListCount;
-        let response = [];
+        let responseTotal;
+        let response;
+
         if (onlyCurrentUserTasks) {
             responseTotal = await getCurrentUserTasks(authUser!.useruid, { ...params, total: 1 });
             response = await getCurrentUserTasks(authUser!.useruid, params);
@@ -82,17 +82,20 @@ export const TasksDataTable = observer((): ReactElement => {
             response = await getAllTasks(authUser!.useruid, params);
         }
 
-        if (responseTotal?.error || response?.error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: responseTotal?.error || response?.error,
-            });
+        if (responseTotal && "error" in responseTotal) {
+            showError(responseTotal.error);
+            return;
         }
-        if (responseTotal && !Array.isArray(responseTotal)) {
-            const { total } = responseTotal;
-            setTotalRecords(total ?? 0);
+
+        if (response && "error" in response) {
+            showError(response.error);
+            return;
         }
+
+        if (responseTotal && !Array.isArray(responseTotal) && "total" in responseTotal) {
+            setTotalRecords((responseTotal.total as number) ?? 0);
+        }
+
         if (response && Array.isArray(response)) {
             setTasks(response);
         }
