@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -14,6 +14,7 @@ import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
 import { SETTINGS_PAGE } from "common/constants/links";
+import { LOGIN_MIN_LENGTH, LOGIN_MAX_LENGTH } from "common/constants/regex";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
@@ -39,9 +40,19 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
+    const [loginError, setLoginError] = useState<string>("");
 
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
+    const isEditMode = !!user?.useruid;
+
+    useEffect(() => {
+        if (!password) {
+            setConfirmPassword("");
+            setPasswordsMismatch(false);
+            setLoginError("");
+        }
+    }, [password]);
 
     const roleOptions: RoleOption[] = ROLE_MAPPING.map((mapping, index) => {
         const apiRole = availableRoles.find((role) =>
@@ -90,6 +101,31 @@ export const GeneralInformation = observer((): ReactElement | null => {
 
     const handleCustomRoleClick = () => {
         navigate(SETTINGS_PAGE.ROLES_CREATE());
+    };
+
+    const validateLogin = (value: string): string => {
+        if (!value) return "";
+        if (value.length < LOGIN_MIN_LENGTH) {
+            return `Login must be at least ${LOGIN_MIN_LENGTH} characters`;
+        }
+        if (value.length > LOGIN_MAX_LENGTH) {
+            return `Login must not exceed ${LOGIN_MAX_LENGTH} characters`;
+        }
+        return "";
+    };
+
+    const handleLoginChange = (value: string) => {
+        changeUserData("loginName", value);
+    };
+
+    const handleLoginBlur = () => {
+        if (user?.loginName !== undefined) {
+            const trimmedValue = user.loginName.trim();
+            changeUserData("loginName", trimmedValue);
+            const error = validateLogin(trimmedValue);
+            setLoginError(error);
+            usersStore.loginError = !!error;
+        }
     };
 
     return (
@@ -176,13 +212,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
             <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
-                    <span className='p-float-label'>
+                    <span className='p-float-label general-information__login'>
                         <InputText
-                            className='w-full'
+                            className={`w-full ${loginError ? "p-invalid" : ""}`}
                             value={user?.loginName || ""}
-                            onChange={(e) => changeUserData("loginName", e.target.value)}
+                            onChange={(e) => handleLoginChange(e.target.value)}
+                            onBlur={handleLoginBlur}
                         />
                         <label className='float-label'>Login (required)</label>
+                        {loginError && <small className='p-error'>{loginError}</small>}
                     </span>
                 </div>
                 <div className='col-4'>
@@ -208,6 +246,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
             <div className='grid'>
                 <div className='col-4'>
                     <PasswordInput
+                        label={`Password ${!isEditMode ? "(required)" : ""}`}
                         password={password}
                         setPassword={(password) => (usersStore.password = password)}
                         error={passwordsMismatch}
@@ -216,7 +255,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
                 </div>
                 <div className='col-4'>
                     <PasswordInput
-                        label='Verify Password (required)'
+                        label={`Verify Password ${!isEditMode ? "(required)" : ""}`}
                         password={confirmPassword}
                         setPassword={setConfirmPassword}
                         error={passwordsMismatch}

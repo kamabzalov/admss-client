@@ -1,6 +1,12 @@
 import { BaseResponseError } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { CheckPasswordResponse, UserData, UserRole, UserRolePayload } from "common/models/users";
+import {
+    CheckPasswordResponse,
+    UserData,
+    UserRole,
+    UserRolePayload,
+    SalespersonInfo,
+} from "common/models/users";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -150,5 +156,20 @@ export const checkPassword = async (useruid: string, password: string) => {
         url: `user/${useruid}/checkpassword`,
         data: { password },
         defaultError: "Password is incorrect",
+    });
+};
+
+export const getSalespersonInfo = async (useruid: string) => {
+    return new ApiRequest().get<SalespersonInfo | BaseResponseError>({
+        url: `user/${useruid}/salespersoninfo`,
+        defaultError: "Error while getting salesperson info",
+    });
+};
+
+export const updateSalespersonInfo = async (useruid: string, data: Partial<SalespersonInfo>) => {
+    return new ApiRequest().post<SalespersonInfo | BaseResponseError>({
+        url: `user/${useruid}/salespersoninfo`,
+        data,
+        defaultError: "Error while updating salesperson info",
     });
 };

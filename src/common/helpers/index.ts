@@ -279,6 +279,8 @@ export const validateDates = (
 
 export const toBinary = (value: boolean): 0 | 1 => (value ? 1 : 0);
 
+export const fromBinary = (value: number | undefined | null): boolean => (value || 0) > 0;
+
 export const convertToStandardTimestamp = (
     dateInput?: string | number | Date,
     withTimeZone: boolean = true

@@ -1,5 +1,6 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
 import { Splitter } from "dashboard/common/display";
 import {
     CURRENCY_OPTIONS,
@@ -8,10 +9,19 @@ import {
     TextInput,
 } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
+import { CREATE_ID } from "common/constants/links";
 
 export const AdditionalInformation = observer((): ReactElement => {
+    const { id } = useParams();
     const usersStore = useStore().usersStore;
-    const { user, changeUserData } = usersStore;
+    const { user, changeUserData, salespersonInfo, changeSalespersonInfo, getSalespersonInfo } =
+        usersStore;
+
+    useEffect(() => {
+        if (id && id !== CREATE_ID) {
+            getSalespersonInfo(id);
+        }
+    }, [id]);
 
     return (
         <div className='additional-information'>
@@ -68,7 +78,8 @@ export const AdditionalInformation = observer((): ReactElement => {
                         currencyIcon={CURRENCY_OPTIONS.DOLLAR}
                         className='w-full'
                         name='Commission Rate'
-                        value={0}
+                        value={salespersonInfo?.Commission || 0}
+                        onChange={(e) => changeSalespersonInfo("Commission", e.value || 0)}
                     />
                 </div>
             </div>

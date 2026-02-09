@@ -29,7 +29,9 @@ export const UsersForm = observer((): ReactElement => {
         getCurrentUserRoles,
         currentUserClear,
         isFormValid,
+        isUserChanged,
         createUser,
+        updateUser,
         loadAvailableRoles,
     } = usersStore;
     const handleGetCurrentUser = async (useruid: string) => {
@@ -54,7 +56,10 @@ export const UsersForm = observer((): ReactElement => {
     }, [authUser]);
 
     useEffect(() => {
-        if (!id || id === CREATE_ID) return;
+        if (!id || id === CREATE_ID) {
+            currentUserClear();
+            return;
+        }
         handleGetCurrentUser(id);
         getCurrentUserRoles(id);
         return () => {
@@ -103,11 +108,28 @@ export const UsersForm = observer((): ReactElement => {
             const response = await createUser();
             if (response && response.error) {
                 showError(response?.error);
-            } else {
-                showSuccess("User created successfully");
-                navigate(USERS_PAGE.MAIN);
+                return;
             }
+            showSuccess("User created successfully");
+            currentUserClear();
+            navigate(USERS_PAGE.MAIN);
+            return;
         }
+
+        if (!id) return;
+
+        if (!usersStore.user.roleuid || !usersStore.user.roleuid.trim()) {
+            showError("Role not selected");
+            return;
+        }
+
+        const response = await updateUser(id);
+        if (response && response.error) {
+            showError(response?.error as string);
+            return;
+        }
+        showSuccess("User updated successfully");
+        navigate(USERS_PAGE.MAIN);
     };
 
     return (
@@ -150,9 +172,17 @@ export const UsersForm = observer((): ReactElement => {
                     </Button>
                     <Button
                         className='uppercase px-6 form__button'
-                        severity={isFormValid ? "success" : "secondary"}
+                        severity={
+                            id === CREATE_ID
+                                ? isFormValid
+                                    ? "success"
+                                    : "secondary"
+                                : isUserChanged
+                                  ? "success"
+                                  : "secondary"
+                        }
                         type='submit'
-                        disabled={!isFormValid}
+                        disabled={id === CREATE_ID ? !isFormValid : !isUserChanged}
                         onClick={handleSaveClick}
                     >
                         {id === CREATE_ID ? "Create" : "Update"}
