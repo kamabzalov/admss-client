@@ -24,3 +24,5 @@ export const PASSWORD_REGEX = {
     NUMBER_REGEX,
     SPECIAL_CHAR_REGEX,
 };
+
+export const LOGIN_VALID_REGEX = /[\s\p{Emoji}\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu;

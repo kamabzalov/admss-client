@@ -14,7 +14,7 @@ import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
 import { SETTINGS_PAGE } from "common/constants/links";
-import { LOGIN_MIN_LENGTH, LOGIN_MAX_LENGTH } from "common/constants/regex";
+import { LOGIN_MIN_LENGTH, LOGIN_MAX_LENGTH, LOGIN_VALID_REGEX } from "common/constants/regex";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
@@ -41,7 +41,6 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
     const [loginError, setLoginError] = useState<string>("");
-
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
     const isEditMode = !!user?.useruid;
@@ -103,7 +102,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
         navigate(SETTINGS_PAGE.ROLES_CREATE());
     };
 
-    const validateLogin = (value: string): string => {
+    const validateLoginLength = (value: string): string => {
         if (!value) return "";
         if (value.length < LOGIN_MIN_LENGTH) {
             return `Login must be at least ${LOGIN_MIN_LENGTH} characters`;
@@ -115,14 +114,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
     };
 
     const handleLoginChange = (value: string) => {
-        changeUserData("loginName", value);
+        const filtered = value.replace(LOGIN_VALID_REGEX, "");
+        changeUserData("loginName", filtered);
     };
 
     const handleLoginBlur = () => {
         if (user?.loginName !== undefined) {
             const trimmedValue = user.loginName.trim();
             changeUserData("loginName", trimmedValue);
-            const error = validateLogin(trimmedValue);
+            const error = validateLoginLength(trimmedValue);
             setLoginError(error);
             usersStore.loginError = !!error;
         }

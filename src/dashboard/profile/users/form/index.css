@@ -143,11 +143,11 @@
             max-width: calc(100% - 20px);
         }
         &::before {
-            --line-height: 4px;
+            --line-height: 8px;
             content: "";
             z-index: -1;
             position: absolute;
-            top: calc(50%);
+            top: 20%;
             left: 2px;
             width: 100%;
             height: var(--line-height);
