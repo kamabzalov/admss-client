@@ -2,6 +2,7 @@ import { Password, PasswordProps } from "primereact/password";
 import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constants/regex";
 import "./index.css";
 import { useId, useMemo } from "react";
+import { TruncatedText } from "dashboard/common/display";
 
 interface PasswordInputProps extends PasswordProps {
     label?: string;
@@ -25,11 +26,11 @@ export const PasswordInput = ({
     ...props
 }: PasswordInputProps) => {
     const id = useId();
-    const hasValidLength = PASSWORD_REGEX.LENGTH_REGEX.test(password || "");
-    const hasLowercase = PASSWORD_REGEX.LOWERCASE_REGEX.test(password || "");
-    const hasUppercase = PASSWORD_REGEX.UPPERCASE_REGEX.test(password || "");
-    const hasNumber = PASSWORD_REGEX.NUMBER_REGEX.test(password || "");
-    const hasSpecial = PASSWORD_REGEX.SPECIAL_CHAR_REGEX.test(password || "");
+    const hasValidLength = new RegExp(PASSWORD_REGEX.LENGTH_REGEX).test(password || "");
+    const hasLowercase = new RegExp(PASSWORD_REGEX.LOWERCASE_REGEX).test(password || "");
+    const hasUppercase = new RegExp(PASSWORD_REGEX.UPPERCASE_REGEX).test(password || "");
+    const hasNumber = new RegExp(PASSWORD_REGEX.NUMBER_REGEX).test(password || "");
+    const hasSpecial = new RegExp(PASSWORD_REGEX.SPECIAL_CHAR_REGEX).test(password || "");
 
     const isPasswordCorrect = useMemo(() => {
         if (skipValidation) return true;
@@ -87,7 +88,11 @@ export const PasswordInput = ({
             <label htmlFor={id} className='float-label'>
                 {label}
             </label>
-            {!!error && <div className='p-error pt-2'>{errorMessage}</div>}
+            {!!error && (
+                <div className='p-error pt-2'>
+                    <TruncatedText text={errorMessage} withTooltip={true} width='full' />
+                </div>
+            )}
         </span>
     );
 };

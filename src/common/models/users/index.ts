@@ -123,3 +123,23 @@ export interface CheckPasswordResponse extends BaseResponseError {
     valid: boolean;
     message: string;
 }
+
+export interface SalespersonInfo extends BaseResponseError {
+    Commission: number;
+    CommissionType: number;
+    VehicleProfit: number;
+    OverallIncome: number;
+    Acquisition: number;
+    Reserve: number;
+    FinanceIncome: number;
+    MiscCost: number;
+    MiscProfit: number;
+    AccessoryProfit: number;
+    GPUProfit: number;
+    CreditLifeProfit: number;
+    GAPProfit: number;
+    DPProfit: number;
+    VehiclePack: number;
+    Devices: number;
+    InterestRate: number;
+}
