@@ -10,24 +10,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    .icon {
+        color: var(--admss-app-medium-blue);
+        transition: all 0.4s ease-in-out;
+    }
 }
 
 .info-panel__button--pulse {
-    animation: pulse 2s infinite;
+    width: 42px;
+    height: 42px;
+    animation: pulse 3s infinite;
 }
 
 @keyframes pulse {
     0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--admss-app-medium-blue) 70%, transparent);
+        box-shadow: 0px 0px 4px var(--admss-app-main-blue);
     }
+
     70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px color-mix(in srgb, var(--admss-app-medium-blue) 0%, transparent);
+        box-shadow: 0px 0px 8px var(--admss-app-main-blue);
     }
+
     100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--admss-app-medium-blue) 0%, transparent);
+        box-shadow: 0px 0px 4px var(--admss-app-main-blue);
     }
 }
 
