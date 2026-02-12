@@ -31,6 +31,12 @@ export class ProfileStore {
     }
 
     public changeProfile = <K extends keyof ExtendedProfile>(key: K, value: ExtendedProfile[K]) => {
+        const currentValue = this._profile[key];
+
+        if (currentValue === value) {
+            return;
+        }
+
         this._profile[key] = value as never;
         this._isProfileChanged = true;
     };
