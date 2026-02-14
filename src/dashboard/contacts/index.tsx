@@ -19,6 +19,7 @@ import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, TableState } from "common/models/user";
+import { usePermissions } from "common/hooks/usePermissions";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
@@ -97,6 +98,7 @@ export const ContactsDataTable = ({
     );
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const { contactPermissions } = usePermissions();
     const store = useStore().contactStore;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -275,7 +277,7 @@ export const ContactsDataTable = ({
                 ? data[returnedField]
                 : data.companyName || data.businessName || `${data.firstName} ${data.lastName}`;
             onRowClick(value);
-        } else {
+        } else if (contactPermissions.canOpenDetails()) {
             navigate(data.contactuid);
         }
     };
@@ -285,6 +287,7 @@ export const ContactsDataTable = ({
     };
 
     const handleCreateContact = () => {
+        if (!contactPermissions.canCreate()) return;
         if (originalPath) {
             store.memoRoute = originalPath;
         }
@@ -412,14 +415,16 @@ export const ContactsDataTable = ({
                     onClick={() => setDialogVisible(true)}
                 />
 
-                <Button
-                    className='contact-top-controls__button'
-                    icon='icon adms-add-item'
-                    severity='success'
-                    type='button'
-                    tooltip='Add new contact'
-                    onClick={handleCreateContact}
-                />
+                {contactPermissions.canCreate() && (
+                    <Button
+                        className='contact-top-controls__button'
+                        icon='icon adms-add-item'
+                        severity='success'
+                        type='button'
+                        tooltip='Add new contact'
+                        onClick={handleCreateContact}
+                    />
+                )}
                 <Button
                     severity='success'
                     type='button'
@@ -522,30 +527,32 @@ export const ContactsDataTable = ({
                         }
                     }}
                 >
-                    <Column
-                        bodyStyle={{ textAlign: "center" }}
-                        reorderable={false}
-                        resizeable={false}
-                        body={({ contactuid }: ContactUser) => {
-                            return (
-                                <Button
-                                    text
-                                    className='table-edit-button'
-                                    icon='adms-edit-item'
-                                    tooltip='Edit contact'
-                                    tooltipOptions={{ position: "mouse" }}
-                                    onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
-                                />
-                            );
-                        }}
-                        pt={{
-                            root: {
-                                style: {
-                                    width: "80px",
+                    {contactPermissions.canEdit() && (
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={({ contactuid }: ContactUser) => {
+                                return (
+                                    <Button
+                                        text
+                                        className='table-edit-button'
+                                        icon='adms-edit-item'
+                                        tooltip='Edit contact'
+                                        tooltipOptions={{ position: "mouse" }}
+                                        onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
+                                    />
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "80px",
+                                    },
                                 },
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    )}
                     {alwaysActiveColumns.map(({ field, header }, index) => {
                         const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
                         const isLastColumn =

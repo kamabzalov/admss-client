@@ -14,7 +14,7 @@ const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
-    const { inventoryPermissions, salesPermissions } = usePermissions();
+    const { inventoryPermissions, contactPermissions, salesPermissions } = usePermissions();
     const { authUser } = store;
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
@@ -84,24 +84,27 @@ export const Home = (): ReactElement => {
                         <h2 className='card-header__title uppercase m-0'>Common tasks</h2>
                     </div>
                     <div className='card-content common-tasks-menu flex flex-wrap lg:justify-content-between md:justify-content-center gap-6'>
-                        {salesPermissions.canShowContacts() && (
-                            <>
-                                <Link
-                                    to='contacts/create'
-                                    className='common-tasks-menu__item new-contact cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-contact'></div>
-                                    New Contact
-                                </Link>
-                                <Link
-                                    to='contacts'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon browse-all-contacts'></div>
-                                    Browse <br /> all contacts
-                                </Link>
-                            </>
-                        )}
+                        {salesPermissions.canShowContacts() &&
+                            contactPermissions.canSeeInMenu() && (
+                                <>
+                                    {contactPermissions.canCreate() && (
+                                        <Link
+                                            to='contacts/create'
+                                            className='common-tasks-menu__item new-contact cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon new-contact'></div>
+                                            New Contact
+                                        </Link>
+                                    )}
+                                    <Link
+                                        to='contacts'
+                                        className='common-tasks-menu__item cursor-pointer'
+                                    >
+                                        <div className='common-tasks-menu__icon browse-all-contacts'></div>
+                                        Browse <br /> all contacts
+                                    </Link>
+                                </>
+                            )}
                         {inventoryPermissions.canSeeInMenu() &&
                             inventoryPermissions.canCreate() && (
                                 <Link
