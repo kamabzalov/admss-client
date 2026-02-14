@@ -1,6 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { usePermissions } from "common/hooks/usePermissions";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { QueryParams } from "common/models/query-params";
 import { AuthUser } from "common/models/user";
@@ -34,6 +35,7 @@ export const CompanySearch = ({
     onChangeGetFullInfo,
     ...props
 }: CompanySearchProps) => {
+    const { contactPermissions } = usePermissions();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<ContactUser[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -109,6 +111,10 @@ export const CompanySearch = ({
             onChange(event);
         }
     };
+
+    if (!contactPermissions.canSelectInInputs()) {
+        return null;
+    }
 
     return (
         <>

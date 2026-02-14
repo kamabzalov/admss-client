@@ -32,7 +32,7 @@ import {
     SSN_VALID_LENGTH,
 } from "common/constants/regex";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { useToastMessage } from "common/hooks";
+import { usePermissions, useToastMessage } from "common/hooks";
 import { CONTACTS_PAGE } from "common/constants/links";
 const STEP = "step";
 
@@ -264,6 +264,7 @@ export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+    const { contactPermissions } = usePermissions();
     const { showError, showSuccess } = useToastMessage();
 
     const [contactSections, setContactSections] = useState<ContactSection[]>([]);
@@ -722,7 +723,7 @@ export const ContactForm = observer((): ReactElement => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
-                                    {id && (
+                                    {id && contactPermissions.canDelete() && (
                                         <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
@@ -807,12 +808,13 @@ export const ContactForm = observer((): ReactElement => {
                                                 )}
                                             </Form>
                                         </Formik>
-                                        {stepActiveIndex === deleteActiveIndex && (
-                                            <DeleteForm
-                                                attemptedSubmit={attemptedSubmit}
-                                                isDeleteConfirm={isDeleteConfirm}
-                                            />
-                                        )}
+                                        {stepActiveIndex === deleteActiveIndex &&
+                                            contactPermissions.canDelete() && (
+                                                <DeleteForm
+                                                    attemptedSubmit={attemptedSubmit}
+                                                    isDeleteConfirm={isDeleteConfirm}
+                                                />
+                                            )}
                                     </div>
                                 </div>
                             </div>
@@ -839,7 +841,8 @@ export const ContactForm = observer((): ReactElement => {
                                 >
                                     Next
                                 </Button>
-                                {stepActiveIndex === deleteActiveIndex ? (
+                                {stepActiveIndex === deleteActiveIndex &&
+                                contactPermissions.canDelete() ? (
                                     <Button
                                         onClick={() =>
                                             deleteReason.length

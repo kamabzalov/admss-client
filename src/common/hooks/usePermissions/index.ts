@@ -95,6 +95,41 @@ export const usePermissions = () => {
         return authUser.permissions.uaSalesPerson === 1;
     };
 
+    const contactPermissions = {
+        canView: (): boolean => hasPermission("uaViewContacts"),
+
+        canCreate: (): boolean => hasPermission("uaAddContacts"),
+
+        canEdit: (): boolean => hasPermission("uaEditContacts"),
+
+        canDelete: (): boolean => hasPermission("uaDeleteContacts"),
+
+        canSeeInMenu: (): boolean => {
+            return (
+                hasPermission("uaViewContacts") &&
+                (hasPermission("uaEditContacts") || hasPermission("uaAddContacts"))
+            );
+        },
+
+        canViewList: (): boolean => {
+            return (
+                hasPermission("uaViewContacts") &&
+                (hasPermission("uaEditContacts") || hasPermission("uaAddContacts"))
+            );
+        },
+
+        canSelectInInputs: (): boolean => {
+            return (
+                hasPermission("uaViewContacts") &&
+                (hasPermission("uaEditContacts") || hasPermission("uaAddContacts"))
+            );
+        },
+
+        canOpenDetails: (): boolean => {
+            return hasPermission("uaViewContacts") && hasPermission("uaEditContacts");
+        },
+    };
+
     const salesPermissions = {
         canShowContacts: (): boolean => {
             return !isSalesperson();
@@ -131,6 +166,7 @@ export const usePermissions = () => {
         hasAllPermissions,
         isSalespersonOnly,
         inventoryPermissions,
+        contactPermissions,
         salesPermissions,
     };
 };
