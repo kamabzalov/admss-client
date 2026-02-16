@@ -14,7 +14,8 @@ const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
-    const { inventoryPermissions, contactPermissions, salesPermissions } = usePermissions();
+    const { inventoryPermissions, contactPermissions, dealPermissions, salesPermissions } =
+        usePermissions();
     const { authUser } = store;
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
@@ -121,15 +122,17 @@ export const Home = (): ReactElement => {
                                 Browse <br /> all inventory
                             </Link>
                         )}
-                        {salesPermissions.canShowDeals() && (
+                        {salesPermissions.canShowDeals() && dealPermissions.canSeeInMenu() && (
                             <>
-                                <Link
-                                    to='deals/create'
-                                    className='common-tasks-menu__item cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-deal'></div>
-                                    New deal
-                                </Link>
+                                {dealPermissions.canCreate() && (
+                                    <Link
+                                        to='deals/create'
+                                        className='common-tasks-menu__item cursor-pointer'
+                                    >
+                                        <div className='common-tasks-menu__icon new-deal'></div>
+                                        New deal
+                                    </Link>
+                                )}
                                 <Link to='deals' className='common-tasks-menu__item cursor-pointer'>
                                     <div className='common-tasks-menu__icon browse-all-deals'></div>
                                     Browse <br /> all deals

@@ -130,6 +130,49 @@ export const usePermissions = () => {
         },
     };
 
+    const dealPermissions = {
+        canView: (): boolean => hasPermission("uaViewDeals"),
+
+        canCreate: (): boolean => hasPermission("uaAddDeals"),
+
+        canEdit: (): boolean => hasPermission("uaEditDeals"),
+
+        canDelete: (): boolean => hasPermission("uaDeleteDeal"),
+
+        canPrintForms: (): boolean => hasPermission("uaPrintDealsForms"),
+
+        canEditWashout: (): boolean => hasPermission("uaEditDealWashout"),
+
+        canUsePaymentCalculator: (): boolean => hasPermission("uaAllowPaymentCalculator"),
+
+        canUsePaymentQuote: (): boolean => hasPermission("uaAllowPaymentQuote"),
+
+        canSeeInMenu: (): boolean => {
+            return (
+                hasPermission("uaViewDeals") &&
+                (hasPermission("uaEditDeals") || hasPermission("uaAddDeals"))
+            );
+        },
+
+        canViewList: (): boolean => {
+            return (
+                hasPermission("uaViewDeals") &&
+                (hasPermission("uaEditDeals") || hasPermission("uaAddDeals"))
+            );
+        },
+
+        canSelectInInputs: (): boolean => {
+            return (
+                hasPermission("uaViewDeals") &&
+                (hasPermission("uaEditDeals") || hasPermission("uaAddDeals"))
+            );
+        },
+
+        canOpenDetails: (): boolean => {
+            return hasPermission("uaViewDeals") && hasPermission("uaEditDeals");
+        },
+    };
+
     const salesPermissions = {
         canShowContacts: (): boolean => {
             return !isSalesperson();
@@ -167,6 +210,7 @@ export const usePermissions = () => {
         isSalespersonOnly,
         inventoryPermissions,
         contactPermissions,
+        dealPermissions,
         salesPermissions,
     };
 };

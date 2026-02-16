@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { ReactElement, ReactNode } from "react";
 import { usePermissions } from "common/hooks";
+import { DASHBOARD_PAGE } from "common/constants/links";
 
 interface InventoryProtectedRouteProps {
     children: ReactNode;
@@ -16,7 +17,7 @@ export const InventoryProtectedRoute = ({
     const { inventoryPermissions } = usePermissions();
 
     if (!inventoryPermissions.canView()) {
-        return <Navigate to='/dashboard' replace />;
+        return <Navigate to={DASHBOARD_PAGE} replace />;
     }
 
     if (requireCreate && !inventoryPermissions.canCreate()) {

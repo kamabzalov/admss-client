@@ -8,6 +8,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser, UserPermissionsResponse } from "common/models/user";
 import { Loader } from "dashboard/common/loader";
 import { createApiDashboardInstance } from "http/index";
+import { DASHBOARD_PAGE, HOME_PAGE } from "common/constants/links";
 
 interface UserRoles {
     admin: boolean;
@@ -52,10 +53,10 @@ const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps):
     }
 
     if (!authUser) {
-        return <Navigate to='/' replace />;
+        return <Navigate to={HOME_PAGE} replace />;
     }
     if (!hasRequiredRole && notAllowed) {
-        return <Navigate to='/dashboard' replace />;
+        return <Navigate to={DASHBOARD_PAGE} replace />;
     }
 
     return (

@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { ReactElement, ReactNode } from "react";
 import { usePermissions } from "common/hooks";
-import { CONTACTS_PAGE } from "common/constants/links";
+import { CONTACTS_PAGE, DASHBOARD_PAGE } from "common/constants/links";
 
 interface ContactsProtectedRouteProps {
     children: ReactNode;
@@ -17,7 +17,7 @@ export const ContactsProtectedRoute = ({
     const { contactPermissions } = usePermissions();
 
     if (!contactPermissions.canView()) {
-        return <Navigate to='/dashboard' replace />;
+        return <Navigate to={DASHBOARD_PAGE} replace />;
     }
 
     if (requireCreate && !contactPermissions.canCreate()) {

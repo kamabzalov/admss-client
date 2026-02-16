@@ -19,6 +19,7 @@ import { TwoFactorAuth } from "sign/two-factor-auth";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { InventoryProtectedRoute } from "http/routes/InventoryProtectedRoute";
 import { ContactsProtectedRoute } from "http/routes/ContactsProtectedRoute";
+import { DealsProtectedRoute } from "http/routes/DealsProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
@@ -147,14 +148,44 @@ const AppRouter = (): ReactElement => {
                             path: "deals",
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
-                                    <Outlet />
+                                    <DealsProtectedRoute>
+                                        <Outlet />
+                                    </DealsProtectedRoute>
                                 </ProtectedRoute>
                             ),
                             children: [
-                                { path: "", element: <Deals /> },
-                                { path: "create", element: <DealsForm /> },
-                                { path: ":id", element: <DealsForm /> },
-                                { path: ":id/washout", element: <DealWashout /> },
+                                {
+                                    path: "",
+                                    element: (
+                                        <DealsProtectedRoute>
+                                            <Deals />
+                                        </DealsProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: "create",
+                                    element: (
+                                        <DealsProtectedRoute requireCreate>
+                                            <DealsForm />
+                                        </DealsProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: ":id",
+                                    element: (
+                                        <DealsProtectedRoute requireEdit>
+                                            <DealsForm />
+                                        </DealsProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: ":id/washout",
+                                    element: (
+                                        <DealsProtectedRoute requireEdit>
+                                            <DealWashout />
+                                        </DealsProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {
