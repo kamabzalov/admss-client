@@ -8,7 +8,7 @@ import { useStore } from "store/hooks";
 import { DealsDataTable } from "dashboard/deals";
 import { getDealsList } from "http/services/deals.service";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
-import { useToastMessage } from "common/hooks";
+import { useToastMessage, usePermissions } from "common/hooks";
 import "./index.css";
 
 const FIELD: keyof Deal = "contactinfo";
@@ -51,6 +51,11 @@ export const DealSearch = ({
     const isJustSelectedRef = useRef<boolean>(false);
     const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const { showWarning } = useToastMessage();
+    const { dealPermissions } = usePermissions();
+
+    if (!dealPermissions.canSelectInInputs()) {
+        return null;
+    }
 
     const handleDealInputChange = async (searchValue: string) => {
         if (!searchValue.trim()) {

@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { DealFinance } from "common/models/deals";
 import { useStore } from "store/hooks";
 import { CREATE_ID, DEALS_PAGE } from "common/constants/links";
+import { usePermissions } from "common/hooks";
 
 export const DealRetailFinances = observer((): ReactElement => {
     const { id } = useParams();
@@ -14,6 +15,7 @@ export const DealRetailFinances = observer((): ReactElement => {
     const { dealFinances, getDealFinances, changeDealFinances, recalculateAndUpdateWashout } =
         store;
     const navigate = useNavigate();
+    const { dealPermissions } = usePermissions();
 
     useEffect(() => {
         id && getDealFinances(id);
@@ -27,30 +29,36 @@ export const DealRetailFinances = observer((): ReactElement => {
 
     return (
         <div className='grid deal-retail-finances row-gap-2'>
-            <div className='col-12'>
-                <div className='flex justify-content-end gap-3 mt-5 mr-3'>
-                    <Button
-                        outlined
-                        type='button'
-                        onClick={() => {
-                            id && id !== CREATE_ID && navigate(DEALS_PAGE.WASHOUT(id));
-                        }}
-                        className='finances__button bold px-6'
-                    >
-                        Washout
-                    </Button>
-                    <Button
-                        type='button'
-                        outlined
-                        onClick={() => {
-                            id && recalculateAndUpdateWashout(id);
-                        }}
-                        className='finances__button bold px-6'
-                    >
-                        Recalculate
-                    </Button>
+            {(dealPermissions.canEditWashout() || dealPermissions.canUsePaymentCalculator()) && (
+                <div className='col-12'>
+                    <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                        {dealPermissions.canEditWashout() && (
+                            <Button
+                                outlined
+                                type='button'
+                                onClick={() => {
+                                    id && id !== CREATE_ID && navigate(DEALS_PAGE.WASHOUT(id));
+                                }}
+                                className='finances__button bold px-6'
+                            >
+                                Washout
+                            </Button>
+                        )}
+                        {dealPermissions.canUsePaymentCalculator() && (
+                            <Button
+                                type='button'
+                                outlined
+                                onClick={() => {
+                                    id && recalculateAndUpdateWashout(id);
+                                }}
+                                className='finances__button bold px-6'
+                            >
+                                Recalculate
+                            </Button>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
             <div className='col-6 finances-column'>
                 <div className='finances-item'>
                     <label className='finances-item__label finances-item--bold'>Cash Price</label>

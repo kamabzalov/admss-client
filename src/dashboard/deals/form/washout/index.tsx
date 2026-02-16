@@ -13,6 +13,7 @@ import { setDealWashout } from "http/services/deals.service";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { Loader } from "dashboard/common/loader";
+import { usePermissions } from "common/hooks";
 
 export enum DealWashoutTabs {
     DEAL_PROFIT = "deal-profit",
@@ -28,6 +29,7 @@ export const DealWashout = observer((): ReactElement | null => {
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().dealStore;
     const toast = useToast();
+    const { dealPermissions } = usePermissions();
     const { inventory, getDeal, getDealWashout, restoreWashoutState, isWashoutStatePreserved } =
         store;
     const [showOverlay, setShowOverlay] = useState(false);
@@ -39,6 +41,11 @@ export const DealWashout = observer((): ReactElement | null => {
             return;
         }
 
+        if (!dealPermissions.canEditWashout()) {
+            navigate(DEALS_PAGE.EDIT(id));
+            return;
+        }
+
         getDeal(id);
         if (isWashoutStatePreserved) {
             restoreWashoutState();
@@ -46,7 +53,7 @@ export const DealWashout = observer((): ReactElement | null => {
         getDealWashout(id);
     }, [id]);
 
-    if (!id || id === CREATE_DEAL_ID) {
+    if (!id || id === CREATE_DEAL_ID || !dealPermissions.canEditWashout()) {
         return null;
     }
 

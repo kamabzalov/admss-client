@@ -30,7 +30,7 @@ import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
-import { useCreateReport, useToastMessage } from "common/hooks";
+import { useCreateReport, useToastMessage, usePermissions } from "common/hooks";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { DealsUserSettings } from "common/models/user";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
@@ -190,6 +190,7 @@ export const DealsDataTable = observer(
         const navigate = useNavigate();
         const { showError } = useToastMessage();
         const { createReport } = useCreateReport<Deal>();
+        const { dealPermissions } = usePermissions();
 
         const searchFields = [
             {
@@ -513,11 +514,13 @@ export const DealsDataTable = observer(
                         onClick={() => setDialogVisible(true)}
                     />
 
-                    <ControlButton
-                        variant={BUTTON_VARIANTS.NEW}
-                        tooltip='Add new deal'
-                        onClick={handleCreateDeal}
-                    />
+                    {dealPermissions.canCreate() && (
+                        <ControlButton
+                            variant={BUTTON_VARIANTS.NEW}
+                            tooltip='Add new deal'
+                            onClick={handleCreateDeal}
+                        />
+                    )}
                     <ControlButton
                         variant={BUTTON_VARIANTS.PRINT}
                         tooltip='Print deals form'
@@ -563,43 +566,45 @@ export const DealsDataTable = observer(
                         }}
                         emptyMessage={ERROR_MESSAGES.NO_DATA}
                     >
-                        <Column
-                            bodyStyle={{ textAlign: "center" }}
-                            reorderable={false}
-                            resizeable={false}
-                            body={(rowDeal: Deal) => {
-                                const statusIcon = getDealStatusIcon(rowDeal.dealstatus);
-                                const statusLabel = getDealStatusLabel(rowDeal.dealstatus);
-                                return (
-                                    <div className={`flex gap-3 align-items-center`}>
-                                        <Button
-                                            text
-                                            className='table-edit-button'
-                                            icon='adms-edit-item'
-                                            tooltip='Edit deal'
-                                            tooltipOptions={{ position: "mouse" }}
-                                            onClick={() =>
-                                                navigate(DEALS_PAGE.EDIT(rowDeal.dealuid))
-                                            }
-                                        />
-                                        <Button
-                                            icon={statusIcon}
-                                            className='deals__status-icon'
-                                            text
-                                            tooltip={statusLabel}
-                                            tooltipOptions={{ position: "mouse" }}
-                                        />
-                                    </div>
-                                );
-                            }}
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "100px",
+                        {dealPermissions.canEdit() && (
+                            <Column
+                                bodyStyle={{ textAlign: "center" }}
+                                reorderable={false}
+                                resizeable={false}
+                                body={(rowDeal: Deal) => {
+                                    const statusIcon = getDealStatusIcon(rowDeal.dealstatus);
+                                    const statusLabel = getDealStatusLabel(rowDeal.dealstatus);
+                                    return (
+                                        <div className={`flex gap-3 align-items-center`}>
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                tooltip='Edit deal'
+                                                tooltipOptions={{ position: "mouse" }}
+                                                onClick={() =>
+                                                    navigate(DEALS_PAGE.EDIT(rowDeal.dealuid))
+                                                }
+                                            />
+                                            <Button
+                                                icon={statusIcon}
+                                                className='deals__status-icon'
+                                                text
+                                                tooltip={statusLabel}
+                                                tooltipOptions={{ position: "mouse" }}
+                                            />
+                                        </div>
+                                    );
+                                }}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "100px",
+                                        },
                                     },
-                                },
-                            }}
-                        />
+                                }}
+                            />
+                        )}
                         {activeColumns.map(({ field, header }: TableColumnsList, index) => {
                             const savedWidth = serverSettings?.deals?.columnWidth?.[field];
                             const isLastColumn = index === activeColumns.length - 1;

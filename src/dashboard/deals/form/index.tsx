@@ -27,7 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { useFormExitConfirmation } from "common/hooks";
+import { useFormExitConfirmation, usePermissions } from "common/hooks";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { DEALS_PAGE } from "common/constants/links";
 
@@ -216,39 +216,25 @@ export const DealsForm = observer(() => {
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const [printActiveIndex, setPrintActiveIndex] = useState<number>(-1);
     const stepsRef = useRef<HTMLDivElement>(null);
+    const accordionStepsRef = useRef<number[]>([0]);
     const navigate = useNavigate();
     const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
-    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
-    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(-1);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const { dealPermissions } = usePermissions();
 
     const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
         isFormChanged,
         onConfirmExit: () => navigate(DEALS_PAGE.MAIN),
         className: "deal-confirm-dialog",
     });
-
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            if (stepActiveIndex >= step) store.accordionActiveIndex = [index];
-        });
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, stepsRef.current]);
 
     useEffect(() => {
         if (stepActiveIndex === printActiveIndex && id) {
@@ -305,28 +291,56 @@ export const DealsForm = observer(() => {
 
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
+        const newAccordionSteps = sections.map((item) => item.startIndex);
+        accordionStepsRef.current = newAccordionSteps;
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
-        setPrintActiveIndex(itemsMenuCount + 1);
-        setDeleteActiveIndex(itemsMenuCount + 2);
+
+        const canPrint = dealPermissions.canPrintForms();
+        const canDelete = dealPermissions.canDelete();
+
+        let currentIndex = itemsMenuCount + 1;
+        if (id && canPrint) {
+            setPrintActiveIndex(currentIndex);
+            currentIndex++;
+        }
+        if (id && canDelete) {
+            setDeleteActiveIndex(currentIndex);
+        }
 
         return () => {
             sections.forEach((section) => section.clearCount());
         };
-    }, [dealType]);
+    }, [dealType, id]);
 
     useEffect(() => {
         if (stepActiveIndex === printActiveIndex) {
             store.accordionActiveIndex = [];
         } else {
-            accordionSteps.forEach((step, index) => {
+            let activeIndex = 0;
+            accordionStepsRef.current.forEach((step, index) => {
                 if (stepActiveIndex >= step) {
-                    store.accordionActiveIndex = [index];
+                    activeIndex = index;
                 }
             });
+            if (
+                !Array.isArray(store.accordionActiveIndex) ||
+                !store.accordionActiveIndex.includes(activeIndex)
+            ) {
+                store.accordionActiveIndex = [activeIndex];
+            }
         }
-    }, [stepActiveIndex, printActiveIndex, accordionSteps]);
+
+        if (stepsRef.current) {
+            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
+            if (activeStep) {
+                activeStep.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+            }
+        }
+    }, [stepActiveIndex, printActiveIndex]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
@@ -441,7 +455,12 @@ export const DealsForm = observer(() => {
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => {
-                                            store.accordionActiveIndex = e.index;
+                                            const newIndex = Array.isArray(e.index)
+                                                ? e.index
+                                                : [e.index];
+                                            if (newIndex.length > 0) {
+                                                store.accordionActiveIndex = e.index;
+                                            }
                                         }}
                                         className='deal__accordion'
                                         multiple
@@ -491,7 +510,7 @@ export const DealsForm = observer(() => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
-                                    {id && (
+                                    {id && dealPermissions.canPrintForms() && (
                                         <Button
                                             icon='icon adms-print'
                                             className={`p-button gap-2 deal__print-nav ${
@@ -503,7 +522,7 @@ export const DealsForm = observer(() => {
                                             Print forms
                                         </Button>
                                     )}
-                                    {id && (
+                                    {id && dealPermissions.canDelete() && (
                                         <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 deal__delete-nav w-full'
@@ -589,20 +608,24 @@ export const DealsForm = observer(() => {
                                                         </div>
                                                     ))
                                                 )}
-                                                {stepActiveIndex === printActiveIndex && (
-                                                    <div className='deal-form'>
-                                                        <div className='deal-form__title uppercase'>
-                                                            Print forms
+                                                {id &&
+                                                    dealPermissions.canPrintForms() &&
+                                                    stepActiveIndex === printActiveIndex && (
+                                                        <div className='deal-form'>
+                                                            <div className='deal-form__title uppercase'>
+                                                                Print forms
+                                                            </div>
+                                                            <PrintDealForms />
                                                         </div>
-                                                        <PrintDealForms />
-                                                    </div>
-                                                )}{" "}
-                                                {stepActiveIndex === deleteActiveIndex && (
-                                                    <DeleteDealForm
-                                                        isDeleteConfirm={isDeleteConfirm}
-                                                        attemptedSubmit={attemptedSubmit}
-                                                    />
-                                                )}
+                                                    )}{" "}
+                                                {id &&
+                                                    dealPermissions.canDelete() &&
+                                                    stepActiveIndex === deleteActiveIndex && (
+                                                        <DeleteDealForm
+                                                            isDeleteConfirm={isDeleteConfirm}
+                                                            attemptedSubmit={attemptedSubmit}
+                                                        />
+                                                    )}
                                             </Form>
                                         </Formik>
                                     </div>
@@ -635,7 +658,9 @@ export const DealsForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex === deleteActiveIndex ||
+                                        (id &&
+                                            dealPermissions.canDelete() &&
+                                            stepActiveIndex === deleteActiveIndex) ||
                                         stepActiveIndex >= itemsMenuCount
                                             ? "secondary"
                                             : "success"
@@ -645,7 +670,9 @@ export const DealsForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                {stepActiveIndex === deleteActiveIndex ? (
+                                {id &&
+                                dealPermissions.canDelete() &&
+                                stepActiveIndex === deleteActiveIndex ? (
                                     <Button
                                         onClick={() =>
                                             deleteReason.length

@@ -23,7 +23,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { Button } from "primereact/button";
 import { parseDateFromServer } from "common/helpers";
 import { DEALS_PAGE } from "common/constants/links";
-import { useToastMessage } from "common/hooks";
+import { useToastMessage, usePermissions } from "common/hooks";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -31,6 +31,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
     const userStore = useStore().userStore;
     const { showError } = useToastMessage();
+    const { dealPermissions } = usePermissions();
     const location = useLocation();
     const currentPath = location.pathname + location.search;
     const navigate = useNavigate();
@@ -44,42 +45,54 @@ export const DealGeneralSale = observer((): ReactElement => {
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
 
     useEffect(() => {
-        getDealTypes().then((res) => {
-            if (res && Array.isArray(res)) {
-                setDealTypesList(res);
-            } else if (!res) {
+        const fetchDealData = async () => {
+            const dealTypesRes = await getDealTypes();
+            if (dealTypesRes && Array.isArray(dealTypesRes)) {
+                setDealTypesList(dealTypesRes);
+            } else if (!dealTypesRes) {
                 showError("Error while getting deal types");
             }
-        });
-        getSaleTypes().then((res) => {
-            if (res && Array.isArray(res)) {
-                setSaleTypesList(res);
-            } else if (!res) {
+
+            const saleTypesRes = await getSaleTypes();
+            if (saleTypesRes && Array.isArray(saleTypesRes)) {
+                setSaleTypesList(saleTypesRes);
+            } else if (!saleTypesRes) {
                 showError("Error while getting sale types");
             }
-        });
-        getDealStatuses().then((res) => {
-            if (res && Array.isArray(res)) {
-                setDealStatusesList(res);
-            } else if (!res) {
+
+            const dealStatusesRes = await getDealStatuses();
+            if (dealStatusesRes && Array.isArray(dealStatusesRes)) {
+                let filteredStatuses = dealStatusesRes;
+                if (!dealPermissions.canUsePaymentQuote()) {
+                    filteredStatuses = dealStatusesRes.filter((status) => status.id !== 0);
+                }
+                setDealStatusesList(filteredStatuses);
+            } else if (!dealStatusesRes) {
                 showError("Error while getting deal statuses");
             }
-        });
-        getDealInventoryStatuses().then((res) => {
-            if (res && Array.isArray(res)) {
-                setInventoryStatusesList(res);
-            } else if (!res) {
+
+            const inventoryStatusesRes = await getDealInventoryStatuses();
+            if (inventoryStatusesRes && Array.isArray(inventoryStatusesRes)) {
+                setInventoryStatusesList(inventoryStatusesRes);
+            } else if (!inventoryStatusesRes) {
                 showError("Error while getting inventory statuses");
             }
-        });
+        };
+
+        fetchDealData();
     }, []);
 
     useEffect(() => {
-        if (authUser?.useruid) {
-            getHowToKnowList(authUser?.useruid).then((res) => {
-                if (Array.isArray(res) && res.length) setHowToKnowList(res);
-            });
-        }
+        const fetchHowToKnowList = async () => {
+            if (authUser?.useruid) {
+                const res = await getHowToKnowList(authUser.useruid);
+                if (Array.isArray(res) && res.length) {
+                    setHowToKnowList(res);
+                }
+            }
+        };
+
+        fetchHowToKnowList();
     }, [authUser]);
 
     const handleGetCompanyInfo = (contact: ContactUser) => {
@@ -118,7 +131,7 @@ export const DealGeneralSale = observer((): ReactElement => {
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
-            {id && (
+            {id && dealPermissions.canEditWashout() && (
                 <div className='col-12 flex justify-content-end'>
                     <Button
                         className='deal-sale__washout-button'
