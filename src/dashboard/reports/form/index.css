@@ -201,6 +201,14 @@
     margin-left: 15px;
     margin-right: 15px;
     margin-bottom: var(--column-padding-bottom);
+
+    &.report-control__move {
+        height: 100%;
+        padding-top: 62px;
+        .data-set__info {
+            margin-bottom: auto;
+        }
+    }
 }
 
 .report-control__button.p-button {

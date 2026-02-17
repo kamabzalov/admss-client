@@ -192,24 +192,14 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         <div className='data-set__control'>
                             <ComboBox
                                 className='data-set__dropdown'
+                                panelClassName='capitalize'
                                 options={availableDatasets}
                                 value={dataSet}
                                 emptyMessage='-'
                                 disabled={!!report.isdefault}
                                 onChange={(e) => setDataSet(e.value)}
-                                pt={{
-                                    wrapper: {
-                                        className: "capitalize",
-                                    },
-                                }}
                                 label='Data Set'
                             />
-                            <InfoOverlayPanel
-                                panelTitle='Note it'
-                                className='data-set__info dataset-info'
-                            >
-                                <DataSetInfoTemplate />
-                            </InfoOverlayPanel>
                         </div>
 
                         <ReportSelect
@@ -230,7 +220,10 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         />
                     </div>
                 </div>
-                <div className='report-control'>
+                <div className='report-control report-control__move'>
+                    <InfoOverlayPanel panelTitle='Note it' className='data-set__info dataset-info'>
+                        <DataSetInfoTemplate />
+                    </InfoOverlayPanel>
                     {ControlButton(
                         MOVE_DIRECTION.RIGHT,
                         () =>

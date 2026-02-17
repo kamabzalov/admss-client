@@ -129,17 +129,16 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
     return (
         <>
             <div className='report__footer gap-3 mt-8 mr-3'>
-                {report.itemuid && (
-                    <Button
-                        className='report__icon-button'
-                        icon='icon adms-password'
-                        severity='success'
-                        onClick={() => setAccessDialogVisible(true)}
-                        outlined
-                        tooltip='Edit access'
-                        tooltipOptions={{ position: "mouse" }}
-                    />
-                )}
+                <Button
+                    className='report__icon-button'
+                    icon='icon adms-password'
+                    severity='success'
+                    onClick={() => setAccessDialogVisible(true)}
+                    outlined
+                    tooltip='Edit access'
+                    tooltipOptions={{ position: "mouse" }}
+                />
+
                 {report.itemuid && (
                     <Button
                         className='report__icon-button'
@@ -184,11 +183,11 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                     {report?.itemuid ? "Update" : "Create"}
                 </Button>
             </div>
-            {report.itemuid && accessDialogVisible && (
+            {accessDialogVisible && (
                 <EditAccessDialog
                     visible={accessDialogVisible}
                     onHide={() => setAccessDialogVisible(false)}
-                    reportuid={report.itemuid}
+                    reportuid={report.itemuid || "0"}
                 />
             )}
             {report.itemuid && (

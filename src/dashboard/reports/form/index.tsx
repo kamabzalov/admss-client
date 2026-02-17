@@ -379,7 +379,7 @@ export const ReportForm = observer((): ReactElement => {
                     targetCollectionId
                 );
                 if (response && response.status === Status.ERROR) {
-                    showError(response.error);
+                    showError(response.error || "Error while moving report to collection");
                 } else {
                     if (dropIndex !== undefined) {
                         const orderResponse = await setReportOrder(
@@ -415,7 +415,7 @@ export const ReportForm = observer((): ReactElement => {
 
                 const response = await setCollectionOrder(sourceCollectionId, dropIndex);
                 if (response && response.status === Status.ERROR) {
-                    showError(response.error);
+                    showError(response.error || "Error while changing collection order");
                 } else {
                     showSuccess(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
                 }

@@ -1,6 +1,7 @@
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     REPORT_TYPES,
+    ReportAccess,
     ReportCollection,
     ReportCollections,
     ReportCreate,
@@ -27,6 +28,7 @@ export class ReportStore {
     private _reportName: string = "";
     private _reportColumns: ReportServiceColumns[] = [];
     private _reportCollections: ReportCollections[] = [];
+    private _reportACL: ReportAccess[] = [];
     private _isReportChanged: boolean = false;
     protected _isLoading = false;
 
@@ -61,6 +63,10 @@ export class ReportStore {
 
     public get reportCollections() {
         return this._reportCollections;
+    }
+
+    public get reportACL() {
+        return this._reportACL;
     }
 
     public get isLoading() {
@@ -172,6 +178,7 @@ export class ReportStore {
                 if (!uid) {
                     const reportData: Partial<ReportCreate> & {
                         columns?: ReportServiceColumns[];
+                        acl?: ReportAccess[];
                     } & { collections: ReportCollections[] } = {
                         name: this._report.name,
                         collections,
@@ -179,6 +186,10 @@ export class ReportStore {
 
                     if (this._reportColumns && this._reportColumns.length) {
                         reportData.columns = this._reportColumns;
+                    }
+
+                    if (this._reportACL && this._reportACL.length) {
+                        reportData.acl = this._reportACL;
                     }
 
                     const response = await createCustomReport(
@@ -288,6 +299,10 @@ export class ReportStore {
         this._reportCollections = state;
     }
 
+    public set reportACL(state: ReportAccess[]) {
+        this._reportACL = state;
+    }
+
     public set isReportChanged(state: boolean) {
         this._isReportChanged = state;
     }
@@ -298,5 +313,6 @@ export class ReportStore {
         this._initialReport = {} as ReportInfo;
         this._isReportChanged = false;
         this._initialReport = {} as ReportInfo;
+        this._reportACL = [];
     };
 }
