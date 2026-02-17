@@ -6,4 +6,6 @@ export const ERROR_MESSAGES: Readonly<Record<string, string>> = {
     PROVIDER_ERROR: "This hook must be used within a provider.",
     SSN_DUPLICATE: "SSN must differ for buyer and co-buyer.",
     NO_DATA: "No data available for display.",
+    ROLE_NAME_INPUT: "Role name must be unique.",
+    ROLE_NAME_TOAST: "This role name is already in use. Try a different name to continue.",
 };

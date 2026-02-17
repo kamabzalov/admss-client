@@ -1,7 +1,7 @@
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { TabPanel, TabView } from "primereact/tabview";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
 import { RolesContacts } from "dashboard/profile/generalSettings/roles/form/contacts";
@@ -19,6 +19,9 @@ import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { TextInput } from "dashboard/common/form/inputs";
+import { checkRoleName } from "http/services/users";
+import { debounce } from "common/helpers";
+import { DEBOUNCE_TIME } from "common/settings";
 
 interface TabItem {
     tabName: string;
@@ -29,9 +32,19 @@ interface RoleFormValues {
     rolename: string;
 }
 
-const RoleFormSchema = Yup.object().shape({
-    rolename: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
-});
+const getRoleFormSchema = (
+    debouncedCheckRoleName: (value: string, resolve: (available: boolean) => void) => void
+) =>
+    Yup.object().shape({
+        rolename: Yup.string()
+            .trim()
+            .required(ERROR_MESSAGES.REQUIRED)
+            .test("is-role-name-available", ERROR_MESSAGES.ROLE_NAME_NOT_UNIQUE, function (value) {
+                return new Promise((resolve) => {
+                    debouncedCheckRoleName(value || "", resolve);
+                });
+            }),
+    });
 
 const tabItems: TabItem[] = [
     { tabName: "CONTACTS", component: <RolesContacts /> },
@@ -46,7 +59,8 @@ const tabItems: TabItem[] = [
 export const UsersRolesForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const usersStore = useStore().usersStore;
+    const { usersStore, userStore } = useStore();
+    const authUser = userStore.authUser;
     const { showError, showSuccess } = useToastMessage();
     const {
         getCurrentRole,
@@ -58,6 +72,51 @@ export const UsersRolesForm = observer((): ReactElement => {
     } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<RoleFormValues>>(null);
+    const initialRolenameRef = useRef<string>("");
+    const initialRoleIdRef = useRef<string>("");
+
+    useEffect(() => {
+        if (!id || id === CREATE_ID) return;
+        if (currentRole?.roleuid !== id) {
+            initialRoleIdRef.current = "";
+            return;
+        }
+        if (initialRoleIdRef.current === id) return;
+        initialRolenameRef.current = currentRole?.rolename ?? "";
+        initialRoleIdRef.current = id;
+    }, [id, currentRole?.roleuid, currentRole?.rolename]);
+
+    const debouncedCheckRoleName = useMemo(
+        () =>
+            debounce(async (value: string, resolve: (available: boolean) => void) => {
+                const trimmed = value.trim();
+                if (!trimmed || !authUser?.useruid) {
+                    resolve(true);
+                    return;
+                }
+                if (id !== CREATE_ID && trimmed === initialRolenameRef.current) {
+                    resolve(true);
+                    return;
+                }
+                try {
+                    const res = await checkRoleName(
+                        authUser.useruid,
+                        trimmed,
+                        id !== CREATE_ID ? currentRole?.roleuid : undefined
+                    );
+                    const available = res && "available" in res && res.available;
+                    resolve(!!available);
+                } catch {
+                    resolve(true);
+                }
+            }, DEBOUNCE_TIME),
+        [authUser?.useruid, id, currentRole?.roleuid]
+    );
+
+    const roleFormSchema = useMemo(
+        () => getRoleFormSchema(debouncedCheckRoleName),
+        [debouncedCheckRoleName]
+    );
 
     useEffect(() => {
         if (id === CREATE_ID) {
@@ -96,7 +155,8 @@ export const UsersRolesForm = observer((): ReactElement => {
 
         const response = await saveCurrentRole();
         if (response && response.error) {
-            showError(response?.error);
+            const isNameUnavailable = "available" in response && response.available === false;
+            showError(isNameUnavailable ? ERROR_MESSAGES.ROLE_NAME_TAKEN_TOAST : response.error);
         } else {
             showSuccess(
                 id === CREATE_ID ? "Role created successfully" : "Role updated successfully"
@@ -112,7 +172,7 @@ export const UsersRolesForm = observer((): ReactElement => {
     return (
         <Formik
             innerRef={formikRef}
-            validationSchema={RoleFormSchema}
+            validationSchema={roleFormSchema}
             initialValues={{
                 rolename: currentRole?.rolename || "",
             }}
@@ -173,8 +233,8 @@ export const UsersRolesForm = observer((): ReactElement => {
                                                             : ""
                                                     }`}
                                                     errorMessage={
-                                                        errors.rolename && touched.rolename
-                                                            ? errors.rolename
+                                                        errors.rolename
+                                                            ? ERROR_MESSAGES.ROLE_NAME_INPUT
                                                             : undefined
                                                     }
                                                 />

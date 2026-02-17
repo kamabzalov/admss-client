@@ -151,6 +151,14 @@ export const createOrUpdateRole = async (roleuid: string, roleData: UserRolePayl
     });
 };
 
+export const checkRoleName = async (useruid: string, rolename: string, roleuid?: string) => {
+    return new ApiRequest().post<{ status: string; available: boolean } | BaseResponseError>({
+        url: `user/${useruid}/check-role-name`,
+        data: { rolename, ...(roleuid ? { roleuid } : {}) },
+        defaultError: "Error while checking role name",
+    });
+};
+
 export const checkPassword = async (useruid: string, password: string) => {
     return new ApiRequest().post<CheckPasswordResponse>({
         url: `user/${useruid}/checkpassword`,
