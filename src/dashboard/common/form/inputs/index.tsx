@@ -85,7 +85,9 @@ interface TextInputProps extends InputTextProps {
     ref?: React.RefObject<HTMLInputElement>;
     wrapperClassName?: string;
     infoText?: string;
+    error?: boolean;
     errorMessage?: string;
+    label?: string;
 }
 
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
@@ -524,7 +526,10 @@ export const TextInput = ({
     ref,
     wrapperClassName,
     infoText,
+    error = false,
     errorMessage,
+    label,
+    className: propsClassName,
     ...props
 }: TextInputProps): ReactElement => {
     const [value, setValue] = useState<string>(props.value || "");
@@ -546,14 +551,20 @@ export const TextInput = ({
         }
     };
 
+    const showError = error || !!errorMessage;
+    const inputClassName = [`w-full`, propsClassName, showError ? "p-invalid" : ""]
+        .filter(Boolean)
+        .join(" ");
+
     const content = (
         <span
-            className={`p-float-label text-input ${errorMessage ? "p-invalid" : ""} relative ${wrapperClassName || ""}`}
+            className={`p-float-label text-input ${showError ? "p-invalid" : ""} relative ${wrapperClassName || ""}`}
         >
             <InputText
                 ref={ref}
                 id={uniqueId}
-                className='w-full'
+                name={name}
+                className={inputClassName}
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 value={value.trim()}
@@ -585,10 +596,14 @@ export const TextInput = ({
                     {infoText}
                 </small>
             )}
-            {errorMessage && <small className='p-error'>{errorMessage}</small>}
             <label htmlFor={uniqueId} className='float-label'>
-                {name}
+                {label ?? name}
             </label>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
         </span>
     );
 

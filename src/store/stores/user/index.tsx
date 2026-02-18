@@ -1,5 +1,11 @@
 import { LS_APP_USER, LS_DEVICE_UID, LS_REMEMBER_ME } from "common/constants/localStorage";
-import { AuthUser, TWO_FACTOR_METHOD, UserPermissionsResponse } from "common/models/user";
+import {
+    AuthUser,
+    getTfaSessionUid,
+    TFA_SESSION_UID_KEY,
+    TWO_FACTOR_METHOD,
+    UserPermissionsResponse,
+} from "common/models/user";
 import { setup2FA, verify2FA } from "http/services/auth.service";
 import { makeAutoObservable, runInAction } from "mobx";
 import { getKeyValue, localStorageClear, setKey } from "services/local-storage.service";
@@ -180,10 +186,11 @@ class TwoFactorAuth {
                 method: TWO_FACTOR_METHOD.EMAIL,
                 user: username,
             });
-            if (response && "2fasessionuid" in response) {
+            const sessionUid = getTfaSessionUid(response);
+            if (sessionUid) {
                 runInAction(() => {
-                    this._twoFactorSessionUID = response["2fasessionuid"];
-                    this._emailMasked = response.email_masked || "";
+                    this._twoFactorSessionUID = sessionUid;
+                    this._emailMasked = (response as { email_masked?: string }).email_masked || "";
                     this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
                     this._resendTimer = 60;
                 });
@@ -225,7 +232,7 @@ class TwoFactorAuth {
         const code = this._verificationCode.join("");
         try {
             const response = await verify2FA({
-                "2fasessionuid": this._twoFactorSessionUID,
+                [TFA_SESSION_UID_KEY]: this._twoFactorSessionUID,
                 code,
             });
 
@@ -254,10 +261,11 @@ class TwoFactorAuth {
                 phone: cleanPhoneNumber,
                 user: username,
             });
-            if (response && "2fasessionuid" in response) {
+            const sessionUid = getTfaSessionUid(response);
+            if (sessionUid) {
                 runInAction(() => {
-                    this._twoFactorSessionUID = response["2fasessionuid"];
-                    this._phoneMasked = response.phone_masked || "";
+                    this._twoFactorSessionUID = sessionUid;
+                    this._phoneMasked = (response as { phone_masked?: string }).phone_masked || "";
                     this._currentStep = TwoFactorAuthStep.VERIFICATION_CODE;
                     this._resendTimer = 60;
                 });
@@ -276,10 +284,10 @@ class TwoFactorAuth {
         if (this._resendTimer === 0) {
             try {
                 const response = await setup2FA({
-                    "2fasessionuid": this._twoFactorSessionUID,
+                    [TFA_SESSION_UID_KEY]: this._twoFactorSessionUID,
                     method: this._selectedMethod || TWO_FACTOR_METHOD.SMS,
                 });
-                if (response && "2fasessionuid" in response) {
+                if (getTfaSessionUid(response)) {
                     runInAction(() => {
                         this._resendTimer = 60;
                     });

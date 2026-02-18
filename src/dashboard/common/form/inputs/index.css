@@ -303,7 +303,32 @@
 }
 
 .text-input {
+    position: relative;
+
     .p-error {
-        bottom: -16px;
+        --line-height: 8px;
+        position: absolute;
+        display: inline-block;
+        left: 2px;
+        z-index: 1;
+        max-width: calc(100% - 4px);
+        bottom: -6px;
+        small {
+            font-size: 12px;
+        }
+
+        @media (max-width: 1780px) {
+            max-width: calc(100% - 20px);
+        }
+        &::before {
+            content: "";
+            z-index: -1;
+            position: absolute;
+            top: var(--line-height);
+            left: 0;
+            width: 100%;
+            height: var(--line-height);
+            background-color: var(--admss-app-white);
+        }
     }
 }
