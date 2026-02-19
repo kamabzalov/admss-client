@@ -83,7 +83,7 @@ export const getUserFavoriteReportList = async (uid: string) => {
 
 export const getReportAccessList = async (reportuid: string, params?: QueryParams) => {
     return new ApiRequest().get<ReportACL>({
-        url: `user/${reportuid}/reportacl`,
+        url: `user/${reportuid}/report-acl`,
         config: { params },
         defaultError: "Error while getting user report access list",
     });
