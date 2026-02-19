@@ -1,10 +1,12 @@
 import { Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { ReportAccess, ReportACL } from "common/models/reports";
-import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { useToast } from "dashboard/common/toast";
-import { getReportAccessList, setReportAccessList } from "http/services/reports.service";
+import {
+    getReportAccessList,
+    getReportAccessListForNewReport,
+    setReportAccessList,
+} from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Checkbox, CheckboxClickEvent } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
@@ -14,6 +16,7 @@ import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { useToastMessage } from "common/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ReportAccess;
@@ -73,23 +76,25 @@ export const EditAccessDialog = ({
     onHide,
     reportuid,
 }: EditAccessDialogProps): ReactElement => {
-    const userStore = useStore().userStore;
+    const store = useStore();
+    const userStore = store.userStore;
+    const reportStore = store.reportStore;
     const { authUser } = userStore;
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
     const [selectedRole, setSelectedRole] = useState<(ROLE | ACCESS)[]>([]);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [search, setSearch] = useState<string>("");
 
     const handleGetReportAccessList = (params?: QueryParams) => {
-        getReportAccessList(reportuid, params).then((response) => {
+        const isNewReport = !reportuid || reportuid === "0";
+        const apiCall = isNewReport
+            ? getReportAccessListForNewReport(params)
+            : getReportAccessList(reportuid, params);
+
+        apiCall.then((response) => {
             if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error || "Error while fetching report access list",
-                    life: TOAST_LIFETIME,
-                });
+                showError(response?.error || "Error while fetching report access list");
             } else {
                 const { acl } = response as ReportACL;
                 if (Array.isArray(acl)) {
@@ -101,6 +106,15 @@ export const EditAccessDialog = ({
             }
         });
     };
+
+    useEffect(() => {
+        const isNewReport = !reportuid || reportuid === "0";
+
+        if (isNewReport && reportStore.reportACL.length > 0) {
+            setAccessList(reportStore.reportACL);
+            setIsButtonDisabled(false);
+        }
+    }, []);
 
     useEffect(() => {
         let qry: string = search;
@@ -234,21 +248,20 @@ export const EditAccessDialog = ({
     };
 
     const handleSaveAccess = () => {
+        const isNewReport = !reportuid || reportuid === "0";
+
+        if (isNewReport) {
+            reportStore.reportACL = accessList;
+            reportStore.isReportChanged = true;
+            onHide();
+            return;
+        }
+
         setReportAccessList(reportuid, { reportuid, acl: accessList }).then((response) => {
             if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error || "Access update failed",
-                    life: TOAST_LIFETIME,
-                });
+                showError(response?.error || "Access update failed");
             } else {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Access updated successfully!",
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess("Access updated successfully!");
                 onHide();
             }
         });
