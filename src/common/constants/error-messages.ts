@@ -6,4 +6,10 @@ export const ERROR_MESSAGES: Readonly<Record<string, string>> = {
     PROVIDER_ERROR: "This hook must be used within a provider.",
     SSN_DUPLICATE: "SSN must differ for buyer and co-buyer.",
     NO_DATA: "No data available for display.",
+    AUTHENTICATION_FAILED: "Authentication failed",
+    INCORRECT_USERNAME: "Incorrect username. Please try again.",
+    INCORRECT_PASSWORD: "Incorrect password. Please try again.",
+    UNEXPECTED_ERROR: "An unexpected error occurred during login",
+    USERNAME_REQUIRED: "Username is required.",
+    PASSWORD_REQUIRED: "Password is required.",
 };

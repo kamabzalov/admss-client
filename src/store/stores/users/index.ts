@@ -295,7 +295,8 @@ export class UsersStore {
     );
 
     public createUser = async () => {
-        const id =
+        const newUseruid = "0";
+        const dealer_id =
             this.rootStore.userStore.authUser?.dealer_id ||
             this.rootStore.userStore.authUser?.useruid ||
             "0";
@@ -303,7 +304,7 @@ export class UsersStore {
             loginname: this._user.loginName || "",
             loginpassword: this._password,
             enabled: this._user.enabled || 1,
-            dealer_id: id,
+            dealer_id,
             roleuid: this._user.roleuid || "",
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
@@ -317,7 +318,7 @@ export class UsersStore {
             salespersonLicense: this._user.salespersonLicense || "",
         };
 
-        const response = await createUser(id, userData as Partial<UserData>);
+        const response = await createUser(newUseruid, userData as Partial<UserData>);
         if (response && response.status === Status.ERROR) {
             return {
                 status: Status.ERROR,
