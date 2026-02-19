@@ -89,7 +89,7 @@ export const PasswordInput = ({
                 {label}
             </label>
             {!!error && (
-                <div className='p-error pt-2'>
+                <div className='p-error'>
                     <TruncatedText text={errorMessage} withTooltip={true} width='full' />
                 </div>
             )}
