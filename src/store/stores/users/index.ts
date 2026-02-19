@@ -270,9 +270,11 @@ export class UsersStore {
         const response = await createOrUpdateRole(this._currentRole.roleuid || "", payload);
 
         if (response && response.status === Status.ERROR) {
+            const err = response as BaseResponseError & { available?: boolean };
             return {
                 status: Status.ERROR,
-                error: (response as BaseResponseError).error,
+                error: err.error,
+                available: err.available,
             };
         }
 
