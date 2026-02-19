@@ -1,7 +1,7 @@
 import { FilterOptions } from "dashboard/inventory/common/data-table";
 import { DataTableState } from "primereact/datatable";
-import { ContactType } from "../contact";
-import { BaseResponseError } from "../base-response";
+import { ContactType } from "common/models/contact";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { PermissionKey } from "common/constants/permissions";
 
 interface ColumnWidth {
@@ -122,6 +122,31 @@ export interface AuthUser {
 export enum TWO_FACTOR_METHOD {
     SMS = "sms",
     EMAIL = "email",
+}
+
+export const TFA_SESSION_UID_KEY = "2fasessionuid" as const;
+
+export const TFA_REQUIRED_KEY = "tfa_required" as const;
+
+export interface AuthResponseTfaRequired {
+    status: Status.OK;
+    [TFA_REQUIRED_KEY]?: boolean;
+    [TFA_SESSION_UID_KEY]?: string;
+}
+
+export function isAuthResponseTfaRequired(response: unknown): response is AuthResponseTfaRequired {
+    if (!response || typeof response !== "object") return false;
+    const responseData = response as Record<string, unknown>;
+    return (
+        responseData.status === Status.OK &&
+        (responseData[TFA_REQUIRED_KEY] === true || !!responseData[TFA_SESSION_UID_KEY])
+    );
+}
+
+export function getTfaSessionUid(response: unknown): string | undefined {
+    if (!response || typeof response !== "object") return undefined;
+    const value = (response as Record<string, unknown>)[TFA_SESSION_UID_KEY];
+    return typeof value === "string" && value ? value : undefined;
 }
 
 export interface TwoFactorCheckResponse {
