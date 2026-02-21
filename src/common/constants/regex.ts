@@ -25,4 +25,4 @@ export const PASSWORD_REGEX = {
     SPECIAL_CHAR_REGEX,
 };
 
-export const LOGIN_VALID_REGEX = /[^a-zA-Z0-9._-]/g;
+export const LOGIN_VALID_REGEX = /[\s\p{Extended_Pictographic}]/gu;
