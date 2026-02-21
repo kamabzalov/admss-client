@@ -53,6 +53,7 @@ export interface TasksUserSettings extends UserSettings {
 export interface ReportsUserSettings {
     scrollTop?: number;
     expandedKeys?: { [key: string]: boolean };
+    columnSelectHintViewed?: boolean;
 }
 
 export interface SidebarUserSettings {

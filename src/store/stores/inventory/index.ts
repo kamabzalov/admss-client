@@ -522,7 +522,6 @@ export class InventoryStore {
                     : Promise.resolve({ status: Status.OK });
 
                 const isNewInventory = !inventoryuid || inventoryuid === "0";
-
                 if (isNewInventory) {
                     const dealer_id =
                         this.rootStore.userStore.authUser?.dealer_id ||
