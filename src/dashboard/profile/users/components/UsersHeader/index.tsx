@@ -54,7 +54,7 @@ export default function UsersHeader({
                 onClick={onDownload}
             />
             <Button
-                className='table-roles-button ml-auto'
+                className='table-roles-button'
                 severity='success'
                 type='button'
                 icon='icon adms-roles'

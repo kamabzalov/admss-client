@@ -1,4 +1,12 @@
-.table-roles-button {
+.table-roles-button.p-button {
     font-weight: 600;
     margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 148px;
+    height: 50px;
+    .p-button-icon-left {
+        display: none;
+    }
 }
