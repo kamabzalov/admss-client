@@ -221,7 +221,11 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     </div>
                 </div>
                 <div className='report-control report-control__move'>
-                    <InfoOverlayPanel panelTitle='Note it' className='data-set__info dataset-info'>
+                    <InfoOverlayPanel
+                        panelTitle='Note it'
+                        className='data-set__info dataset-info'
+                        profileHintKey='columnSelectHintViewed'
+                    >
                         <DataSetInfoTemplate />
                     </InfoOverlayPanel>
                     {ControlButton(

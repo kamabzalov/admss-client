@@ -31,7 +31,7 @@ export const DataSetInfoTemplate = (): ReactElement => {
                 <span className='dataset-info__highlight'>Inventory</span>.
                 <br />
                 The
-                <span className='dataset-info__highlight'>
+                <span className='dataset-info__highlight pr-1'>
                     first column you add determines the primary entity
                 </span>
                 — the report will be grouped and generated based on that entity.
@@ -48,10 +48,11 @@ export const DataSetInfoTemplate = (): ReactElement => {
                 </li>
             </ul>
             <p className='dataset-info__text pt-3'>
-                <span className='dataset-info__highlight'>Entity Compatibility:</span>
+                <span className='dataset-info__highlight pl-0'>Entity Compatibility:</span>
             </p>
             <p className='dataset-info__text'>
-                Each report can only include entities that are directly linked. Use the guide below
+                Each report can only include entities that are directly linked. Use the guide below{" "}
+                <br />
                 to avoid invalid combinations:
             </p>
 
@@ -65,11 +66,11 @@ export const DataSetInfoTemplate = (): ReactElement => {
                 <Column field='compatible' header='Compatible with' />
             </DataTable>
             <p className='dataset-info__text'>
-                <span className='dataset-info__highlight'>Example:</span>
+                <span className='dataset-info__highlight pr-1'>Example:</span>
                 Contacts + Inventory is not allowed (no direct relationship).
             </p>
             <p className='dataset-info__text pt-3'>
-                <span className='dataset-info__highlight'>
+                <span className='dataset-info__highlight flex'>
                     Make sure to select the primary column first and then only add compatible
                     entities to avoid errors!
                 </span>
