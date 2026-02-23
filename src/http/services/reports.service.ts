@@ -196,7 +196,7 @@ export const deleteReportDocument = async (documentuid: string) => {
 
 export const setReportAccessList = async (reportuid: string, reportACL: Partial<ReportACL>) => {
     return new ApiRequest().post<any>({
-        url: `user/${reportuid}/reportacl`,
+        url: `user/${reportuid}/report-acl`,
         data: { ...reportACL },
         defaultError: "Error while setting report access list",
     });
