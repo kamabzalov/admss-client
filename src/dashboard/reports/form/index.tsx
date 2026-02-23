@@ -27,6 +27,7 @@ import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
 import { useFormExitConfirmation } from "common/hooks";
 import { REPORTS_PAGE } from "common/constants/links";
+import { TruncatedText } from "dashboard/common/display";
 
 const COLLECTION_DRAG_DELAY = 1000;
 const DEEPLY_NESTED_LEVEL = 3;
@@ -90,10 +91,10 @@ export const NodeContent = ({
         <div className='w-full' ref={ref}>
             <Button
                 onClick={onClick}
-                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
+                className={`report__list-item w-full min-w-0 ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
                 text
             >
-                {node.label}
+                <TruncatedText text={node.label || ""} withTooltip />
             </Button>
         </div>
     );
@@ -465,7 +466,7 @@ export const ReportForm = observer((): ReactElement => {
                                     <div
                                         onDragEnter={(e) => handleDragEnter(e, node)}
                                         onDragLeave={handleDragLeave}
-                                        className='w-full'
+                                        className='w-full min-w-0 overflow-hidden'
                                     >
                                         <NodeContent
                                             node={nodeData}
