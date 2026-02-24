@@ -265,9 +265,11 @@ export const AdvancedSearchDialog = <T,>({
                         return (
                             <div key={key} className='dialog-dates'>
                                 <DateInput
-                                    className={`${dateError ? "p-invalid" : ""} dialog-dates__input dialog-dates__input--start`}
+                                    className={`dialog-dates__input dialog-dates__input--start ${dateError ? "p-invalid" : ""}`}
                                     date={Number(startDate)}
                                     emptyDate
+                                    error={!!dateError}
+                                    errorMessage={dateError}
                                     onClearAction={() => {
                                         handleDateChange(0, true);
                                         onInputChange(key, "");
@@ -280,9 +282,11 @@ export const AdvancedSearchDialog = <T,>({
                                     }}
                                 />
                                 <DateInput
-                                    className={`${dateError ? "p-invalid" : ""} dialog-dates__input dialog-dates__input--end`}
+                                    className={`dialog-dates__input dialog-dates__input--end ${dateError ? "p-invalid" : ""}`}
                                     date={Number(endDate)}
                                     emptyDate
+                                    error={!!dateError}
+                                    errorMessage={dateError}
                                     onClearAction={() => {
                                         handleDateChange(0, false);
                                         onInputChange(key, "");

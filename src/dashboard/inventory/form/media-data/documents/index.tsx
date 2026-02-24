@@ -11,7 +11,7 @@ import {
     FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
 } from "primereact/fileupload";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
@@ -254,7 +254,9 @@ export const DocumentsMedia = observer((): ReactElement => {
                     value={uploadFileDocuments?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
-                <InputText
+                <TextInput
+                    name='comment'
+                    label='Comment'
                     className='media-input__text'
                     placeholder='Comment'
                     value={uploadFileDocuments?.data?.notes || ""}

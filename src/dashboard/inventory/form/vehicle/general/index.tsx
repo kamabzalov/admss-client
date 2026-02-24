@@ -1,4 +1,3 @@
-import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -17,7 +16,7 @@ import { observer } from "mobx-react-lite";
 import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
 import { Audit, Inventory, InventoryLocations, MakesListData } from "common/models/inventory";
-import { InputNumber } from "primereact/inputnumber";
+import { TextInput, NumberInput } from "dashboard/common/form/inputs";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -401,10 +400,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     required
                     className={`w-full vehicle-general__dropdown ${
                         inventory.locationuid === "" && "p-inputwrapper-filled"
-                    } ${errors.locationuid ? "p-invalid" : ""}`}
+                    }`}
                     label='Location name (required)'
+                    error={!!errors.locationuid}
+                    errorMessage={errors.locationuid}
                 />
-                <small className='p-error'>{errors.locationuid}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -416,12 +416,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     onChange={handleGroupClassChange}
                     onFocus={() => setIsGroupClassFocused(true)}
                     onBlur={() => setIsGroupClassFocused(false)}
-                    className={`w-full vehicle-general__dropdown ${
-                        errors.GroupClassName ? "p-invalid" : ""
-                    }`}
+                    className='w-full vehicle-general__dropdown'
                     label={`Inventory group (${!inventory.GroupClassName && !isGroupClassFocused ? "req." : "required"})`}
+                    error={!!errors.GroupClassName}
+                    errorMessage={errors.GroupClassName}
                 />
-                <small className='p-error'>{errors.GroupClassName}</small>
             </div>
 
             <div className='col-12'>
@@ -429,18 +428,18 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             {inventory.GroupClassName === EQUIPMENT ? (
                 <div className='col-6 relative'>
-                    <span className='p-float-label'>
-                        <InputText
-                            value={values.VIN}
-                            onChange={({ target: { value } }) => {
-                                setFieldValue("VIN", value);
-                                changeInventory({ key: "VIN", value });
-                            }}
-                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
-                        />
-                        <label className='float-label'>VIN (required)</label>
-                    </span>
-                    <small className='p-error'>{errors.VIN}</small>
+                    <TextInput
+                        name='VIN'
+                        label='VIN (required)'
+                        value={values.VIN}
+                        onChange={({ target: { value } }) => {
+                            setFieldValue("VIN", value);
+                            changeInventory({ key: "VIN", value });
+                        }}
+                        className='w-full'
+                        error={!!errors.VIN}
+                        errorMessage={errors.VIN}
+                    />
                 </div>
             ) : (
                 <>
@@ -480,43 +479,44 @@ export const VehicleGeneral = observer((): ReactElement => {
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}
-                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
+                            className='w-full'
+                            error={!!errors.VIN}
+                            errorMessage={errors.VIN as string}
                         />
-                        <small className='p-error'>{errors.VIN}</small>
                     </div>
                 </>
             )}
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={
-                            "vehicle-general__text-input w-full" +
-                            (errors.StockNo ? " p-invalid" : "")
+                <TextInput
+                    name='StockNo'
+                    label='Stock#'
+                    className='vehicle-general__text-input w-full'
+                    value={values.StockNo}
+                    error={!!errors.StockNo}
+                    errorMessage={errors.StockNo}
+                    onChange={async ({ target: { value } }) => {
+                        await setFieldValue("StockNo", value);
+                        await setFieldTouched("StockNo", true, false);
+                        changeInventory({ key: "StockNo", value });
+                        validateField("StockNo");
+                    }}
+                    onInput={(event: React.FormEvent<HTMLInputElement>) => {
+                        const value = (event.target as HTMLInputElement).value;
+                        if (!value) {
+                            return changeInventory({ key: "StockNo", value: "" });
                         }
-                        name='StockNo'
-                        value={values.StockNo}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("StockNo", value);
-                            await setFieldTouched("StockNo", true, false);
-                            changeInventory({ key: "StockNo", value });
-                            validateField("StockNo");
-                        }}
-                        onInput={(event: React.FormEvent<HTMLInputElement>) => {
-                            const value = (event.target as HTMLInputElement).value;
-                            if (!value) {
-                                return changeInventory({ key: "StockNo", value: "" });
-                            }
-                            setFieldValue("StockNo", value);
-                            changeInventory({ key: "StockNo", value });
-                        }}
-                    />
-                    <label className='float-label'>Stock#</label>
-                </span>
-                <small className='p-error'>{errors.StockNo}</small>
+                        setFieldValue("StockNo", value);
+                        changeInventory({ key: "StockNo", value });
+                    }}
+                />
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
+                <span
+                    className={`p-float-label input-error-wrapper relative ${
+                        errors.Make ? "p-invalid" : ""
+                    }`}
+                >
                     <AutoComplete
                         {...getFieldProps("Make")}
                         value={values.Make}
@@ -555,9 +555,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
+                    {errors.Make && (
+                        <div className='p-error'>
+                            <small>{errors.Make}</small>
+                        </div>
+                    )}
                 </span>
-
-                <small className='p-error'>{errors.Make}</small>
             </div>
 
             <div className='col-6 relative'>
@@ -585,77 +588,59 @@ export const VehicleGeneral = observer((): ReactElement => {
                         setFieldValue("Model", model);
                         changeInventory({ key: "Model", value: model });
                     }}
-                    className={`vehicle-general__dropdown w-full ${
-                        errors.Model ? "p-invalid" : ""
-                    }`}
+                    className='vehicle-general__dropdown w-full'
                     itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
                     label='Model (required)'
+                    error={!!errors.Model}
+                    errorMessage={errors.Model}
                 />
-                <small className='p-error'>{errors.Model}</small>
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='vehicle-general__text-input w-full'
-                        value={inventory?.Trim || ""}
-                        maxLength={16}
-                        onChange={({ target: { value } }) =>
-                            changeInventory({ key: "Trim", value })
-                        }
-                    />
-                    <label className='float-label'>Trim</label>
-                </span>
+                <TextInput
+                    name='Trim'
+                    label='Trim'
+                    className='vehicle-general__text-input w-full'
+                    value={inventory?.Trim || ""}
+                    maxLength={16}
+                    onChange={({ target: { value } }) => changeInventory({ key: "Trim", value })}
+                />
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        {...getFieldProps("Year")}
-                        className={`vehicle-general__text-input w-full ${
-                            errors.Year ? "p-invalid" : ""
-                        }`}
-                        useGrouping={false}
-                        value={parseInt(values.Year) || null}
-                        onChange={({ value }) => {
-                            if (!value) {
-                                return changeInventory({ key: "Year", value: "" });
-                            }
-                            setFieldValue("Year", value);
-                            changeInventory({ key: "Year", value: String(value) });
-                        }}
-                        onInput={(event: React.FormEvent<HTMLInputElement>) => {
-                            const value = (event.target as HTMLInputElement).value;
-                            if (!value) {
-                                return changeInventory({ key: "Year", value: "" });
-                            }
-                            setFieldValue("Year", value);
-                            changeInventory({ key: "Year", value: String(value) });
-                        }}
-                    />
-                    <label className='float-label'>Year (required)</label>
-                </span>
-                <small className='p-error'>{errors.Year}</small>
+                <NumberInput
+                    name='Year'
+                    label='Year (required)'
+                    className='vehicle-general__text-input w-full'
+                    useGrouping={false}
+                    value={parseInt(values.Year) || null}
+                    error={!!errors.Year}
+                    errorMessage={errors.Year}
+                    onValueChange={({ value }) => {
+                        if (!value) {
+                            return changeInventory({ key: "Year", value: "" });
+                        }
+                        setFieldValue("Year", value);
+                        changeInventory({ key: "Year", value: String(value) });
+                    }}
+                />
             </div>
 
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        {...getFieldProps("mileage")}
-                        className={`vehicle-general__text-input w-full ${
-                            errors.mileage ? "p-invalid" : ""
-                        }`}
-                        value={parseMileage(inventory?.mileage || "0")}
-                        useGrouping={false}
-                        min={0}
-                        onChange={({ value }) => {
-                            changeInventory({
-                                key: "mileage",
-                                value: value ? String(value) : "0",
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Mileage</label>
-                </span>
-                <small className='p-error'>{errors.mileage}</small>
+                <NumberInput
+                    name='mileage'
+                    label='Mileage'
+                    className='vehicle-general__text-input w-full'
+                    value={parseMileage(inventory?.mileage || "0")}
+                    useGrouping={false}
+                    min={0}
+                    error={!!errors.mileage}
+                    errorMessage={errors.mileage}
+                    onValueChange={({ value }) => {
+                        changeInventory({
+                            key: "mileage",
+                            value: value ? String(value) : "0",
+                        });
+                    }}
+                />
             </div>
             <div className='col-3'>
                 <ComboBox

@@ -1,7 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
-import { BorderedCheckbox, DashboardRadio, DateInput } from "dashboard/common/form/inputs";
+import {
+    BorderedCheckbox,
+    DashboardRadio,
+    DateInput,
+    TextInput,
+} from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 
@@ -59,17 +64,16 @@ export const DealRetailTag = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='deal-odometer__text-input w-full'
-                        value={Class_of_License}
-                        disabled={!Title_and_License}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Class_of_License", value })
-                        }
-                    />
-                    <label className='float-label'>Class of License</label>
-                </span>
+                <TextInput
+                    name='Class_of_License'
+                    label='Class of License'
+                    className='deal-odometer__text-input w-full'
+                    value={Class_of_License}
+                    disabled={!Title_and_License}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Class_of_License", value })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
@@ -82,17 +86,16 @@ export const DealRetailTag = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='deal-odometer__text-input w-full'
-                        value={Plate_Number}
-                        disabled={!Title_and_License}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Plate_Number", value })
-                        }
-                    />
-                    <label className='float-label'>Plate#</label>
-                </span>
+                <TextInput
+                    name='Plate_Number'
+                    label='Plate#'
+                    className='deal-odometer__text-input w-full'
+                    value={Plate_Number}
+                    disabled={!Title_and_License}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Plate_Number", value })
+                    }
+                />
             </div>
 
             <div className='col-3'>
@@ -148,7 +151,7 @@ export const DealRetailTag = observer((): ReactElement => {
                                 className='deal-odometer__text-input w-full'
                                 disabled={!Plate_Transferred || !Title_and_License}
                                 value={!Plate_Transferred ? "" : Transferred_Plate_Number}
-                                onChange={({ target: { value } }) =>
+                                onChange={({ target: { value } }: { target: { value: string } }) =>
                                     changeDealExtData({ key: "Transferred_Plate_Number", value })
                                 }
                             />
@@ -161,7 +164,7 @@ export const DealRetailTag = observer((): ReactElement => {
                                 className='deal-odometer__text-input w-full'
                                 disabled={!Exchanged_Plates || !Title_and_License}
                                 value={!Exchanged_Plates ? "" : Exchanged_Plate_Number}
-                                onChange={({ target: { value } }) =>
+                                onChange={({ target: { value } }: { target: { value: string } }) =>
                                     changeDealExtData({ key: "Exchanged_Plate_Number", value })
                                 }
                             />
@@ -174,7 +177,7 @@ export const DealRetailTag = observer((): ReactElement => {
                                 className='deal-odometer__text-input w-full'
                                 disabled={!Replace_Plate || !Title_and_License}
                                 value={!Replace_Plate ? "" : Replaced_Plate_Number}
-                                onChange={({ target: { value } }) =>
+                                onChange={({ target: { value } }: { target: { value: string } }) =>
                                     changeDealExtData({ key: "Replaced_Plate_Number", value })
                                 }
                             />
@@ -206,7 +209,7 @@ export const DealRetailTag = observer((): ReactElement => {
                         className='deal-odometer__text-input w-full'
                         value={TempTagNumber}
                         disabled={!Title_and_License}
-                        onChange={({ target: { value } }) =>
+                        onChange={({ target: { value } }: { target: { value: string } }) =>
                             changeDealExtData({ key: "TempTagNumber", value })
                         }
                     />

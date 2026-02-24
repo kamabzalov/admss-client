@@ -2,8 +2,9 @@ import "./index.css";
 import { ChangeEvent, ReactElement, useEffect, useState, useRef, useId } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
+import { DropdownChangeEvent } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
@@ -112,7 +113,7 @@ export const LinksMedia = observer((): ReactElement => {
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileLinks = {
             ...store.uploadFileLinks,
-            contenttype: e.target.value,
+            contenttype: e.value,
         };
     };
 
@@ -368,16 +369,18 @@ export const LinksMedia = observer((): ReactElement => {
             </div>
 
             <div className='col-12 mt-2 media-input'>
-                <Dropdown
+                <ComboBox
                     className='media-input__dropdown'
                     placeholder='Category'
-                    optionLabel={"name"}
-                    optionValue={"id"}
+                    optionLabel='name'
+                    optionValue='id'
                     options={[...CATEGORIES]}
                     value={uploadFileLinks?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
-                <InputText
+                <TextInput
+                    name='comment'
+                    label='Comment'
                     className='media-input__text'
                     placeholder='Comment'
                     value={uploadFileLinks?.notes || ""}

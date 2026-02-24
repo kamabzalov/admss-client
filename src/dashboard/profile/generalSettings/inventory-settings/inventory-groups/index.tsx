@@ -1,7 +1,7 @@
 import "./index.css";
 import { Button } from "primereact/button";
 import { ReactElement, useState, useMemo } from "react";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { addUserGroupList, deleteUserGroupList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
@@ -251,7 +251,9 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                 <div className='inventory-group__name'>
                                     {editedItem.itemuid === item.itemuid ? (
                                         <div className='flex row-edit'>
-                                            <InputText
+                                            <TextInput
+                                                name='description'
+                                                label=''
                                                 type='text'
                                                 value={editedItem.description}
                                                 className='row-edit__input'

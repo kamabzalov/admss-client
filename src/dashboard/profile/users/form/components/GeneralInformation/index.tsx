@@ -1,7 +1,7 @@
 import { ReactElement, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Skeleton } from "primereact/skeleton";
 import { Splitter } from "dashboard/common/display";
 import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/inputs";
@@ -134,34 +134,31 @@ export const GeneralInformation = observer((): ReactElement | null => {
             <Splitter title='Personal Data' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <InputText
-                            className='w-full'
-                            value={user?.firstName || ""}
-                            onChange={(e) => changeUserData("firstName", e.target.value)}
-                        />
-                        <label className='float-label'>First Name (required)</label>
-                    </span>
+                    <TextInput
+                        name='firstName'
+                        label='First Name (required)'
+                        className='w-full'
+                        value={user?.firstName || ""}
+                        onChange={(e) => changeUserData("firstName", e.target.value)}
+                    />
                 </div>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <InputText
-                            className='w-full'
-                            value={user?.middleName || ""}
-                            onChange={(e) => changeUserData("middleName", e.target.value)}
-                        />
-                        <label className='float-label'>Middle Name</label>
-                    </span>
+                    <TextInput
+                        name='middleName'
+                        label='Middle Name'
+                        className='w-full'
+                        value={user?.middleName || ""}
+                        onChange={(e) => changeUserData("middleName", e.target.value)}
+                    />
                 </div>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <InputText
-                            className='w-full'
-                            value={user?.lastName || ""}
-                            onChange={(e) => changeUserData("lastName", e.target.value)}
-                        />
-                        <label className='float-label'>Last Name (required)</label>
-                    </span>
+                    <TextInput
+                        name='lastName'
+                        label='Last Name (required)'
+                        className='w-full'
+                        value={user?.lastName || ""}
+                        onChange={(e) => changeUserData("lastName", e.target.value)}
+                    />
                 </div>
             </div>
             <div className='general-information__role-header'>
@@ -212,16 +209,16 @@ export const GeneralInformation = observer((): ReactElement | null => {
             <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
-                    <span className='p-float-label general-information__login'>
-                        <InputText
-                            className={`w-full ${loginError ? "p-invalid" : ""}`}
-                            value={user?.loginName || ""}
-                            onChange={(e) => handleLoginChange(e.target.value)}
-                            onBlur={handleLoginBlur}
-                        />
-                        <label className='float-label'>Login (required)</label>
-                        {loginError && <small className='p-error'>{loginError}</small>}
-                    </span>
+                    <TextInput
+                        name='loginName'
+                        label='Login (required)'
+                        className='w-full general-information__login'
+                        value={user?.loginName || ""}
+                        error={!!loginError}
+                        errorMessage={loginError}
+                        onChange={(e) => handleLoginChange(e.target.value)}
+                        onBlur={handleLoginBlur}
+                    />
                 </div>
                 <div className='col-4'>
                     <EmailInput

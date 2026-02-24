@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import { Checkbox, CheckboxClickEvent } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import "./index.css";
@@ -351,7 +351,9 @@ export const EditAccessDialog = ({
                     </div>
                     <span className='p-input-icon-right'>
                         <i className='icon adms-search' />
-                        <InputText
+                        <TextInput
+                            name='search'
+                            label='Search'
                             placeholder='Search'
                             className='w-full'
                             value={search}

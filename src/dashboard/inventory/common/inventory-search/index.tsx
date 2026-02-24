@@ -18,6 +18,8 @@ interface InventorySearchProps extends DropdownProps {
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
     originalPath?: string;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const InventorySearch = ({
@@ -28,6 +30,8 @@ export const InventorySearch = ({
     returnedField,
     getFullInfo,
     originalPath,
+    error,
+    errorMessage,
     ...props
 }: InventorySearchProps) => {
     const { inventoryPermissions } = usePermissions();
@@ -85,6 +89,8 @@ export const InventorySearch = ({
                         : undefined
                 }
                 disabled={!canSelectInventory}
+                error={error}
+                errorMessage={errorMessage}
                 {...props}
             />
             {canSelectInventory && (

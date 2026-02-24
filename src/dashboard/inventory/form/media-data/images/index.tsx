@@ -11,7 +11,7 @@ import {
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { DropdownChangeEvent } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
@@ -302,7 +302,9 @@ export const ImagesMedia = observer((): ReactElement => {
                     value={uploadFileImages?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
-                <InputText
+                <TextInput
+                    name='comment'
+                    label='Comment'
                     className='media-input__text'
                     placeholder='Comment'
                     value={uploadFileImages?.data?.notes || ""}

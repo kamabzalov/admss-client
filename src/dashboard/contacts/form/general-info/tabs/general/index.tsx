@@ -261,18 +261,16 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                 value={contact.type || 0}
                                 options={typeList}
                                 onChange={handleTypeChange}
-                                className={`w-full general-info__dropdown ${
-                                    errors.type ? "p-invalid" : ""
-                                }`}
+                                className='w-full general-info__dropdown'
                                 label='Type (required)'
+                                error={!!errors.type}
+                                errorMessage={errors.type as string}
                                 pt={{
                                     wrapper: {
                                         style: { height: "auto", maxHeight: "none" },
                                     },
                                 }}
                             />
-
-                            <small className='p-error'>{errors.type}</small>
                         </div>
                     </div>
                     {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (

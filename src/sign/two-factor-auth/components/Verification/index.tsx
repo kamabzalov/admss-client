@@ -1,4 +1,4 @@
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { FormikProps } from "formik";
 import { observer } from "mobx-react-lite";
@@ -83,9 +83,17 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
             <form className='auth-verification' onSubmit={formik.handleSubmit}>
                 <div className='two-factor-auth__code-inputs'>
                     {twoFactorAuthStore.verificationCode.map((code, index) => (
-                        <InputText
+                        <TextInput
                             key={index}
-                            ref={(el) => twoFactorAuthStore.setCodeInputRef(index, el)}
+                            name={`code-${index}`}
+                            label=''
+                            ref={
+                                ((el: HTMLInputElement | null) =>
+                                    twoFactorAuthStore.setCodeInputRef(
+                                        index,
+                                        el
+                                    )) as unknown as React.RefObject<HTMLInputElement>
+                            }
                             value={code}
                             onChange={(e) => {
                                 handleCodeChange(index, e.target.value);

@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { Button } from "primereact/button";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
 import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
@@ -50,10 +51,10 @@ export default function AuditHeader({
     return (
         <div className='datatable-controls'>
             <span className='p-float-label accounts-filter-wrapper'>
-                <Dropdown
+                <ComboBox
+                    id='account-type-input'
                     optionValue='value'
                     optionLabel='name'
-                    inputId='account-type-input'
                     value={selectedAccountType}
                     options={accountTypeOptions}
                     valueTemplate={accountTypeSelectedItemTemplate}

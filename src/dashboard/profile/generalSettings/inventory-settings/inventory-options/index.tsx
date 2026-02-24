@@ -6,7 +6,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
 import { getInventoryGroupOptions } from "http/services/inventory-service";
-import { Dropdown } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { observer } from "mobx-react-lite";
 import { GeneralInventoryOptions } from "common/models/general-settings";
 import { NEW_ITEM, InventoryOptionRow, HeaderColumn } from "./template";
@@ -309,7 +309,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             <div className='flex justify-content-end align-items-center mb-4'>
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <Dropdown
+                        <ComboBox
                             optionLabel='description'
                             optionValue='itemuid'
                             filter
@@ -320,9 +320,9 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                 store.inventoryGroupID = e.value;
                             }}
                             placeholder='Group class'
-                            className={`w-full vehicle-general__dropdown`}
+                            className='w-full vehicle-general__dropdown'
+                            label='Options by inventory group'
                         />
-                        <label className='float-label'>Options by inventory group</label>
                     </span>
                 </div>
                 <Button

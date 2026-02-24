@@ -1,11 +1,11 @@
+import { PhoneInput, TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { InputText, InputTextProps } from "primereact/inputtext";
+import { InputTextProps } from "primereact/inputtext";
 import { ReactElement, useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { Contact } from "common/models/contact";
-import { PhoneInput } from "dashboard/common/form/inputs";
 
 interface SocialInputProps extends InputTextProps {
     social: "Facebook" | "WhatsApp" | "Slack" | "Microsoft Teams";
@@ -21,12 +21,13 @@ const SocialInput = (props: SocialInputProps): ReactElement => {
     const currentIcon = iconMap[props.social];
 
     return (
-        <span className='p-float-label contact-social'>
-            <InputText
+        <span className='contact-social'>
+            <TextInput
                 {...props}
+                name={props.social}
+                label={props.social}
                 className='contact-social__input contacts-social__text-input w-full'
             />
-            <label className='float-label'>{props.social}</label>
             <i className={`${currentIcon} contact-social__icon`} />
         </span>
     );
@@ -51,44 +52,44 @@ export const ContactsSocialInfo = observer((): ReactElement => {
     return (
         <div className='grid contacts-social row-gap-2'>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        type='email'
-                        className={`contacts-social__text-input w-full ${
-                            errors.email1 ? "p-invalid" : ""
-                        }`}
-                        value={values.email1 || ""}
-                        onBlur={handleBlur}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("email1", value);
-                            changeContact("email1", value);
-                            setFieldTouched("email1", true, true);
-                        }}
-                    />
-                    <label className='float-label'>E-mail address</label>
-                </span>
-                <small className='p-error'>{errors.email1}</small>
+                <TextInput
+                    name='email1'
+                    label='E-mail address'
+                    type='email'
+                    className={`contacts-social__text-input w-full ${
+                        errors.email1 ? "p-invalid" : ""
+                    }`}
+                    value={values.email1 || ""}
+                    onBlur={handleBlur}
+                    error={!!errors.email1}
+                    errorMessage={errors.email1}
+                    onChange={async ({ target: { value } }) => {
+                        await setFieldValue("email1", value);
+                        changeContact("email1", value);
+                        setFieldTouched("email1", true, true);
+                    }}
+                />
             </div>
             {anotherEmail ? (
                 <div className='col-6 relative'>
-                    <span className='p-float-label'>
-                        <InputText
-                            type='email'
-                            className={`contacts-social__text-input w-full ${
-                                errors.email2 ? "p-invalid" : ""
-                            }`}
-                            onBlur={handleBlur}
-                            value={values.email2 || ""}
-                            onChange={async ({ target: { value } }) => {
-                                if (!value?.length) setAnotherEmail(false);
-                                await setFieldValue("email2", value);
-                                changeContact("email2", value);
-                                setFieldTouched("email2", true, true);
-                            }}
-                        />
-                        <label className='float-label'>E-mail address</label>
-                    </span>
-                    <small className='p-error'>{errors.email2}</small>
+                    <TextInput
+                        name='email2'
+                        label='E-mail address'
+                        type='email'
+                        className={`contacts-social__text-input w-full ${
+                            errors.email2 ? "p-invalid" : ""
+                        }`}
+                        onBlur={handleBlur}
+                        value={values.email2 || ""}
+                        error={!!errors.email2}
+                        errorMessage={errors.email2}
+                        onChange={async ({ target: { value } }) => {
+                            if (!value?.length) setAnotherEmail(false);
+                            await setFieldValue("email2", value);
+                            changeContact("email2", value);
+                            setFieldTouched("email2", true, true);
+                        }}
+                    />
                 </div>
             ) : (
                 <div className='col-6'>
