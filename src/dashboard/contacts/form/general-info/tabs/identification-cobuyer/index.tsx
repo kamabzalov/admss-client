@@ -1,7 +1,6 @@
+import { DateInput, TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
-import { DateInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
 import { PartialContact } from "dashboard/contacts/form";
 import {
@@ -186,16 +185,15 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
                 </div>
 
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <InputText
-                            className='identification-info__text-input w-full'
-                            value={contactExtData.CoBuyer_Driver_License_Num || ""}
-                            onChange={({ target: { value } }) => {
-                                changeContactExtData("CoBuyer_Driver_License_Num", value);
-                            }}
-                        />
-                        <label className='float-label'>Driver License's Number</label>
-                    </span>
+                    <TextInput
+                        name='CoBuyer_Driver_License_Num'
+                        label="Driver License's Number"
+                        className='identification-info__text-input w-full'
+                        value={contactExtData.CoBuyer_Driver_License_Num || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("CoBuyer_Driver_License_Num", value);
+                        }}
+                    />
                 </div>
 
                 <div className='col-3 mr-2'>

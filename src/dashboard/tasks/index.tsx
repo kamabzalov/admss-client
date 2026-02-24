@@ -7,7 +7,7 @@ import {
     DataTableValue,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -312,7 +312,9 @@ export const TasksDataTable = observer((): ReactElement => {
                 <div className='flex align-items-center gap-3 flex-wrap'>
                     <span className='p-input-icon-right tasks-search'>
                         <i className='icon adms-search' />
-                        <InputText
+                        <TextInput
+                            name='search'
+                            label='Search'
                             value={globalSearch}
                             placeholder='Search'
                             onChange={(e) => setGlobalSearch(e.target.value)}

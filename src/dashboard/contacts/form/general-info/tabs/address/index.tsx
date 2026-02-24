@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { AutoComplete } from "primereact/autocomplete";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
@@ -300,33 +300,29 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             />
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='address-info__text-input w-full'
-                        value={(type === BUYER ? contact.city : contactExtData.CoBuyer_City) || ""}
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("city", value)
-                                : changeContactExtData("CoBuyer_City", value)
-                        }
-                        disabled={isControlDisabled}
-                    />
-                    <label className='float-label'>City</label>
-                </span>
+                <TextInput
+                    name='city'
+                    label='City'
+                    className='address-info__text-input w-full'
+                    value={(type === BUYER ? contact.city : contactExtData.CoBuyer_City) || ""}
+                    onChange={({ target: { value } }) =>
+                        type === BUYER
+                            ? changeContact("city", value)
+                            : changeContactExtData("CoBuyer_City", value)
+                    }
+                    disabled={isControlDisabled}
+                />
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='address-info__text-input w-full'
-                        value={
-                            (type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Zip_Code) || ""
-                        }
-                        onChange={({ target: { value } }) => handlePrimaryZipCodeChange(value)}
-                        disabled={isControlDisabled}
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
+                <TextInput
+                    name='ZIP'
+                    label='Zip Code'
+                    className='address-info__text-input w-full'
+                    value={(type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Zip_Code) || ""}
+                    onChange={({ target: { value } }) => handlePrimaryZipCodeChange(value)}
+                    disabled={isControlDisabled}
+                />
             </div>
             <div className='col-12 grid'>
                 <div className='col-9 text-line'>
@@ -436,39 +432,35 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='mailing-address-info__text-input w-full'
-                        value={
-                            (type === BUYER
-                                ? contact.mailCity
-                                : contactExtData.CoBuyer_Mailing_City) || ""
-                        }
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("mailCity", value)
-                                : changeContactExtData("CoBuyer_Mailing_City", value)
-                        }
-                        disabled={isSameAsMailing || isControlDisabled}
-                    />
-                    <label className='float-label'>City</label>
-                </span>
+                <TextInput
+                    name='mailCity'
+                    label='City'
+                    className='mailing-address-info__text-input w-full'
+                    value={
+                        (type === BUYER ? contact.mailCity : contactExtData.CoBuyer_Mailing_City) ||
+                        ""
+                    }
+                    onChange={({ target: { value } }) =>
+                        type === BUYER
+                            ? changeContact("mailCity", value)
+                            : changeContactExtData("CoBuyer_Mailing_City", value)
+                    }
+                    disabled={isSameAsMailing || isControlDisabled}
+                />
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='mailing-address-info__text-input w-full'
-                        value={
-                            (type === BUYER
-                                ? contact.mailZIP
-                                : contactExtData.CoBuyer_Mailing_Zip) || ""
-                        }
-                        onChange={({ target: { value } }) => handleMailingZipCodeChange(value)}
-                        disabled={isSameAsMailing || isControlDisabled}
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
+                <TextInput
+                    name='mailZIP'
+                    label='Zip Code'
+                    className='mailing-address-info__text-input w-full'
+                    value={
+                        (type === BUYER ? contact.mailZIP : contactExtData.CoBuyer_Mailing_Zip) ||
+                        ""
+                    }
+                    onChange={({ target: { value } }) => handleMailingZipCodeChange(value)}
+                    disabled={isSameAsMailing || isControlDisabled}
+                />
             </div>
         </div>
     );

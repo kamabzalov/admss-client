@@ -5,7 +5,8 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { DropdownChangeEvent } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { Checkbox } from "primereact/checkbox";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TableColumnsList } from "dashboard/accounts/common/data-table";
@@ -118,10 +119,10 @@ export default function AccountsHeader({
                 disabled={isLoading}
             />
             <span className='p-float-label accounts-filter-wrapper ml-auto'>
-                <Dropdown
+                <ComboBox
+                    id='account-type-input'
                     optionValue='value'
                     optionLabel='name'
-                    inputId='account-type-input'
                     value={selectedAccountType}
                     options={accountTypeOptions}
                     valueTemplate={accountTypeSelectedItemTemplate}

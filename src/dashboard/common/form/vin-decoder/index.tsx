@@ -11,6 +11,8 @@ import { Loader } from "dashboard/common/loader";
 interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
     buttonClassName?: string;
+    error?: boolean;
+    errorMessage?: string;
 }
 export const MIN_VIN_LENGTH = 1;
 export const MAX_VIN_LENGTH = 17;
@@ -25,8 +27,11 @@ export const VINDecoder = ({
     onChange,
     disabled,
     buttonClassName,
+    error,
+    errorMessage,
     ...props
 }: VINDecoderProps): ReactElement => {
+    const showError = error || !!errorMessage;
     const toast = useToast();
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
     const [isDecoding, setIsDecoding] = useState<boolean>(false);
@@ -75,24 +80,34 @@ export const VINDecoder = ({
     }, [disabled, value, buttonDisabled]);
 
     return (
-        <span className='p-float-label vin-decoder'>
-            <InputText
-                {...props}
-                className={`vin-decoder__text-input ${props.className}`}
-                value={value?.toUpperCase()}
-                onChange={handleInputChange}
-            />
-            <Button
-                className={`vin-decoder__decode-button ${buttonClassName} ${isDecoding ? "vin-decoder__decode-button--loading" : ""}`}
-                disabled={buttonDisabled || disabled}
-                loading={isDecoding}
-                type='button'
-                onClick={handleGetVinInfo}
-                loadingIcon={<Loader size='small' includeText={false} color='white' />}
-            >
-                Decode
-            </Button>
-            <label className='float-label'>VIN (required)</label>
+        <span
+            className={`vin-decoder__wrapper relative ${showError ? "p-invalid" : ""}`}
+            style={{ display: "block", width: "100%" }}
+        >
+            <span className='p-float-label vin-decoder'>
+                <InputText
+                    {...props}
+                    className={`vin-decoder__text-input ${showError ? "p-invalid" : ""} ${props.className || ""}`}
+                    value={value?.toUpperCase()}
+                    onChange={handleInputChange}
+                />
+                <Button
+                    className={`vin-decoder__decode-button ${buttonClassName} ${isDecoding ? "vin-decoder__decode-button--loading" : ""}`}
+                    disabled={buttonDisabled || disabled}
+                    loading={isDecoding}
+                    type='button'
+                    onClick={handleGetVinInfo}
+                    loadingIcon={<Loader size='small' includeText={false} color='white' />}
+                >
+                    Decode
+                </Button>
+                <label className='float-label'>VIN (required)</label>
+            </span>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
         </span>
     );
 };

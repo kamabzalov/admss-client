@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { DateInput, PhoneInput, StateDropdown } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
@@ -61,16 +61,15 @@ export const DealRetailLiens = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='deal-liens__text-input w-full'
-                        value={First_Lien_Address}
-                        onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "First_Lien_Address", value })
-                        }
-                    />
-                    <label className='float-label'>Address</label>
-                </span>
+                <TextInput
+                    name='First_Lien_Address'
+                    label='Address'
+                    className='deal-liens__text-input w-full'
+                    value={First_Lien_Address}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "First_Lien_Address", value })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <StateDropdown
@@ -83,28 +82,26 @@ export const DealRetailLiens = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={First_Lien_City}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "First_Lien_City", value });
-                        }}
-                        className='w-full deal-liens__text'
-                    />
-                    <label className='float-label'>City</label>
-                </span>
+                <TextInput
+                    name='First_Lien_City'
+                    label='City'
+                    value={First_Lien_City}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "First_Lien_City", value });
+                    }}
+                    className='w-full deal-liens__text'
+                />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={First_Lien_Zip_Code}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "First_Lien_Zip_Code", value });
-                        }}
-                        className='deal-liens__text-input w-full'
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
+                <TextInput
+                    name='First_Lien_Zip_Code'
+                    label='Zip Code'
+                    value={First_Lien_Zip_Code}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "First_Lien_Zip_Code", value });
+                    }}
+                    className='deal-liens__text-input w-full'
+                />
             </div>
 
             <hr className='form-line' />
@@ -119,28 +116,26 @@ export const DealRetailLiens = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={First_Lien_Acct_Num}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "First_Lien_Acct_Num", value });
-                        }}
-                        className='deal-liens__text-input w-full'
-                    />
-                    <label className='float-label'>Account#</label>
-                </span>
+                <TextInput
+                    name='First_Lien_Acct_Num'
+                    label='Account#'
+                    value={First_Lien_Acct_Num}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "First_Lien_Acct_Num", value });
+                    }}
+                    className='deal-liens__text-input w-full'
+                />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={First_Lien_Lienholder_ID}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "First_Lien_Lienholder_ID", value });
-                        }}
-                        className='deal-liens__text-input w-full'
-                    />
-                    <label className='float-label'>Lesser ID#</label>
-                </span>
+                <TextInput
+                    name='First_Lien_Lienholder_ID'
+                    label='Lesser ID#'
+                    value={First_Lien_Lienholder_ID}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "First_Lien_Lienholder_ID", value });
+                    }}
+                    className='deal-liens__text-input w-full'
+                />
             </div>
         </div>
     );

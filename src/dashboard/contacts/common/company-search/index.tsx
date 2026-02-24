@@ -21,6 +21,8 @@ interface CompanySearchProps extends DropdownProps {
     returnedField?: RETURNED_FIELD_TYPE<ContactUser>;
     onChangeGetFullInfo?: (contact: ContactUser) => void;
     getFullInfo?: (contact: ContactUser) => void;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const CompanySearch = ({
@@ -33,6 +35,8 @@ export const CompanySearch = ({
     returnedField,
     getFullInfo,
     onChangeGetFullInfo,
+    error,
+    errorMessage,
     ...props
 }: CompanySearchProps) => {
     const { contactPermissions } = usePermissions();
@@ -130,6 +134,8 @@ export const CompanySearch = ({
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}
+                error={error}
+                errorMessage={errorMessage}
                 {...props}
             />
             <Dialog

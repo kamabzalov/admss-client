@@ -1,7 +1,6 @@
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
-import { InputText } from "primereact/inputtext";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
 
@@ -40,8 +39,9 @@ export const AccountAuditInfo = observer((): ReactElement => {
                 />
             </div>
             <div className='take-payment__item'>
-                <label className='take-payment__label'>Payment Taken By:</label>
-                <InputText
+                <TextInput
+                    name='PaymentTakenBy'
+                    label='Payment Taken By'
                     className={`take-payment__input--small ${
                         fieldChanged["PaymentTakenBy"] ? "input-change" : ""
                     }`}
@@ -53,8 +53,9 @@ export const AccountAuditInfo = observer((): ReactElement => {
                 />
             </div>
             <div className='take-payment__item'>
-                <label className='take-payment__label'>Payment Notes:</label>
-                <InputText
+                <TextInput
+                    name='Notes'
+                    label='Payment Notes'
                     className={`take-payment__input--small ${
                         fieldChanged["Notes"] ? "input-change" : ""
                     }`}

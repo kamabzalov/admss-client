@@ -11,7 +11,7 @@ import {
 } from "primereact/datatable";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
@@ -36,7 +36,7 @@ import { store } from "store";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
-import { InputNumber } from "primereact/inputnumber";
+import { NumberInput } from "dashboard/common/form/inputs";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
@@ -709,7 +709,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                         />
                         <span className='p-input-icon-right export-web__search ml-auto'>
                             <i className='icon adms-search' />
-                            <InputText
+                            <TextInput
+                                name='search'
+                                label='Search'
                                 value={globalSearch}
                                 placeholder='Search'
                                 onChange={(e) => setGlobalSearch(e.target.value)}
@@ -833,7 +835,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     handleCheckboxChange(field, rowIndex)
                                                 }
                                             />
-                                            <InputNumber
+                                            <NumberInput
+                                                name={`price-${field}-${rowIndex}`}
+                                                label=''
                                                 maxFractionDigits={2}
                                                 minFractionDigits={2}
                                                 disabled={
@@ -846,7 +850,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                         (item) => item.field === field
                                                     )?.price[rowIndex] || 0
                                                 }
-                                                onChange={({ value }) =>
+                                                onValueChange={({ value }) =>
                                                     value &&
                                                     handlePriceChange(field, rowIndex, value)
                                                 }
@@ -878,13 +882,15 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                             }`}
                                         >
                                             {field === "ListPrice" ? (
-                                                <InputNumber
+                                                <NumberInput
                                                     key={forceUpdate}
+                                                    name={`listPrice-${rowIndex}`}
+                                                    label=''
                                                     maxFractionDigits={2}
                                                     minFractionDigits={2}
                                                     className='export-web__input-price'
                                                     value={Number(value)}
-                                                    onChange={({ value }) => {
+                                                    onValueChange={({ value }) => {
                                                         setPriceChanged(true);
                                                         if (
                                                             !initialPrice ||

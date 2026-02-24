@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAccountInsurance, updateAccountInsurance } from "http/services/accounts.service";
 import { Checkbox } from "primereact/checkbox";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { AccountInsurance } from "common/models/accounts";
 import { observer } from "mobx-react-lite";
@@ -185,19 +185,17 @@ export const AccountInsuranceInfo = observer(
                                         Title Received
                                     </label>
                                 </div>
-                                <span className='p-float-label'>
-                                    <InputText
-                                        id='account-insurance-title-num'
-                                        className='insurance-info__input w-full'
-                                        value={Title_Num}
-                                        onChange={(e) => {
-                                            setIsButtonDisabled(false);
-                                            setHasUnsavedChanges(true);
-                                            changeAccountExtData("Title_Num", e.target.value);
-                                        }}
-                                    />
-                                    <label className='float-label'>Title#</label>
-                                </span>
+                                <TextInput
+                                    name='Title_Num'
+                                    label='Title#'
+                                    className='insurance-info__input w-full'
+                                    value={Title_Num}
+                                    onChange={(e) => {
+                                        setIsButtonDisabled(false);
+                                        setHasUnsavedChanges(true);
+                                        changeAccountExtData("Title_Num", e.target.value);
+                                    }}
+                                />
                             </div>
                         </>
                     )}

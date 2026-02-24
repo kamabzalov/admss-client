@@ -11,7 +11,7 @@ import {
     FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
 } from "primereact/fileupload";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { Tag } from "primereact/tag";
 import { useStore } from "store/hooks";
 import { emptyTemplate } from "dashboard/common/form/upload";
@@ -241,7 +241,9 @@ export const ContactsDocuments = observer((): ReactElement => {
                 style={{ "--upload-text": `"${UPLOAD_TEXT.IMAGES}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
-                <InputText
+                <TextInput
+                    name='notes'
+                    label=''
                     className='media-input__text'
                     placeholder='Comment'
                     value={uploadFileDocuments?.data?.notes || ""}

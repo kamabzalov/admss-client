@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { ReactElement, useCallback, useEffect, useId, useState } from "react";
 import "./index.css";
-import { InputText } from "primereact/inputtext";
 import {
     getAutoMakeModelList,
     getInventoryAutomakesList,
@@ -11,10 +10,15 @@ import {
 import { DropdownProps } from "primereact/dropdown";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { useFormikContext } from "formik";
-import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { CurrencyInput, DateInput, PhoneInput } from "dashboard/common/form/inputs";
+import {
+    CurrencyInput,
+    DateInput,
+    NumberInput,
+    PhoneInput,
+    TextInput,
+} from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { PartialDeal } from "dashboard/deals/form";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -257,9 +261,9 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         changeDealExtData({ key: "Trade1_VIN", value });
                     }}
                     onAction={handleVINchange}
-                    className={`${errors.Trade1_VIN ? "p-invalid" : ""}`}
+                    error={!!errors.Trade1_VIN}
+                    errorMessage={errors.Trade1_VIN as string}
                 />
-                <small className='p-error'>{errors.Trade1_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
                 <ComboBox
@@ -271,14 +275,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     onChange={({ value }) => handleMakeChange(value)}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
-                    className={`deal-trade__dropdown w-full ${
-                        errors.Trade1_Make ? "p-invalid" : ""
-                    }`}
+                    className='deal-trade__dropdown w-full'
                     label='Make (required)'
                     editable
+                    error={!!errors.Trade1_Make}
+                    errorMessage={errors.Trade1_Make as string}
                 />
-
-                <small className='p-error'>{errors.Trade1_Make || ""}</small>
             </div>
 
             <div className='col-6 relative'>
@@ -289,61 +291,59 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     editable
                     options={automakesModelList}
                     onChange={({ value }) => handleModelChange(value)}
-                    className={`deal-trade__dropdown w-full ${
-                        errors.Trade1_Model ? "p-invalid" : ""
-                    }`}
+                    className='deal-trade__dropdown w-full'
                     label='Model (required)'
+                    error={!!errors.Trade1_Model}
+                    errorMessage={errors.Trade1_Model as string}
                 />
-                <small className='p-error'>{errors.Trade1_Model}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        className={`deal-trade__text-input w-full ${
-                            errors.Trade1_Year ? "p-invalid" : ""
-                        }`}
-                        required
-                        min={0}
-                        useGrouping={false}
-                        value={parseInt(Trade1_Year) || null}
-                        onChange={({ value }) => {
-                            if (!value) {
-                                return changeDealExtData({ key: "Trade1_Year", value: "" });
-                            }
-                            setFieldValue("Trade1_Year", value);
-                            changeDealExtData({ key: "Trade1_Year", value: String(value) });
-                        }}
-                    />
-                    <label className='float-label'>Year (required)</label>
-                </span>
-                <small className='p-error'>{errors.Trade1_Year}</small>
-            </div>
-
-            <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputNumber
-                        className={`deal-trade__text-input w-full ${errors.Trade1_Mileage ? "p-invalid" : ""}`}
-                        required
-                        value={
-                            values.Trade1_Mileage
-                                ? parseFloat(values.Trade1_Mileage.replace(/[^0-9.]/g, ""))
-                                : null
+                <NumberInput
+                    name='Trade1_Year'
+                    label='Year (required)'
+                    className={`deal-trade__text-input w-full ${
+                        errors.Trade1_Year ? "p-invalid" : ""
+                    }`}
+                    required
+                    min={0}
+                    useGrouping={false}
+                    value={parseInt(Trade1_Year) || null}
+                    onValueChange={({ value }) => {
+                        if (!value) {
+                            return changeDealExtData({ key: "Trade1_Year", value: "" });
                         }
-                        useGrouping
-                        min={0}
-                        onChange={({ value }) => {
-                            const valAsString = value?.toString() || "";
-                            setFieldValue("Trade1_Mileage", valAsString);
-                            changeDealExtData({
-                                key: "Trade1_Mileage",
-                                value: valAsString,
-                            });
-                        }}
-                    />
-                    <label className='float-label'>Mileage (required)</label>
-                </span>
+                        setFieldValue("Trade1_Year", value);
+                        changeDealExtData({ key: "Trade1_Year", value: String(value) });
+                    }}
+                    error={!!errors.Trade1_Year}
+                    errorMessage={errors.Trade1_Year}
+                />
+            </div>
 
-                <small className='p-error'>{errors.Trade1_Mileage || ""}</small>
+            <div className='col-3 relative'>
+                <NumberInput
+                    name='Trade1_Mileage'
+                    label='Mileage (required)'
+                    className={`deal-trade__text-input w-full ${errors.Trade1_Mileage ? "p-invalid" : ""}`}
+                    required
+                    value={
+                        values.Trade1_Mileage
+                            ? parseFloat(values.Trade1_Mileage.replace(/[^0-9.]/g, ""))
+                            : null
+                    }
+                    useGrouping
+                    min={0}
+                    onValueChange={({ value }) => {
+                        const valAsString = value?.toString() || "";
+                        setFieldValue("Trade1_Mileage", valAsString);
+                        changeDealExtData({
+                            key: "Trade1_Mileage",
+                            value: valAsString,
+                        });
+                    }}
+                    error={!!errors.Trade1_Mileage}
+                    errorMessage={errors.Trade1_Mileage}
+                />
             </div>
             <div className='col-3'>
                 <ComboBox
@@ -374,28 +374,26 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={Trade1_Title_Num}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Trade1_Title_Num", value });
-                        }}
-                        className='deal-trade__text-input w-full'
-                    />
-                    <label className='float-label'>Title#</label>
-                </span>
+                <TextInput
+                    name='Trade1_Title_Num'
+                    label='Title#'
+                    value={Trade1_Title_Num}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Trade1_Title_Num", value });
+                    }}
+                    className='deal-trade__text-input w-full'
+                />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        value={Trade1_StockNum}
-                        onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Trade1_StockNum", value });
-                        }}
-                        className='deal-trade__text-input w-full'
-                    />
-                    <label className='float-label'>Stock#</label>
-                </span>
+                <TextInput
+                    name='Trade1_StockNum'
+                    label='Stock#'
+                    value={Trade1_StockNum}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Trade1_StockNum", value });
+                    }}
+                    className='deal-trade__text-input w-full'
+                />
             </div>
 
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
@@ -526,22 +524,22 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-trade__text-input w-full' ${
-                            errors.Trade1_Lien_Address ? "p-invalid" : ""
-                        }`}
-                        value={values.Trade1_Lien_Address}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("Trade1_Lien_Address", value);
-                            setFieldTouched("Trade1_Lien_Address", true);
-                            changeDealExtData({ key: "Trade1_Lien_Address", value });
-                        }}
-                        onBlur={() => setFieldTouched("Trade1_Lien_Address", true, true)}
-                    />
-                    <label className='float-label'>Mailing address</label>
-                </span>
-                <small className='p-error'>{errors.Trade1_Lien_Address}</small>
+                <TextInput
+                    name='Trade1_Lien_Address'
+                    label='Mailing address'
+                    className={`deal-trade__text-input w-full ${
+                        errors.Trade1_Lien_Address ? "p-invalid" : ""
+                    }`}
+                    value={values.Trade1_Lien_Address}
+                    onChange={async ({ target: { value } }) => {
+                        await setFieldValue("Trade1_Lien_Address", value);
+                        setFieldTouched("Trade1_Lien_Address", true);
+                        changeDealExtData({ key: "Trade1_Lien_Address", value });
+                    }}
+                    onBlur={() => setFieldTouched("Trade1_Lien_Address", true, true)}
+                    error={!!errors.Trade1_Lien_Address}
+                    errorMessage={errors.Trade1_Lien_Address}
+                />
             </div>
 
             <div className='col-3'>

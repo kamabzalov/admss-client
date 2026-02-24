@@ -95,12 +95,11 @@ export const VehicleDescription = observer((): ReactElement => {
                         setFieldValue("TypeOfFuel_id", value || "0");
                         changeInventory({ key: "TypeOfFuel_id", value: value || "0" });
                     }}
-                    className={`vehicle-description__dropdown w-full ${
-                        errors.TypeOfFuel_id ? "p-invalid" : ""
-                    }`}
+                    className='vehicle-description__dropdown w-full'
                     label='Type of Fuel (required)'
+                    error={!!errors.TypeOfFuel_id}
+                    errorMessage={errors.TypeOfFuel_id}
                 />
-                <small className='p-error'>{errors.TypeOfFuel_id}</small>
             </div>
             <div className='col-3'>
                 <ComboBox

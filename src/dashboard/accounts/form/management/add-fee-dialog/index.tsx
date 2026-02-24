@@ -1,8 +1,7 @@
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import "./index.css";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, TextInput } from "dashboard/common/form/inputs";
 import { useMemo, useState } from "react";
-import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { addAccountFee } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
@@ -100,15 +99,14 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                 optionValue='name'
             />
 
-            <span className='p-float-label'>
-                <InputText
-                    className={`w-full ${changedFields.other ? "" : "input--grey"}`}
-                    disabled={addFee.type !== "Other"}
-                    value={addFee.other}
-                    onChange={({ target: { value } }) => handleInputChange("other", value)}
-                />
-                <label className='float-label'>Other</label>
-            </span>
+            <TextInput
+                name='other'
+                label='Other'
+                className={`w-full ${changedFields.other ? "" : "input--grey"}`}
+                disabled={addFee.type !== "Other"}
+                value={addFee.other}
+                onChange={({ target: { value } }) => handleInputChange("other", value)}
+            />
 
             <div className='splitter mb-2'>
                 <hr className='splitter__line flex-1' />
@@ -125,14 +123,13 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
                 />
             </div>
 
-            <span className='p-float-label'>
-                <InputText
-                    className={`w-full ${changedFields.reason ? "" : "input--grey"}`}
-                    value={addFee.reason}
-                    onChange={({ target: { value } }) => handleInputChange("reason", value)}
-                />
-                <label className='float-label'>Reason (required)</label>
-            </span>
+            <TextInput
+                name='reason'
+                label='Reason (required)'
+                className={`w-full ${changedFields.reason ? "" : "input--grey"}`}
+                value={addFee.reason}
+                onChange={({ target: { value } }) => handleInputChange("reason", value)}
+            />
 
             <span className='p-float-label'>
                 <InputTextarea

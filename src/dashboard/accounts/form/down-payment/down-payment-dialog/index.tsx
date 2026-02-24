@@ -5,14 +5,13 @@ import {
 import { AccountDownPayments } from "common/models/accounts";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { CurrencyInput, DateInput, TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { DialogProps } from "primereact/dialog";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
-import { InputText } from "primereact/inputtext";
-import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface DownPaymentDialogProps extends DialogProps {
     visible: boolean;
@@ -94,14 +93,13 @@ export const DownPaymentDialog = ({
                 />
 
                 {isCheckNumberActive && (
-                    <span className='p-float-label'>
-                        <InputText
-                            value={checkNumber}
-                            onChange={({ target: { value } }) => setCheckNumber(value)}
-                            className='payment-dialog__text-input w-full'
-                        />
-                        <label className='float-label'>Check#</label>
-                    </span>
+                    <TextInput
+                        name='checkNumber'
+                        label='Check#'
+                        value={checkNumber}
+                        onChange={({ target: { value } }) => setCheckNumber(value)}
+                        className='payment-dialog__text-input w-full'
+                    />
                 )}
                 <CurrencyInput
                     value={amount}

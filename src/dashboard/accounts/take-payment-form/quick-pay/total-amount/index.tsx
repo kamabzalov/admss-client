@@ -1,12 +1,11 @@
 import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
 import { TOAST_LIFETIME } from "common/settings";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { DateInput, CurrencyInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { checkAccountPaymentInfo } from "http/services/accounts.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { ReactElement, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
@@ -87,9 +86,9 @@ export const AccountTotalAmount = observer((): ReactElement => {
             </div>
 
             <div className='take-payment__item'>
-                <label className='take-payment__label'>Check#</label>
-                <InputText
-                    id='checkNumber'
+                <TextInput
+                    name='CheckNumber'
+                    label='Check#'
                     className={`take-payment__input ${
                         fieldChanged["CheckNumber"] ? "input-change" : ""
                     }`}

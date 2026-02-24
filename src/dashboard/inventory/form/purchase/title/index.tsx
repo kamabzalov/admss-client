@@ -7,7 +7,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { useFormikContext } from "formik";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { ReactElement } from "react";
 import { useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
@@ -84,16 +84,15 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleNumber}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleNumber", value })
-                        }
-                    />
-                    <label className='float-label'>Number</label>
-                </span>
+                <TextInput
+                    name='titleNumber'
+                    label='Number'
+                    className='purchase-title__text-input w-full'
+                    value={titleNumber}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titleNumber", value })
+                    }
+                />
             </div>
 
             <div className='col-3 flex align-items-center'>
@@ -161,29 +160,27 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleHolderPayoff}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleHolderPayoff", value })
-                        }
-                    />
-                    <label className='float-label'>Holder Payoff</label>
-                </span>
+                <TextInput
+                    name='titleHolderPayoff'
+                    label='Holder Payoff'
+                    className='purchase-title__text-input w-full'
+                    value={titleHolderPayoff}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titleHolderPayoff", value })
+                    }
+                />
             </div>
 
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleHolderAddress}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleHolderAddress", value })
-                        }
-                    />
-                    <label className='float-label'>Holder Address</label>
-                </span>
+                <TextInput
+                    name='titleHolderAddress'
+                    label='Holder Address'
+                    className='purchase-title__text-input w-full'
+                    value={titleHolderAddress}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titleHolderAddress", value })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <ComboBox
@@ -202,16 +199,15 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titleHolderZIP}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titleHolderZIP", value })
-                        }
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
+                <TextInput
+                    name='titleHolderZIP'
+                    label='Zip Code'
+                    className='purchase-title__text-input w-full'
+                    value={titleHolderZIP}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titleHolderZIP", value })
+                    }
+                />
             </div>
 
             <hr className='form-line' />
@@ -246,16 +242,15 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titlePrevAddress}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titlePrevAddress", value })
-                        }
-                    />
-                    <label className='float-label'>Previous Address</label>
-                </span>
+                <TextInput
+                    name='titlePrevAddress'
+                    label='Previous Address'
+                    className='purchase-title__text-input w-full'
+                    value={titlePrevAddress}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titlePrevAddress", value })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <ComboBox
@@ -275,16 +270,15 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='purchase-title__text-input w-full'
-                        value={titlePrevZIP}
-                        onChange={({ target: { value } }) =>
-                            changeInventoryExtData({ key: "titlePrevZIP", value })
-                        }
-                    />
-                    <label className='float-label'>Zip Code</label>
-                </span>
+                <TextInput
+                    name='titlePrevZIP'
+                    label='Zip Code'
+                    className='purchase-title__text-input w-full'
+                    value={titlePrevZIP}
+                    onChange={({ target: { value } }) =>
+                        changeInventoryExtData({ key: "titlePrevZIP", value })
+                    }
+                />
             </div>
         </div>
     );

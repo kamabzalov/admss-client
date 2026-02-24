@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import {
     getDealInventoryStatuses,
@@ -154,27 +154,26 @@ export const DealGeneralSale = observer((): ReactElement => {
                     value={values?.contactinfo}
                     getFullInfo={handleGetCompanyInfo}
                     name='Buyer Name (required)'
-                    className={`${errors.contactinfo && "p-invalid"}`}
+                    className={errors.contactinfo ? "p-invalid" : ""}
+                    error={!!errors.contactinfo}
+                    errorMessage={errors.contactinfo as string}
                 />
-                <small className='p-error'>{errors.contactinfo}</small>
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InventorySearch
-                        {...getFieldProps("inventoryinfo")}
-                        className={`${errors.inventoryinfo && "p-invalid"}`}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("inventoryinfo", value);
-                            changeDeal({ key: "inventoryinfo", value });
-                        }}
-                        originalPath={currentPath}
-                        value={values?.inventoryinfo}
-                        getFullInfo={handleGetInventoryInfo}
-                        name='Vehicle (required)'
-                    />
-                    <label className='float-label'></label>
-                </span>
-                <small className='p-error'>{errors.inventoryinfo}</small>
+                <InventorySearch
+                    {...getFieldProps("inventoryinfo")}
+                    className={errors.inventoryinfo ? "p-invalid" : ""}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("inventoryinfo", value);
+                        changeDeal({ key: "inventoryinfo", value });
+                    }}
+                    originalPath={currentPath}
+                    value={values?.inventoryinfo}
+                    getFullInfo={handleGetInventoryInfo}
+                    name='Vehicle (required)'
+                    error={!!errors.inventoryinfo}
+                    errorMessage={errors.inventoryinfo as string}
+                />
             </div>
             <div className='col-6 relative'>
                 <ComboBox
@@ -190,10 +189,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                         store.dealType = e.value;
                         changeDeal({ key: "dealtype", value: e.value });
                     }}
-                    className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
+                    error={!!errors.dealtype}
+                    errorMessage={errors.dealtype as string}
                 />
-
-                <small className='p-error'>{errors.dealtype}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -207,10 +206,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                     }}
                     options={dealStatusesList}
                     required
-                    className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='Sale status (required)'
+                    error={!!errors.dealstatus}
+                    errorMessage={errors.dealstatus as string}
                 />
-                <small className='p-error'>{errors.dealstatus}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -225,37 +225,40 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "saletype", value: e.value });
                     }}
                     label='Sale type (required)'
-                    className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
+                    error={!!errors.saletype}
+                    errorMessage={errors.saletype as string}
                 />
-                <small className='p-error'>{errors.saletype}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("dateeffective")}
-                    className={`${errors.dateeffective && "p-invalid"}`}
+                    className={errors.dateeffective ? "p-invalid" : ""}
                     name='Sale date (required)'
                     date={parseDateFromServer(values.dateeffective)}
                     emptyDate
+                    error={!!errors.dateeffective}
+                    errorMessage={errors.dateeffective as string}
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", value);
                         changeDeal({ key: "dateeffective", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{errors.dateeffective}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("datepurchase")}
-                    className={`${errors.datepurchase && "p-invalid"}`}
+                    className={errors.datepurchase ? "p-invalid" : ""}
                     name='First operated (required)'
                     date={parseDateFromServer(values.datepurchase)}
                     emptyDate
+                    error={!!errors.datepurchase}
+                    errorMessage={errors.datepurchase as string}
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", value);
                         changeDeal({ key: "datepurchase", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{errors.datepurchase}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -271,10 +274,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "inventorystatus", value: e.value });
                     }}
                     required
-                    className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='New or Used (req.)'
+                    error={!!errors.inventorystatus}
+                    errorMessage={errors.inventorystatus as string}
                 />
-                <small className='p-error'>{errors.inventorystatus}</small>
             </div>
 
             <div className='col-12 text-line'>
@@ -293,20 +297,18 @@ export const DealGeneralSale = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...getFieldProps("accountInfo")}
-                        className='w-full deal-sale__text-input'
-                        disabled={!!id}
-                        value={deal.accountInfo || ""}
-                        onChange={({ target: { value } }) => {
-                            if (id) return;
-                            setFieldValue("accountInfo", value);
-                            changeDeal({ key: "accountInfo", value });
-                        }}
-                    />
-                    <label className='float-label'>Account number</label>
-                </span>
+                <TextInput
+                    label='Account number'
+                    {...getFieldProps("accountInfo")}
+                    className='w-full deal-sale__text-input'
+                    disabled={!!id}
+                    value={deal.accountInfo || ""}
+                    onChange={({ target: { value } }) => {
+                        if (id) return;
+                        setFieldValue("accountInfo", value);
+                        changeDeal({ key: "accountInfo", value });
+                    }}
+                />
             </div>
 
             <hr className='col-12 form-line' />
@@ -324,25 +326,25 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDealExtData({ key: "HowFoundOut", value: e.value });
                     }}
                     editable
-                    className={`w-full deal-sale__dropdown ${errors.HowFoundOut && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='How did you hear about us? (required)'
+                    error={!!errors.HowFoundOut}
+                    errorMessage={errors.HowFoundOut as string}
                 />
-                <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...getFieldProps("SaleID")}
-                        className={`deal-sale__text-input w-full ${errors.SaleID && "p-invalid"}`}
-                        value={values.SaleID}
-                        onChange={(e) => {
-                            setFieldValue("SaleID", e.target.value);
-                            changeDealExtData({ key: "SaleID", value: e.target.value });
-                        }}
-                    />
-                    <label className='float-label'>ROS SaleID (required)</label>
-                </span>
-                <small className='p-error'>{errors.SaleID}</small>
+                <TextInput
+                    label='ROS SaleID (required)'
+                    {...getFieldProps("SaleID")}
+                    className='deal-sale__text-input w-full'
+                    value={values.SaleID}
+                    error={!!errors.SaleID}
+                    errorMessage={errors.SaleID}
+                    onChange={(e) => {
+                        setFieldValue("SaleID", e.target.value);
+                        changeDealExtData({ key: "SaleID", value: e.target.value });
+                    }}
+                />
             </div>
         </section>
     );

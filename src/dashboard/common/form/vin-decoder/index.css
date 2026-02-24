@@ -25,3 +25,40 @@
         }
     }
 }
+
+.vin-decoder__wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.vin-decoder__wrapper .p-error {
+    --line-height: 8px;
+    position: absolute;
+    display: inline-block;
+    left: 2px;
+    z-index: 1;
+    max-width: calc(100% - 4px);
+    bottom: -6px;
+}
+
+.vin-decoder__wrapper .p-error small {
+    font-size: 12px;
+}
+
+.vin-decoder__wrapper .p-error::before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: var(--line-height);
+    left: 0;
+    width: 100%;
+    height: var(--line-height);
+    background-color: var(--admss-app-white);
+}
+
+@media (max-width: 1780px) {
+    .vin-decoder__wrapper .p-error {
+        max-width: calc(100% - 20px);
+    }
+}
