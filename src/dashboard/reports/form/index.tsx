@@ -18,14 +18,12 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
 import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
-import { useFormExitConfirmation } from "common/hooks";
+import { useFormExitConfirmation, useToastMessage } from "common/hooks";
 import { REPORTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 
@@ -107,7 +105,7 @@ export const ReportForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
@@ -137,12 +135,7 @@ export const ReportForm = observer((): ReactElement => {
                     await getUserReportCollections();
                 }
             } catch (error) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: TOAST_MESSAGES.ERROR,
-                    detail: "Failed to load report collections",
-                    life: TOAST_LIFETIME,
-                });
+                showError("Failed to load report collections");
             }
         };
 
@@ -235,24 +228,6 @@ export const ReportForm = observer((): ReactElement => {
             reportStore.reportName = doc.name;
             navigate(`/dashboard/reports/${doc.documentUID}`);
         }
-    };
-
-    const showError = (detail: string) => {
-        toast.current?.show({
-            severity: "error",
-            summary: TOAST_MESSAGES.ERROR,
-            detail,
-            life: TOAST_LIFETIME,
-        });
-    };
-
-    const showSuccess = (detail: string) => {
-        toast.current?.show({
-            severity: "success",
-            summary: TOAST_MESSAGES.SUCCESS,
-            detail,
-            life: TOAST_LIFETIME,
-        });
     };
 
     const handleDragEnter = (_: React.DragEvent<HTMLDivElement>, node: TreeNode) => {

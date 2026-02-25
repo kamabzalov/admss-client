@@ -1,8 +1,7 @@
+import { useToastMessage } from "common/hooks";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportServiceColumns } from "common/models/reports";
-import { TOAST_LIFETIME } from "common/settings";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { useToast } from "dashboard/common/toast";
 import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
@@ -59,7 +58,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
     const { report, saveReport, isReportChanged } = reportStore;
-    const toast = useToast();
+    const { showSuccess, showError } = useToastMessage();
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
     const [duplicateDialogVisible, setDuplicateDialogVisible] = useState<boolean>(false);
     const [deleteDialogVisible, setDeleteDialogVisible] = useState<boolean>(false);
@@ -69,33 +68,14 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
         const response = await saveReport(report?.itemuid);
         if (response) {
             if (response?.status === Status.OK) {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Custom report is successfully saved!",
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess("Custom report is successfully saved!");
                 const { itemuid } = response as { status: Status.OK; itemuid: string };
                 navigate(`/dashboard/reports/${itemuid}`);
                 onRefetch?.();
             } else {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error || "Error while saving new custom report",
-                    life: TOAST_LIFETIME,
-                });
+                showError(response?.error || "Error while saving new custom report");
             }
         }
-    };
-
-    const handleToastShow = (status: Status, detail: string) => {
-        toast.current?.show({
-            severity: status === Status.OK ? "success" : "error",
-            summary: status === Status.OK ? "Success" : "Error",
-            detail: detail,
-            life: TOAST_LIFETIME,
-        });
     };
 
     const handleDuplicateReport = async () => {
@@ -105,9 +85,9 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                 const { itemuid } = response as { status: Status.OK; itemuid: string };
                 navigate(`/dashboard/reports/${itemuid}`);
                 onRefetch?.();
-                handleToastShow(Status.OK, "Custom report is successfully copied!");
+                showSuccess("Custom report is successfully copied!");
             } else {
-                handleToastShow(Status.ERROR, response?.error!);
+                showError(response?.error!);
             }
         }
     };
@@ -118,10 +98,10 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
             deleteReportDocument(report.itemuid).then((response: BaseResponseError | undefined) => {
                 if (response?.status === Status.OK) {
                     navigate("/dashboard/reports/create");
-                    handleToastShow(Status.OK, "Custom report is successfully deleted!");
+                    showSuccess("Custom report is successfully deleted!");
                     onRefetch?.();
                 } else {
-                    handleToastShow(Status.ERROR, response?.error!);
+                    showError(response?.error!);
                 }
             });
     };

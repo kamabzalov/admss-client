@@ -1,9 +1,8 @@
+import { useToastMessage } from "common/hooks";
 import { Status } from "common/models/base-response";
 import { ReportCollection, ReportDocument } from "common/models/reports";
-import { TOAST_LIFETIME } from "common/settings";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TextInput } from "dashboard/common/form/inputs";
-import { useToast } from "dashboard/common/toast";
 import { deleteReportCollection } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { MultiSelect } from "primereact/multiselect";
@@ -39,7 +38,7 @@ export const CollectionPanelContent = ({
     const [confirmMessage, setConfirmMessage] = useState<string>("");
     const [confirmTitle, setConfirmTitle] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
     const [initialSelectedReports, setInitialSelectedReports] =
         useState<Partial<ReportDocument>[]>(selectedReports);
@@ -82,12 +81,7 @@ export const CollectionPanelContent = ({
         collectionuid &&
             deleteReportCollection(collectionuid).then((response) => {
                 if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response?.error,
-                        life: TOAST_LIFETIME,
-                    });
+                    showError(response?.error || "Error while deleting collection");
                 } else {
                     handleClosePanel?.();
                     setCollectionNameInput("");
