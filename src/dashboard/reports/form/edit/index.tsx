@@ -5,9 +5,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { ReportColumnSelect } from "./column-select";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportCollections } from "common/models/reports";
@@ -16,7 +14,7 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { DateInput } from "dashboard/common/form/inputs";
 import { DIALOG_ACTION, reportDownloadForm } from "dashboard/reports/common/report-parameters";
 import { validateDates } from "common/helpers";
-import { useDateRange } from "common/hooks";
+import { useDateRange, useToastMessage } from "common/hooks";
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -31,7 +29,7 @@ export const ReportEditForm = observer((): ReactElement => {
         getReport,
         changeReport,
     } = store;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
     const [dialogAction, setDialogAction] = useState<DIALOG_ACTION>(DIALOG_ACTION.PREVIEW);
     const { startDate, endDate, handleDateChange } = useDateRange();
@@ -41,12 +39,7 @@ export const ReportEditForm = observer((): ReactElement => {
         id &&
             getReport(id).then((response) => {
                 if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response?.error || "Error while fetching report",
-                        life: TOAST_LIFETIME,
-                    });
+                    showError(response?.error || "Error while fetching report");
                     navigate(`/dashboard/reports`);
                 }
             });
@@ -80,12 +73,7 @@ export const ReportEditForm = observer((): ReactElement => {
                 ...report,
             });
             if (response && response.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error || "Error while downloading report",
-                    life: TOAST_LIFETIME,
-                });
+                showError(response.error || "Error while downloading report");
             }
         }
     };

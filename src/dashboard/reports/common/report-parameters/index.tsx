@@ -1,9 +1,8 @@
 import { convertToStandardTimestamp, formatDateForServer } from "common/helpers";
+import { useToastMessage } from "common/hooks";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportDocument, ReportSetParams } from "common/models/reports";
-import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
-import { useToast } from "dashboard/common/toast";
 import { setReportDocumentTemplate } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
@@ -68,7 +67,7 @@ export const ReportParameters = ({
     report,
     handleClosePanel,
 }: ReportParametersProps): ReactElement => {
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
     const [startDate, setStartDate] = useState<string | number>("");
     const [endDate, setEndDate] = useState<string | number>("");
@@ -96,12 +95,7 @@ export const ReportParameters = ({
             true
         );
         if (response && response.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: response.error || "Error while downloading report",
-                life: TOAST_LIFETIME,
-            });
+            showError(response.error || "Error while downloading report");
         }
     };
 

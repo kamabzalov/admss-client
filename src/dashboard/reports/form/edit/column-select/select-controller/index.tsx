@@ -1,10 +1,9 @@
 import { ReportServiceColumns, ReportServices } from "common/models/reports";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { getReportColumns, getReportDatasets } from "http/services/reports.service";
 import { useStore } from "store/hooks";
-import { useToast } from "dashboard/common/toast";
 import { useEffect, useState } from "react";
+import { useToastMessage } from "common/hooks";
 
 interface Dataset {
     id: number;
@@ -58,7 +57,7 @@ export const useReportColumnController = () => {
     const { report } = store;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [dataSet, setDataSet] = useState<ReportServices | null>(null);
     const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
     const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
@@ -133,12 +132,7 @@ export const useReportColumnController = () => {
 
             const response = await getReportColumns({ service: dataSet, useruid });
             if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error,
-                    life: TOAST_LIFETIME,
-                });
+                showError(response?.error || "Error while fetching report columns");
             } else if (response) {
                 const columnsWithOrigin = response.map((item: ReportServiceColumns) => ({
                     ...item,
@@ -151,7 +145,7 @@ export const useReportColumnController = () => {
             }
         };
         fetchColumns();
-    }, [dataSet, authUser?.useruid, toast]);
+    }, [dataSet, authUser?.useruid, showError]);
 
     useEffect(() => {
         store.reportColumns = selectedValues;
