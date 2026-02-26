@@ -23,6 +23,7 @@ export const UserRoleColumn = (props: UserRoleColumnProps) => <Column {...props}
 
 enum USER_ROLE_MODAL_MESSAGE {
     COPY_ROLE = "Do you really want to duplicate this role?",
+    COPY_ROLE_SUCCESS = "Role is successfully duplicated!",
     DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
     DELETE_ROLE_SUCCESS = "Role is successfully deleted!",
 }
@@ -82,7 +83,8 @@ export const UsersRoles = observer((): ReactElement => {
         if (response && response.error) {
             showError(response?.error);
         } else {
-            handleGetUserRoles();
+            handleGetUserRoles(false);
+            showSuccess(USER_ROLE_MODAL_MESSAGE.COPY_ROLE_SUCCESS);
         }
     };
 
@@ -130,6 +132,11 @@ export const UsersRoles = observer((): ReactElement => {
                     className='roles-table'
                     rowClassName={() => "hover:text-primary cursor-pointer roles-table-row"}
                     tableStyle={{ tableLayout: "fixed", width: "100%" }}
+                    pt={{
+                        wrapper: {
+                            className: "thin-scrollbar",
+                        },
+                    }}
                 >
                     <Column
                         bodyStyle={{ textAlign: "center" }}

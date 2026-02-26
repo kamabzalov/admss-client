@@ -6,7 +6,7 @@ import { useStore } from "store/hooks";
 
 const accountsPermissions: readonly PermissionKey[] = [
     "uaViewAccounts",
-    "uaAllowBackdatingPayments",
+    "uaAllowBackDatingPayments",
     "uaAllowPartialPayments",
     "uaAllowPaymentCalculator",
     "uaAllowPaymentQuote",
@@ -44,8 +44,8 @@ export const RolesAccounts = observer((): ReactElement => {
             <div className='col-6'>
                 <BorderedCheckbox
                     name='Allow Back Dating Payments'
-                    checked={hasRolePermission("uaAllowBackdatingPayments")}
-                    onChange={() => togglePermission("uaAllowBackdatingPayments")}
+                    checked={hasRolePermission("uaAllowBackDatingPayments")}
+                    onChange={() => togglePermission("uaAllowBackDatingPayments")}
                 />
             </div>
             <div className='col-6'>

@@ -196,7 +196,7 @@ export const parseDateFromServer = (
         if (options.returnType === DateReturnType.DATE) {
             const day = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 1 : 0]);
             const month = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 0 : 1]);
-            const year = parseInt(dateParts[options.format === DateFormat.DD_MM_YYYY ? 2 : 1]);
+            const year = parseInt(dateParts[2]);
 
             const padNumber = (num: number) => num.toString().padStart(2, "0");
 

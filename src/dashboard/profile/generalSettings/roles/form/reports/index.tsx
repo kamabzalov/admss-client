@@ -32,7 +32,11 @@ export const RolesReports = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='Create Reports' checked disabled />
+                <BorderedCheckbox
+                    name='Create Reports'
+                    checked={hasRolePermission("uaCreateReports")}
+                    onChange={() => togglePermission("uaCreateReports")}
+                />
             </div>
         </section>
     );

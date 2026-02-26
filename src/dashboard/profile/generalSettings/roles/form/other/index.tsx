@@ -25,7 +25,11 @@ export const RolesOther = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='Allow Mobile' checked disabled />
+                <BorderedCheckbox
+                    name='Allow Mobile'
+                    checked={hasRolePermission("uaAllowMobile")}
+                    onChange={() => togglePermission("uaAllowMobile")}
+                />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
@@ -35,13 +39,25 @@ export const RolesOther = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='Allow Web' checked disabled />
+                <BorderedCheckbox
+                    name='Allow Web'
+                    checked={hasRolePermission("uaAllowWeb")}
+                    onChange={() => togglePermission("uaAllowWeb")}
+                />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='View Deleted' checked disabled />
+                <BorderedCheckbox
+                    name='View Deleted'
+                    checked={hasRolePermission("uaViewDeleted")}
+                    onChange={() => togglePermission("uaViewDeleted")}
+                />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='Undelete Deleted' checked disabled />
+                <BorderedCheckbox
+                    name='Undelete Deleted'
+                    checked={hasRolePermission("uaUndeleteDeleted")}
+                    onChange={() => togglePermission("uaUndeleteDeleted")}
+                />
             </div>
         </section>
     );
