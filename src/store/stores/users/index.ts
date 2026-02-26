@@ -255,6 +255,11 @@ export class UsersStore {
         return this._currentRole.permissions;
     }
 
+    public get allPermissionsChecked(): boolean {
+        if (!this._currentRole) return false;
+        return PERMISSION_KEYS.every((key) => this.hasRolePermission(key));
+    }
+
     public saveCurrentRole = async () => {
         if (!this._currentRole) {
             return {

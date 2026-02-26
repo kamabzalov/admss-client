@@ -354,6 +354,9 @@
 .p-datatable-wrapper:not(
         .thin-scrollbar
     )::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 67px;
+    background: var(--admss-app-light-blue);
+    border-style: solid;
     border-width: 0 7px 7px 7px;
     border-color: transparent transparent var(--admss-app-primary) transparent;
 }
@@ -845,6 +848,18 @@
 .thin-scrollbar::-webkit-scrollbar {
     width: 4px;
     height: 4px;
+    background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+}
+
+.p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 60px;
+    background: transparent;
+    border: none;
+    background: var(--admss-app-light-blue);
 }
 
 .p-inputtext + .float-label,
