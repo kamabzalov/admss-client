@@ -122,6 +122,22 @@ export const createUser = async (dealer_id: string, userData: Partial<UserData>)
     });
 };
 
+export const updateUserProfile = async (useruid: string, userData: Partial<UserData>) => {
+    return new ApiRequest().post({
+        url: `user/${useruid}/user`,
+        data: userData,
+        defaultError: "Error while updating user profile",
+    });
+};
+
+export const changePassword = async (useruid: string, password: string) => {
+    return new ApiRequest().post({
+        url: `user/${useruid}/changepassword`,
+        data: { password },
+        defaultError: "Error while changing password",
+    });
+};
+
 export const generateNewPassword = async (useruid: string) => {
     return new ApiRequest().get({
         url: `user/${useruid}/newpassword`,

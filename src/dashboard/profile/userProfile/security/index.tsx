@@ -3,40 +3,38 @@ import { PasswordInput } from "dashboard/common/form/inputs/password";
 import { Button } from "primereact/button";
 import { Splitter } from "dashboard/common/display";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
-import { checkPassword } from "http/services/users";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 import "./index.css";
+import { useToastMessage } from "common/hooks";
 
-export const Security = (): ReactElement => {
-    const { userStore } = useStore();
-    const [currentPassword, setCurrentPassword] = useState<string>("");
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
+export const Security = observer((): ReactElement => {
+    const rootStore = useStore();
+    const { profileStore } = rootStore;
+    const { showError, showSuccess } = useToastMessage();
     const [supportContactVisible, setSupportContactVisible] = useState<boolean>(false);
-    const [currentPasswordError, setCurrentPasswordError] = useState<boolean>(false);
-    const [currentPasswordErrorMessage, setCurrentPasswordErrorMessage] = useState<string | null>(
-        null
-    );
-    const [isValidatingPassword, setIsValidatingPassword] = useState<boolean>(false);
     const validationRequestRef = useRef<string>("");
     const isValidatingRef = useRef<boolean>(false);
 
-    const passwordsMismatch = newPassword !== confirmPassword && confirmPassword.length > 0;
-
-    const resetCurrentPasswordError = () => {
-        setCurrentPasswordError(false);
-        setCurrentPasswordErrorMessage(null);
-    };
+    const {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+        currentPasswordError,
+        currentPasswordErrorMessage,
+        isValidatingPassword,
+        passwordsMismatch,
+    } = profileStore;
 
     const handleCurrentPasswordChange = (password: string) => {
-        setCurrentPassword(password);
+        profileStore.setCurrentPassword(password);
         validationRequestRef.current = "";
-        resetCurrentPasswordError();
+        profileStore.resetCurrentPasswordError();
     };
 
     const handleCurrentPasswordBlur = async () => {
         if (!currentPassword || currentPassword.length === 0) {
-            resetCurrentPasswordError();
+            profileStore.resetCurrentPasswordError();
             return;
         }
 
@@ -46,32 +44,36 @@ export const Security = (): ReactElement => {
 
         isValidatingRef.current = true;
         validationRequestRef.current = currentPassword;
-        setIsValidatingPassword(true);
-        resetCurrentPasswordError();
-
-        if (!userStore.authUser?.useruid) {
-            return;
-        }
+        profileStore.setIsValidatingPassword(true);
+        profileStore.resetCurrentPasswordError();
 
         try {
-            const response = await checkPassword(userStore.authUser.useruid, currentPassword);
+            const response = await profileStore.validateCurrentPassword(currentPassword);
 
             if (response && "valid" in response) {
                 if (!response.valid) {
-                    setCurrentPasswordError(true);
-                    setCurrentPasswordErrorMessage(response.message);
+                    profileStore.setCurrentPasswordError(true, response.message);
                 } else {
-                    resetCurrentPasswordError();
+                    profileStore.resetCurrentPasswordError();
                 }
+            } else if (response && "error" in response && response.error) {
+                profileStore.setCurrentPasswordError(true, response.error as string);
             }
         } finally {
-            setIsValidatingPassword(false);
+            profileStore.setIsValidatingPassword(false);
             isValidatingRef.current = false;
         }
     };
 
-    const handleChangePassword = () => {
-        return;
+    const handleChangePassword = async () => {
+        const response = await profileStore.changeUserPassword();
+
+        if (response && "error" in response && response.error) {
+            showError(response.error as string);
+            return;
+        }
+
+        showSuccess("Password changed successfully");
     };
 
     const handleContactSupportClick = () => {
@@ -105,14 +107,14 @@ export const Security = (): ReactElement => {
                     <PasswordInput
                         label='New Password'
                         password={newPassword}
-                        setPassword={setNewPassword}
+                        setPassword={(value) => profileStore.setNewPassword(value)}
                     />
                 </div>
                 <div className='col-3 user-profile-password__confirm'>
                     <PasswordInput
                         label='Confirm Password'
                         password={confirmPassword}
-                        setPassword={setConfirmPassword}
+                        setPassword={(value) => profileStore.setConfirmPassword(value)}
                         error={passwordsMismatch}
                     />
                 </div>
@@ -157,4 +159,4 @@ export const Security = (): ReactElement => {
             />
         </div>
     );
-};
+});

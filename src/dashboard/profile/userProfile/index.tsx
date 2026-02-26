@@ -10,6 +10,7 @@ import { DASHBOARD_PAGE } from "common/constants/links";
 import { observer } from "mobx-react-lite";
 import { DataTableWrapper } from "dashboard/common/data-table";
 import { useStore } from "store/hooks";
+import { useToastMessage } from "common/hooks";
 
 interface TabItem {
     settingName: string;
@@ -18,10 +19,12 @@ interface TabItem {
 }
 
 export const UserProfile = observer((): ReactElement => {
-    const store = useStore().profileStore;
-    const { isProfileChanged } = store;
+    const rootStore = useStore();
+    const profileStore = rootStore.profileStore;
+    const { isProfileChanged } = profileStore;
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const { showError, showSuccess } = useToastMessage();
 
     const tabItems: TabItem[] = [
         {
@@ -61,8 +64,15 @@ export const UserProfile = observer((): ReactElement => {
         navigate(DASHBOARD_PAGE);
     };
 
-    const handleSave = () => {
-        return;
+    const handleSave = async () => {
+        const response = await profileStore.saveProfile();
+
+        if (response && "error" in response && response.error) {
+            showError(response.error as string);
+            return;
+        }
+
+        showSuccess("Profile is successfully updated!");
     };
 
     return (

@@ -8,7 +8,8 @@ import {
     getUserRoles,
     getSalespersonInfo,
     updateSalespersonInfo,
-    setUserData,
+    updateUserProfile,
+    changePassword,
 } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -361,17 +362,23 @@ export class UsersStore {
             salespersonLicense: this._user.salespersonLicense || "",
         };
 
-        if (this._password) {
-            userData.loginpassword = this._password;
-        }
-
         try {
-            const response = await setUserData(useruid, userData);
+            const response = await updateUserProfile(useruid, userData);
             if (response && response.status === Status.ERROR) {
                 return {
                     status: Status.ERROR,
                     error: response?.error,
                 };
+            }
+
+            if (this._password && this._password.trim()) {
+                const passwordResponse = await changePassword(useruid, this._password);
+                if (passwordResponse && passwordResponse.status === Status.ERROR) {
+                    return {
+                        status: Status.ERROR,
+                        error: passwordResponse?.error,
+                    };
+                }
             }
 
             const salespersonResponse = await this.updateSalespersonInfo(useruid);

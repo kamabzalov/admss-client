@@ -32,7 +32,7 @@ export class RootStore {
         this.accountStore = new AccountStore(this);
         this.reportStore = new ReportStore(this);
         this.generalSettingsStore = new GeneralSettingsStore(this);
-        this.profileStore = new ProfileStore();
+        this.profileStore = new ProfileStore(this);
     }
 }
 
