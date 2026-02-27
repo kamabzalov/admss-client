@@ -4,6 +4,12 @@
     .users-table-row--disabled {
         color: var(--admss-app-light-grey);
     }
+
+    .users-table {
+        .p-datatable-thead > tr > th {
+            width: auto;
+        }
+    }
 }
 
 .users__title {
