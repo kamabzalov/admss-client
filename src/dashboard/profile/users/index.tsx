@@ -166,7 +166,7 @@ export const Users = observer((): ReactElement => {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card users'>
+                <div className='card users data-table-wrapper'>
                     <div className='card-header'>
                         <h2 className='card-header__title users__title uppercase m-0'>Users</h2>
                     </div>
@@ -200,6 +200,7 @@ export const Users = observer((): ReactElement => {
                                         first={lazyState.first}
                                         rows={lazyState.rows}
                                         rowsPerPageOptions={ROWS_PER_PAGE}
+                                        className='users-table'
                                         totalRecords={totalRecords || 1}
                                         onPage={pageChanged}
                                         onSort={sortData}

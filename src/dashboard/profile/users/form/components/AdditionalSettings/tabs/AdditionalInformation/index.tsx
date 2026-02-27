@@ -3,11 +3,12 @@ import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import { Splitter } from "dashboard/common/display";
 import {
-    CURRENCY_OPTIONS,
-    CurrencyInput,
+    CURRENCY_SELECT_OPTIONS,
+    NumberInput,
     StateDropdown,
     TextInput,
 } from "dashboard/common/form/inputs";
+import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { CREATE_ID } from "common/constants/links";
 
@@ -74,13 +75,59 @@ export const AdditionalInformation = observer((): ReactElement => {
             <Splitter title='Commission' className='my-5' />
             <div className='grid'>
                 <div className='col-3'>
-                    <CurrencyInput
-                        currencyIcon={CURRENCY_OPTIONS.DOLLAR}
-                        className='w-full'
-                        name='Commission Rate'
-                        value={salespersonInfo?.Commission || 0}
-                        onChange={(e) => changeSalespersonInfo("Commission", e.value || 0)}
-                    />
+                    <div className='flex align-items-center justify-content-between commission-rate relative text-input'>
+                        <label className='commission-rate__label label-top'>Commission</label>
+                        <div className='commission-rate__input flex justify-content-center'>
+                            <Button
+                                type='button'
+                                icon='icon adms-percentage'
+                                severity={
+                                    (salespersonInfo?.CommissionType ??
+                                        CURRENCY_SELECT_OPTIONS[0].value) ===
+                                    CURRENCY_SELECT_OPTIONS[1].value
+                                        ? "success"
+                                        : "secondary"
+                                }
+                                onClick={() =>
+                                    changeSalespersonInfo(
+                                        "CommissionType",
+                                        CURRENCY_SELECT_OPTIONS[1].value
+                                    )
+                                }
+                                className='commission-rate__button commission-rate__button-percent'
+                            />
+                            <Button
+                                type='button'
+                                icon='icon adms-dollar-sign'
+                                severity={
+                                    (salespersonInfo?.CommissionType ??
+                                        CURRENCY_SELECT_OPTIONS[0].value) ===
+                                    CURRENCY_SELECT_OPTIONS[0].value
+                                        ? "success"
+                                        : "secondary"
+                                }
+                                onClick={() =>
+                                    changeSalespersonInfo(
+                                        "CommissionType",
+                                        CURRENCY_SELECT_OPTIONS[0].value
+                                    )
+                                }
+                                className='commission-rate__button commission-rate__button-currency'
+                            />
+                            <NumberInput
+                                name='Commission'
+                                label=''
+                                minFractionDigits={2}
+                                maxFractionDigits={2}
+                                min={0}
+                                locale='en-US'
+                                value={salespersonInfo?.Commission ?? 0}
+                                onChange={(e) => changeSalespersonInfo("Commission", e.value ?? 0)}
+                                className='w-full'
+                                wrapperClassName='flex-1'
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

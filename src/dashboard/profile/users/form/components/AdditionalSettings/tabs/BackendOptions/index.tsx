@@ -48,7 +48,7 @@ export const BackendOptions = observer((): ReactElement => {
     return (
         <div className='backend-options mt-4'>
             <div className='grid'>
-                <div className='col-3'>
+                <div className='col-3 pb-0'>
                     <BorderedCheckbox
                         name='Select All'
                         checked={allChecked}
@@ -57,7 +57,7 @@ export const BackendOptions = observer((): ReactElement => {
                 </div>
             </div>
 
-            <Splitter className='mb-3' />
+            <Splitter className='my-4' />
 
             <div className='grid'>
                 <div className='col-3'>

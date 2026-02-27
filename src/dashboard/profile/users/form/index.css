@@ -20,6 +20,16 @@
     .card-header {
         padding-top: 0;
     }
+
+    .typical-options {
+        .typical-options__select-all {
+            margin-top: 4px;
+        }
+        .grid > [class*="col"] {
+            padding-top: 5px;
+            padding-bottom: 0;
+        }
+    }
 }
 
 .user-form-page__tabs {
