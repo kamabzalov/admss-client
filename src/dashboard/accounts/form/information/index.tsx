@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { AppColors } from "common/models/css-variables";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 import { formatPhoneNumber } from "common/helpers";
+import { usePermissions } from "common/hooks";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
@@ -38,7 +39,7 @@ export const AccountInformation = observer((): ReactElement => {
         },
     } = store;
     const navigate = useNavigate();
-
+    const { accountPermissions } = usePermissions();
     return (
         <div className='account-info'>
             <h3 className='account-info__title account-title'>Account Information</h3>
@@ -123,15 +124,17 @@ export const AccountInformation = observer((): ReactElement => {
                             },
                         ]}
                     />
-                    <Button
-                        className='account-info__button'
-                        onClick={() =>
-                            navigate(`take-payment?tab=${AccountTakePaymentTabs.PAY_OFF}`)
-                        }
-                        outlined
-                    >
-                        Calculate Payoff
-                    </Button>
+                    {accountPermissions.canEditPartialPayments() && (
+                        <Button
+                            className='account-info__button'
+                            onClick={() =>
+                                navigate(`take-payment?tab=${AccountTakePaymentTabs.PAY_OFF}`)
+                            }
+                            outlined
+                        >
+                            Calculate Payoff
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

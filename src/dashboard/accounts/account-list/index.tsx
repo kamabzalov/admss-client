@@ -21,6 +21,7 @@ import AccountsAdvancedSearch from "./components/AccountsAdvancedSearch";
 import { useCreateReport } from "common/hooks";
 import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
+import { usePermissions } from "common/hooks";
 import { Button } from "primereact/button";
 import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
@@ -49,6 +50,7 @@ export const AccountsDataTable = observer(
             useUserProfileSettings<AccountsUserSettings, TableColumnsList>("accounts", columns);
         const navigate = useNavigate();
         const { createReport } = useCreateReport<AccountInfo>();
+        const { accountPermissions } = usePermissions();
 
         const printTableData = async (print: boolean = false) => {
             if (!authUser) return;
@@ -127,7 +129,7 @@ export const AccountsDataTable = observer(
             if (onRowClick) {
                 const value = returnedField ? data[returnedField] : data.name;
                 onRowClick(value);
-            } else {
+            } else if (accountPermissions.canOpenDetails()) {
                 navigate(data.accountuid);
             }
         };
@@ -184,30 +186,34 @@ export const AccountsDataTable = observer(
                                 }
                             }}
                         >
-                            <Column
-                                bodyStyle={{ textAlign: "center" }}
-                                reorderable={false}
-                                resizeable={false}
-                                body={({ accountuid }: AccountInfo) => {
-                                    return (
-                                        <Button
-                                            text
-                                            className='table-edit-button'
-                                            icon='adms-edit-item'
-                                            tooltip='Edit account'
-                                            tooltipOptions={{ position: "mouse" }}
-                                            onClick={() => navigate(ACCOUNTS_PAGE.EDIT(accountuid))}
-                                        />
-                                    );
-                                }}
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: "80px",
+                            {accountPermissions.canEdit() && (
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={({ accountuid }: AccountInfo) => {
+                                        return (
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                tooltip='Edit account'
+                                                tooltipOptions={{ position: "mouse" }}
+                                                onClick={() =>
+                                                    navigate(ACCOUNTS_PAGE.EDIT(accountuid))
+                                                }
+                                            />
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "80px",
+                                            },
                                         },
-                                    },
-                                }}
-                            />
+                                    }}
+                                />
+                            )}
 
                             {activeColumns.map(({ field, header }: TableColumnsList, index) => {
                                 const savedWidth = serverSettings?.accounts?.columnWidth?.[field];

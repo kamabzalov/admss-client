@@ -9,12 +9,15 @@ import { Button } from "primereact/button";
 import { ReactElement, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 
 export const AccountTotalAmount = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().accountStore;
     const toast = useToast();
     const [fieldChanged, setFieldChanged] = useState<Record<string, boolean>>({});
+    const { accountPermissions } = usePermissions();
+    const isReadOnly = !accountPermissions.canEditPartialPayments();
 
     const {
         accountTakePayment: {
@@ -60,6 +63,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["PaymentDate"] ? "input-change" : ""
                     }`}
                     date={PaymentDate}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PaymentDate");
                         changeAccountTakePayment("PaymentDate", e.target.value as string);
@@ -76,6 +80,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                     }`}
                     options={[...ACCOUNT_PAYMENT_METHODS]}
                     value={PaymentMethod}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PaymentMethod");
                         changeAccountTakePayment("PaymentMethod", e.value);
@@ -93,6 +98,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["CheckNumber"] ? "input-change" : ""
                     }`}
                     value={CheckNumber}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("CheckNumber");
                         changeAccountTakePayment("CheckNumber", e.target.value);
@@ -110,6 +116,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                             fieldChanged["TotalAmount"] ? "input-change" : ""
                         }`}
                         value={TotalAmount}
+                        disabled={isReadOnly}
                         onChange={({ value }) => {
                             markFieldChanged("TotalAmount");
                             changeAccountTakePayment("TotalAmount", value as number);
@@ -118,6 +125,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                     <Button
                         severity='secondary'
                         icon='pi pi-arrow-right'
+                        disabled={isReadOnly}
                         onClick={handleCheckPayment}
                     />
                 </div>
@@ -134,6 +142,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["BreakdownDownPayment"] ? "input-change" : ""
                     }`}
                     value={BreakdownDownPayment}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("BreakdownDownPayment");
                         changeAccountTakePayment("BreakdownDownPayment", value as number);
@@ -147,6 +156,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["BreakdownFees"] ? "input-change" : ""
                     }`}
                     value={BreakdownFees}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("BreakdownFees");
                         changeAccountTakePayment("BreakdownFees", value as number);
@@ -160,6 +170,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["BreakdownPrincipal"] ? "input-change" : ""
                     }`}
                     value={BreakdownPrincipal}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("BreakdownPrincipal");
                         changeAccountTakePayment("BreakdownPrincipal", value as number);
@@ -173,6 +184,7 @@ export const AccountTotalAmount = observer((): ReactElement => {
                         fieldChanged["BreakdownContractPayment"] ? "input-change" : ""
                     }`}
                     value={BreakdownContractPayment}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("BreakdownContractPayment");
                         changeAccountTakePayment("BreakdownContractPayment", value as number);

@@ -15,7 +15,6 @@ import {
 } from "primereact/multiselect";
 import { SplitButton } from "primereact/splitbutton";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 import { AddPaymentNoteDialog } from "./add-payment-note";
 import { AddNoteDialog } from "../notes/add-note-dialog";
 import { makeShortReports } from "http/services/reports.service";
@@ -24,6 +23,8 @@ import { useToast } from "dashboard/common/toast";
 import { observer } from "mobx-react-lite";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { rowExpansionTemplate } from "dashboard/common/data-table";
+import { usePermissions } from "common/hooks";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -65,6 +66,7 @@ export const AccountPaymentHistory = observer((): ReactElement => {
     const toast = useToast();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
+    const { accountPermissions } = usePermissions();
     const navigate = useNavigate();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
@@ -334,6 +336,11 @@ export const AccountPaymentHistory = observer((): ReactElement => {
         handleFilterActivity();
     }, [selectedPayment, id]);
 
+    const handleTakePaymentButtonClick = () => {
+        if (!id || !accountPermissions.canEditPayments()) return;
+        navigate(ACCOUNTS_PAGE.TAKE_PAYMENT(id));
+    };
+
     return (
         <div className='account-history account-card'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -390,9 +397,7 @@ export const AccountPaymentHistory = observer((): ReactElement => {
                         tooltipOptions={{
                             position: "bottom",
                         }}
-                        onClick={() =>
-                            navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`)
-                        }
+                        onClick={handleTakePaymentButtonClick}
                         outlined
                     />
                 </div>

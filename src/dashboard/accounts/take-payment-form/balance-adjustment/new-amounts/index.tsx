@@ -2,12 +2,15 @@ import { TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 
 export const AccountNewAmounts = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
         accountPaymentsInfo: { NewAmounts },
     } = store;
+    const { accountPermissions } = usePermissions();
+    const isReadOnly = !accountPermissions.canEditPartialPayments();
     return (
         <div className='take-payment__card'>
             <h3 className='take-payment__title'>New Amounts</h3>
@@ -16,6 +19,7 @@ export const AccountNewAmounts = observer((): ReactElement => {
                 name='adjustmentComment'
                 label='Adjustment Comment'
                 className='balance-adjustment__input mt-2'
+                disabled={isReadOnly}
             />
 
             <hr className='form-line' />

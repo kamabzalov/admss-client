@@ -7,6 +7,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { useNavigate } from "react-router-dom";
 import { InputTextarea } from "primereact/inputtextarea";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface ReportSelectProps {
     header: string;
@@ -71,7 +72,7 @@ export const NoticeAlert = observer(({ ...props }: NoticeAlertProps): ReactEleme
     };
 
     const handleNoticeClick = () => {
-        navigate(`/dashboard/accounts/${store.accountID}?tab=notes`);
+        navigate(ACCOUNTS_PAGE.NOTES(store.accountID));
     };
 
     return (

@@ -8,8 +8,8 @@ import { AccountPayOff } from "./pay-off";
 import { AccountBalanceAdjustment } from "./balance-adjustment";
 import "./index.css";
 import { observer } from "mobx-react-lite";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
+import { ACCOUNTS_PAGE } from "common/constants/links";
+import { useToastMessage } from "common/hooks";
 
 export enum AccountTakePaymentTabs {
     QUICK_PAY = "quick-pay",
@@ -23,7 +23,7 @@ export const AccountTakePayment = observer((): ReactElement => {
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().accountStore;
     const userStore = useStore().userStore;
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const { authUser } = userStore;
     const {
         account: { accountnumber, accountstatus },
@@ -85,16 +85,12 @@ export const AccountTakePayment = observer((): ReactElement => {
     }, [tabParam, setSearchParams]);
 
     const handleSaveTakePayment = async () => {
+        if (!id) return;
         const result = await saveTakePayment();
         if (result?.error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: result.error,
-                life: TOAST_LIFETIME,
-            });
+            showError(result.error);
         } else {
-            navigate(`/dashboard/accounts/${id}`);
+            navigate(ACCOUNTS_PAGE.EDIT(id));
         }
     };
 
@@ -103,7 +99,15 @@ export const AccountTakePayment = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => navigate(prevPath || `/dashboard/accounts/${id}`)}
+                onClick={() => {
+                    if (prevPath) {
+                        navigate(prevPath);
+                    } else if (id) {
+                        navigate(ACCOUNTS_PAGE.EDIT(id));
+                    } else {
+                        navigate(-1);
+                    }
+                }}
             />
             <div className='card account'>
                 <div className='card-header flex'>

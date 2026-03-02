@@ -2,6 +2,7 @@ export const HELP_PAGE: string = "https://www.admss.com/";
 export const CONTACT_SUPPORT: string = "contact-support";
 export const SERVICE_UPDATE_PAGE: string = "/service-update";
 export const CREATE_ID: string = "create";
+export const TAB_ID: string = "tab";
 export const USER_PROFILE_PAGE_ID: string = "user-profile";
 export const HOME_PAGE: string = "/";
 
@@ -63,15 +64,33 @@ export const CONTACTS_PAGE: Readonly<ContactsPage> = {
 interface AccountsPage {
     readonly MAIN: string;
     CREATE(): string;
+    NOTES_TAB: string;
+    PROMISE_TO_PAY_TAB: string;
     EDIT(id: string): string;
+    NOTES(id: string): string;
+    PROMISE_TO_PAY(id: string): string;
+    TAKE_PAYMENT_TAB: string;
+    TAKE_PAYMENT(id: string): string;
 }
 export const ACCOUNTS_PAGE: Readonly<AccountsPage> = {
     MAIN: `${DASHBOARD_PAGE}/accounts`,
+    NOTES_TAB: `?${TAB_ID}=notes`,
+    PROMISE_TO_PAY_TAB: `?${TAB_ID}=promise-to-pay`,
+    TAKE_PAYMENT_TAB: `?${TAB_ID}=take-payment`,
     CREATE() {
         return `${this.MAIN}${CREATE_PATH}`;
     },
     EDIT(id: string) {
         return `${this.MAIN}/${id}`;
+    },
+    NOTES(id: string) {
+        return `${this.EDIT(id)}${this.NOTES_TAB}`;
+    },
+    PROMISE_TO_PAY(id: string) {
+        return `${this.EDIT(id)}${this.PROMISE_TO_PAY_TAB}`;
+    },
+    TAKE_PAYMENT(id: string) {
+        return `${this.EDIT(id)}${this.TAKE_PAYMENT_TAB}`;
     },
 };
 

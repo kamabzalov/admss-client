@@ -22,6 +22,7 @@ export const PERMISSION_KEYS = [
     "uaDeleteInventory",
     "uaDeletePayments",
     "uaEditContacts",
+    "uaEditAccounts",
     "uaEditDealWashout",
     "uaEditDeals",
     "uaEditExpenses",

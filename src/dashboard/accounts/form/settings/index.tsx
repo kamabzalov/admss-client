@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 export const AccountSettings = observer((): ReactElement => {
     const [accountStatus, setAccountStatus] = useState<string>("");
@@ -21,9 +22,16 @@ export const AccountSettings = observer((): ReactElement => {
     } = store;
 
     const handleNavigate = (tabName: string) => {
-        const params = new URLSearchParams();
-        params.set("tab", tabName);
-        navigate(`/dashboard/accounts/${id}?${params.toString()}`, { replace: true });
+        if (!id) return;
+
+        switch (tabName) {
+            case ACCOUNTS_PAGE.PROMISE_TO_PAY_TAB:
+                navigate(ACCOUNTS_PAGE.PROMISE_TO_PAY(id), { replace: true });
+                break;
+            default:
+                navigate(ACCOUNTS_PAGE.EDIT(id), { replace: true });
+                break;
+        }
     };
 
     return (
