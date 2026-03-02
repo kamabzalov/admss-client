@@ -139,7 +139,6 @@ export const Home = (): ReactElement => {
                                 </Link>
                             </>
                         )}
-
                         <Link to='test-drive' className='common-tasks-menu__item cursor-pointer'>
                             <div className='common-tasks-menu__icon print-test-drive'></div>
                             Print <br /> (for test drive)
