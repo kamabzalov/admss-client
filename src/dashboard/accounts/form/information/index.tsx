@@ -124,7 +124,7 @@ export const AccountInformation = observer((): ReactElement => {
                             },
                         ]}
                     />
-                    {accountPermissions.canEditPayments() && (
+                    {accountPermissions.canEditPartialPayments() && (
                         <Button
                             className='account-info__button'
                             onClick={() =>
