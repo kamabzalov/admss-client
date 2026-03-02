@@ -4,12 +4,16 @@ import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 
 export const AccountAdjustments = observer((): ReactElement => {
     const store = useStore().accountStore;
     const [fieldChanged, setFieldChanged] = useState<Record<string, boolean>>({});
+    const { accountPermissions } = usePermissions();
+    const isReadOnly = !accountPermissions.canEditPartialPayments();
 
     const markFieldChanged = (field: string) => {
+        if (isReadOnly) return;
         setFieldChanged((prev) => ({ ...prev, [field]: true }));
     };
 
@@ -23,6 +27,7 @@ export const AccountAdjustments = observer((): ReactElement => {
             AdjDownPayment,
         },
         accountExtData: { Total_Adjustments },
+        changeAccountTakePayment,
     } = store;
 
     return (
@@ -36,11 +41,12 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjType"] ? "input-change" : ""
                     }`}
                     options={[...ADJUSTMENT_TYPES]}
+                    value={AdjType}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("AdjType");
-                        store.changeAccountTakePayment("AdjType", value);
+                        changeAccountTakePayment("AdjType", value);
                     }}
-                    value={AdjType}
                 />
             </div>
             <div className='take-payment__item'>
@@ -50,9 +56,10 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjDate"] ? "input-change" : ""
                     }`}
                     date={Number(AdjDate)}
+                    disabled={isReadOnly}
                     onChange={({ target: { value } }) => {
                         markFieldChanged("AdjDate");
-                        store.changeAccountTakePayment("AdjDate", String(value));
+                        changeAccountTakePayment("AdjDate", String(value));
                     }}
                 />
             </div>
@@ -66,9 +73,10 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjPrincipal"] ? "input-change" : ""
                     }`}
                     value={AdjPrincipal}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("AdjPrincipal");
-                        store.changeAccountTakePayment("AdjPrincipal", value || 0);
+                        changeAccountTakePayment("AdjPrincipal", value || 0);
                     }}
                 />
             </div>
@@ -79,9 +87,10 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjInterest"] ? "input-change" : ""
                     }`}
                     value={AdjInterest}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("AdjInterest");
-                        store.changeAccountTakePayment("AdjInterest", value || 0);
+                        changeAccountTakePayment("AdjInterest", value || 0);
                     }}
                 />
             </div>
@@ -92,9 +101,10 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjExtraPrincipal"] ? "input-change" : ""
                     }`}
                     value={AdjExtraPrincipal}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("AdjExtraPrincipal");
-                        store.changeAccountTakePayment("AdjExtraPrincipal", value || 0);
+                        changeAccountTakePayment("AdjExtraPrincipal", value || 0);
                     }}
                 />
             </div>
@@ -105,9 +115,10 @@ export const AccountAdjustments = observer((): ReactElement => {
                         fieldChanged["AdjDownPayment"] ? "input-change" : ""
                     }`}
                     value={AdjDownPayment}
+                    disabled={isReadOnly}
                     onChange={({ value }) => {
                         markFieldChanged("AdjDownPayment");
-                        store.changeAccountTakePayment("AdjDownPayment", value || 0);
+                        changeAccountTakePayment("AdjDownPayment", value || 0);
                     }}
                 />
             </div>

@@ -171,6 +171,13 @@ export class AccountStore {
 
     public changeAccountTakePayment = action(
         (key: keyof AccountUpdateTakePayment, value: string | number) => {
+            const canEditPartialPayments =
+                this.rootStore.userStore.authUser?.permissions?.uaAllowPartialPayments === 1;
+
+            if (!canEditPartialPayments) {
+                return;
+            }
+
             this._isAccountPaymentChanged = true;
             this._accountTakePayment[key] = value as never;
         }

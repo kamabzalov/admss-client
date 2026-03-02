@@ -20,8 +20,13 @@ import { usePermissions } from "common/hooks/usePermissions";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
-    const { inventoryPermissions, contactPermissions, dealPermissions, salesPermissions } =
-        usePermissions();
+    const {
+        inventoryPermissions,
+        contactPermissions,
+        dealPermissions,
+        accountPermissions,
+        salesPermissions,
+    } = usePermissions();
     const { authUser, settings } = store;
     const [isInitialRender, setIsInitialRender] = useState(true);
 
@@ -89,6 +94,7 @@ export const Sidebar = observer((): ReactElement => {
                     dealPermissions.canSeeInMenu() &&
                     renderNavItem(DEALS_PAGE.MAIN, "deals", "Deals")}
                 {salesPermissions.canShowAccounts() &&
+                    accountPermissions.canSeeInMenu() &&
                     renderNavItem(ACCOUNTS_PAGE.MAIN, "accounts", "Accounts")}
                 {salesPermissions.canShowReports() &&
                     renderNavItem(REPORTS_PAGE.MAIN, "reports", "Reports")}

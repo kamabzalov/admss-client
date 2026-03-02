@@ -260,7 +260,7 @@ export const AccountDownPayment = (): ReactElement => {
             </div>
 
             <div className='grid account__body'>
-                <div className='col-3 ml-auto'>
+                <div className='ml-auto'>
                     <SplitButton
                         model={takePaymentItems}
                         className='account__split-button ml-auto'

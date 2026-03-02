@@ -5,25 +5,30 @@ import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 
 export const PayOffInfo = observer((): ReactElement => {
     const store = useStore().accountStore;
     const [fieldChanged, setFieldChanged] = useState<Record<string, boolean>>({});
+    const { accountPermissions } = usePermissions();
+    const isReadOnly = !accountPermissions.canEditPartialPayments();
 
     const {
-        accountTakePayment: {
-            PayOffBalancePaydown,
-            PayOffDownPayment,
-            PayOffFees,
-            PaymentDate,
-            PaymentMethod,
-            CheckNumber,
-            PaymentTakenBy,
-        },
+        accountTakePayment,
         accountExtData: { Total_Paid },
         changeAccountTakePayment,
         accountDrawers,
     } = store;
+
+    const {
+        PayOffBalancePaydown,
+        PayOffDownPayment,
+        PayOffFees,
+        PaymentDate,
+        PaymentMethod,
+        CheckNumber,
+        PaymentTakenBy,
+    } = accountTakePayment;
 
     const markFieldChanged = (field: string) => {
         setFieldChanged((prev) => ({ ...prev, [field]: true }));
@@ -40,6 +45,7 @@ export const PayOffInfo = observer((): ReactElement => {
                     }`}
                     date={PaymentDate ? new Date(PaymentDate).getTime() : undefined}
                     emptyDate
+                    disabled={isReadOnly}
                     onChange={({ target: { value } }) => {
                         markFieldChanged("PaymentDate");
                         changeAccountTakePayment("PaymentDate", value ? String(value) : "");
@@ -57,6 +63,7 @@ export const PayOffInfo = observer((): ReactElement => {
                     optionValue='name'
                     optionLabel='name'
                     value={PaymentMethod}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PaymentMethod");
                         changeAccountTakePayment("PaymentMethod", e.value);
@@ -71,6 +78,7 @@ export const PayOffInfo = observer((): ReactElement => {
                         fieldChanged["CheckNumber"] ? "input-change" : ""
                     }`}
                     value={CheckNumber}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("CheckNumber");
                         changeAccountTakePayment("CheckNumber", e.target.value);
@@ -84,6 +92,7 @@ export const PayOffInfo = observer((): ReactElement => {
                         fieldChanged["PayOffBalancePaydown"] ? "input-change" : ""
                     }`}
                     value={PayOffBalancePaydown}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PayOffBalancePaydown");
                         changeAccountTakePayment("PayOffBalancePaydown", e.value || 0);
@@ -97,6 +106,7 @@ export const PayOffInfo = observer((): ReactElement => {
                         fieldChanged["PayOffDownPayment"] ? "input-change" : ""
                     }`}
                     value={PayOffDownPayment}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PayOffDownPayment");
                         changeAccountTakePayment("PayOffDownPayment", e.value || 0);
@@ -110,6 +120,7 @@ export const PayOffInfo = observer((): ReactElement => {
                         fieldChanged["PayOffFees"] ? "input-change" : ""
                     }`}
                     value={PayOffFees}
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("PayOffFees");
                         changeAccountTakePayment("PayOffFees", e.value || 0);
@@ -134,6 +145,7 @@ export const PayOffInfo = observer((): ReactElement => {
                     }`}
                     optionLabel='drawer'
                     optionValue='drawer'
+                    disabled={isReadOnly}
                     onChange={(e) => {
                         markFieldChanged("CashDrawer");
                         changeAccountTakePayment("CashDrawer", e.value);
@@ -155,7 +167,13 @@ export const PayOffInfo = observer((): ReactElement => {
                     }}
                 />
             </div>
-            <Button label='Apply Payment' className='pay-off__button' outlined />
+            <Button
+                label='Apply Payment'
+                className='pay-off__button'
+                severity={isReadOnly ? "secondary" : "success"}
+                outlined
+                disabled={isReadOnly}
+            />
         </div>
     );
 });

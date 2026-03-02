@@ -14,8 +14,13 @@ const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
-    const { inventoryPermissions, contactPermissions, dealPermissions, salesPermissions } =
-        usePermissions();
+    const {
+        inventoryPermissions,
+        contactPermissions,
+        dealPermissions,
+        accountPermissions,
+        salesPermissions,
+    } = usePermissions();
     const { authUser } = store;
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
@@ -139,6 +144,16 @@ export const Home = (): ReactElement => {
                                 </Link>
                             </>
                         )}
+                        {salesPermissions.canShowAccounts() &&
+                            accountPermissions.canSeeInMenu() && (
+                                <Link
+                                    to='accounts'
+                                    className='common-tasks-menu__item cursor-pointer'
+                                >
+                                    <div className='common-tasks-menu__icon browse-all-contacts'></div>
+                                    Browse <br /> all accounts
+                                </Link>
+                            )}
                         <Link to='test-drive' className='common-tasks-menu__item cursor-pointer'>
                             <div className='common-tasks-menu__icon print-test-drive'></div>
                             Print <br /> (for test drive)

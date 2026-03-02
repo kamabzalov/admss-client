@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { InputNumberProps } from "primereact/inputnumber";
 import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 
 interface PayOffItemProps extends InputNumberProps {
     numberSign?: "+" | "-";
@@ -36,20 +37,24 @@ const PayOffItem = observer(
 
 export const AccountCashDealInfo = observer((): ReactElement => {
     const store = useStore().accountStore;
+    const { accountPermissions } = usePermissions();
+    const isReadOnly = !accountPermissions.canEditPartialPayments();
     const {
         accountPaymentsInfo: { CashDealPayoff },
-        accountTakePayment: {
-            PayoffReserve,
-            PayoffDiscount,
-            PayoffLoanFees,
-            PayoffServiceContractWithholding,
-            PayoffGAPWithholding,
-            PayoffVSIWithholding,
-            PayoffMiscWithholding,
-            PayoffMiscProfitComission,
-        },
+        accountTakePayment,
         changeAccountTakePayment,
     } = store;
+
+    const {
+        PayoffReserve,
+        PayoffDiscount,
+        PayoffLoanFees,
+        PayoffServiceContractWithholding,
+        PayoffGAPWithholding,
+        PayoffVSIWithholding,
+        PayoffMiscWithholding,
+        PayoffMiscProfitComission,
+    } = accountTakePayment;
 
     return (
         <div className='take-payment__card'>
@@ -75,6 +80,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffReserve}
                 fieldName='PayoffReserve'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) => changeAccountTakePayment("PayoffReserve", value || 0)}
             />
 
@@ -83,6 +89,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffDiscount}
                 fieldName='PayoffDiscount'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) => changeAccountTakePayment("PayoffDiscount", value || 0)}
             />
 
@@ -91,6 +98,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffLoanFees}
                 fieldName='PayoffLoanFees'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) => changeAccountTakePayment("PayoffLoanFees", value || 0)}
             />
 
@@ -99,6 +107,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffServiceContractWithholding}
                 fieldName='PayoffServiceContractWithholding'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) =>
                     changeAccountTakePayment("PayoffServiceContractWithholding", value || 0)
                 }
@@ -109,6 +118,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffGAPWithholding}
                 fieldName='PayoffGAPWithholding'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) =>
                     changeAccountTakePayment("PayoffGAPWithholding", value || 0)
                 }
@@ -119,6 +129,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffVSIWithholding}
                 fieldName='PayoffVSIWithholding'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) =>
                     changeAccountTakePayment("PayoffVSIWithholding", value || 0)
                 }
@@ -129,6 +140,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffMiscWithholding}
                 fieldName='PayoffMiscWithholding'
                 numberSign='-'
+                disabled={isReadOnly}
                 onChange={({ value }) =>
                     changeAccountTakePayment("PayoffMiscWithholding", value || 0)
                 }
@@ -139,6 +151,7 @@ export const AccountCashDealInfo = observer((): ReactElement => {
                 value={PayoffMiscProfitComission}
                 fieldName='PayoffMiscProfitComission'
                 numberSign='+'
+                disabled={isReadOnly}
                 onChange={({ value }) =>
                     changeAccountTakePayment("PayoffMiscProfitComission", value || 0)
                 }

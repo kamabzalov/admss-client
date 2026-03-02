@@ -18,6 +18,7 @@ import { SignIn } from "sign/sign-in";
 import { TwoFactorAuth } from "sign/two-factor-auth";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { InventoryProtectedRoute } from "http/routes/InventoryProtectedRoute";
+import { AccountsProtectedRoute } from "http/routes/AccountsProtectedRoute";
 import { ContactsProtectedRoute } from "http/routes/ContactsProtectedRoute";
 import { DealsProtectedRoute } from "http/routes/DealsProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
@@ -192,14 +193,23 @@ const AppRouter = (): ReactElement => {
                             path: "accounts",
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
-                                    <Outlet />
+                                    <AccountsProtectedRoute>
+                                        <Outlet />
+                                    </AccountsProtectedRoute>
                                 </ProtectedRoute>
                             ),
                             children: [
                                 { path: "", element: <Accounts /> },
                                 { path: "create", element: <AccountsForm /> },
                                 { path: ":id", element: <AccountsForm /> },
-                                { path: ":id/take-payment", element: <AccountTakePayment /> },
+                                {
+                                    path: ":id/take-payment",
+                                    element: (
+                                        <AccountsProtectedRoute requireEditPayments>
+                                            <AccountTakePayment />
+                                        </AccountsProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {

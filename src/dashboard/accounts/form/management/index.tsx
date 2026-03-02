@@ -13,6 +13,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { AddFeeDialog } from "./add-fee-dialog";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useStore } from "store/hooks";
+import { usePermissions } from "common/hooks";
 import { makeShortReports } from "http/services/reports.service";
 import { ComboBox } from "dashboard/common/form/dropdown";
 
@@ -39,6 +40,7 @@ export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
+    const { accountPermissions } = usePermissions();
     const navigate = useNavigate();
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
@@ -221,12 +223,14 @@ export const AccountManagement = (): ReactElement => {
                         onClick={() => setIsDialogActive(true)}
                         outlined
                     />
-                    <Button
-                        className='account-management__button'
-                        label='Take Payment'
-                        outlined
-                        onClick={() => navigate(quickPayPath)}
-                    />
+                    {accountPermissions.canEditPayments() && (
+                        <Button
+                            className='account-management__button'
+                            label='Take Payment'
+                            outlined
+                            onClick={() => navigate(quickPayPath)}
+                        />
+                    )}
                 </div>
                 <div className='col-12 account__table'>
                     <DataTable
