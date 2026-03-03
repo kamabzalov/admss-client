@@ -1,9 +1,10 @@
 import { makeAutoObservable } from "mobx";
 import { AuthUser } from "common/models/user";
 import { RootStore } from "store";
-import { updateUserProfile, changePassword, checkPassword } from "http/services/users";
+import { updateUserProfile, changePassword, checkPassword, getUserData } from "http/services/users";
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { typeGuards } from "common/utils";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
     address: string;
@@ -36,6 +37,16 @@ export class ProfileStore {
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
+
+        const authUser = this.rootStore.userStore.authUser;
+
+        if (authUser) {
+            this._profile = {
+                ...this._profile,
+                companyname: authUser.companyname || "",
+                locationname: authUser.locationname || "",
+            };
+        }
     }
 
     public get profile() {
@@ -124,6 +135,47 @@ export class ProfileStore {
         this._isValidatingPassword = false;
     }
 
+    public loadProfile = async () => {
+        const authUser = this.rootStore.userStore.authUser;
+
+        if (!authUser?.useruid) {
+            return {
+                status: Status.ERROR,
+                error: "User is not authenticated",
+            } as BaseResponseError;
+        }
+
+        try {
+            const response = await getUserData(authUser.useruid);
+
+            if (!response || typeGuards.isExist(response.error)) {
+                return response as BaseResponseError | undefined;
+            }
+
+            const userData = response as UserData;
+
+            this._profile = {
+                ...this._profile,
+                companyname: userData.companyName || authUser.companyname || "",
+                locationname: userData.city || authUser.locationname || "",
+                address: userData.streetAddress || "",
+                state: userData.state || "",
+                zipCode: userData.ZIP || "",
+                phoneNumber: userData.phone || userData.phone1 || "",
+                email: userData.email || userData.email1 || "",
+            };
+
+            this._isProfileChanged = false;
+
+            return userData;
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            } as BaseResponseError;
+        }
+    };
+
     public saveProfile = async () => {
         const authUser = this.rootStore.userStore.authUser;
         if (!authUser?.useruid) {
@@ -133,20 +185,23 @@ export class ProfileStore {
             } as BaseResponseError;
         }
 
+        const convertEmptyValue = (value: string | undefined): string => {
+            return value === "" || value === undefined ? "" : value;
+        };
+
         const userData: Partial<UserData> = {
-            companyName: this._profile.companyname || authUser.companyname,
-            city: this._profile.locationname || authUser.locationname,
-            streetAddress: this._profile.address,
-            state: this._profile.state,
-            ZIP: this._profile.zipCode,
-            phone: this._profile.phoneNumber,
-            email: this._profile.email,
+            phone: convertEmptyValue(this._profile.phoneNumber),
+            email: convertEmptyValue(this._profile.email),
+            streetAddress: convertEmptyValue(this._profile.address),
+            city: convertEmptyValue(this._profile.locationname || authUser.locationname),
+            state: convertEmptyValue(this._profile.state),
+            ZIP: convertEmptyValue(this._profile.zipCode),
         };
 
         try {
             const response = await updateUserProfile(authUser.useruid, userData);
 
-            if (response && "error" in response && (response as BaseResponseError).error) {
+            if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
             }
 
@@ -177,7 +232,7 @@ export class ProfileStore {
         try {
             const response = await changePassword(authUser.useruid, this._newPassword);
 
-            if (response && "error" in response && (response as BaseResponseError).error) {
+            if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
             }
 
