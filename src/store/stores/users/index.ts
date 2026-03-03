@@ -69,6 +69,7 @@ export class UsersStore {
     private _loginError: boolean = false;
     private _salespersonInfo: Partial<SalespersonInfo> = initialSalespersonInfo;
     private _isUserChanged: boolean = false;
+    private _isNewUserInitialized: boolean = false;
     protected _isLoading = false;
 
     public get user() {
@@ -105,6 +106,14 @@ export class UsersStore {
 
     public get isUserChanged() {
         return this._isUserChanged;
+    }
+
+    public get isNewUserInitialized() {
+        return this._isNewUserInitialized;
+    }
+
+    public set isNewUserInitialized(initialized: boolean) {
+        this._isNewUserInitialized = initialized;
     }
 
     public constructor(rootStore: RootStore) {
@@ -470,6 +479,7 @@ export class UsersStore {
         this._loginError = false;
         this._salespersonInfo = initialSalespersonInfo;
         this._isUserChanged = false;
+        this._isNewUserInitialized = false;
     });
 
     public get isFormValid(): boolean {
