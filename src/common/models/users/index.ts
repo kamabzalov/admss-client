@@ -143,3 +143,8 @@ export interface SalespersonInfo extends BaseResponseError {
     Devices: number;
     InterestRate: number;
 }
+
+export interface ChangePasswordPayload {
+    current_password: string;
+    new_password: string;
+}

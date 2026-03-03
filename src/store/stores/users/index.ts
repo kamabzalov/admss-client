@@ -377,7 +377,10 @@ export class UsersStore {
             }
 
             if (this._password && this._password.trim()) {
-                const passwordResponse = await changePassword(useruid, this._password);
+                const passwordResponse = await changePassword(useruid, {
+                    current_password: "",
+                    new_password: this._password,
+                });
                 if (passwordResponse && passwordResponse.status === Status.ERROR) {
                     return {
                         status: Status.ERROR,
