@@ -6,6 +6,7 @@ import {
     UserRole,
     UserRolePayload,
     SalespersonInfo,
+    ChangePasswordPayload,
 } from "common/models/users";
 import { ApiRequest } from "http/index";
 
@@ -130,10 +131,10 @@ export const updateUserProfile = async (useruid: string, userData: Partial<UserD
     });
 };
 
-export const changePassword = async (useruid: string, password: string) => {
+export const changePassword = async (useruid: string, payload: ChangePasswordPayload) => {
     return new ApiRequest().post({
         url: `user/${useruid}/changepassword`,
-        data: { password },
+        data: payload,
         defaultError: "Error while changing password",
     });
 };

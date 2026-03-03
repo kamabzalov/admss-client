@@ -1,4 +1,4 @@
-import { ReactElement, useState, useRef } from "react";
+import { ReactElement, useState, useRef, useMemo } from "react";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import { Button } from "primereact/button";
 import { Splitter } from "dashboard/common/display";
@@ -80,6 +80,24 @@ export const Security = observer((): ReactElement => {
         setSupportContactVisible(true);
     };
 
+    const isButtonDisabled = useMemo(() => {
+        return (
+            !currentPassword ||
+            !newPassword ||
+            !confirmPassword ||
+            passwordsMismatch ||
+            currentPasswordError ||
+            isValidatingPassword
+        );
+    }, [
+        currentPassword,
+        newPassword,
+        confirmPassword,
+        passwordsMismatch,
+        currentPasswordError,
+        isValidatingPassword,
+    ]);
+
     return (
         <div className='user-profile__content'>
             <div className='user-profile__header'>
@@ -122,15 +140,8 @@ export const Security = observer((): ReactElement => {
                     <Button
                         className='user-profile-password__button'
                         onClick={handleChangePassword}
-                        disabled={
-                            !currentPassword ||
-                            !newPassword ||
-                            !confirmPassword ||
-                            passwordsMismatch ||
-                            currentPasswordError ||
-                            isValidatingPassword
-                        }
-                        severity='secondary'
+                        disabled={isButtonDisabled}
+                        severity={isButtonDisabled ? "secondary" : "success"}
                     >
                         Change Password
                     </Button>

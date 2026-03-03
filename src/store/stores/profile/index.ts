@@ -230,7 +230,10 @@ export class ProfileStore {
         }
 
         try {
-            const response = await changePassword(authUser.useruid, this._newPassword);
+            const response = await changePassword(authUser.useruid, {
+                current_password: this._currentPassword,
+                new_password: this._newPassword,
+            });
 
             if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
