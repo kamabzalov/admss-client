@@ -11,6 +11,7 @@ import { observer } from "mobx-react-lite";
 import { DataTableWrapper } from "dashboard/common/data-table";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
+import { typeGuards } from "common/utils";
 
 interface TabItem {
     settingName: string;
@@ -45,6 +46,18 @@ export const UserProfile = observer((): ReactElement => {
     ];
 
     useEffect(() => {
+        const load = async () => {
+            const response = await profileStore.loadProfile();
+
+            if (response && typeGuards.isExist(response.error)) {
+                showError(response.error);
+            }
+        };
+
+        load();
+    }, []);
+
+    useEffect(() => {
         const defaultTabRoute = tabItems[0].route;
         const currentTab = searchParams.get("section");
         if (!currentTab) {
@@ -67,7 +80,7 @@ export const UserProfile = observer((): ReactElement => {
     const handleSave = async () => {
         const response = await profileStore.saveProfile();
 
-        if (response && "error" in response && response.error) {
+        if (response && typeGuards.isExist(response.error)) {
             showError(response.error as string);
             return;
         }

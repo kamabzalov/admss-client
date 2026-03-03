@@ -49,6 +49,7 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             options={options}
             filter={filter ?? shouldEnableFilter}
             itemTemplate={dropdownListItem}
+            valueTemplate={dropdownListItem}
             pt={{
                 list: {
                     className: "combo-box__list",

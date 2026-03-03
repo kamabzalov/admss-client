@@ -32,7 +32,7 @@ export const PersonalInformation = observer((): ReactElement => {
                     <TextInput
                         name='Company Name'
                         value={authUser?.companyname || profile?.companyname || ""}
-                        onChange={(event) => changeProfile("companyname", event.target.value)}
+                        disabled
                     />
                     <TextInput
                         name='Location (city/state)'

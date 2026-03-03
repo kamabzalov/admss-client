@@ -1,8 +1,7 @@
-import { BaseResponse, Status } from "common/models/base-response";
-import { authorizedUserApiInstance } from "../index";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { ServerUserSettings, UserGroup, UserPermissionsResponse } from "common/models/user";
 import { InventoryLocations } from "common/models/inventory";
-import { isAxiosError } from "axios";
+import { ApiRequest } from "http/index";
 
 export interface ExtendedUserData extends BaseResponse {
     locations: InventoryLocations[];
@@ -15,103 +14,104 @@ export interface UserSettings extends BaseResponse {
     updated: string;
 }
 
-export const getExtendedData = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<ExtendedUserData>(`user/${uid}/info`);
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
+export const getExtendedData = async (uid: string): Promise<ExtendedUserData | undefined> => {
+    const response = await new ApiRequest().get<ExtendedUserData>({
+        url: `user/${uid}/info`,
+        defaultError: "Error while getting extended user data",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
     }
+
+    return response as ExtendedUserData;
 };
 
-export const getUserSettings = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserSettings>(`user/${uid}/profile`);
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
+export const getUserSettings = async (uid: string): Promise<UserSettings | undefined> => {
+    const response = await new ApiRequest().get<UserSettings>({
+        url: `user/${uid}/profile`,
+        defaultError: "Error while getting user settings",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
     }
+
+    return response as UserSettings;
 };
 
-export const setUserSettings = async (uid: string, settings: Partial<ServerUserSettings>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/profile`, {
-            profile: JSON.stringify(settings),
-        });
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
+export const setUserSettings = async (
+    uid: string,
+    settings: Partial<ServerUserSettings>
+): Promise<BaseResponse | BaseResponseError | undefined> => {
+    return new ApiRequest().post<BaseResponse | BaseResponseError>({
+        url: `user/${uid}/profile`,
+        data: { profile: JSON.stringify(settings) },
+        defaultError: "Error while setting user settings",
+    });
 };
 
-export const getUserGroupList = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserGroup[]>(`user/${uid}/grouplist`);
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
+export const getUserGroupList = async (uid: string): Promise<UserGroup[] | undefined> => {
+    const response = await new ApiRequest().get<UserGroup[]>({
+        url: `user/${uid}/grouplist`,
+        defaultError: "Error while getting user group list",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
     }
+
+    return response as UserGroup[];
 };
-export const getUserGroupActiveList = async (uid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserGroup[]>(
-            `user/${uid}/grouplistactive`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
+
+export const getUserGroupActiveList = async (uid: string): Promise<UserGroup[] | undefined> => {
+    const response = await new ApiRequest().get<UserGroup[]>({
+        url: `user/${uid}/grouplistactive`,
+        defaultError: "Error while getting active user group list",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
     }
+
+    return response as UserGroup[];
 };
 
 export const addUserGroupList = async (
     uid: string,
     { description, enabled, itemuid, order, isdefault }: Partial<UserGroup>
-) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${uid}/grouplist`,
-            {
-                description,
-                enabled,
-                itemuid,
-                order,
-                isdefault,
-            }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while creating user inventory group",
-            };
-        }
-    }
+): Promise<BaseResponse | BaseResponseError | undefined> => {
+    return new ApiRequest().post<BaseResponse | BaseResponseError>({
+        url: `user/${uid}/grouplist`,
+        data: {
+            description,
+            enabled,
+            itemuid,
+            order,
+            isdefault,
+        },
+        defaultError: "Error while creating user inventory group",
+    });
 };
 
 export const deleteUserGroupList = async (itemuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponse>(
-            `user/${itemuid}/deletegroup`
-        );
-        return request.data;
-    } catch (error) {
-        // TODO: add error handler
-    }
+    return new ApiRequest().post<BaseResponse | BaseResponseError>({
+        url: `user/${itemuid}/deletegroup`,
+        defaultError: "Error while deleting user inventory group",
+    });
 };
 
 export const getUserPermissions = async (
     uid: string
-): Promise<Partial<UserPermissionsResponse>> => {
-    try {
-        const request = await authorizedUserApiInstance.get<UserPermissionsResponse>(
-            `user/${uid}/permissions`
-        );
-        return request.data;
-    } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting user permissions",
-        };
+): Promise<Partial<UserPermissionsResponse> | undefined> => {
+    const response = await new ApiRequest().get<Partial<UserPermissionsResponse>>({
+        url: `user/${uid}/permissions`,
+        defaultError: "Error while getting user permissions",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
     }
+
+    return response as Partial<UserPermissionsResponse>;
 };
