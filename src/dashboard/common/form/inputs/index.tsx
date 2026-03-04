@@ -14,6 +14,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { EMAIL_REGEX } from "common/constants/regex";
+import { TruncatedText } from "dashboard/common/display";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -665,7 +666,9 @@ export const TextInput = ({
             </label>
             {showError && errorMessage && (
                 <div className='p-error'>
-                    <small>{errorMessage}</small>
+                    <small>
+                        <TruncatedText text={errorMessage} withTooltip />
+                    </small>
                 </div>
             )}
         </span>
@@ -747,7 +750,7 @@ export const PhoneInput = ({
     colWidth,
     onChange,
     onBlur,
-    withValidationMessage = false,
+    withValidationMessage = true,
     error: errorProp = false,
     errorMessage: errorMessageProp,
     ...props

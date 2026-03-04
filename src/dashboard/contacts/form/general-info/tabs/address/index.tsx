@@ -4,10 +4,8 @@ import { AutoComplete } from "primereact/autocomplete";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
-import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
-import { ComboBox } from "dashboard/common/form/dropdown";
 import { StateDropdown } from "dashboard/common/form/inputs";
 import { useGooglePlacesAutocomplete, AddressSuggestion } from "common/hooks";
 
@@ -405,31 +403,21 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     <label className='float-label'>Street address</label>
                 </span>
             </div>
-            <div className='col-3'>
-                <ComboBox
-                    optionLabel='label'
-                    optionValue='id'
-                    placeholder='State'
-                    value={
-                        (type === BUYER
-                            ? contact.mailState
-                            : contactExtData.CoBuyer_Mailing_State) || ""
-                    }
-                    onChange={({ target: { value } }) =>
-                        type === BUYER
-                            ? changeContact("mailState", value)
-                            : changeContactExtData("CoBuyer_Mailing_State", value)
-                    }
-                    options={STATES_LIST}
-                    className='w-full mailing-address-info__dropdown'
-                    disabled={isSameAsMailing || isControlDisabled}
-                    showClear={
-                        !!(type === BUYER
-                            ? contact.mailState
-                            : contactExtData.CoBuyer_Mailing_State)
-                    }
-                />
-            </div>
+            <StateDropdown
+                name='State'
+                showClear={
+                    !!(type === BUYER ? contact.mailState : contactExtData.CoBuyer_Mailing_State)
+                }
+                className='w-full mailing-address-info__dropdown'
+                disabled={isSameAsMailing || isControlDisabled}
+                value={type === BUYER ? contact.mailState : contactExtData.CoBuyer_Mailing_State}
+                colWidth={3}
+                onChange={({ value }) =>
+                    type === BUYER
+                        ? changeContact("mailState", value)
+                        : changeContactExtData("CoBuyer_Mailing_State", value)
+                }
+            />
 
             <div className='col-3'>
                 <TextInput

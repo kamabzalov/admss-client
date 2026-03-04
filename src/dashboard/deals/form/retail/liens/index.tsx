@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
-import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { TextInput } from "dashboard/common/form/inputs";
 import { DateInput, PhoneInput, StateDropdown } from "dashboard/common/form/inputs";
@@ -47,16 +46,16 @@ export const DealRetailLiens = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='col-3 relative'>
-                <PhoneInput
-                    name='Phone Number'
-                    value={First_Lien_Phone_Num}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("First_Lien_Phone_Num", value.replace(/[^0-9]/g, ""));
-                        changeDealExtData({ key: "First_Lien_Phone_Num", value });
-                    }}
-                />
-            </div>
+            <PhoneInput
+                colWidth={3}
+                name='Phone Number'
+                value={First_Lien_Phone_Num}
+                onChange={({ target: { value } }) => {
+                    setFieldValue("First_Lien_Phone_Num", value.replace(/[^0-9]/g, ""));
+                    changeDealExtData({ key: "First_Lien_Phone_Num", value });
+                }}
+                withValidationMessage
+            />
 
             <hr className='form-line' />
 
@@ -71,16 +70,15 @@ export const DealRetailLiens = observer((): ReactElement => {
                     }
                 />
             </div>
-            <div className='col-3'>
-                <StateDropdown
-                    value={First_Lien_State}
-                    name='State'
-                    onChange={({ target: { value } }) =>
-                        changeDealExtData({ key: "First_Lien_State", value })
-                    }
-                    className='w-full deal-liens__dropdown'
-                />
-            </div>
+            <StateDropdown
+                colWidth={3}
+                value={First_Lien_State}
+                name='State'
+                onChange={({ target: { value } }) =>
+                    changeDealExtData({ key: "First_Lien_State", value })
+                }
+                className='w-full deal-liens__dropdown'
+            />
             <div className='col-3'>
                 <TextInput
                     name='First_Lien_City'

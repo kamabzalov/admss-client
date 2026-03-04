@@ -1,4 +1,4 @@
-import { DateInput, TextInput } from "dashboard/common/form/inputs";
+import { DateInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
 import "./index.css";
@@ -11,7 +11,6 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
-import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
@@ -169,20 +168,14 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     ) : (
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
-                <div className='col-3'>
-                    <ComboBox
-                        optionLabel='label'
-                        optionValue='id'
-                        value={contactExtData.Buyer_DL_State || ""}
-                        options={STATES_LIST}
-                        onChange={({ target: { value } }) =>
-                            changeContactExtData("Buyer_DL_State", value)
-                        }
-                        className='w-full identification-info__dropdown'
-                        showClear={!!contactExtData.Buyer_DL_State}
-                        label="DL's State"
-                    />
-                </div>
+                <StateDropdown
+                    name="DL's State"
+                    showClear={!!contactExtData.Buyer_DL_State}
+                    className='w-full identification-info__dropdown'
+                    value={contactExtData.Buyer_DL_State}
+                    colWidth={3}
+                    onChange={({ value }) => changeContactExtData("Buyer_DL_State", value)}
+                />
 
                 <div className='col-3'>
                     <TextInput

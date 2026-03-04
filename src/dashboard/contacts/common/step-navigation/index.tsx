@@ -2,8 +2,6 @@ import { Button } from "primereact/button";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { ReactElement } from "react";
 
-/* eslint-disable jsx-a11y/anchor-is-valid */
-
 export enum ContactAccordionItems {
     BUYER = "Buyer information",
     CO_BUYER = "Co-buyer information",

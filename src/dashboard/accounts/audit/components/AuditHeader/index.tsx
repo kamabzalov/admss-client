@@ -50,8 +50,9 @@ export default function AuditHeader({
 
     return (
         <div className='datatable-controls'>
-            <span className='p-float-label accounts-filter-wrapper'>
+            <span className='accounts-filter-wrapper'>
                 <ComboBox
+                    label='Filter by'
                     id='account-type-input'
                     optionValue='value'
                     optionLabel='name'
@@ -66,9 +67,6 @@ export default function AuditHeader({
                     panelClassName='audit-filter__panel'
                     scrollHeight='calc(100vh - 200px)'
                 />
-                <label className='float-label' htmlFor='account-type-input'>
-                    Filter by
-                </label>
             </span>
             <Button
                 severity='success'

@@ -149,16 +149,15 @@ export const DealRetailInsurance = observer((): ReactElement => {
                 </span>
             </div>
 
-            <div className='col-3 relative'>
-                <PhoneInput
-                    name='Phone Number'
-                    value={Agent_Phone_No}
-                    onChange={({ target: { value } }) => {
-                        changeDealExtData({ key: "Agent_Phone_No", value: value ?? "" });
-                    }}
-                    id='Agent_Phone_No'
-                />
-            </div>
+            <PhoneInput
+                name='Phone Number'
+                value={Agent_Phone_No}
+                onChange={({ target: { value } }) => {
+                    changeDealExtData({ key: "Agent_Phone_No", value: value ?? "" });
+                }}
+                id='Agent_Phone_No'
+                colWidth={3}
+            />
 
             <hr className='form-line' />
 

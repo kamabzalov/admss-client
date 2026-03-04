@@ -118,8 +118,9 @@ export default function AccountsHeader({
                 onClick={onDownload}
                 disabled={isLoading}
             />
-            <span className='p-float-label accounts-filter-wrapper ml-auto'>
+            <span className='accounts-filter-wrapper ml-auto'>
                 <ComboBox
+                    label='Type'
                     id='account-type-input'
                     optionValue='value'
                     optionLabel='name'
@@ -132,9 +133,7 @@ export default function AccountsHeader({
                         onAccountTypeChange(e.value);
                     }}
                 />
-                <label className='float-label' htmlFor='account-type-input'>
-                    Type
-                </label>{" "}
+
                 {selectedAccountType && (
                     <Button
                         icon='pi pi-times'
