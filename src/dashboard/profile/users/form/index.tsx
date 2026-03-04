@@ -57,9 +57,13 @@ export const UsersForm = observer((): ReactElement => {
 
     useEffect(() => {
         if (!id || id === CREATE_ID) {
-            currentUserClear();
+            if (!usersStore.isNewUserInitialized) {
+                currentUserClear();
+                usersStore.isNewUserInitialized = true;
+            }
             return;
         }
+        usersStore.isNewUserInitialized = false;
         handleGetCurrentUser(id);
         getCurrentUserRoles(id);
         return () => {
@@ -100,6 +104,8 @@ export const UsersForm = observer((): ReactElement => {
     };
 
     const handleCloseClick = () => {
+        currentUserClear();
+        usersStore.isNewUserInitialized = false;
         navigate(USERS_PAGE.MAIN);
     };
 
