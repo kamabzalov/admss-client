@@ -539,16 +539,15 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='col-3'>
-                <PhoneInput
-                    name='Phone Number'
-                    value={Trade2_Lien_Phone}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("Trade2_Lien_Phone", value.replace(/[^0-9]/g, ""));
-                        changeDealExtData({ key: "Trade2_Lien_Phone", value: value ?? "" });
-                    }}
-                />
-            </div>
+            <PhoneInput
+                name='Phone Number'
+                value={Trade2_Lien_Phone}
+                onChange={({ target: { value } }) => {
+                    setFieldValue("Trade2_Lien_Phone", value);
+                    changeDealExtData({ key: "Trade2_Lien_Phone", value });
+                }}
+                colWidth={3}
+            />
             <div className='col-6'>
                 <CompanySearch
                     originalPath={currentPath}

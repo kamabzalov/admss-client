@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
+import { EmailInput, PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
 import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import "./index.css";
 import { Splitter } from "dashboard/common/display";
@@ -75,12 +75,12 @@ export const PersonalInformation = observer((): ReactElement => {
                     value={profile.phoneNumber}
                     onChange={(e) => changeProfile("phoneNumber", e.target.value)}
                 />
-                <TextInput
+                <EmailInput
                     name='E-mail'
                     colWidth={6}
-                    type='email'
                     value={profile.email}
-                    onChange={(e) => changeProfile("email", e.target.value)}
+                    onChange={({ target: { value } }) => changeProfile("email", value)}
+                    withValidationMessage
                 />
                 <div className='col-12 user-profile-info-message'>
                     <img src={InfoIcon} alt='info' className='user-profile-info-message__icon' />

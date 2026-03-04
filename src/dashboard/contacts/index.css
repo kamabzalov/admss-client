@@ -75,6 +75,9 @@
 .contact-social {
     display: flex;
     align-items: center;
+    .text-input {
+        width: 100%;
+    }
 }
 
 .contact-social__input {

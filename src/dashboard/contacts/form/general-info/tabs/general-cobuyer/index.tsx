@@ -176,6 +176,16 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         }
     };
 
+    const isCoBuyerFirstNameError =
+        shouldShowNameRequired &&
+        touched.CoBuyer_First_Name &&
+        (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim());
+
+    const isCoBuyerLastNameError =
+        shouldShowNameRequired &&
+        touched.CoBuyer_Last_Name &&
+        (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim());
+
     return (
         <div className='grid general-info row-gap-2 cobuyer-info'>
             <div className='col-12 flex gap-4'>
@@ -223,63 +233,46 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 </div>
             </div>
 
-            <div className='col-4 relative'>
-                <TextInput
-                    className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_First_Name && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
-                    value={contactExtData.CoBuyer_First_Name || ""}
-                    onChange={({ target: { value } }) =>
-                        handleFieldChange("CoBuyer_First_Name", value)
-                    }
-                    name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
-                    tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
-                    disabled={shouldDisableNameFields}
-                    clearButton
-                />
-                <small className='p-error'>
-                    {shouldShowNameRequired &&
-                    touched.CoBuyer_First_Name &&
-                    (!contactExtData.CoBuyer_First_Name ||
-                        !contactExtData.CoBuyer_First_Name.trim())
-                        ? ERROR_MESSAGES.REQUIRED
-                        : ""}
-                </small>
-            </div>
+            <TextInput
+                colWidth={4}
+                className='general-info__text-input w-full'
+                value={contactExtData.CoBuyer_First_Name || ""}
+                onChange={({ target: { value } }) => handleFieldChange("CoBuyer_First_Name", value)}
+                name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
+                tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                disabled={shouldDisableNameFields}
+                clearButton
+                error={!!isCoBuyerFirstNameError}
+                errorMessage={isCoBuyerFirstNameError ? ERROR_MESSAGES.REQUIRED : undefined}
+            />
 
-            <div className='col-4 relative'>
-                <TextInput
-                    name='Middle Name'
-                    className={`general-info__text-input w-full ${errors.CoBuyer_Middle_Name ? "p-invalid" : ""}`}
-                    value={contactExtData.CoBuyer_Middle_Name || ""}
-                    onChange={({ target: { value } }) =>
-                        handleFieldChange("CoBuyer_Middle_Name", value)
-                    }
-                    tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
-                    disabled={shouldDisableNameFields}
-                    clearButton
-                />
-                <small className='p-error'>{errors.CoBuyer_Middle_Name || ""}</small>
-            </div>
+            <TextInput
+                colWidth={4}
+                name='Middle Name'
+                className='general-info__text-input w-full'
+                value={contactExtData.CoBuyer_Middle_Name || ""}
+                onChange={({ target: { value } }) =>
+                    handleFieldChange("CoBuyer_Middle_Name", value)
+                }
+                tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                disabled={shouldDisableNameFields}
+                clearButton
+                error={!!errors.CoBuyer_Middle_Name}
+                errorMessage={errors.CoBuyer_Middle_Name as string}
+            />
 
-            <div className='col-4 relative'>
-                <TextInput
-                    name={`Last Name${shouldShowNameRequired ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_Last_Name && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
-                    value={contactExtData.CoBuyer_Last_Name || ""}
-                    onChange={({ target: { value } }) =>
-                        handleFieldChange("CoBuyer_Last_Name", value)
-                    }
-                    tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
-                    disabled={shouldDisableNameFields}
-                    clearButton
-                />
-                <small className='p-error'>
-                    {shouldShowNameRequired &&
-                    touched.CoBuyer_Last_Name &&
-                    (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim())
-                        ? ERROR_MESSAGES.REQUIRED
-                        : ""}
-                </small>
-            </div>
+            <TextInput
+                colWidth={4}
+                name={`Last Name${shouldShowNameRequired ? " (required)" : ""}`}
+                className='general-info__text-input w-full'
+                value={contactExtData.CoBuyer_Last_Name || ""}
+                onChange={({ target: { value } }) => handleFieldChange("CoBuyer_Last_Name", value)}
+                tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                disabled={shouldDisableNameFields}
+                clearButton
+                error={!!isCoBuyerLastNameError}
+                errorMessage={isCoBuyerLastNameError ? ERROR_MESSAGES.REQUIRED : undefined}
+            />
         </div>
     );
 });

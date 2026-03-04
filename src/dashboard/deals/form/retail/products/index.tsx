@@ -72,32 +72,24 @@ export const DealRetailProducts = observer((): ReactElement => {
             </div>
 
             <div className='col-3'>
-                <span className='p-float-label'>
-                    <ComboBox
-                        options={[WarrantyTerm.MONTH, WarrantyTerm.MILES]}
-                        value={Warranty_Miles}
-                        onChange={({ value }) =>
-                            changeDealExtData({ key: "Warranty_Miles", value })
-                        }
-                        className='w-full deal-products__dropdown'
-                    />
-                    <label className='float-label'>Term (month or miles)</label>
-                </span>
+                <ComboBox
+                    label='Term (month or miles)'
+                    options={[WarrantyTerm.MONTH, WarrantyTerm.MILES]}
+                    value={Warranty_Miles}
+                    onChange={({ value }) => changeDealExtData({ key: "Warranty_Miles", value })}
+                    className='w-full deal-products__dropdown'
+                />
             </div>
             {Warranty_Miles === WarrantyTerm.MONTH && (
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            editable
-                            options={[...TERM_MONTH_LIST]}
-                            value={Warranty_Term}
-                            onChange={({ value }) =>
-                                changeDealExtData({ key: "Warranty_Term", value })
-                            }
-                            className='w-full deal-products__dropdown'
-                        />
-                        <label className='float-label'>Duration</label>
-                    </span>
+                    <ComboBox
+                        label='Duration'
+                        editable
+                        options={[...TERM_MONTH_LIST]}
+                        value={Warranty_Term}
+                        onChange={({ value }) => changeDealExtData({ key: "Warranty_Term", value })}
+                        className='w-full deal-products__dropdown'
+                    />
                 </div>
             )}
 

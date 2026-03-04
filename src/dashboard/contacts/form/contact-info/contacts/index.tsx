@@ -1,4 +1,4 @@
-import { PhoneInput, TextInput } from "dashboard/common/form/inputs";
+import { EmailInput, PhoneInput, TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { InputTextProps } from "primereact/inputtext";
 import { ReactElement, useEffect, useState } from "react";
@@ -51,46 +51,31 @@ export const ContactsSocialInfo = observer((): ReactElement => {
 
     return (
         <div className='grid contacts-social row-gap-2'>
-            <div className='col-6 relative'>
-                <TextInput
-                    name='email1'
-                    label='E-mail address'
-                    type='email'
-                    className={`contacts-social__text-input w-full ${
-                        errors.email1 ? "p-invalid" : ""
-                    }`}
-                    value={values.email1 || ""}
-                    onBlur={handleBlur}
-                    error={!!errors.email1}
-                    errorMessage={errors.email1}
+            <EmailInput
+                name='E-mail address'
+                colWidth={6}
+                value={values.email1 || ""}
+                error={!!errors.email1}
+                errorMessage={errors.email1}
+                onChange={async ({ target: { value } }) => {
+                    await setFieldValue("email1", value);
+                    changeContact("email1", value);
+                    setFieldTouched("email1", true, true);
+                }}
+            />
+            {anotherEmail ? (
+                <EmailInput
+                    name='E-mail address'
+                    colWidth={6}
+                    value={values.email2 || ""}
+                    error={!!errors.email2}
+                    errorMessage={errors.email2}
                     onChange={async ({ target: { value } }) => {
-                        await setFieldValue("email1", value);
-                        changeContact("email1", value);
-                        setFieldTouched("email1", true, true);
+                        await setFieldValue("email2", value);
+                        changeContact("email2", value);
+                        setFieldTouched("email2", true, true);
                     }}
                 />
-            </div>
-            {anotherEmail ? (
-                <div className='col-6 relative'>
-                    <TextInput
-                        name='email2'
-                        label='E-mail address'
-                        type='email'
-                        className={`contacts-social__text-input w-full ${
-                            errors.email2 ? "p-invalid" : ""
-                        }`}
-                        onBlur={handleBlur}
-                        value={values.email2 || ""}
-                        error={!!errors.email2}
-                        errorMessage={errors.email2}
-                        onChange={async ({ target: { value } }) => {
-                            if (!value?.length) setAnotherEmail(false);
-                            await setFieldValue("email2", value);
-                            changeContact("email2", value);
-                            setFieldTouched("email2", true, true);
-                        }}
-                    />
-                </div>
             ) : (
                 <div className='col-6'>
                     <Button
@@ -105,38 +90,30 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 </div>
             )}
 
-            <div className='col-6 relative'>
+            <PhoneInput
+                name='Phone Number'
+                colWidth={6}
+                onBlur={handleBlur}
+                value={contact.phone1 ?? ""}
+                onChange={async ({ target: { value } }) => {
+                    await setFieldValue("phone1", value);
+                    changeContact("phone1", value);
+                    setFieldTouched("phone1", true, true);
+                }}
+            />
+            {anotherPhone ? (
                 <PhoneInput
                     name='Phone Number'
-                    className={`contacts-social__text-input w-full ${
-                        errors.phone1 ? "p-invalid" : ""
-                    }`}
+                    colWidth={6}
                     onBlur={handleBlur}
-                    value={contact.phone1 ?? ""}
+                    value={contact.phone2 ?? ""}
                     onChange={async ({ target: { value } }) => {
-                        await setFieldValue("phone1", value);
-                        changeContact("phone1", value);
-                        setFieldTouched("phone1", true, true);
+                        if (!value?.length) setAnotherPhone(false);
+                        await setFieldValue("phone2", value);
+                        changeContact("phone2", value);
+                        setFieldTouched("phone2", true, true);
                     }}
                 />
-            </div>
-            {anotherPhone ? (
-                <div className='col-6 relative'>
-                    <PhoneInput
-                        name='Phone Number'
-                        className={`contacts-social__text-input w-full ${
-                            errors.phone2 ? "p-invalid" : ""
-                        }`}
-                        onBlur={handleBlur}
-                        value={contact.phone2 ?? ""}
-                        onChange={async ({ target: { value } }) => {
-                            if (!value?.length) setAnotherPhone(false);
-                            await setFieldValue("phone2", value);
-                            changeContact("phone2", value);
-                            setFieldTouched("phone2", true, true);
-                        }}
-                    />
-                </div>
             ) : (
                 <div className='col-6'>
                     <Button

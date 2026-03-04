@@ -149,16 +149,16 @@ export const PurchaseTitle = observer((): ReactElement => {
                     originalPath={currentPath}
                 />
             </div>
-            <div className='col-3'>
-                <PhoneInput
-                    name='Phone number'
-                    value={titleHolderPhone}
-                    onChange={({ target: { value } }) => {
-                        changeInventoryExtData({ key: "titleHolderPhone", value });
-                    }}
-                    onBlur={() => setFieldTouched("titleHolderPhone", true)}
-                />
-            </div>
+
+            <PhoneInput
+                name='Phone number'
+                value={titleHolderPhone}
+                onChange={({ target: { value } }) => {
+                    changeInventoryExtData({ key: "titleHolderPhone", value });
+                }}
+                onBlur={() => setFieldTouched("titleHolderPhone", true)}
+                colWidth={3}
+            />
             <div className='col-3'>
                 <TextInput
                     name='titleHolderPayoff'

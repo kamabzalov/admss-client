@@ -2,6 +2,7 @@ import {
     BorderedCheckbox,
     CurrencyInput,
     DateInput,
+    EmailInput,
     PercentInput,
     PhoneInput,
 } from "dashboard/common/form/inputs";
@@ -68,30 +69,19 @@ export const PurchasePurchases = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`'purchase-purchases__text-input w-full' ${
-                            errors.purPurchaseEmail ? "p-invalid" : ""
-                        }`}
-                        value={purPurchaseEmail}
-                        onChange={({ target: { value } }) => {
-                            changeInventoryExtData({
-                                key: "purPurchaseEmail",
-                                value,
-                            });
-                        }}
-                        onBlur={() => setFieldTouched("purPurchaseEmail", true, true)}
-                        pt={{
-                            root: {
-                                className: "w-full",
-                            },
-                        }}
-                    />
-                    <label className='float-label'>E-mail</label>
-                </span>
-                <small className='p-error'>{errors.purPurchaseEmail}</small>
-            </div>
+            <EmailInput
+                name='E-mail'
+                colWidth={3}
+                value={purPurchaseEmail}
+                error={!!errors.purPurchaseEmail}
+                errorMessage={errors.purPurchaseEmail}
+                onChange={({ target: { value } }) => {
+                    changeInventoryExtData({
+                        key: "purPurchaseEmail",
+                        value,
+                    });
+                }}
+            />
             <div className='col-3'>
                 <PhoneInput
                     name='Phone number'

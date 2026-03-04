@@ -261,20 +261,16 @@ export const PrintForTestDrive = (): ReactElement => {
                                                         )}
                                                 </div>
 
-                                                <div className='col-4 relative'>
-                                                    <PhoneInput
-                                                        name='Phone Number (required)'
-                                                        value={values.homePhone}
-                                                        onChange={handleChange}
-                                                        onBlur={(e) => e && handleBlur}
-                                                        id='homePhone'
-                                                    />
-                                                    {errors.homePhone && touched.homePhone && (
-                                                        <div className='p-error'>
-                                                            {errors.homePhone}
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                <PhoneInput
+                                                    name='Phone Number (required)'
+                                                    value={values.homePhone}
+                                                    onChange={handleChange}
+                                                    onBlur={(e) => e && handleBlur}
+                                                    id='homePhone'
+                                                    colWidth={4}
+                                                    error={!!errors.homePhone}
+                                                    errorMessage={errors.homePhone}
+                                                />
 
                                                 <div className='col-4 relative'>
                                                     <TextInput

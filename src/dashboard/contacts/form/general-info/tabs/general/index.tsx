@@ -47,7 +47,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, values, validateField, setFieldValue, setFieldTouched } =
+    const { errors, values, validateField, setFieldValue, setFieldTouched, setFieldError } =
         useFormikContext<Contact>();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,9 +60,20 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     ) => {
         changeContact(field, value);
         await setFieldValue(field, value, true);
-        await validateField(field);
-        if (shouldTouch) {
-            setFieldTouched(field, true, true);
+
+        const isMiddleNameCleared = field === "middleName" && !value?.trim();
+        if (isMiddleNameCleared) {
+            setFieldError("firstName", undefined);
+            setFieldError("middleName", undefined);
+            setFieldError("lastName", undefined);
+            setFieldTouched("firstName", false, false);
+            setFieldTouched("middleName", false, false);
+            setFieldTouched("lastName", false, false);
+        } else {
+            await validateField(field);
+            if (shouldTouch) {
+                setFieldTouched(field, true, true);
+            }
         }
     };
 
@@ -323,91 +334,88 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     ) : null}
                     {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                         <>
-                            <div className='col-4 relative'>
-                                <TextInput
-                                    className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
-                                    value={contact.firstName || ""}
-                                    onChange={({ target: { value } }) =>
-                                        handleFieldChange("firstName", value)
-                                    }
-                                    onBlur={handleOfacCheck}
-                                    name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
-                                    tooltip={
-                                        isBusinessNameRequired
-                                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                            : shouldDisableNameFields
-                                              ? TOOLTIP_MESSAGE.PERSON
-                                              : ""
-                                    }
-                                    disabled={shouldDisableNameFields}
-                                    clearButton
-                                />
-                                <small className='p-error'>{errors.firstName}</small>
-                            </div>
+                            <TextInput
+                                colWidth={4}
+                                className='general-info__text-input'
+                                value={contact.firstName || ""}
+                                onChange={({ target: { value } }) =>
+                                    handleFieldChange("firstName", value)
+                                }
+                                onBlur={handleOfacCheck}
+                                name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                                tooltip={
+                                    isBusinessNameRequired
+                                        ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                        : shouldDisableNameFields
+                                          ? TOOLTIP_MESSAGE.PERSON
+                                          : ""
+                                }
+                                disabled={shouldDisableNameFields}
+                                clearButton
+                                error={!!errors.firstName}
+                                errorMessage={errors.firstName as string}
+                            />
 
-                            <div className='col-4 relative'>
-                                <TextInput
-                                    name='Middle Name'
-                                    className={`general-info__text-input ${errors.middleName ? "p-invalid" : ""}`}
-                                    value={contact.middleName || ""}
-                                    onChange={({ target: { value } }) =>
-                                        handleFieldChange("middleName", value, true)
-                                    }
-                                    tooltip={
-                                        isBusinessNameRequired
-                                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                            : shouldDisableNameFields
-                                              ? TOOLTIP_MESSAGE.PERSON
-                                              : ""
-                                    }
-                                    disabled={shouldDisableNameFields}
-                                    clearButton
-                                />
-                                <small className='p-error'>{errors.middleName}</small>
-                            </div>
+                            <TextInput
+                                colWidth={4}
+                                name='Middle Name'
+                                className='general-info__text-input'
+                                value={contact.middleName || ""}
+                                onChange={({ target: { value } }) =>
+                                    handleFieldChange("middleName", value, true)
+                                }
+                                tooltip={
+                                    isBusinessNameRequired
+                                        ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                        : shouldDisableNameFields
+                                          ? TOOLTIP_MESSAGE.PERSON
+                                          : ""
+                                }
+                                disabled={shouldDisableNameFields}
+                                clearButton
+                                error={!!errors.middleName}
+                                errorMessage={errors.middleName as string}
+                            />
 
-                            <div className='col-4 relative'>
-                                <TextInput
-                                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
-                                    className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
-                                    value={contact.lastName || ""}
-                                    onChange={({ target: { value } }) =>
-                                        handleFieldChange("lastName", value)
-                                    }
-                                    onBlur={handleOfacCheck}
-                                    disabled={shouldDisableNameFields}
-                                    tooltip={
-                                        isBusinessNameRequired
-                                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                            : shouldDisableNameFields
-                                              ? TOOLTIP_MESSAGE.PERSON
-                                              : ""
-                                    }
-                                    clearButton
-                                />
-                                <small className='p-error'>{errors.lastName}</small>
-                            </div>
+                            <TextInput
+                                colWidth={4}
+                                name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                                className='general-info__text-input'
+                                value={contact.lastName || ""}
+                                onChange={({ target: { value } }) =>
+                                    handleFieldChange("lastName", value)
+                                }
+                                onBlur={handleOfacCheck}
+                                disabled={shouldDisableNameFields}
+                                tooltip={
+                                    isBusinessNameRequired
+                                        ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                                        : shouldDisableNameFields
+                                          ? TOOLTIP_MESSAGE.PERSON
+                                          : ""
+                                }
+                                clearButton
+                                error={!!errors.lastName}
+                                errorMessage={errors.lastName as string}
+                            />
                         </>
                     ) : null}
                     {!!contactType && (
-                        <div className='col-4 relative'>
-                            <TextInput
-                                name={`Business Name${!shouldDisableBusinessName ? " (required)" : ""}`}
-                                className={`general-info__text-input w-full ${
-                                    errors.businessName ? "p-invalid" : ""
-                                }`}
-                                value={contact.businessName || ""}
-                                onChange={({ target: { value } }) => {
-                                    changeContact("businessName", value);
-                                    setFieldValue("businessName", value);
-                                }}
-                                disabled={!!shouldDisableBusinessName}
-                                tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
-                                clearButton
-                            />
-
-                            <small className='p-error'>{errors.businessName}</small>
-                        </div>
+                        <TextInput
+                            colWidth={4}
+                            name={`Business Name${!shouldDisableBusinessName ? " (required)" : ""}`}
+                            className='general-info__text-input w-full'
+                            value={contact.businessName || ""}
+                            onChange={({ target: { value } }) => {
+                                changeContact("businessName", value);
+                                setFieldValue("businessName", value);
+                            }}
+                            disabled={!!shouldDisableBusinessName}
+                            tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
+                            clearButton
+                            error={!!errors.businessName}
+                            errorMessage={errors.businessName as string}
+                        />
                     )}
                 </>
             )}

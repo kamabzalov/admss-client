@@ -227,13 +227,13 @@ export const GeneralInformation = observer((): ReactElement | null => {
                         onChange={(e) => changeUserData("email1", e.target.value)}
                     />
                 </div>
-                <div className='col-4'>
-                    <PhoneInput
-                        name={`Phone Number ${!hasEmail ? "(required)" : ""}`}
-                        value={user?.phone1 || ""}
-                        onChange={(e) => changeUserData("phone1", e.target.value)}
-                    />
-                </div>
+
+                <PhoneInput
+                    name={`Phone Number ${!hasEmail ? "(required)" : ""}`}
+                    colWidth={4}
+                    value={user?.phone1 || ""}
+                    onChange={(e) => changeUserData("phone1", e.target.value)}
+                />
                 <div className='col-12 user-profile-info-message'>
                     <img src={InfoIcon} alt='info' className='user-profile-info-message__icon' />
                     <span className='user-profile-info-message__text'>{INFO_MESSAGE}</span>
