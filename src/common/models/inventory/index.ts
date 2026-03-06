@@ -425,6 +425,7 @@ export interface InventoryExpense extends BaseResponseError {
 }
 
 export interface InventoryPaymentBack extends BaseResponseError {
+    id?: string;
     payPack: number;
     payDefaultExpAdded: 0 | 1;
     payPaid: 0 | 1;
