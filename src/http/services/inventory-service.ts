@@ -110,7 +110,7 @@ export const getInventoryGroupOptions = async (groupuid: string) => {
 };
 
 export const getInventoryPaymentBack = async (inventoryuid: string) => {
-    return new ApiRequest().get<InventoryPaymentBack>({
+    return new ApiRequest().get<InventoryPaymentBack[]>({
         url: `inventory/${inventoryuid}/paymentpack`,
         defaultError: "Error on get inventory expense",
     });
@@ -253,6 +253,13 @@ export const setInventoryPaymentBack = async (
         url: `inventory/${inventoryuid}/paymentpack`,
         data: inventoryPayment,
         defaultError: "Error on set inventory expense",
+    });
+};
+
+export const deleteInventoryPaymentPack = async (paymentPackId: string) => {
+    return new ApiRequest().post<BaseResponseError>({
+        url: `inventory/${paymentPackId}/deletepaymentpack`,
+        defaultError: "Error on delete payment",
     });
 };
 

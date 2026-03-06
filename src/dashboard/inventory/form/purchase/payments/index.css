@@ -3,11 +3,22 @@
     height: 110px;
 }
 
-.purchase-payments__button {
-    padding: 0 80px;
-    font-size: 24px;
+.purchase-payments__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-left: auto;
     margin-top: 10px;
+}
+
+.purchase-payments__button {
+    font-size: 24px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    width: 200px;
+    height: 54px;
 }
 
 .purchase-payments__table.p-datatable .p-column-header-content {
@@ -18,30 +29,93 @@
     color: var(--admss-app-medium-grey);
 }
 
-.total-sum {
-    margin-left: auto;
-    margin-top: 10px;
-    font-size: 18px;
-}
+.purchase-payments__table.p-datatable {
+    --datatable-header-height: 44px;
+    margin-top: 50px;
 
-.total-sum__label {
-    color: var(--admss-app-main-blue);
-    font-weight: 700;
-}
+    .p-datatable-thead {
+        height: var(--datatable-header-height);
+    }
 
-.total-sum__value {
-    margin: 0 10px;
-    font-weight: 600;
+    ::-webkit-scrollbar {
+        background: linear-gradient(
+            to bottom,
+            var(--admss-app-light-blue) var(--datatable-header-height),
+            transparent var(--datatable-header-height)
+        );
+    }
+
+    ::-webkit-scrollbar-track {
+        margin-top: var(--datatable-header-height);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--admss-app-medium-blue);
+        border-radius: 5px;
+    }
+
+    .p-datatable-wrapper {
+        overflow-x: auto;
+        padding-left: 6px;
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+
+    .p-column-header-content {
+        justify-content: flex-start;
+    }
 }
 
 .purchase-payments__table-button {
-    &.p-button {
+    &.p-button.p-button-icon-only {
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        transition: color 0.3s ease-in-out;
+
+        .p-button-icon {
+            transition:
+                transform 0.3s ease-in-out,
+                color 0.3s ease-in-out;
+            transform-origin: center;
+        }
+
+        &.edit-button {
+            color: var(--admss-app-blue-text);
+        }
+
+        &:disabled {
+            color: var(--admss-app-light-grey);
+        }
         &:enabled:hover {
+            color: var(--admss-app-medium-grey);
             background: transparent;
         }
         &:enabled:focus {
             box-shadow: none;
         }
+    }
+}
+
+.inventory-form .p-datatable {
+    .p-datatable-thead > tr > th {
+        border-left: 1px solid var(--admss-app-medium-blue);
+    }
+    .p-datatable-thead > tr > th:last-child {
+        border-left: none;
+    }
+    tr td:has(.purchase-payments__table-controls-container) + td {
+        border-left: none;
+    }
+    tr td:has(.purchase-payments__delete-button) {
+        border-left: none;
+        width: 20px;
+        padding: 0;
     }
 }
 
@@ -54,4 +128,42 @@
     border-radius: 50%;
     border: none;
     background: transparent;
+
+    &:enabled:hover {
+        color: var(--admss-app-medium-grey);
+        background: transparent;
+        box-shadow: none;
+        border: none;
+    }
+}
+
+.purchase-payments__table .expanded-row {
+    display: flex;
+    gap: 10px;
+    padding-left: 82px;
+}
+
+.purchase-payments__table .expanded-row__label {
+    font-weight: 700;
+    flex: 0;
+}
+
+.table-button-active .p-button-icon {
+    color: var(--admss-app-primary);
+    transform: rotate(180deg);
+}
+
+.inventory-form .p-datatable .p-datatable-tbody {
+    .purchase-payments__table-controls {
+        padding: 0 10px;
+        height: 40px;
+
+        .purchase-payments__table-controls-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
+        }
+    }
 }
