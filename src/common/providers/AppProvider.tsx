@@ -2,6 +2,7 @@ import { ReactElement, ReactNode } from "react";
 import { ToastProvider } from "dashboard/common/toast";
 import { NotificationProvider } from "dashboard/common/notification";
 import { APIProvider } from "@vis.gl/react-google-maps";
+import { AuthProvider } from "common/providers/AuthProvider";
 
 interface AppProviderProps {
     children: ReactNode;
@@ -13,7 +14,9 @@ export const AppProvider = ({ children }: AppProviderProps): ReactElement => {
     if (!apiKey) {
         return (
             <ToastProvider>
-                <NotificationProvider>{children}</NotificationProvider>
+                <NotificationProvider>
+                    <AuthProvider>{children}</AuthProvider>
+                </NotificationProvider>
             </ToastProvider>
         );
     }
@@ -21,7 +24,9 @@ export const AppProvider = ({ children }: AppProviderProps): ReactElement => {
     return (
         <APIProvider apiKey={apiKey} libraries={["places"]}>
             <ToastProvider>
-                <NotificationProvider>{children}</NotificationProvider>
+                <NotificationProvider>
+                    <AuthProvider>{children}</AuthProvider>
+                </NotificationProvider>
             </ToastProvider>
         </APIProvider>
     );

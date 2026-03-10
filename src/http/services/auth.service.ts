@@ -3,6 +3,8 @@ import { ApiRequest, nonAuthorizedUserApiInstance } from "../index";
 import { BaseResponseError } from "common/models/base-response";
 import {
     AuthUser,
+    RefreshTokenRequest,
+    RefreshTokenResponse,
     TwoFASetupResponse,
     TwoFAVerifyResponse,
     TwoFactorCheckEndpointRequest,
@@ -15,6 +17,16 @@ import {
     TwoFactorTrustedDeviceRemoveRequest,
     TwoFactorVerifyRequest,
 } from "common/models/user";
+
+export const refreshAccessToken = async (data: RefreshTokenRequest) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post<
+        RefreshTokenResponse | BaseResponseError
+    >({
+        url: "user/refresh",
+        data,
+        defaultError: "Failed to refresh access token",
+    });
+};
 
 export const auth = async ({
     username,

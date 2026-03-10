@@ -6,6 +6,7 @@ import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { HOME_PAGE, SERVICE_UPDATE_PAGE } from "common/constants/links";
+import { refreshAccessTokenIfNeeded } from "http/token-refresh";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -49,28 +50,61 @@ authorizedUserApiInstance.interceptors.request.use((config) => {
     return config;
 });
 
-const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
-    if (error.response && error.response.status === 401) {
-        const currentPath = window.location.pathname + window.location.search;
-        const authUser: AuthUser | null = getKeyValue(LS_APP_USER);
-        localStorage.removeItem("useruid");
-        localStorageClear(LS_APP_USER);
-        if (authUser && currentPath !== HOME_PAGE) {
-            const routeData: LastRouteData = {
-                path: currentPath,
-                timestamp: Date.now(),
-                useruid: authUser.useruid,
-            };
-            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+const isRefreshRequest = (config: AxiosRequestConfig | undefined): boolean => {
+    const url = config?.url ?? "";
+    return String(url).includes("user/refresh");
+};
+
+const handleUnauthorized = async (
+    error: AxiosError,
+    navigate: NavigateFunction
+): Promise<unknown> => {
+    const config = error.config;
+    if (!config || isRefreshRequest(config)) {
+        return rejectAndRedirectToLogin(error, navigate);
+    }
+
+    const refreshed = await refreshAccessTokenIfNeeded();
+    if (refreshed) {
+        const token = getToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+            return authorizedUserApiInstance.request(config);
         }
-        navigate(HOME_PAGE);
-        return Promise.reject(error.response);
-    } else if (error.response && error.response.status === 500) {
+    }
+
+    return rejectAndRedirectToLogin(error, navigate);
+};
+
+const rejectAndRedirectToLogin = (
+    error: AxiosError,
+    navigate: NavigateFunction
+): Promise<unknown> => {
+    const currentPath = window.location.pathname + window.location.search;
+    const authUser: AuthUser | null = getKeyValue(LS_APP_USER);
+    localStorage.removeItem("useruid");
+    localStorageClear(LS_APP_USER);
+    if (authUser && currentPath !== HOME_PAGE) {
+        const routeData: LastRouteData = {
+            path: currentPath,
+            timestamp: Date.now(),
+            useruid: authUser.useruid,
+        };
+        localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+    }
+    navigate(HOME_PAGE);
+    return Promise.reject(error.response ?? error);
+};
+
+const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
+    if (error.response?.status === 401) {
+        return handleUnauthorized(error, navigate);
+    }
+    if (error.response?.status === 500) {
         navigate(SERVICE_UPDATE_PAGE);
         return Promise.reject(error.response);
-    } else {
-        return Promise.reject(error);
     }
+    return Promise.reject(error);
 };
 
 export function createApiDashboardInstance(navigate: NavigateFunction) {

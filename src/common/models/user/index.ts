@@ -92,6 +92,8 @@ export interface AuthUser {
     "2fasessionuid": string;
     companyname: string;
     dealer_id: string;
+    dealer_name?: string;
+    dealer_status?: string;
     device_trust_days: number;
     device_trusted: boolean;
     expires_in: number;
@@ -113,6 +115,8 @@ export interface AuthUser {
     status: "OK";
     token: string;
     token_type: string;
+    refresh_token?: string;
+    refresh_token_expires_in?: number;
     username: string;
     useruid: string;
     modified?: string;
@@ -213,6 +217,21 @@ export interface TwoFactorElevateRequest {
 export interface TwoFactorCheckEndpointRequest {
     method: "GET" | "POST" | string;
     endpoint: string;
+}
+
+export interface RefreshTokenRequest {
+    refresh_token: string;
+    sessionuid: string;
+}
+
+export interface RefreshTokenResponse extends BaseResponseError {
+    token: string;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+    refresh_token_expires_in: number;
+    sessionuid: string;
+    useruid: string;
 }
 
 export type UserPermissionsResponse = BaseResponseError & {
