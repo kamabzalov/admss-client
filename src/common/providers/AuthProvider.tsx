@@ -127,6 +127,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         setSecondsLeft(safeInitialSeconds);
 
         clearCountdownInterval();
+        if (inactivityTimerId.current !== null) {
+            window.clearTimeout(inactivityTimerId.current);
+            inactivityTimerId.current = null;
+        }
 
         if (safeInitialSeconds === 0) {
             return;
@@ -279,6 +283,9 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         }
 
         const handleActivity = () => {
+            if (isSessionExpiring) {
+                return;
+            }
             resetInactivityTimer();
         };
 
@@ -307,7 +314,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                 inactivityTimerId.current = null;
             }
         };
-    }, [authUser]);
+    }, [authUser, isSessionExpiring]);
 
     const scheduleRefresh = useCallback(
         (expiresInSec: number) => {
