@@ -1,3 +1,5 @@
+import { MS_IN_SECOND, SECONDS_IN_MINUTE } from "common/constants/time";
+
 interface AppSettings {
     ROWS_PER_PAGE: Array<number>;
     TOAST_LIFETIME: number;
@@ -8,6 +10,7 @@ interface AppSettings {
     BASE_CARD_WIDTH: number;
     BASE_CARD_HEIGHT: number;
     ROUTE_RESTORE_TIMEOUT_HOURS: number;
+    INACTIVITY_TIMEOUT_SECONDS: number;
 }
 
 const {
@@ -20,9 +23,10 @@ const {
     BASE_CARD_WIDTH,
     BASE_CARD_HEIGHT,
     ROUTE_RESTORE_TIMEOUT_HOURS,
+    INACTIVITY_TIMEOUT_SECONDS,
 }: AppSettings = {
     ROWS_PER_PAGE: [10, 20, 50, 100, 1000],
-    TOAST_LIFETIME: 3000,
+    TOAST_LIFETIME: 3 * MS_IN_SECOND,
     DEFAULT_MAX_COLUMN_WIDTH: 350,
     DEFAULT_FILTER_THRESHOLD: 15,
     DEFAULT_CARD_HEIGHT: 983,
@@ -30,6 +34,7 @@ const {
     BASE_CARD_HEIGHT: 1000,
     DEBOUNCE_TIME: 1000,
     ROUTE_RESTORE_TIMEOUT_HOURS: 8,
+    INACTIVITY_TIMEOUT_SECONDS: 3 * SECONDS_IN_MINUTE,
 };
 
 export {
@@ -42,4 +47,5 @@ export {
     BASE_CARD_WIDTH,
     BASE_CARD_HEIGHT,
     ROUTE_RESTORE_TIMEOUT_HOURS,
+    INACTIVITY_TIMEOUT_SECONDS,
 };

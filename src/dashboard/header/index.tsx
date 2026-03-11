@@ -7,8 +7,8 @@ import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser } from "common/models/user";
 import { logout } from "http/services/auth.service";
 import { useLocation, useNavigate } from "react-router-dom";
-import { localStorageClear } from "services/local-storage.service";
-import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
+import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
+import { useAuth } from "common/providers/AuthProvider";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { useStore } from "store/hooks";
@@ -26,6 +26,7 @@ import {
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser, isSettingsLoaded } = store;
+    const { logout: authLogout } = useAuth();
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -60,8 +61,8 @@ export const Header = observer((): ReactElement => {
             useruid,
         };
         localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
-        localStorageClear(LS_APP_USER);
         await logout(useruid, token);
+        authLogout();
         navigate(HOME_PAGE, { replace: true });
     };
 

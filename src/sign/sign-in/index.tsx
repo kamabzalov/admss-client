@@ -18,12 +18,14 @@ import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 import { getKeyValue } from "services/local-storage.service";
 import {
+    AuthUser,
     getTfaSessionUid,
     isAuthResponseTfaRequired,
     TwoFactorCheckResponse,
 } from "common/models/user";
 import { observer } from "mobx-react-lite";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { useAuth } from "common/providers/AuthProvider";
 
 export interface LoginForm {
     username: string;
@@ -81,6 +83,7 @@ export const SignIn = observer(() => {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { showError } = useToastMessage();
+    const { login } = useAuth();
 
     useEffect(() => {
         const storedUser = getKeyValue(LS_APP_USER);
@@ -145,7 +148,9 @@ export const SignIn = observer(() => {
                 }
                 if (response.status === Status.OK && "token" in response && response.token) {
                     try {
-                        userStore.storedUser = response;
+                        const authUser = response as AuthUser;
+                        userStore.storedUser = authUser;
+                        login(authUser);
                         createApiDashboardInstance(navigate);
                         if (formik.values.rememberme) {
                             userStore.setRememberMeWithPassword(

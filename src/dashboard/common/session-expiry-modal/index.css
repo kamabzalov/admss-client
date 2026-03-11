@@ -1,0 +1,137 @@
+.session-expiry-modal {
+    width: 1140px;
+    height: 470px;
+    max-width: 90vw;
+
+    .session-expiry-modal__header {
+        display: flex;
+        align-items: center;
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 2px;
+            margin-right: 12px;
+            font-size: 24px;
+            color: var(--admss-app-red);
+        }
+    }
+}
+
+.session-expiry-modal .p-dialog-header {
+    padding: 50px;
+    padding-bottom: 16px;
+    border-bottom: none;
+}
+
+.session-expiry-modal .p-dialog-title {
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--admss-app-blue-text);
+}
+
+.session-expiry-modal .p-dialog-content {
+    padding: 0 50px 30px;
+}
+
+.session-expiry-modal__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.session-expiry-modal__description {
+    margin: 0;
+    text-align: left;
+    padding-bottom: 20px;
+    font-size: 18px;
+    line-height: 20px;
+    color: var(--admss-app-text-muted);
+    font-family: Open Sans;
+}
+
+.session-expiry-modal__timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+    border-radius: 8px;
+    background-color: var(--admss-app-focus-blue);
+    color: var(--admss-app-main-blue);
+    border: 1px dashed var(--admss-app-medium-light-blue);
+    border-radius: 10px;
+}
+
+.session-expiry-modal__timer--warning {
+    background-color: var(--admss-app-focus-yellow);
+    color: var(--admss-app-warning-yellow);
+    border-color: var(--admss-app-warning-yellow);
+}
+
+.session-expiry-modal__timer--danger {
+    background-color: var(--admss-app-focus-red);
+    color: var(--admss-app-red);
+    border-color: var(--admss-app-red);
+}
+
+.session-expiry-modal__timer-value {
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.session-expiry-modal__timer-label {
+    margin-top: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.session-expiry-modal__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.session-expiry-modal__button.p-button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    height: 60px;
+}
+
+.session-expiry-modal__button--primary.p-button {
+    background-color: var(--admss-app-main-blue);
+    border-color: var(--admss-app-main-blue);
+    &:enabled:hover,
+    &:enabled:focus {
+        box-shadow: none;
+        background-color: var(--admss-app-warning-blue);
+        border-color: var(--admss-app-warning-blue);
+        color: var(--admss-app-white);
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+}
+
+.session-expiry-modal__button--secondary.p-button {
+    background-color: var(--admss-app-white);
+    color: var(--admss-app-main-blue);
+    border-color: var(--admss-app-main-blue);
+    &:enabled:hover,
+    &:enabled:focus {
+        box-shadow: none;
+        background-color: var(--admss-app-white);
+        border-color: var(--admss-app-warning-blue);
+        color: var(--admss-app-warning-blue);
+        outline: none;
+        box-shadow: none;
+    }
+}
