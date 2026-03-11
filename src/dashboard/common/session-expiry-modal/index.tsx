@@ -1,8 +1,10 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import "./index.css";
 import { SECONDS_IN_MINUTE } from "common/constants/time";
+import { TITLE_APP, TITLE_SESSION_EXPIRY } from "common/constants/titles";
+import expireClockIcon from "assets/images/expire-clock.svg";
 
 const SESSION_EXPIRY = {
     MESSAGE:
@@ -28,24 +30,64 @@ export const SessionExpiryModal = ({
     onContinue,
     onLogout,
 }: SessionExpiryModalProps): ReactElement => {
+    const previousTitleRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (!visible) {
+            if (previousTitleRef.current !== null) {
+                document.title = previousTitleRef.current;
+                previousTitleRef.current = null;
+            }
+            return;
+        }
+
+        if (previousTitleRef.current === null) {
+            previousTitleRef.current = document.title;
+        }
+
+        let showExpiry = true;
+        document.title = TITLE_SESSION_EXPIRY;
+
+        const intervalId = window.setInterval(() => {
+            document.title = showExpiry ? TITLE_APP : TITLE_SESSION_EXPIRY;
+            showExpiry = !showExpiry;
+        }, 1000);
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [visible]);
+
     const minutes = Math.floor(secondsLeft / SECONDS_IN_MINUTE)
         .toString()
         .padStart(2, "0");
     const seconds = (secondsLeft % SECONDS_IN_MINUTE).toString().padStart(2, "0");
 
     const timerClassName = `session-expiry-modal__timer${
-        secondsLeft < SESSION_DANGER_THRESHOLD_SECONDS ? " session-expiry-modal__timer--danger" : ""
+        secondsLeft <= SESSION_DANGER_THRESHOLD_SECONDS
+            ? " session-expiry-modal__timer--danger"
+            : ""
     }${
-        secondsLeft < SESSION_WARNING_THRESHOLD_SECONDS &&
-        secondsLeft >= SESSION_DANGER_THRESHOLD_SECONDS
+        secondsLeft <= SESSION_WARNING_THRESHOLD_SECONDS &&
+        secondsLeft > SESSION_DANGER_THRESHOLD_SECONDS
             ? " session-expiry-modal__timer--warning"
             : ""
     }`;
 
     const dialogHeader = () => {
+        const isDanger = secondsLeft <= SESSION_DANGER_THRESHOLD_SECONDS;
+
         return (
             <div className='session-expiry-modal__header'>
-                <i className='icon adms-warning' />
+                {isDanger ? (
+                    <i className='icon adms-warning' />
+                ) : (
+                    <img
+                        src={expireClockIcon}
+                        alt='Session expiry warning'
+                        className='session-expiry-modal__header-icon'
+                    />
+                )}
                 <span>Your session is about to expire</span>
             </div>
         );
