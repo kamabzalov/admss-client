@@ -31,41 +31,27 @@
     border-radius: 50%;
     width: 40px;
     height: 40px;
+    padding: 0;
     display: inline-flex;
-    justify-content: center;
     align-items: center;
-    transition: background-color 0.4s;
+    justify-content: center;
     cursor: pointer;
     border: none;
-    &:enabled:focus {
-        box-shadow: none;
-    }
-    .icon {
-        color: var(--admss-app-medium-blue);
-        transition: all 0.4s ease-in-out;
-    }
+    transition: background-color 0.4s;
+}
+
+.info-panel__button:focus {
+    outline: none;
 }
 
 .info-panel__button--pulse {
     animation: pulse 3s infinite;
 }
 
-.info-panel__button.p-button:hover,
-.info-panel__button.p-button:active {
-    box-shadow: none;
-    border: none;
-    background-color: var(--admss-app-main-blue);
-}
-
 .info-panel__icon {
-    color: #fff;
-    line-height: 1;
-    font-size: 16px;
-    padding-top: 1px;
-}
-
-.info-panel__icon-wrapper:hover {
-    background-color: var(--admss-app-medium-blue);
+    width: 40px;
+    height: 40px;
+    display: block;
 }
 
 .info-panel__panel {

@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import "./index.css";
-import { Button } from "primereact/button";
+import questionMarkIcon from "assets/images/question-mark.svg";
 import { useStore } from "store/hooks";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { ReportsUserSettings, ServerUserSettings } from "common/models/user";
@@ -24,13 +24,11 @@ export const InfoOverlayPanel = ({
     const { userStore } = useStore();
     const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const [profileHintViewed, setProfileHintViewed] = useState<boolean | undefined>(undefined);
+    const [profileHintViewed, setProfileHintViewed] = useState<boolean>(true);
     const { authUser } = userStore;
 
     const isProfileBased = Boolean(profileHintKey && authUser);
-    const isFirstVisit = isProfileBased
-        ? profileHintViewed !== true
-        : userStore.isFirstVisit(pageId ?? "");
+    const isFirstVisit = userStore.isFirstVisit(pageId ?? "");
 
     useEffect(() => {
         if (!isProfileBased || !authUser) return;
@@ -115,13 +113,14 @@ export const InfoOverlayPanel = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <Button
+            <button
                 type='button'
                 className={`info-panel__button ${showPulse ? "info-panel__button--pulse" : ""}`}
                 onClick={handleButtonClick}
+                aria-label='Info'
             >
-                <i className='icon adms-question-mark p-text-secondary p-overlay-badge info-panel__icon' />
-            </Button>
+                <img src={questionMarkIcon} alt='' className='info-panel__icon' />
+            </button>
             {panelShow && (
                 <div className='info-panel__panel shadow-3'>
                     <div className='info-panel__title'>{panelTitle}</div>
