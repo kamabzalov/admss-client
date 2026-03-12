@@ -19,7 +19,11 @@ export interface ReportsPostData {
 }
 
 export interface ReportDocument {
-    accessed: string;
+    AskForDate: 0 | 1;
+    AskForStartAndEndDates: 0 | 1;
+    ShowAverages: 0 | 1;
+    ShowLineCount: 0 | 1;
+    ShowTotals: 0 | 1;
     count: number;
     created: string;
     collections?: ReportCollections[];

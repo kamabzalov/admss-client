@@ -1,4 +1,4 @@
-import { convertToStandardTimestamp, formatDateForServer } from "common/helpers";
+import { convertToStandardTimestamp, formatDateForServer, fromBinary } from "common/helpers";
 import { useToastMessage } from "common/hooks";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportDocument, ReportSetParams } from "common/models/reports";
@@ -33,13 +33,16 @@ export const reportDownloadForm = async (
         columns: params.columns,
     };
 
-    if (!!params.AskForStartAndEndDates || withDate) {
+    if (withDate) {
         payload.from_date = params.from_date
             ? convertToStandardTimestamp(params.from_date)
             : convertToStandardTimestamp();
-        payload.to_date = params.to_date
-            ? convertToStandardTimestamp(params.to_date)
-            : convertToStandardTimestamp();
+
+        if (!!params.AskForStartAndEndDates) {
+            payload.to_date = params.to_date
+                ? convertToStandardTimestamp(params.to_date)
+                : convertToStandardTimestamp();
+        }
     }
 
     const response = await setReportDocumentTemplate(params.itemUID || "0", payload);
@@ -73,27 +76,33 @@ export const ReportParameters = ({
     const [endDate, setEndDate] = useState<string | number>("");
 
     useEffect(() => {
-        if (!startDate || !endDate) {
+        if (!startDate || (fromBinary(report.AskForStartAndEndDates) && !endDate)) {
             setIsButtonDisabled(true);
         } else {
             setIsButtonDisabled(false);
         }
-    }, [startDate, endDate]);
+    }, [startDate, endDate, report.AskForStartAndEndDates]);
 
     const handleCloseClick = () => {
         handleClosePanel?.();
     };
 
     const handleDownloadForm = async (download: boolean = false) => {
-        const response = await reportDownloadForm(
-            {
-                action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
-                from_date: startDate ? new Date(Number(startDate)) : convertToStandardTimestamp(),
-                to_date: endDate ? new Date(Number(endDate)) : convertToStandardTimestamp(),
-                ...report,
-            },
-            true
-        );
+        const basePayload = {
+            action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
+            from_date: startDate ? new Date(Number(startDate)) : convertToStandardTimestamp(),
+            ...report,
+        };
+
+        const payload =
+            fromBinary(report.AskForStartAndEndDates) && endDate
+                ? {
+                      ...basePayload,
+                      to_date: new Date(Number(endDate)),
+                  }
+                : basePayload;
+
+        const response = await reportDownloadForm(payload, true);
         if (response && response.status === Status.ERROR) {
             showError(response.error || "Error while downloading report");
         }
@@ -117,13 +126,15 @@ export const ReportParameters = ({
                     emptyDate
                     onChange={({ value }) => setStartDate(Number(value))}
                 />
-                <DateInput
-                    name='End Date'
-                    colWidth={3}
-                    date={endDate}
-                    emptyDate
-                    onChange={({ value }) => setEndDate(Number(value))}
-                />
+                {fromBinary(report.AskForStartAndEndDates) && (
+                    <DateInput
+                        name='End Date'
+                        colWidth={3}
+                        date={endDate}
+                        emptyDate
+                        onChange={({ value }) => setEndDate(Number(value))}
+                    />
+                )}
                 <div className='col-12 flex justify-content-end gap-3'>
                     <Button
                         className='edit-collection__button'

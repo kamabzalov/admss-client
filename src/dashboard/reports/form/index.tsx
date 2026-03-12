@@ -86,7 +86,7 @@ export const NodeContent = ({
     }, [isSelected, isTogglerVisible, isSimpleNode, isDeeplyNested]);
 
     return (
-        <div className='w-full' ref={ref}>
+        <div className='w-full overflow-hidden' ref={ref}>
             <Button
                 onClick={onClick}
                 className={`report__list-item w-full min-w-0 ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
@@ -441,7 +441,7 @@ export const ReportForm = observer((): ReactElement => {
                                     <div
                                         onDragEnter={(e) => handleDragEnter(e, node)}
                                         onDragLeave={handleDragLeave}
-                                        className='w-full min-w-0 overflow-hidden'
+                                        className='w-full min-w-0'
                                     >
                                         <NodeContent
                                             node={nodeData}
