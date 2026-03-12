@@ -181,6 +181,10 @@ export class ReportStore {
                         acl?: ReportAccess[];
                     } & { collections: ReportCollections[] } = {
                         name: this._report.name,
+                        ShowTotals: this._report.ShowTotals,
+                        ShowAverages: this._report.ShowAverages,
+                        ShowLineCount: this._report.ShowLineCount,
+                        AskForStartAndEndDates: this._report.AskForStartAndEndDates,
                         collections,
                     };
 
@@ -313,6 +317,9 @@ export class ReportStore {
         this._initialReport = {} as ReportInfo;
         this._isReportChanged = false;
         this._initialReport = {} as ReportInfo;
+        this._reportName = "";
+        this._reportColumns = [];
+        this._reportCollections = [];
         this._reportACL = [];
     };
 }

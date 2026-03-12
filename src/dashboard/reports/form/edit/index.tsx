@@ -108,7 +108,11 @@ export const ReportEditForm = observer((): ReactElement => {
                             className='w-full'
                             disabled={!!report.isdefault}
                             value={report?.name || reportName}
-                            onChange={(e) => changeReport("name", e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                changeReport("name", !value.trim().length ? "" : value);
+                            }}
+                            onBlur={(e) => changeReport("name", e.target.value.trim())}
                         />
                         <label className='float-label w-full'>Name</label>
                     </span>
@@ -166,7 +170,7 @@ export const ReportEditForm = observer((): ReactElement => {
             <div className='report-form__body grid'>
                 <ReportColumnSelect />
 
-                <div className='splitter col-12'>
+                <div className='splitter col-12 pt-0'>
                     <h3 className='splitter__title m-0 pr-3'>Report options</h3>
                     <hr className='splitter__line flex-1' />
                 </div>
@@ -208,7 +212,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     </label>
                 </div>
 
-                <div className='splitter col-12'>
+                <div className='splitter col-12 mt-3'>
                     <h3 className='splitter__title m-0 pr-3'>Report parameters</h3>
                     <hr className='splitter__line flex-1' />
                 </div>

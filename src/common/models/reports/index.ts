@@ -112,6 +112,10 @@ export interface ReportCreate extends BaseResponseError {
     info: string;
     name: string;
     version: string;
+    ShowTotals: 0 | 1;
+    ShowAverages: 0 | 1;
+    ShowLineCount: 0 | 1;
+    AskForStartAndEndDates: 0 | 1;
     description: string;
 }
 

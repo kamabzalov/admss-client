@@ -1,3 +1,17 @@
+.report {
+    .card-header {
+        padding-top: 0;
+        padding-left: 16px;
+    }
+    border-radius: 10px;
+    .card-content {
+        padding-right: 20px;
+    }
+    .report__footer {
+        margin-right: 20px;
+    }
+}
+
 .report__card {
     --column-width: 370px;
     --select-area-height: 191px;
@@ -17,9 +31,12 @@
         --column-width: 180px;
     }
 
-    max-height: 70vh;
+    height: 100%;
+    max-height: 100%;
     display: flex;
     justify-content: space-between;
+    flex: 1;
+    min-height: 0;
 
     .p-tree {
         flex: 0 0 30%;
@@ -120,8 +137,7 @@
 
 .report-form {
     flex-direction: column;
-    max-height: 70vh;
-    padding-top: 20px;
+    padding-top: 0;
 }
 
 .report-form__header {
@@ -140,6 +156,8 @@
     border: var(--admss-app-light-blue) solid 1px;
     flex-wrap: nowrap;
     gap: 20px;
+    padding: 0px;
+    margin-top: 20px;
 }
 
 .report-controls__main {
@@ -318,14 +336,18 @@
 .report__footer {
     display: flex;
     margin-left: auto;
-    margin-bottom: 60px;
     align-items: center;
     width: 65.5%;
     justify-content: flex-end;
+    margin-bottom: 15px;
 }
 
 .report__footer .report__button.p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     height: 60px;
+    width: 245px;
 }
 
 .report__icon-button.p-button {
@@ -375,6 +397,13 @@
 
 .card.report {
     padding: 40px 30px;
+    max-width: var(--data-table-base-card-width);
+    height: var(--data-table-wrapper-height, var(--admss-app-default-card-height));
+    max-height: calc(
+        100vh - var(--admss-app-header-height) - var(--admss-app-content-top-margin) - 10px
+    );
+    display: flex;
+    flex-direction: column;
 }
 
 .p-treenode-content.deeply-nested-node {
