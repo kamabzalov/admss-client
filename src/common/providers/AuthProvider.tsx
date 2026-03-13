@@ -105,7 +105,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     const refreshTimerId = useRef<number | null>(null);
     const countdownIntervalId = useRef<number | null>(null);
     const inactivityTimerId = useRef<number | null>(null);
-    const lastActivityAtRef = useRef<number | null>(null);
+    const inactivityPreRefreshTimerId = useRef<number | null>(null);
+    const inactivityInitializedRef = useRef<boolean>(false);
 
     const clearRefreshTimer = () => {
         if (refreshTimerId.current !== null) {
@@ -132,7 +133,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             inactivityTimerId.current = null;
         }
 
-        if (safeInitialSeconds === 0) {
+        if (!safeInitialSeconds) {
             return;
         }
 
@@ -153,10 +154,11 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             return;
         }
 
-        lastActivityAtRef.current = Date.now();
-
         if (inactivityTimerId.current !== null) {
             window.clearTimeout(inactivityTimerId.current);
+        }
+        if (inactivityPreRefreshTimerId.current !== null) {
+            window.clearTimeout(inactivityPreRefreshTimerId.current);
         }
 
         inactivityTimerId.current = window.setTimeout(() => {
@@ -165,6 +167,15 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             }
             startExpiryCountdown(REFRESH_MARGIN_SECONDS);
         }, INACTIVITY_TIMEOUT_SECONDS * MS_IN_SECOND);
+
+        const preRefreshDelayMs = (INACTIVITY_TIMEOUT_SECONDS * MS_IN_SECOND) / 2;
+
+        inactivityPreRefreshTimerId.current = window.setTimeout(() => {
+            if (!authUser) {
+                return;
+            }
+            void refreshAccessTokenIfNeeded();
+        }, preRefreshDelayMs);
     };
 
     const login = useCallback((user: AuthUser) => {
@@ -241,6 +252,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                 window.clearTimeout(inactivityTimerId.current);
                 inactivityTimerId.current = null;
             }
+            if (inactivityPreRefreshTimerId.current !== null) {
+                window.clearTimeout(inactivityPreRefreshTimerId.current);
+                inactivityPreRefreshTimerId.current = null;
+            }
         };
     }, []);
 
@@ -278,41 +293,41 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                 window.clearTimeout(inactivityTimerId.current);
                 inactivityTimerId.current = null;
             }
-            lastActivityAtRef.current = null;
+            inactivityInitializedRef.current = false;
             return;
         }
 
-        const handleActivity = () => {
-            if (isSessionExpiring) {
+        const handleUserActivity = (event: MouseEvent | KeyboardEvent | TouchEvent) => {
+            if (isSessionExpiring || !event.isTrusted) {
                 return;
             }
+
             resetInactivityTimer();
         };
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                handleActivity();
+                return;
             }
         };
 
         const activityEvents: Array<keyof WindowEventMap> = ["click", "keydown", "touchstart"];
 
         activityEvents.forEach((eventName) => {
-            window.addEventListener(eventName, handleActivity);
+            window.addEventListener(eventName, handleUserActivity as EventListener);
         });
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
-        resetInactivityTimer();
+        if (!inactivityInitializedRef.current) {
+            inactivityInitializedRef.current = true;
+            resetInactivityTimer();
+        }
 
         return () => {
             activityEvents.forEach((eventName) => {
-                window.removeEventListener(eventName, handleActivity);
+                window.removeEventListener(eventName, handleUserActivity as EventListener);
             });
             document.removeEventListener("visibilitychange", handleVisibilityChange);
-            if (inactivityTimerId.current !== null) {
-                window.clearTimeout(inactivityTimerId.current);
-                inactivityTimerId.current = null;
-            }
         };
     }, [authUser, isSessionExpiring]);
 
@@ -322,14 +337,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                 return;
             }
 
-            const now = Date.now();
-            const totalMs = expiresInSec * MS_IN_SECOND;
             const refreshInMs = Math.max((expiresInSec - REFRESH_MARGIN_SECONDS) * MS_IN_SECOND, 0);
-
-            setTokens((prev) => ({
-                ...prev,
-                expiresAt: now + totalMs,
-            }));
 
             clearRefreshTimer();
 
