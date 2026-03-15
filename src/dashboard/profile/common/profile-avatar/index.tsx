@@ -1,6 +1,7 @@
 import { ReactElement, useRef, useState } from "react";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import "./index.css";
+import { useStore } from "store/hooks";
 
 interface ProfileAvatarProps {
     onClick?: () => void;
@@ -9,6 +10,7 @@ interface ProfileAvatarProps {
 export const ProfileAvatar = ({ onClick }: ProfileAvatarProps): ReactElement => {
     const [avatarImage, setAvatarImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { profileStore } = useStore();
 
     const handleChooseClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -16,14 +18,18 @@ export const ProfileAvatar = ({ onClick }: ProfileAvatarProps): ReactElement => 
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatarImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+        const [file] = e.target.files || [];
+
+        if (!file || !file.size) {
+            return;
         }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatarImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        profileStore.setLogoFile(file);
     };
 
     return (
