@@ -5,6 +5,7 @@ import { updateUserProfile, changePassword, checkPassword, getUserData } from "h
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { typeGuards } from "common/utils";
+import { uploadUserLogo } from "http/services/media.service";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
     address: string;
@@ -28,6 +29,7 @@ export class ProfileStore {
     public rootStore: RootStore;
     private _profile: ExtendedProfile = initialProfile;
     private _isProfileChanged: boolean = false;
+    private _logoFile: File | null = null;
     private _currentPassword: string = "";
     private _newPassword: string = "";
     private _confirmPassword: string = "";
@@ -70,6 +72,13 @@ export class ProfileStore {
 
     public set profile(profile: ExtendedProfile) {
         this._profile = profile;
+    }
+
+    public setLogoFile(file: File | null) {
+        this._logoFile = file;
+        if (file) {
+            this._isProfileChanged = true;
+        }
     }
 
     public markProfileSaved() {
@@ -203,6 +212,18 @@ export class ProfileStore {
 
             if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
+            }
+
+            if (this._logoFile) {
+                const logoResponse = (await uploadUserLogo(authUser.useruid, this._logoFile)) as
+                    | BaseResponseError
+                    | undefined;
+
+                if (logoResponse && logoResponse.status === Status.ERROR) {
+                    return logoResponse;
+                }
+
+                this._logoFile = null;
             }
 
             this._isProfileChanged = false;
