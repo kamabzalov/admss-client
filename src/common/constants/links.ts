@@ -5,6 +5,7 @@ export const CREATE_ID: string = "create";
 export const TAB_ID: string = "tab";
 export const USER_PROFILE_PAGE_ID: string = "user-profile";
 export const HOME_PAGE: string = "/";
+export const TWO_FA_PAGE: string = "/2fa";
 
 export const DASHBOARD_PAGE: string = "/dashboard";
 export const CREATE_PATH: string = `/${CREATE_ID}`;
