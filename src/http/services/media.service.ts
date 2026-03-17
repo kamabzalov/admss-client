@@ -94,6 +94,30 @@ export const uploadUserLogo = async (
     });
 };
 
+export const getUserLogo = async (useruid: string): Promise<string | undefined> => {
+    const response = await new ApiRequest().get<Blob | BaseResponseError>({
+        url: `media/${useruid}/logo`,
+        config: { responseType: "blob" },
+        defaultError: "Error while getting user logo",
+    });
+
+    if (!response || (response as BaseResponseError).status === Status.ERROR) {
+        return undefined;
+    }
+
+    const blob = response as Blob;
+
+    const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new window.FileReader();
+        reader.addEventListener("load", (event) => {
+            resolve(event.target?.result as string);
+        });
+        reader.readAsDataURL(blob);
+    });
+
+    return dataUrl;
+};
+
 export const setMediaItemData = async (
     inventoryUid: string,
     {
