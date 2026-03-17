@@ -1,16 +1,23 @@
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import "./index.css";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
 interface ProfileAvatarProps {
     onClick?: () => void;
 }
 
-export const ProfileAvatar = ({ onClick }: ProfileAvatarProps): ReactElement => {
+export const ProfileAvatar = observer(({ onClick }: ProfileAvatarProps): ReactElement => {
     const [avatarImage, setAvatarImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { profileStore } = useStore();
+
+    useEffect(() => {
+        if (profileStore.logo) {
+            setAvatarImage(profileStore.logo);
+        }
+    }, [profileStore.logo]);
 
     const handleChooseClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -53,4 +60,4 @@ export const ProfileAvatar = ({ onClick }: ProfileAvatarProps): ReactElement => 
             />
         </div>
     );
-};
+});

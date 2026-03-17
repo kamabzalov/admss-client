@@ -25,6 +25,7 @@ import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { HOME_PAGE } from "common/constants/links";
 import { INACTIVITY_TIMEOUT_SECONDS } from "common/settings";
 import { MS_IN_SECOND, SECONDS_IN_MINUTE } from "common/constants/time";
+import { store } from "store";
 
 const REFRESH_MARGIN_SECONDS = SECONDS_IN_MINUTE;
 
@@ -243,6 +244,12 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         setAuthUser(user);
         setTokens(nextTokens);
     }, []);
+
+    useEffect(() => {
+        if (authUser?.useruid) {
+            void store.profileStore.loadLogo(authUser.useruid);
+        }
+    }, [authUser?.useruid]);
 
     useEffect(() => {
         return () => {
