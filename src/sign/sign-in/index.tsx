@@ -12,7 +12,7 @@ import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { TwoFactorAuthStep } from "store/stores/user";
 import { useToastMessage } from "common/hooks";
-import { DASHBOARD_PAGE } from "common/constants/links";
+import { DASHBOARD_PAGE, TWO_FA_PAGE } from "common/constants/links";
 import { LS_LAST_ROUTE, LastRouteData, LS_APP_USER } from "common/constants/localStorage";
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
@@ -26,6 +26,7 @@ import {
 import { observer } from "mobx-react-lite";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { useAuth } from "common/providers/AuthProvider";
+import { TWO_FA_TEST_USERNAME } from "sign/two-factor-auth";
 
 export interface LoginForm {
     username: string;
@@ -49,9 +50,9 @@ const parseLastRoute = (routeDataString: string): LastRouteData | null => {
 const isRouteValid = (routeData: LastRouteData, expectedUseruid: string): boolean => {
     return Boolean(
         routeData.path &&
-            routeData.timestamp &&
-            routeData.useruid &&
-            routeData.useruid === expectedUseruid
+        routeData.timestamp &&
+        routeData.useruid &&
+        routeData.useruid === expectedUseruid
     );
 };
 
@@ -146,6 +147,29 @@ export const SignIn = observer(() => {
                     showError(ERROR_MESSAGES.AUTHENTICATION_FAILED);
                     return;
                 }
+
+                const username = formik.values.username || "";
+
+                if (
+                    isAuthResponseTfaRequired(response) &&
+                    username.toLowerCase().includes(TWO_FA_TEST_USERNAME)
+                ) {
+                    const checkResponse = (await check2FA({
+                        user: formik.values.username,
+                        deviceuid: userStore.deviceUID,
+                    })) as TwoFactorCheckResponse;
+                    userStore.twoFactorAuth.reset();
+                    const sessionUid = getTfaSessionUid(response);
+                    if (sessionUid) {
+                        userStore.twoFactorAuth.twoFactorSessionUID = sessionUid;
+                    }
+                    userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.INTRODUCTION;
+                    if (checkResponse?.tfa_method) {
+                        userStore.twoFactorAuth.selectedMethod = checkResponse.tfa_method;
+                    }
+                    navigate(TWO_FA_PAGE, { state: formik.values });
+                    return;
+                }
                 if (response.status === Status.OK && "token" in response && response.token) {
                     try {
                         const authUser = response as AuthUser;
@@ -164,23 +188,6 @@ export const SignIn = observer(() => {
                         showError(String(error));
                         return;
                     }
-                    return;
-                }
-                if (isAuthResponseTfaRequired(response)) {
-                    const checkResponse = (await check2FA({
-                        user: formik.values.username,
-                        deviceuid: userStore.deviceUID,
-                    })) as TwoFactorCheckResponse;
-                    userStore.twoFactorAuth.reset();
-                    const sessionUid = getTfaSessionUid(response);
-                    if (sessionUid) {
-                        userStore.twoFactorAuth.twoFactorSessionUID = sessionUid;
-                    }
-                    userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.INTRODUCTION;
-                    if (checkResponse?.tfa_method) {
-                        userStore.twoFactorAuth.selectedMethod = checkResponse.tfa_method;
-                    }
-                    navigate("/2fa", { state: formik.values });
                     return;
                 }
                 const serverError =

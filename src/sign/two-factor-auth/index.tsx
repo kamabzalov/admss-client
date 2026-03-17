@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import "../index.css";
 import "./index.css";
-import { DASHBOARD_PAGE } from "common/constants/links";
+import { DASHBOARD_PAGE, HOME_PAGE } from "common/constants/links";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { useStore } from "store/hooks";
 import { TwoFactorAuthStep } from "store/stores/user";
@@ -21,6 +21,8 @@ import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 
+export const TWO_FA_TEST_USERNAME = "2fa_test";
+
 export interface TwoFactorAuthForm {
     phoneNumber: string;
     verificationCode: string[];
@@ -34,6 +36,13 @@ export const TwoFactorAuth = observer(() => {
     const loginData = location.state as LoginForm | undefined;
     const userStore = useStore().userStore;
     const twoFactorAuthStore = userStore.twoFactorAuth;
+
+    useEffect(() => {
+        const username = loginData?.username || "";
+        if (!username || !username.toLowerCase().includes(TWO_FA_TEST_USERNAME)) {
+            navigate(HOME_PAGE, { replace: true });
+        }
+    }, [loginData, navigate]);
 
     const formik = useFormik<TwoFactorAuthForm>({
         initialValues: {

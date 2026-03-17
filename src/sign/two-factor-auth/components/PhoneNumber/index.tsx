@@ -43,10 +43,9 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
                         onBlur={formik.handleBlur}
                         value={formik.values.phoneNumber}
                         mask='(999) 999-9999'
+                        error={!!(formik.touched.phoneNumber && formik.errors.phoneNumber)}
+                        errorMessage={formik.errors.phoneNumber || ""}
                     />
-                    {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
-                        <small className='p-error error-space'>{formik.errors.phoneNumber}</small>
-                    ) : null}
                 </div>
                 <Button
                     label='Continue'
