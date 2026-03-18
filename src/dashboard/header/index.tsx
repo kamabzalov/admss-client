@@ -3,7 +3,6 @@ import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
-import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser } from "common/models/user";
 import { logout } from "http/services/auth.service";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,6 +10,7 @@ import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { useAuth } from "common/providers/AuthProvider";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
+import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
@@ -133,11 +133,11 @@ export const Header = observer((): ReactElement => {
 
                     <div className='header__menu'>
                         <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
-                        <img
+                        <ProfileAvatar
                             className='header__icon'
+                            size={60}
+                            editable={false}
                             onClick={(event) => menuRight?.current?.toggle(event)}
-                            src={userCabinet}
-                            alt='User cabinet'
                         />
                     </div>
                 </div>
