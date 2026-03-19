@@ -11,6 +11,7 @@ import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { RouteTracker } from "dashboard/common/route-tracker";
+import { FirstLoginPasswordModal } from "dashboard/common/first-login-password-change-modal";
 
 export const Dashboard = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -47,11 +48,16 @@ export const Dashboard = observer((): ReactElement => {
         return <Loader overlay />;
     }
 
+    const needFirstLoginPwdChange = Boolean(
+        (authUser as { password_change_required?: boolean }).password_change_required
+    );
+
     return (
         <Suspense fallback={<Loader overlay />}>
             <RouteTracker />
             <Header />
             <Sidebar />
+            <FirstLoginPasswordModal visible={needFirstLoginPwdChange} user={authUser} />
             {!settings.isSidebarCollapsed && <div className='sidebar-overlay'></div>}
             {isSettingsLoaded ? (
                 <main className='main'>

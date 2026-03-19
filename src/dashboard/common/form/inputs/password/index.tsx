@@ -3,6 +3,7 @@ import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constant
 import "./index.css";
 import { useId, useMemo } from "react";
 import { TruncatedText } from "dashboard/common/display";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface PasswordInputProps extends PasswordProps {
     label?: string;
@@ -21,7 +22,7 @@ export const PasswordInput = ({
     password,
     setPassword,
     error = false,
-    errorMessage = "Passwords do not match. Please check and try again.",
+    errorMessage = `${ERROR_MESSAGES.PASSWORD_MISMATCH} Please check and try again.`,
     skipValidation = false,
     ...props
 }: PasswordInputProps) => {

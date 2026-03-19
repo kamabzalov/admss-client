@@ -88,7 +88,7 @@ export interface UserGroup {
     isdefault: 0 | 1;
 }
 
-export interface AuthUser {
+export interface AuthUser extends BaseResponseError {
     "2fasessionuid": string;
     companyname: string;
     dealer_id: string;
@@ -112,7 +112,6 @@ export interface AuthUser {
     permissions: UserPermissionsResponse;
     sandbox_mode: boolean;
     sessionuid: string;
-    status: "OK";
     token: string;
     token_type: string;
     refresh_token?: string;
