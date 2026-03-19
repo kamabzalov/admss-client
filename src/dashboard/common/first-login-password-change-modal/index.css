@@ -1,0 +1,65 @@
+.first-login-password-modal {
+    width: 506px;
+    height: 606px;
+
+    .p-dialog-header {
+        padding: 22px;
+    }
+
+    .first-login-password-modal__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .first-login-password-modal__title {
+            color: var(--admss-app-main-blue);
+            font-size: 26px;
+            margin: 30px 0;
+            font-weight: 700;
+        }
+
+        .first-login-password-modal__header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-size: 5.5rem;
+            color: var(--admss-app-primary-main-green);
+        }
+
+        .first-login-password-modal__description {
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: 300;
+            width: 80%;
+            color: var(--admss-app-blue-text);
+            text-align: center;
+        }
+
+        .first-login-password-modal__fields {
+            padding-top: 14px;
+            padding-bottom: 40px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .first-login-password-modal__actions {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .p-button {
+                width: 100%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                height: 60px;
+                font-weight: 700;
+                font-size: 24px;
+            }
+        }
+    }
+}

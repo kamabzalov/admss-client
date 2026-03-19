@@ -189,3 +189,11 @@ export const check2FAEndpoint = async (useruid: string, data?: TwoFactorCheckEnd
         defaultError: "Failed to check if endpoint requires 2FA elevation",
     });
 };
+
+export const changePasswordFirstLogin = async (new_password: string) => {
+    return new ApiRequest().post({
+        url: "user/0/change-password-first-login",
+        data: { new_password },
+        defaultError: "Failed to change password",
+    });
+};

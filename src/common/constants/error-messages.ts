@@ -14,4 +14,5 @@ export const ERROR_MESSAGES: Readonly<Record<string, string>> = {
     UNEXPECTED_ERROR: "An unexpected error occurred during login",
     USERNAME_REQUIRED: "Username is required.",
     PASSWORD_REQUIRED: "Password is required.",
+    PASSWORD_MISMATCH: "Passwords do not match.",
 };

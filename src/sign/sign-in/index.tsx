@@ -50,9 +50,9 @@ const parseLastRoute = (routeDataString: string): LastRouteData | null => {
 const isRouteValid = (routeData: LastRouteData, expectedUseruid: string): boolean => {
     return Boolean(
         routeData.path &&
-        routeData.timestamp &&
-        routeData.useruid &&
-        routeData.useruid === expectedUseruid
+            routeData.timestamp &&
+            routeData.useruid &&
+            routeData.useruid === expectedUseruid
     );
 };
 
