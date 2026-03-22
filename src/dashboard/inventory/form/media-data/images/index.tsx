@@ -3,28 +3,28 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
     FileUpload,
-    FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
     FileUploadUploadEvent,
     ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
-import { Tag } from "primereact/tag";
 import { DropdownChangeEvent } from "primereact/dropdown";
-import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
-import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
-import { ComboBox } from "dashboard/common/form/dropdown";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useToastMessage } from "common/hooks";
 import { TruncatedText } from "dashboard/common/display";
+import {
+    createMediaChooseTemplate,
+    MediaUploadFields,
+    MediaUploadedSectionHeader,
+} from "dashboard/inventory/form/media-data/common/template";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -42,6 +42,32 @@ enum ModalInfo {
 }
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
+
+const imagesLimitationsTooltip = (
+    <>
+        <p>
+            <b>Supported formats</b>:{" "}
+            {limitations.formats.map((format, index) => (
+                <span key={index}>
+                    {format}
+                    {index !== limitations.formats.length - 1 && ", "}
+                </span>
+            ))}
+        </p>
+        <p>
+            <b>Minimal resolution</b>: {limitations.minResolution}
+        </p>
+        <p>
+            <b>Maximal resolution</b>: {limitations.maxResolution}
+        </p>
+        <p>
+            <b>Maximal size</b>: {limitations.maxSize} MBytes
+        </p>
+        <p>
+            <b>Batch upload</b>: Up to {limitations.maxUpload} items
+        </p>
+    </>
+);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -195,59 +221,12 @@ export const ImagesMedia = observer((): ReactElement => {
         );
     };
 
-    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
-        return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
-                {totalCount ? (
-                    <div className='media-choose__selected flex align-items-center'>
-                        To upload more drag and drop images
-                        <span className='font-semibold mx-3'>or</span>
-                        {chooseButton}
-                    </div>
-                ) : (
-                    <>
-                        {chooseButton}
-                        <div className='flex w-full justify-content-center align-items-center mt-4 relative'>
-                            <span className='media__upload-text-info media__upload-text-info--bold'>
-                                Up to {limitations.maxUpload} items
-                            </span>
-                            <span className='media__upload-text-info'>
-                                Maximal size is {limitations.maxSize} Mb
-                            </span>
-                            {limitations.formats.map((format) => (
-                                <Tag key={format} className='media__upload-tag' value={format} />
-                            ))}
-                            <div className='media-tooltip'>
-                                <InfoOverlayPanel panelTitle='Limitations:'>
-                                    <p>
-                                        <b>Supported formats</b>:{" "}
-                                        {limitations.formats.map((format, index) => (
-                                            <span key={index}>
-                                                {format}
-                                                {index !== limitations.formats.length - 1 && ", "}
-                                            </span>
-                                        ))}
-                                    </p>
-                                    <p>
-                                        <b>Minimal resolution</b>: {limitations.minResolution}
-                                    </p>
-                                    <p>
-                                        <b>Maximal resolution</b>: {limitations.maxResolution}
-                                    </p>
-                                    <p>
-                                        <b>Maximal size</b>: {limitations.maxSize} MBytes
-                                    </p>
-                                    <p>
-                                        <b>Batch upload</b>: Up to {limitations.maxUpload} items
-                                    </p>
-                                </InfoOverlayPanel>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        );
-    };
+    const chooseTemplate = createMediaChooseTemplate({
+        totalCount,
+        limitations,
+        dragDropMoreText: "To upload more drag and drop images",
+        tooltipContent: imagesLimitationsTooltip,
+    });
 
     const handleChangeOrder = (list: Layout[]) => {
         const orderedList: Pick<InventoryMediaPostData, "itemuid" | "order">[] = [];
@@ -292,52 +271,31 @@ export const ImagesMedia = observer((): ReactElement => {
                 className='col-12'
                 style={{ "--upload-text": `"${UPLOAD_TEXT.IMAGES}"` } as React.CSSProperties}
             />
-            <div className='col-12 mt-4 media-input'>
-                <ComboBox
-                    className='media-input__dropdown'
-                    placeholder='Category'
-                    optionLabel={"name"}
-                    optionValue={"id"}
-                    options={[...CATEGORIES]}
-                    value={uploadFileImages?.data?.contenttype || 0}
-                    onChange={handleCategorySelect}
-                />
-                <TextInput
-                    name='comment'
-                    label='Comment'
-                    className='media-input__text'
-                    placeholder='Comment'
-                    value={uploadFileImages?.data?.notes || ""}
-                    onChange={handleCommentaryChange}
-                />
-                <Button
-                    severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount || isLoading}
-                    className='p-button media-input__button'
-                    onClick={handleUploadFiles}
-                >
-                    Save
-                </Button>
-            </div>
-            <div className='col-12 media__uploaded media-uploaded'>
-                <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
-                <span
-                    className={`media-uploaded__label mx-2 uploaded-count ${
-                        images.length && "uploaded-count--blue"
-                    }`}
-                >
-                    ({images.length}/{limitations.maxMediaCount})
-                </span>
-                <hr className='media-uploaded__line flex-1' />
-                <label className='cursor-pointer media-uploaded__label'>
-                    <Checkbox
-                        checked={imagesChecked.every((checked) => checked) && checked}
-                        onChange={() => handleCheckedChange()}
-                        className='media-uploaded__checkbox'
-                    />
-                    Export to Web
-                </label>
-            </div>
+            <MediaUploadFields
+                categoryValue={uploadFileImages?.data?.contenttype || 0}
+                onCategoryChange={handleCategorySelect}
+                notesValue={uploadFileImages?.data?.notes || ""}
+                onNotesChange={handleCommentaryChange}
+                onSave={handleUploadFiles}
+                canSave={!!totalCount}
+                isLoading={isLoading}
+            />
+            <MediaUploadedSectionHeader
+                title='uploaded images'
+                currentCount={images.length}
+                maxCount={limitations.maxMediaCount ?? 0}
+                highlightCount={!!images.length}
+                trailing={
+                    <label className='cursor-pointer media-uploaded__label'>
+                        <Checkbox
+                            checked={imagesChecked.every((c) => c) && checked}
+                            onChange={() => handleCheckedChange()}
+                            className='media-uploaded__checkbox'
+                        />
+                        Export to Web
+                    </label>
+                }
+            />
             <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && images?.length ? (

@@ -1,5 +1,5 @@
-.media-documents__document {
-    border-radius: 5px;
+.media-fileupload--documents .media-choose .info-panel__panel {
+    min-width: 271px;
 }
 
 .media-documents__item {
@@ -12,8 +12,4 @@
 .presentation__document {
     object-fit: cover;
     border-radius: 2px;
-}
-
-.media-choose .info-panel__panel {
-    min-width: 271px;
 }
