@@ -1,6 +1,7 @@
 import { AccordionItems, Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 import "./index.css";
+import "./common/template/index.css";
 const MediaDataImages = lazy(() =>
     import("dashboard/inventory/form/media-data/images").then((module) => ({
         default: module.ImagesMedia,

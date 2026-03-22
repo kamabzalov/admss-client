@@ -65,15 +65,33 @@
 
 .media-input {
     display: flex;
-    justify-content: space-between;
-
+    flex-direction: row;
+    align-items: center;
     gap: 25px;
     padding: 0;
+    width: 100%;
 }
 
-.media-input__dropdown,
-.media-input__button {
-    width: 23%;
+.media-input > .input-error-wrapper {
+    flex: 0 0 var(--media-input-width);
+    max-width: var(--media-input-width);
+    min-width: 0;
+}
+
+.media-input .media-input__dropdown {
+    width: 100%;
+}
+
+.media-input > .text-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+.media-input > .media-input__button {
+    flex: 0 0 var(--media-input-width);
+    max-width: var(--media-input-width);
+    min-width: 0;
 }
 
 .media-input__button {
@@ -85,7 +103,7 @@
 }
 
 .media-input__text {
-    width: 48%;
+    width: 100%;
 }
 
 .media-input__text,

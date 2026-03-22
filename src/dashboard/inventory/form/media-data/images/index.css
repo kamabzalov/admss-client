@@ -22,62 +22,23 @@
     color: var(--admss-app-primary-main-green);
 }
 
-.media .p-fileupload-content > div:nth-child(2) {
+.media .p-fileupload-row .presentation .presentation__content {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    width: 88%;
     gap: 10px;
 }
 
-.media .p-fileupload-row {
-    width: 24%;
-}
-
-.media .p-fileupload-row .presentation {
-    justify-content: space-between;
-    box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
-    border-radius: 5px;
-    font-size: 14px;
-    padding: 0 4px;
-    .presentation__content {
-        display: flex;
-        align-items: center;
-        width: 88%;
-        gap: 10px;
-        .presentation__label {
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
+.media .p-fileupload-row .presentation .presentation__content .presentation__label {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .presentation__image {
     object-fit: cover;
     border-radius: 2px;
-}
-
-.presentation__remove-button.p-button {
-    background: transparent;
-    color: var(--admss-app-medium-grey);
-    border: none;
-    height: auto;
-    width: 24px;
-}
-
-.presentation__remove-button.p-button > .pi {
-    font-size: 12px;
-}
-
-.presentation__remove-button.p-button:hover {
-    background: transparent;
-    color: var(--admss-app-primary);
-    border: none;
-    height: auto;
-}
-
-.media-choose .info-panel__panel {
-    min-width: 418px;
 }
 
 .p-image-mask.p-component-overlay {
