@@ -29,16 +29,33 @@ export const FirstLoginPasswordModal = ({
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
+    const [isNewPasswordValid, setIsNewPasswordValid] = useState(false);
+    const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
+
     const passwordsMismatch = useMemo(() => {
         return newPassword !== confirmPassword && confirmPassword.length > 0;
     }, [newPassword, confirmPassword]);
 
     const isButtonDisabled = useMemo(() => {
-        return isSaving || !newPassword || !confirmPassword || passwordsMismatch;
-    }, [isSaving, newPassword, confirmPassword, passwordsMismatch]);
+        return (
+            isSaving ||
+            !newPassword ||
+            !confirmPassword ||
+            passwordsMismatch ||
+            !isNewPasswordValid ||
+            !isConfirmPasswordValid
+        );
+    }, [
+        isSaving,
+        newPassword,
+        confirmPassword,
+        passwordsMismatch,
+        isNewPasswordValid,
+        isConfirmPasswordValid,
+    ]);
 
     const handleSave = async () => {
-        if (isSaving) return;
+        if (isSaving || !isNewPasswordValid || !isConfirmPasswordValid) return;
 
         if (!newPassword || !confirmPassword) {
             showError(ERROR_MESSAGES.PASSWORD_REQUIRED);
@@ -108,14 +125,12 @@ export const FirstLoginPasswordModal = ({
                     <PasswordInput
                         label='New Password'
                         password={newPassword}
-                        setPassword={(v) => setNewPassword(v)}
-                    />
-
-                    <PasswordInput
-                        label='Confirm Password'
-                        password={confirmPassword}
-                        setPassword={(v) => setConfirmPassword(v)}
-                        error={passwordsMismatch}
+                        setPassword={setNewPassword}
+                        withConfirm
+                        confirmPassword={confirmPassword}
+                        setConfirmPassword={setConfirmPassword}
+                        onValidityChange={setIsNewPasswordValid}
+                        onConfirmValidityChange={setIsConfirmPasswordValid}
                     />
                 </div>
 
