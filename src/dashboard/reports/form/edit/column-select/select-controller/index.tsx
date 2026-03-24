@@ -2,8 +2,10 @@ import { ReportServiceColumns, ReportServices } from "common/models/reports";
 import { Status } from "common/models/base-response";
 import { getReportColumns, getReportDatasets } from "http/services/reports.service";
 import { useStore } from "store/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useToastMessage } from "common/hooks";
+import { useParams } from "react-router-dom";
+import { CREATE_ID } from "common/constants/links";
 
 interface Dataset {
     id: number;
@@ -53,6 +55,7 @@ const getCompatibleDatasets = (
 };
 
 export const useReportColumnController = () => {
+    const { id: routeId } = useParams();
     const store = useStore().reportStore;
     const { report } = store;
     const userStore = useStore().userStore;
@@ -61,11 +64,15 @@ export const useReportColumnController = () => {
     const [dataSet, setDataSet] = useState<ReportServices | null>(null);
     const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
     const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
-    const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
     const [initialDataSets, setInitialDataSets] =
         useState<Record<ReportServices, ReportServiceColumns[]>>(initialDataSetsData);
     const [availableDatasets, setAvailableDatasets] = useState<ReportServices[]>(dataSetValues);
     const [datasets, setDatasets] = useState<Dataset[]>([]);
+    const hasPushedColumnsToStore = useRef(false);
+
+    useEffect(() => {
+        hasPushedColumnsToStore.current = false;
+    }, [routeId]);
 
     useEffect(() => {
         const fetchDatasets = async () => {
@@ -147,9 +154,28 @@ export const useReportColumnController = () => {
         fetchColumns();
     }, [dataSet, authUser?.useruid, showError]);
 
+    const allowColumnStoreSync = useMemo(() => {
+        if (!datasets.length) return false;
+        if (!routeId || routeId === CREATE_ID) return true;
+        return !!report?.itemuid;
+    }, [datasets.length, routeId, report?.itemuid]);
+
     useEffect(() => {
+        if (!allowColumnStoreSync) return;
+        const canPushColumnsToStore =
+            !!routeId &&
+            routeId !== CREATE_ID &&
+            !!report?.itemuid &&
+            selectedValues.length === 0 &&
+            (report?.columns?.length ?? 0) > 0 &&
+            !hasPushedColumnsToStore.current;
+
+        if (!canPushColumnsToStore) return;
+
         store.reportColumns = selectedValues;
-    }, [selectedValues, store]);
+        hasPushedColumnsToStore.current = true;
+        store.recomputeState();
+    }, [selectedValues, store, allowColumnStoreSync, routeId, report?.itemuid, report?.columns]);
 
     return {
         dataSet,
@@ -159,8 +185,6 @@ export const useReportColumnController = () => {
         setSelectedValues,
         availableValues,
         setAvailableValues,
-        currentItem,
-        setCurrentItem,
         availableDatasets,
     };
 };

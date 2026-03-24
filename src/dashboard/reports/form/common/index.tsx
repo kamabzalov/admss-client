@@ -13,7 +13,7 @@ import { useStore } from "store/hooks";
 interface ReportSelectProps {
     header: string;
     values: ReportServiceColumns[];
-    currentItem: ReportServiceColumns | null;
+    selectedItems: ReportServiceColumns[];
     onItemClick: (item: ReportServiceColumns) => void;
     onItemDoubleClick?: (item: ReportServiceColumns) => void;
     containerRef?: RefObject<HTMLDivElement>;
@@ -22,19 +22,29 @@ interface ReportSelectProps {
 export const ReportSelect = ({
     header,
     values,
-    currentItem,
+    selectedItems,
     onItemClick,
     onItemDoubleClick,
     containerRef,
 }: ReportSelectProps): ReactElement => {
+    const isSelected = (value: ReportServiceColumns) => selectedItems.includes(value);
+
     return (
-        <div className='report-select' ref={containerRef} style={{ overflowY: "auto" }}>
+        <div
+            className='report-select'
+            ref={containerRef}
+            style={{ overflowY: "auto" }}
+            role='listbox'
+            aria-multiselectable='true'
+        >
             <span className='report-select__header'>{header}</span>
             <ul className='report-select__list'>
                 {values.map((value) => (
                     <li
-                        className={`report-select__item ${currentItem === value ? "selected" : ""}`}
+                        className={`report-select__item ${isSelected(value) ? "selected" : ""}`}
                         key={value.data}
+                        role='option'
+                        aria-selected={isSelected(value)}
                         onClick={() => {
                             onItemClick(value);
                         }}

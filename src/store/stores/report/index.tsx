@@ -111,6 +111,8 @@ export class ReportStore {
                 });
 
                 this._initialReport = JSON.parse(JSON.stringify(response));
+                this._reportColumns = [...(report.columns || [])];
+                this.checkIsReportChanged();
             } else {
                 const { error } = response as BaseResponseError;
                 throw new Error(error);
@@ -298,6 +300,10 @@ export class ReportStore {
     public set reportColumns(state: ReportServiceColumns[]) {
         this._reportColumns = state;
     }
+
+    public recomputeState = () => {
+        this.checkIsReportChanged();
+    };
 
     public set reportCollections(state: ReportCollections[]) {
         this._reportCollections = state;

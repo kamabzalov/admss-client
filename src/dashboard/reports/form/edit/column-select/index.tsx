@@ -1,5 +1,5 @@
 import { Button } from "primereact/button";
-import { ReactElement, useRef } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { ReportSelect } from "dashboard/reports/form/common";
 import { observer } from "mobx-react-lite";
 import { ReportServiceColumns } from "common/models/reports";
@@ -10,6 +10,19 @@ import { DataSetInfoTemplate } from "dashboard/reports/form/edit/column-select/i
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import "./index.css";
 
+const toggleItemInSelection = (
+    reportItem: ReportServiceColumns,
+    prev: ReportServiceColumns[]
+): ReportServiceColumns[] => {
+    if (prev.includes(reportItem)) {
+        if (prev.length === 1) {
+            return prev;
+        }
+        return prev.filter((item) => item !== reportItem);
+    }
+    return [...prev, reportItem];
+};
+
 export const ReportColumnSelect = observer((): ReactElement => {
     const {
         dataSet,
@@ -19,13 +32,27 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setSelectedValues,
         availableValues,
         setAvailableValues,
-        currentItem,
-        setCurrentItem,
         availableDatasets,
     } = useReportColumnController();
 
+    const [leftSelection, setLeftSelection] = useState<ReportServiceColumns[]>([]);
+    const [rightSelection, setRightSelection] = useState<ReportServiceColumns[]>([]);
+
     const availableRef = useRef<HTMLDivElement>(null);
     const selectedRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setLeftSelection((prev) => prev.filter((i) => availableValues.includes(i)));
+    }, [availableValues]);
+
+    useEffect(() => {
+        setRightSelection((prev) => prev.filter((i) => selectedValues.includes(i)));
+    }, [selectedValues]);
+
+    useEffect(() => {
+        setLeftSelection([]);
+        setRightSelection([]);
+    }, [dataSet]);
 
     const scrollToTop = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -33,7 +60,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
     const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollTo({
-            top: ref.current.scrollHeight,
+            top: ref.current?.scrollHeight ?? 0,
             behavior: "smooth",
         });
     };
@@ -43,11 +70,38 @@ export const ReportColumnSelect = observer((): ReactElement => {
         from: ReportServiceColumns[],
         to: ReportServiceColumns[],
         setFrom: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
-        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
+        setTo: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        clearLeft: boolean
     ) => {
-        setFrom(from.filter((i) => i !== item));
+        setFrom(from.filter((reportItem) => reportItem !== item));
         setTo([...to, item]);
-        setCurrentItem(null);
+        if (clearLeft) {
+            setLeftSelection([]);
+        } else {
+            setRightSelection([]);
+        }
+    };
+
+    const moveMultipleToSelected = () => {
+        if (!leftSelection.length) return;
+        const toMove = leftSelection.filter((reportItem) => availableValues.includes(reportItem));
+        if (!toMove.length) return;
+        const ordered = availableValues.filter((reportItem) => toMove.includes(reportItem));
+        setAvailableValues((prev) => prev.filter((reportItem) => !toMove.includes(reportItem)));
+        setSelectedValues((prev) => [...prev, ...ordered]);
+        setLeftSelection([]);
+        setRightSelection(ordered);
+    };
+
+    const moveMultipleToAvailable = () => {
+        if (!rightSelection.length) return;
+        const toMove = rightSelection.filter((reportItem) => selectedValues.includes(reportItem));
+        if (!toMove.length) return;
+        const ordered = selectedValues.filter((reportItem) => toMove.includes(reportItem));
+        setSelectedValues((prev) => prev.filter((reportItem) => !toMove.includes(reportItem)));
+        setAvailableValues((prev) => [...prev, ...ordered]);
+        setRightSelection([]);
+        setLeftSelection(ordered);
     };
 
     const moveAllItems = (
@@ -58,6 +112,8 @@ export const ReportColumnSelect = observer((): ReactElement => {
     ) => {
         setTo([...to, ...from]);
         setFrom([]);
+        setLeftSelection([]);
+        setRightSelection([]);
     };
 
     const changeOrder = (
@@ -107,6 +163,29 @@ export const ReportColumnSelect = observer((): ReactElement => {
         }, 50);
     };
 
+    const handleAvailableClick = (item: ReportServiceColumns) => {
+        setRightSelection([]);
+        setLeftSelection((prev) => toggleItemInSelection(item, prev));
+    };
+
+    const handleSelectedClick = (item: ReportServiceColumns) => {
+        setLeftSelection([]);
+        setRightSelection((prev) => toggleItemInSelection(item, prev));
+    };
+
+    const leftReorderItem = leftSelection.length === 1 ? leftSelection[0] : null;
+    const rightReorderItem = rightSelection.length === 1 ? rightSelection[0] : null;
+
+    const canMoveRight =
+        leftSelection.length > 0 &&
+        leftSelection.every((reportItem) => availableValues.includes(reportItem)) &&
+        !leftSelection.some((reportItem) => selectedValues.includes(reportItem));
+
+    const canMoveLeft =
+        rightSelection.length > 0 &&
+        rightSelection.every((reportItem) => selectedValues.includes(reportItem)) &&
+        !rightSelection.some((reportItem) => availableValues.includes(reportItem));
+
     const ControlButton = (
         icon: string,
         action: () => void,
@@ -134,58 +213,58 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         {ControlButton(
                             MOVE_DIRECTION.UP,
                             () =>
-                                currentItem &&
+                                leftReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    leftReorderItem,
                                     MOVE_DIRECTION.UP,
                                     availableValues,
                                     setAvailableValues
                                 ),
                             MOVE_DIRECTION.UP,
-                            availableValues.findIndex((i) => i === currentItem) === 0 ||
-                                !currentItem
+                            availableValues.findIndex((i) => i === leftReorderItem) === 0 ||
+                                !leftReorderItem
                         )}
                         {ControlButton(
                             "double-up",
                             () =>
-                                currentItem &&
+                                leftReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    leftReorderItem,
                                     MOVE_DIRECTION.TOP,
                                     availableValues,
                                     setAvailableValues
                                 ),
                             MOVE_DIRECTION.TOP,
-                            availableValues.findIndex((i) => i === currentItem) === 0 ||
-                                !currentItem
+                            availableValues.findIndex((i) => i === leftReorderItem) === 0 ||
+                                !leftReorderItem
                         )}
                         {ControlButton(
                             MOVE_DIRECTION.DOWN,
                             () =>
-                                currentItem &&
+                                leftReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    leftReorderItem,
                                     MOVE_DIRECTION.DOWN,
                                     availableValues,
                                     setAvailableValues
                                 ),
                             MOVE_DIRECTION.DOWN,
-                            availableValues.findIndex((i) => i === currentItem) ===
-                                availableValues.length - 1 || !currentItem
+                            availableValues.findIndex((i) => i === leftReorderItem) ===
+                                availableValues.length - 1 || !leftReorderItem
                         )}
                         {ControlButton(
                             "double-down",
                             () =>
-                                currentItem &&
+                                leftReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    leftReorderItem,
                                     MOVE_DIRECTION.BOTTOM,
                                     availableValues,
                                     setAvailableValues
                                 ),
                             MOVE_DIRECTION.BOTTOM,
-                            availableValues.findIndex((i) => i === currentItem) ===
-                                availableValues.length - 1 || !currentItem
+                            availableValues.findIndex((i) => i === leftReorderItem) ===
+                                availableValues.length - 1 || !leftReorderItem
                         )}
                     </div>
                     <div className='report-control__content data-set'>
@@ -205,15 +284,16 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         <ReportSelect
                             header='Available'
                             values={availableValues}
-                            currentItem={currentItem}
-                            onItemClick={(item) => setCurrentItem(item)}
+                            selectedItems={leftSelection}
+                            onItemClick={handleAvailableClick}
                             onItemDoubleClick={(item) =>
                                 moveItem(
                                     item,
                                     availableValues,
                                     selectedValues,
                                     setAvailableValues,
-                                    setSelectedValues
+                                    setSelectedValues,
+                                    true
                                 )
                             }
                             containerRef={availableRef}
@@ -230,17 +310,9 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     </InfoOverlayPanel>
                     {ControlButton(
                         MOVE_DIRECTION.RIGHT,
-                        () =>
-                            currentItem &&
-                            moveItem(
-                                currentItem,
-                                availableValues,
-                                selectedValues,
-                                setAvailableValues,
-                                setSelectedValues
-                            ),
+                        moveMultipleToSelected,
                         "Move Right",
-                        !!selectedValues.includes(currentItem!) || !currentItem
+                        !canMoveRight
                     )}
                     {ControlButton(
                         "double-right",
@@ -256,17 +328,9 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     )}
                     {ControlButton(
                         MOVE_DIRECTION.LEFT,
-                        () =>
-                            currentItem &&
-                            moveItem(
-                                currentItem,
-                                selectedValues,
-                                availableValues,
-                                setSelectedValues,
-                                setAvailableValues
-                            ),
+                        moveMultipleToAvailable,
                         "Move Left",
-                        !!availableValues.includes(currentItem!) || !currentItem
+                        !canMoveLeft
                     )}
                     {ControlButton(
                         "double-left",
@@ -285,15 +349,16 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     <ReportSelect
                         header='Selected'
                         values={selectedValues}
-                        currentItem={currentItem}
-                        onItemClick={(item) => setCurrentItem(item)}
+                        selectedItems={rightSelection}
+                        onItemClick={handleSelectedClick}
                         onItemDoubleClick={(item) =>
                             moveItem(
                                 item,
                                 selectedValues,
                                 availableValues,
                                 setSelectedValues,
-                                setAvailableValues
+                                setAvailableValues,
+                                false
                             )
                         }
                         containerRef={selectedRef}
@@ -302,56 +367,58 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         {ControlButton(
                             MOVE_DIRECTION.UP,
                             () =>
-                                currentItem &&
+                                rightReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    rightReorderItem,
                                     MOVE_DIRECTION.UP,
                                     selectedValues,
                                     setSelectedValues
                                 ),
                             MOVE_DIRECTION.UP,
-                            selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
+                            selectedValues.findIndex((i) => i === rightReorderItem) === 0 ||
+                                !rightReorderItem
                         )}
                         {ControlButton(
                             "double-up",
                             () =>
-                                currentItem &&
+                                rightReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    rightReorderItem,
                                     MOVE_DIRECTION.TOP,
                                     selectedValues,
                                     setSelectedValues
                                 ),
                             MOVE_DIRECTION.TOP,
-                            selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
+                            selectedValues.findIndex((i) => i === rightReorderItem) === 0 ||
+                                !rightReorderItem
                         )}
                         {ControlButton(
                             MOVE_DIRECTION.DOWN,
                             () =>
-                                currentItem &&
+                                rightReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    rightReorderItem,
                                     MOVE_DIRECTION.DOWN,
                                     selectedValues,
                                     setSelectedValues
                                 ),
                             MOVE_DIRECTION.DOWN,
-                            selectedValues.findIndex((i) => i === currentItem) ===
-                                selectedValues.length - 1 || !currentItem
+                            selectedValues.findIndex((i) => i === rightReorderItem) ===
+                                selectedValues.length - 1 || !rightReorderItem
                         )}
                         {ControlButton(
                             "double-down",
                             () =>
-                                currentItem &&
+                                rightReorderItem &&
                                 changeOrder(
-                                    currentItem,
+                                    rightReorderItem,
                                     MOVE_DIRECTION.BOTTOM,
                                     selectedValues,
                                     setSelectedValues
                                 ),
                             MOVE_DIRECTION.BOTTOM,
-                            selectedValues.findIndex((i) => i === currentItem) ===
-                                selectedValues.length - 1 || !currentItem
+                            selectedValues.findIndex((i) => i === rightReorderItem) ===
+                                selectedValues.length - 1 || !rightReorderItem
                         )}
                     </div>
                 </div>
