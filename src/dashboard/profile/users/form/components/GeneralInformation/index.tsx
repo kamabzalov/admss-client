@@ -1,4 +1,4 @@
-import { ReactElement, useState, useEffect } from "react";
+import { ReactElement, useState, useEffect, useMemo, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { TextInput } from "dashboard/common/form/inputs";
@@ -8,13 +8,17 @@ import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/in
 import { RadioButtonProps } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
-import { generateNewPassword } from "http/services/users";
+import { checkLogin, generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
 import { SETTINGS_PAGE } from "common/constants/links";
 import { LOGIN_MIN_LENGTH, LOGIN_MAX_LENGTH, LOGIN_VALID_REGEX } from "common/constants/regex";
+import { debounce } from "common/helpers";
+import { DEBOUNCE_TIME } from "common/settings";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { typeGuards } from "common/utils";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
@@ -40,16 +44,31 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
-    const [loginError, setLoginError] = useState<string>("");
+    const [loginError, setLoginError] = useState<string | null>(null);
+    const initialLoginRef = useRef<string>("");
+    const initialUseruidRef = useRef<string>("");
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
     const isEditMode = !!user?.useruid;
 
     useEffect(() => {
+        if (!user?.useruid) return;
+        if (initialUseruidRef.current !== user.useruid) {
+            initialUseruidRef.current = user.useruid;
+            initialLoginRef.current = (user.loginName || "").trim();
+            return;
+        }
+        const name = (user.loginName || "").trim();
+        if (initialLoginRef.current === "" && name !== "") {
+            initialLoginRef.current = name;
+        }
+    }, [user?.useruid, user?.loginName]);
+
+    useEffect(() => {
         if (!password) {
             setConfirmPassword("");
             setPasswordsMismatch(false);
-            setLoginError("");
+            setLoginError(null);
         }
     }, [password]);
 
@@ -102,30 +121,64 @@ export const GeneralInformation = observer((): ReactElement | null => {
         navigate(SETTINGS_PAGE.ROLES_CREATE());
     };
 
-    const validateLoginLength = (value: string): string => {
-        if (!value) return "";
+    const validateLoginLength = (value: string): string | null => {
+        if (!value) return null;
         if (value.length < LOGIN_MIN_LENGTH) {
             return `Login must be at least ${LOGIN_MIN_LENGTH} characters`;
         }
         if (value.length > LOGIN_MAX_LENGTH) {
             return `Login must not exceed ${LOGIN_MAX_LENGTH} characters`;
         }
-        return "";
+        return null;
     };
 
     const handleLoginChange = (value: string) => {
         const filtered = value.replace(LOGIN_VALID_REGEX, "");
         changeUserData("loginName", filtered);
+        debouncedCheckLoginName(filtered);
     };
 
+    const debouncedCheckLoginName = useMemo(
+        () =>
+            debounce(async (value: string) => {
+                const trimmed = value.trim();
+                if (!trimmed || !authUser?.useruid) {
+                    setLoginError(null);
+                    usersStore.loginError = false;
+                    return;
+                }
+                if (!!user?.useruid && trimmed === initialLoginRef.current) {
+                    setLoginError(null);
+                    usersStore.loginError = false;
+                    return;
+                }
+
+                const lengthError = validateLoginLength(trimmed);
+                if (lengthError) {
+                    setLoginError(lengthError);
+                    usersStore.loginError = true;
+                    return;
+                }
+
+                const res = await checkLogin(trimmed);
+                if (res && typeGuards.hasProperty(res, "exists")) {
+                    if (res.exists) {
+                        setLoginError(res.message || ERROR_MESSAGES.LOGIN_NAME_UNIQUE);
+                        usersStore.loginError = true;
+                    } else {
+                        setLoginError(null);
+                        usersStore.loginError = false;
+                    }
+                }
+            }, DEBOUNCE_TIME),
+        [authUser?.useruid, user?.useruid]
+    );
+
     const handleLoginBlur = () => {
-        if (user?.loginName !== undefined) {
-            const trimmedValue = user.loginName.trim();
-            changeUserData("loginName", trimmedValue);
-            const error = validateLoginLength(trimmedValue);
-            setLoginError(error);
-            usersStore.loginError = !!error;
-        }
+        if (user?.loginName === undefined) return;
+        const trimmedValue = user.loginName.trim();
+        changeUserData("loginName", trimmedValue);
+        debouncedCheckLoginName(trimmedValue);
     };
 
     return (
@@ -215,7 +268,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
                         className='w-full general-information__login'
                         value={user?.loginName || ""}
                         error={!!loginError}
-                        errorMessage={loginError}
+                        errorMessage={loginError || null}
                         onChange={(e) => handleLoginChange(e.target.value)}
                         onBlur={handleLoginBlur}
                     />
