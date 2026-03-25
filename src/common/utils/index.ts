@@ -38,6 +38,9 @@ export const typeGuards = {
     isExist: <T>(value: T): value is NonNullable<T> => {
         return value !== undefined && value !== null;
     },
+    hasProperty: <K extends PropertyKey>(value: unknown, key: K): value is Record<K, unknown> => {
+        return typeof value === "object" && value !== null && key in (value as object);
+    },
     isNumber: (value: unknown): value is number => {
         return typeof value === "number";
     },

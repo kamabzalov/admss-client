@@ -148,3 +148,8 @@ export interface ChangePasswordPayload {
     current_password: string;
     new_password: string;
 }
+
+export interface CheckLoginResponse extends BaseResponseError {
+    login: string;
+    exists: boolean;
+}

@@ -91,7 +91,7 @@ interface TextInputProps extends InputTextProps {
     wrapperClassName?: string;
     infoText?: string;
     error?: boolean;
-    errorMessage?: string;
+    errorMessage?: string | null;
     label?: string;
 }
 
