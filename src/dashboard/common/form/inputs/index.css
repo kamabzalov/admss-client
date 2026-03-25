@@ -335,10 +335,11 @@
             max-width: calc(100% - 20px);
         }
         &::before {
+            --line-height: 12px;
             content: "";
             z-index: -1;
             position: absolute;
-            top: var(--line-height);
+            top: calc(var(--line-height) / 3);
             left: 0;
             width: 100%;
             height: var(--line-height);
