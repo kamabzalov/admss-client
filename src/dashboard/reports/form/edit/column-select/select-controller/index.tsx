@@ -68,10 +68,12 @@ export const useReportColumnController = () => {
         useState<Record<ReportServices, ReportServiceColumns[]>>(initialDataSetsData);
     const [availableDatasets, setAvailableDatasets] = useState<ReportServices[]>(dataSetValues);
     const [datasets, setDatasets] = useState<Dataset[]>([]);
-    const hasPushedColumnsToStore = useRef(false);
+    const initialSelectedValuesRef = useRef<ReportServiceColumns[] | null>(null);
+    const selectedValuesHydratedRef = useRef(false);
 
     useEffect(() => {
-        hasPushedColumnsToStore.current = false;
+        initialSelectedValuesRef.current = null;
+        selectedValuesHydratedRef.current = false;
     }, [routeId]);
 
     useEffect(() => {
@@ -92,6 +94,7 @@ export const useReportColumnController = () => {
         if (report?.columns) {
             const initialSelectedValues = report.columns.filter(Boolean);
             setSelectedValues(initialSelectedValues);
+            initialSelectedValuesRef.current = initialSelectedValues;
 
             const selectedDatasets = Array.from(
                 new Set(
@@ -104,6 +107,24 @@ export const useReportColumnController = () => {
             setAvailableDatasets(compatibleDatasets);
         }
     }, [report, datasets, authUser?.useruid]);
+
+    useEffect(() => {
+        if (!routeId || routeId === CREATE_ID) {
+            selectedValuesHydratedRef.current = true;
+            return;
+        }
+
+        const initialSelectedValues = initialSelectedValuesRef.current;
+        if (!initialSelectedValues) return;
+
+        const isSame =
+            selectedValues.length === initialSelectedValues.length &&
+            selectedValues.every((item, idx) => item.data === initialSelectedValues[idx]?.data);
+
+        if (isSame) {
+            selectedValuesHydratedRef.current = true;
+        }
+    }, [selectedValues, routeId]);
 
     useEffect(() => {
         const selectedDatasets = Array.from(
@@ -162,20 +183,11 @@ export const useReportColumnController = () => {
 
     useEffect(() => {
         if (!allowColumnStoreSync) return;
-        const canPushColumnsToStore =
-            !!routeId &&
-            routeId !== CREATE_ID &&
-            !!report?.itemuid &&
-            selectedValues.length === 0 &&
-            (report?.columns?.length ?? 0) > 0 &&
-            !hasPushedColumnsToStore.current;
-
-        if (!canPushColumnsToStore) return;
+        if (routeId && routeId !== CREATE_ID && !selectedValuesHydratedRef.current) return;
 
         store.reportColumns = selectedValues;
-        hasPushedColumnsToStore.current = true;
         store.recomputeState();
-    }, [selectedValues, store, allowColumnStoreSync, routeId, report?.itemuid, report?.columns]);
+    }, [selectedValues, allowColumnStoreSync, routeId, store]);
 
     return {
         dataSet,

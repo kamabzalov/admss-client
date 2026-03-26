@@ -205,7 +205,13 @@ export class ReportStore {
                     if (response?.status === Status.OK) {
                         uid = (response as ReportInfo).itemuid;
                         this._currentID = uid;
+                        this._report = {
+                            ...this._report,
+                            columns: this._reportColumns,
+                            itemuid: uid,
+                        };
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
+                        this.checkIsReportChanged();
                         return { ...response, itemuid: uid } as ReportInfo;
                     } else {
                         const { error } = response as BaseResponseError;
@@ -260,7 +266,12 @@ export class ReportStore {
                             }
                         }
 
+                        this._report = {
+                            ...this._report,
+                            columns: this._reportColumns,
+                        };
                         this._initialReport = JSON.parse(JSON.stringify(this._report));
+                        this.checkIsReportChanged();
                         return { ...response, itemuid: uid } as ReportInfo;
                     } else {
                         const { error } = response as BaseResponseError;

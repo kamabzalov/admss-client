@@ -116,6 +116,26 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setRightSelection([]);
     };
 
+    const handleReorderInList = (
+        list: ReportServiceColumns[],
+        setList: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        item: ReportServiceColumns,
+        toIndex: number,
+        setSelection: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
+        clearSelection: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
+    ) => {
+        const fromIndex = list.findIndex((i) => i.data === item.data);
+        if (fromIndex === -1) return;
+        const clampedTarget = Math.max(0, Math.min(toIndex, list.length - 1));
+        if (fromIndex === clampedTarget) return;
+        const next = [...list];
+        const [moved] = next.splice(fromIndex, 1);
+        next.splice(clampedTarget, 0, moved);
+        setList(next);
+        setSelection([moved]);
+        clearSelection([]);
+    };
+
     const changeOrder = (
         item: ReportServiceColumns,
         direction: MOVE_DIRECTION,
@@ -285,6 +305,17 @@ export const ReportColumnSelect = observer((): ReactElement => {
                             header='Available'
                             values={availableValues}
                             selectedItems={leftSelection}
+                            draggableItems={!report.isdefault}
+                            onItemReorder={(item, index) =>
+                                handleReorderInList(
+                                    availableValues,
+                                    setAvailableValues,
+                                    item,
+                                    index,
+                                    setLeftSelection,
+                                    setRightSelection
+                                )
+                            }
                             onItemClick={handleAvailableClick}
                             onItemDoubleClick={(item) =>
                                 moveItem(
@@ -350,6 +381,17 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         header='Selected'
                         values={selectedValues}
                         selectedItems={rightSelection}
+                        draggableItems={!report.isdefault}
+                        onItemReorder={(item, index) =>
+                            handleReorderInList(
+                                selectedValues,
+                                setSelectedValues,
+                                item,
+                                index,
+                                setRightSelection,
+                                setLeftSelection
+                            )
+                        }
                         onItemClick={handleSelectedClick}
                         onItemDoubleClick={(item) =>
                             moveItem(
