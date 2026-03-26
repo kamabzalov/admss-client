@@ -274,9 +274,16 @@
     height: var(--select-area-height);
     max-height: var(--select-area-height);
     overflow-y: scroll;
+    overflow-x: hidden;
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+.report-select__list .react-grid-item.react-grid-placeholder {
+    background-color: var(--admss-app-medium-light-blue);
+    border: 1px solid var(--admss-app-medium-blue);
+    opacity: 1;
 }
 
 .report-control__checkbox {

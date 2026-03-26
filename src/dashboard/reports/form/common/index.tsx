@@ -6,9 +6,12 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { ReactElement, RefObject, useState } from "react";
+import { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
+import GridLayout, { Layout } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 
 interface ReportSelectProps {
     header: string;
@@ -16,7 +19,9 @@ interface ReportSelectProps {
     selectedItems: ReportServiceColumns[];
     onItemClick: (item: ReportServiceColumns) => void;
     onItemDoubleClick?: (item: ReportServiceColumns) => void;
-    containerRef?: RefObject<HTMLDivElement>;
+    containerRef?: MutableRefObject<HTMLDivElement | null>;
+    draggableItems?: boolean;
+    onItemReorder?: (item: ReportServiceColumns, newIndex: number) => void;
 }
 
 export const ReportSelect = ({
@@ -26,36 +31,102 @@ export const ReportSelect = ({
     onItemClick,
     onItemDoubleClick,
     containerRef,
+    draggableItems,
+    onItemReorder,
 }: ReportSelectProps): ReactElement => {
     const isSelected = (value: ReportServiceColumns) => selectedItems.includes(value);
+    const [isDragging, setIsDragging] = useState(false);
+    const [gridWidth, setGridWidth] = useState(1);
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const layouts = useMemo(
+        () => ({
+            lg: values.map((value, index) => ({
+                i: value.data,
+                x: 0,
+                y: index,
+                w: 1,
+                h: 1,
+            })),
+        }),
+        [values]
+    );
+
+    useEffect(() => {
+        const node = rootRef.current;
+        if (!node) return;
+
+        const updateWidth = () => {
+            const nextWidth = Math.max(node.clientWidth - 2, 1);
+            setGridWidth(nextWidth);
+        };
+
+        updateWidth();
+        const resizeObserver = new ResizeObserver(updateWidth);
+        resizeObserver.observe(node);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    const handleDragStop = (_: unknown, oldItem: Layout, newItem: Layout) => {
+        setIsDragging(false);
+        if (!onItemReorder) return;
+        if (oldItem.y === newItem.y) return;
+        const movedItem = values.find((value) => value.data === oldItem.i);
+        if (!movedItem) return;
+        onItemReorder(movedItem, newItem.y);
+    };
 
     return (
         <div
             className='report-select'
-            ref={containerRef}
-            style={{ overflowY: "auto" }}
+            ref={(node) => {
+                rootRef.current = node;
+                if (containerRef) {
+                    containerRef.current = node;
+                }
+            }}
             role='listbox'
             aria-multiselectable='true'
         >
             <span className='report-select__header'>{header}</span>
-            <ul className='report-select__list'>
+            <GridLayout
+                className='report-select__list'
+                layout={layouts.lg}
+                cols={1}
+                rowHeight={39}
+                margin={[0, 0]}
+                compactType='vertical'
+                preventCollision={false}
+                width={gridWidth}
+                useCSSTransforms={false}
+                autoSize={false}
+                isDraggable={!!draggableItems}
+                isDroppable={false}
+                isResizable={false}
+                onDragStart={() => setIsDragging(true)}
+                onDragStop={handleDragStop}
+            >
                 {values.map((value) => (
-                    <li
+                    <div
                         className={`report-select__item ${isSelected(value) ? "selected" : ""}`}
                         key={value.data}
                         role='option'
                         aria-selected={isSelected(value)}
                         onClick={() => {
+                            if (isDragging) return;
                             onItemClick(value);
                         }}
                         onDoubleClick={() => {
+                            if (isDragging) return;
                             onItemDoubleClick?.(value);
                         }}
                     >
                         {value.name}
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </GridLayout>
         </div>
     );
 };
