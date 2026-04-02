@@ -27,7 +27,11 @@ import { TableColumnsList, TASKS_STATUS_LIST } from "dashboard/tasks/common";
 import { Checkbox } from "primereact/checkbox";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
-import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
+import {
+    createStringifySearchQuery,
+    formatDateTimeForDisplay,
+    isObjectValuesEmpty,
+} from "common/helpers";
 import { ColumnSelector } from "dashboard/common/filter";
 import { ServerUserSettings, TasksUserSettings } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
@@ -43,6 +47,8 @@ const alwaysActiveColumns: TableColumnsList[] = [
     { field: "phone", header: "Phone number", checked: true },
     { field: "created", header: "Created", checked: true },
 ];
+
+const taskTableDateFields = new Set<string>(["startdate", "deadline", "created"]);
 
 const selectableColumns: TableColumnsList[] = [
     { field: "accountname", header: "Account", checked: false, isSelectable: true },
@@ -460,8 +466,11 @@ export const TasksDataTable = observer((): ReactElement => {
                                 key={field}
                                 sortable
                                 body={(data) => {
-                                    const value = String(data[field] || "");
-                                    return <TruncatedText text={value} withTooltip />;
+                                    const raw = data[field as keyof Task];
+                                    const text = taskTableDateFields.has(field)
+                                        ? formatDateTimeForDisplay(raw as string)
+                                        : String(raw ?? "");
+                                    return <TruncatedText text={text} withTooltip />;
                                 }}
                                 headerClassName='cursor-move'
                                 pt={getColumnPtStyles({
@@ -484,8 +493,11 @@ export const TasksDataTable = observer((): ReactElement => {
                                 key={field}
                                 sortable
                                 body={(data) => {
-                                    const value = String(data[field] || "");
-                                    return <TruncatedText text={value} withTooltip />;
+                                    const raw = data[field as keyof Task];
+                                    const text = taskTableDateFields.has(field)
+                                        ? formatDateTimeForDisplay(raw as string)
+                                        : String(raw ?? "");
+                                    return <TruncatedText text={text} withTooltip />;
                                 }}
                                 headerClassName='cursor-move'
                                 pt={getColumnPtStyles({ savedWidth, isLastColumn })}

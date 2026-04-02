@@ -24,6 +24,26 @@ export interface DateFormatOptions {
     format?: DateFormat;
 }
 
+const padTwoDigits = (num: number) => num.toString().padStart(2, "0");
+
+const parseApiDateString = (value: string): Date | null => {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed.includes("/")) {
+        return null;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+        return null;
+    }
+    const parsed = new Date(trimmed);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const isUtcMidnight = (date: Date) =>
+    date.getUTCHours() === 0 &&
+    date.getUTCMinutes() === 0 &&
+    date.getUTCSeconds() === 0 &&
+    date.getUTCMilliseconds() === 0;
+
 export const isObjectValuesEmpty = (obj: Record<string, string | number>) =>
     Object.values(obj).every((value) =>
         typeGuards.isString(value) ? !value.trim().length : !value
@@ -170,6 +190,31 @@ export const formatDateForServer = (date: Date | number, withTimeZone?: boolean)
     return `${base}${timeZone}`;
 };
 
+export const formatDateTimeForDisplay = (value: string | number | undefined | null): string => {
+    if (!typeGuards.isExist(value)) {
+        return "";
+    }
+    if (typeGuards.isString(value) && value.trim() === "") {
+        return "";
+    }
+
+    let date: Date;
+
+    if (typeGuards.isNumber(value)) {
+        date = new Date(value);
+    } else {
+        const trimmed = value.trim();
+        const fromIso = parseApiDateString(trimmed);
+        date = fromIso ?? new Date(trimmed);
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return typeGuards.isString(value) ? value : String(value);
+    }
+
+    return `${padTwoDigits(date.getMonth() + 1)}/${padTwoDigits(date.getDate())}/${date.getFullYear()} ${padTwoDigits(date.getHours())}:${padTwoDigits(date.getMinutes())}:${padTwoDigits(date.getSeconds())}`;
+};
+
 export const parseDateFromServer = (
     date: string | number | undefined | null,
     options: DateFormatOptions = {
@@ -189,6 +234,29 @@ export const parseDateFromServer = (
     }
 
     try {
+        const parsedIsoDate = parseApiDateString(date);
+        if (parsedIsoDate) {
+            if (options.returnType === DateReturnType.DATE) {
+                const utcDay = parsedIsoDate.getUTCDate();
+                const utcMonth = parsedIsoDate.getUTCMonth() + 1;
+                const utcYear = parsedIsoDate.getUTCFullYear();
+                const sep = options.separator || DateSeparator.SLASH;
+                return `${padTwoDigits(utcDay)}${sep}${padTwoDigits(utcMonth)}${sep}${utcYear}`;
+            }
+
+            if (options.returnType === DateReturnType.DATE_WITH_TIME) {
+                const localDay = parsedIsoDate.getDate();
+                const localMonth = parsedIsoDate.getMonth() + 1;
+                const localYear = parsedIsoDate.getFullYear();
+                const localHours = parsedIsoDate.getHours();
+                const localMinutes = parsedIsoDate.getMinutes();
+                const localSeconds = parsedIsoDate.getSeconds();
+                return `${padTwoDigits(localDay)}.${padTwoDigits(localMonth)}.${localYear} ${padTwoDigits(localHours)}:${padTwoDigits(localMinutes)}:${padTwoDigits(localSeconds)}`;
+            }
+
+            return parsedIsoDate.getTime();
+        }
+
         const parts = date.split(" ");
         const dateParts = parts[0].split("/");
         const timeParts = parts[1] ? parts[1].split(":") : ["0", "0", "0"];
@@ -292,6 +360,19 @@ export const convertToStandardTimestamp = (
     }
 
     if (typeGuards.isString(dateInput)) {
+        const parsedIsoDate = parseApiDateString(dateInput);
+        if (parsedIsoDate) {
+            if (!isUtcMidnight(parsedIsoDate)) {
+                return parsedIsoDate.getTime();
+            }
+            const utcYear = parsedIsoDate.getUTCFullYear();
+            const utcMonthIndex = parsedIsoDate.getUTCMonth();
+            const utcDay = parsedIsoDate.getUTCDate();
+            if (withTimeZone) {
+                return new Date(utcYear, utcMonthIndex, utcDay, 12, 0, 0, 0).getTime();
+            }
+            return Date.UTC(utcYear, utcMonthIndex, utcDay, 12, 0, 0, 0);
+        }
         date = new Date(dateInput);
     } else if (typeGuards.isNumber(dateInput)) {
         date = new Date(dateInput);
