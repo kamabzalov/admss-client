@@ -1,6 +1,7 @@
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { formatDateTimeForDisplay } from "common/helpers";
 import { Task } from "common/models/tasks";
 
 interface TaskSummaryDialogProps extends DialogProps {
@@ -31,8 +32,14 @@ export const TaskSummaryDialog = ({
         >
             <div className='task-summary__body flex flex-column'>
                 <TaskSummaryRow title='Assigned to:' value={currentTask?.username || ""} />
-                <TaskSummaryRow title='Start date:' value={currentTask?.startdate || ""} />
-                <TaskSummaryRow title='Due date:' value={currentTask?.deadline || ""} />
+                <TaskSummaryRow
+                    title='Start date:'
+                    value={formatDateTimeForDisplay(currentTask?.startdate)}
+                />
+                <TaskSummaryRow
+                    title='Due date:'
+                    value={formatDateTimeForDisplay(currentTask?.deadline)}
+                />
                 <TaskSummaryRow title='Account:' value={currentTask?.accountname || ""} />
                 <TaskSummaryRow title='Deal:' value={currentTask?.dealname || ""} />
                 <TaskSummaryRow title='Contact:' value={currentTask?.contactname || ""} />
