@@ -1,3 +1,4 @@
+import { REPORTS_PAGE } from "common/constants/links";
 import { useToastMessage } from "common/hooks";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportServiceColumns } from "common/models/reports";
@@ -6,127 +7,217 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, MutableRefObject, ReactElement, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
-import GridLayout, { Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
+
+const REPORT_DRAG = {
+    TYPE: "report-drag-type",
+    TEXT_PLAIN: "text/plain",
+    MOVE: "move",
+    END: "dragend",
+} as const;
+
+export type ReportColumnListId = "available" | "selected";
 
 interface ReportSelectProps {
     header: string;
+    listId: ReportColumnListId;
     values: ReportServiceColumns[];
     selectedItems: ReportServiceColumns[];
     onItemClick: (item: ReportServiceColumns) => void;
     onItemDoubleClick?: (item: ReportServiceColumns) => void;
     containerRef?: MutableRefObject<HTMLDivElement | null>;
     draggableItems?: boolean;
-    onItemReorder?: (item: ReportServiceColumns, newIndex: number) => void;
+    onColumnDrop: (
+        sourceList: ReportColumnListId,
+        dataKey: string,
+        targetList: ReportColumnListId,
+        targetIndex: number
+    ) => void;
 }
 
 export const ReportSelect = ({
     header,
+    listId,
     values,
     selectedItems,
     onItemClick,
     onItemDoubleClick,
     containerRef,
     draggableItems,
-    onItemReorder,
+    onColumnDrop,
 }: ReportSelectProps): ReactElement => {
     const isSelected = (value: ReportServiceColumns) => selectedItems.includes(value);
-    const [isDragging, setIsDragging] = useState(false);
-    const [gridWidth, setGridWidth] = useState(1);
-    const rootRef = useRef<HTMLDivElement | null>(null);
-    const layouts = useMemo(
-        () => ({
-            lg: values.map((value, index) => ({
-                i: value.data,
-                x: 0,
-                y: index,
-                w: 1,
-                h: 1,
-            })),
-        }),
-        [values]
-    );
+    const ignoreClickRef = useRef(false);
+    const dragRef = useRef<{
+        sourceList: ReportColumnListId;
+        data: string;
+        sourceIndex: number;
+    } | null>(null);
+    const [dropIndex, setDropIndex] = useState<number | null>(null);
 
     useEffect(() => {
-        const node = rootRef.current;
-        if (!node) return;
-
-        const updateWidth = () => {
-            const nextWidth = Math.max(node.clientWidth - 2, 1);
-            setGridWidth(nextWidth);
+        const reset = () => {
+            dragRef.current = null;
+            setDropIndex(null);
         };
-
-        updateWidth();
-        const resizeObserver = new ResizeObserver(updateWidth);
-        resizeObserver.observe(node);
-
-        return () => {
-            resizeObserver.disconnect();
-        };
+        document.addEventListener(REPORT_DRAG.END, reset);
+        return () => document.removeEventListener(REPORT_DRAG.END, reset);
     }, []);
 
-    const handleDragStop = (_: unknown, oldItem: Layout, newItem: Layout) => {
-        setIsDragging(false);
-        if (!onItemReorder) return;
-        if (oldItem.y === newItem.y) return;
-        const movedItem = values.find((value) => value.data === oldItem.i);
-        if (!movedItem) return;
-        onItemReorder(movedItem, newItem.y);
+    const isNoOpPosition = (targetIdx: number): boolean => {
+        const src = dragRef.current;
+        if (!src || src.sourceList !== listId) return false;
+        return targetIdx === src.sourceIndex || targetIdx === src.sourceIndex + 1;
     };
+
+    const onDragStart = (e: React.DragEvent, item: ReportServiceColumns, index: number) => {
+        if (!draggableItems) return;
+        dragRef.current = { sourceList: listId, data: item.data, sourceIndex: index };
+        setDropIndex(null);
+        e.dataTransfer.setData(
+            REPORT_DRAG.TYPE,
+            JSON.stringify({ sourceList: listId, data: item.data })
+        );
+        e.dataTransfer.setData(REPORT_DRAG.TEXT_PLAIN, item.data);
+        e.dataTransfer.effectAllowed = REPORT_DRAG.MOVE;
+    };
+
+    const onDragEnd = () => {
+        dragRef.current = null;
+        setDropIndex(null);
+        ignoreClickRef.current = true;
+        window.setTimeout(() => {
+            ignoreClickRef.current = false;
+        }, 0);
+    };
+
+    const onDrop = (e: React.DragEvent, targetIdx: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragRef.current = null;
+        setDropIndex(null);
+        if (!draggableItems) return;
+        const raw = e.dataTransfer.getData(REPORT_DRAG.TYPE);
+        if (!raw) return;
+        try {
+            const { sourceList, data } = JSON.parse(raw) as {
+                sourceList: ReportColumnListId;
+                data: string;
+            };
+            if (data) onColumnDrop(sourceList, data, listId, targetIdx);
+        } catch {
+            return;
+        }
+    };
+
+    const allowDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = REPORT_DRAG.MOVE;
+    };
+
+    const onRowDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = REPORT_DRAG.MOVE;
+        if (isNoOpPosition(index)) {
+            setDropIndex(null);
+            return;
+        }
+        setDropIndex(index);
+    };
+
+    const onTailDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = REPORT_DRAG.MOVE;
+        if (isNoOpPosition(values.length)) {
+            setDropIndex(null);
+            return;
+        }
+        setDropIndex(values.length);
+    };
+
+    const onEmptyDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = REPORT_DRAG.MOVE;
+        setDropIndex(0);
+    };
+
+    const showIndicator = dropIndex !== null;
 
     return (
         <div
             className='report-select'
             ref={(node) => {
-                rootRef.current = node;
-                if (containerRef) {
-                    containerRef.current = node;
-                }
+                if (containerRef) containerRef.current = node;
             }}
             role='listbox'
             aria-multiselectable='true'
+            onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropIndex(null);
+            }}
         >
             <span className='report-select__header'>{header}</span>
-            <GridLayout
+            <div
                 className='report-select__list'
-                layout={layouts.lg}
-                cols={1}
-                rowHeight={39}
-                margin={[0, 0]}
-                compactType='vertical'
-                preventCollision={false}
-                width={gridWidth}
-                useCSSTransforms={false}
-                autoSize={false}
-                isDraggable={!!draggableItems}
-                isDroppable={false}
-                isResizable={false}
-                onDragStart={() => setIsDragging(true)}
-                onDragStop={handleDragStop}
+                onDragOver={allowDrop}
+                onDrop={(e) => {
+                    if (e.target === e.currentTarget) onDrop(e, values.length);
+                }}
             >
-                {values.map((value) => (
+                {values.length === 0 ? (
                     <div
-                        className={`report-select__item ${isSelected(value) ? "selected" : ""}`}
-                        key={value.data}
-                        role='option'
-                        aria-selected={isSelected(value)}
-                        onClick={() => {
-                            if (isDragging) return;
-                            onItemClick(value);
-                        }}
-                        onDoubleClick={() => {
-                            if (isDragging) return;
-                            onItemDoubleClick?.(value);
-                        }}
-                    >
-                        {value.name}
-                    </div>
-                ))}
-            </GridLayout>
+                        className={`report-select__item report-select__item--drop-empty ${
+                            showIndicator ? "report-select__item--drop-empty-active" : ""
+                        }`}
+                        role='presentation'
+                        onDragOver={onEmptyDragOver}
+                        onDrop={(e) => onDrop(e, 0)}
+                    />
+                ) : (
+                    values.map((value, index) => (
+                        <Fragment key={value.data}>
+                            {dropIndex === index && (
+                                <div className='report-select__drop-placeholder' aria-hidden />
+                            )}
+                            <div
+                                className={`report-select__item ${isSelected(value) ? "selected" : ""}`}
+                                role='option'
+                                aria-selected={isSelected(value)}
+                                draggable={!!draggableItems}
+                                onDragStart={(e) => onDragStart(e, value, index)}
+                                onDragEnd={onDragEnd}
+                                onDragOver={(e) => onRowDragOver(e, index)}
+                                onDrop={(e) => onDrop(e, index)}
+                                onClick={() => {
+                                    if (ignoreClickRef.current) return;
+                                    onItemClick(value);
+                                }}
+                                onDoubleClick={() => {
+                                    if (ignoreClickRef.current) return;
+                                    onItemDoubleClick?.(value);
+                                }}
+                            >
+                                {value.name}
+                            </div>
+                        </Fragment>
+                    ))
+                )}
+                {dropIndex === values.length && values.length > 0 && (
+                    <div className='report-select__drop-placeholder' aria-hidden />
+                )}
+                {values.length > 0 && (
+                    <div
+                        className='report-select__drop-tail'
+                        role='presentation'
+                        onDragOver={onTailDragOver}
+                        onDrop={(e) => onDrop(e, values.length)}
+                    />
+                )}
+            </div>
         </div>
     );
 };
@@ -164,7 +255,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
             const response = await copyReportDocument(report.itemuid);
             if (response?.status === Status.OK) {
                 const { itemuid } = response as { status: Status.OK; itemuid: string };
-                navigate(`/dashboard/reports/${itemuid}`);
+                navigate(REPORTS_PAGE.EDIT(itemuid));
                 onRefetch?.();
                 showSuccess("Custom report is successfully copied!");
             } else {
@@ -178,7 +269,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
             !report.isdefault &&
             deleteReportDocument(report.itemuid).then((response: BaseResponseError | undefined) => {
                 if (response?.status === Status.OK) {
-                    navigate("/dashboard/reports/create");
+                    navigate(REPORTS_PAGE.CREATE());
                     showSuccess("Custom report is successfully deleted!");
                     onRefetch?.();
                 } else {
@@ -226,7 +317,7 @@ export const ReportFooter = observer(({ onRefetch }: ReportFooterProps): ReactEl
                 <Button
                     className='ml-auto uppercase px-6 report__button'
                     severity='danger'
-                    onClick={() => navigate("/dashboard/reports")}
+                    onClick={() => navigate(REPORTS_PAGE.MAIN)}
                     outlined
                 >
                     Cancel

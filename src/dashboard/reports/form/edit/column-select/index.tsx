@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { ReportSelect } from "dashboard/reports/form/common";
+import { ReportColumnListId, ReportSelect } from "dashboard/reports/form/common";
 import { observer } from "mobx-react-lite";
 import { ReportServiceColumns } from "common/models/reports";
 import { useReportColumnController } from "dashboard/reports/form/edit/column-select/select-controller";
@@ -116,24 +116,56 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setRightSelection([]);
     };
 
-    const handleReorderInList = (
-        list: ReportServiceColumns[],
-        setList: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
-        item: ReportServiceColumns,
-        toIndex: number,
-        setSelection: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>,
-        clearSelection: React.Dispatch<React.SetStateAction<ReportServiceColumns[]>>
+    const handleColumnDrop = (
+        sourceList: ReportColumnListId,
+        dataKey: string,
+        targetList: ReportColumnListId,
+        targetIndex: number
     ) => {
-        const fromIndex = list.findIndex((i) => i.data === item.data);
-        if (fromIndex === -1) return;
-        const clampedTarget = Math.max(0, Math.min(toIndex, list.length - 1));
-        if (fromIndex === clampedTarget) return;
-        const next = [...list];
-        const [moved] = next.splice(fromIndex, 1);
-        next.splice(clampedTarget, 0, moved);
-        setList(next);
-        setSelection([moved]);
-        clearSelection([]);
+        if (report.isdefault) return;
+        const getList = (id: ReportColumnListId) =>
+            id === "available" ? availableValues : selectedValues;
+        const setList = (id: ReportColumnListId) =>
+            id === "available" ? setAvailableValues : setSelectedValues;
+
+        const sourceArr = getList(sourceList);
+        const item = sourceArr.find((c) => c.data === dataKey);
+        if (!item) return;
+
+        if (sourceList === targetList) {
+            const fromIndex = sourceArr.findIndex((c) => c.data === dataKey);
+            if (fromIndex === -1) return;
+            const next = [...sourceArr];
+            const [moved] = next.splice(fromIndex, 1);
+            let insertAt = targetIndex;
+            if (fromIndex < insertAt) insertAt -= 1;
+            if (insertAt < 0 || insertAt > next.length) return;
+            next.splice(insertAt, 0, moved);
+            setList(sourceList)(next);
+            if (sourceList === "available") {
+                setLeftSelection([moved]);
+                setRightSelection([]);
+            } else {
+                setRightSelection([moved]);
+                setLeftSelection([]);
+            }
+            return;
+        }
+
+        const newSource = sourceArr.filter((c) => c.data !== dataKey);
+        const destArr = getList(targetList);
+        const insertAt = Math.max(0, Math.min(targetIndex, destArr.length));
+        const nextDest = [...destArr];
+        nextDest.splice(insertAt, 0, item);
+        setList(sourceList)(newSource);
+        setList(targetList)(nextDest);
+        if (targetList === "selected") {
+            setRightSelection([item]);
+            setLeftSelection([]);
+        } else {
+            setLeftSelection([item]);
+            setRightSelection([]);
+        }
     };
 
     const changeOrder = (
@@ -303,19 +335,11 @@ export const ReportColumnSelect = observer((): ReactElement => {
 
                         <ReportSelect
                             header='Available'
+                            listId='available'
                             values={availableValues}
                             selectedItems={leftSelection}
                             draggableItems={!report.isdefault}
-                            onItemReorder={(item, index) =>
-                                handleReorderInList(
-                                    availableValues,
-                                    setAvailableValues,
-                                    item,
-                                    index,
-                                    setLeftSelection,
-                                    setRightSelection
-                                )
-                            }
+                            onColumnDrop={handleColumnDrop}
                             onItemClick={handleAvailableClick}
                             onItemDoubleClick={(item) =>
                                 moveItem(
@@ -379,19 +403,11 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 <div className='report-control__selected'>
                     <ReportSelect
                         header='Selected'
+                        listId='selected'
                         values={selectedValues}
                         selectedItems={rightSelection}
                         draggableItems={!report.isdefault}
-                        onItemReorder={(item, index) =>
-                            handleReorderInList(
-                                selectedValues,
-                                setSelectedValues,
-                                item,
-                                index,
-                                setRightSelection,
-                                setLeftSelection
-                            )
-                        }
+                        onColumnDrop={handleColumnDrop}
                         onItemClick={handleSelectedClick}
                         onItemDoubleClick={(item) =>
                             moveItem(
