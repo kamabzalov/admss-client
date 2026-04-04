@@ -280,10 +280,24 @@
     margin: 0;
 }
 
-.report-select__list .react-grid-item.react-grid-placeholder {
+.report-select__item--drop-empty {
+    min-height: var(--select-area-height);
+    width: 100%;
+}
+
+.report-select__item--drop-empty-active {
     background-color: var(--admss-app-medium-light-blue);
-    border: 1px solid var(--admss-app-medium-blue);
-    opacity: 1;
+}
+
+.report-select__drop-placeholder {
+    height: 2px;
+    background-color: var(--admss-app-medium-blue);
+    flex-shrink: 0;
+}
+
+.report-select__drop-tail {
+    min-height: 6px;
+    width: 100%;
 }
 
 .report-control__checkbox {
@@ -332,7 +346,7 @@
     transition: background-color 0.3s ease;
 }
 
-.report-select__item:hover {
+.report-select__item:not(.report-select__item--drop-empty):hover {
     background-color: var(--admss-app-light-green);
 }
 
