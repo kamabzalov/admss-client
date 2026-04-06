@@ -9,7 +9,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
-import { formatDateForServer, validateDates } from "common/helpers";
+import { formatDateForServer, serverDateToLocal, validateDates } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
@@ -40,9 +40,11 @@ const getDefaultDeadlineDate = (): Date => {
 };
 
 const initializeTaskState = (task?: Task, defaultUseruid?: string): Partial<PostDataTask> => ({
-    startdate: formatDateForServer(task?.startdate ? new Date(task.startdate) : new Date()),
+    startdate: formatDateForServer(
+        task?.startdate ? serverDateToLocal(task.startdate) : new Date()
+    ),
     deadline: formatDateForServer(
-        task?.deadline ? new Date(task.deadline) : getDefaultDeadlineDate()
+        task?.deadline ? serverDateToLocal(task.deadline) : getDefaultDeadlineDate()
     ),
     useruid: task?.useruid || defaultUseruid || "",
     accountuid: task?.accountuid || "",

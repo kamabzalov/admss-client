@@ -190,6 +190,23 @@ export const formatDateForServer = (date: Date | number, withTimeZone?: boolean)
     return `${base}${timeZone}`;
 };
 
+export const serverDateToLocal = (value: string): Date => {
+    const trimmed = value.trim();
+    if (!/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+        return new Date(trimmed);
+    }
+    const date = new Date(trimmed);
+    if (Number.isNaN(date.getTime())) return date;
+    return new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
+    );
+};
+
 export const formatDateTimeForDisplay = (value: string | number | undefined | null): string => {
     if (!typeGuards.isExist(value)) {
         return "";
@@ -199,20 +216,33 @@ export const formatDateTimeForDisplay = (value: string | number | undefined | nu
     }
 
     let date: Date;
+    let useUtc = false;
 
     if (typeGuards.isNumber(value)) {
         date = new Date(value);
     } else {
         const trimmed = value.trim();
         const fromIso = parseApiDateString(trimmed);
-        date = fromIso ?? new Date(trimmed);
+        if (fromIso) {
+            date = fromIso;
+            useUtc = true;
+        } else {
+            date = new Date(trimmed);
+        }
     }
 
     if (Number.isNaN(date.getTime())) {
         return typeGuards.isString(value) ? value : String(value);
     }
 
-    return `${padTwoDigits(date.getMonth() + 1)}/${padTwoDigits(date.getDate())}/${date.getFullYear()} ${padTwoDigits(date.getHours())}:${padTwoDigits(date.getMinutes())}:${padTwoDigits(date.getSeconds())}`;
+    const month = useUtc ? date.getUTCMonth() + 1 : date.getMonth() + 1;
+    const day = useUtc ? date.getUTCDate() : date.getDate();
+    const year = useUtc ? date.getUTCFullYear() : date.getFullYear();
+    const hours = useUtc ? date.getUTCHours() : date.getHours();
+    const minutes = useUtc ? date.getUTCMinutes() : date.getMinutes();
+    const seconds = useUtc ? date.getUTCSeconds() : date.getSeconds();
+
+    return `${padTwoDigits(month)}/${padTwoDigits(day)}/${year} ${padTwoDigits(hours)}:${padTwoDigits(minutes)}:${padTwoDigits(seconds)}`;
 };
 
 export const parseDateFromServer = (
