@@ -254,7 +254,7 @@ export const Reports = (): ReactElement => {
             if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
                 event.stopPropagation();
                 const currentCollection = [...reportCollections, ...customCollections].find(
-                    (col) => col.itemUID === collectionUid
+                    (col) => col?.itemUID === collectionUid
                 );
                 if (currentCollection?.documents) {
                     setSelectedReports(currentCollection.documents as ReportDocument[]);
@@ -272,7 +272,7 @@ export const Reports = (): ReactElement => {
         }
         event.stopPropagation();
         event.preventDefault();
-        if (isParametersEditing?.itemUID === report.itemUID) {
+        if (isParametersEditing?.itemUID === report?.itemUID) {
             setIsParametersEditing(null);
         } else {
             setIsParametersEditing(report);
@@ -389,7 +389,7 @@ export const Reports = (): ReactElement => {
             dragData?.document
         ) {
             const sourceCollectionId = dragData.collectionId;
-            const targetCollectionId = dropData.collection.itemUID;
+            const targetCollectionId = dropData?.collection?.itemUID;
             const reportId = dragData.document.documentUID;
             if (sourceCollectionId && sourceCollectionId !== targetCollectionId) {
                 const response = await moveReportToCollection(
@@ -406,7 +406,7 @@ export const Reports = (): ReactElement => {
         }
 
         if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
-            const sourceCollectionId = dragData.collection.itemUID;
+            const sourceCollectionId = dragData?.collection?.itemUID;
             if (sourceCollectionId) {
                 const response = await setCollectionOrder(sourceCollectionId, dropIndex);
                 if (response && response.status === Status.ERROR) {
@@ -421,14 +421,14 @@ export const Reports = (): ReactElement => {
     };
 
     const updateDocumentOrderInCollection = async (collectionUid: string) => {
-        const foundCollection = reportCollections.find((col) => col.itemUID === collectionUid);
+        const foundCollection = reportCollections.find((col) => col?.itemUID === collectionUid);
         if (!foundCollection || !foundCollection.documents) return;
         const updatedDocs = foundCollection.documents.map((doc, idx) => ({
             ...doc,
             order: idx,
         }));
         setReportCollections((prev) =>
-            prev.map((c) => (c.itemUID === collectionUid ? { ...c, documents: updatedDocs } : c))
+            prev.map((c) => (c?.itemUID === collectionUid ? { ...c, documents: updatedDocs } : c))
         );
     };
 
@@ -439,13 +439,13 @@ export const Reports = (): ReactElement => {
         if (nodeType === NODE_TYPES.COLLECTION) {
             const currentCollection: ReportCollection = data.collection;
             const handleEditClick = (ev: React.MouseEvent<HTMLElement>) => {
-                handleCustomEditCollection(ev, currentCollection.itemUID);
+                handleCustomEditCollection(ev, currentCollection?.itemUID);
             };
             const hasNewDocs = currentCollection.documents?.some((doc) => doc.isNew);
             const isMatchedBySearch =
                 reportSearch &&
                 currentCollection.name?.toLowerCase().includes(reportSearch.toLowerCase());
-            const isEditing = currentCollection.itemUID === isCollectionEditing;
+            const isEditing = currentCollection?.itemUID === isCollectionEditing;
             return (
                 <>
                     <div className='reports__list-item'>
@@ -474,7 +474,7 @@ export const Reports = (): ReactElement => {
                                         setIsCollectionEditing(null);
                                         handleGetUserReportCollections();
                                     }}
-                                    collectionuid={currentCollection.itemUID}
+                                    collectionuid={currentCollection?.itemUID}
                                     collectionName={currentCollection.name}
                                     collections={[...customCollections, ...reportCollections]}
                                     selectedReports={currentCollection?.documents || []}
@@ -482,7 +482,7 @@ export const Reports = (): ReactElement => {
                                     setSelectedReports={setSelectedReports}
                                     handleCreateCollection={() =>
                                         handleUpdateCollection(
-                                            currentCollection.itemUID,
+                                            currentCollection?.itemUID,
                                             currentCollection.name
                                         )
                                     }
@@ -526,7 +526,7 @@ export const Reports = (): ReactElement => {
                         <ActionButtons
                             report={currentReport}
                             collectionList={[reportCollections[0], ...customCollections].filter(
-                                (col) => col.itemUID !== data.parentCollectionUID
+                                (col) => col?.itemUID !== data.parentCollectionUID
                             )}
                             refetchCollectionsAction={handleGetUserReportCollections}
                             currentCollectionUID={data.parentCollectionUID}
