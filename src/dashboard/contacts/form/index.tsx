@@ -723,12 +723,20 @@ export const ContactForm = observer((): ReactElement => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
-                                    {id && contactPermissions.canDelete() && (
+                                    {id && (
                                         <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
-                                            severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
+                                            severity={
+                                                contactPermissions.canDelete()
+                                                    ? "danger"
+                                                    : "secondary"
+                                            }
+                                            disabled={!contactPermissions.canDelete()}
+                                            onClick={() =>
+                                                contactPermissions.canDelete() &&
+                                                setStepActiveIndex(deleteActiveIndex)
+                                            }
                                         >
                                             Delete contact
                                         </Button>

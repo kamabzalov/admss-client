@@ -20,6 +20,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, TableState } from "common/models/user";
 import { usePermissions } from "common/hooks/usePermissions";
+import { useToastMessage } from "common/hooks";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
@@ -99,6 +100,7 @@ export const ContactsDataTable = ({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const { contactPermissions } = usePermissions();
+    const { showWarning } = useToastMessage();
     const store = useStore().contactStore;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -287,7 +289,10 @@ export const ContactsDataTable = ({
     };
 
     const handleCreateContact = () => {
-        if (!contactPermissions.canCreate()) return;
+        if (!contactPermissions.canCreate()) {
+            showWarning("You don't have permission to create contacts.");
+            return;
+        }
         if (originalPath) {
             store.memoRoute = originalPath;
         }
@@ -415,16 +420,15 @@ export const ContactsDataTable = ({
                     onClick={() => setDialogVisible(true)}
                 />
 
-                {contactPermissions.canCreate() && (
-                    <Button
-                        className='contact-top-controls__button'
-                        icon='icon adms-add-item'
-                        severity='success'
-                        type='button'
-                        tooltip='Add new contact'
-                        onClick={handleCreateContact}
-                    />
-                )}
+                <Button
+                    className='contact-top-controls__button'
+                    icon='icon adms-add-item'
+                    severity={contactPermissions.canCreate() ? "success" : "secondary"}
+                    type='button'
+                    disabled={!contactPermissions.canCreate()}
+                    tooltip='Add new contact'
+                    onClick={handleCreateContact}
+                />
                 <Button
                     severity='success'
                     type='button'
@@ -527,7 +531,7 @@ export const ContactsDataTable = ({
                         }
                     }}
                 >
-                    {contactPermissions.canEdit() && (
+                    {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             reorderable={false}
@@ -535,12 +539,19 @@ export const ContactsDataTable = ({
                             body={({ contactuid }: ContactUser) => {
                                 return (
                                     <Button
+                                        disabled={!contactPermissions.canEdit()}
+                                        severity={
+                                            contactPermissions.canEdit() ? "success" : "secondary"
+                                        }
                                         text
                                         className='table-edit-button'
                                         icon='adms-edit-item'
                                         tooltip='Edit contact'
                                         tooltipOptions={{ position: "mouse" }}
-                                        onClick={() => navigate(CONTACTS_PAGE.EDIT(contactuid))}
+                                        onClick={() =>
+                                            contactPermissions.canEdit() &&
+                                            navigate(CONTACTS_PAGE.EDIT(contactuid))
+                                        }
                                     />
                                 );
                             }}
@@ -552,7 +563,7 @@ export const ContactsDataTable = ({
                                 },
                             }}
                         />
-                    )}
+                    }
                     {alwaysActiveColumns.map(({ field, header }, index) => {
                         const savedWidth = serverSettings?.contacts?.columnWidth?.[field];
                         const isLastColumn =

@@ -37,9 +37,11 @@ export const CompanySearch = ({
     onChangeGetFullInfo,
     error,
     errorMessage,
+    disabled,
     ...props
 }: CompanySearchProps) => {
     const { contactPermissions } = usePermissions();
+    const canSelectInInputs = contactPermissions.canSelectInInputs();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<ContactUser[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -116,10 +118,6 @@ export const CompanySearch = ({
         }
     };
 
-    if (!contactPermissions.canSelectInInputs()) {
-        return null;
-    }
-
     return (
         <>
             <SearchInput
@@ -131,12 +129,15 @@ export const CompanySearch = ({
                 onInputChange={handleCompanyInputChange}
                 value={value}
                 onChange={handleOnChange}
-                onIconClick={() => {
-                    setDialogVisible(true);
-                }}
                 error={error}
                 errorMessage={errorMessage}
                 {...props}
+                disabled={!canSelectInInputs || !!disabled}
+                onIconClick={() => {
+                    if (canSelectInInputs) {
+                        setDialogVisible(true);
+                    }
+                }}
             />
             <Dialog
                 header={<div className='uppercase'>Choose a Contact</div>}
