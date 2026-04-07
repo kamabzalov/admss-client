@@ -386,6 +386,7 @@ export const SearchInput = ({
     onIconClick,
     error,
     errorMessage,
+    disabled,
     ...props
 }: SearchInputProps): ReactElement => {
     const dropdownRef: LegacyRef<any> = useRef(null);
@@ -423,6 +424,7 @@ export const SearchInput = ({
                         editable
                         placeholder={title}
                         {...props}
+                        disabled={disabled}
                         pt={{
                             trigger: {
                                 className: "hidden",
@@ -435,6 +437,7 @@ export const SearchInput = ({
                     className='search-input__icon input-icon input-icon-right'
                     onClick={onIconClick}
                     type='button'
+                    disabled={disabled}
                 >
                     <i className='icon adms-table-search' />
                 </button>
