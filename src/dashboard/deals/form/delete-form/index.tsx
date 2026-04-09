@@ -1,5 +1,6 @@
 import { DEALS_PAGE } from "common/constants/links";
 import { toBinary } from "common/helpers";
+import { usePermissions } from "common/hooks/usePermissions";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
@@ -35,7 +36,7 @@ export const DeleteDealForm = observer(
         const userStore = useStore().userStore;
         const store = useStore().dealStore;
         const { authUser } = userStore;
-
+        const { accountPermissions } = usePermissions();
         const {
             deleteDealAndRelatedOption,
             deleteDealOption,
@@ -258,8 +259,10 @@ export const DeleteDealForm = observer(
                         <div className='col-6'>
                             <BorderedCheckbox
                                 name='Delete the account'
+                                disabled={!accountPermissions.canDelete()}
                                 checked={deleteAccountOption}
                                 onChange={({ checked }) =>
+                                    accountPermissions.canDelete() &&
                                     handleCheckboxChange(DELETE_OPTION.DELETE_ACCOUNT, !!checked)
                                 }
                             />
