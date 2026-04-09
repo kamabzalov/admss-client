@@ -13,6 +13,8 @@ import { ContactsDataTable } from "dashboard/contacts";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
 const FIELD: keyof ContactUser = "companyName";
+const getContactName = (contact: ContactUser): string =>
+    contact.companyName || contact.businessName || `${contact.firstName} ${contact.lastName}`;
 
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
@@ -76,10 +78,7 @@ export const CompanySearch = ({
                 if (Array.isArray(response) && response?.length) {
                     const optionsWithName = response.map((contact) => ({
                         ...contact,
-                        name:
-                            contact.companyName ||
-                            contact.businessName ||
-                            `${contact.firstName} ${contact.lastName}`,
+                        name: getContactName(contact),
                     }));
                     setOptions(optionsWithName);
                 } else {
@@ -99,18 +98,28 @@ export const CompanySearch = ({
     };
 
     const handleOnChange = (event: DropdownChangeEvent) => {
-        const selectedValue = event.value;
+        const selectedValue = String(event.value || "");
+        let selectedContact: ContactUser | undefined;
 
         if (returnedField === ALL_FIELDS) {
-            const selectedContact = options.find((contact) => contact[FIELD] === selectedValue);
+            selectedContact = options.find((contact) => {
+                const fullName = `${contact.firstName} ${contact.lastName}`.trim();
+                const contactName = getContactName(contact);
+                return (
+                    contactName === selectedValue ||
+                    contact.companyName === selectedValue ||
+                    contact.businessName === selectedValue ||
+                    fullName === selectedValue
+                );
+            });
 
             if (selectedContact && getFullInfo) {
                 getFullInfo(selectedContact);
             }
         }
 
-        if (onChangeGetFullInfo) {
-            onChangeGetFullInfo(event.target.value);
+        if (onChangeGetFullInfo && selectedContact) {
+            onChangeGetFullInfo(selectedContact);
         }
 
         if (onChange) {
@@ -123,7 +132,7 @@ export const CompanySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
+                optionValue={returnedField === ALL_FIELDS ? "name" : returnedField || FIELD}
                 optionLabel='name'
                 options={options}
                 onInputChange={handleCompanyInputChange}

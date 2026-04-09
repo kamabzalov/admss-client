@@ -65,7 +65,7 @@ export class DealStore {
     private _isWashoutStatePreserved: boolean = false;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
-    private _dealType: number = 0;
+    private _dealType: number | null = null;
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
     private _accordionActiveIndex: number | number[] = [];
@@ -304,12 +304,18 @@ export class DealStore {
         }
     };
 
-    public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
-        if (this._deal && key !== "extdata" && key !== "finance") {
-            this._isFormChanged = true;
-            (this._deal as Record<typeof key, string | number>)[key] = value;
+    public changeDeal = action(
+        ({ key, value }: { key: keyof Deal; value: string | number | null | undefined }) => {
+            if (this._deal && key !== "extdata" && key !== "finance") {
+                this._isFormChanged = true;
+                if (value === null || value === undefined) {
+                    delete (this._deal as Record<string, unknown>)[key as string];
+                } else {
+                    (this._deal as Record<typeof key, string | number>)[key] = value;
+                }
+            }
         }
-    });
+    );
 
     public changeDealExtData = action(
         ({ key, value }: { key: keyof DealExtData; value: string | number }) => {
@@ -651,7 +657,7 @@ export class DealStore {
         }
     });
 
-    public set dealType(type: number) {
+    public set dealType(type: number | null) {
         this._dealType = type;
     }
 
@@ -715,6 +721,7 @@ export class DealStore {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
         this._dealID = "";
+        this._dealType = null;
         this._deleteReason = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinance = {} as DealFinance;

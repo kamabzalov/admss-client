@@ -8,8 +8,6 @@
         width: 100%;
     }
 
-
-
     .deal-insurance__currency-input.deal-insurance__currency-input--grey {
         .p-inputtext {
             color: var(--admss-app-medium-grey);
@@ -33,4 +31,7 @@
         border: none;
     }
 
+    .currency-item .currency-item__label.label-top {
+        top: -4px;
+    }
 }

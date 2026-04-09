@@ -29,23 +29,25 @@ import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useFormExitConfirmation, usePermissions } from "common/hooks";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
-import { DEALS_PAGE } from "common/constants/links";
+import { CREATE_ID, DEALS_PAGE } from "common/constants/links";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
 
-export type PartialDeal = Pick<
-    Deal,
-    | "contactinfo"
-    | "inventoryinfo"
-    | "dealtype"
-    | "dealstatus"
-    | "saletype"
-    | "datepurchase"
-    | "dateeffective"
-    | "inventorystatus"
-> &
+export type PartialDeal = Omit<
     Pick<
+        Deal,
+        | "contactinfo"
+        | "inventoryinfo"
+        | "dealtype"
+        | "dealstatus"
+        | "saletype"
+        | "datepurchase"
+        | "dateeffective"
+        | "inventorystatus"
+    >,
+    "dealtype"
+> & { dealtype: number | null } & Pick<
         DealExtData,
         | "HowFoundOut"
         | "SaleID"
@@ -109,7 +111,7 @@ const MAX_YEAR = new Date().getFullYear();
 export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
     contactinfo: Yup.string().required("Data is required."),
     inventoryinfo: Yup.string().required("Data is required."),
-    dealtype: Yup.number().required("Data is required."),
+    dealtype: Yup.number().nullable().required("Data is required."),
     dealstatus: Yup.number().required("Data is required."),
     saletype: Yup.number().required("Data is required."),
     datepurchase: Yup.string().trim().required("Data is required."),
@@ -271,22 +273,24 @@ export const DealsForm = observer(() => {
     useEffect(() => {
         let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
 
-        switch (dealType) {
-            case DealType.LHPH:
-                dealsSections = [...dealsSections, DealLHPH];
-                break;
-            case DealType.DISMANTLE:
-                dealsSections = [...dealsSections, DealDismantleForm];
-                break;
-            case DealType.WHOLESALE:
-                dealsSections = [...dealsSections, DealWholeSale];
-                break;
-            case DealType.BHPH:
-                dealsSections = [...dealsSections, DealBHPH];
-                break;
-            default:
-                dealsSections = [...dealsSections, DealRetail];
-                break;
+        if (dealType !== null && dealType !== undefined) {
+            switch (dealType) {
+                case DealType.LHPH:
+                    dealsSections = [...dealsSections, DealLHPH];
+                    break;
+                case DealType.DISMANTLE:
+                    dealsSections = [...dealsSections, DealDismantleForm];
+                    break;
+                case DealType.WHOLESALE:
+                    dealsSections = [...dealsSections, DealWholeSale];
+                    break;
+                case DealType.BHPH:
+                    dealsSections = [...dealsSections, DealBHPH];
+                    break;
+                default:
+                    dealsSections = [...dealsSections, DealRetail];
+                    break;
+            }
         }
 
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
@@ -544,7 +548,10 @@ export const DealsForm = observer(() => {
                                                 {
                                                     contactinfo: deal.contactinfo || "",
                                                     inventoryinfo: deal.inventoryinfo || "",
-                                                    dealtype: deal.dealtype || dealType,
+                                                    dealtype:
+                                                        !id || id === CREATE_ID
+                                                            ? null
+                                                            : (deal.dealtype ?? null),
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase,

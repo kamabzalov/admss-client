@@ -9,10 +9,10 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
-import { getDealsList, TotalDealsList } from "http/services/deals.service";
+import { getDealsList } from "http/services/deals.service";
 import { ROWS_PER_PAGE } from "common/settings";
 import { useNavigate } from "react-router-dom";
-import { Deal } from "common/models/deals";
+import { Deal, TotalDealsList } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import {

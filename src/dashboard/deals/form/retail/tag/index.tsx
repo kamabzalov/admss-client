@@ -57,9 +57,7 @@ export const DealRetailTag = observer((): ReactElement => {
                             changeDealExtData({ key: "Title_and_License", value: 1 });
                         }
                     }}
-                    initialValue={
-                        !Title_Only && !Title_and_License ? "0" : Title_Only === 1 ? "0" : "1"
-                    }
+                    initialValue={Title_Only === 1 ? "0" : Title_and_License === 1 ? "1" : null}
                     style={{ width: `${95 / tagTopRadio.length}%` }}
                 />
             </div>
@@ -208,7 +206,6 @@ export const DealRetailTag = observer((): ReactElement => {
                     <InputText
                         className='deal-odometer__text-input w-full'
                         value={TempTagNumber}
-                        disabled={!Title_and_License}
                         onChange={({ target: { value } }: { target: { value: string } }) =>
                             changeDealExtData({ key: "TempTagNumber", value })
                         }

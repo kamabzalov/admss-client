@@ -7,11 +7,11 @@ import {
     BorderedCheckbox,
     CurrencyInput,
     DateInput,
+    NumberInput,
     PhoneInput,
 } from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
-import { InputNumber } from "primereact/inputnumber";
 import { useLocation } from "react-router-dom";
 
 const [MIN_LIMIT, MAX_LIMIT] = [0, 1000000];
@@ -189,26 +189,27 @@ export const DealRetailInsurance = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <div className='deal-insurance__liability'>
-                    <span className='p-float-label deal-insurance__liability-item'>
-                        <InputNumber
+                    <span className='deal-insurance__liability-item'>
+                        <NumberInput
                             value={Ins_Liab_Limit1}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
+                            name='Liability Row'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Liab_Limit1", value: Number(value) });
                             }}
                             className='deal-insurance__text-input w-full'
                         />
-                        <label className='float-label'>Liability Row</label>
                     </span>
 
                     <div className='deal-insurance__divider-vertical' />
 
                     <span className='p-float-label deal-insurance__liability-item'>
-                        <InputNumber
+                        <NumberInput
                             value={Ins_Liab_Limit2}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
+                            name='Liability Limits Notes'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Liab_Limit2", value: Number(value) });
                             }}
@@ -219,10 +220,11 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     <div className='deal-insurance__divider-vertical' />
 
                     <span className='p-float-label deal-insurance__liability-item'>
-                        <InputNumber
+                        <NumberInput
                             value={Ins_Prop_Limit}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
+                            name='Insurance Notes'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Prop_Limit", value: Number(value) });
                             }}
