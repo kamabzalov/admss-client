@@ -48,8 +48,12 @@ export const DealRetailTag = observer((): ReactElement => {
             <div className='col-6'>
                 <DashboardRadio
                     radioArray={tagTopRadio}
+                    clearable
                     onChange={(value) => {
-                        if (value === "0") {
+                        if (value === null) {
+                            changeDealExtData({ key: "Title_Only", value: 0 });
+                            changeDealExtData({ key: "Title_and_License", value: 0 });
+                        } else if (value === "0") {
                             changeDealExtData({ key: "Title_Only", value: 1 });
                             changeDealExtData({ key: "Title_and_License", value: 0 });
                         } else {
