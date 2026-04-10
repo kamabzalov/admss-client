@@ -33,7 +33,8 @@ interface DashboardRadioProps {
     style?: CSSProperties;
     disabled?: boolean;
     initialValue?: string | number | null;
-    onChange?: (value: string | number) => void;
+    clearable?: boolean;
+    onChange?: (value: string | number | null) => void;
     wrapperClassName?: string;
     justifyContent?: "between" | "center" | "start" | "end";
     rowGap?: number;
@@ -137,6 +138,7 @@ interface DateInputProps extends CalendarProps {
 export const DashboardRadio = ({
     radioArray,
     initialValue,
+    clearable,
     style,
     disabled,
     wrapperClassName,
@@ -149,13 +151,24 @@ export const DashboardRadio = ({
     const [radioValue, setRadioValue] = useState<string>("");
 
     const handleRadioChange = (e: RadioButtonChangeEvent) => {
-        setRadioValue(String(e.value));
-        onChange?.(String(e.value));
+        const clicked = String(e.value);
+        if (clearable && radioValue === clicked) {
+            setRadioValue("");
+            onChange?.(null);
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+            return;
+        }
+        setRadioValue(clicked);
+        onChange?.(clicked);
     };
 
     useEffect(() => {
         if (initialValue !== undefined && initialValue !== null) {
             setRadioValue(String(initialValue));
+        } else {
+            setRadioValue("");
         }
     }, [initialValue]);
 
@@ -164,20 +177,30 @@ export const DashboardRadio = ({
             className={`flex flex-wrap row-gap-${rowGap} justify-content-${justifyContent} ${columnGap ? `column-gap-${columnGap}` : ""} radio ${wrapperClassName || ""}`}
         >
             {radioArray.map(({ name, title, value }) => {
+                const strValue = String(value);
+                const isChecked = radioValue === strValue;
                 return (
                     <div
                         key={name}
                         className='flex align-items-center justify-content-between radio__item radio-item border-round'
                         style={style}
+                        onClick={() =>
+                            clearable &&
+                            isChecked &&
+                            !disabled &&
+                            handleRadioChange({
+                                value: strValue,
+                            } as RadioButtonChangeEvent)
+                        }
                     >
                         <div className='radio-item__input flex align-items-center justify-content-center'>
                             <RadioButton
                                 inputId={name}
                                 name={name}
                                 disabled={disabled}
-                                value={String(value)}
+                                value={strValue}
                                 onChange={handleRadioChange}
-                                checked={radioValue === String(value)}
+                                checked={isChecked}
                             />
                         </div>
                         <label htmlFor={name} className='radio-item__label'>

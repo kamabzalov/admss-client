@@ -53,7 +53,8 @@ export const DealProfitCommission = observer(() => {
         return optionDefault;
     };
 
-    const handleCommissionOptionChange = (value: string | number) => {
+    const handleCommissionOptionChange = (value: string | number | null) => {
+        if (value === null) return;
         const numericValue = Number(value);
         changeDealWashout("Comm2OptFigureAfter", toBinary(numericValue === optionAfterIndex));
         changeDealWashout("Comm2OptSplitCommInHalf", toBinary(numericValue === optionSplitIndex));

@@ -107,6 +107,7 @@ export interface DealExtData {
     Dismntl_Sold_Transmission: number;
     Dismntl_Sold_Transmission_To: string;
     ERT_Submitted: number;
+    electronicRegistrationTitling?: string;
     Exchanged_Plate_Number: string;
     Exchanged_Plates: number;
     First_Lien_Acct_Num: string;
@@ -120,6 +121,8 @@ export interface DealExtData {
     First_Lien_Zip_Code: string;
     GAP_Company: string;
     HowFoundOut: string;
+    serviceContract?: string;
+    titleTransferFee?: string;
     Ins_AH: number;
     Ins_AH_J: number;
     Ins_AH_RATE_ID: number;
@@ -215,6 +218,7 @@ export interface DealExtData {
     Trade1_VID: string;
     Trade1_VIN: string;
     Trade1_Year: string;
+    Trade1_GroupClassUID?: string;
     Trade2_Allowance: string;
     Trade2_BodyStyle: string;
     Trade2_Color: string;
@@ -239,10 +243,12 @@ export interface DealExtData {
     Trade2_VID: string;
     Trade2_VIN: string;
     Trade2_Year: string;
-    Transferred_Expiration_Date: string;
+    Trade2_GroupClassUID?: string;
+    Transferred_Expiration_Date: string | number;
     Transferred_Plate_Number: string;
     Vehicle_Has_Lien: number;
     Vehicle_Is_Leased: number;
+    VSI?: string;
     Warranty_Deductible: number;
     Warranty_Miles: string;
     Warranty_Name: string;
@@ -585,4 +591,18 @@ export interface DealWashout extends BaseResponseError {
     salesperson2name: string;
     name: string;
     requestuid: string;
+}
+
+export interface DealTypeResponse extends BaseResponse {
+    deal_types: IndexedDealList[];
+}
+export interface DealStatusList extends BaseResponse {
+    deal_status: IndexedDealList[];
+}
+export interface InventoryStatusResponse extends BaseResponse {
+    inventory_status: IndexedDealList[];
+}
+
+export interface TotalDealsList extends BaseResponse {
+    total: number;
 }

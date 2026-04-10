@@ -9,14 +9,13 @@ import {
     getDealStatuses,
     getDealTypes,
     getHowToKnowList,
-    getSaleTypes,
 } from "http/services/deals.service";
 import { HowToKnow, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
-import { ContactUser } from "common/models/contact";
+import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -39,7 +38,6 @@ export const DealGeneralSale = observer((): ReactElement => {
     const { deal, changeDeal, changeDealExtData } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
-    const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
@@ -51,13 +49,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                 setDealTypesList(dealTypesRes);
             } else if (!dealTypesRes) {
                 showError("Error while getting deal types");
-            }
-
-            const saleTypesRes = await getSaleTypes();
-            if (saleTypesRes && Array.isArray(saleTypesRes)) {
-                setSaleTypesList(saleTypesRes);
-            } else if (!saleTypesRes) {
-                showError("Error while getting sale types");
             }
 
             const dealStatusesRes = await getDealStatuses();
@@ -150,6 +141,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         setFieldValue("contactinfo", value);
                         changeDeal({ key: "contactinfo", value });
                     }}
+                    contactCategory={ContactTypeNameList.BUYERS}
                     originalPath={currentPath}
                     value={values?.contactinfo}
                     getFullInfo={handleGetCompanyInfo}
@@ -180,21 +172,21 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("dealtype")}
                     optionLabel='name'
                     optionValue='id'
-                    required
                     options={dealTypesList}
                     label='Type of Deal (required)'
-                    value={values.dealtype}
+                    value={values.dealtype ?? null}
                     onChange={(e) => {
-                        setFieldValue("dealtype", e.value);
-                        store.dealType = e.value;
-                        changeDeal({ key: "dealtype", value: e.value });
+                        const v = e.value;
+                        setFieldValue("dealtype", v ?? null);
+                        store.dealType = v ?? null;
+                        changeDeal({ key: "dealtype", value: v });
                     }}
                     className='w-full deal-sale__dropdown'
                     error={!!errors.dealtype}
                     errorMessage={errors.dealtype as string}
                 />
             </div>
-            <div className='col-3 relative'>
+            <div className='col-6 relative'>
                 <ComboBox
                     {...getFieldProps("dealstatus")}
                     optionLabel='name'
@@ -212,24 +204,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     errorMessage={errors.dealstatus as string}
                 />
             </div>
-            <div className='col-3 relative'>
-                <ComboBox
-                    {...getFieldProps("saletype")}
-                    optionLabel='name'
-                    optionValue='id'
-                    required
-                    options={saleTypesList}
-                    value={values.saletype}
-                    onChange={(e) => {
-                        setFieldValue("saletype", e.value);
-                        changeDeal({ key: "saletype", value: e.value });
-                    }}
-                    label='Sale type (required)'
-                    className='w-full deal-sale__dropdown'
-                    error={!!errors.saletype}
-                    errorMessage={errors.saletype as string}
-                />
-            </div>
+
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("dateeffective")}

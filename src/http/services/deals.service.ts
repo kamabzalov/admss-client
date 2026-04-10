@@ -11,12 +11,11 @@ import {
     DealPrintFormResponse,
     DealWashout,
     HowToKnow,
-    IndexedDealList,
+    DealTypeResponse,
+    DealStatusList,
+    InventoryStatusResponse,
+    TotalDealsList,
 } from "common/models/deals";
-
-export interface TotalDealsList extends BaseResponse {
-    total: number;
-}
 
 export const getDealsList = async (
     uid: string,
@@ -35,19 +34,6 @@ export const getDealInfo = async (uid: string) => {
         defaultError: "Error while getting deal info",
     });
 };
-
-interface DealTypeResponse extends BaseResponse {
-    deal_types: IndexedDealList[];
-}
-interface DealStatusList extends BaseResponse {
-    deal_status: IndexedDealList[];
-}
-interface SaleTypeResponse extends BaseResponse {
-    sale_types: IndexedDealList[];
-}
-interface InventoryStatusResponse extends BaseResponse {
-    inventory_status: IndexedDealList[];
-}
 
 export const getDealTypes = async () => {
     const response = await new ApiRequest().get<DealTypeResponse>({
@@ -70,19 +56,6 @@ export const getDealStatuses = async () => {
 
     if (response && "deal_status" in response) {
         return response.deal_status;
-    }
-
-    return undefined;
-};
-
-export const getSaleTypes = async () => {
-    const response = await new ApiRequest().get<SaleTypeResponse>({
-        url: "deals/listsaletypes",
-        defaultError: "Error while get deal sale types",
-    });
-
-    if (response && "sale_types" in response) {
-        return response.sale_types;
     }
 
     return undefined;

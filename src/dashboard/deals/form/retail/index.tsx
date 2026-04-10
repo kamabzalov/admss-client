@@ -4,11 +4,8 @@ import { lazy } from "react";
 const DealRetailLiens = lazy(() =>
     import("./liens").then((module) => ({ default: module.DealRetailLiens }))
 );
-const DealRetailTradeFirst = lazy(() =>
-    import("./trade-first").then((module) => ({ default: module.DealRetailTradeFirst }))
-);
-const DealRetailTradeSecond = lazy(() =>
-    import("./trade-second").then((module) => ({ default: module.DealRetailTradeSecond }))
+const DealRetailTrade = lazy(() =>
+    import("./trade").then((module) => ({ default: module.DealRetailTrade }))
 );
 const DealRetailTag = lazy(() =>
     import("./tag").then((module) => ({ default: module.DealRetailTag }))
@@ -43,8 +40,8 @@ const DealBuyHerePayHere = lazy(() =>
 
 const baseForm = [
     { itemLabel: AccordionDealItems.LIENS, component: <DealRetailLiens /> },
-    { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTradeFirst /> },
-    { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTradeSecond /> },
+    { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTrade tradeNumber={1} /> },
+    { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTrade tradeNumber={2} /> },
     { itemLabel: AccordionDealItems.TAG, component: <DealRetailTag /> },
     { itemLabel: AccordionDealItems.INSURANCE, component: <DealRetailInsurance /> },
     { itemLabel: AccordionDealItems.CHARGES, component: <DealRetailCharges /> },

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { CurrencyInput } from "dashboard/common/form/inputs";
@@ -20,18 +20,23 @@ export const DealRetailProducts = observer((): ReactElement => {
     const currentPath = pathname + search;
     const {
         deal: { price },
-        dealExtData: {
-            GAP_Company,
-            Warranty_Name,
-            Warranty_Miles,
-            Warranty_Term,
-            Warranty_Deductible,
-            Warranty_Notes,
-            Warranty_Price,
-        },
+        dealExtData,
         changeDeal,
         changeDealExtData,
     } = store;
+    const {
+        GAP_Company,
+        Warranty_Name,
+        Warranty_Miles,
+        Warranty_Term,
+        Warranty_Deductible,
+        Warranty_Notes,
+        Warranty_Price,
+        serviceContract,
+    } = dealExtData;
+    const serviceContractCost = Number(serviceContract) || 0;
+    const [gapCost, setGapCost] = useState<number>(0);
+
     return (
         <div className='grid deal-retail-products row-gap-2'>
             <div className='col-6'>
@@ -78,6 +83,19 @@ export const DealRetailProducts = observer((): ReactElement => {
                     value={Warranty_Miles}
                     onChange={({ value }) => changeDealExtData({ key: "Warranty_Miles", value })}
                     className='w-full deal-products__dropdown'
+                />
+            </div>
+            <div className='col-3 ml-auto'>
+                <CurrencyInput
+                    labelPosition='top'
+                    value={serviceContractCost}
+                    onChange={({ value }) =>
+                        changeDealExtData({
+                            key: "serviceContract",
+                            value: Number(value) || 0,
+                        })
+                    }
+                    title='Service Contract Cost'
                 />
             </div>
             {Warranty_Miles === WarrantyTerm.MONTH && (
@@ -136,6 +154,14 @@ export const DealRetailProducts = observer((): ReactElement => {
                     }}
                     labelPosition='top'
                     title='Price'
+                />
+            </div>
+            <div className='col-3'>
+                <CurrencyInput
+                    labelPosition='top'
+                    title='GAP Cost'
+                    value={gapCost}
+                    onChange={({ value }) => setGapCost(Number(value) || 0)}
                 />
             </div>
         </div>
