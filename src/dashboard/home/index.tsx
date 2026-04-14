@@ -6,7 +6,7 @@ import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
-import { getAlerts, setAlert } from "http/services/tasks.service";
+import { dismissAlert, getAlerts } from "http/services/tasks.service";
 import { useNotification, usePermissions, useToastMessage } from "common/hooks";
 import { Alert } from "common/models/tasks";
 
@@ -38,7 +38,7 @@ export const Home = (): ReactElement => {
 
     const showNextAlert = useCallback(
         async (currentAlert: Alert) => {
-            const result = await setAlert(currentAlert.itemuid);
+            const result = await dismissAlert(currentAlert.itemuid);
 
             if (result?.error) {
                 setPendingAlerts([]);
