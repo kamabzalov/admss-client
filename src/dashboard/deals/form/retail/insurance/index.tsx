@@ -194,7 +194,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
                             value={Ins_Liab_Limit1}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
-                            name='Liability Row'
+                            name='Liability Limits'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Liab_Limit1", value: Number(value) });
                             }}
@@ -209,7 +209,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
                             value={Ins_Liab_Limit2}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
-                            name='Liability Limits Notes'
+                            name='Liability Limits'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Liab_Limit2", value: Number(value) });
                             }}
@@ -224,7 +224,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
                             value={Ins_Prop_Limit}
                             min={MIN_LIMIT}
                             max={MAX_LIMIT}
-                            name='Insurance Notes'
+                            name='Liability Limits'
                             onChange={({ value }) => {
                                 changeDealExtData({ key: "Ins_Prop_Limit", value: Number(value) });
                             }}
@@ -243,7 +243,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
                         }}
                         className='deal-insurance__text-area'
                     />
-                    <label className='float-label'>Notes</label>
+                    <label className='float-label'>Insurance Notes</label>
                 </span>
             </div>
         </div>
