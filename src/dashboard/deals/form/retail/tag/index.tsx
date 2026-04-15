@@ -43,6 +43,17 @@ export const DealRetailTag = observer((): ReactElement => {
         },
         changeDealExtData,
     } = store;
+
+    const clearTitleAndLicenseDependentFields = () => {
+        changeDealExtData({ key: "Plate_Transferred", value: 0 });
+        changeDealExtData({ key: "Exchanged_Plates", value: 0 });
+        changeDealExtData({ key: "Replace_Plate", value: 0 });
+        changeDealExtData({ key: "Transferred_Plate_Number", value: "" });
+        changeDealExtData({ key: "Exchanged_Plate_Number", value: "" });
+        changeDealExtData({ key: "Replaced_Plate_Number", value: "" });
+        changeDealExtData({ key: "Plate_Issue_Date", value: 0 });
+    };
+
     return (
         <div className='grid deal-retail-tag row-gap-2'>
             <div className='col-6'>
@@ -53,9 +64,11 @@ export const DealRetailTag = observer((): ReactElement => {
                         if (value === null) {
                             changeDealExtData({ key: "Title_Only", value: 0 });
                             changeDealExtData({ key: "Title_and_License", value: 0 });
+                            clearTitleAndLicenseDependentFields();
                         } else if (value === "0") {
                             changeDealExtData({ key: "Title_Only", value: 1 });
                             changeDealExtData({ key: "Title_and_License", value: 0 });
+                            clearTitleAndLicenseDependentFields();
                         } else {
                             changeDealExtData({ key: "Title_Only", value: 0 });
                             changeDealExtData({ key: "Title_and_License", value: 1 });

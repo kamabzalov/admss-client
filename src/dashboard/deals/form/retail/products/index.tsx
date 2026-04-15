@@ -85,6 +85,18 @@ export const DealRetailProducts = observer((): ReactElement => {
                     className='w-full deal-products__dropdown'
                 />
             </div>
+            {Warranty_Miles === WarrantyTerm.MONTH && (
+                <div className='col-3'>
+                    <ComboBox
+                        label='Duration'
+                        editable
+                        options={[...TERM_MONTH_LIST]}
+                        value={Warranty_Term}
+                        onChange={({ value }) => changeDealExtData({ key: "Warranty_Term", value })}
+                        className='w-full deal-products__dropdown'
+                    />
+                </div>
+            )}
             <div className='col-3 ml-auto'>
                 <CurrencyInput
                     labelPosition='top'
@@ -98,18 +110,6 @@ export const DealRetailProducts = observer((): ReactElement => {
                     title='Service Contract Cost'
                 />
             </div>
-            {Warranty_Miles === WarrantyTerm.MONTH && (
-                <div className='col-3'>
-                    <ComboBox
-                        label='Duration'
-                        editable
-                        options={[...TERM_MONTH_LIST]}
-                        value={Warranty_Term}
-                        onChange={({ value }) => changeDealExtData({ key: "Warranty_Term", value })}
-                        className='w-full deal-products__dropdown'
-                    />
-                </div>
-            )}
 
             <div className='col-12'>
                 <span className='p-float-label'>
