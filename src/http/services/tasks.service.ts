@@ -79,9 +79,9 @@ export const getAlerts = async (useruid: string) => {
     });
 };
 
-export const setAlert = async (alertuid: string) => {
+export const dismissAlert = async (alertuid: string) => {
     return new ApiRequest().post({
-        url: `tasks/${alertuid}/setalert`,
-        defaultError: "Error while setting alert",
+        url: `tasks/${alertuid}/dismiss-alert`,
+        defaultError: "Error while dismissing alert",
     });
 };
