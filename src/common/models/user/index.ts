@@ -46,6 +46,10 @@ export interface DealsUserSettings extends UserSettings {
     activeColumns?: string[];
 }
 
+export interface LeadsUserSettings extends UserSettings {
+    activeColumns?: string[];
+}
+
 export interface TasksUserSettings extends UserSettings {
     activeColumns?: string[];
 }
@@ -69,6 +73,7 @@ export interface ServerUserSettings {
     accounts?: AccountsUserSettings;
     accountsAudit?: AccountsAuditUserSettings;
     deals?: DealsUserSettings;
+    leads?: LeadsUserSettings;
     tasks?: TasksUserSettings;
     exportWeb: ExportWebUserSettings;
     exportSchedule: ExportWebUserSettings;
