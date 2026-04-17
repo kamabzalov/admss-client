@@ -11,6 +11,7 @@ import { Contacts } from "dashboard/contacts";
 import { ContactForm } from "dashboard/contacts/form";
 import { Deals } from "dashboard/deals";
 import { DealsForm } from "dashboard/deals/form";
+import { Leads } from "dashboard/leads";
 import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";
 import { InventoryForm } from "dashboard/inventory/form";
@@ -188,6 +189,16 @@ const AppRouter = (): ReactElement => {
                                     ),
                                 },
                             ],
+                        },
+                        {
+                            path: "leads",
+                            element: (
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <DealsProtectedRoute>
+                                        <Leads />
+                                    </DealsProtectedRoute>
+                                </ProtectedRoute>
+                            ),
                         },
                         {
                             path: "accounts",

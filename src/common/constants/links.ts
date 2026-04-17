@@ -31,6 +31,14 @@ export const DEALS_PAGE: Readonly<DealsPage> = {
     },
 };
 
+interface LeadsPage {
+    readonly MAIN: string;
+}
+
+export const LEADS_PAGE: Readonly<LeadsPage> = {
+    MAIN: `${DASHBOARD_PAGE}/leads`,
+};
+
 interface InventoryPage {
     readonly MAIN: string;
     CREATE(): string;
@@ -171,6 +179,7 @@ interface SidebarPage {
     readonly INVENTORY: string;
     readonly CONTACTS: string;
     readonly DEALS: string;
+    readonly LEADS: string;
     readonly ACCOUNTS: string;
     readonly REPORTS: string;
     readonly EXPORT_WEB: string;
@@ -182,6 +191,7 @@ export const SIDEBAR_PAGE: Readonly<SidebarPage> = {
     INVENTORY: INVENTORY_PAGE.MAIN,
     CONTACTS: CONTACTS_PAGE.MAIN,
     DEALS: DEALS_PAGE.MAIN,
+    LEADS: LEADS_PAGE.MAIN,
     ACCOUNTS: ACCOUNTS_PAGE.MAIN,
     REPORTS: REPORTS_PAGE.MAIN,
     EXPORT_WEB: EXPORT_WEB_PAGE.MAIN,

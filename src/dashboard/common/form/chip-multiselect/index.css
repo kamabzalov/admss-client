@@ -1,0 +1,141 @@
+.chip-multiselect-shell {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.chip-multiselect-shell .chip-multiselect.p-multiselect {
+    width: 100%;
+}
+
+.chip-multiselect.p-multiselect {
+    border: 1px solid var(--admss-app-lightest-grey);
+    border-radius: 8px;
+    background: var(--admss-app-white);
+    align-items: center;
+    overflow: visible;
+    position: relative;
+}
+
+.chip-multiselect.p-multiselect .p-multiselect-label-container {
+    padding-left: 12px;
+    overflow: visible;
+}
+
+.chip-multiselect__label {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    color: var(--admss-app-medium-grey);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.chip-multiselect .p-multiselect-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: visible;
+}
+
+.chip-multiselect.p-inputwrapper-filled.p-multiselect.p-multiselect-chip .p-multiselect-label {
+    padding: 0.2rem;
+}
+
+.chip-multiselect.p-multiselect .p-multiselect-clear-icon,
+.chip-multiselect.p-multiselect .p-multiselect-trigger-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.chip-multiselect.p-multiselect .p-multiselect-trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2rem;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chip-multiselect.p-multiselect.p-multiselect-clearable .p-multiselect-clear-icon {
+    right: 2rem;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    margin-top: -0.4rem;
+}
+
+.chip-multiselect.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover,
+.chip-multiselect.p-multiselect:not(.p-disabled)
+    .p-multiselect-trigger:hover
+    .p-multiselect-trigger-icon {
+    color: var(--admss-app-darkest-grey);
+}
+
+.chip-multiselect .p-multiselect-token:nth-child(n + 2) {
+    display: none;
+}
+
+.chip-multiselect .p-multiselect-token {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    height: 25px;
+    min-height: 25px;
+    padding: 0 10px 0 12px;
+    border-radius: 999px;
+    background: var(--admss-app-primary-main-green);
+    color: var(--admss-app-white);
+}
+
+.chip-multiselect .p-multiselect-token-label {
+    color: inherit;
+}
+
+.chip-multiselect .p-multiselect-token-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    flex-shrink: 0;
+    color: inherit;
+}
+
+.chip-multiselect .p-multiselect-token-icon svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+
+.chip-multiselect-shell .chip-multiselect__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    height: 25px;
+    min-height: 25px;
+    min-width: 0;
+    padding: 0 9px;
+    background: var(--admss-app-light-green);
+    color: var(--admss-app-primary-main-green);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}

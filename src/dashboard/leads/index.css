@@ -1,0 +1,107 @@
+.leads {
+    .datatable-controls {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        padding: 0;
+        gap: 20px;
+        align-items: center;
+
+        .datatable-controls__search .p-inputtext {
+            width: 200px;
+            height: 50px;
+            align-items: center;
+        }
+
+        .datatable-controls__search-button.p-button {
+            display: flex;
+            padding: 0;
+            flex: 0 0 200px;
+            align-items: center;
+        }
+
+        .leads__columns-float,
+        .leads__filter {
+            width: 230px;
+            height: 50px;
+            align-items: center;
+            @media (max-width: 1252px) {
+                width: 200px;
+            }
+        }
+
+        .leads__columns-float .chip-multiselect.p-multiselect {
+            height: 50px;
+            min-height: 50px;
+        }
+
+        .leads__filter.p-multiselect {
+            border: 1px solid var(--admss-app-lightest-grey);
+            border-radius: 8px;
+            background: var(--admss-app-white);
+            align-items: center;
+            overflow: visible;
+        }
+
+        .p-float-label:has(.leads__filter) {
+            margin-left: auto;
+            @media (max-width: 1252px) {
+                margin-left: 0;
+            }
+        }
+    }
+
+    .leads__filter.p-multiselect .p-multiselect-clear-icon,
+    .leads__filter.p-multiselect .p-multiselect-trigger-icon {
+        color: var(--admss-app-medium-grey);
+    }
+
+    .leads__filter.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover,
+    .leads__filter.p-multiselect:not(.p-disabled) .p-multiselect-trigger:hover .p-multiselect-trigger-icon {
+        color: var(--admss-app-darkest-grey);
+    }
+}
+
+.leads__status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    max-width: 100%;
+}
+
+.leads__status-pill--new {
+    border-color: var(--admss-app-lead-status-new);
+    color: var(--admss-app-lead-status-new);
+    background: transparent;
+}
+
+.leads__status-pill--in-progress {
+    border-color: var(--admss-app-lead-status-in-progress);
+    color: var(--admss-app-lead-status-in-progress);
+    background: transparent;
+}
+
+.leads__status-pill--completed {
+    border-color: var(--admss-app-lead-status-completed);
+    color: var(--admss-app-lead-status-completed);
+    background: transparent;
+}
+
+.leads__status-pill--rejected {
+    border-color: var(--admss-app-lead-status-rejected);
+    color: var(--admss-app-lead-status-rejected);
+    background: transparent;
+}
+
+.leads__status-pill--neutral {
+    border-color: var(--admss-app-light-grey);
+    color: var(--admss-app-darkest-grey);
+    background: transparent;
+}
