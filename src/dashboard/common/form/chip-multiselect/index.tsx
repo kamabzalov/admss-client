@@ -13,6 +13,7 @@ export type ChipMultiSelectProps = MultiSelectProps & {
 export function ChipMultiSelect({
     overflowCount,
     floatLabel = false,
+    panelHeaderTemplate = null,
     label,
     floatClassName,
     className,
@@ -71,10 +72,35 @@ export function ChipMultiSelect({
         };
     }, [showCount, value]);
 
+    useEffect(() => {
+        const shellElement = shellRef.current;
+        if (!shellElement) return;
+
+        const tokenLabelElements = shellElement.querySelectorAll(
+            ".chip-multiselect .p-multiselect-token-label"
+        ) as NodeListOf<HTMLElement>;
+
+        tokenLabelElements.forEach((labelElement) => {
+            const labelText = (labelElement.textContent || "").trim();
+            if (!labelText) {
+                labelElement.removeAttribute("title");
+                return;
+            }
+
+            const isTruncated = labelElement.scrollWidth > labelElement.clientWidth;
+            if (isTruncated) {
+                labelElement.setAttribute("title", labelText);
+            } else {
+                labelElement.removeAttribute("title");
+            }
+        });
+    }, [value]);
+
     return (
         <span className={shellClassName} ref={shellRef}>
             <MultiSelect
                 {...rest}
+                panelHeaderTemplate={!panelHeaderTemplate ? <></> : panelHeaderTemplate}
                 value={value}
                 display={display}
                 showClear={showClear ?? true}

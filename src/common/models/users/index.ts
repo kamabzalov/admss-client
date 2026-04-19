@@ -89,6 +89,7 @@ export interface UserData extends BaseResponseError {
     phone: string;
     rolename: string;
     roleuid: string;
+    roles: string[];
     salespersonLicense: string;
     state: string;
     streetAddress: string;
