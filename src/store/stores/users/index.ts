@@ -1,4 +1,4 @@
-import { SubUser, UserData, UserRole, UserRolePayload, SalespersonInfo } from "common/models/users";
+import { UserData, UserRole, UserRolePayload, SalespersonInfo } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     createUser,
@@ -24,6 +24,7 @@ const initialUserData: Partial<UserData> = {
     loginpassword: "",
     rolename: "",
     roleuid: "",
+    roles: [],
     email1: "",
     email: "",
     phone1: "",
@@ -36,6 +37,17 @@ const initialUserData: Partial<UserData> = {
     state: "",
     ZIP: "",
     salespersonLicense: "",
+};
+
+const normalizeUserRolesFromUserinfo = (userData: UserData): string[] => {
+    const raw = userData.roles;
+    if (Array.isArray(raw) && raw.length) {
+        return raw.map((roleUid) => String(roleUid).trim()).filter(Boolean);
+    }
+    if (userData.roleuid?.trim()) {
+        return [userData.roleuid.trim()];
+    }
+    return [];
 };
 
 const initialSalespersonInfo: Partial<SalespersonInfo> = {
@@ -169,7 +181,11 @@ export class UsersStore {
                 await Promise.reject(response?.error);
                 return;
             } else {
-                this._user = response as SubUser;
+                const data = response as UserData;
+                this._user = {
+                    ...data,
+                    roles: normalizeUserRolesFromUserinfo(data),
+                };
                 this._isUserChanged = false;
             }
         } catch (error) {
@@ -199,7 +215,7 @@ export class UsersStore {
         try {
             const response = await getUserRoles(useruid);
             if (response && Array.isArray(response)) {
-                this._availableRoles = (response as UserRole[]).slice(0, 4);
+                this._availableRoles = response as UserRole[];
             } else {
                 this._availableRoles = [];
             }
@@ -317,12 +333,13 @@ export class UsersStore {
             this.rootStore.userStore.authUser?.dealer_id ||
             this.rootStore.userStore.authUser?.useruid ||
             "0";
+        const roles = (this._user.roles || []).filter((roleuid) => !!roleuid?.trim());
         const userData = {
             loginname: this._user.loginName || "",
             loginpassword: this._password,
             enabled: this._user.enabled || 1,
             dealer_id,
-            roleuid: this._user.roleuid || "",
+            roles,
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
             middleName: this._user.middleName || "",
@@ -360,10 +377,11 @@ export class UsersStore {
     };
 
     public updateUser = async (useruid: string) => {
+        const roles = (this._user.roles || []).filter((roleuid) => !!roleuid?.trim());
         const userData: Partial<UserData> = {
             loginname: this._user.loginName || this._user.loginname || "",
             enabled: this._user.enabled || 1,
-            roleuid: this._user.roleuid || "",
+            roles,
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
             middleName: this._user.middleName || "",
@@ -494,7 +512,7 @@ export class UsersStore {
             !!this._user.firstName &&
             !!this._user.lastName &&
             !!this._user.loginName &&
-            !!this._user.roleuid &&
+            !!this._user.roles?.length &&
             (hasValidPhone || hasEmail) &&
             isPasswordValid &&
             !this._loginError
