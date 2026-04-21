@@ -33,10 +33,18 @@ export const DEALS_PAGE: Readonly<DealsPage> = {
 
 interface LeadsPage {
     readonly MAIN: string;
+    CREATE(): string;
+    EDIT(id: string): string;
 }
 
 export const LEADS_PAGE: Readonly<LeadsPage> = {
     MAIN: `${DASHBOARD_PAGE}/leads`,
+    CREATE() {
+        return `${this.MAIN}${CREATE_PATH}`;
+    },
+    EDIT(id: string) {
+        return `${this.MAIN}/${id}`;
+    },
 };
 
 interface InventoryPage {
