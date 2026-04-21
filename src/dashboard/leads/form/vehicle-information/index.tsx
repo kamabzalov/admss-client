@@ -1,7 +1,13 @@
-import { ReactElement } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
+import { DropdownProps } from "primereact/dropdown";
 import { FormikErrors } from "formik";
-import { NumberInput, TextInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, TextInput } from "dashboard/common/form/inputs";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { getAutoMakeModelList, getInventoryAutomakesList } from "http/services/inventory-service";
+import { MakesListData } from "common/models/inventory";
+import { ListData } from "common/models";
+import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { LeadFormValues } from "../types";
 import { isVehicleStepValid } from "../helpers";
 import { ConvertButton } from "../common/convert-button";
@@ -20,6 +26,79 @@ export const VehicleInformationStep = ({
     onConvert,
 }: VehicleInformationStepProps): ReactElement => {
     const isTradeIn = values.type === "trade-in";
+
+    const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
+
+    useEffect(() => {
+        getInventoryAutomakesList().then((list) => {
+            if (list) {
+                const upperCasedList = list.map((item) => ({
+                    ...item,
+                    name: item.name.toUpperCase(),
+                }));
+                setAutomakesList(upperCasedList);
+            }
+        });
+    }, []);
+
+    const handleSelectMake = useCallback(() => {
+        const makeString = values.make.toLowerCase().replaceAll(" ", "");
+        if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeString)) {
+            getAutoMakeModelList(makeString).then((list) => {
+                if (list && Object.keys(list).length) {
+                    setAutomakesModelList(list);
+                } else {
+                    setAutomakesModelList([]);
+                }
+            });
+        }
+    }, [automakesList, values.make]);
+
+    useEffect(() => {
+        if (values.make) {
+            handleSelectMake();
+        }
+    }, [values.make, handleSelectMake]);
+
+    const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
+        if (option) {
+            return (
+                <div className='flex align-items-center'>
+                    <img
+                        alt={option.name}
+                        src={option.logo || defaultMakesLogo}
+                        className='mr-2 vehicle-general__dropdown-icon'
+                    />
+                    <div>{option.name}</div>
+                </div>
+            );
+        }
+
+        return <span>{props.placeholder}</span>;
+    };
+
+    const autoMakesOptionTemplate = (option: MakesListData) => {
+        return (
+            <div className='flex align-items-center'>
+                <img
+                    alt={option.name}
+                    src={option.logo || defaultMakesLogo}
+                    className='mr-2 vehicle-general__dropdown-icon'
+                />
+                <div>{option.name}</div>
+            </div>
+        );
+    };
+
+    const handleMakeChange = (value: string) => {
+        setFieldValue("make", value);
+        setAutomakesModelList([]);
+    };
+
+    const handleModelChange = (value: string) => {
+        setFieldValue("model", value);
+    };
 
     return (
         <>
@@ -43,25 +122,41 @@ export const VehicleInformationStep = ({
                     error={Boolean(errors.vin)}
                     errorMessage={errors.vin}
                 />
-                <TextInput
-                    name='Make'
-                    value={values.make}
-                    onChange={(e) => setFieldValue("make", e.target.value)}
-                    colWidth={6}
-                    error={Boolean(errors.make)}
-                    errorMessage={errors.make}
-                />
+                <div className='col-6 relative'>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        value={values.make}
+                        required
+                        options={automakesList}
+                        onChange={({ value }) => handleMakeChange(value)}
+                        valueTemplate={selectedAutoMakesTemplate}
+                        itemTemplate={autoMakesOptionTemplate}
+                        className='vehicle-general__dropdown w-full'
+                        label='Make'
+                        editable
+                        error={Boolean(errors.make)}
+                        errorMessage={errors.make}
+                    />
+                </div>
             </div>
 
             <div className='grid lead-row pt-3'>
-                <TextInput
-                    name='Model'
-                    value={values.model}
-                    onChange={(e) => setFieldValue("model", e.target.value)}
-                    colWidth={6}
-                    error={Boolean(errors.model)}
-                    errorMessage={errors.model}
-                />
+                <div className='col-6 relative'>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        value={values.model}
+                        required
+                        options={automakesModelList}
+                        onChange={({ value }) => handleModelChange(value)}
+                        className='vehicle-general__dropdown w-full'
+                        label='Model'
+                        editable
+                        error={Boolean(errors.model)}
+                        errorMessage={errors.model}
+                    />
+                </div>
                 <TextInput
                     name='Year'
                     value={values.year}
@@ -82,28 +177,30 @@ export const VehicleInformationStep = ({
 
             {isTradeIn && (
                 <div key='trade-in-row' className='grid lead-row pt-3'>
-                    <NumberInput
-                        key='desiredPrice'
-                        name='Desired Price'
-                        value={values.desiredPrice}
-                        onValueChange={(e) => setFieldValue("desiredPrice", e.value ?? null)}
-                        colWidth={3}
-                        min={0}
-                        useGrouping
-                        error={Boolean(errors.desiredPrice)}
-                        errorMessage={errors.desiredPrice}
-                    />
-                    <NumberInput
-                        key='payoffAmount'
-                        name='Payoff Amount'
-                        value={values.payoffAmount}
-                        onValueChange={(e) => setFieldValue("payoffAmount", e.value ?? null)}
-                        colWidth={3}
-                        min={0}
-                        useGrouping
-                        error={Boolean(errors.payoffAmount)}
-                        errorMessage={errors.payoffAmount}
-                    />
+                    <div className='col-3'>
+                        <CurrencyInput
+                            key='desiredPrice'
+                            name='Desired Price'
+                            title='Desired Price'
+                            labelPosition='top'
+                            value={values.desiredPrice}
+                            onValueChange={(e) => setFieldValue("desiredPrice", e.value ?? null)}
+                            error={Boolean(errors.desiredPrice)}
+                            errorMessage={errors.desiredPrice}
+                        />
+                    </div>
+                    <div className='col-3'>
+                        <CurrencyInput
+                            key='payoffAmount'
+                            name='Payoff Amount'
+                            title='Payoff Amount'
+                            labelPosition='top'
+                            value={values.payoffAmount}
+                            onValueChange={(e) => setFieldValue("payoffAmount", e.value ?? null)}
+                            error={Boolean(errors.payoffAmount)}
+                            errorMessage={errors.payoffAmount}
+                        />
+                    </div>
                 </div>
             )}
 

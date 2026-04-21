@@ -103,6 +103,9 @@
     border-radius: 0;
     overflow: hidden;
     overflow-y: auto;
+    &.card-content__wrapper {
+        height: 56vh;
+    }
 }
 
 .lead-form__title {
