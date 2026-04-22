@@ -12,6 +12,7 @@ import { ContactForm } from "dashboard/contacts/form";
 import { Deals } from "dashboard/deals";
 import { DealsForm } from "dashboard/deals/form";
 import { Leads } from "dashboard/leads";
+import { LeadsForm } from "dashboard/leads/form";
 import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";
 import { InventoryForm } from "dashboard/inventory/form";
@@ -37,6 +38,7 @@ import { Users } from "dashboard/profile/users";
 import { UsersForm } from "dashboard/profile/users/form";
 import { UsersRolesForm } from "dashboard/profile/generalSettings/roles/form";
 import { UserProfile } from "dashboard/profile/userProfile";
+import { CREATE_ID } from "common/constants/links";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -93,7 +95,7 @@ const AppRouter = (): ReactElement => {
                                     ),
                                 },
                                 {
-                                    path: "create",
+                                    path: CREATE_ID,
                                     element: (
                                         <InventoryProtectedRoute requireCreate>
                                             <InventoryForm />
@@ -129,7 +131,7 @@ const AppRouter = (): ReactElement => {
                                     ),
                                 },
                                 {
-                                    path: "create",
+                                    path: CREATE_ID,
                                     element: (
                                         <ContactsProtectedRoute requireCreate>
                                             <ContactForm />
@@ -165,7 +167,7 @@ const AppRouter = (): ReactElement => {
                                     ),
                                 },
                                 {
-                                    path: "create",
+                                    path: CREATE_ID,
                                     element: (
                                         <DealsProtectedRoute requireCreate>
                                             <DealsForm />
@@ -195,10 +197,24 @@ const AppRouter = (): ReactElement => {
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
                                     <DealsProtectedRoute>
-                                        <Leads />
+                                        <Outlet />
                                     </DealsProtectedRoute>
                                 </ProtectedRoute>
                             ),
+                            children: [
+                                {
+                                    path: "",
+                                    element: <Leads />,
+                                },
+                                {
+                                    path: CREATE_ID,
+                                    element: <LeadsForm />,
+                                },
+                                {
+                                    path: ":id",
+                                    element: <LeadsForm />,
+                                },
+                            ],
                         },
                         {
                             path: "accounts",
@@ -211,7 +227,7 @@ const AppRouter = (): ReactElement => {
                             ),
                             children: [
                                 { path: "", element: <Accounts /> },
-                                { path: "create", element: <AccountsForm /> },
+                                { path: CREATE_ID, element: <AccountsForm /> },
                                 { path: ":id", element: <AccountsForm /> },
                                 {
                                     path: ":id/take-payment",
@@ -258,7 +274,7 @@ const AppRouter = (): ReactElement => {
                             children: [
                                 { path: "", element: <Reports /> },
                                 { path: ":id", element: <ReportForm /> },
-                                { path: "create", element: <ReportForm /> },
+                                { path: CREATE_ID, element: <ReportForm /> },
                             ],
                         },
                         {

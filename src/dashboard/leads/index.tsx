@@ -29,7 +29,7 @@ import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
-import { DEALS_PAGE } from "common/constants/links";
+import { LEADS_PAGE } from "common/constants/links";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal;
@@ -657,7 +657,7 @@ export const LeadsDataTable = observer(() => {
                 <ControlButton
                     variant={BUTTON_VARIANTS.NEW}
                     tooltip='Add new lead'
-                    onClick={() => navigate(DEALS_PAGE.CREATE())}
+                    onClick={() => navigate(LEADS_PAGE.CREATE())}
                 />
                 <ControlButton
                     variant={BUTTON_VARIANTS.PRINT}
@@ -703,6 +703,30 @@ export const LeadsDataTable = observer(() => {
                     }}
                     emptyMessage={ERROR_MESSAGES.NO_DATA}
                 >
+                    <Column
+                        bodyStyle={{ textAlign: "center" }}
+                        reorderable={false}
+                        resizeable={false}
+                        body={(lead: Deal) => (
+                            <Button
+                                text
+                                className='table-edit-button'
+                                icon='adms-edit-item'
+                                tooltip='Edit lead'
+                                tooltipOptions={{ position: "mouse" }}
+                                onClick={() =>
+                                    navigate(LEADS_PAGE.EDIT(lead.dealuid), { state: { lead } })
+                                }
+                            />
+                        )}
+                        pt={{
+                            root: {
+                                style: {
+                                    width: "70px",
+                                },
+                            },
+                        }}
+                    />
                     {activeColumns.map(({ field, header }: LeadsTableColumn, index) => {
                         const savedWidth = serverSettings?.leads?.columnWidth?.[field];
                         const isLastColumn = index === activeColumns.length - 1;
