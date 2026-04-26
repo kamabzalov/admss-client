@@ -90,7 +90,7 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                     <div className='card-content__footer'>
                         <Button
                             onClick={() => setDialogActive(true)}
-                            className='underline messages-more'
+                            className='recent-messages__button messages-more'
                             text
                         >
                             See more...

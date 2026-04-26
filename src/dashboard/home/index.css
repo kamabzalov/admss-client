@@ -130,6 +130,7 @@
         }
     }
     .home-page__tasks-widget {
+        min-height: 332px;
         .add-task-control.p-button.p-button-icon-only {
             display: inline-flex;
             align-items: center;
@@ -143,27 +144,10 @@
             margin-right: 14px;
             font-weight: 600;
         }
-        .task-calendar {
-            display: flex;
-            justify-content: center;
-            max-width: 380px;
-            border-left: 1px solid var(--admss-app-light-blue);
-            .p-datepicker-calendar {
-                thead th,
-                tbody td {
-                    padding: 0px;
-                    width: 45px;
-                }
+    }
 
-                thead th > span,
-                tbody td > span {
-                    display: inline-flex;
-                    height: 30px;
-                    width: 30px;
-                    margin: 0px;
-                }
-            }
-        }
+    .home-page__latest-leads-widget {
+        min-height: 332px;
     }
     .card-content__footer {
         display: flex;

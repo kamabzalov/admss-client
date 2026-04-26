@@ -1,21 +1,16 @@
-.messages-more.p-button.p-button-text {
-    text-align: right;
-    background: none;
-    border: none;
-    cursor: pointer;
+.recent-messages__button.p-button.messages-more {
+    padding: 0;
+    color: var(--admss-app-main-blue);
     text-decoration: underline;
-    text-underline-offset: 3px;
-    font-weight: 600;
-    color: var(--admss-app-darkest-grey);
-    &:enabled:hover {
-        background: none;
-        border: none;
-        color: var(--admss-app-darkest-grey);
+
+    .p-button-label {
+        font-weight: 400;
     }
-    &:enabled:focus {
-        background: none;
-        border: none;
-        box-shadow: none;
+
+    &:enabled:hover {
+        color: var(--admss-app-medium-blue);
+        text-decoration: underline;
+        background: transparent;
     }
 }
 
