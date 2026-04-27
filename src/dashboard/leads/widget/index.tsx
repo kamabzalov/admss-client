@@ -5,90 +5,19 @@ import { Button } from "primereact/button";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
+import {
+    formatCreatedDate,
+    getLeadStatusPresentation,
+    getLeadStatusToneModifier,
+    getLeadTypeLabel,
+} from "dashboard/leads/common";
 import "./index.css";
 
 const DEFAULT_LEADS_SHOW_COUNT = 4;
 
-type LeadStatusTone = "new" | "in-progress" | "completed" | "neutral";
-
 interface LatestLeadsProps {
     leadsShowCount?: number;
 }
-
-const getLeadTypeLabel = (dealtype: number): string => (dealtype <= 1 ? "Trade-In" : "Service");
-
-const getLeadStatusToneFromText = (status: string): LeadStatusTone => {
-    const normalized = status.trim().toUpperCase();
-
-    if (normalized.includes("FINALIZED") || normalized.includes("COMPLETED")) {
-        return "completed";
-    }
-
-    if (
-        normalized.includes("IN PROGRESS") ||
-        normalized.includes("PENDING") ||
-        normalized.includes("NOT FINAL") ||
-        normalized.includes("IN TRANSIT")
-    ) {
-        return "in-progress";
-    }
-
-    if (normalized.includes("NEW") || normalized.includes("QUOTE")) {
-        return "new";
-    }
-
-    return "neutral";
-};
-
-const getLeadStatusToneFromDealStatus = (dealStatusId: number): LeadStatusTone => {
-    switch (dealStatusId) {
-        case 3:
-            return "completed";
-        case 1:
-        case 2:
-            return "in-progress";
-        case 0:
-            return "new";
-        default:
-            return "neutral";
-    }
-};
-
-const getLeadStatusPresentation = (lead: Deal): { label: string; tone: LeadStatusTone } => {
-    const statusText = lead.status?.trim() ?? "";
-    const toneFromText = statusText ? getLeadStatusToneFromText(statusText) : "neutral";
-    const tone =
-        toneFromText !== "neutral"
-            ? toneFromText
-            : getLeadStatusToneFromDealStatus(lead.dealstatus);
-
-    if (tone === "in-progress") {
-        return { label: "IN PROGRESS", tone };
-    }
-
-    if (tone === "new") {
-        return { label: "NEW", tone };
-    }
-
-    if (tone === "completed") {
-        return { label: "COMPLETED", tone };
-    }
-
-    return { label: statusText.toUpperCase() || "UNKNOWN", tone };
-};
-
-const formatCreatedDate = (created: string): string => {
-    const parsedDate = new Date(created);
-    if (Number.isNaN(parsedDate.getTime())) {
-        return created;
-    }
-
-    return parsedDate.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-    });
-};
 
 export const LatestLeads = ({
     leadsShowCount = DEFAULT_LEADS_SHOW_COUNT,
@@ -140,6 +69,9 @@ export const LatestLeads = ({
                         leads.slice(0, leadsShowCount).map((lead) => {
                             const { label: statusLabel, tone: statusTone } =
                                 getLeadStatusPresentation(lead);
+                            const statusToneClass = statusTone
+                                ? getLeadStatusToneModifier(statusTone)
+                                : "";
 
                             return (
                                 <div key={lead.itemuid} className='latest-leads__row'>
@@ -151,11 +83,15 @@ export const LatestLeads = ({
                                         {formatCreatedDate(lead.created)}
                                     </span>
                                     <span className='latest-leads__cell'>
-                                        <span
-                                            className={`latest-leads__status latest-leads__status--${statusTone}`}
-                                        >
-                                            {statusLabel}
-                                        </span>
+                                        {statusTone ? (
+                                            <span
+                                                className={`latest-leads__status latest-leads__status--${statusToneClass}`}
+                                            >
+                                                {statusLabel}
+                                            </span>
+                                        ) : (
+                                            ""
+                                        )}
                                     </span>
                                 </div>
                             );
