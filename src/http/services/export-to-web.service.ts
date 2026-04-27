@@ -5,6 +5,7 @@ import {
     ExportWebHistoryList,
     ExportWebList,
     ExportWebPostData,
+    ExportWebScheduleActionResponse,
     ExportWebScheduleList,
 } from "common/models/export-web";
 import { isAxiosError } from "axios";
@@ -102,7 +103,7 @@ export const exportTaskScheduleDelete = async (taskuid: string) => {
 
 export const exportTaskSchedulePause = async (taskuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+        const request = await authorizedUserApiInstance.post<ExportWebScheduleActionResponse>(
             `external/${taskuid}/pause`
         );
         return request.data;
@@ -116,7 +117,7 @@ export const exportTaskSchedulePause = async (taskuid: string) => {
 
 export const exportTaskScheduleContinue = async (taskuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+        const request = await authorizedUserApiInstance.post<ExportWebScheduleActionResponse>(
             `external/${taskuid}/continue`
         );
         return request.data;

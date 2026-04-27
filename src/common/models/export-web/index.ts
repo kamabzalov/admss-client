@@ -1,4 +1,5 @@
-import { ReportsColumn } from "../reports";
+import { ReportsColumn } from "common/models/reports";
+import { BaseResponseError } from "common/models/base-response";
 
 interface Audit {
     DataNeedsUpdate: 0 | 1;
@@ -99,4 +100,9 @@ export interface ExportWebScheduleList {
 export interface ExportWebPostData {
     data: Record<string, unknown>[];
     columns: ReportsColumn[];
+}
+
+export interface ExportWebScheduleActionResponse extends BaseResponseError {
+    paused?: number;
+    taskuid?: string;
 }

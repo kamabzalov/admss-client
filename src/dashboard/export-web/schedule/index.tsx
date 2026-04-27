@@ -8,7 +8,7 @@ import {
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
-import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
+import { ROWS_PER_PAGE } from "common/settings";
 import { store } from "store";
 import {
     exportTaskScheduleContinue,
@@ -19,13 +19,14 @@ import {
 import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
-import { ExportWebScheduleList } from "common/models/export-web";
+import { ExportWebScheduleActionResponse, ExportWebScheduleList } from "common/models/export-web";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { QueryParams } from "common/models/query-params";
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
+import { useToastMessage } from "common/hooks";
+import { fromBinary } from "common/helpers";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
@@ -53,6 +54,11 @@ enum ExportWebScheduleAction {
     DELETE = "delete",
 }
 
+enum ExportWebScheduleSuccessMessage {
+    PAUSE = "Task has been paused.",
+    CONTINUE = "Task has been resumed.",
+}
+
 export const ExportSchedule = (): ReactElement => {
     const userStore = store.userStore;
     const { authUser } = userStore;
@@ -64,7 +70,7 @@ export const ExportSchedule = (): ReactElement => {
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const [deletedId, setDeletedId] = useState<string | null>(null);
-    const toast = useToast();
+    const { showError, showSuccess } = useToastMessage();
 
     const handleGetExportScheduleList = async (params: QueryParams) => {
         if (!authUser) return;
@@ -257,15 +263,20 @@ export const ExportSchedule = (): ReactElement => {
                 throw new Error(`Unknown action: ${action}`);
         }
 
-        actionPromise.then((response) => {
+        actionPromise.then((response: ExportWebScheduleActionResponse) => {
             if (response?.status === Status.ERROR) {
-                toast?.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response?.error,
-                    life: TOAST_LIFETIME,
-                });
+                showError(response?.error);
             } else {
+                if (
+                    action === ExportWebScheduleAction.PAUSE ||
+                    action === ExportWebScheduleAction.CONTINUE
+                ) {
+                    const detail = fromBinary(response?.paused)
+                        ? ExportWebScheduleSuccessMessage.PAUSE
+                        : ExportWebScheduleSuccessMessage.CONTINUE;
+                    showSuccess(detail);
+                }
+
                 let qry: string = "";
 
                 const params: QueryParams = {
@@ -378,7 +389,7 @@ export const ExportSchedule = (): ReactElement => {
                                             outlined
                                             tooltip='Pause'
                                             className='text schedule-button'
-                                            icon='icon adms-pause'
+                                            icon='icon adms-schedule-pause'
                                             onClick={() =>
                                                 handleTaskAction(
                                                     taskuid,
@@ -390,7 +401,7 @@ export const ExportSchedule = (): ReactElement => {
                                             outlined
                                             tooltip='Play'
                                             className='text schedule-button'
-                                            icon='icon adms-play-prev'
+                                            icon='icon adms-play-button'
                                             onClick={() =>
                                                 handleTaskAction(
                                                     taskuid,
