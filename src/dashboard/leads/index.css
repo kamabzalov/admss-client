@@ -100,8 +100,3 @@
     background: transparent;
 }
 
-.leads__status-pill--neutral {
-    border-color: var(--admss-app-light-grey);
-    color: var(--admss-app-darkest-grey);
-    background: transparent;
-}

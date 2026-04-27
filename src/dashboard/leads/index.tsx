@@ -27,9 +27,16 @@ import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { LeadsUserSettings } from "common/models/user";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { DEAL_STATUS_ID } from "common/constants/lead-options";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import { LEADS_PAGE } from "common/constants/links";
+import {
+    formatCreatedDate,
+    getLeadStatusPresentation,
+    getLeadStatusToneModifier,
+    getLeadTypeLabel,
+} from "dashboard/leads/common";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal;
@@ -61,14 +68,6 @@ enum FILTER_CATEGORIES {
     OTHER = "Other",
 }
 
-enum DEAL_STATUS_ID {
-    QUOTE_OR_PROSPECT = 0,
-    PENDING_OR_IN_TRANSIT = 1,
-    SOLD_NOT_FINALIZED = 2,
-    SOLD_FINALIZED = 3,
-    DEAD_OR_DELETED = 6,
-}
-
 const DEALS_TYPE_LIST: LeadsFilterOptions[] = [
     { name: "All", value: "allTypes" },
     { name: "Buy Here Pay Here", value: "0.DealType" },
@@ -98,120 +97,6 @@ const FILTER_GROUP_LIST: LeadsFilterGroup[] = [
     { name: FILTER_CATEGORIES.STATUS, options: DEALS_STATUS_LIST },
     { name: FILTER_CATEGORIES.OTHER, options: DEALS_OTHER_LIST },
 ];
-
-const getDealStatusLabel = (dealStatusId: number): string => {
-    switch (dealStatusId) {
-        case DEAL_STATUS_ID.QUOTE_OR_PROSPECT:
-            return "Quote";
-        case DEAL_STATUS_ID.PENDING_OR_IN_TRANSIT:
-            return "Pending";
-        case DEAL_STATUS_ID.SOLD_NOT_FINALIZED:
-            return "Not finalized deals";
-        case DEAL_STATUS_ID.SOLD_FINALIZED:
-            return "Finalized deals";
-        default:
-            return "Unknown";
-    }
-};
-
-const LEAD_STATUS_LABEL = {
-    new: "NEW",
-    inProgress: "IN PROGRESS",
-    completed: "COMPLETED",
-    rejected: "REJECTED",
-} as const;
-
-type LeadStatusTone = keyof typeof LEAD_STATUS_LABEL | "neutral";
-
-const normalizeStatusText = (raw: string): string => raw.trim().toUpperCase().replace(/\s+/g, " ");
-
-const classifyLeadStatusFromText = (normalized: string): LeadStatusTone | null => {
-    if (!normalized) return null;
-    if (
-        normalized.includes("REJECT") ||
-        normalized.includes("DEAD") ||
-        normalized.includes("DELETE") ||
-        normalized.includes("CANCEL")
-    ) {
-        return "rejected";
-    }
-    if (
-        normalized.includes("COMPLET") ||
-        normalized.includes("FINALIZED") ||
-        (normalized.includes("FINAL") && !normalized.includes("NOT FINAL"))
-    ) {
-        return "completed";
-    }
-    if (
-        normalized.includes("IN PROGRESS") ||
-        normalized.includes("PROGRESS") ||
-        normalized.includes("PENDING") ||
-        normalized.includes("PEND") ||
-        normalized.includes("NOT FINAL") ||
-        normalized.includes("IN TRANSIT")
-    ) {
-        return "inProgress";
-    }
-    if (normalized.includes("NEW") || normalized.includes("QUOTE")) {
-        return "new";
-    }
-    return null;
-};
-
-const classifyLeadStatusFromDealStatus = (dealStatusId: number): LeadStatusTone | null => {
-    switch (dealStatusId) {
-        case DEAL_STATUS_ID.DEAD_OR_DELETED:
-            return "rejected";
-        case DEAL_STATUS_ID.SOLD_FINALIZED:
-            return "completed";
-        case DEAL_STATUS_ID.PENDING_OR_IN_TRANSIT:
-        case DEAL_STATUS_ID.SOLD_NOT_FINALIZED:
-            return "inProgress";
-        case DEAL_STATUS_ID.QUOTE_OR_PROSPECT:
-            return "new";
-        default:
-            return null;
-    }
-};
-
-const getLeadStatusPresentation = (deal: Deal): { label: string; pillClass: string } => {
-    const fromApi = deal.status?.trim();
-    const normalizedApi = fromApi ? normalizeStatusText(fromApi) : "";
-    const fromText = normalizedApi ? classifyLeadStatusFromText(normalizedApi) : null;
-    const fromId = classifyLeadStatusFromDealStatus(deal.dealstatus);
-    const tone: LeadStatusTone = fromText ?? fromId ?? "neutral";
-
-    if (tone === "neutral") {
-        const label = normalizedApi || getDealStatusLabel(deal.dealstatus).toUpperCase();
-        return {
-            label,
-            pillClass: "leads__status-pill leads__status-pill--neutral",
-        };
-    }
-
-    return {
-        label: LEAD_STATUS_LABEL[tone],
-        pillClass: `leads__status-pill leads__status-pill--${tone === "inProgress" ? "in-progress" : tone}`,
-    };
-};
-
-const getLeadTypeLabel = (dealtype: number | null | undefined): string => {
-    if (dealtype == null) return "";
-    return dealtype <= 1 ? "Trade-in" : "Service";
-};
-
-const formatCreatedDate = (value: string): string => {
-    if (!value) return "";
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-        return value;
-    }
-    return parsed.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-    });
-};
 
 enum SEARCH_FORM_FIELDS {
     CUSTOMER = "accountInfo",
@@ -759,9 +644,16 @@ export const LeadsDataTable = observer(() => {
                                         return <TruncatedText text={text} withTooltip />;
                                     }
                                     if (field === "status") {
-                                        const { label, pillClass } =
-                                            getLeadStatusPresentation(data);
-                                        return <span className={pillClass}>{label}</span>;
+                                        const { label, tone } = getLeadStatusPresentation(data);
+                                        if (!tone) return "";
+                                        const modifier = getLeadStatusToneModifier(tone);
+                                        return (
+                                            <span
+                                                className={`leads__status-pill leads__status-pill--${modifier}`}
+                                            >
+                                                {label}
+                                            </span>
+                                        );
                                     }
                                     if (field === "inventoryinfo") {
                                         const text = String(data.inventoryinfo || "").toUpperCase();

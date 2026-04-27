@@ -33,8 +33,9 @@
     .latest-leads__row {
         display: grid;
         grid-template-columns: 1.1fr 2.2fr 1.1fr 1.2fr;
-        border-bottom: 1px solid var(--admss-app-light-grey);
-        align-items: center;
+        border-bottom: 1px solid var(--admss-app-medium-blue);
+        align-items: stretch;
+        cursor: pointer;
     }
 
     .latest-leads__row:last-child {
@@ -61,6 +62,8 @@
     }
 
     .latest-leads__cell {
+        display: flex;
+        align-items: center;
         padding: 6px 10px;
         min-width: 0;
         overflow: hidden;
@@ -73,7 +76,7 @@
     }
 
     .latest-leads__row .latest-leads__cell:not(:last-child) {
-        border-right: 1px solid var(--admss-app-light-grey);
+        border-right: 1px solid var(--admss-app-medium-blue);
     }
 
     .latest-leads__status {
@@ -111,12 +114,6 @@
         background: transparent;
     }
 
-    .latest-leads__status--neutral {
-        color: var(--admss-app-darkest-grey);
-        border-color: var(--admss-app-light-grey);
-        background: transparent;
-    }
-
     .latest-leads__empty {
         padding: 16px;
         font-size: 14px;
@@ -134,6 +131,7 @@
         color: var(--admss-app-main-blue);
         text-decoration: underline;
         font-weight: 400;
+        font-size: 14px;
 
         &:enabled:hover {
             color: var(--admss-app-medium-blue);
