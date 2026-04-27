@@ -13,6 +13,14 @@
   font-size: 14px;
 }
 
+.schedule-button.p-button.p-button-icon-only .p-button-icon {
+  margin: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .schedule-button.p-button.p-button-icon-only.p-button-outlined:enabled:active {
   color: var(--admss-app-white);
   background: var(--admss-app-primary-main-green);
