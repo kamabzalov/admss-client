@@ -51,65 +51,92 @@ export const LeadsForm = (): ReactElement => {
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ values, errors, setFieldValue, submitForm, isSubmitting, dirty }) => (
-                        <Form className='card lead__card'>
-                            <div className='card-header lead__header'>
-                                <h2 className='lead__title'>Create new lead</h2>
-                            </div>
-                            <div className='lead__body'>
-                                <LeadFormSidebar
-                                    activeStep={activeStep}
-                                    onStepChange={setActiveStep}
-                                    showVehicleStep={Boolean(values.type)}
-                                />
-                                <section className='lead__panel card-content__wrapper'>
-                                    {activeStep === CONTACT_STEP ? (
-                                        <ContactInformationStep
-                                            values={values}
-                                            errors={errors}
-                                            setFieldValue={setFieldValue}
-                                        />
-                                    ) : (
-                                        <VehicleInformationStep
-                                            values={values}
-                                            errors={errors}
-                                            setFieldValue={setFieldValue}
-                                        />
-                                    )}
-                                </section>
-                            </div>
+                    {({
+                        values,
+                        errors,
+                        setFieldValue,
+                        setFieldError,
+                        setErrors,
+                        setTouched,
+                        submitForm,
+                        isSubmitting,
+                        dirty,
+                    }) => {
+                        const handleFieldValueChange = (field: string, value: unknown) => {
+                            setFieldValue(field, value);
+                            if (field === "type") {
+                                setErrors({});
+                                setTouched({});
+                                return;
+                            }
 
-                            <FormNav className='lead__footer'>
-                                <FormNavButton
-                                    onClick={() => {
-                                        if (activeStep === CONTACT_STEP) {
-                                            handleExit();
-                                            return;
-                                        }
-                                        setActiveStep((prev) => prev - 1);
-                                    }}
-                                    outlined
-                                >
-                                    Back
-                                </FormNavButton>
-                                <FormNavButton
-                                    onClick={() => setActiveStep((prev) => prev + 1)}
-                                    disabled={activeStep >= LAST_STEP || !values.type}
-                                    severity={activeStep >= LAST_STEP ? "secondary" : "success"}
-                                    outlined
-                                >
-                                    Next
-                                </FormNavButton>
-                                <FormNavButton
-                                    onClick={() => submitForm()}
-                                    severity={!dirty || isSubmitting ? "secondary" : "success"}
-                                    disabled={!dirty || isSubmitting}
-                                >
-                                    Save
-                                </FormNavButton>
-                            </FormNav>
-                        </Form>
-                    )}
+                            setFieldError(field, undefined);
+                        };
+                        const clearFieldError = (field: keyof LeadFormValues) =>
+                            setFieldError(field, undefined);
+
+                        return (
+                            <Form className='card lead__card'>
+                                <div className='card-header lead__header'>
+                                    <h2 className='lead__title'>Create new lead</h2>
+                                </div>
+                                <div className='lead__body'>
+                                    <LeadFormSidebar
+                                        activeStep={activeStep}
+                                        onStepChange={setActiveStep}
+                                        showVehicleStep={Boolean(values.type)}
+                                    />
+                                    <section className='lead__panel card-content__wrapper'>
+                                        {activeStep === CONTACT_STEP ? (
+                                            <ContactInformationStep
+                                                values={values}
+                                                errors={errors}
+                                                setFieldValue={handleFieldValueChange}
+                                                clearFieldError={clearFieldError}
+                                            />
+                                        ) : (
+                                            <VehicleInformationStep
+                                                values={values}
+                                                errors={errors}
+                                                setFieldValue={handleFieldValueChange}
+                                                clearFieldError={clearFieldError}
+                                            />
+                                        )}
+                                    </section>
+                                </div>
+
+                                <FormNav className='lead__footer'>
+                                    <FormNavButton
+                                        onClick={() => {
+                                            if (activeStep === CONTACT_STEP) {
+                                                handleExit();
+                                                return;
+                                            }
+                                            setActiveStep((prev) => prev - 1);
+                                        }}
+                                        outlined
+                                    >
+                                        Back
+                                    </FormNavButton>
+                                    <FormNavButton
+                                        onClick={() => setActiveStep((prev) => prev + 1)}
+                                        disabled={activeStep >= LAST_STEP || !values.type}
+                                        severity={activeStep >= LAST_STEP ? "secondary" : "success"}
+                                        outlined
+                                    >
+                                        Next
+                                    </FormNavButton>
+                                    <FormNavButton
+                                        onClick={() => submitForm()}
+                                        severity={!dirty || isSubmitting ? "secondary" : "success"}
+                                        disabled={!dirty || isSubmitting}
+                                    >
+                                        Save
+                                    </FormNavButton>
+                                </FormNav>
+                            </Form>
+                        );
+                    }}
                 </Formik>
             </div>
         </div>

@@ -8,14 +8,16 @@ import { getAutoMakeModelList, getInventoryAutomakesList } from "http/services/i
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { LeadFormValues } from "../types";
-import { isVehicleStepValid } from "../helpers";
-import { ConvertButton } from "../common/convert-button";
+import { SERVICE_TYPE_OPTIONS, WARRANTY_OPTIONS } from "common/constants/lead-options";
+import { LeadFormValues } from "dashboard/leads/form/types";
+import { isVehicleStepValid } from "dashboard/leads/form/helpers";
+import { ConvertButton } from "dashboard/leads/form/common/convert-button";
 
 interface VehicleInformationStepProps {
     values: LeadFormValues;
     errors: FormikErrors<LeadFormValues>;
     setFieldValue: (field: string, value: unknown) => void;
+    clearFieldError: (field: keyof LeadFormValues) => void;
     onConvert?: () => void;
 }
 
@@ -23,6 +25,7 @@ export const VehicleInformationStep = ({
     values,
     errors,
     setFieldValue,
+    clearFieldError,
     onConvert,
 }: VehicleInformationStepProps): ReactElement => {
     const isTradeIn = values.type === "trade-in";
@@ -122,58 +125,113 @@ export const VehicleInformationStep = ({
                     error={Boolean(errors.vin)}
                     errorMessage={errors.vin}
                 />
-                <div className='col-6 relative'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.make}
-                        required
-                        options={automakesList}
-                        onChange={({ value }) => handleMakeChange(value)}
-                        valueTemplate={selectedAutoMakesTemplate}
-                        itemTemplate={autoMakesOptionTemplate}
-                        className='vehicle-general__dropdown w-full'
-                        label='Make'
-                        editable
-                        error={Boolean(errors.make)}
-                        errorMessage={errors.make}
+                {isTradeIn ? (
+                    <div className='col-6 relative'>
+                        <ComboBox
+                            optionLabel='name'
+                            optionValue='name'
+                            value={values.make}
+                            options={automakesList}
+                            onChange={({ value }) => handleMakeChange(value)}
+                            onShow={() => clearFieldError("make")}
+                            onFocus={() => clearFieldError("make")}
+                            valueTemplate={selectedAutoMakesTemplate}
+                            itemTemplate={autoMakesOptionTemplate}
+                            className='vehicle-general__dropdown w-full'
+                            label='Make'
+                            editable
+                            error={Boolean(errors.make)}
+                            errorMessage={errors.make}
+                        />
+                    </div>
+                ) : (
+                    <TextInput
+                        name='Vehicle (required)'
+                        value={values.vehicle}
+                        onChange={(e) => setFieldValue("vehicle", e.target.value)}
+                        colWidth={6}
+                        error={Boolean(errors.vehicle)}
+                        errorMessage={errors.vehicle}
                     />
-                </div>
+                )}
             </div>
 
-            <div className='grid lead-row pt-3'>
-                <div className='col-6 relative'>
-                    <ComboBox
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.model}
-                        required
-                        options={automakesModelList}
-                        onChange={({ value }) => handleModelChange(value)}
-                        className='vehicle-general__dropdown w-full'
-                        label='Model'
-                        editable
-                        error={Boolean(errors.model)}
-                        errorMessage={errors.model}
+            {isTradeIn ? (
+                <div className='grid lead-row pt-3'>
+                    <div className='col-6 relative'>
+                        <ComboBox
+                            optionLabel='name'
+                            optionValue='name'
+                            value={values.model}
+                            options={automakesModelList}
+                            onChange={({ value }) => handleModelChange(value)}
+                            onShow={() => clearFieldError("model")}
+                            onFocus={() => clearFieldError("model")}
+                            className='vehicle-general__dropdown w-full'
+                            label='Model'
+                            editable
+                            error={Boolean(errors.model)}
+                            errorMessage={errors.model}
+                        />
+                    </div>
+                    <TextInput
+                        name='Year'
+                        value={values.year}
+                        onChange={(e) => setFieldValue("year", e.target.value)}
+                        colWidth={3}
+                        error={Boolean(errors.year)}
+                        errorMessage={errors.year}
+                    />
+                    <TextInput
+                        name='Mileage'
+                        value={values.mileage}
+                        onChange={(e) => setFieldValue("mileage", e.target.value)}
+                        colWidth={3}
+                        error={Boolean(errors.mileage)}
+                        errorMessage={errors.mileage}
                     />
                 </div>
-                <TextInput
-                    name='Year'
-                    value={values.year}
-                    onChange={(e) => setFieldValue("year", e.target.value)}
-                    colWidth={3}
-                    error={Boolean(errors.year)}
-                    errorMessage={errors.year}
-                />
-                <TextInput
-                    name='Mileage'
-                    value={values.mileage}
-                    onChange={(e) => setFieldValue("mileage", e.target.value)}
-                    colWidth={3}
-                    error={Boolean(errors.mileage)}
-                    errorMessage={errors.mileage}
-                />
-            </div>
+            ) : (
+                <div className='grid lead-row pt-3'>
+                    <TextInput
+                        name='Mileage'
+                        value={values.mileage}
+                        onChange={(e) => setFieldValue("mileage", e.target.value)}
+                        colWidth={3}
+                        error={Boolean(errors.mileage)}
+                        errorMessage={errors.mileage}
+                    />
+                    <div className='col-3 relative'>
+                        <ComboBox
+                            label='Warranty'
+                            options={WARRANTY_OPTIONS}
+                            value={values.warranty}
+                            onChange={(e) => setFieldValue("warranty", e.value || "")}
+                            onShow={() => clearFieldError("warranty")}
+                            onFocus={() => clearFieldError("warranty")}
+                            optionLabel='label'
+                            optionValue='value'
+                            error={Boolean(errors.warranty)}
+                            errorMessage={errors.warranty}
+                        />
+                    </div>
+                    <div className='col-6 relative'>
+                        <ComboBox
+                            label='Type of Service (required)'
+                            options={SERVICE_TYPE_OPTIONS}
+                            value={values.typeOfService}
+                            required
+                            onChange={(e) => setFieldValue("typeOfService", e.value || "")}
+                            onShow={() => clearFieldError("typeOfService")}
+                            onFocus={() => clearFieldError("typeOfService")}
+                            optionLabel='label'
+                            optionValue='value'
+                            error={Boolean(errors.typeOfService)}
+                            errorMessage={errors.typeOfService}
+                        />
+                    </div>
+                </div>
+            )}
 
             {isTradeIn && (
                 <div key='trade-in-row' className='grid lead-row pt-3'>

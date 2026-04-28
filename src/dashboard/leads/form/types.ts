@@ -16,10 +16,13 @@ export interface LeadFormValues {
     preferredDateTime: string;
     waitOrDropOff: ServiceVisitType | "";
     vin: string;
+    vehicle: string;
     make: string;
     model: string;
     year: string;
     mileage: string;
+    warranty: string;
+    typeOfService: string;
     desiredPrice: number | null;
     payoffAmount: number | null;
     vehicleAdditionalInfo: string;
@@ -33,23 +36,6 @@ export interface ExistingLeadState {
         status?: string;
     };
 }
-
-export const LEAD_TYPE_OPTIONS = [
-    { label: "Trade-in", value: "trade-in" },
-    { label: "Service", value: "service" },
-];
-
-export const LEAD_STATUS_OPTIONS = [
-    { label: "New", value: "new" },
-    { label: "In Progress", value: "in-progress" },
-    { label: "Completed", value: "completed" },
-    { label: "Rejected", value: "rejected" },
-];
-
-export const VISIT_TYPE_OPTIONS = [
-    { label: "Wait", value: "wait" },
-    { label: "Drop Off", value: "drop-off" },
-];
 
 export const emptyLeadValues: LeadFormValues = {
     id: "",
@@ -65,10 +51,13 @@ export const emptyLeadValues: LeadFormValues = {
     preferredDateTime: "",
     waitOrDropOff: "",
     vin: "",
+    vehicle: "",
     make: "",
     model: "",
     year: "",
     mileage: "",
+    warranty: "",
+    typeOfService: "",
     desiredPrice: null,
     payoffAmount: null,
     vehicleAdditionalInfo: "",
