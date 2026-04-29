@@ -37,3 +37,23 @@
         border-radius: 50%;
     }
 }
+
+.switch-button.switch-button--small.p-inputswitch {
+    width: 40px;
+    height: 20px;
+}
+
+.switch-button.switch-button--small.p-inputswitch .p-inputswitch-slider:before {
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+}
+
+.switch-button.switch-button--small.p-inputswitch.p-inputswitch-checked
+    .p-inputswitch-slider:before {
+    transform: translateX(16px);
+}
+
+.switch-button.switch-button--small.p-inputswitch .p-inputswitch-slider:before {
+    transform: translateX(-4px);
+}

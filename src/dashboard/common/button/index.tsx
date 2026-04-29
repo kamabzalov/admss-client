@@ -45,7 +45,11 @@ export const ControlButton = ({ variant, ...props }: ControlButtonProps) => {
     );
 };
 
-export const SwitchButton = ({ ...props }: InputSwitchProps) => {
+interface SwitchButtonProps extends InputSwitchProps {
+    small?: boolean;
+}
+
+export const SwitchButton = ({ small = false, ...props }: SwitchButtonProps) => {
     const isControlled = typeof props.checked !== "undefined";
     const [internalChecked, setInternalChecked] = useState(props.checked || false);
 
@@ -59,7 +63,7 @@ export const SwitchButton = ({ ...props }: InputSwitchProps) => {
         <InputSwitch
             onClick={handleClick}
             {...props}
-            className={`switch-button ${props.className || ""}`}
+            className={`switch-button ${small ? "switch-button--small" : ""} ${props.className || ""}`}
             checked={isControlled ? !!props.checked : internalChecked}
             onChange={(e) => {
                 if (isControlled) {

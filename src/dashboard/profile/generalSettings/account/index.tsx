@@ -4,6 +4,7 @@ import { Slider, SliderChangeEvent } from "primereact/slider";
 import { useState, ChangeEvent } from "react";
 import "./index.css";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 interface SettingsAccountProps {
     settings?: any;
@@ -13,8 +14,7 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
     const [valueDigits, setValueDigits] = useState<number>(2);
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='settings-form'>
-            <div className='settings-form__title'>Account Settings</div>
+        <SettingsSection title='Account Settings'>
             <div className='grid settings-account'>
                 <div className='col-3'>
                     <span className='p-float-label'>
@@ -93,6 +93,6 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
                     />
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };
