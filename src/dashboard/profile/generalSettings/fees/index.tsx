@@ -1,10 +1,10 @@
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import "./index.css";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 export const SettingsFees = () => {
     return (
-        <div className='settings-form'>
-            <div className='settings-form__title'>Fees</div>
+        <SettingsSection title='Fees'>
             <div className='grid settings-fees'>
                 <div className='col-6'>
                     <CurrencyInput title='Default documentation fee' value={421} />
@@ -28,6 +28,6 @@ export const SettingsFees = () => {
                     <CurrencyInput title='Default tag fee' />
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };

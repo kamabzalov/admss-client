@@ -106,3 +106,10 @@ export interface ExportWebScheduleActionResponse extends BaseResponseError {
     paused?: number;
     taskuid?: string;
 }
+
+export interface LeadServiceType {
+    itemuid: string;
+    name: string;
+    enabled: 0 | 1;
+    isDefault: boolean;
+}

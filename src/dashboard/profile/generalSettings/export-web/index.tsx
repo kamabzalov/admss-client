@@ -11,6 +11,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import "./index.css";
 import { TruncatedText } from "dashboard/common/display";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof GeneralSettingsWebExport;
@@ -140,9 +141,8 @@ export const SettingsExportWeb = (): ReactElement => {
     };
 
     return (
-        <div className='settings-form'>
+        <SettingsSection title='Export to Web'>
             {isLoading && <Loader overlay />}
-            <div className='settings-form__title'>Export to Web</div>
             <div className='grid settings-export-web p-2'>
                 <div className='col-12'>
                     <DataTable
@@ -193,6 +193,6 @@ export const SettingsExportWeb = (): ReactElement => {
                     </DataTable>
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };

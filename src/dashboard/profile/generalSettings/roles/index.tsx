@@ -14,6 +14,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { DateFormat, DateReturnType, DateSeparator, parseDateFromServer } from "common/helpers";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
     field?: keyof UserRole;
@@ -114,9 +115,8 @@ export const UsersRoles = observer((): ReactElement => {
     };
 
     return (
-        <div className='settings-form roles-settings-form'>
+        <SettingsSection title='Roles' className='roles-settings-form'>
             {isLoading && <Loader overlay />}
-            <div className='settings-form__title'>Roles</div>
             <div className='flex justify-content-end mb-4'>
                 <Button className='settings-form__button' onClick={handleAddNewUserRole}>
                     New Role
@@ -262,6 +262,6 @@ export const UsersRoles = observer((): ReactElement => {
                     className='roles-confirm-dialog'
                 />
             ) : null}
-        </div>
+        </SettingsSection>
     );
 });

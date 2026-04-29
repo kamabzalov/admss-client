@@ -1,5 +1,6 @@
 import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 interface SettingsDealsProps {
     settings: {
@@ -11,9 +12,8 @@ interface SettingsDealsProps {
 
 export const SettingsDeals = ({ settings }: SettingsDealsProps): JSX.Element => {
     return (
-        <div className='settings-form settings-deals'>
-            <div className='settings-form__title'>Deals</div>
+        <SettingsSection title='Deals' className='settings-deals'>
             {settings && <DashboardRadio radioArray={settings} />}
-        </div>
+        </SettingsSection>
     );
 };

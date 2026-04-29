@@ -9,6 +9,7 @@ import { SettingsStockNew } from "dashboard/profile/generalSettings/inventory-se
 import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/inventory-settings/stockTradeIn";
 import { SettingsInventoryOptions } from "dashboard/profile/generalSettings/inventory-settings/inventory-options";
 import { SettingsInventoryDefaults } from "dashboard/profile/generalSettings/inventory-settings/default";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 const tabs = [
     { header: "Groups", component: <SettingsInventoryGroups /> },
@@ -77,8 +78,7 @@ export const InventorySettings = observer((): ReactElement => {
     };
 
     return (
-        <div className='col-12 settings-inventory'>
-            <div className='settings-form__title'>Inventory settings</div>
+        <SettingsSection title='Inventory settings' className='col-12 settings-inventory'>
             <TabView
                 className='settings-inventory__tabs'
                 activeIndex={activeTab || 0}
@@ -90,6 +90,6 @@ export const InventorySettings = observer((): ReactElement => {
                     </TabPanel>
                 ))}
             </TabView>
-        </div>
+        </SettingsSection>
     );
 });

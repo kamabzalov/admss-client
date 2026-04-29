@@ -2,10 +2,10 @@ import { CurrencyInput } from "dashboard/common/form/inputs";
 import "./index.css";
 import { InputNumber } from "primereact/inputnumber";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 export const SettingsLease = () => {
     return (
-        <div className='settings-form'>
-            <div className='settings-form__title'>Lease Settings</div>
+        <SettingsSection title='Lease Settings'>
             <div className='grid settings-lease'>
                 <div className='col-3'>
                     <span className='p-float-label'>
@@ -44,6 +44,6 @@ export const SettingsLease = () => {
                     <ComboBox className='settings-lease__dropdown' label='Payment frequency' />
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };

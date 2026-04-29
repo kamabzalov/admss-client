@@ -1,6 +1,7 @@
 /* App variables */
 :root {
     --admss-app-font: "Open Sans", Arial, Helvetica, sans-serif;
+    --admss-app-font-condensed: "Open Sans Condensed", "Open Sans", Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
 
@@ -129,4 +130,11 @@ body {
 .main .container {
     width: calc(var(--admss-app-container-width) - var(--admss-app-aside-collapsed-width));
     max-width: var(--admss-app-container-width-expanded);
+}
+
+.heading-condensed {
+    font-family: var(--admss-app-font-condensed);
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: 0;
 }

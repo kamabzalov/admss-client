@@ -67,10 +67,10 @@ export const isContactStepValid = (values: LeadFormValues): boolean => {
     if (values.type !== LEAD_TYPE.TRADE_IN) return false;
     return Boolean(
         values.type &&
-        values.firstName.trim() &&
-        values.lastName.trim() &&
-        values.email.trim() &&
-        values.phone.trim()
+            values.firstName.trim() &&
+            values.lastName.trim() &&
+            values.email.trim() &&
+            values.phone.trim()
     );
 };
 
@@ -78,12 +78,12 @@ export const isVehicleStepValid = (values: LeadFormValues): boolean => {
     if (values.type === LEAD_TYPE.TRADE_IN) {
         return Boolean(
             values.vin.trim() &&
-            values.make.trim() &&
-            values.model.trim() &&
-            values.year.trim() &&
-            values.mileage.trim() &&
-            values.desiredPrice !== null &&
-            values.payoffAmount !== null
+                values.make.trim() &&
+                values.model.trim() &&
+                values.year.trim() &&
+                values.mileage.trim() &&
+                values.desiredPrice !== null &&
+                values.payoffAmount !== null
         );
     }
 

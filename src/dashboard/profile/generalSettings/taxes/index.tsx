@@ -1,11 +1,11 @@
 import { ComboBox } from "dashboard/common/form/dropdown";
 import "./index.css";
 import { PercentInput } from "dashboard/common/form/inputs";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 export const SettingsTaxes = () => {
     return (
-        <div className='settings-form'>
-            <div className='settings-form__title'>Taxes</div>
+        <SettingsSection title='Taxes'>
             <div className='grid'>
                 <div className='col-3'>
                     <ComboBox label='State' className='taxes__dropdown' />
@@ -14,6 +14,6 @@ export const SettingsTaxes = () => {
                     <PercentInput />
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };

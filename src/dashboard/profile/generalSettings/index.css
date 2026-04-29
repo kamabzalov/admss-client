@@ -11,6 +11,10 @@
     max-height: var(--card-max-height);
     display: flex;
     flex-direction: column;
+
+    .card-header {
+        padding-top: 0;
+    }
 }
 
 .settings-form {
@@ -77,7 +81,6 @@
 .settings-form__title {
     height: var(--title-height);
     font-size: 20px;
-    font-weight: 700;
     text-transform: uppercase;
 }
 

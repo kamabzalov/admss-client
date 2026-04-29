@@ -20,6 +20,7 @@ import {
 } from "dashboard/profile/generalSettings/watermarking/common";
 import { Status } from "common/models/base-response";
 import { ImagePreview } from "dashboard/profile/generalSettings/watermarking/preview";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 export const SettingsWatermarking = observer((): ReactElement => {
     const store = useStore().generalSettingsStore;
@@ -229,8 +230,7 @@ export const SettingsWatermarking = observer((): ReactElement => {
     };
 
     return (
-        <div className='settings-form watermarking'>
-            <div className='settings-form__title'>Watermarking</div>
+        <SettingsSection title='Watermarking' className='watermarking'>
             <div className='grid align-items-center mt-0'>
                 <div className='col-6'>
                     <Checkbox
@@ -345,6 +345,6 @@ export const SettingsWatermarking = observer((): ReactElement => {
                 isOpen={isPreviewOpen}
                 onClose={handleClosePreview}
             />
-        </div>
+        </SettingsSection>
     );
 });

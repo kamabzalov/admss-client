@@ -19,6 +19,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DASHBOARD_PAGE } from "common/constants/links";
 import { SettingsExportWeb } from "dashboard/profile/generalSettings/export-web";
 import { UsersRoles } from "dashboard/profile/generalSettings/roles";
+import { SettingsLeadSettings } from "dashboard/profile/generalSettings/lead-settings/index";
 
 interface TabItem {
     settingName: string;
@@ -104,6 +105,11 @@ export const GeneralSettings = observer((): ReactElement => {
             settingName: "Export to Web",
             route: "export-web",
             component: <SettingsExportWeb />,
+        },
+        {
+            settingName: "Lead Settings",
+            route: "lead-settings",
+            component: <SettingsLeadSettings />,
         },
         {
             settingName: "Roles",

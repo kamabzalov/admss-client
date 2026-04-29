@@ -10,6 +10,7 @@ import { HowToKnow } from "common/models/deals";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 const NEW_ITEM = "new";
 const DESCRIPTION_MAX_LENGTH = 127;
@@ -131,9 +132,8 @@ export const SettingsOther = (): ReactElement => {
     }, [windowWidth]);
 
     return (
-        <div className='settings-form'>
+        <SettingsSection title='Other'>
             {isLoading && <Loader overlay />}
-            <div className='settings-form__title'>Other</div>
             <div className='flex justify-content-end mb-4'>
                 <Button
                     className='settings-form__button'
@@ -303,6 +303,6 @@ export const SettingsOther = (): ReactElement => {
                     </div>
                 </div>
             </div>
-        </div>
+        </SettingsSection>
     );
 };
