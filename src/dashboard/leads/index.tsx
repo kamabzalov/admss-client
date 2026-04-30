@@ -607,7 +607,8 @@ export const LeadsDataTable = observer(() => {
                         pt={{
                             root: {
                                 style: {
-                                    width: "70px",
+                                    width: "40px",
+                                    padding: "0px",
                                 },
                             },
                         }}
@@ -675,6 +676,7 @@ export const LeadsDataTable = observer(() => {
             <AdvancedSearchDialog<AdvancedSearch>
                 visible={dialogVisible}
                 buttonDisabled={buttonDisabled}
+                className='leads-advanced-search'
                 onHide={() => {
                     setButtonDisabled(!hasAdvancedSearch);
                     setDialogVisible(false);
@@ -683,7 +685,7 @@ export const LeadsDataTable = observer(() => {
                 onSearchClear={handleClearAdvancedSearchField}
                 onInputChange={handleSetAdvancedSearch}
                 fields={searchFields as SearchField<AdvancedSearch>[]}
-                searchForm={SEARCH_FORM_TYPE.DEALS}
+                searchForm={SEARCH_FORM_TYPE.LEADS}
             />
         </section>
     );
