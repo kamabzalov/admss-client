@@ -57,8 +57,14 @@
     }
 
     .leads__filter.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover,
-    .leads__filter.p-multiselect:not(.p-disabled) .p-multiselect-trigger:hover .p-multiselect-trigger-icon {
+    .leads__filter.p-multiselect:not(.p-disabled)
+        .p-multiselect-trigger:hover
+        .p-multiselect-trigger-icon {
         color: var(--admss-app-darkest-grey);
+    }
+
+    .p-datatable-wrapper {
+        scrollbar-gutter: auto;
     }
 }
 
@@ -100,3 +106,13 @@
     background: transparent;
 }
 
+.leads-advanced-search {
+    width: 548px;
+    .p-dialog-header {
+        padding-bottom: 12px;
+    }
+
+    .dialog-dates {
+        gap: 20px;
+    }
+}

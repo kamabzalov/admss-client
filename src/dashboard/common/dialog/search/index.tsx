@@ -25,6 +25,7 @@ export enum SEARCH_FORM_TYPE {
     INVENTORY,
     DEALS,
     ACCOUNTS,
+    LEADS,
 }
 
 enum DROPDOWN_TYPE {
@@ -78,6 +79,10 @@ export const AdvancedSearchDialog = <T,>({
     const autoCompleteRef = useRef<AutoComplete>(null);
     const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
     const autoMake = fields.find((field) => field.key === "Make")?.value;
+    const filteredFields =
+        searchForm === SEARCH_FORM_TYPE.LEADS
+            ? fields.filter((field) => field.type === SEARCH_FIELD_TYPE.DATE_RANGE)
+            : fields;
 
     const handleGetAutoMakeList = useCallback(async () => {
         if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
@@ -242,7 +247,7 @@ export const AdvancedSearchDialog = <T,>({
             draggable
         >
             <div className='flex flex-column gap-4 pt-4'>
-                {fields.map(({ key, value, type, label }) => {
+                {filteredFields.map(({ key, value, type, label }) => {
                     if (type === SEARCH_FIELD_TYPE.DATE) {
                         return (
                             <DateInput
