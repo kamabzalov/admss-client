@@ -29,6 +29,7 @@ export interface LeadFormValues {
 }
 
 export interface ExistingLeadState {
+    prevPath?: string;
     lead?: {
         contactinfo?: string;
         inventoryinfo?: string;

@@ -50,8 +50,8 @@
     font-size: 22px;
 }
 
-.lead__close-button:hover,
-.lead__close-button:focus {
+.lead__close-button:enabled:hover,
+.lead__close-button:enabled:focus {
     background-color: transparent;
     border-color: transparent;
     color: var(--admss-app-primary);

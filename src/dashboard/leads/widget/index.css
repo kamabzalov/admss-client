@@ -114,10 +114,9 @@
         background: transparent;
     }
 
+    .empty-list,
     .latest-leads__empty {
-        padding: 16px;
-        font-size: 14px;
-        text-align: center;
+        color: var(--admss-app-medium-grey);
     }
 
     .latest-leads__footer {

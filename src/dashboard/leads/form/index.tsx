@@ -22,6 +22,7 @@ export const LeadsForm = (): ReactElement => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState<number>(CONTACT_STEP);
     const locationState = location.state as ExistingLeadState | null;
+    const prevPath = locationState?.prevPath;
     const initialValues = useMemo(
         () => getInitialValues(id, locationState?.lead),
         [id, locationState?.lead]
@@ -36,7 +37,14 @@ export const LeadsForm = (): ReactElement => {
         navigate(LEADS_PAGE.MAIN);
     };
 
-    const handleExit = () => navigate(LEADS_PAGE.MAIN);
+    const handleExit = () => {
+        if (prevPath) {
+            navigate(prevPath);
+            return;
+        }
+
+        navigate(LEADS_PAGE.MAIN);
+    };
 
     return (
         <div className='grid relative lead'>
@@ -78,7 +86,9 @@ export const LeadsForm = (): ReactElement => {
                         return (
                             <Form className='card lead__card'>
                                 <div className='card-header lead__header'>
-                                    <h2 className='lead__title'>Create new lead</h2>
+                                    <h2 className='lead__title'>
+                                        {id ? "Edit" : "Create new"} lead
+                                    </h2>
                                 </div>
                                 <div className='lead__body'>
                                     <LeadFormSidebar
