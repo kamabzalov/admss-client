@@ -77,7 +77,7 @@ export const LatestLeads = ({
 
                             return (
                                 <div
-                                    key={lead.itemuid}
+                                    key={lead.dealuid || lead.itemuid}
                                     className='latest-leads__row'
                                     onClick={() =>
                                         navigate(LEADS_PAGE.EDIT(lead.dealuid), {
