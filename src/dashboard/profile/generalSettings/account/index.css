@@ -2,3 +2,88 @@
 .settings-account .p-inputnumber-input {
     width: 100%;
 }
+
+.settings-account {
+    padding-top: 0;
+    padding-left: 0;
+
+    .settings-form__title {
+        height: 48px;
+    }
+
+    .p-tabview-nav {
+        flex-direction: row;
+        flex: 0 0;
+        width: auto;
+        border: none;
+        min-height: auto;
+        border-bottom: 2px solid var(--admss-app-light-grey);
+        text-transform: uppercase;
+        font-weight: 700;
+        gap: 10px;
+    }
+
+    .settings-account__tabs .p-tabview-nav-container {
+        height: 35px;
+        padding-bottom: 40px;
+    }
+
+    .settings-account__tabs .p-tabview-nav {
+        display: flex;
+        height: auto;
+        min-height: auto;
+        flex-direction: row;
+    }
+
+    .settings-account__tabs .p-tabview-panels {
+        padding-top: 50px;
+        padding-left: 0;
+        padding-right: 10px;
+        border: none;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link {
+        color: var(--admss-app-primary);
+        border: none;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+        color: var(--admss-app-main-blue);
+        border-radius: 0;
+        border-bottom: 2px solid var(--admss-app-main-blue);
+    }
+
+    .radio {
+        width: 50%;
+    }
+}
+
+.settings-account__late-fee-row {
+    align-items: flex-start;
+}
+
+.settings-account__info .info-panel__button--pulse {
+    animation: none;
+}
+
+.settings-account__info .info-panel__panel {
+    padding: 30px;
+    width: 480px;
+    right: 50px;
+    bottom: -200px;
+}
+
+.settings-account__info .info-panel__body {
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.settings-account__info .info-panel__body p {
+    margin: 0 0 10px;
+}
+
+.settings-account__info .info-panel__body p:last-child {
+    margin-bottom: 0;
+}

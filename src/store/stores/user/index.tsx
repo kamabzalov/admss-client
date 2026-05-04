@@ -439,18 +439,27 @@ export class UserStore {
     }
 
     public set storedUser(user: AuthUser | null) {
+        if (!user) {
+            this._storedUser = null;
+            localStorageClear(LS_APP_USER);
+            return;
+        }
         try {
-            if (user) {
-                const { permissions, ...restUserData } = user;
-                this._storedUser = {
-                    ...restUserData,
-                    permissions: this._storedUser?.permissions || ({} as UserPermissionsResponse),
-                };
-                setKey(LS_APP_USER, JSON.stringify(this._storedUser));
-            } else {
-                this._storedUser = null;
-                localStorageClear(LS_APP_USER);
-            }
+            const { permissions: incomingPermissions, ...restUserData } = user;
+            const isSameUser =
+                this._storedUser?.useruid != null && this._storedUser.useruid === user.useruid;
+            const hasIncomingPermissions =
+                !!incomingPermissions && Object.keys(incomingPermissions).length > 0;
+
+            this._storedUser = {
+                ...restUserData,
+                permissions: hasIncomingPermissions
+                    ? incomingPermissions
+                    : isSameUser && this._storedUser?.permissions
+                      ? this._storedUser.permissions
+                      : ({} as UserPermissionsResponse),
+            };
+            setKey(LS_APP_USER, JSON.stringify(this._storedUser));
         } catch {
             this._storedUser = null;
             localStorageClear(LS_APP_USER);

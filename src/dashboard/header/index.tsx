@@ -14,6 +14,7 @@ import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
+import { usePermissions } from "common/hooks/usePermissions";
 import {
     CONTACT_SUPPORT,
     HELP_PAGE,
@@ -27,6 +28,7 @@ export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser, isSettingsLoaded } = store;
     const { logout: authLogout } = useAuth();
+    const { canAccessSettings, canAccessUsers } = usePermissions();
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -36,21 +38,15 @@ export const Header = observer((): ReactElement => {
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
 
-    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        if (authUser && Object.keys(authUser.permissions).length) {
-            getExtendedData(authUser.useruid).then((response) => {
-                if (response && response.locations && response.locations.length > 1) {
-                    setShowChangeLocation(true);
-                }
-            });
-            const { permissions } = authUser;
-            const { uaSalesPerson, ...otherPermissions } = permissions;
-            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-                return setIsSalesPerson(false);
-            }
-            if (!!uaSalesPerson) setIsSalesPerson(true);
+        if (!authUser) {
+            setShowChangeLocation(false);
+            return;
         }
+
+        getExtendedData(authUser.useruid).then((response) => {
+            setShowChangeLocation(!!response?.locations && response.locations.length > 1);
+        });
     }, [authUser?.useruid]);
 
     const signOut = async ({ useruid, token }: AuthUser) => {
@@ -72,48 +68,50 @@ export const Header = observer((): ReactElement => {
         navigate({ search: searchParams.toString() }, { replace: true });
     };
 
-    const menuItems = useMemo(
-        () =>
-            [
-                {
-                    label: "My Profile",
-                    command: () => navigate(USER_PROFILE_PAGE.MAIN),
+    const menuItems = useMemo(() => {
+        const showSettingsMenu = canAccessSettings();
+        const showUsersMenu = canAccessUsers();
+        const hasManageSectionItems = showChangeLocation || showUsersMenu;
+
+        return [
+            {
+                label: "My Profile",
+                command: () => navigate(USER_PROFILE_PAGE.MAIN),
+            },
+            showSettingsMenu
+                ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
+                : null,
+            { separator: true },
+            showChangeLocation ? { label: "Change Location" } : null,
+            showUsersMenu ? { label: "Users", command: () => navigate(USERS_PAGE.MAIN) } : null,
+            hasManageSectionItems ? { separator: true } : null,
+            {
+                label: "Contact support",
+                command() {
+                    setSupportContact(true);
                 },
-                !isSalesPerson
-                    ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
-                    : null,
-                { separator: true },
-                showChangeLocation ? { label: "Change Location" } : null,
-                { label: "Users", command: () => navigate(USERS_PAGE.MAIN) },
-                { separator: true },
-                {
-                    label: "Contact support",
-                    command() {
-                        setSupportContact(true);
-                    },
+            },
+            {
+                label: "Support history",
+                command() {
+                    setSupportHistory(true);
                 },
-                {
-                    label: "Support history",
-                    command() {
-                        setSupportHistory(true);
-                    },
+            },
+            {
+                label: "Help",
+                command() {
+                    window.open(HELP_PAGE, "_blank");
                 },
-                {
-                    label: "Help",
-                    command() {
-                        window.open(HELP_PAGE, "_blank");
-                    },
+            },
+            { separator: true },
+            {
+                label: "Logout",
+                command() {
+                    authUser && signOut(authUser);
                 },
-                { separator: true },
-                {
-                    label: "Logout",
-                    command() {
-                        authUser && signOut(authUser);
-                    },
-                },
-            ].filter(Boolean) as MenuItem[],
-        [authUser, isSalesPerson, showChangeLocation]
-    );
+            },
+        ].filter(Boolean) as MenuItem[];
+    }, [authUser, canAccessSettings, canAccessUsers, showChangeLocation, navigate]);
 
     if (!isSettingsLoaded) {
         return <></>;
