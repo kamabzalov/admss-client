@@ -11,6 +11,8 @@ interface InfoOverlayPanelProps {
     className?: string;
     pageId?: string | null;
     profileHintKey?: keyof Pick<ReportsUserSettings, "columnSelectHintViewed">;
+    disableHover?: boolean;
+    disablePulse?: boolean;
 }
 
 export const InfoOverlayPanel = ({
@@ -19,6 +21,8 @@ export const InfoOverlayPanel = ({
     className,
     pageId,
     profileHintKey,
+    disableHover = false,
+    disablePulse = false,
 }: InfoOverlayPanelProps): ReactElement => {
     const [panelShow, setPanelShow] = useState<boolean>(false);
     const { userStore } = useStore();
@@ -105,13 +109,13 @@ export const InfoOverlayPanel = ({
         };
     }, []);
 
-    const showPulse = isProfileBased ? !profileHintViewed : isFirstVisit;
+    const showPulse = disablePulse ? false : isProfileBased ? !profileHintViewed : isFirstVisit;
 
     return (
         <div
             className={`info-panel ${className ?? ""}`}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={disableHover ? undefined : handleMouseEnter}
+            onMouseLeave={disableHover ? undefined : handleMouseLeave}
         >
             <button
                 type='button'

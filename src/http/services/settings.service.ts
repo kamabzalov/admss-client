@@ -39,6 +39,39 @@ export const updateUserGeneralSettings = async (body?: Partial<GeneralSettings>)
     }
 };
 
+export const getUserSettingsByUid = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<GeneralSettings>(
+            `user/${useruid}/settings`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting user settings",
+            };
+        }
+    }
+};
+
+export const updateUserSettingsByUid = async (useruid: string, body?: Partial<GeneralSettings>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `user/${useruid}/settings`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating user settings",
+            };
+        }
+    }
+};
+
 export const getWatermark = async (
     mediauid: string
 ): Promise<string | BaseResponseError | undefined> => {

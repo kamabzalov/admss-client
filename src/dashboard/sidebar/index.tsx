@@ -27,6 +27,7 @@ export const Sidebar = observer((): ReactElement => {
         dealPermissions,
         accountPermissions,
         salesPermissions,
+        canAccessSettings,
     } = usePermissions();
     const { authUser, settings } = store;
     const [isInitialRender, setIsInitialRender] = useState(true);
@@ -107,12 +108,13 @@ export const Sidebar = observer((): ReactElement => {
                 {salesPermissions.canShowDeals() &&
                     dealPermissions.canSeeInMenu() &&
                     renderNavItem(LEADS_PAGE.MAIN, "leads", "Leads")}
-                {renderNavItem(
-                    SETTINGS_PAGE.MAIN,
-                    <i className='sidebar-nav__icon adms-settings' />,
-                    "Settings",
-                    "sidebar-nav__item--settings"
-                )}
+                {canAccessSettings() &&
+                    renderNavItem(
+                        SETTINGS_PAGE.MAIN,
+                        <i className='sidebar-nav__icon adms-settings' />,
+                        "Settings",
+                        "sidebar-nav__item--settings"
+                    )}
             </ul>
         </aside>
     );

@@ -221,11 +221,17 @@ export const usePermissions = () => {
         },
     };
 
+    const canAccessSettings = (): boolean => hasPermission("uaEditSettings");
+
+    const canAccessUsers = (): boolean => hasPermission("uaCreateUsers");
+
     return {
         hasPermission,
         hasAnyPermission,
         hasAllPermissions,
         isSalespersonOnly,
+        canAccessSettings,
+        canAccessUsers,
         inventoryPermissions,
         contactPermissions,
         dealPermissions,

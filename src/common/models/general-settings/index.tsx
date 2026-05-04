@@ -7,6 +7,7 @@ export interface GeneralSettings extends BaseResponseError {
     accountLateFeeMax: number;
     accountLateFeeMin: number;
     accountLateFeePercentage: number;
+    accountNumberStrategy: number;
     accountPrefix: string;
     accountStartNumber: number;
     accountSuffix: string;

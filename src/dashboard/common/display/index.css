@@ -6,3 +6,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.splitter {
+    display: flex;
+    align-items: center;
+    .splitter__line + * {
+        margin-left: 15px;
+    }
+}
