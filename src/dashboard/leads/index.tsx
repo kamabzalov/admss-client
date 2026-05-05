@@ -8,7 +8,11 @@ import { getDealsList } from "http/services/deals.service";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Deal, TotalDealsList } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import {
+    MultiSelect,
+    MultiSelectChangeEvent,
+    MultiSelectPanelHeaderTemplateEvent,
+} from "primereact/multiselect";
 import { ChipMultiSelect } from "dashboard/common/form/chip-multiselect";
 import {
     AdvancedSearchDialog,
@@ -27,7 +31,7 @@ import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { LeadsUserSettings } from "common/models/user";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { DEAL_STATUS_ID } from "common/constants/lead-options";
+import { LEAD_STATUS_OPTIONS, LEAD_TYPE_OPTIONS } from "common/constants/lead-options";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import { LEADS_PAGE } from "common/constants/links";
@@ -63,39 +67,25 @@ interface LeadsFilterGroup {
 }
 
 enum FILTER_CATEGORIES {
-    TYPE = "Type (one of the list)",
-    STATUS = "Status (one of the list)",
-    OTHER = "Other",
+    TYPE = "Type",
+    STATUS = "Status",
 }
 
-const DEALS_TYPE_LIST: LeadsFilterOptions[] = [
-    { name: "All", value: "allTypes" },
-    { name: "Buy Here Pay Here", value: "0.DealType" },
-    { name: "Lease Here Pay Here", value: "7.DealType" },
-    { name: "Cash", value: "1.DealType" },
-    { name: "Wholesale", value: "5.DealType" },
-    { name: "Dismantled", value: "6.DealType" },
-];
-
-const DEALS_OTHER_LIST: LeadsFilterOptions[] = [
-    { name: "All incomplete", value: "0.DealComplete" },
-    { name: "Dead or Deleted", value: `${DEAL_STATUS_ID.DEAD_OR_DELETED}.DealStatus` },
-    { name: "Deals not yet sent to RFC", value: "0.RFCSent" },
-];
-
-const DEALS_STATUS_LIST: LeadsFilterOptions[] = [
-    { name: "All", value: "allStatuses" },
-    { name: "Recent deals", value: "0.30.Age" },
-    { name: "Quotes", value: `${DEAL_STATUS_ID.QUOTE_OR_PROSPECT}.DealStatus` },
-    { name: "Pending", value: `${DEAL_STATUS_ID.PENDING_OR_IN_TRANSIT}.DealStatus` },
-    { name: "Sold, Not finalized", value: `${DEAL_STATUS_ID.SOLD_NOT_FINALIZED}.DealStatus` },
-    { name: "Manager's review", value: "1.managerReview" },
-];
-
 const FILTER_GROUP_LIST: LeadsFilterGroup[] = [
-    { name: FILTER_CATEGORIES.TYPE, options: DEALS_TYPE_LIST },
-    { name: FILTER_CATEGORIES.STATUS, options: DEALS_STATUS_LIST },
-    { name: FILTER_CATEGORIES.OTHER, options: DEALS_OTHER_LIST },
+    {
+        name: FILTER_CATEGORIES.TYPE,
+        options: LEAD_TYPE_OPTIONS.map(({ label, value }) => ({
+            name: label,
+            value: `${value}.type`,
+        })),
+    },
+    {
+        name: FILTER_CATEGORIES.STATUS,
+        options: LEAD_STATUS_OPTIONS.map(({ label, value }) => ({
+            name: label,
+            value: `${value}.status`,
+        })),
+    },
 ];
 
 enum SEARCH_FORM_FIELDS {
@@ -288,23 +278,27 @@ export const LeadsDataTable = observer(() => {
 
     const matchesFilterToken = (deal: Deal, token: string): boolean => {
         const [valuePart, fieldPart] = token.split(".");
-        const parsedValue = Number(valuePart);
-        if (!Number.isFinite(parsedValue) || !fieldPart) return true;
+        if (!valuePart || !fieldPart) return true;
 
-        if (fieldPart === "DealType") {
-            return Number(deal.dealtype) === parsedValue;
+        if (fieldPart === `${FILTER_CATEGORIES.TYPE}.type`) {
+            if (deal.dealtype == null) return false;
+            const normalizedDealType = deal.dealtype <= 1 ? "trade-in" : "service";
+            return normalizedDealType === valuePart;
         }
-        if (fieldPart === "DealStatus") {
-            return Number(deal.dealstatus) === parsedValue;
+
+        if (fieldPart === `${FILTER_CATEGORIES.STATUS}.status`) {
+            const { tone } = getLeadStatusPresentation(deal);
+            if (!tone) return false;
+            const modifier = getLeadStatusToneModifier(tone);
+            return modifier === valuePart;
         }
+
         return true;
     };
 
     const rowsToDisplay = useMemo(() => {
         const normalizedSearch = globalSearch.trim().toLowerCase();
-        const selectedFilters = dealSelectedGroup.filter(
-            (item) => item && item !== "allTypes" && item !== "allStatuses"
-        );
+        const selectedFilters = dealSelectedGroup.filter((item) => Boolean(item));
 
         return rows.filter((deal) => {
             if (selectedFilters.length) {
@@ -427,6 +421,40 @@ export const LeadsDataTable = observer(() => {
         });
     };
 
+    const filterHeaderTemplate = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
+        const filterOptions = FILTER_GROUP_LIST.flatMap((group) =>
+            group.options.map((option) => option.value)
+        );
+        const allSelected =
+            filterOptions.length > 0 &&
+            filterOptions.every((value) => dealSelectedGroup.includes(value));
+
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        checked={allSelected}
+                        onChange={() => {
+                            setDealSelectedGroup(allSelected ? [] : filterOptions);
+                        }}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    type='button'
+                    className='p-multiselect-close p-link'
+                    onClick={(event) => {
+                        setDealSelectedGroup([]);
+                        onCloseClick(event);
+                    }}
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
     const filterTemplate = (
         <span className='p-float-label'>
             <MultiSelect
@@ -436,32 +464,12 @@ export const LeadsDataTable = observer(() => {
                 options={FILTER_GROUP_LIST}
                 optionGroupLabel='name'
                 optionGroupChildren='options'
-                panelHeaderTemplate={<></>}
+                panelHeaderTemplate={filterHeaderTemplate}
                 display='chip'
                 className='leads__filter'
                 onChange={(e) => {
                     e.stopPropagation();
-                    const newValue = [...e.value];
-                    const lastSelected = newValue[newValue.length - 1];
-
-                    const lastSelectedCategory = FILTER_GROUP_LIST.find((group) =>
-                        group.options.some((option) => option.value === lastSelected)
-                    )?.name;
-
-                    if (
-                        lastSelectedCategory === FILTER_CATEGORIES.TYPE ||
-                        lastSelectedCategory === FILTER_CATEGORIES.STATUS
-                    ) {
-                        const filteredValue = newValue.filter((item) => {
-                            const itemCategory = FILTER_GROUP_LIST.find((group) =>
-                                group.options.some((option) => option.value === item)
-                            )?.name;
-                            return itemCategory !== lastSelectedCategory || item === lastSelected;
-                        });
-                        setDealSelectedGroup(filteredValue);
-                    } else {
-                        setDealSelectedGroup(newValue);
-                    }
+                    setDealSelectedGroup(Array.isArray(e.value) ? [...e.value] : []);
                 }}
                 pt={{
                     wrapper: {
