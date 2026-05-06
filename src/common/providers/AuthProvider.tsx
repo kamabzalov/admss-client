@@ -13,6 +13,11 @@ import { AuthUser } from "common/models/user";
 import { getKeyValue, localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { typeGuards } from "common/utils";
+import {
+    broadcastSessionEvent,
+    SESSION_SYNC,
+    subscribeToSessionEvents,
+} from "common/utils/cross-tab-sync";
 import { SessionExpiryModal } from "dashboard/common/session-expiry-modal";
 import {
     registerAuthProviderUpdate,
@@ -28,6 +33,7 @@ import { MS_IN_SECOND, SECONDS_IN_MINUTE } from "common/constants/time";
 import { store } from "store";
 
 const REFRESH_MARGIN_SECONDS = SECONDS_IN_MINUTE;
+const CROSS_TAB_ACTIVITY_BROADCAST_THROTTLE_MS = 5 * MS_IN_SECOND;
 
 interface AuthTokensState {
     accessToken: string | null;
@@ -108,6 +114,15 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     const inactivityTimerId = useRef<number | null>(null);
     const inactivityPreRefreshTimerId = useRef<number | null>(null);
     const inactivityInitializedRef = useRef<boolean>(false);
+    const lastActivityBroadcastAtRef = useRef<number>(0);
+
+    const broadcastLocalActivityIfNeeded = () => {
+        const now = Date.now();
+        if (now - lastActivityBroadcastAtRef.current >= CROSS_TAB_ACTIVITY_BROADCAST_THROTTLE_MS) {
+            lastActivityBroadcastAtRef.current = now;
+            broadcastSessionEvent(SESSION_SYNC.ACTIVITY);
+        }
+    };
 
     const clearRefreshTimer = () => {
         if (refreshTimerId.current !== null) {
@@ -235,6 +250,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             await apiLogout(authUser.useruid, tokens.accessToken);
         }
 
+        broadcastSessionEvent(SESSION_SYNC.LOGOUT);
         logout();
         window.location.replace(HOME_PAGE);
     }, [authUser, tokens.accessToken, logout]);
@@ -310,6 +326,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             }
 
             resetInactivityTimer();
+            broadcastLocalActivityIfNeeded();
         };
 
         const handleVisibilityChange = () => {
@@ -337,6 +354,64 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, [authUser, isSessionExpiring]);
+
+    useEffect(() => {
+        if (!authUser) {
+            return;
+        }
+
+        const unsubscribe = subscribeToSessionEvents((event) => {
+            switch (event.type) {
+                case SESSION_SYNC.ACTIVITY: {
+                    resetInactivityTimer();
+                    if (isSessionExpiring) {
+                        setIsSessionExpiring(false);
+                        setSecondsLeft(0);
+                        clearCountdownInterval();
+                    }
+                    break;
+                }
+                case SESSION_SYNC.SESSION_REFRESHED: {
+                    const stored = getKeyValue(LS_APP_USER) as AuthUser | null;
+                    if (!stored) {
+                        return;
+                    }
+                    const now = Date.now();
+                    setAuthUser(stored);
+                    setTokens({
+                        accessToken: stored.token || null,
+                        refreshToken: stored.refresh_token || null,
+                        sessionUid: stored.sessionuid || null,
+                        userUid: stored.useruid || null,
+                        expiresAt: typeGuards.isNumber(stored.expires_in)
+                            ? now + stored.expires_in * MS_IN_SECOND
+                            : null,
+                        refreshExpiresAt: typeGuards.isNumber(stored.refresh_token_expires_in)
+                            ? now + stored.refresh_token_expires_in * MS_IN_SECOND
+                            : null,
+                    });
+                    setIsSessionExpiring(false);
+                    setSecondsLeft(0);
+                    clearCountdownInterval();
+                    clearRefreshTimer();
+                    if (isSessionExpiring) {
+                        resetInactivityTimer();
+                    }
+                    if (typeGuards.isNumber(stored.expires_in)) {
+                        scheduleRefresh(stored.expires_in);
+                    }
+                    break;
+                }
+                case SESSION_SYNC.LOGOUT: {
+                    logout();
+                    window.location.replace(HOME_PAGE);
+                    break;
+                }
+            }
+        });
+
+        return () => unsubscribe();
+    }, [authUser, isSessionExpiring, logout]);
 
     const scheduleRefresh = useCallback(
         (expiresInSec: number) => {
@@ -394,8 +469,12 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             setSecondsLeft(0);
             clearCountdownInterval();
             clearRefreshTimer();
+            if (isSessionExpiring) {
+                resetInactivityTimer();
+            }
+            broadcastSessionEvent(SESSION_SYNC.SESSION_REFRESHED);
         },
-        [scheduleRefresh]
+        [isSessionExpiring, scheduleRefresh]
     );
 
     useEffect(() => {
