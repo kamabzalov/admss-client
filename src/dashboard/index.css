@@ -44,6 +44,14 @@
     }
 }
 
+.p-button.p-button-success.p-button-outlined:enabled:hover,
+.p-button.p-button-outlined:enabled:hover {
+    color: var(--admss-app-dark-green);
+    box-shadow: none;
+    border-color: var(--admss-app-dark-green);
+    background: transparent;
+}
+
 .card-header {
     margin-bottom: 30px;
     display: flex;
