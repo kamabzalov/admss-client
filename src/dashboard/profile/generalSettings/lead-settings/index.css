@@ -114,6 +114,13 @@
         padding: 20px;
         margin-right: 10px;
     }
+
+    .settings-lead__icon-placeholder {
+        flex: 0 0 auto;
+        width: 22px;
+        padding: 20px;
+        margin-right: 10px;
+    }
 }
 
 .settings-lead__type--header {
@@ -123,7 +130,7 @@
 
 .settings-lead__type-text {
     white-space: nowrap;
-    &:disabled {
+    &.settings-lead__type-text--disabled {
         opacity: 1;
         color: var(--admss-app-lightest-grey);
     }
