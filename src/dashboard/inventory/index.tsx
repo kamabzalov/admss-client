@@ -4,7 +4,6 @@ import {
     DataTableColReorderEvent,
     DataTableColumnResizeEndEvent,
     DataTablePageEvent,
-    DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
@@ -447,26 +446,6 @@ export default function Inventories({
         }
     };
 
-    const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
-        const selectedText = window.getSelection()?.toString();
-
-        if (!!selectedText?.length) {
-            return;
-        }
-
-        if (getFullInfo) {
-            getFullInfo(data as Inventory);
-        }
-        if (onRowClick) {
-            const value = returnedField ? data[returnedField] : data.Make;
-            onRowClick(value);
-        } else {
-            if (inventoryPermissions.canOpenDetails()) {
-                navigate(data.itemuid);
-            }
-        }
-    };
-
     return (
         <DataTableWrapper className='card inventory'>
             <div className='card-header'>
@@ -535,7 +514,6 @@ export default function Inventories({
                         rowClassName={() => "table-row"}
                         onColReorder={handleColumnReorder}
                         onColumnResizeEnd={handleColumnResize}
-                        onRowClick={handleOnRowClick}
                         emptyMessage={ERROR_MESSAGES.NO_DATA}
                     >
                         <Column
