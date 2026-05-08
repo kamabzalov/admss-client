@@ -460,10 +460,6 @@ export default function Inventories({
         if (onRowClick) {
             const value = returnedField ? data[returnedField] : data.Make;
             onRowClick(value);
-        } else {
-            if (inventoryPermissions.canOpenDetails()) {
-                navigate(data.itemuid);
-            }
         }
     };
 
