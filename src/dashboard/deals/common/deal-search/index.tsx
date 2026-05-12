@@ -65,10 +65,8 @@ export const DealSearch = ({
         }
         isJustSelectedRef.current = false;
         setIsLoading(true);
-        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
-        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
-            qry,
+            qry: searchValue,
         };
         const response = await getDealsList(authUser!.useruid, params);
 

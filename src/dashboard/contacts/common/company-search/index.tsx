@@ -67,10 +67,8 @@ export const CompanySearch = ({
         if (!searchValue.trim()) {
             return;
         }
-        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
-        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
-            qry,
+            qry: searchValue,
             ...(currentCategory && { param: currentCategory }),
         };
         user &&

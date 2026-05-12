@@ -110,15 +110,17 @@ export const AddTaskDialog = observer(
 
         const handleDateChange = (key: DATE_TYPE, date: Date) => {
             const formattedDate = formatDateForServer(date);
-            if (
-                (key === DATE_TYPE.START &&
-                    validateDates(formattedDate, taskState.deadline || "")) ||
-                (key === DATE_TYPE.DEADLINE &&
-                    validateDates(taskState.startdate || "", formattedDate))
-            ) {
+            const validation =
+                key === DATE_TYPE.START
+                    ? validateDates(formattedDate, taskState.deadline || "")
+                    : validateDates(taskState.startdate || "", formattedDate);
+
+            if (validation.isValid) {
                 setTaskState((prev) => ({ ...prev, [key]: formattedDate }));
                 setDateError("");
                 setIsFormChanged(true);
+            } else {
+                setDateError(validation.error || "");
             }
         };
 
@@ -129,7 +131,7 @@ export const AddTaskDialog = observer(
 
         const handleSaveTaskData = async () => {
             if (
-                !validateDates(taskState.startdate || "", taskState.deadline || "") ||
+                !validateDates(taskState.startdate || "", taskState.deadline || "").isValid ||
                 !taskState.useruid
             )
                 return;
