@@ -1,11 +1,20 @@
 import { makeAutoObservable } from "mobx";
 import { AuthUser } from "common/models/user";
 import { RootStore } from "store";
-import { updateUserProfile, changePassword, checkPassword, getUserData } from "http/services/users";
+import {
+    updateUserProfile,
+    changePassword,
+    checkPassword,
+    getUserData,
+    getUserLocations,
+    setUserLocations,
+    getDealerLocations,
+} from "http/services/users";
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { typeGuards } from "common/utils";
 import { getUserLogo, uploadUserLogo } from "http/services/media.service";
+import { InventoryLocations } from "common/models/inventory";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
     address: string;
@@ -38,6 +47,14 @@ export class ProfileStore {
     private _currentPasswordError: boolean = false;
     private _currentPasswordErrorMessage: string | null = null;
     private _isValidatingPassword: boolean = false;
+    private _currentLocation: Partial<InventoryLocations> | null = null;
+    private _locations: InventoryLocations[] = [];
+    private _selectedLocationUid: string = "";
+    private _dealerLocations: InventoryLocations[] = [];
+    private _selectedLocationUids: string[] = [];
+    private _hasUnsavedLocationChanges: boolean = false;
+    private _showLocationsWarning: boolean = false;
+    private _isLocationsSaving: boolean = false;
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
@@ -76,9 +93,100 @@ export class ProfileStore {
         return this._isProfileChanged;
     }
 
+    public get locations() {
+        return this._locations;
+    }
+
+    public get selectedLocationUid() {
+        return this._selectedLocationUid;
+    }
+
+    public get dealerLocations() {
+        return this._dealerLocations;
+    }
+
+    public get selectedLocationUids() {
+        return this._selectedLocationUids;
+    }
+
+    public get hasUnsavedLocationChanges() {
+        return this._hasUnsavedLocationChanges;
+    }
+
+    public get showLocationsWarning() {
+        return this._showLocationsWarning;
+    }
+
+    public get isLocationsSaving() {
+        return this._isLocationsSaving;
+    }
+
     public set profile(profile: ExtendedProfile) {
         this._profile = profile;
     }
+
+    public changeCurrentLocation(locationuid: string) {
+        const selectedLocation = this._locations.find(
+            (location) => location.locationuid === locationuid
+        );
+        if (!selectedLocation) {
+            return;
+        }
+
+        const hasLocationChanged = this._selectedLocationUid !== locationuid;
+        this._selectedLocationUid = locationuid;
+        this._currentLocation = selectedLocation;
+        this._profile = {
+            ...this._profile,
+            locationname: selectedLocation.locName || "",
+            address: selectedLocation.locStreetAddress || "",
+            state: selectedLocation.locState || "",
+            zipCode: selectedLocation.locZIP || "",
+            phoneNumber: selectedLocation.locPhone1 || "",
+            email: selectedLocation.locEmail1 || "",
+        };
+        this._isProfileChanged = hasLocationChanged;
+    }
+
+    public changeSelectedLocations = (locationUids: string[]) => {
+        const uniqueUids = Array.from(new Set(locationUids));
+        const prevSorted = [...this._selectedLocationUids].sort().join(",");
+        const nextSorted = [...uniqueUids].sort().join(",");
+        const hasSelectionChanged = prevSorted !== nextSorted;
+
+        this._selectedLocationUids = uniqueUids;
+
+        const primaryUid = uniqueUids[0];
+        const primaryLocation = primaryUid
+            ? this._dealerLocations.find((location) => location.locationuid === primaryUid) ||
+              this._locations.find((location) => location.locationuid === primaryUid) ||
+              null
+            : null;
+        this._currentLocation = primaryLocation;
+
+        if (primaryLocation) {
+            this._profile = {
+                ...this._profile,
+                locationname: primaryLocation.locName || "",
+                address: primaryLocation.locStreetAddress || "",
+                state: primaryLocation.locState || "",
+                zipCode: primaryLocation.locZIP || "",
+                phoneNumber: primaryLocation.locPhone1 || "",
+                email: primaryLocation.locEmail1 || "",
+            };
+        }
+
+        if (hasSelectionChanged) {
+            this._isProfileChanged = true;
+            this._hasUnsavedLocationChanges = true;
+        }
+    };
+
+    public markLocationsBlurred = () => {
+        if (this._hasUnsavedLocationChanges) {
+            this._showLocationsWarning = true;
+        }
+    };
 
     public setLogoFile(file: File | null) {
         this._logoFile = file;
@@ -175,23 +283,55 @@ export class ProfileStore {
         }
 
         try {
-            const response = await getUserData(authUser.useruid);
+            const [response, locationsResponse, dealerLocationsResponse] = await Promise.all([
+                getUserData(authUser.useruid),
+                getUserLocations(authUser.useruid),
+                authUser.dealer_id
+                    ? getDealerLocations(authUser.dealer_id)
+                    : Promise.resolve(undefined),
+            ]);
 
             if (!response || typeGuards.isExist(response.error)) {
                 return response as BaseResponseError | undefined;
             }
 
             const userData = response as UserData;
+            const userLocations = Array.isArray(locationsResponse) ? locationsResponse : [];
+            const dealerLocations = Array.isArray(dealerLocationsResponse)
+                ? dealerLocationsResponse
+                : [];
+            const currentLocation =
+                userLocations.find((location) => location.locationuid === authUser.locationuid) ||
+                userLocations[0];
+
+            const dealerLocationUids = new Set(
+                dealerLocations
+                    .map((location) => location.locationuid)
+                    .filter((uid): uid is string => !!uid)
+            );
+            const selectedUids = userLocations
+                .map((location) => location.locationuid)
+                .filter((uid): uid is string => !!uid)
+                .filter((uid) => dealerLocationUids.has(uid));
+
+            this._locations = userLocations;
+            this._selectedLocationUid = currentLocation?.locationuid || "";
+            this._currentLocation = currentLocation || null;
+            this._dealerLocations = dealerLocations;
+            this._selectedLocationUids = selectedUids;
+            this._hasUnsavedLocationChanges = false;
+            this._showLocationsWarning = false;
 
             this._profile = {
                 ...this._profile,
                 companyname: userData.companyName || authUser.companyname || "",
-                locationname: userData.city || authUser.locationname || "",
-                address: userData.streetAddress || "",
-                state: userData.state || "",
-                zipCode: userData.ZIP || "",
-                phoneNumber: userData.phone || userData.phone1 || "",
-                email: userData.email || userData.email1 || "",
+                locationname:
+                    currentLocation?.locName || userData.city || authUser.locationname || "",
+                address: currentLocation?.locStreetAddress || userData.streetAddress || "",
+                state: currentLocation?.locState || userData.state || "",
+                zipCode: currentLocation?.locZIP || userData.ZIP || "",
+                phoneNumber: currentLocation?.locPhone1 || userData.phone || userData.phone1 || "",
+                email: currentLocation?.locEmail1 || userData.email || userData.email1 || "",
             };
 
             this._isProfileChanged = false;
@@ -221,10 +361,6 @@ export class ProfileStore {
         const userData: Partial<UserData> = {
             phone: convertEmptyValue(this._profile.phoneNumber),
             email: convertEmptyValue(this._profile.email),
-            streetAddress: convertEmptyValue(this._profile.address),
-            city: convertEmptyValue(this._profile.locationname || authUser.locationname),
-            state: convertEmptyValue(this._profile.state),
-            ZIP: convertEmptyValue(this._profile.zipCode),
         };
 
         try {
@@ -232,6 +368,24 @@ export class ProfileStore {
 
             if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
+            }
+
+            const locationPayload: Partial<InventoryLocations> = {
+                ...this._currentLocation,
+                useruid: authUser.useruid,
+                locationuid:
+                    this._currentLocation?.locationuid || authUser.locationuid || undefined,
+                locName: convertEmptyValue(this._profile.locationname || authUser.locationname),
+                locStreetAddress: convertEmptyValue(this._profile.address),
+                locState: convertEmptyValue(this._profile.state),
+                locZIP: convertEmptyValue(this._profile.zipCode),
+                locPhone1: convertEmptyValue(this._profile.phoneNumber),
+                locEmail1: convertEmptyValue(this._profile.email),
+            };
+
+            const locationResponse = await setUserLocations(authUser.useruid, [locationPayload]);
+            if (locationResponse && typeGuards.isExist(locationResponse.error)) {
+                return locationResponse as BaseResponseError;
             }
 
             if (this._logoFile) {
@@ -257,6 +411,42 @@ export class ProfileStore {
                 status: Status.ERROR,
                 error,
             } as BaseResponseError;
+        }
+    };
+
+    public saveLocations = async () => {
+        const authUser = this.rootStore.userStore.authUser;
+        if (!authUser?.useruid) {
+            return {
+                status: Status.ERROR,
+                error: "User is not authenticated",
+            } as BaseResponseError;
+        }
+
+        this._isLocationsSaving = true;
+        try {
+            const selectedLocations: Partial<InventoryLocations>[] = this._dealerLocations
+                .filter((location) => this._selectedLocationUids.includes(location.locationuid))
+                .map((location) => ({
+                    ...location,
+                    useruid: authUser.useruid,
+                }));
+
+            const response = await setUserLocations(authUser.useruid, selectedLocations);
+            if (response && typeGuards.isExist(response.error)) {
+                return response as BaseResponseError;
+            }
+
+            this._hasUnsavedLocationChanges = false;
+            this._showLocationsWarning = false;
+            return response;
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            } as BaseResponseError;
+        } finally {
+            this._isLocationsSaving = false;
         }
     };
 

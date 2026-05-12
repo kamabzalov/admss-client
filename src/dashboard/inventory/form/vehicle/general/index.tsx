@@ -7,8 +7,8 @@ import {
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
-    getInventoryLocations,
 } from "http/services/inventory-service";
+import { getUserLocations } from "http/services/users";
 
 import { useFormikContext } from "formik";
 import { useStore } from "store/hooks";
@@ -106,7 +106,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
     const handleGetLocationsList = async () => {
         if (!authUser) return;
-        const response = await getInventoryLocations(authUser.useruid);
+        const response = await getUserLocations(authUser.useruid);
         if (response && Array.isArray(response)) {
             setLocationList(response);
         }
