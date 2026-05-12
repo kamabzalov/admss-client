@@ -58,10 +58,8 @@ export const AccountSearch = ({
         }
         IsRefSelected.current = false;
         setIsLoading(true);
-        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
-        const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
-            qry,
+            qry: searchValue,
         };
         const response = await getAccountsList(authUser!.useruid, params);
 
