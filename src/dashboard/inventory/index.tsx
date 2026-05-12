@@ -7,7 +7,8 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
+import { getInventoryList } from "http/services/inventory-service";
+import { getUserLocations } from "http/services/users";
 import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { Column } from "primereact/column";
@@ -89,7 +90,7 @@ export default function Inventories({
     const getInventoryInfo = async () => {
         if (!authUser) return;
 
-        const locationsResponse = await getInventoryLocations(authUser.useruid);
+        const locationsResponse = await getUserLocations(authUser.useruid);
         if (locationsResponse && Array.isArray(locationsResponse)) {
             setLocations(locationsResponse);
         }

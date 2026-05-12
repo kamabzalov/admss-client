@@ -13,7 +13,6 @@ import {
     InventoryCheckVIN,
     InventoryPaymentBack,
     InventoryOptions,
-    LocationsListData,
     MakesListData,
     OptionsListData,
     InventoryShortList,
@@ -211,19 +210,6 @@ export const getInventoryPrintFormTemplate = async (
         defaultError: "Error while getting inventory print form template",
         returnErrorObject: false,
     }) as Promise<any | undefined>;
-};
-
-export const getInventoryLocations = async (useruid: string) => {
-    const response = await new ApiRequest().get<LocationsListData>({
-        url: `user/${useruid}/locations`,
-        defaultError: "Error while getting inventory locations",
-    });
-
-    if (response && "locations" in response) {
-        return response.locations;
-    }
-
-    return undefined;
 };
 
 export const checkStockNoAvailability = async (stockno: string) => {

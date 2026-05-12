@@ -9,6 +9,7 @@ import {
     ChangePasswordPayload,
     CheckLoginResponse,
 } from "common/models/users";
+import { InventoryLocations, LocationsListData } from "common/models/inventory";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -130,6 +131,44 @@ export const updateUserProfile = async (useruid: string, userData: Partial<UserD
         data: userData,
         defaultError: "Error while updating user profile",
     });
+};
+
+export const setUserLocations = async (
+    useruid: string,
+    locations: Partial<InventoryLocations>[]
+) => {
+    return new ApiRequest().post({
+        url: `user/${useruid}/locations`,
+        data: locations,
+        defaultError: "Error while updating user locations",
+    });
+};
+
+export const getUserLocations = async (useruid: string) => {
+    const response = await new ApiRequest().get<LocationsListData>({
+        url: `user/${useruid}/locations`,
+        defaultError: "Error while getting inventory locations",
+    });
+
+    if (response && "locations" in response) {
+        return response.locations;
+    }
+
+    return undefined;
+};
+
+export const getDealerLocations = async (dealerId: string, params?: QueryParams) => {
+    const response = await new ApiRequest().get<LocationsListData>({
+        url: `dealer/${dealerId}/locations`,
+        config: { params },
+        defaultError: "Error while getting dealer locations",
+    });
+
+    if (response && "locations" in response) {
+        return response.locations;
+    }
+
+    return undefined;
 };
 
 export const changePassword = async (useruid: string, payload: ChangePasswordPayload) => {
