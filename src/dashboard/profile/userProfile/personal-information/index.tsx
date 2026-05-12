@@ -110,7 +110,6 @@ export const PersonalInformation = observer((): ReactElement => {
                                         ? "success"
                                         : "secondary"
                                 }
-                                loading={isLocationsSaving}
                                 onClick={handleSaveLocations}
                             >
                                 Save

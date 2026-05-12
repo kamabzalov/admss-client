@@ -370,24 +370,6 @@ export class ProfileStore {
                 return response as BaseResponseError;
             }
 
-            const locationPayload: Partial<InventoryLocations> = {
-                ...this._currentLocation,
-                useruid: authUser.useruid,
-                locationuid:
-                    this._currentLocation?.locationuid || authUser.locationuid || undefined,
-                locName: convertEmptyValue(this._profile.locationname || authUser.locationname),
-                locStreetAddress: convertEmptyValue(this._profile.address),
-                locState: convertEmptyValue(this._profile.state),
-                locZIP: convertEmptyValue(this._profile.zipCode),
-                locPhone1: convertEmptyValue(this._profile.phoneNumber),
-                locEmail1: convertEmptyValue(this._profile.email),
-            };
-
-            const locationResponse = await setUserLocations(authUser.useruid, [locationPayload]);
-            if (locationResponse && typeGuards.isExist(locationResponse.error)) {
-                return locationResponse as BaseResponseError;
-            }
-
             if (this._logoFile) {
                 const logoResponse = (await uploadUserLogo(authUser.useruid, this._logoFile)) as
                     | BaseResponseError
