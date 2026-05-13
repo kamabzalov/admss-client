@@ -6,7 +6,7 @@ import { AuthUser } from "common/models/user";
 import { getInventoryList } from "http/services/inventory-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { Inventory } from "common/models/inventory";
 import Inventories from "dashboard/inventory";
 import { usePermissions } from "common/hooks";
@@ -68,6 +68,38 @@ export const InventorySearch = ({
         setDialogVisible(false);
     };
 
+    const fieldKey = (returnedField || FIELD) as keyof Inventory;
+
+    const handleInventoryChange = (event: DropdownChangeEvent) => {
+        const selectedValue = event.value;
+        const selected = options.find(
+            (o) => String(o[fieldKey] ?? "") === String(selectedValue ?? "")
+        );
+
+        if (selected && getFullInfo) {
+            getFullInfo(selected);
+        }
+
+        const displayValue = selected
+            ? returnedField
+                ? String(selected[fieldKey] ?? "")
+                : selected.name || selected.Make || String(selectedValue ?? "")
+            : String(selectedValue ?? "");
+
+        if (!String(displayValue).trim()) {
+            setOptions([]);
+        }
+
+        onChange?.({
+            ...event,
+            value: displayValue,
+            target: {
+                name: name as string,
+                value: displayValue,
+            },
+        } as DropdownChangeEvent);
+    };
+
     const canSelectInventory = inventoryPermissions.canSelectInInputs();
 
     return (
@@ -80,7 +112,7 @@ export const InventorySearch = ({
                 options={options}
                 onInputChange={handleInventoryInputChange}
                 value={value}
-                onChange={onChange}
+                onChange={handleInventoryChange}
                 onIconClick={
                     canSelectInventory
                         ? () => {

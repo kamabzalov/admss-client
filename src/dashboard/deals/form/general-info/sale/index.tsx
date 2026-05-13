@@ -35,7 +35,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const currentPath = location.pathname + location.search;
     const navigate = useNavigate();
     const { authUser } = userStore;
-    const { deal, changeDeal, changeDealExtData } = store;
+    const { deal, changeDeal, changeDealExtData, accountNumberPreview } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
@@ -277,7 +277,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("accountInfo")}
                     className='w-full deal-sale__text-input'
                     disabled={!!id}
-                    value={deal.accountInfo || ""}
+                    value={deal.accountInfo || accountNumberPreview || ""}
                     onChange={({ target: { value } }) => {
                         if (id) return;
                         setFieldValue("accountInfo", value);

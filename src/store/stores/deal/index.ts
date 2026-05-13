@@ -26,6 +26,8 @@ import {
     setDealPayments,
 } from "http/services/deals.service";
 import { getInventoryInfo } from "http/services/inventory-service";
+import { getAccountNumberPreview } from "http/services/accounts.service";
+import { AccountNumberPreviewResponse } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
@@ -85,6 +87,10 @@ export class DealStore {
     private _dealSecondTradeOverwrite: boolean = false;
 
     private _debouncedRecalculate: (dealuid: string) => void;
+    private _debouncedAccountNumberPreview: (inventoryUid: string) => void;
+
+    private _accountNumberPreview: string = "";
+    private _accountNumberPreviewLoading: boolean = false;
 
     private readonly _recalculateKeys: (keyof DealFinance)[] = [
         "CashPrice",
@@ -110,6 +116,9 @@ export class DealStore {
             (dealuid: string) => this.recalculateAndUpdateWashout(dealuid),
             DEBOUNCE_TIME
         );
+        this._debouncedAccountNumberPreview = debounce((inventoryUid: string) => {
+            void this.fetchAccountNumberPreview(inventoryUid);
+        }, DEBOUNCE_TIME);
     }
 
     public get deal() {
@@ -229,6 +238,46 @@ export class DealStore {
         );
     }
 
+    public get accountNumberPreview() {
+        return this._accountNumberPreview;
+    }
+
+    public get isAccountNumberPreviewLoading() {
+        return this._accountNumberPreviewLoading;
+    }
+
+    public requestAccountNumberPreview = (inventoryuid?: string | null) => {
+        if (this._dealID) {
+            return;
+        }
+        const uid =
+            !inventoryuid || !String(inventoryuid).trim().length ? "0" : String(inventoryuid);
+        this._debouncedAccountNumberPreview(uid);
+    };
+
+    private fetchAccountNumberPreview = async (inventoryUid: string) => {
+        this._accountNumberPreviewLoading = true;
+        try {
+            const response = await getAccountNumberPreview(inventoryUid);
+            if (
+                response &&
+                response.status === Status.OK &&
+                "accountnumber" in response &&
+                typeof (response as AccountNumberPreviewResponse).accountnumber === "string"
+            ) {
+                this._accountNumberPreview = (
+                    response as AccountNumberPreviewResponse
+                ).accountnumber;
+            } else {
+                this._accountNumberPreview = "";
+            }
+        } catch {
+            this._accountNumberPreview = "";
+        } finally {
+            this._accountNumberPreviewLoading = false;
+        }
+    };
+
     public getDeal = async (itemuid: string) => {
         this._isLoading = true;
         this._dealErrorMessage = "";
@@ -239,6 +288,7 @@ export class DealStore {
                 this._deal = deal;
                 this._dealType = deal.dealtype;
                 this._dealID = extdata.dealUID;
+                this._accountNumberPreview = "";
                 this._dealExtData = extdata || ({} as DealExtData);
                 this._dealFinance = finance || ({} as DealFinance);
                 const inventoryResponse = await getInventoryInfo(deal.inventoryuid);
@@ -308,10 +358,25 @@ export class DealStore {
         ({ key, value }: { key: keyof Deal; value: string | number | null | undefined }) => {
             if (this._deal && key !== "extdata" && key !== "finance") {
                 this._isFormChanged = true;
+
+                if (key === "inventoryinfo" && !this._dealID) {
+                    const cleared =
+                        value === null || value === undefined || String(value).trim().length === 0;
+                    if (cleared) {
+                        delete (this._deal as Record<string, unknown>).inventoryuid;
+                        this.requestAccountNumberPreview(null);
+                    }
+                }
+
                 if (value === null || value === undefined) {
                     delete (this._deal as Record<string, unknown>)[key as string];
                 } else {
                     (this._deal as Record<typeof key, string | number>)[key] = value;
+                }
+                if (key === "inventoryuid" && !this._dealID) {
+                    this.requestAccountNumberPreview(
+                        value === null || value === undefined ? null : String(value)
+                    );
                 }
             }
         }
@@ -721,6 +786,8 @@ export class DealStore {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
         this._dealID = "";
+        this._accountNumberPreview = "";
+        this._accountNumberPreviewLoading = false;
         this._dealType = null;
         this._deleteReason = "";
         this._dealExtData = {} as DealExtData;
