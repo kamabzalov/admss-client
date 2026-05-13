@@ -1,5 +1,13 @@
 import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
-import { BaseResponseError, Status } from "../base-response";
+import { BaseResponse, BaseResponseError, Status } from "../base-response";
+
+export interface AccountNumberPreviewResponse extends BaseResponse {
+    accountnumber: string;
+    source?: string;
+    strategy?: number;
+    inventoryuid?: string;
+    account_number_fallback?: string;
+}
 
 export interface Account {
     accountnumber: string;

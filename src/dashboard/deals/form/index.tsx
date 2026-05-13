@@ -271,6 +271,13 @@ export const DealsForm = observer(() => {
     }, [id]);
 
     useEffect(() => {
+        if (id && id !== CREATE_ID) {
+            return;
+        }
+        store.requestAccountNumberPreview(deal.inventoryuid);
+    }, [id, deal.inventoryuid, store]);
+
+    useEffect(() => {
         let dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
 
         if (dealType !== null && dealType !== undefined) {

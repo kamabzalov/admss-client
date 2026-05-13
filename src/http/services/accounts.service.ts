@@ -1,6 +1,7 @@
 import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import {
     AccountDetails,
+    AccountNumberPreviewResponse,
     AccountDownPayments,
     AccountDrawer,
     AccountFeeData,
@@ -25,6 +26,14 @@ import { ApiRequest } from "http/index";
 export interface TotalAccountList extends BaseResponse {
     total: number;
 }
+
+export const getAccountNumberPreview = async (inventoryuid: string) => {
+    const id = !inventoryuid || !String(inventoryuid).trim().length ? "0" : String(inventoryuid);
+    return new ApiRequest().get<AccountNumberPreviewResponse | BaseResponseError>({
+        url: `accounts/${id}/account-number-preview`,
+        defaultError: "Error while getting account number preview",
+    });
+};
 
 export const getAccountsList = async (uid: string, queryParams: QueryParams) => {
     return new ApiRequest().get<AccountInfo[] | TotalAccountList>({
