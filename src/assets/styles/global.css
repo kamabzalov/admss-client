@@ -14,6 +14,7 @@
     --admss-app-aside-expanded-width: 228px;
     --admss-app-content-top-margin: 50px;
     --admss-app-header-height: 108px;
+    --admss-app-header-height-scrolled: 75px;
     --admss-app-dialog-border-radius: 15px;
     --admss-app-container-width: 91vw;
     --admss-app-container-width-collapsed: 1539px;
@@ -108,6 +109,10 @@ body {
 
 #root {
     height: 100%;
+}
+
+html.app-header-scrolled {
+    --admss-app-header-height: var(--admss-app-header-height-scrolled);
 }
 
 ::placeholder {

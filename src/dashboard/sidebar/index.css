@@ -5,7 +5,10 @@
     padding-top: var(--admss-app-content-top-margin);
     left: 0;
     width: var(--admss-app-aside-expanded-width);
-    transition: width 0.3s ease;
+    transition:
+        width 0.3s ease,
+        top 0.3s ease,
+        height 0.3s ease;
     top: var(--admss-app-header-height);
     height: calc(100vh - var(--admss-app-header-height));
     background: var(--admss-app-main-blue);

@@ -6,31 +6,29 @@
     height: var(--admss-app-header-height);
     background: var(--admss-app-white-blue);
     border-bottom: 5px solid var(--admss-app-main-blue);
-    &.header--collapsed {
-        padding: 15px 20px;
-        padding-right: 40px;
-    }
-    &.header--expanded {
-        padding: 15px 40px;
-    }
     display: flex;
     align-items: center;
+    padding: 15px 20px;
+    transition:
+        height 0.3s ease,
+        padding 0.3s ease;
+}
+
+.app-header-scrolled {
+    .sidebar {
+        padding-top: 26px;
+    }
+    .header {
+        padding-right: 40px;
+    }
 }
 
 .header__logo {
     transition: all 0.3s ease;
-    &.header__logo--expanded {
-        margin: 0 20px;
-        margin-right: 120px;
-        width: 88px;
-        height: 76px;
-    }
-
-    &.header__logo--collapsed {
-        margin-right: 88px;
-        width: 47px;
-        height: 41px;
-    }
+    margin: 0 0px;
+    margin-right: 80px;
+    width: 48px;
+    height: 42px;
 }
 
 .header__content {
@@ -44,16 +42,23 @@
     display: flex;
     flex-direction: column;
     gap: 23px;
+    transition: gap 0.3s ease;
+}
+
+html.app-header-scrolled .header__info {
+    gap: 6px;
 }
 
 .header__name {
-    font-size: 24px;
+    font-size: 22px;
     line-height: 100%;
+    transition: font-size 0.3s ease;
 }
 
 .header__location {
     font-size: 18px;
     line-height: 100%;
+    transition: font-size 0.3s ease;
 }
 
 .header-dealer-info {
@@ -69,12 +74,22 @@
     align-items: center;
 }
 
-.header__icon {
+.header .header__icon.profile-avatar {
     cursor: pointer;
     border: 2px solid transparent;
     width: 60px;
     height: 60px;
+    --avatar-size: 60px;
     border-radius: 50%;
+    transition:
+        width 0.3s ease,
+        height 0.3s ease;
+}
+
+.app-header-scrolled .header .header__icon.profile-avatar {
+    width: 44px;
+    height: 44px;
+    --avatar-size: 44px;
 }
 
 .header__icon:hover {
