@@ -35,7 +35,7 @@ export const DealGeneralSale = observer((): ReactElement => {
     const currentPath = location.pathname + location.search;
     const navigate = useNavigate();
     const { authUser } = userStore;
-    const { deal, changeDeal, changeDealExtData, accountNumberPreview } = store;
+    const { deal, changeDeal, changeDealExtData, accountNumberFieldValue } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
@@ -127,7 +127,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     <Button
                         className='deal-sale__washout-button'
                         outlined
-                        label={"Washout"}
+                        label={"Deal Washout"}
                         onClick={() => {
                             navigate(DEALS_PAGE.WASHOUT(id));
                         }}
@@ -186,7 +186,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     errorMessage={errors.dealtype as string}
                 />
             </div>
-            <div className='col-6 relative'>
+            <div className='col-3 relative'>
                 <ComboBox
                     {...getFieldProps("dealstatus")}
                     optionLabel='name'
@@ -277,7 +277,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("accountInfo")}
                     className='w-full deal-sale__text-input'
                     disabled={!!id}
-                    value={deal.accountInfo || accountNumberPreview || ""}
+                    value={accountNumberFieldValue}
                     onChange={({ target: { value } }) => {
                         if (id) return;
                         setFieldValue("accountInfo", value);

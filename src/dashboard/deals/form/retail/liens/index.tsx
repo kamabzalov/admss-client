@@ -168,7 +168,7 @@ export const DealRetailLiens = observer((): ReactElement => {
 
             <div className='col-3'>
                 <DateInput
-                    name='Date of lien'
+                    name='Date of Lien'
                     emptyDate
                     date={First_Lien_Date}
                     onChange={({ value }) =>

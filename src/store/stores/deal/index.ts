@@ -30,6 +30,7 @@ import { getAccountNumberPreview } from "http/services/accounts.service";
 import { AccountNumberPreviewResponse } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
+import { typeGuards } from "common/utils";
 
 interface DealItem extends Omit<Deal, "extdata" | "finance"> {}
 
@@ -242,6 +243,13 @@ export class DealStore {
         return this._accountNumberPreview;
     }
 
+    public get accountNumberFieldValue(): string {
+        if (typeGuards.isString(this._deal.accountInfo)) {
+            return this._deal.accountInfo;
+        }
+        return this._accountNumberPreview || "";
+    }
+
     public get isAccountNumberPreviewLoading() {
         return this._accountNumberPreviewLoading;
     }
@@ -263,7 +271,7 @@ export class DealStore {
                 response &&
                 response.status === Status.OK &&
                 "accountnumber" in response &&
-                typeof (response as AccountNumberPreviewResponse).accountnumber === "string"
+                typeGuards.isString((response as AccountNumberPreviewResponse).accountnumber)
             ) {
                 this._accountNumberPreview = (
                     response as AccountNumberPreviewResponse
