@@ -12,8 +12,10 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { RouteTracker } from "dashboard/common/route-tracker";
 import { FirstLoginPasswordModal } from "dashboard/common/first-login-password-change-modal";
+import { useAppHeaderScroll } from "dashboard/header/useAppHeaderScroll";
 
 export const Dashboard = observer((): ReactElement => {
+    useAppHeaderScroll();
     const navigate = useNavigate();
     const [user, setUser] = useState<AuthUser | null>(null);
 

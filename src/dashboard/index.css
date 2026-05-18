@@ -31,6 +31,7 @@
 .main {
     padding-top: calc(var(--admss-app-header-height) + var(--admss-app-content-top-margin));
     height: 100%;
+    transition: padding-top 0.3s ease;
 }
 
 .card {

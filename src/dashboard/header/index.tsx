@@ -117,45 +117,41 @@ export const Header = observer((): ReactElement => {
         return <></>;
     }
 
-    if (menuRight) {
-        return (
-            <header className='header header--collapsed'>
-                <img src={logo} alt='ADMSS' className='header__logo header__logo--collapsed' />
+    return (
+        <header className='header'>
+            <img src={logo} alt='ADMSS' className='header__logo' />
 
-                <div className='header__content'>
-                    <div className='header__info'>
-                        <span className='header__name'>{authUser?.loginname}</span>
+            <div className='header__content'>
+                <div className='header__info'>
+                    <span className='header__name'>{authUser?.loginname}</span>
 
-                        <span className='header__location'>{authUser?.locationname}</span>
-                    </div>
-
-                    <div className='header__menu'>
-                        <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
-                        <ProfileAvatar
-                            className='header__icon'
-                            size={60}
-                            editable={false}
-                            onClick={(event) => menuRight?.current?.toggle(event)}
-                        />
-                    </div>
+                    <span className='header__location'>{authUser?.locationname}</span>
                 </div>
-                {authUser && (
-                    <>
-                        <SupportContactDialog
-                            onHide={() => {
-                                setSupportContact(false);
-                                removeSupportHistoryParam();
-                            }}
-                            visible={supportContact}
-                        />
-                        <SupportHistoryDialog
-                            onHide={() => setSupportHistory(false)}
-                            visible={supportHistory}
-                        />
-                    </>
-                )}
-            </header>
-        );
-    }
-    return <></>;
+
+                <div className='header__menu'>
+                    <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
+                    <ProfileAvatar
+                        className='header__icon'
+                        editable={false}
+                        onClick={(event) => menuRight?.current?.toggle(event)}
+                    />
+                </div>
+            </div>
+            {authUser && (
+                <>
+                    <SupportContactDialog
+                        onHide={() => {
+                            setSupportContact(false);
+                            removeSupportHistoryParam();
+                        }}
+                        visible={supportContact}
+                    />
+                    <SupportHistoryDialog
+                        onHide={() => setSupportHistory(false)}
+                        visible={supportHistory}
+                    />
+                </>
+            )}
+        </header>
+    );
 });
