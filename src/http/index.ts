@@ -195,4 +195,41 @@ export class ApiRequest {
             return this.handleError(error, defaultError, returnErrorObject);
         }
     }
+
+    async patch<T = BaseResponseError>(
+        options: ApiPostOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            data,
+            config,
+            defaultError = ERROR_MESSAGES.API_ERROR,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.patch<T>(url, data, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
+
+    async delete<T = BaseResponseError>(
+        options: ApiRequestOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            config,
+            defaultError = ERROR_MESSAGES.API_ERROR,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.delete<T>(url, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
 }

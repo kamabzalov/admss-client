@@ -319,6 +319,42 @@ export interface ContactType {
     name: ContactTypeNameList | string;
 }
 
+export interface ContactTypeSetting {
+    id: string;
+    type_id: number;
+    name: string;
+    enabled: boolean;
+    is_default: boolean;
+    require_business_name: boolean;
+    require_personal_name: boolean;
+    sort_order: number;
+}
+
+export interface ContactTypeSettingsResponse extends BaseResponseError {
+    contact_type_settings: ContactTypeSetting[];
+}
+
+export interface CreateContactTypeSettingPayload {
+    name: string;
+    enabled: boolean;
+    require_business_name: boolean;
+    require_personal_name: boolean;
+    sort_order: number;
+}
+
+export interface CreateContactTypeSettingResponse extends BaseResponseError {
+    id: string;
+    type_id: number;
+}
+
+export interface UpdateContactTypeSettingPayload {
+    name?: string;
+    enabled?: boolean;
+    require_business_name?: boolean;
+    require_personal_name?: boolean;
+    sort_order?: number;
+}
+
 export interface ContactUser extends Contact {
     ZIP: string;
     city: string;

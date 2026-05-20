@@ -8,7 +8,6 @@ import { SettingsDeals } from "dashboard/profile/generalSettings/deals";
 import { SettingsTaxes } from "dashboard/profile/generalSettings/taxes";
 import { SettingsLease } from "dashboard/profile/generalSettings/lease";
 import { SettingsAccount } from "dashboard/profile/generalSettings/account";
-import { SettingsContract } from "dashboard/profile/generalSettings/contract";
 import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermarking";
 import { InventorySettings } from "dashboard/profile/generalSettings/inventory-settings";
 import { SettingsOther } from "dashboard/profile/generalSettings/other";
@@ -20,6 +19,7 @@ import { DASHBOARD_PAGE } from "common/constants/links";
 import { SettingsExportWeb } from "dashboard/profile/generalSettings/export-web";
 import { UsersRoles } from "dashboard/profile/generalSettings/roles";
 import { SettingsLeadSettings } from "dashboard/profile/generalSettings/lead-settings/index";
+import { SettingsContact } from "dashboard/profile/generalSettings/contact-settings";
 
 interface TabItem {
     settingName: string;
@@ -91,9 +91,9 @@ export const GeneralSettings = observer((): ReactElement => {
             component: <SettingsAccount />,
         },
         {
-            settingName: "Contract Settings",
-            route: "contract-settings",
-            component: <SettingsContract />,
+            settingName: "Contact settings",
+            route: "contact-settings",
+            component: <SettingsContact />,
         },
         { settingName: "Lease Settings", route: "lease-settings", component: <SettingsLease /> },
         {
