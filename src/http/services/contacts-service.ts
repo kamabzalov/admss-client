@@ -4,10 +4,14 @@ import {
     Contact,
     ContactUser,
     ContactsCategories,
+    ContactTypeSettingsResponse,
+    CreateContactTypeSettingPayload,
+    CreateContactTypeSettingResponse,
     SalespersonsList,
     ScanBarcodeDL,
     SetContactResponse,
     TotalUsers,
+    UpdateContactTypeSettingPayload,
 } from "common/models/contact";
 import { BaseResponseError } from "common/models/base-response";
 import { ListData } from "common/models";
@@ -58,6 +62,56 @@ export const getContactsTypeList = async (uid?: string) => {
     }
 
     return undefined;
+};
+
+export const getContactTypeSettings = async (
+    dealerId: string
+): Promise<ContactTypeSettingsResponse | BaseResponseError | undefined> => {
+    return new ApiRequest().get<ContactTypeSettingsResponse>({
+        url: `contacts/${dealerId}/contact-type-settings`,
+        defaultError: "Error while getting contact type settings",
+    });
+};
+
+export const initContactTypeSettings = async (
+    dealerId: string
+): Promise<BaseResponseError | undefined> => {
+    return new ApiRequest().post<BaseResponseError>({
+        url: `contacts/${dealerId}/contact-type-settings-init`,
+        data: {},
+        defaultError: "Error while initializing default contact type settings",
+    });
+};
+
+export const createContactTypeSetting = async (
+    dealerId: string,
+    data: CreateContactTypeSettingPayload
+): Promise<CreateContactTypeSettingResponse | BaseResponseError | undefined> => {
+    return new ApiRequest().post<CreateContactTypeSettingResponse>({
+        url: `contacts/${dealerId}/contact-type-settings`,
+        data,
+        defaultError: "Error while creating contact type setting",
+    });
+};
+
+export const updateContactTypeSetting = async (
+    settingId: string,
+    data: UpdateContactTypeSettingPayload
+): Promise<BaseResponseError | undefined> => {
+    return new ApiRequest().patch<BaseResponseError>({
+        url: `contacts/${settingId}/contact-type-settings`,
+        data,
+        defaultError: "Error while updating contact type setting",
+    });
+};
+
+export const deleteContactTypeSetting = async (
+    settingId: string
+): Promise<BaseResponseError | undefined> => {
+    return new ApiRequest().delete<BaseResponseError>({
+        url: `contacts/${settingId}/contact-type-settings`,
+        defaultError: "Error while deleting contact type setting",
+    });
 };
 
 export const getContactDeleteReasonsList = async (uid: string | "0") => {

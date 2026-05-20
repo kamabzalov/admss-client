@@ -1,3 +1,33 @@
+.combo-box.p-dropdown {
+    align-items: center;
+}
+
+.combo-box--custom-height .p-dropdown-label {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    line-height: 1;
+}
+
+.combo-box--custom-height .p-dropdown-label .combo-box__list-item,
+.combo-box--custom-height .p-dropdown-label .truncated-text {
+    width: 100%;
+    min-width: 0;
+}
+
+.combo-box-float-label--custom-height > label.float-label {
+    top: 50%;
+    margin-top: 0;
+    transform: translateY(-50%);
+}
+
+.p-float-label.combo-box-float-label--custom-height:has(.p-inputwrapper-filled) > label.float-label,
+.p-float-label.combo-box-float-label--custom-height:has(.p-inputwrapper-focus) > label.float-label {
+    top: 0;
+    margin-top: -16px;
+    transform: none;
+}
+
 .combo-box {
     .p-dropdown-trigger {
         color: var(--admss-app-medium-grey);
