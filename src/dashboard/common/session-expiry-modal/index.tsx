@@ -95,6 +95,7 @@ export const SessionExpiryModal = ({
 
     return (
         <Dialog
+            blockScroll
             visible={visible}
             onHide={onLogout}
             className='session-expiry-modal'

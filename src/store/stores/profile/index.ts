@@ -41,6 +41,9 @@ export class ProfileStore {
     private _logo: string | null = null;
     private _logoPreview: string | null = null;
     private _logoFile: File | null = null;
+    private _logoLoadedUseruid: string | null = null;
+    private _logoLoadFailed: boolean = false;
+    private _logoLoading: boolean = false;
     private _currentPassword: string = "";
     private _newPassword: string = "";
     private _confirmPassword: string = "";
@@ -261,14 +264,49 @@ export class ProfileStore {
         this._isValidatingPassword = false;
     }
 
+    public resetLogoCache = () => {
+        this._logo = null;
+        this._logoPreview = null;
+        this._logoFile = null;
+        this._logoLoadedUseruid = null;
+        this._logoLoadFailed = false;
+        this._logoLoading = false;
+    };
+
     public loadLogo = async (useruid: string) => {
+        if (this._logoLoading) {
+            return;
+        }
+
+        if (
+            this._logoLoadedUseruid === useruid &&
+            (this._logo !== null || this._logoPreview !== null || this._logoLoadFailed)
+        ) {
+            return;
+        }
+
+        this._logoLoading = true;
+
         try {
             const logo = await getUserLogo(useruid);
-            this._logo = logo || null;
-            this._logoPreview = null;
+            this._logoLoadedUseruid = useruid;
+
+            if (logo) {
+                this._logo = logo;
+                this._logoPreview = null;
+                this._logoLoadFailed = false;
+            } else {
+                this._logo = null;
+                this._logoPreview = null;
+                this._logoLoadFailed = true;
+            }
         } catch {
+            this._logoLoadedUseruid = useruid;
             this._logo = null;
             this._logoPreview = null;
+            this._logoLoadFailed = true;
+        } finally {
+            this._logoLoading = false;
         }
     };
 

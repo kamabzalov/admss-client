@@ -147,10 +147,8 @@ export const Home = (): ReactElement => {
             <div className='col-12 xl:col-6'>
                 <div className='card home-page__tasks-widget'>
                     <div className='card-content'>
-                        <div className='grid lg:justify-content-between md:justify-content-center'>
-                            <div className='col-12'>
-                                <TasksWidget />
-                            </div>
+                        <div className='w-full lg:justify-content-between md:justify-content-center'>
+                            <TasksWidget />
                         </div>
                     </div>
                 </div>
@@ -166,58 +164,64 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 xl:col-5'>
-                <RecentMessages />
-            </div>
-            <div className='col-12 xl:col-4'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Recently added contact</h2>
+            <div className='col-12'>
+                <div className='grid home-page__bottom-cards'>
+                    <div className='col-12 xl:col-4'>
+                        <RecentMessages />
                     </div>
-                    <div className='card-content'>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Name:</dt>
-                            <dd>Johnny Walker</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Phone:</dt>
-                            <dd>631-429-6822</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>E-mail:</dt>
-                            <dd>walkerjohnny@hotmail.com</dd>
-                        </dl>
-                        <dl className='contact-item flex'>
-                            <dt className='contact-item__label'>Date & time:</dt>
-                            <dd>26, April 2023</dd>
-                        </dl>
+                    <div className='col-12 xl:col-4'>
+                        <div className='card h-full home-page__recent-contact'>
+                            <div className='card-header'>
+                                <h2 className='card-header__title uppercase m-0'>
+                                    Recently added contact
+                                </h2>
+                            </div>
+                            <div className='card-content home-page__recent-contact__content'>
+                                <dl className='contact-item flex'>
+                                    <dt className='contact-item__label'>Name:</dt>
+                                    <dd>Johnny Walker</dd>
+                                </dl>
+                                <dl className='contact-item flex'>
+                                    <dt className='contact-item__label'>Phone:</dt>
+                                    <dd>631-429-6822</dd>
+                                </dl>
+                                <dl className='contact-item flex'>
+                                    <dt className='contact-item__label'>E-mail:</dt>
+                                    <dd>walkerjohnny@hotmail.com</dd>
+                                </dl>
+                                <dl className='contact-item flex'>
+                                    <dt className='contact-item__label'>Date & time:</dt>
+                                    <dd>26, April 2023</dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div className='col-12 xl:col-3'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='uppercase m-0'>Printing</h2>
-                    </div>
-                    <div className='card-content'>
-                        <ul className='list-none pl-0 printing-menu'>
-                            <li className='printing-menu__item'>
-                                <i className='adms-email printing-menu__icon' />
-                                Mailings
-                            </li>
-                            <li className='printing-menu__item '>
-                                <i className='adms-blank printing-menu__icon' />
-                                Blank credit application
-                            </li>
-                            <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
-                                Print "Initial privacy notice"
-                            </li>
-                            <li className='printing-menu__item'>
-                                <i className='adms-print printing-menu__icon' />
-                                Print deal forms
-                            </li>
-                        </ul>
+                    <div className='col-12 xl:col-4'>
+                        <div className='card h-full'>
+                            <div className='card-header'>
+                                <h2 className='card-header__title uppercase m-0'>Printing</h2>
+                            </div>
+                            <div className='card-content'>
+                                <ul className='list-none pl-0 printing-menu'>
+                                    <li className='printing-menu__item'>
+                                        <i className='adms-email printing-menu__icon' />
+                                        Mailings
+                                    </li>
+                                    <li className='printing-menu__item '>
+                                        <i className='adms-blank printing-menu__icon' />
+                                        Blank credit application
+                                    </li>
+                                    <li className='printing-menu__item'>
+                                        <i className='adms-print printing-menu__icon' />
+                                        Print "Initial privacy notice"
+                                    </li>
+                                    <li className='printing-menu__item'>
+                                        <i className='adms-print printing-menu__icon' />
+                                        Print deal forms
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

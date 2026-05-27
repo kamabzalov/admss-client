@@ -1,18 +1,25 @@
-import { Status } from "common/models/base-response";
+import { Status, TotalListCount } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { TruncatedText } from "dashboard/common/display";
 import { useToast } from "dashboard/common/toast";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { getSupportMessages, SupportHistory } from "http/services/support.service";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof SupportHistory;
 }
+
+const COLUMN_STYLES: Partial<Record<keyof SupportHistory, React.CSSProperties>> = {
+    username: { width: "28%" },
+    topic: { width: "calc(72% - 105px)" },
+    created: { width: "120px" },
+};
 
 const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "username", header: "From" },
@@ -30,31 +37,46 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
     const toast = useToast();
     const [dialogActive, setDialogActive] = useState<boolean>(false);
     const [supportHistoryData, setSupportHistoryData] = useState<SupportHistory[]>([]);
+    const [allMessagesCount, setAllMessagesCount] = useState<number>(0);
+
+    const handleGetRecentMessages = useCallback(async () => {
+        if (!authUser) return;
+
+        const [totalCountResponse, messagesResponse] = await Promise.all([
+            getSupportMessages(authUser.useruid, { total: 1 }),
+            getSupportMessages(authUser.useruid, { top: messagesShowCount, type: "desc" }),
+        ]);
+
+        if (totalCountResponse && !Array.isArray(totalCountResponse)) {
+            setAllMessagesCount((totalCountResponse as TotalListCount).total ?? 0);
+        }
+
+        if (Array.isArray(messagesResponse)) {
+            setSupportHistoryData(messagesResponse);
+        } else {
+            messagesResponse?.error &&
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: messagesResponse.error,
+                    life: TOAST_LIFETIME,
+                });
+        }
+    }, [authUser, messagesShowCount, toast]);
 
     useEffect(() => {
-        if (authUser) {
-            getSupportMessages(authUser.useruid, { top: messagesShowCount, type: "desc" }).then(
-                (response) => {
-                    if (Array.isArray(response)) {
-                        setSupportHistoryData(response);
-                    } else {
-                        response?.error &&
-                            toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: response.error,
-                                life: TOAST_LIFETIME,
-                            });
-                    }
-                }
-            );
-        }
-    }, [authUser]);
+        handleGetRecentMessages();
+    }, [handleGetRecentMessages]);
 
     return (
         <div className='card h-full'>
             <div className='card-header'>
-                <h2 className='card-header__title uppercase m-0'>Recent messages</h2>
+                <h2
+                    className='card-header__title uppercase m-0 recent-messages__title'
+                    onClick={() => setDialogActive(true)}
+                >
+                    Recent messages
+                </h2>
             </div>
             <div className='card-content'>
                 <DataTable
@@ -67,34 +89,40 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                             field={field}
                             header={header}
                             key={field}
+                            style={COLUMN_STYLES[field]}
+                            headerClassName={`cursor-default recent-messages__col recent-messages__col--${field}`}
+                            bodyClassName={`recent-messages__col recent-messages__col--${field}`}
                             body={(data: SupportHistory) => {
                                 if (field === "topic") {
                                     return (
-                                        <div
-                                            className='white-space-nowrap 
-                                            overflow-hidden 
-                                            text-overflow-ellipsis 
-                                            max-w-8rem'
-                                        >
-                                            {data[field]}
-                                        </div>
+                                        <TruncatedText
+                                            text={String(data[field] ?? "")}
+                                            withTooltip
+                                            className='recent-messages__theme-cell'
+                                        />
+                                    );
+                                }
+                                if (field === "created") {
+                                    return (
+                                        <TruncatedText
+                                            text={String(data[field] ?? "")}
+                                            withTooltip
+                                        />
                                     );
                                 }
                                 return data[field];
                             }}
-                            headerClassName='cursor-default'
                         />
                     ))}
                 </DataTable>
-                {!!supportHistoryData.length && (
-                    <div className='card-content__footer'>
+                {allMessagesCount > messagesShowCount && (
+                    <div className='card-content__footer recent-messages__footer'>
                         <Button
                             onClick={() => setDialogActive(true)}
                             className='recent-messages__button messages-more'
+                            label='See more...'
                             text
-                        >
-                            See more...
-                        </Button>
+                        />
                     </div>
                 )}
             </div>

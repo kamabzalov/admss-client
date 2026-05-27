@@ -65,20 +65,6 @@
     font-size: 24px;
     padding: 10px 30px 10px 30px;
     font-weight: bold;
-    background: var(--admss-app-primary-main-green);
-}
-
-.p-dialog-footer > .p-button:hover,
-.p-dialog-footer > .p-button:focus {
-    background: var(--admss-app-dark-green);
-}
-
-.p-dialog-footer > .p-button:active {
-    box-shadow: 0px 0px 0px 3px var(--admss-app-focus-green);
-}
-
-.p-dialog-footer > .p-button:disabled {
-    background: var(--admss-app-light-grey);
 }
 
 .p-dialog .p-dialog-content:last-of-type {

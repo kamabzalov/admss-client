@@ -40,9 +40,6 @@
     box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.8);
     padding: 25px 30px;
 
-    .p-button.p-button-success:enabled:focus {
-        box-shadow: none;
-    }
 }
 
 .p-button.p-button-success.p-button-outlined:enabled:hover,
@@ -139,10 +136,6 @@
     background-color: transparent;
     border-color: transparent;
     color: var(--admss-app-primary);
-}
-
-.p-inputtext:enabled:focus {
-    box-shadow: none;
 }
 
 .p-datatable {
@@ -785,13 +778,27 @@
 
 .sidebar-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #00000014;
+    top: var(--admss-app-header-height);
+    left: var(--admss-app-aside-collapsed-width);
+    width: calc(100% - var(--admss-app-aside-collapsed-width));
+    height: calc(100% - var(--admss-app-header-height));
+    background-color: var(--admss-app-overlay-color);
     z-index: 998;
-    transition: opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        left 0.3s ease,
+        width 0.3s ease,
+        opacity 0.3s ease,
+        top 0.3s ease,
+        height 0.3s ease;
+}
+
+.sidebar:not(.collapsed) ~ .sidebar-overlay {
+    left: var(--admss-app-aside-expanded-width);
+    width: calc(100% - var(--admss-app-aside-expanded-width));
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .p-dropdown-label {

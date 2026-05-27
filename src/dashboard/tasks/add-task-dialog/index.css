@@ -1,16 +1,39 @@
-.dialog__add-task {
-    --admss-app-dialog-button-width: 220px;
+.p-dialog.dialog__add-task {
+    --admss-app-dialog-button-width: 270px;
     --admss-app-dialog-button-height: 59px;
     width: 660px;
-    height: 872px;
+    height: auto;
+    max-height: min(882px, calc(100vh - 32px));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     .p-dialog-header {
         padding-bottom: 18px;
+        flex-shrink: 0;
+    }
+
+    > .p-dialog-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
     .p-dialog-content-body {
         padding-top: 20px;
+        padding-bottom: 4px;
         gap: 30px;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+
+        > * {
+            flex-shrink: 0;
+        }
     }
 
     .p-error {
@@ -46,12 +69,22 @@
         height: var(--admss-app-dialog-button-height);
         flex-direction: row-reverse;
         .p-button.p-splitbutton-defaultbutton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
             font-weight: 700;
-            font-size: 22px;
+            font-size: 24px;
             height: 100%;
             border-left: none;
             border-right: 1px solid;
             border-radius: 0 5px 5px 0;
+            padding-left: 40px;
+            .p-button-label {
+                flex: 0 1 auto;
+                flex-grow: 0;
+                text-align: left;
+            }
             &:active,
             &:focus,
             &:hover {
@@ -135,14 +168,16 @@
         }
     }
     .task-dialog__footer {
-        padding-top: 34px;
+        flex-shrink: 0;
         display: flex;
         gap: 20px;
         justify-content: center;
         align-items: center;
+        padding: 30px 0 40px;
+        background: var(--admss-app-white);
         .task-dialog__save-button.p-button {
             font-weight: 700;
-            font-size: 22px;
+            font-size: 24px;
             width: var(--admss-app-dialog-button-width);
             height: var(--admss-app-dialog-button-height);
         }
@@ -152,6 +187,9 @@
 .p-dialog .p-dialog-description {
     width: 100%;
     height: 130px;
+    min-height: 80px;
+    max-height: 240px;
+    resize: vertical;
 }
 
 .p-menu {

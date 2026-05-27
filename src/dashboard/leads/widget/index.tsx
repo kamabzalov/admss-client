@@ -57,7 +57,12 @@ export const LatestLeads = ({
     return (
         <section className='latest-leads'>
             <div className='latest-leads__header flex justify-content-between align-items-center'>
-                <h2 className='card-content__title uppercase m-0'>Latest Leads</h2>
+                <h2
+                    className='card-content__title uppercase m-0 latest-leads__title'
+                    onClick={() => navigate(LEADS_PAGE.MAIN)}
+                >
+                    Latest Leads
+                </h2>
             </div>
             <div className='card-content latest-leads__content'>
                 {leads.length ? (
@@ -116,12 +121,11 @@ export const LatestLeads = ({
                 {allLeadsCount > leadsShowCount && (
                     <div className='card-content__footer latest-leads__footer'>
                         <Button
-                            className='latest-leads__button tasks-widget__button messages-more'
+                            className='latest-leads__button messages-more'
+                            label='See more...'
                             onClick={() => navigate(LEADS_PAGE.MAIN)}
                             text
-                        >
-                            See more...
-                        </Button>
+                        />
                     </div>
                 )}
             </div>

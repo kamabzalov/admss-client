@@ -47,6 +47,8 @@ export const ConfirmModal = ({
     return (
         <>
             <ConfirmDialog
+                acceptClassName='p-button-success'
+                blockScroll
                 header={
                     <div className='confirm-header'>
                         <i

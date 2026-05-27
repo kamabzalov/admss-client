@@ -164,6 +164,7 @@ export const AccountSearch = ({
                 {...props}
             />
             <Dialog
+                blockScroll
                 header={<div className='uppercase'>Choose an Account</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw", height: "75vh" }}

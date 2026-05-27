@@ -47,7 +47,7 @@
     }
 
     .latest-leads__row--header .latest-leads__cell {
-        font-size: 13px;
+        font-size: 16px;
         line-height: 1;
         text-transform: none;
         color: var(--admss-app-main-blue);
@@ -69,7 +69,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 14px;
+        font-size: 16px;
         line-height: 1.35;
         font-weight: 400;
         color: var(--admss-app-blue-text);
@@ -123,23 +123,5 @@
         font-size: 14px;
         font-weight: 600;
         height: 32px;
-    }
-
-    .latest-leads__button.p-button.messages-more {
-        padding: 0;
-        color: var(--admss-app-main-blue);
-        text-decoration: underline;
-        font-weight: 400;
-        font-size: 14px;
-
-        &:enabled:hover {
-            color: var(--admss-app-medium-blue);
-            text-decoration: underline;
-            background: transparent;
-        }
-
-        .p-button-label {
-            font-weight: 400;
-        }
     }
 }

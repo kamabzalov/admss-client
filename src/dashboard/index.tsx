@@ -20,7 +20,7 @@ export const Dashboard = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
 
     const store = useStore().userStore;
-    const { authUser, settings, isSettingsLoaded } = store;
+    const { authUser, isSettingsLoaded } = store;
 
     useEffect(() => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -60,7 +60,7 @@ export const Dashboard = observer((): ReactElement => {
             <Header />
             <Sidebar />
             <FirstLoginPasswordModal visible={needFirstLoginPwdChange} user={authUser} />
-            {!settings.isSidebarCollapsed && <div className='sidebar-overlay'></div>}
+            <div className='sidebar-overlay hidden lg:block'></div>
             {isSettingsLoaded ? (
                 <main className='main'>
                     <div className='container'>

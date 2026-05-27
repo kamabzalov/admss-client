@@ -177,6 +177,7 @@ export const DealSearch = ({
                 }}
             />
             <Dialog
+                blockScroll
                 header={<div className='uppercase'>Choose a Deal</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw", height: "75vh" }}

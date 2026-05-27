@@ -12,6 +12,7 @@ import { renderTaskStatus } from "dashboard/tasks/common";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useNavigate } from "react-router-dom";
 import { useToastMessage } from "common/hooks";
+import { TASKS_PAGE } from "common/constants/links";
 
 const DEFAULT_TASK_COUNT = 4;
 
@@ -34,7 +35,11 @@ export const TasksWidget = observer(() => {
         try {
             const [totalCountResponse, tasksResponse] = await Promise.all([
                 getCurrentUserTasks(authUser!.useruid, { total: 1 }),
-                getCurrentUserTasks(authUser!.useruid, { top: taskCount }),
+                getCurrentUserTasks(authUser!.useruid, {
+                    top: taskCount,
+                    column: "created",
+                    type: "desc",
+                }),
             ]);
 
             if (
@@ -98,7 +103,10 @@ export const TasksWidget = observer(() => {
     return (
         <div className='tasks-widget'>
             <div className='tasks-widget-header flex justify-content-between align-items-center'>
-                <h2 className='card-content__title uppercase m-0'>
+                <h2
+                    className='card-content__title uppercase m-0 tasks-widget__title'
+                    onClick={() => navigate(TASKS_PAGE.MAIN)}
+                >
                     Tasks
                     <span className={`tasks-widget-count ${!tasks.length ? "empty-list" : ""}`}>
                         ({allTasksCount})
@@ -116,7 +124,7 @@ export const TasksWidget = observer(() => {
                         return (
                             <li
                                 key={`${task.itemuid}-${task.index}`}
-                                className='mb-2 tasks-widget__item'
+                                className='mb-3 tasks-widget__item'
                             >
                                 <Checkbox
                                     name='task'
@@ -140,18 +148,17 @@ export const TasksWidget = observer(() => {
                 ) : (
                     <li className='mb-2 empty-list'>No tasks yet.</li>
                 )}
-                {allTasksCount > DEFAULT_TASK_COUNT && (
-                    <li className='p-0'>
-                        <Button
-                            className='tasks-widget__button messages-more'
-                            onClick={() => navigate("/dashboard/tasks")}
-                            text
-                        >
-                            View more...
-                        </Button>
-                    </li>
-                )}
             </ul>
+            {allTasksCount > DEFAULT_TASK_COUNT && (
+                <div className='card-content__footer tasks-widget__footer'>
+                    <Button
+                        className='tasks-widget__button messages-more'
+                        label='View more...'
+                        onClick={() => navigate(TASKS_PAGE.MAIN)}
+                        text
+                    />
+                </div>
+            )}
             <div className='hidden'>
                 <AddTaskDialog
                     visible={showAddTaskDialog}
