@@ -13,6 +13,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useNavigate } from "react-router-dom";
 import { useToastMessage } from "common/hooks";
 import { TASKS_PAGE } from "common/constants/links";
+import { TruncatedText } from "dashboard/common/display";
 
 const DEFAULT_TASK_COUNT = 4;
 
@@ -121,6 +122,10 @@ export const TasksWidget = observer(() => {
             <ul className='list-none ml-0 pl-0'>
                 {tasks.length ? (
                     tasks.map((task) => {
+                        const taskLabel =
+                            task.taskname ||
+                            `${task.description} ${task.username ?? `- ${task.username}`}`;
+
                         return (
                             <li
                                 key={`${task.itemuid}-${task.index}`}
@@ -132,16 +137,15 @@ export const TasksWidget = observer(() => {
                                     checked={checkboxStates[task.itemuid] || false}
                                     onChange={() => handleStatusChange(task)}
                                 />
-                                <label
-                                    className='ml-2 cursor-pointer tasks-widget__label'
-                                    onClick={() => handleEditTask(task)}
-                                >
-                                    {task.taskname ||
-                                        `${task.description} ${
-                                            task.username ?? `- ${task.username}`
-                                        }`}
-                                </label>
-                                {renderTaskStatus(task.statuscode)}
+                                <div className='tasks-widget__content'>
+                                    <label
+                                        className='ml-2 cursor-pointer tasks-widget__label'
+                                        onClick={() => handleEditTask(task)}
+                                    >
+                                        <TruncatedText text={taskLabel} withTooltip />
+                                    </label>
+                                    {renderTaskStatus(task.statuscode)}
+                                </div>
                             </li>
                         );
                     })

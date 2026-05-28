@@ -750,13 +750,11 @@
 }
 
 .p-datepicker-calendar {
-    thead th,
     tbody td {
         padding: 1px;
         width: 45px;
     }
 
-    thead th > span,
     tbody td > span {
         margin: 0px;
     }

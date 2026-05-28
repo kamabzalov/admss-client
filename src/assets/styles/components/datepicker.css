@@ -1,5 +1,9 @@
 .p-datepicker {
     border: none;
+    width: 345px;
+    min-width: 345px;
+    padding: 0 20px;
+    --admss-app-datepicker-icon-size: 1.5rem;
 }
 
 .p-datepicker .p-datepicker-header .p-datepicker-title .p-datepicker-month,
@@ -11,14 +15,95 @@
 .p-datepicker .p-datepicker-header .p-datepicker-prev,
 .p-datepicker .p-datepicker-header .p-datepicker-next {
     color: var(--admss-app-darkest-grey);
+    width: var(--admss-app-datepicker-icon-size);
+    height: var(--admss-app-datepicker-icon-size);
 }
 
-.p-datepicker-calendar thead th {
+.p-datepicker .p-datepicker-header .p-datepicker-prev-icon,
+.p-datepicker .p-datepicker-header .p-datepicker-next-icon,
+.p-datepicker .p-datepicker-header .p-datepicker-prev svg,
+.p-datepicker .p-datepicker-header .p-datepicker-next svg {
+    width: 10px;
+    height: 10px;
+}
+
+.p-datepicker .p-datepicker-header {
+    padding: 7px 0px;
+    margin-bottom: 6px;
+    .p-datepicker-title .p-link {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 0;
+        margin-right: 4px;
+    }
+}
+
+.p-datepicker table {
+    margin: 0;
+}
+
+.p-datepicker .p-datepicker-calendar-container {
+    padding-top: 10px;
+}
+
+.p-datepicker table td {
+    padding: 0;
+}
+
+.p-datepicker .p-datepicker-calendar thead th {
     text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0 0 10px;
+    width: 45px;
+}
+
+.p-datepicker table td > span {
+    width: 2rem;
+    height: 2rem;
+    font-size: 14px;
+}
+
+.p-datepicker .p-timepicker {
+    border-top: 1px solid var(--admss-app-light-grey);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 10px 0;
+}
+
+.p-datepicker .p-timepicker > div:not(.p-separator) {
+    padding: 0 2px;
+}
+
+.p-datepicker .p-timepicker button {
+    width: var(--admss-app-datepicker-icon-size);
+    height: var(--admss-app-datepicker-icon-size);
+    padding: 0;
+}
+
+.p-datepicker .p-timepicker button svg {
+    width: 10px;
+    height: 10px;
+}
+
+.p-datepicker .p-timepicker button:last-child {
+    margin-top: 0;
+}
+
+.p-datepicker .p-timepicker span {
+    font-size: 14px;
+}
+
+.p-datepicker .p-timepicker .p-separator {
+    margin: 0 2px;
+    padding: 0;
 }
 
 .p-datepicker table td.p-datepicker-today > span {
     background-color: var(--admss-app-success);
-    color: #fff;
+    color: var(--admss-app-white);
     border-radius: 50%;
 }
