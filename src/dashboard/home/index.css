@@ -22,6 +22,8 @@
 
     .printing-menu__item {
         margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 600;
     }
 
     .printing-menu__icon {
@@ -144,6 +146,12 @@
             margin-right: 14px;
             font-weight: 600;
         }
+
+        .tasks-widget__footer {
+            font-size: 14px;
+            font-weight: 600;
+            height: 32px;
+        }
     }
 
     .home-page__latest-leads-widget {
@@ -153,5 +161,98 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+
+    .messages-more.p-button.p-button-text {
+        padding: 0;
+        min-width: unset;
+        height: auto;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        outline: none;
+        color: var(--admss-app-main-blue);
+        font-size: 14px;
+        line-height: 100%;
+        text-decoration: underline;
+
+        .p-button-label {
+            font-weight: 600;
+            text-shadow: 0 0 0 transparent;
+            transition: text-shadow 0.25s ease;
+        }
+
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active,
+        &:focus,
+        &:focus-visible {
+            color: var(--admss-app-main-blue);
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            outline: none;
+            text-decoration: underline;
+        }
+
+        &:enabled:hover .p-button-label,
+        &:enabled:focus .p-button-label,
+        &:enabled:active .p-button-label {
+            text-shadow:
+                0.1px 0 0 currentColor,
+                -0.1px 0 0 currentColor;
+        }
+    }
+
+    .tasks-widget__title,
+    .latest-leads__title,
+    .recent-messages__title {
+        cursor: pointer;
+    }
+
+    .home-page__bottom-cards {
+        align-items: stretch;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] {
+        display: flex;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-content {
+        flex: 1 1 auto;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-header {
+        padding-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-header__title {
+        width: auto;
+    }
+
+    .home-page__recent-contact .home-page__recent-contact__content {
+        flex-grow: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .home-page__recent-contact .contact-item:not(:last-child) {
+        margin-bottom: 20px;
+    }
+
+    .home-page__recent-contact .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .home-page__bottom-cards .printing-menu__item:last-child {
+        margin-bottom: 0;
     }
 }

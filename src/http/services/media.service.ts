@@ -1,3 +1,4 @@
+import { getMediaUserLogoPath } from "common/constants/api-paths";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
 import {
@@ -87,16 +88,28 @@ export const uploadUserLogo = async (
     formData.append("file", file);
 
     return new ApiRequest().post<BaseResponse | BaseResponseError>({
-        url: `media/${useruid}/logo`,
+        url: getMediaUserLogoPath(useruid),
         data: formData,
         config: { headers: { "Content-Type": "multipart/form-data" } },
         defaultError: "Error while uploading user logo",
     });
 };
 
+const isImageBlob = (blob: Blob): boolean => {
+    if (!blob.size) {
+        return false;
+    }
+
+    if (blob.type.startsWith("image/")) {
+        return true;
+    }
+
+    return !blob.type.includes("json") && !blob.type.includes("text");
+};
+
 export const getUserLogo = async (useruid: string): Promise<string | undefined> => {
     const response = await new ApiRequest().get<Blob | BaseResponseError>({
-        url: `media/${useruid}/logo`,
+        url: getMediaUserLogoPath(useruid),
         config: { responseType: "blob" },
         defaultError: "Error while getting user logo",
     });
@@ -106,6 +119,10 @@ export const getUserLogo = async (useruid: string): Promise<string | undefined> 
     }
 
     const blob = response as Blob;
+
+    if (!isImageBlob(blob)) {
+        return undefined;
+    }
 
     const dataUrl = await new Promise<string>((resolve) => {
         const reader = new window.FileReader();

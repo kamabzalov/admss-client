@@ -5,6 +5,7 @@ import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/loca
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { isRefreshApiPath, isUserLogoApiPath } from "common/constants/api-paths";
 import { HOME_PAGE, SERVICE_UPDATE_PAGE } from "common/constants/links";
 import { refreshAccessTokenIfNeeded } from "http/token-refresh";
 
@@ -50,10 +51,14 @@ authorizedUserApiInstance.interceptors.request.use((config) => {
     return config;
 });
 
-const isRefreshRequest = (config: AxiosRequestConfig | undefined): boolean => {
-    const url = config?.url ?? "";
-    return String(url).includes("user/refresh");
-};
+const isRefreshRequest = (config: AxiosRequestConfig | undefined): boolean =>
+    isRefreshApiPath(config?.url ?? "");
+
+const isUserLogoRequest = (config: AxiosRequestConfig | undefined): boolean =>
+    isUserLogoApiPath(config?.url ?? "");
+
+let dashboardNavigate: NavigateFunction | null = null;
+let isDashboardApiConfigured = false;
 
 const handleUnauthorized = async (
     error: AxiosError,
@@ -62,6 +67,10 @@ const handleUnauthorized = async (
     const config = error.config;
     if (!config || isRefreshRequest(config)) {
         return rejectAndRedirectToLogin(error, navigate);
+    }
+
+    if (isUserLogoRequest(config)) {
+        return Promise.reject(error.response ?? error);
     }
 
     const refreshed = await refreshAccessTokenIfNeeded();
@@ -108,6 +117,14 @@ const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
 };
 
 export function createApiDashboardInstance(navigate: NavigateFunction) {
+    dashboardNavigate = navigate;
+
+    if (isDashboardApiConfigured) {
+        return;
+    }
+
+    isDashboardApiConfigured = true;
+
     authorizedUserApiInstance.interceptors.response.use(
         (response) => {
             if (response.status === 200) {
@@ -116,7 +133,7 @@ export function createApiDashboardInstance(navigate: NavigateFunction) {
                 return Promise.reject({ messages: response.statusText });
             }
         },
-        (error) => handleErrorResponse(error, navigate)
+        (error) => handleErrorResponse(error, dashboardNavigate!)
     );
 }
 

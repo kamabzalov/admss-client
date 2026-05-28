@@ -1,3 +1,4 @@
+import { API_PATH_USER_REFRESH } from "common/constants/api-paths";
 import { LoginForm } from "sign/sign-in";
 import { ApiRequest, nonAuthorizedUserApiInstance } from "../index";
 import { BaseResponseError } from "common/models/base-response";
@@ -22,7 +23,7 @@ export const refreshAccessToken = async (data: RefreshTokenRequest) => {
     return new ApiRequest(nonAuthorizedUserApiInstance).post<
         RefreshTokenResponse | BaseResponseError
     >({
-        url: "user/refresh",
+        url: API_PATH_USER_REFRESH,
         data,
         defaultError: "Failed to refresh access token",
     });

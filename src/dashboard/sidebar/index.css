@@ -17,6 +17,10 @@
     &.collapsed {
         width: var(--admss-app-aside-collapsed-width, 84px);
     }
+
+    &:not(.collapsed) {
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+    }
 }
 
 .sidebar-toggle.p-button.p-button-icon-only.p-button-rounded {

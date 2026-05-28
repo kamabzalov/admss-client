@@ -2,6 +2,44 @@
     height: 50px;
 }
 
+.p-inputtext:enabled:hover,
+.p-inputtextarea:enabled:hover,
+.p-inputnumber .p-inputnumber-input:enabled:hover {
+    border-color: var(--admss-app-primary-main-green);
+}
+
+.p-inputtext:enabled:focus,
+.p-inputtextarea:enabled:focus,
+.p-inputnumber .p-inputnumber-input:enabled:focus {
+    outline: none;
+    outline-offset: 0;
+    border-color: var(--admss-app-primary-main-green);
+    box-shadow: var(--admss-app-input-focus-shadow);
+}
+
+.p-dropdown:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled):hover,
+.p-cascadeselect:not(.p-disabled):hover,
+.p-treeselect:not(.p-disabled):hover {
+    border-color: var(--admss-app-primary-main-green);
+}
+
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-cascadeselect:not(.p-disabled).p-focus,
+.p-treeselect:not(.p-disabled).p-focus,
+.p-autocomplete.p-inputwrapper-focus,
+.p-calendar.p-focus:not(.p-calendar-disabled) {
+    outline: none;
+    outline-offset: 0;
+    border-color: var(--admss-app-primary-main-green);
+    box-shadow: var(--admss-app-input-focus-shadow);
+}
+
+.p-calendar.p-focus:not(.p-calendar-disabled) .p-inputtext:enabled:focus {
+    box-shadow: none;
+}
+
 .p-checkbox .p-checkbox-box.p-highlight,
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
     background: var(--admss-app-success);

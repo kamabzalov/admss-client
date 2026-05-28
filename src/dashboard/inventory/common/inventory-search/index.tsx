@@ -127,6 +127,7 @@ export const InventorySearch = ({
             />
             {canSelectInventory && (
                 <Dialog
+                    blockScroll
                     header={<div className='uppercase'>Choose an Inventory</div>}
                     visible={dialogVisible}
                     style={{ width: "75vw" }}

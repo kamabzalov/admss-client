@@ -24,3 +24,27 @@
 .p-datatable tr:has(+ .p-datatable-row-expansion) {
     background: var(--admss-app-light-green);
 }
+
+.p-paginator {
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-last {
+        color: var(--admss-app-medium-grey);
+        &:not(.p-disabled):not(.p-highlight):hover,
+        &:not(.p-disabled):not(.p-highlight):focus {
+            color: var(--admss-app-primary);
+            background: var(--admss-app-light-green);
+        }
+    }
+
+    .p-paginator-pages .p-paginator-page {
+        color: var(--admss-app-primary);
+    }
+
+    .p-paginator-pages .p-paginator-page:not(.p-highlight):hover,
+    .p-paginator-pages .p-paginator-page:not(.p-highlight):focus {
+        background: var(--admss-app-light-green);
+        color: var(--admss-app-primary);
+    }
+}

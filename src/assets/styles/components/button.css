@@ -6,3 +6,56 @@
 .p-button.p-button-icon-only {
     width: 50px;
 }
+
+.p-button.p-button-success,
+.p-buttonset.p-button-success > .p-button,
+.p-splitbutton.p-button-success > .p-button,
+.p-button.p-confirm-dialog-accept {
+    color: var(--admss-app-white);
+    background: var(--admss-app-primary-main-green);
+    border-color: var(--admss-app-primary-main-green);
+}
+
+.p-button.p-button-success:enabled:hover,
+.p-button.p-button-success:not(button):not(a):not(.p-disabled):hover,
+.p-buttonset.p-button-success > .p-button:enabled:hover,
+.p-buttonset.p-button-success > .p-button:not(button):not(a):not(.p-disabled):hover,
+.p-splitbutton.p-button-success > .p-button:enabled:hover,
+.p-splitbutton.p-button-success > .p-button:not(button):not(a):not(.p-disabled):hover,
+.p-button.p-confirm-dialog-accept:enabled:hover,
+.p-button.p-confirm-dialog-accept:not(button):not(a):not(.p-disabled):hover {
+    background: var(--admss-app-primary-main-green-hover);
+    border-color: var(--admss-app-primary-main-green-hover);
+    color: var(--admss-app-white);
+}
+
+.p-button.p-button-success:enabled:focus,
+.p-button.p-button-success:not(button):not(a):not(.p-disabled):focus,
+.p-buttonset.p-button-success > .p-button:enabled:focus,
+.p-buttonset.p-button-success > .p-button:not(button):not(a):not(.p-disabled):focus,
+.p-splitbutton.p-button-success > .p-button:enabled:focus,
+.p-splitbutton.p-button-success > .p-button:not(button):not(a):not(.p-disabled):focus,
+.p-button.p-confirm-dialog-accept:enabled:focus,
+.p-button.p-confirm-dialog-accept:not(button):not(a):not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.p-button.p-button-success:enabled:active,
+.p-button.p-button-success:not(button):not(a):not(.p-disabled):active,
+.p-buttonset.p-button-success > .p-button:enabled:active,
+.p-buttonset.p-button-success > .p-button:not(button):not(a):not(.p-disabled):active,
+.p-splitbutton.p-button-success > .p-button:enabled:active,
+.p-splitbutton.p-button-success > .p-button:not(button):not(a):not(.p-disabled):active,
+.p-button.p-confirm-dialog-accept:enabled:active,
+.p-button.p-confirm-dialog-accept:not(button):not(a):not(.p-disabled):active {
+    background: var(--admss-app-primary-main-green-active);
+    border-color: var(--admss-app-primary-main-green-active);
+    color: var(--admss-app-white);
+}
+
+.p-button.p-button-success:disabled,
+.p-button.p-confirm-dialog-accept:disabled {
+    background: var(--admss-app-light-grey);
+    border-color: var(--admss-app-light-grey);
+    color: var(--admss-app-white);
+}

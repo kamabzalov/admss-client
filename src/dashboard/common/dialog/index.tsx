@@ -31,6 +31,7 @@ export const DashboardDialog = ({
 
     return (
         <Dialog
+            blockScroll
             draggable={false}
             header={header}
             className={`dialog ${className}`}
@@ -61,6 +62,7 @@ export const DashboardDialog = ({
                                     type='submit'
                                     label={`${footer}`}
                                     disabled={buttonDisabled}
+                                    severity='success'
                                 />
                             )}
                         </div>

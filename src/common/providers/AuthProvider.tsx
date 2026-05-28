@@ -196,6 +196,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
 
     const login = useCallback((user: AuthUser) => {
         const now = Date.now();
+        store.profileStore.resetLogoCache();
         setAuthUser(user);
         setTokens({
             accessToken: user.token || null,
@@ -218,6 +219,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     }, []);
 
     const logout = useCallback(() => {
+        store.profileStore.resetLogoCache();
         setAuthUser(null);
         setTokens({
             accessToken: null,

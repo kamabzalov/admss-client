@@ -104,6 +104,7 @@ export const FirstLoginPasswordModal = ({
 
     return (
         <Dialog
+            blockScroll
             visible={visible}
             onHide={() => {}}
             className='first-login-password-modal'

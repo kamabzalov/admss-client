@@ -50,10 +50,6 @@
             height: 32px;
         }
 
-        .p-inputtext:focus {
-            box-shadow: none;
-        }
-
         .input-icon {
             height: 32px;
             width: 32px;

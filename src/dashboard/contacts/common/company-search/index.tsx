@@ -147,6 +147,7 @@ export const CompanySearch = ({
                 }}
             />
             <Dialog
+                blockScroll
                 header={<div className='uppercase'>Choose a Contact</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw", height: "75vh" }}
