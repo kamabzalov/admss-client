@@ -1,0 +1,43 @@
+.deal-retail-liens__tabs .p-tabview-panels {
+    padding: 0;
+    padding-top: 40px;
+}
+
+.deal-retail-liens__tabs .p-tabview .p-tabview-nav {
+    margin: 0;
+    border-bottom: 1px solid var(--admss-app-light-grey);
+    margin-bottom: 30px;
+}
+
+.deal-retail-liens__tabs .card-header {
+    align-items: stretch;
+}
+
+.p-tabview .p-tabview-nav li.deal-retail-liens__header .p-tabview-nav-link {
+    font-weight: 700;
+    color: var(--admss-app-primary);
+    border: none;
+    border-bottom: 1px solid var(--admss-app-light-grey);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight.deal-retail-liens__header .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.p-tabview
+    .p-tabview-nav
+    li.deal-retail-liens__header:not(.p-highlight):not(.p-disabled):hover
+    .p-tabview-nav-link {
+    color: var(--admss-app-main-blue);
+    border-color: transparent;
+    border-bottom: 1px solid var(--admss-app-light-grey);
+}
+
+.deal-retail-liens__shared-fields {
+    margin-top: 0;
+}
+
+.deal-form:has(.deal-retail-liens) > .deal-form__title {
+    margin-bottom: 6px;
+}

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -54,6 +53,7 @@ export type PartialDeal = Omit<
         | "OdometerReading"
         | "OdomDigits"
         | "First_Lien_Phone_Num"
+        | "Second_Lien_Phone_Num"
         | "Trade1_Make"
         | "Trade1_Model"
         | "Trade1_VIN"
@@ -84,7 +84,7 @@ const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
         "SaleID",
     ],
     [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
-    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num"],
+    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num", "Second_Lien_Phone_Num"],
     [AccordionDealItems.FIRST_TRADE]: [
         "Trade1_Make",
         "Trade1_Model",
@@ -122,6 +122,10 @@ export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object
     OdometerReading: Yup.string().required("Data is required."),
     OdomDigits: Yup.number().required("Data is required."),
     First_Lien_Phone_Num: Yup.string().matches(PHONE_NUMBER_REGEX, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+    Second_Lien_Phone_Num: Yup.string().matches(PHONE_NUMBER_REGEX, {
         message: "Please enter a valid number.",
         excludeEmptyString: false,
     }),
@@ -572,6 +576,8 @@ export const DealsForm = observer(() => {
                                                     OdomDigits: dealExtData?.OdomDigits || "",
                                                     First_Lien_Phone_Num:
                                                         dealExtData?.First_Lien_Phone_Num || "",
+                                                    Second_Lien_Phone_Num:
+                                                        dealExtData?.Second_Lien_Phone_Num || "",
                                                     Trade1_Make: dealExtData?.Trade1_Make || "",
                                                     Trade1_Model: dealExtData?.Trade1_Model || "",
                                                     Trade1_VIN: dealExtData?.Trade1_VIN || "",
@@ -611,7 +617,7 @@ export const DealsForm = observer(() => {
                                                                     : "hidden"
                                                             }`}
                                                         >
-                                                            <div className='deal-form__title uppercase'>
+                                                            <div className='deal-form__title uppercase heading-condensed'>
                                                                 {item.itemLabel}
                                                             </div>
                                                             {stepActiveIndex === item.itemIndex && (

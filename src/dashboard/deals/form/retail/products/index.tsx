@@ -8,6 +8,7 @@ import { useStore } from "store/hooks";
 import { TERM_MONTH_LIST } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useLocation } from "react-router-dom";
+import { Splitter } from "dashboard/common/display";
 
 enum WarrantyTerm {
     MILES = "Miles",
@@ -65,6 +66,8 @@ export const DealRetailProducts = observer((): ReactElement => {
                     title='Price'
                 />
             </div>
+            <div className='col-3' />
+
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
@@ -75,10 +78,22 @@ export const DealRetailProducts = observer((): ReactElement => {
                     title='Deductible'
                 />
             </div>
-
+            <div className='col-3'>
+                <CurrencyInput
+                    labelPosition='top'
+                    value={serviceContractCost}
+                    onChange={({ value }) =>
+                        changeDealExtData({
+                            key: "serviceContract",
+                            value: Number(value) || 0,
+                        })
+                    }
+                    title='Service Contract Cost'
+                />
+            </div>
             <div className='col-3'>
                 <ComboBox
-                    label='Term (month or miles)'
+                    label='Term'
                     options={[WarrantyTerm.MONTH, WarrantyTerm.MILES]}
                     value={Warranty_Miles}
                     onChange={({ value }) => changeDealExtData({ key: "Warranty_Miles", value })}
@@ -97,19 +112,6 @@ export const DealRetailProducts = observer((): ReactElement => {
                     />
                 </div>
             )}
-            <div className='col-3 ml-auto'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={serviceContractCost}
-                    onChange={({ value }) =>
-                        changeDealExtData({
-                            key: "serviceContract",
-                            value: Number(value) || 0,
-                        })
-                    }
-                    title='Service Contract Cost'
-                />
-            </div>
 
             <div className='col-12'>
                 <span className='p-float-label'>
@@ -124,7 +126,7 @@ export const DealRetailProducts = observer((): ReactElement => {
                 </span>
             </div>
 
-            <hr className='form-line' />
+            <Splitter className='px-2 pt-2 pb-3 w-full' />
 
             <div className='col-6'>
                 <CompanySearch
