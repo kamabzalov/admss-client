@@ -51,18 +51,6 @@
         }
     }
 
-    .leads__filter.p-multiselect .p-multiselect-clear-icon,
-    .leads__filter.p-multiselect .p-multiselect-trigger-icon {
-        color: var(--admss-app-medium-grey);
-    }
-
-    .leads__filter.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover,
-    .leads__filter.p-multiselect:not(.p-disabled)
-        .p-multiselect-trigger:hover
-        .p-multiselect-trigger-icon {
-        color: var(--admss-app-darkest-grey);
-    }
-
     .p-datatable-wrapper {
         scrollbar-gutter: auto;
     }

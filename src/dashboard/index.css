@@ -39,7 +39,6 @@
     background: #fff;
     box-shadow: 0 0 5px 0 rgba(41, 93, 194, 0.8);
     padding: 25px 30px;
-
 }
 
 .p-button.p-button-success.p-button-outlined:enabled:hover,
@@ -271,6 +270,24 @@
     border-left: none;
 }
 
+.p-datatable
+    .p-datatable-thead
+    > tr
+    > th:first-child:has(.p-column-title:empty):has(+ .p-sortable-column.p-highlight) {
+    background: var(--admss-app-light-blue);
+    color: var(--admss-app-primary);
+}
+
+.p-datatable
+    .p-datatable-thead
+    > tr
+    > th:first-child:has(.p-column-title:empty):has(
+        + .p-sortable-column:not(.p-sortable-disabled):hover
+    ) {
+    background: var(--admss-app-medium-light-blue);
+    color: var(--admss-app-primary);
+}
+
 .p-datatable.p-datatable-gridlines .p-datatable-tbody > tr:first-child > td {
     border-top: none;
 }
@@ -291,7 +308,9 @@
 .p-inputtext:enabled:focus + .float-label,
 .p-float-label .p-inputwrapper-filled ~ label,
 .p-float-label .p-inputwrapper-focus ~ label,
-.p-float-label textarea.p-filled ~ label {
+.p-float-label textarea.p-filled ~ label,
+.p-float-label:has(.p-inputwrapper-filled) > .float-label,
+.p-float-label:has(.p-inputwrapper-focus) > .float-label {
     top: 0;
     left: 4px;
     color: var(--admss-app-medium-grey);
@@ -391,11 +410,70 @@
 .p-tooltip .p-tooltip-text {
     background: var(--admss-app-white);
     color: var(--admss-app-blue-text);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px var(--admss-app-dark-blue);
+    padding: 10px 18px;
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
 }
 
 .p-tooltip .p-tooltip-arrow {
     display: none;
+}
+
+.p-tooltip.tooltip-tail-left,
+.p-tooltip.tooltip-tail-right,
+.p-tooltip.tooltip-tail-top,
+.p-tooltip.tooltip-tail-bottom {
+    filter: drop-shadow(0px 0px 4px var(--admss-app-dark-blue));
+}
+
+.p-tooltip.tooltip-tail-left .p-tooltip-text,
+.p-tooltip.tooltip-tail-right .p-tooltip-text,
+.p-tooltip.tooltip-tail-top .p-tooltip-text,
+.p-tooltip.tooltip-tail-bottom .p-tooltip-text {
+    position: relative;
+    box-shadow: none;
+}
+
+.p-tooltip.tooltip-tail-left .p-tooltip-text::before,
+.p-tooltip.tooltip-tail-right .p-tooltip-text::before,
+.p-tooltip.tooltip-tail-top .p-tooltip-text::before,
+.p-tooltip.tooltip-tail-bottom .p-tooltip-text::before {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: var(--admss-app-white);
+    border-radius: 1px;
+    transform: rotate(45deg);
+}
+
+.p-tooltip.tooltip-tail-left .p-tooltip-text::before {
+    top: 50%;
+    left: -3px;
+    margin-top: -3px;
+}
+
+.p-tooltip.tooltip-tail-right .p-tooltip-text::before {
+    top: 50%;
+    right: -3px;
+    margin-top: -3px;
+}
+
+.p-tooltip.tooltip-tail-top .p-tooltip-text::before {
+    left: 50%;
+    top: -3px;
+    margin-left: -3px;
+}
+
+.p-tooltip.tooltip-tail-bottom .p-tooltip-text::before {
+    left: 50%;
+    bottom: -3px;
+    margin-left: -3px;
 }
 
 .p-error {
@@ -434,6 +512,50 @@
 .vehicle__dropdown-icon {
     height: 30px;
     width: 30px;
+}
+
+.p-dropdown-panel {
+    .p-dropdown-items {
+        padding: 0;
+        .p-dropdown-item {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+    }
+}
+
+.p-multiselect-panel {
+    .p-multiselect-items {
+        padding: 0;
+        font-size: 16px;
+        .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
+            background: var(--admss-app-light-green);
+        }
+    }
+
+    .dropdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1.5rem;
+        font-size: 16px;
+        font-weight: 600;
+        height: 44px;
+        background-color: var(--admss-app-light-blue);
+        .p-multiselect-close {
+            line-height: 1;
+            padding-top: 4px;
+            .pi-times {
+                font-size: 14px;
+            }
+            color: var(--admss-app-medium-grey);
+            &:hover {
+                color: var(--admss-app-darkest-grey);
+            }
+        }
+    }
 }
 
 .form-nav__button {
@@ -622,10 +744,6 @@
     background: var(--admss-app-white);
 }
 
-.p-dropdown-panel .p-dropdown-items {
-    padding: 0;
-}
-
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
     background-color: var(--admss-app-light-green);
     color: var(--admss-app-blue-text);
@@ -637,10 +755,46 @@
 
 .p-dropdown .p-dropdown-trigger {
     transition: rotate 0.4s;
+    color: var(--admss-app-medium-grey);
+}
+
+.p-dropdown:not(.p-disabled) .p-dropdown-trigger:hover {
+    color: var(--admss-app-darkest-grey);
+}
+
+.p-dropdown .p-dropdown-clear-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.p-dropdown:not(.p-disabled) .p-dropdown-clear-icon:hover,
+.p-dropdown:not(.p-disabled) .p-dropdown-clear-icon:focus {
+    color: var(--admss-app-darkest-grey);
 }
 
 .p-dropdown .p-dropdown-trigger[aria-expanded="true"] {
     rotate: 180deg;
+}
+
+.p-multiselect .p-multiselect-trigger,
+.p-multiselect .p-multiselect-clear-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.p-multiselect:not(.p-disabled) .p-multiselect-trigger:hover,
+.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover {
+    color: var(--admss-app-darkest-grey);
+}
+
+.global-search__icon,
+.p-input-icon-right > .icon.adms-search {
+    color: var(--admss-app-medium-grey);
+}
+
+.global-search:hover .global-search__icon,
+.global-search:has(.p-inputtext:focus) .global-search__icon,
+.p-input-icon-right:hover > .icon.adms-search,
+.p-input-icon-right:has(.p-inputtext:focus) > .icon.adms-search {
+    color: var(--admss-app-darkest-grey);
 }
 
 .text--red {
@@ -978,8 +1132,15 @@ figure {
         font-size: 20px;
     }
 
+    .p-button-icon,
     .icon {
         font-size: 26px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        position: static;
     }
 }
 

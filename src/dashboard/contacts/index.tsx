@@ -41,6 +41,7 @@ import { CONTACTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -413,7 +414,7 @@ export const ContactsDataTable = ({
                     onChange={(e) => setGlobalSearch(e.target.value)}
                 />
                 <Button
-                    className='contact-top-controls__button m-r-20px'
+                    className='contact-top-controls__button contact-advanced-search-button'
                     label='Advanced search'
                     severity='success'
                     type='button'
@@ -421,46 +422,49 @@ export const ContactsDataTable = ({
                 />
 
                 <Button
-                    className='contact-top-controls__button'
+                    className='contact-top-controls__button new-contact-button'
                     icon='icon adms-add-item'
                     severity={contactPermissions.canCreate() ? "success" : "secondary"}
                     type='button'
                     disabled={!contactPermissions.canCreate()}
                     tooltip='Add new contact'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={handleCreateContact}
-                />
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-print'
-                    tooltip='Print contacts form'
+                >
+                    New
+                </Button>
+                <ControlButton
+                    variant={BUTTON_VARIANTS.PRINT}
+                    tooltip='Print'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData(true)}
                 />
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-download'
-                    tooltip='Download contacts form'
+                <ControlButton
+                    variant={BUTTON_VARIANTS.DOWNLOAD}
+                    tooltip='Download'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData()}
                 />
 
-                <ComboBox
-                    value={selectedCategory}
-                    onChange={handleChangeCategory}
-                    options={categories}
-                    optionLabel='name'
-                    editable
-                    disabled={!!contactCategory}
-                    placeholder='Category'
-                    className='category-selector ml-auto'
-                    pt={{
-                        wrapper: {
-                            style: {
-                                maxHeight: "500px",
+                <span className='ml-auto'>
+                    <ComboBox
+                        value={selectedCategory}
+                        onChange={handleChangeCategory}
+                        options={categories}
+                        optionLabel='name'
+                        editable
+                        disabled={!!contactCategory}
+                        placeholder='Category'
+                        className='category-selector'
+                        pt={{
+                            wrapper: {
+                                style: {
+                                    maxHeight: "500px",
+                                },
                             },
-                        },
-                    }}
-                />
+                        }}
+                    />
+                </span>
                 <ColumnSelector<TableColumnsList>
                     selectableColumns={selectableColumns}
                     activeColumns={activeColumns}
@@ -547,7 +551,10 @@ export const ContactsDataTable = ({
                                         className='table-edit-button'
                                         icon='adms-edit-item'
                                         tooltip='Edit contact'
-                                        tooltipOptions={{ position: "mouse" }}
+                                        tooltipOptions={{
+                                            position: "right",
+                                            className: "tooltip-tail-left",
+                                        }}
                                         onClick={() =>
                                             contactPermissions.canEdit() &&
                                             navigate(CONTACTS_PAGE.EDIT(contactuid))
@@ -558,7 +565,7 @@ export const ContactsDataTable = ({
                             pt={{
                                 root: {
                                     style: {
-                                        width: "80px",
+                                        width: "60px",
                                     },
                                 },
                             }}

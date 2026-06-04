@@ -73,7 +73,6 @@ export const AdvancedSearchDialog = <T,>({
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [typeList, setTypeList] = useState<ContactType[]>([]);
-    const [selectedType, setSelectedType] = useState<string>("");
     const { startDate, endDate, handleDateChange } = useDateRange();
     const [dateError, setDateError] = useState<string>("");
     const autoCompleteRef = useRef<AutoComplete>(null);
@@ -246,7 +245,7 @@ export const AdvancedSearchDialog = <T,>({
             onHide={onHide}
             draggable
         >
-            <div className='flex flex-column gap-4 pt-4'>
+            <div className='flex search-dialog__fields flex-column pt-2'>
                 {filteredFields.map(({ key, value, type, label }) => {
                     if (type === SEARCH_FIELD_TYPE.DATE) {
                         return (
@@ -308,8 +307,17 @@ export const AdvancedSearchDialog = <T,>({
                         );
                     }
 
+                    const comboBoxHasLabel =
+                        type === SEARCH_FIELD_TYPE.DROPDOWN &&
+                        (searchForm === SEARCH_FORM_TYPE.CONTACTS ||
+                            (searchForm === SEARCH_FORM_TYPE.INVENTORY &&
+                                key === DROPDOWN_TYPE.MODEL));
+
                     return (
-                        <span className='p-float-label p-input-icon-right relative' key={key}>
+                        <span
+                            className={`${comboBoxHasLabel ? "" : "p-float-label"} p-input-icon-right relative`}
+                            key={key}
+                        >
                             {type === SEARCH_FIELD_TYPE.TEXT && (
                                 <InputText
                                     type='tel'
@@ -405,11 +413,12 @@ export const AdvancedSearchDialog = <T,>({
                                                 optionLabel='name'
                                                 optionValue='name'
                                                 id={uniqueId}
+                                                label={label || String(key)}
                                                 value={value ?? ""}
                                                 editable
                                                 options={automakesModelList}
-                                                onChange={({ target }) =>
-                                                    onInputChange(key, target.value)
+                                                onChange={({ value: selectedValue }) =>
+                                                    onInputChange(key, selectedValue ?? "")
                                                 }
                                             />
                                         )}
@@ -423,18 +432,14 @@ export const AdvancedSearchDialog = <T,>({
                                         optionLabel='name'
                                         optionValue='id'
                                         id={uniqueId}
-                                        value={
-                                            typeList?.find(
-                                                (typeItem) => typeItem?.name === selectedType
-                                            )?.id
-                                        }
+                                        label={label || String(key)}
+                                        value={value != null && value !== "" ? Number(value) : null}
                                         options={typeList || []}
-                                        onChange={({ target }) => {
-                                            const selected = typeList?.find(
-                                                (typeItem) => typeItem?.id === target.value
+                                        onChange={({ value: selectedValue }) => {
+                                            onInputChange(
+                                                key,
+                                                selectedValue != null ? String(selectedValue) : ""
                                             );
-                                            setSelectedType(selected?.name || "");
-                                            onInputChange(key, target.value);
                                         }}
                                     />
                                 )}
@@ -459,9 +464,6 @@ export const AdvancedSearchDialog = <T,>({
                                     text
                                     className={`cursor-pointer search-dialog__clear ${type === SEARCH_FIELD_TYPE.DROPDOWN ? "search-dialog__clear--dropdown" : ""}`}
                                     onClick={() => {
-                                        if (key === DROPDOWN_TYPE.TYPE) {
-                                            setSelectedType("");
-                                        }
                                         if (key === DROPDOWN_TYPE.MAKE) {
                                             const modelField = fields.find(
                                                 (field) => field.key === "Model"
@@ -477,9 +479,11 @@ export const AdvancedSearchDialog = <T,>({
                                 />
                             )}
 
-                            <label htmlFor={uniqueId} className='float-label'>
-                                {label || key}
-                            </label>
+                            {!comboBoxHasLabel && (
+                                <label htmlFor={uniqueId} className='float-label'>
+                                    {label || key}
+                                </label>
+                            )}
                         </span>
                     );
                 })}
