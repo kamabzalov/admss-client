@@ -29,25 +29,14 @@
 }
 
 .combo-box {
-    .p-dropdown-trigger {
-        color: var(--admss-app-medium-grey);
-        &:hover {
-            color: var(--admss-app-darkest-grey);
-        }
-        .p-icon {
-            font-size: 14px;
-        }
+    .p-dropdown-trigger .p-icon {
+        font-size: 14px;
     }
 
     .p-dropdown-clear-icon.p-clickable {
-        color: var(--admss-app-medium-grey);
         width: 14px;
         height: 14px;
         margin-top: -0.4rem;
-        &:hover,
-        &:focus {
-            color: var(--admss-app-darkest-grey);
-        }
     }
 }
 

@@ -4,10 +4,6 @@
     .tasks__search-button {
         width: 200px;
         height: 50px;
-
-        .pi.pi-search {
-            color: var(--admss-app-medium-grey);
-        }
     }
 
     .tasks__add-button {

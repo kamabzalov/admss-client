@@ -1,10 +1,12 @@
 .search-dialog {
     width: 480px;
     .p-dialog-footer {
-        margin-bottom: 30px;
+        padding: 0;
+        margin: 40px 0;
         .p-button {
-            width: 240px;
+            width: 100%;
             height: 60px;
+            margin: 0;
         }
     }
     .p-dropdown-label {
@@ -17,6 +19,9 @@
         padding-right: 12px;
         padding-top: 10px;
         padding-left: 0;
+    }
+    .search-dialog__fields {
+        gap: 30px;
     }
 }
 .search-dialog__clear.p-button {

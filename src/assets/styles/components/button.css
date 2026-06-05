@@ -7,6 +7,14 @@
     width: 50px;
 }
 
+.p-button.contact-advanced-search-button .p-button-label,
+.p-button.datatable-controls__search-button .p-button-label,
+.p-button.inventory-top-controls__search-button .p-button-label,
+.p-button.contact-top-controls__button:not(.p-button-icon-only) .p-button-label,
+.p-button.tasks__search-button .p-button-label {
+    font-weight: 600;
+}
+
 .p-button.p-button-success,
 .p-buttonset.p-button-success > .p-button,
 .p-splitbutton.p-button-success > .p-button,
@@ -24,8 +32,8 @@
 .p-splitbutton.p-button-success > .p-button:not(button):not(a):not(.p-disabled):hover,
 .p-button.p-confirm-dialog-accept:enabled:hover,
 .p-button.p-confirm-dialog-accept:not(button):not(a):not(.p-disabled):hover {
-    background: var(--admss-app-primary-main-green-hover);
-    border-color: var(--admss-app-primary-main-green-hover);
+    background: var(--admss-app-dark-green);
+    border-color: var(--admss-app-dark-green);
     color: var(--admss-app-white);
 }
 
@@ -57,5 +65,11 @@
 .p-button.p-confirm-dialog-accept:disabled {
     background: var(--admss-app-light-grey);
     border-color: var(--admss-app-light-grey);
+    color: var(--admss-app-white);
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight:hover {
+    background: var(--admss-app-dark-green);
+    border-color: var(--admss-app-dark-green);
     color: var(--admss-app-white);
 }

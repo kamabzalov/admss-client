@@ -918,6 +918,7 @@ export const GlobalSearchInput = ({
     onChange,
     onInputChange,
     value,
+    placeholder = "Search",
     ...props
 }: GlobalSearchInputProps): ReactElement => {
     const uniqueId = useId();
@@ -954,18 +955,16 @@ export const GlobalSearchInput = ({
     }, [value, enableDebounce]);
 
     return (
-        <span className='global-search p-input-icon-right p-float-label'>
+        <span className='global-search p-input-icon-right'>
             <i className='icon adms-search global-search__icon' />
             <InputText
                 id={uniqueId}
                 className='global-search__input'
                 value={enableDebounce ? internalValue : value || ""}
                 onChange={handleChange}
+                placeholder={placeholder}
                 {...props}
             />
-            <label htmlFor={uniqueId} className='global-search__label float-label'>
-                {props.placeholder || "Search"}
-            </label>
         </span>
     );
 };

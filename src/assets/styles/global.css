@@ -97,6 +97,10 @@
     --admss-app-lead-status-rejected: var(--admss-app-statuses-cancelled);
 
     --admss-app-default-card-height: 983px;
+
+    --admss-app-datatable-records-end-line-width: 98%;
+    --admss-app-datatable-records-end-line-height: 3px;
+    --admss-app-datatable-records-end-line-color: var(--admss-app-light-blue);
 }
 
 html {

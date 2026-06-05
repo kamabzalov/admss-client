@@ -17,16 +17,24 @@
 .print-button,
 .download-button {
     padding: 0;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 50px;
     width: 50px;
 }
 
+.print-button .p-button-icon,
+.download-button .p-button-icon,
 .print-button .icon,
 .download-button .icon {
     font-size: 26px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    position: static;
 }
 
 .switch-button {
