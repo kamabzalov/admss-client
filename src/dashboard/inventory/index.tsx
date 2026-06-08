@@ -411,7 +411,7 @@ export default function Inventories({
                 className='table-edit-button'
                 icon='adms-edit-item'
                 tooltip='Edit inventory'
-                tooltipOptions={{ position: "mouse" }}
+                tooltipOptions={{ position: "right", className: "tooltip-tail-left" }}
                 onClick={() => navigate(INVENTORY_PAGE.EDIT(itemuid))}
             />
         );
@@ -464,14 +464,23 @@ export default function Inventories({
         }
     };
 
+    const locationLabel = currentLocation?.locName || "Any Location";
+
     return (
         <DataTableWrapper className='card inventory'>
             <div className='card-header'>
                 <h2 className='card-header__title inventory__title uppercase m-0'>Inventory</h2>
                 {locations.length > 0 && (
                     <SplitButton
-                        label={currentLocation?.locName || "Any Location"}
                         className='inventory-location'
+                        buttonTemplate={
+                            <TruncatedText
+                                text={locationLabel}
+                                withTooltip
+                                className='inventory-location__label'
+                            />
+                        }
+                        buttonProps={{ "aria-label": locationLabel }}
                         model={[
                             {
                                 label: "Any Location",
@@ -495,7 +504,7 @@ export default function Inventories({
                             })),
                         ]}
                         rounded
-                        menuStyle={{ transform: "translateX(164px)" }}
+                        appendTo='self'
                         pt={{
                             menu: {
                                 className: "inventory-location__menu",

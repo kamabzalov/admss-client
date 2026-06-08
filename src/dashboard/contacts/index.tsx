@@ -280,8 +280,6 @@ export const ContactsDataTable = ({
                 ? data[returnedField]
                 : data.companyName || data.businessName || `${data.firstName} ${data.lastName}`;
             onRowClick(value);
-        } else if (contactPermissions.canOpenDetails()) {
-            navigate(data.contactuid);
         }
     };
 
@@ -421,27 +419,20 @@ export const ContactsDataTable = ({
                     onClick={() => setDialogVisible(true)}
                 />
 
-                <Button
-                    className='contact-top-controls__button new-contact-button'
-                    icon='icon adms-add-item'
-                    severity={contactPermissions.canCreate() ? "success" : "secondary"}
-                    type='button'
-                    disabled={!contactPermissions.canCreate()}
+                <ControlButton
+                    variant={BUTTON_VARIANTS.NEW}
                     tooltip='Add new contact'
-                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={handleCreateContact}
-                >
-                    New
-                </Button>
+                />
                 <ControlButton
                     variant={BUTTON_VARIANTS.PRINT}
-                    tooltip='Print'
+                    withTooltip
                     tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData(true)}
                 />
                 <ControlButton
                     variant={BUTTON_VARIANTS.DOWNLOAD}
-                    tooltip='Download'
+                    withTooltip
                     tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData()}
                 />

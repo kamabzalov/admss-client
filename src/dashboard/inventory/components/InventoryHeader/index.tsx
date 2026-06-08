@@ -8,6 +8,7 @@ import {
 import { Checkbox } from "primereact/checkbox";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { FilterOptions, TableColumnsList } from "dashboard/inventory/common/data-table";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 interface InventoryHeaderProps {
     searchValue: string;
@@ -150,31 +151,32 @@ export default function InventoryHeader({
                 onClick={onAdvancedSearch}
             />
             {onAddNew && (
-                <Button
-                    className='inventory-top-controls__button new-inventory-button'
-                    icon='icon adms-add-item'
-                    severity='success'
-                    type='button'
+                <ControlButton
+                    variant={BUTTON_VARIANTS.NEW}
                     tooltip='Add new inventory'
                     onClick={onAddNew}
-                >
-                    New
-                </Button>
+                    tooltipOptions={{
+                        position: "right",
+                        className: "tooltip-tail-left",
+                    }}
+                />
             )}
-            <Button
-                className='inventory-top-controls__button'
-                severity='success'
-                type='button'
-                icon='icon adms-print'
-                tooltip='Print inventory form'
+            <ControlButton
+                variant={BUTTON_VARIANTS.PRINT}
+                withTooltip
+                tooltipOptions={{
+                    position: "right",
+                    className: "tooltip-tail-left",
+                }}
                 onClick={onPrint}
             />
-            <Button
-                className='inventory-top-controls__button'
-                severity='success'
-                type='button'
-                icon='icon adms-download'
-                tooltip='Download inventory form'
+            <ControlButton
+                variant={BUTTON_VARIANTS.DOWNLOAD}
+                withTooltip
+                tooltipOptions={{
+                    position: "right",
+                    className: "tooltip-tail-left",
+                }}
                 onClick={onDownload}
             />
             <MultiSelect

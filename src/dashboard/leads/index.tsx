@@ -567,7 +567,7 @@ export const LeadsDataTable = observer(() => {
             </div>
             {isLoading ? (
                 <div className='dashboard-loader__wrapper'>
-                    <Loader overlay />
+                    <Loader />
                 </div>
             ) : (
                 <DataTable
@@ -625,12 +625,7 @@ export const LeadsDataTable = observer(() => {
                         const savedWidth = serverSettings?.leads?.columnWidth?.[field];
                         const isLastColumn = index === activeColumns.length - 1;
                         const additionalStyles =
-                            field === "status"
-                                ? {
-                                      maxWidth: "240px",
-                                      width: "240px",
-                                  }
-                                : undefined;
+                            field === "status" && !isLastColumn ? { maxWidth: "240px" } : undefined;
 
                         return (
                             <Column
