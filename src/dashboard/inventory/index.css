@@ -260,60 +260,58 @@
     padding-bottom: 0;
 }
 
-.new-inventory-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    flex-direction: column;
-    height: 50px;
-    width: 50px;
-}
-
-.new-inventory-button .icon {
-    font-size: 20px;
-}
-
 .inventory-location {
-    width: 200px;
+    position: relative;
+    width: 180px;
+    --inventory-location-toggle-size: 30px;
+}
+
+.inventory-location.p-splitbutton {
+    display: inline-flex;
+    align-items: stretch;
 }
 
 .inventory-location .p-button {
     display: inline-flex;
     align-items: center;
     flex-wrap: nowrap;
-    height: 34px;
+    height: var(--inventory-location-toggle-size);
     justify-content: center;
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
     background: var(--admss-app-dark-blue);
     border: none;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
-.inventory-location .p-button-label {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.inventory-location .inventory-location__label {
+    min-width: 0;
+    text-align: left;
 }
 
 .inventory-location .p-button.p-splitbutton-defaultbutton {
+    flex: 1;
+    min-width: 0;
     background: var(--admss-app-dark-blue);
     border: none;
     box-shadow: none;
     cursor: default;
 }
 
-.inventory-location .p-button.p-button-icon-only {
-    width: 29px;
+.inventory-location .p-button.p-splitbutton-menubutton {
+    width: var(--inventory-location-toggle-size);
+    min-width: var(--inventory-location-toggle-size);
+    height: var(--inventory-location-toggle-size);
+    padding: 0;
+    flex-shrink: 0;
     border-left: 1px solid #292a2e33;
 }
 
-.inventory-location .p-button.p-button-icon-only:hover,
-.inventory-location .p-button.p-button-icon-only:focus,
-.inventory-location .p-button.p-button-icon-only:active {
+.inventory-location .p-button.p-splitbutton-menubutton:hover,
+.inventory-location .p-button.p-splitbutton-menubutton:focus,
+.inventory-location .p-button.p-splitbutton-menubutton:active {
     background: var(--admss-app-dark-blue);
     filter: brightness(0.8);
     border: none;
@@ -321,18 +319,20 @@
     box-shadow: none;
 }
 
-.inventory-location .p-button svg {
+.inventory-location .p-button.p-splitbutton-menubutton svg {
     width: 14px;
     height: 14px;
     transition: transform 0.3s ease-in-out;
 }
 
-.inventory-location .p-button:focus svg {
+.inventory-location .p-splitbutton-menubutton[aria-expanded="true"] svg {
     transform: rotate(180deg);
 }
 
 .inventory-location__menu {
+    left: calc(100% - var(--inventory-location-toggle-size)) !important;
     width: 233px;
+    min-width: 233px;
 }
 
 .inventory-form .p-datatable .p-datatable-thead > tr > th {

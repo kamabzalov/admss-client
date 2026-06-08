@@ -358,8 +358,6 @@ export const DealsDataTable = observer(
             if (onRowClick) {
                 const value = returnedField ? data[returnedField] : data.contactinfo;
                 onRowClick(value);
-            } else {
-                navigate(data.dealuid);
             }
         };
 
@@ -536,7 +534,7 @@ export const DealsDataTable = observer(
                 </div>
                 {isLoading ? (
                     <div className='dashboard-loader__wrapper'>
-                        <Loader overlay />
+                        <Loader />
                     </div>
                 ) : (
                     <DataTable

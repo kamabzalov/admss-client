@@ -1,5 +1,12 @@
 .search-dialog {
     width: 480px;
+
+    .p-dialog-header .p-dialog-header-icon:focus,
+    .p-dialog-header .p-dialog-header-icon:focus-visible {
+        box-shadow: none;
+        outline: none;
+    }
+
     .p-dialog-footer {
         padding: 0;
         margin: 40px 0;

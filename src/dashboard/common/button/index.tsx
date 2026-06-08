@@ -11,9 +11,10 @@ export enum BUTTON_VARIANTS {
 
 interface ControlButtonProps extends ButtonProps {
     variant: BUTTON_VARIANTS;
+    withTooltip?: boolean | string;
 }
 
-export const ControlButton = ({ variant, ...props }: ControlButtonProps) => {
+export const ControlButton = ({ variant, withTooltip, ...props }: ControlButtonProps) => {
     const buttonIcon = {
         [BUTTON_VARIANTS.NEW]: "icon adms-add-item",
         [BUTTON_VARIANTS.PRINT]: "icon adms-print",
@@ -38,6 +39,13 @@ export const ControlButton = ({ variant, ...props }: ControlButtonProps) => {
             icon={props.icon || buttonIcon[variant]}
             severity={props.severity || "success"}
             type={props.type || "button"}
+            tooltip={
+                withTooltip
+                    ? typeof withTooltip === "string"
+                        ? withTooltip
+                        : buttonLabel[variant]
+                    : undefined
+            }
             {...props}
         >
             {props.label || (variant === BUTTON_VARIANTS.NEW && buttonLabel[variant])}
