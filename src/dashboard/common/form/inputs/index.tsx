@@ -82,6 +82,7 @@ interface DateInputProps extends CalendarProps {
     emptyDate?: boolean;
     clearButton?: boolean;
     floatLabel?: boolean;
+    hideTodayHighlight?: boolean;
     onClearAction?: () => void;
 }
 
@@ -486,11 +487,16 @@ export const DateInput = ({
     clearButton,
     floatLabel = true,
     checked = false,
+    hideTodayHighlight,
     onClearAction,
     error,
     errorMessage,
     ...props
 }: DateInputProps): ReactElement => {
+    const { panelClassName, ...calendarProps } = props;
+    const mergedPanelClassName = [panelClassName, hideTodayHighlight && "p-datepicker--hide-today"]
+        .filter(Boolean)
+        .join(" ");
     const showError = error || !!errorMessage;
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(checked);
@@ -574,11 +580,12 @@ export const DateInput = ({
                         value={checkbox && !isChecked ? null : innerDate}
                         disabled={checkbox && !isChecked}
                         className={`w-full date-item__calendar ${checkbox ? "date-item__calendar--checkbox" : ""} ${showError ? "p-invalid" : ""}`}
+                        panelClassName={mergedPanelClassName || undefined}
                         onChange={(e) => {
                             handleDateChange(e.value as Date | null);
-                            props.onChange?.(e);
+                            calendarProps.onChange?.(e);
                         }}
-                        {...props}
+                        {...calendarProps}
                     />
                     {innerDate && clearButton && (
                         <Button

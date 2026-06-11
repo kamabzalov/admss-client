@@ -107,3 +107,10 @@
     color: var(--admss-app-white);
     border-radius: 50%;
 }
+
+.p-datepicker.p-datepicker--hide-today table td.p-datepicker-today > span:not(.p-highlight) {
+    background-color: transparent;
+    color: var(--admss-app-primary);
+    border-color: transparent;
+    border-radius: 0;
+}

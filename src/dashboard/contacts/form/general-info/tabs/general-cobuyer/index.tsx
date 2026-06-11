@@ -1,32 +1,30 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useRef, useState, useMemo } from "react";
+import { ReactElement, useEffect, useState, useMemo } from "react";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
 import { Contact, ContactExtData, ContactOFAC, ScanBarcodeDL } from "common/models/contact";
 import { checkContactOFAC, scanContactDL } from "http/services/contacts-service";
-import { Checkbox } from "primereact/checkbox";
-import { Button } from "primereact/button";
 import { Status } from "common/models/base-response";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { Loader } from "dashboard/common/loader";
 import "./index.css";
 import { useToastMessage } from "common/hooks";
+import { ScanDlControls } from "dashboard/contacts/form/general-info/common/scan-dl-controls";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
 
-    const { setFieldValue, validateField, setFieldTouched, errors, touched } =
+    const { setFieldValue, validateField, setFieldTouched, setFieldError, errors, touched } =
         useFormikContext<ContactExtData>();
     const { showError } = useToastMessage();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
 
     const handleFieldChange = async (field: keyof ContactExtData, value: string) => {
@@ -50,9 +48,18 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         return isNameRequired && !shouldDisableNameFields;
     }, [isNameRequired, shouldDisableNameFields]);
 
-    const handleScanDL = () => {
-        fileInputRef.current?.click();
-    };
+    useEffect(() => {
+        if (!shouldDisableNameFields) {
+            return;
+        }
+
+        (["CoBuyer_First_Name", "CoBuyer_Middle_Name", "CoBuyer_Last_Name"] as const).forEach(
+            (field) => {
+                setFieldError(field, undefined);
+                setFieldTouched(field, false, false);
+            }
+        );
+    }, [shouldDisableNameFields, setFieldError, setFieldTouched]);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -188,50 +195,13 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     return (
         <div className='grid general-info row-gap-2 cobuyer-info'>
-            <div className='col-12 flex gap-4'>
-                <Button
-                    type='button'
-                    label={isScanning ? "Scanning" : "Scan driver license"}
-                    className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
-                    tooltip='Data received from the DL’s backside will fill in related fields'
-                    outlined={!isScanning}
-                    onClick={handleScanDL}
-                    loading={isScanning}
-                    loadingIcon={<Loader size='small' includeText={false} color='white' />}
-                />
-                <input
-                    type='file'
-                    accept='image/*'
-                    style={{ display: "none" }}
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                />
-                <div className='general-info-overwrite pb-3'>
-                    <Checkbox
-                        checked={allowOverwrite}
-                        inputId='general-info-overwrite'
-                        className='general-info-overwrite__checkbox'
-                        onChange={() => setAllowOverwrite(!allowOverwrite)}
-                    />
-                    <label
-                        htmlFor='general-info-overwrite'
-                        className='general-info-overwrite__label'
-                    >
-                        Overwrite data
-                    </label>
-                    <Button
-                        text
-                        tooltip="Data received from the DL's backside will overwrite user-entered data"
-                        icon='icon adms-help'
-                        outlined
-                        type='button'
-                        className='general-info-overwrite__icon'
-                        tooltipOptions={{
-                            className: "overwrite-tooltip",
-                        }}
-                    />
-                </div>
-            </div>
+            <ScanDlControls
+                checkboxId='general-info-cobuyer-overwrite'
+                isScanning={isScanning}
+                allowOverwrite={allowOverwrite}
+                onAllowOverwriteChange={setAllowOverwrite}
+                onFileChange={handleFileChange}
+            />
 
             <TextInput
                 colWidth={4}
@@ -240,6 +210,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 onChange={({ target: { value } }) => handleFieldChange("CoBuyer_First_Name", value)}
                 name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!isCoBuyerFirstNameError}
@@ -255,6 +226,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     handleFieldChange("CoBuyer_Middle_Name", value)
                 }
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!errors.CoBuyer_Middle_Name}
@@ -268,6 +240,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 value={contactExtData.CoBuyer_Last_Name || ""}
                 onChange={({ target: { value } }) => handleFieldChange("CoBuyer_Last_Name", value)}
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!isCoBuyerLastNameError}

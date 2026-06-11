@@ -70,7 +70,7 @@ export const DeleteForm = observer(
 
         return (
             <div className='contact-form col-12'>
-                <div className='contact-form__title contact-form__title--danger uppercase'>
+                <div className='contact-form__title contact-form__title--danger uppercase heading-condensed'>
                     Delete contact
                 </div>
                 <div className='grid'>

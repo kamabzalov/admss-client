@@ -353,6 +353,15 @@
     transition: all 0.2s ease;
 }
 
+.p-datatable.p-datatable-scrollable {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.p-datatable.p-datatable-scrollable > .p-datatable-wrapper {
+    overscroll-behavior-y: none;
+}
+
 .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar {
     width: 12px;
     height: 12px;
@@ -360,7 +369,9 @@
 
 .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-thumb {
     border: 0.2em solid var(--admss-app-light-blue);
+    border-top-width: calc(var(--admss-app-datatable-header-height) + 0.2em);
     border-radius: 0.6em;
+    background-clip: padding-box;
     width: 6px;
 }
 
@@ -375,7 +386,6 @@
 .p-datatable-wrapper:not(
         .thin-scrollbar
     )::-webkit-scrollbar-button:single-button:vertical:decrement {
-    height: 67px;
     background: var(--admss-app-light-blue);
     border-style: solid;
     border-width: 0 7px 7px 7px;
@@ -503,6 +513,7 @@
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 700;
+    font-family: var(--admss-app-font-condensed);
 
     &.text-line__title--red {
         color: var(--admss-app-red);
@@ -629,22 +640,6 @@
 
 .p-dropdown-panel.p-component {
     max-width: 250px;
-}
-
-.p-accordion
-    .vertical-step-menu
-    .p-steps-item.section-invalid
-    .p-menuitem-link.vertical-nav
-    .p-steps-number.vertical-nav__icon {
-    border-color: var(--admss-app-red);
-}
-
-.p-accordion
-    .vertical-step-menu
-    .p-steps-item.section-valid
-    .p-menuitem-link.vertical-nav
-    .p-steps-number.vertical-nav__icon {
-    background-color: var(--admss-app-green);
 }
 
 .splitter {
@@ -803,6 +798,10 @@
 
 .text--green {
     color: var(--admss-app-green);
+}
+
+.text--light-grey {
+    color: var(--admss-app-light-grey);
 }
 
 .vertical-step-menu.p-steps .p-steps-item .p-menuitem-link.vertical-nav.p-button {
@@ -1023,11 +1022,9 @@
     border-radius: 5px;
 }
 
-.p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
-    height: 60px;
-    background: transparent;
-    border: none;
-    background: var(--admss-app-light-blue);
+.p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-thumb {
+    border-top: var(--admss-app-datatable-header-height) solid var(--admss-app-light-blue);
+    background-clip: padding-box;
 }
 
 .p-inputtext + .float-label,

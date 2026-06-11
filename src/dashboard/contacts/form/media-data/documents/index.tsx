@@ -3,6 +3,7 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 import { Button } from "primereact/button";
 import {
     FileUpload,
@@ -18,7 +19,7 @@ import { emptyTemplate } from "dashboard/common/form/upload";
 import { useToastMessage } from "common/hooks";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
-import { ContactDocumentTemplate } from "./document-template";
+import { ContactDocumentTemplate } from "dashboard/contacts/form/media-data/documents/document-template";
 import { TruncatedText } from "dashboard/common/display";
 import { UPLOAD_TEXT } from "common/constants/media-categories";
 
@@ -150,10 +151,10 @@ export const ContactsDocuments = observer((): ReactElement => {
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         <TruncatedText
                             withTooltip
-                            tooltipOptions={{
+                            tooltipOptions={contactFormTooltipOptions({
                                 position: "top",
                                 content: file.name,
-                            }}
+                            })}
                             className='presentation__label-text'
                             text={file.name}
                         />
@@ -192,7 +193,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <InfoOverlayPanel panelTitle='Limitations:'>
+                                <InfoOverlayPanel panelTitle='Limitations:' disablePulse>
                                     <p>
                                         <b>Supported formats: </b>
                                         {limitations.formats.map((format, index) => (

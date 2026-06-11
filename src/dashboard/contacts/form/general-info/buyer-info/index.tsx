@@ -54,7 +54,15 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
                 onTabChange={handleTabChange}
             >
                 {tabs.map((tab, index) => (
-                    <TabPanel key={index} header={tab.header}>
+                    <TabPanel
+                        key={index}
+                        header={tab.header}
+                        pt={{
+                            header: {
+                                className: "heading-condensed",
+                            },
+                        }}
+                    >
                         {isLoading ? <Loader className='contact-form__loader' /> : tab.component}
                     </TabPanel>
                 ))}

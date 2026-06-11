@@ -1,0 +1,54 @@
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item:not(.section-valid):not(.section-in-progress):not(.section-invalid)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-in-progress
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    border: 1px solid var(--admss-app-primary-main-green);
+}
+
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-invalid
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    border-color: var(--admss-app-red);
+}
+
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-valid
+    .p-menuitem-link.vertical-nav
+    .p-steps-number.vertical-nav__icon {
+    background-color: var(--admss-app-green);
+}
+
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-in-progress:not(:last-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number::before,
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-valid:not(:last-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number::before,
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-in-progress:not(:first-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number::after,
+.p-accordion
+    .vertical-step-menu
+    .p-steps-item.section-valid:not(:first-child)
+    .p-menuitem-link.vertical-nav
+    .p-steps-number::after {
+    background-color: var(--admss-app-primary-main-green);
+}

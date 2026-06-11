@@ -42,8 +42,3 @@
     margin-top: -16px;
     font-size: 12px;
 }
-
-.overwrite-tooltip .p-tooltip-text {
-    box-shadow: 0 0 5px 0 var(--admss-app-dark-blue);
-    background-color: var(--admss-app-white-blue);
-}

@@ -101,6 +101,7 @@
     --admss-app-datatable-records-end-line-width: 98%;
     --admss-app-datatable-records-end-line-height: 3px;
     --admss-app-datatable-records-end-line-color: var(--admss-app-light-blue);
+    --admss-app-datatable-header-height: 50px;
 }
 
 html {

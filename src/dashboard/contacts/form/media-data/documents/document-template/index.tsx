@@ -1,5 +1,6 @@
 import { useCallback, ReactElement } from "react";
 import { TruncatedText } from "dashboard/common/display";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 import { Image } from "primereact/image";
 import { ContactMediaItem } from "common/models/contact";
 import { useStore } from "store/hooks";
@@ -139,7 +140,12 @@ export const ContactDocumentTemplate = ({
                             <i className='pi pi-comment' />
                         </span>
                     </span>
-                    <TruncatedText className='document-info__text' text={notes || ""} withTooltip />
+                    <TruncatedText
+                        className='document-info__text'
+                        text={notes || ""}
+                        withTooltip
+                        tooltipOptions={contactFormTooltipOptions({ position: "top" })}
+                    />
                 </div>
                 <div className='document-info__item'>
                     <span className='document-info__icon'>
