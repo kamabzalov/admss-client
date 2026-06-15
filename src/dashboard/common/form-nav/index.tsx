@@ -7,11 +7,7 @@ interface FormNavProps {
 }
 
 export const FormNav = ({ children, className = "" }: FormNavProps): ReactElement => {
-    return (
-        <div className={`flex justify-content-end gap-3 mt-5 mr-3 form-nav ${className}`.trim()}>
-            {children}
-        </div>
-    );
+    return <div className={`form-nav ${className}`.trim()}>{children}</div>;
 };
 
 export const FormNavButton = ({

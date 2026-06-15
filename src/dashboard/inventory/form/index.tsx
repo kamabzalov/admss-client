@@ -1,9 +1,17 @@
-import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 import { Button } from "primereact/button";
-import { AccordionItems, Inventory, InventoryItem, InventorySection } from "../common";
+import { FormNav, FormNavButton } from "dashboard/common/form-nav";
+import {
+    AccordionItems,
+    Inventory,
+    InventoryItem,
+    InventorySection,
+    createInventorySections,
+    getInventoryMenuCount,
+    resetFormStepSectionCounters,
+} from "dashboard/inventory/common";
+import { FormStepAccordion } from "dashboard/common/form-stepper";
 import { InventoryPurchaseData } from "dashboard/inventory/form/purchase";
 import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -140,7 +148,6 @@ export const InventoryForm = observer(() => {
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
-    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
@@ -295,21 +302,6 @@ export const InventoryForm = observer(() => {
         });
     };
 
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            stepActiveIndex >= step && setAccordionActiveIndex([index]);
-        });
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, stepsRef.current]);
-
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : CREATE_INVENTORY_ID;
         return `${INVENTORY_PAGE.EDIT(currentPath)}?step=${activeIndex + 1}`;
@@ -331,10 +323,9 @@ export const InventoryForm = observer(() => {
             InventoryExportWebData,
         ];
         id && inventorySections.splice(2, 0, InventoryMediaData);
-        const sections = inventorySections.map((sectionData) => new InventorySection(sectionData));
+        const sections = createInventorySections(inventorySections);
         setInventorySections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        const itemsMenuCount = getInventoryMenuCount(sections);
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
         setDeleteActiveIndex(itemsMenuCount + 2);
@@ -345,16 +336,16 @@ export const InventoryForm = observer(() => {
         }
 
         return () => {
-            sections.forEach((section) => section.clearCount());
+            resetFormStepSectionCounters();
             clearInventory();
         };
     }, [id, store]);
 
     useEffect(() => {
-        if (
-            stepActiveIndex >= accordionSteps[accordionSteps.length - 1] &&
-            !isInventoryWebExported
-        ) {
+        const lastSectionStartIndex =
+            inventorySections[inventorySections.length - 1]?.startIndex ?? 0;
+
+        if (stepActiveIndex >= lastSectionStartIndex && !isInventoryWebExported) {
             if (id) {
                 getInventoryExportWeb(id);
                 getWebCheckStatus(id);
@@ -362,7 +353,7 @@ export const InventoryForm = observer(() => {
                 setIsInventoryWebExported(true);
             }
         }
-    }, [accordionSteps, stepActiveIndex]);
+    }, [inventorySections, stepActiveIndex, isInventoryWebExported, id]);
 
     const handleOnBackClick = () => {
         setStepActiveIndex((prev) => {
@@ -388,6 +379,14 @@ export const InventoryForm = observer(() => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
     };
+
+    const handleStepChange = useCallback(
+        (globalIndex: number) => {
+            setStepActiveIndex(globalIndex);
+            navigate(getUrl(globalIndex));
+        },
+        [id, navigate]
+    );
 
     const handleSaveInventoryForm = () => {
         setIsSubmitting(true);
@@ -489,84 +488,48 @@ export const InventoryForm = observer(() => {
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
-                                <div className='inventory__navigation' ref={stepsRef}>
-                                    <Accordion
-                                        activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
-                                        className='inventory__accordion'
-                                        multiple
-                                    >
-                                        {inventorySections.map((section) => (
-                                            <AccordionTab
-                                                key={section.sectionId}
-                                                header={section.label}
-                                            >
-                                                <Steps
-                                                    readOnly={false}
-                                                    activeIndex={
-                                                        stepActiveIndex - section.startIndex
-                                                    }
-                                                    onSelect={(e) => {
-                                                        setStepActiveIndex(
-                                                            e.index + section.startIndex
-                                                        );
-                                                    }}
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
-                                                                );
-                                                            },
-                                                            className: errorSections.length
-                                                                ? errorSections.includes(itemLabel)
-                                                                    ? "section-invalid"
-                                                                    : "section-valid"
-                                                                : "",
-                                                        })
-                                                    )}
-                                                    className='vertical-step-menu'
-                                                    pt={{
-                                                        menu: {
-                                                            className: "flex-column w-full",
-                                                        },
-                                                        step: {
-                                                            className:
-                                                                "border-circle inventory-step",
-                                                        },
-                                                    }}
-                                                />
-                                            </AccordionTab>
-                                        ))}
-                                    </Accordion>
-                                    {id && (
-                                        <Button
-                                            icon='icon adms-print'
-                                            className={`p-button gap-2 inventory__print-nav ${
-                                                stepActiveIndex === printActiveIndex &&
-                                                "inventory__print-nav--active"
-                                            } w-full`}
-                                            onClick={handleActivePrintForms}
-                                        >
-                                            Print forms
-                                        </Button>
-                                    )}
-                                    {id && inventoryPermissions.canDelete() && (
-                                        <Button
-                                            icon='pi pi-times'
-                                            className='p-button gap-2 inventory__delete-nav w-full'
-                                            severity='danger'
-                                            onClick={() =>
-                                                inventoryPermissions.canDelete() &&
-                                                setStepActiveIndex(deleteActiveIndex)
-                                            }
-                                        >
-                                            Delete inventory
-                                        </Button>
-                                    )}
-                                </div>
+                                <FormStepAccordion
+                                    sections={inventorySections}
+                                    stepActiveIndex={stepActiveIndex}
+                                    accordionActiveIndex={accordionActiveIndex}
+                                    onAccordionChange={setAccordionActiveIndex}
+                                    onStepChange={handleStepChange}
+                                    errorSections={errorSections}
+                                    accordionClassName='inventory__accordion'
+                                    stepClassName='border-circle inventory-step'
+                                    navigationRef={stepsRef}
+                                    expandMode='sync-with-step'
+                                    wrapperClassName='inventory__navigation'
+                                    footer={
+                                        id ? (
+                                            <>
+                                                <Button
+                                                    icon='icon adms-print'
+                                                    className={`p-button gap-2 inventory__print-nav ${
+                                                        stepActiveIndex === printActiveIndex &&
+                                                        "inventory__print-nav--active"
+                                                    } w-full`}
+                                                    onClick={handleActivePrintForms}
+                                                >
+                                                    Print forms
+                                                </Button>
+                                                {inventoryPermissions.canDelete() && (
+                                                    <Button
+                                                        icon='pi pi-times'
+                                                        className='p-button gap-2 inventory__delete-nav w-full'
+                                                        severity='danger'
+                                                        onClick={() =>
+                                                            inventoryPermissions.canDelete() &&
+                                                            setStepActiveIndex(deleteActiveIndex)
+                                                        }
+                                                    >
+                                                        Delete inventory
+                                                    </Button>
+                                                )}
+                                            </>
+                                        ) : undefined
+                                    }
+                                />
                                 <div className='w-full flex flex-column p-0 inventory-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
@@ -651,17 +614,16 @@ export const InventoryForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-8 mr-3'>
-                                <Button
+                            <FormNav>
+                                <FormNavButton
                                     onClick={handleOnBackClick}
-                                    className='uppercase px-6 inventory__button'
                                     disabled={stepActiveIndex <= 0}
                                     severity={stepActiveIndex <= 0 ? "secondary" : "success"}
                                     outlined
                                 >
                                     Back
-                                </Button>
-                                <Button
+                                </FormNavButton>
+                                <FormNavButton
                                     onClick={handleOnNextClick}
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
@@ -670,33 +632,31 @@ export const InventoryForm = observer(() => {
                                             ? "secondary"
                                             : "success"
                                     }
-                                    className='uppercase px-6 inventory__button'
                                     outlined
                                 >
                                     Next
-                                </Button>
+                                </FormNavButton>
                                 {stepActiveIndex === deleteActiveIndex ? (
-                                    <Button
+                                    <FormNavButton
                                         onClick={() =>
                                             deleteReason.length
                                                 ? setConfirmDeleteVisible(true)
                                                 : setAttemptedSubmit(true)
                                         }
-                                        className='p-button uppercase px-6 inventory__button inventory__button--danger'
+                                        className='form-nav__button--danger'
                                     >
                                         Delete
-                                    </Button>
+                                    </FormNavButton>
                                 ) : (
-                                    <Button
-                                        className='uppercase px-6 inventory__button'
+                                    <FormNavButton
                                         onClick={handleSaveInventoryForm}
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
                                         {id ? "Update" : "Save"}
-                                    </Button>
+                                    </FormNavButton>
                                 )}
-                            </div>
+                            </FormNav>
                         </div>
                     </div>
                 </div>

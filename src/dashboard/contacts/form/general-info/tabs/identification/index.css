@@ -27,6 +27,7 @@
 }
 
 .contact-upload:has(.upload-empty) {
+    --dl-upload-content-shift: 20px;
     display: flex;
     flex-direction: column-reverse;
     background-color: var(--admss-app-white-blue);
@@ -40,7 +41,16 @@
     justify-content: center;
     flex-wrap: wrap;
     margin-left: auto;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.contact-upload .dl-header .p-fileupload-choose.p-button {
+    width: 168px;
+    height: 44px;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .contact-upload:not(.upload-empty) .dl-header.dl-header__active {
@@ -53,12 +63,24 @@
 
 .contact-upload .upload-empty__image {
     translate: 0 25%;
+    padding-left: 30px;
 }
 
 .contact-upload .upload-empty__icon {
     width: 50px;
     height: 40px;
     margin: 20px 0 10px;
+}
+
+.contact-upload .upload-empty__content {
+    transform: translateX(calc(-1 * var(--dl-upload-content-shift)));
+    position: relative;
+    z-index: 1;
+    padding-bottom: 0px;
+}
+
+.contact-upload .dl__upload-splitter {
+    width: 168px;
 }
 
 .contact-upload .p-fileupload-content:has(.upload-empty) {

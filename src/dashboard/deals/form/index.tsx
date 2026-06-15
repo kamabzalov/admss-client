@@ -1,8 +1,16 @@
-import { Steps } from "primereact/steps";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "primereact/button";
-import { AccordionDealItems, Deals, DealsItem, DealsSection } from "../common";
+import { FormNav, FormNavButton } from "dashboard/common/form-nav";
+import {
+    AccordionDealItems,
+    Deals,
+    DealsItem,
+    DealsSection,
+    createDealsSections,
+    getDealsMenuCount,
+    resetFormStepSectionCounters,
+} from "../common";
+import { FormStepAccordion } from "dashboard/common/form-stepper";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
@@ -224,7 +232,6 @@ export const DealsForm = observer(() => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(-1);
     const stepsRef = useRef<HTMLDivElement>(null);
-    const accordionStepsRef = useRef<number[]>([0]);
     const navigate = useNavigate();
     const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
@@ -304,11 +311,9 @@ export const DealsForm = observer(() => {
             }
         }
 
-        const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
+        const sections = createDealsSections(dealsSections);
         setDealsSections(sections);
-        const newAccordionSteps = sections.map((item) => item.startIndex);
-        accordionStepsRef.current = newAccordionSteps;
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        const itemsMenuCount = getDealsMenuCount(sections);
         setItemsMenuCount(itemsMenuCount);
 
         const canPrint = dealPermissions.canPrintForms();
@@ -324,43 +329,34 @@ export const DealsForm = observer(() => {
         }
 
         return () => {
-            sections.forEach((section) => section.clearCount());
+            resetFormStepSectionCounters();
         };
     }, [dealType, id]);
-
-    useEffect(() => {
-        if (stepActiveIndex === printActiveIndex) {
-            store.accordionActiveIndex = [];
-        } else {
-            let activeIndex = 0;
-            accordionStepsRef.current.forEach((step, index) => {
-                if (stepActiveIndex >= step) {
-                    activeIndex = index;
-                }
-            });
-            if (
-                !Array.isArray(store.accordionActiveIndex) ||
-                !store.accordionActiveIndex.includes(activeIndex)
-            ) {
-                store.accordionActiveIndex = [activeIndex];
-            }
-        }
-
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, printActiveIndex]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
     };
+
+    const handleStepChange = useCallback(
+        (globalIndex: number) => {
+            setStepActiveIndex(globalIndex);
+            navigate(getUrl(globalIndex));
+        },
+        [id, navigate]
+    );
+
+    const handleAccordionChange = useCallback(
+        (index: number | number[]) => {
+            store.accordionActiveIndex = index;
+        },
+        [store]
+    );
+
+    const collapseOnStepIndices = useMemo(
+        () => (printActiveIndex >= 0 ? [printActiveIndex] : []),
+        [printActiveIndex]
+    );
 
     const handleSaveDealForm = () => {
         formikRef.current?.validateForm().then((errors) => {
@@ -466,91 +462,52 @@ export const DealsForm = observer(() => {
                         </div>
                         <div className='card-content deal__card'>
                             <div className='grid flex-nowrap deal__card-content'>
-                                <div className='p-0 card-content__wrapper' ref={stepsRef}>
-                                    <Accordion
-                                        activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => {
-                                            const newIndex = Array.isArray(e.index)
-                                                ? e.index
-                                                : [e.index];
-                                            if (newIndex.length > 0) {
-                                                store.accordionActiveIndex = e.index;
-                                            }
-                                        }}
-                                        className='deal__accordion'
-                                        multiple
-                                    >
-                                        {dealsSections.map((section) => (
-                                            <AccordionTab
-                                                key={section.sectionId}
-                                                header={section.label}
-                                            >
-                                                <Steps
-                                                    readOnly={false}
-                                                    activeIndex={
-                                                        stepActiveIndex - section.startIndex
-                                                    }
-                                                    onSelect={(e) => {
-                                                        setStepActiveIndex(
-                                                            e.index + section.startIndex
-                                                        );
-                                                    }}
-                                                    model={section.items.map(
-                                                        (
-                                                            { itemLabel, template }: any,
-                                                            idx: number
-                                                        ) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
-                                                                );
-                                                            },
-                                                            className: errorSections.length
-                                                                ? errorSections.includes(itemLabel)
-                                                                    ? "section-invalid"
-                                                                    : "section-valid"
-                                                                : "",
-                                                        })
-                                                    )}
-                                                    className='vertical-step-menu'
-                                                    pt={{
-                                                        menu: { className: "flex-column w-full" },
-                                                        step: {
-                                                            className: "border-circle deal-step",
-                                                        },
-                                                    }}
-                                                />
-                                            </AccordionTab>
-                                        ))}
-                                    </Accordion>
-                                    {id && dealPermissions.canPrintForms() && (
-                                        <Button
-                                            icon='icon adms-print'
-                                            className={`p-button gap-2 deal__print-nav ${
-                                                stepActiveIndex === printActiveIndex &&
-                                                "deal__print-nav--active"
-                                            } w-full`}
-                                            onClick={handleActivePrintForms}
-                                        >
-                                            Print forms
-                                        </Button>
-                                    )}
-                                    {id && dealPermissions.canDelete() && (
-                                        <Button
-                                            icon='pi pi-times'
-                                            className='p-button gap-2 deal__delete-nav w-full'
-                                            severity='danger'
-                                            onClick={() => {
-                                                navigate(getUrl(deleteActiveIndex));
-                                                setStepActiveIndex(deleteActiveIndex);
-                                            }}
-                                        >
-                                            Delete deal
-                                        </Button>
-                                    )}
-                                </div>
+                                <FormStepAccordion
+                                    sections={dealsSections}
+                                    stepActiveIndex={stepActiveIndex}
+                                    accordionActiveIndex={accordionActiveIndex}
+                                    onAccordionChange={handleAccordionChange}
+                                    onStepChange={handleStepChange}
+                                    errorSections={errorSections}
+                                    accordionClassName='deal__accordion'
+                                    stepClassName='border-circle deal-step'
+                                    navigationRef={stepsRef}
+                                    expandMode='sync-with-step'
+                                    collapseOnStepIndices={collapseOnStepIndices}
+                                    preventEmptyAccordion
+                                    wrapperClassName='p-0 card-content__wrapper'
+                                    footer={
+                                        id ? (
+                                            <>
+                                                {dealPermissions.canPrintForms() && (
+                                                    <Button
+                                                        icon='icon adms-print'
+                                                        className={`p-button gap-2 deal__print-nav ${
+                                                            stepActiveIndex === printActiveIndex &&
+                                                            "deal__print-nav--active"
+                                                        } w-full`}
+                                                        onClick={handleActivePrintForms}
+                                                    >
+                                                        Print forms
+                                                    </Button>
+                                                )}
+                                                {dealPermissions.canDelete() && (
+                                                    <Button
+                                                        icon='pi pi-times'
+                                                        className='p-button gap-2 deal__delete-nav w-full'
+                                                        severity='danger'
+                                                        onClick={() => {
+                                                            navigate(getUrl(deleteActiveIndex));
+                                                            setStepActiveIndex(deleteActiveIndex);
+                                                        }}
+                                                    >
+                                                        Delete deal
+                                                    </Button>
+                                                )}
+                                            </>
+                                        ) : undefined
+                                    }
+                                />
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
@@ -651,8 +608,8 @@ export const DealsForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
-                                <Button
+                            <FormNav>
+                                <FormNavButton
                                     onClick={() => {
                                         if (!stepActiveIndex) {
                                             return handleExitClick();
@@ -663,12 +620,11 @@ export const DealsForm = observer(() => {
                                             return newStep;
                                         });
                                     }}
-                                    className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Back
-                                </Button>
-                                <Button
+                                </FormNavButton>
+                                <FormNavButton
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev + 1;
@@ -685,15 +641,14 @@ export const DealsForm = observer(() => {
                                             ? "secondary"
                                             : "success"
                                     }
-                                    className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Next
-                                </Button>
+                                </FormNavButton>
                                 {id &&
                                 dealPermissions.canDelete() &&
                                 stepActiveIndex === deleteActiveIndex ? (
-                                    <Button
+                                    <FormNavButton
                                         onClick={() =>
                                             deleteReason.length
                                                 ? setConfirmDeleteVisible(true)
@@ -711,21 +666,20 @@ export const DealsForm = observer(() => {
                                                 ? "secondary"
                                                 : "danger"
                                         }
-                                        className='p-button form-nav__button deal__button'
+                                        className='form-nav__button--danger'
                                     >
                                         Delete
-                                    </Button>
+                                    </FormNavButton>
                                 ) : (
-                                    <Button
+                                    <FormNavButton
                                         onClick={handleSaveDealForm}
-                                        className='form-nav__button deal__button'
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
                                         {id ? "Update" : "Save"}
-                                    </Button>
+                                    </FormNavButton>
                                 )}
-                            </div>
+                            </FormNav>
                         </div>
                     </div>
                 </div>
