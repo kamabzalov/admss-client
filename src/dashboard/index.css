@@ -1,4 +1,5 @@
 @import "dashboard/common/form/index.css";
+@import "dashboard/common/form-nav/index.css";
 
 .color-dusty-blue {
     color: var(--admss-app-dusty-blue);
@@ -369,7 +370,6 @@
 
 .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-thumb {
     border: 0.2em solid var(--admss-app-light-blue);
-    border-top-width: calc(var(--admss-app-datatable-header-height) + 0.2em);
     border-radius: 0.6em;
     background-clip: padding-box;
     width: 6px;
@@ -386,6 +386,7 @@
 .p-datatable-wrapper:not(
         .thin-scrollbar
     )::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: var(--admss-app-datatable-scrollbar-header-offset);
     background: var(--admss-app-light-blue);
     border-style: solid;
     border-width: 0 7px 7px 7px;
@@ -415,6 +416,16 @@
 
 .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-track {
     background: var(--admss-app-light-blue);
+}
+
+@supports (font: -apple-system-body) {
+    .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-button:single-button:vertical:decrement {
+        height: 8px;
+    }
+
+    .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-thumb {
+        border-top-width: calc(var(--admss-app-datatable-header-height) + 0.2em);
+    }
 }
 
 .p-tooltip .p-tooltip-text {
@@ -567,16 +578,6 @@
             }
         }
     }
-}
-
-.form-nav__button {
-    width: 245px;
-    font-size: 24px;
-    font-weight: 700;
-    justify-content: center;
-    height: 70px;
-    transition: opacity 0.4s;
-    text-transform: uppercase;
 }
 
 .row-edit {
@@ -1022,9 +1023,23 @@
     border-radius: 5px;
 }
 
-.p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-thumb {
-    border-top: var(--admss-app-datatable-header-height) solid var(--admss-app-light-blue);
-    background-clip: padding-box;
+.p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 60px;
+    background-color: var(--admss-app-light-blue);
+    border: none;
+}
+
+@supports (font: -apple-system-body) {
+    .p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
+        height: 4px;
+        background-color: var(--admss-app-light-blue);
+        border: none;
+    }
+
+    .p-datatable-wrapper.thin-scrollbar::-webkit-scrollbar-thumb {
+        border-top: var(--admss-app-datatable-header-height) solid var(--admss-app-light-blue);
+        background-clip: padding-box;
+    }
 }
 
 .p-inputtext + .float-label,

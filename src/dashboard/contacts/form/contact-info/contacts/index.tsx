@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { useFormikContext } from "formik";
 import { Contact } from "common/models/contact";
+import { Splitter } from "dashboard/common/display";
 
 interface SocialInputProps extends InputTextProps {
     social: "Facebook" | "WhatsApp" | "Slack" | "Microsoft Teams";
@@ -128,7 +129,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 </div>
             )}
 
-            <hr className='form-line' />
+            <Splitter className='col-12 my-3' />
 
             <div className='col-6'>
                 <SocialInput

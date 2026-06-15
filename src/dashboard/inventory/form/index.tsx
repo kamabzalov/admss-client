@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 import { Button } from "primereact/button";
+import { FormNav, FormNavButton } from "dashboard/common/form-nav";
 import {
     AccordionItems,
     Inventory,
@@ -613,17 +614,16 @@ export const InventoryForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-8 mr-3'>
-                                <Button
+                            <FormNav>
+                                <FormNavButton
                                     onClick={handleOnBackClick}
-                                    className='uppercase px-6 inventory__button'
                                     disabled={stepActiveIndex <= 0}
                                     severity={stepActiveIndex <= 0 ? "secondary" : "success"}
                                     outlined
                                 >
                                     Back
-                                </Button>
-                                <Button
+                                </FormNavButton>
+                                <FormNavButton
                                     onClick={handleOnNextClick}
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
@@ -632,33 +632,31 @@ export const InventoryForm = observer(() => {
                                             ? "secondary"
                                             : "success"
                                     }
-                                    className='uppercase px-6 inventory__button'
                                     outlined
                                 >
                                     Next
-                                </Button>
+                                </FormNavButton>
                                 {stepActiveIndex === deleteActiveIndex ? (
-                                    <Button
+                                    <FormNavButton
                                         onClick={() =>
                                             deleteReason.length
                                                 ? setConfirmDeleteVisible(true)
                                                 : setAttemptedSubmit(true)
                                         }
-                                        className='p-button uppercase px-6 inventory__button inventory__button--danger'
+                                        className='form-nav__button--danger'
                                     >
                                         Delete
-                                    </Button>
+                                    </FormNavButton>
                                 ) : (
-                                    <Button
-                                        className='uppercase px-6 inventory__button'
+                                    <FormNavButton
                                         onClick={handleSaveInventoryForm}
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
                                         {id ? "Update" : "Save"}
-                                    </Button>
+                                    </FormNavButton>
                                 )}
-                            </div>
+                            </FormNav>
                         </div>
                     </div>
                 </div>

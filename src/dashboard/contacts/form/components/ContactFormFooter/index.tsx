@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { Button } from "primereact/button";
+import { FormNav, FormNavButton } from "dashboard/common/form-nav";
 
 interface ContactFormFooterProps {
     stepActiveIndex: number;
@@ -37,45 +37,42 @@ export default function ContactFormFooter({
     const isNextDisabled = stepActiveIndex >= itemsMenuCount;
 
     return (
-        <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
-            <Button
+        <FormNav>
+            <FormNavButton
                 onClick={onBack}
-                className='form-nav__button'
                 outlined
                 disabled={isBackDisabled}
                 severity={isBackDisabled ? "secondary" : "success"}
             >
                 Back
-            </Button>
-            <Button
+            </FormNavButton>
+            <FormNavButton
                 onClick={onNext}
                 disabled={isNextDisabled}
                 severity={isNextDisabled ? "secondary" : "success"}
-                className='form-nav__button'
                 outlined
             >
                 Next
-            </Button>
+            </FormNavButton>
             {isOnDeleteStep ? (
-                <Button
+                <FormNavButton
                     onClick={onDeleteClick}
                     disabled={!deleteReason.length}
                     {...(!deleteReason.length && { severity: "secondary" })}
-                    className='form-nav__button form-nav__button--danger'
+                    className='form-nav__button--danger'
                 >
                     Delete
-                </Button>
+                </FormNavButton>
             ) : (
-                <Button
-                    className='form-nav__button'
+                <FormNavButton
                     type='button'
                     onClick={onSave}
                     disabled={!isContactChanged || !hasContactType}
                     severity={isContactChanged && hasContactType ? "success" : "secondary"}
                 >
                     {isEditMode ? "Update" : "Save"}
-                </Button>
+                </FormNavButton>
             )}
-        </div>
+        </FormNav>
     );
 }

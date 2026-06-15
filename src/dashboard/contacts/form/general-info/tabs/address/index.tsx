@@ -4,10 +4,11 @@ import { AutoComplete } from "primereact/autocomplete";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
-import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { StateDropdown } from "dashboard/common/form/inputs";
 import { useGooglePlacesAutocomplete, AddressSuggestion } from "common/hooks";
+import { Splitter } from "dashboard/common/display";
+import { Checkbox } from "primereact/checkbox";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -322,27 +323,22 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                     disabled={isControlDisabled}
                 />
             </div>
-            <div className='col-12 grid'>
-                <div className='col-9 text-line'>
-                    <h3 className='text-line__title m-0 pr-3'>Mailing address</h3>
-                    <hr className='text-line__line flex-1' />
+
+            <Splitter title='Mailing address' className='col-12 my-5'>
+                <div className='flex px-2 flex-nowrap align-items-center'>
+                    <Checkbox
+                        inputId='contact-same-address'
+                        className='mt-1'
+                        name='contact-same-address'
+                        checked={isSameAsMailing}
+                        onChange={() => setIsSameAsMailing(!isSameAsMailing)}
+                        disabled={isControlDisabled}
+                    />
+                    <label htmlFor='contact-same-address' className='ml-2'>
+                        Same as main address
+                    </label>
                 </div>
-                <div className='col-3'>
-                    <div className='flex px-2'>
-                        <Checkbox
-                            inputId='contact-same-address'
-                            className='mt-1'
-                            name='contact-same-address'
-                            checked={isSameAsMailing}
-                            onChange={() => setIsSameAsMailing(!isSameAsMailing)}
-                            disabled={isControlDisabled}
-                        />
-                        <label htmlFor='contact-same-address' className='ml-2'>
-                            Same as primary address
-                        </label>
-                    </div>
-                </div>
-            </div>
+            </Splitter>
 
             <div className='col-6'>
                 <span className='p-float-label'>

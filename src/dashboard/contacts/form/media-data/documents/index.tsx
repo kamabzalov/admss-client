@@ -182,16 +182,24 @@ export const ContactsDocuments = observer((): ReactElement => {
                 ) : (
                     <>
                         {chooseButton}
-                        <div className='flex w-full justify-content-center align-items-center mt-4 relative'>
-                            <span className='media__upload-text-info media__upload-text-info--bold'>
-                                Up to {limitations.maxUpload} items
-                            </span>
-                            <span className='media__upload-text-info'>
-                                Maximal size is {limitations.maxSize} Mb
-                            </span>
-                            {limitations.formats.map((format) => (
-                                <Tag key={format} className='media__upload-tag' value={format} />
-                            ))}
+                        <div className='flex w-full justify-content-center align-items-center mt-4 relative media__upload-info'>
+                            <div className='media__upload-info-row'>
+                                <span className='media__upload-text-info media__upload-text-info--bold'>
+                                    Up to {limitations.maxUpload} items
+                                </span>
+                                <span className='media__upload-text-info'>
+                                    Maximal size is {limitations.maxSize} Mb
+                                </span>
+                                <div className='media__upload-tags'>
+                                    {limitations.formats.map((format) => (
+                                        <Tag
+                                            key={format}
+                                            className='media__upload-tag'
+                                            value={format}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                             <div className='media-tooltip'>
                                 <InfoOverlayPanel panelTitle='Limitations:' disablePulse>
                                     <p>

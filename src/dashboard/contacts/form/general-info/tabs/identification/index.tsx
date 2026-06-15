@@ -133,7 +133,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions, side: DLSide) => {
         const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
         return (
-            <div className={`col-6 dl-header ${size ? "dl-header__active" : "mr-1"}`}>
+            <div className={`col-6 dl-header ${size ? "dl-header__active" : "mr-4"}`}>
                 {chooseButton}
             </div>
         );
@@ -142,16 +142,16 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     const emptyTemplate = (side: DLSide) => {
         return (
             <div className='grid upload-empty px-4'>
-                <div className='col-6 flex align-items-center justify-content-center upload-empty__image'>
+                <div className='col-6 flex align-items-center upload-empty__image'>
                     <img
                         alt={`empty ${DLSides.FRONT} DL`}
                         src={side === DLSides.FRONT ? dlFrontImage : dlBackImage}
                     />
                 </div>
-                <div className='col-6 flex align-items-center flex-column'>
+                <div className='col-6 flex align-items-center flex-column upload-empty__content'>
                     <img alt='upload icon' src={uploadImage} className='upload-empty__icon' />
                     <span className='text-center dl__upload-icon-label'>
-                        Drag and Drop Images Here
+                        Drag and drop image here
                     </span>
                     <div className='col-12 flex justify-content-center align-items-center dl__upload-splitter'>
                         <hr className='dl__line mr-4 flex-1' />

@@ -1,5 +1,6 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "primereact/button";
+import { FormNav, FormNavButton } from "dashboard/common/form-nav";
 import {
     AccordionDealItems,
     Deals,
@@ -607,8 +608,8 @@ export const DealsForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
-                                <Button
+                            <FormNav>
+                                <FormNavButton
                                     onClick={() => {
                                         if (!stepActiveIndex) {
                                             return handleExitClick();
@@ -619,12 +620,11 @@ export const DealsForm = observer(() => {
                                             return newStep;
                                         });
                                     }}
-                                    className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Back
-                                </Button>
-                                <Button
+                                </FormNavButton>
+                                <FormNavButton
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev + 1;
@@ -641,15 +641,14 @@ export const DealsForm = observer(() => {
                                             ? "secondary"
                                             : "success"
                                     }
-                                    className='form-nav__button deal__button'
                                     outlined
                                 >
                                     Next
-                                </Button>
+                                </FormNavButton>
                                 {id &&
                                 dealPermissions.canDelete() &&
                                 stepActiveIndex === deleteActiveIndex ? (
-                                    <Button
+                                    <FormNavButton
                                         onClick={() =>
                                             deleteReason.length
                                                 ? setConfirmDeleteVisible(true)
@@ -667,21 +666,20 @@ export const DealsForm = observer(() => {
                                                 ? "secondary"
                                                 : "danger"
                                         }
-                                        className='p-button form-nav__button deal__button'
+                                        className='form-nav__button--danger'
                                     >
                                         Delete
-                                    </Button>
+                                    </FormNavButton>
                                 ) : (
-                                    <Button
+                                    <FormNavButton
                                         onClick={handleSaveDealForm}
-                                        className='form-nav__button deal__button'
                                         severity={isFormChanged ? "success" : "secondary"}
                                         disabled={!isFormChanged}
                                     >
                                         {id ? "Update" : "Save"}
-                                    </Button>
+                                    </FormNavButton>
                                 )}
-                            </div>
+                            </FormNav>
                         </div>
                     </div>
                 </div>
