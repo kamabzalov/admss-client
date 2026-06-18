@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import {
     BorderedCheckbox,
     CurrencyInput,
@@ -142,7 +143,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                 </span>
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-6'>
                 <CompanySearch
@@ -237,7 +238,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-3'>
                 <span className='p-float-label'>

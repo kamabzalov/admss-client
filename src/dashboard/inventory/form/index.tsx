@@ -1,7 +1,4 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
-import { Button } from "primereact/button";
-import { FormNav, FormNavButton } from "dashboard/common/form-nav";
 import {
     AccordionItems,
     Inventory,
@@ -11,7 +8,7 @@ import {
     getInventoryMenuCount,
     resetFormStepSectionCounters,
 } from "dashboard/inventory/common";
-import { FormStepAccordion } from "dashboard/common/form-stepper";
+import { FormStepAccordion, SectionHeaderWithCount } from "dashboard/common/form-stepper";
 import { InventoryPurchaseData } from "dashboard/inventory/form/purchase";
 import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,6 +28,7 @@ import * as Yup from "yup";
 import {
     InventoryExtData,
     Inventory as InventoryModel,
+    InventoryWebInfo,
     InventoryStockNumber,
 } from "common/models/inventory";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
@@ -39,6 +37,18 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { INVENTORY_PAGE } from "common/constants/links";
+import {
+    EntityFormBody,
+    EntityFormCard,
+    EntityFormContent,
+    EntityFormDeleteNavButton,
+    EntityFormFooter,
+    EntityFormHeader,
+    EntityFormPage,
+    EntityFormPrintNavButton,
+    EntityFormSteps,
+} from "dashboard/common/entity-form-layout";
+import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 
 const STEP = "step";
 export enum INVENTORY_STEPS {
@@ -103,6 +113,58 @@ const tabFields: Partial<
     [AccordionItems.TITLE]: ["titleHolderPhone", "titlePrevPhone"],
 };
 
+const WEB_PRICE_FIELDS: (keyof InventoryWebInfo)[] = ["ListPrice", "SpecialPrice"];
+const WEB_DATES_FIELDS: (keyof InventoryWebInfo)[] = ["InStockDate", "LastModifiedDate"];
+const WEB_FUEL_FIELDS: (keyof InventoryWebInfo)[] = ["CityMPG", "HwyMPG"];
+const WEB_EXTRA_FIELDS: (keyof InventoryWebInfo)[] = [
+    "ExtraField1",
+    "ExtraField2",
+    "ExtraField3",
+    "ExtraPrice1",
+    "ExtraPrice2",
+    "ExtraPrice3",
+];
+const WEB_HISTORY_FIELDS: (keyof InventoryWebInfo)[] = ["LastExportDate"];
+
+const isEmptyValue = (value: unknown): boolean => {
+    if (value === null || value === undefined) {
+        return true;
+    }
+
+    if (typeof value === "string") {
+        const trimmedValue = value.trim();
+        return !trimmedValue || trimmedValue === "0";
+    }
+
+    if (typeof value === "number") {
+        return value <= 0;
+    }
+
+    return false;
+};
+
+const hasAnyFilledField = (
+    source: Record<string, unknown> | undefined,
+    fields: string[]
+): boolean => {
+    if (!source) {
+        return false;
+    }
+
+    return fields.some((field) => !isEmptyValue(source[field]));
+};
+
+const hasAllFilledFields = (
+    source: Record<string, unknown> | undefined,
+    fields: string[]
+): boolean => {
+    if (!source) {
+        return false;
+    }
+
+    return fields.every((field) => !isEmptyValue(source[field]));
+};
+
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
@@ -140,6 +202,14 @@ export const InventoryForm = observer(() => {
         tabLength,
         inventory,
         inventoryExtData,
+        inventoryOptions,
+        inventoryAudit,
+        inventoryExportWeb,
+        images,
+        videos,
+        audios,
+        documents,
+        links,
         isFormChanged,
         isErasingNeeded,
         currentLocation,
@@ -419,6 +489,194 @@ export const InventoryForm = observer(() => {
         });
     };
 
+    const isInventoryTabFilled = (itemLabel: AccordionItems | string): boolean => {
+        if (!itemLabel) {
+            return false;
+        }
+
+        switch (itemLabel) {
+            case AccordionItems.GENERAL: {
+                const requiredFields = tabFields[
+                    AccordionItems.GENERAL
+                ] as (keyof PartialInventory)[];
+                return hasAllFilledFields(
+                    inventory as unknown as Record<string, unknown>,
+                    requiredFields
+                );
+            }
+            case AccordionItems.DESCRIPTION: {
+                const requiredFields = tabFields[
+                    AccordionItems.DESCRIPTION
+                ] as (keyof PartialInventory)[];
+                return hasAllFilledFields(
+                    inventory as unknown as Record<string, unknown>,
+                    requiredFields
+                );
+            }
+            case AccordionItems.PURCHASES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "purPurchasedFrom",
+                    "purPurchaseAmount",
+                    "purPurchaseDate",
+                    "purPurchaseBuyerName",
+                    "purPurchaseEmail",
+                    "purPurchasePhone",
+                    "purPurchaseAddress",
+                    "purPurchaseCity",
+                    "purPurchaseZipCode",
+                ]);
+            case AccordionItems.PAYMENTS:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "payAskingPrice",
+                    "payCashPrice",
+                    "payDownPayment",
+                    "payPayment",
+                    "payTerm",
+                    "payAPR",
+                    "payAmtFin",
+                    "payRemarks",
+                ]);
+            case AccordionItems.EXPENSES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "payExpenses",
+                    "payDefaultExpAdded",
+                ]);
+            case AccordionItems.TITLE:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "titleNumber",
+                    "titleState",
+                    "titleStatus",
+                    "titleReceivedDate",
+                    "titleHolderName",
+                    "titleHolderPhone",
+                    "titlePrevName",
+                    "titlePrevPhone",
+                ]);
+            case AccordionItems.FLOORPLAN:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "fpFloorplanCompany",
+                    "fpRemainBal",
+                    "fpReduxAmt",
+                    "fpReductionDate",
+                    "fpIsFloorplanned",
+                ]);
+            case AccordionItems.CONSIGN:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "csIsConsigned",
+                    "csName",
+                    "csOwnerAskingPrice",
+                    "csReserveAmt",
+                    "csDate",
+                    "csReturnDate",
+                    "csNotes",
+                ]);
+            case AccordionItems.OPTIONS:
+                return inventoryOptions.length > 0;
+            case AccordionItems.CHECKS:
+                return Object.values(inventoryAudit || {}).some((value) => !isEmptyValue(value));
+            case AccordionItems.KEYS:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "keyNumber",
+                    "keysHasRemote",
+                    "keysMissing",
+                    "keysDuplicate",
+                ]);
+            case AccordionItems.DISCLOSURES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "damSalvage",
+                    "damFlood",
+                    "damTheft",
+                    "damReconstructed",
+                    "damODOMInExcess",
+                    "damODOMNotActual",
+                    "bgWarranty",
+                    "bgAsIs",
+                ]);
+            case AccordionItems.OTHER:
+                return hasAnyFilledField(inventory as unknown as Record<string, unknown>, [
+                    "Trim",
+                    "Engine",
+                    "Transmission",
+                    "ExteriorColor",
+                    "InteriorColor",
+                    "mileage",
+                    "Notes",
+                ]);
+            case AccordionItems.IMAGES:
+                return images.length > 0;
+            case AccordionItems.VIDEO:
+                return videos.length > 0;
+            case AccordionItems.AUDIO:
+                return audios.length > 0;
+            case AccordionItems.DOCUMENTS:
+                return documents.length > 0;
+            case AccordionItems.LINKS:
+                return links.length > 0;
+            case AccordionItems.WATERMARKING:
+                return false;
+            case AccordionItems.PRICE:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_PRICE_FIELDS
+                );
+            case AccordionItems.DATES:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_DATES_FIELDS
+                );
+            case AccordionItems.FUEL:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_FUEL_FIELDS
+                );
+            case AccordionItems.EXTRA:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_EXTRA_FIELDS
+                );
+            case AccordionItems.HISTORY:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_HISTORY_FIELDS
+                );
+            default:
+                return false;
+        }
+    };
+
+    const resolveStepClassName = (item: InventoryItem, globalIndex: number): string => {
+        const isFilled = isInventoryTabFilled(item.itemLabel);
+
+        if (errorSections.includes(item.itemLabel)) {
+            return "section-invalid";
+        }
+
+        if (isFilled) {
+            return "section-valid";
+        }
+
+        if (globalIndex <= stepActiveIndex) {
+            return "section-in-progress";
+        }
+
+        return "";
+    };
+
+    const renderSectionHeader = (section: InventorySection) => {
+        const filledTabsCount = section.items.reduce(
+            (count, item) => (isInventoryTabFilled(item.itemLabel) ? count + 1 : count),
+            0
+        );
+
+        return (
+            <SectionHeaderWithCount
+                label={section.label}
+                filledCount={filledTabsCount}
+                totalCount={section.items.length}
+            />
+        );
+    };
+
     const navigateAndClear = () => {
         if (memoRoute) {
             navigate(memoRoute);
@@ -449,45 +707,65 @@ export const InventoryForm = observer(() => {
         }
     };
 
+    const inventoryHeaderMetadata = useMemo(() => {
+        if (!id) {
+            return [];
+        }
+
+        return [
+            { label: "Stock#", value: inventory?.StockNo || "", truncate: false },
+            { label: "Make", value: inventory?.Make || "", truncate: false },
+            { label: "Model", value: inventory?.Model || "", truncate: false },
+            { label: "Year", value: inventory?.Year || "", truncate: false },
+            { label: "VIN", value: inventory?.VIN || "", truncate: false },
+        ];
+    }, [id, inventory]);
+
+    const accordionFooter = useMemo(() => {
+        if (!id) {
+            return undefined;
+        }
+
+        return (
+            <>
+                <EntityFormPrintNavButton
+                    isActive={stepActiveIndex === printActiveIndex}
+                    onClick={handleActivePrintForms}
+                >
+                    Print forms
+                </EntityFormPrintNavButton>
+                {inventoryPermissions.canDelete() && (
+                    <EntityFormDeleteNavButton
+                        onClick={() =>
+                            inventoryPermissions.canDelete() &&
+                            setStepActiveIndex(deleteActiveIndex)
+                        }
+                    >
+                        Delete inventory
+                    </EntityFormDeleteNavButton>
+                )}
+            </>
+        );
+    }, [
+        id,
+        stepActiveIndex,
+        printActiveIndex,
+        deleteActiveIndex,
+        inventoryPermissions,
+        handleActivePrintForms,
+    ]);
+
     return (
         <Suspense fallback={<Loader className='inventory-loader' />}>
-            <div className='grid relative'>
-                <Button
-                    icon='pi pi-times'
-                    className='p-button close-button'
-                    onClick={handleExitClick}
-                />
-                <div className='col-12'>
-                    <div className='card inventory'>
-                        <div className='card-header flex'>
-                            <h2 className='card-header__title uppercase m-0'>
-                                {id ? "Edit" : "Create new"} inventory
-                            </h2>
-                            {id && (
-                                <div className='card-header-info'>
-                                    Stock#
-                                    <span className='card-header-info__data'>
-                                        {inventory?.StockNo}
-                                    </span>
-                                    Make
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Make}
-                                    </span>
-                                    Model
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Model}
-                                    </span>
-                                    Year
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Year}
-                                    </span>
-                                    VIN
-                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
+            <EntityFormPage onClose={handleExitClick}>
+                <EntityFormCard entityClassName='inventory'>
+                    <EntityFormHeader
+                        title={`${id ? "Edit" : "Create new"} inventory`}
+                        metadata={inventoryHeaderMetadata}
+                    />
+                    <EntityFormContent>
+                        <EntityFormBody
+                            sidebar={
                                 <FormStepAccordion
                                     sections={inventorySections}
                                     stepActiveIndex={stepActiveIndex}
@@ -495,172 +773,92 @@ export const InventoryForm = observer(() => {
                                     onAccordionChange={setAccordionActiveIndex}
                                     onStepChange={handleStepChange}
                                     errorSections={errorSections}
-                                    accordionClassName='inventory__accordion'
+                                    resolveStepClassName={resolveStepClassName}
+                                    accordionClassName='entity-form-accordion'
                                     stepClassName='border-circle inventory-step'
+                                    renderSectionHeader={renderSectionHeader}
                                     navigationRef={stepsRef}
                                     expandMode='sync-with-step'
-                                    wrapperClassName='inventory__navigation'
-                                    footer={
-                                        id ? (
-                                            <>
-                                                <Button
-                                                    icon='icon adms-print'
-                                                    className={`p-button gap-2 inventory__print-nav ${
-                                                        stepActiveIndex === printActiveIndex &&
-                                                        "inventory__print-nav--active"
-                                                    } w-full`}
-                                                    onClick={handleActivePrintForms}
-                                                >
-                                                    Print forms
-                                                </Button>
-                                                {inventoryPermissions.canDelete() && (
-                                                    <Button
-                                                        icon='pi pi-times'
-                                                        className='p-button gap-2 inventory__delete-nav w-full'
-                                                        severity='danger'
-                                                        onClick={() =>
-                                                            inventoryPermissions.canDelete() &&
-                                                            setStepActiveIndex(deleteActiveIndex)
-                                                        }
-                                                    >
-                                                        Delete inventory
-                                                    </Button>
-                                                )}
-                                            </>
-                                        ) : undefined
-                                    }
+                                    wrapperClassName='p-0'
+                                    footer={accordionFooter}
                                 />
-                                <div className='w-full flex flex-column p-0 inventory-content__wrapper'>
-                                    <div className='flex flex-grow-1'>
-                                        <Formik
-                                            innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema({
-                                                initialVIN,
-                                                initialStockNo,
-                                                debouncedCheckStockNoAvailability,
-                                                debouncedCheckVINAvailability,
-                                                isSubmitting,
-                                            })}
-                                            initialValues={
-                                                {
-                                                    VIN: inventory?.VIN || "",
-                                                    Make: inventory.Make,
-                                                    Model: inventory.Model,
-                                                    Year: inventory.Year,
-                                                    TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
-                                                    StockNo: inventory?.StockNo || "",
-                                                    locationuid:
-                                                        inventory?.locationuid || currentLocation,
-                                                    GroupClassName: inventory?.GroupClassName || "",
-                                                    purPurchaseEmail:
-                                                        inventoryExtData?.purPurchaseEmail || "",
-                                                    purPurchasePhone:
-                                                        inventoryExtData?.purPurchasePhone || "",
-                                                    titleHolderPhone:
-                                                        inventoryExtData?.titleHolderPhone || "",
-                                                    titlePrevPhone:
-                                                        inventoryExtData?.titlePrevPhone || "",
-                                                } as PartialInventory
-                                            }
-                                            enableReinitialize
-                                            validateOnChange={false}
-                                            validateOnBlur={false}
-                                            validateOnMount={validateOnMount}
-                                            onSubmit={() => handleSubmit(id)}
-                                        >
-                                            <Form name='inventoryForm' className='w-full'>
-                                                {inventorySections.map((section) =>
-                                                    section.items.map((item: InventoryItem) => (
-                                                        <div
-                                                            key={item.itemIndex}
-                                                            className={`${
-                                                                stepActiveIndex === item.itemIndex
-                                                                    ? "block inventory-form"
-                                                                    : "hidden"
-                                                            }`}
-                                                        >
-                                                            <div className='inventory-form__title uppercase'>
-                                                                {item.itemLabel}
-                                                            </div>
-                                                            {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense
-                                                                    fallback={
-                                                                        <Loader className='inventory-loader' />
-                                                                    }
-                                                                >
-                                                                    {item.component}
-                                                                </Suspense>
-                                                            )}
-                                                        </div>
-                                                    ))
-                                                )}
-
-                                                {stepActiveIndex === printActiveIndex && (
-                                                    <div className='inventory-form'>
-                                                        <div className='inventory-form__title uppercase'>
-                                                            Print history
-                                                        </div>
-                                                        <PrintForms />
-                                                    </div>
-                                                )}
-                                                {stepActiveIndex === deleteActiveIndex && (
-                                                    <DeleteForm
-                                                        attemptedSubmit={attemptedSubmit}
-                                                        isDeleteConfirm={isDeleteConfirm}
-                                                    />
-                                                )}
-                                            </Form>
-                                        </Formik>
-                                    </div>
-                                </div>
-                            </div>
-                            <FormNav>
-                                <FormNavButton
-                                    onClick={handleOnBackClick}
-                                    disabled={stepActiveIndex <= 0}
-                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
-                                    outlined
-                                >
-                                    Back
-                                </FormNavButton>
-                                <FormNavButton
-                                    onClick={handleOnNextClick}
-                                    disabled={stepActiveIndex >= itemsMenuCount}
-                                    severity={
-                                        stepActiveIndex === deleteActiveIndex ||
-                                        stepActiveIndex >= itemsMenuCount
-                                            ? "secondary"
-                                            : "success"
-                                    }
-                                    outlined
-                                >
-                                    Next
-                                </FormNavButton>
-                                {stepActiveIndex === deleteActiveIndex ? (
-                                    <FormNavButton
-                                        onClick={() =>
-                                            deleteReason.length
-                                                ? setConfirmDeleteVisible(true)
-                                                : setAttemptedSubmit(true)
-                                        }
-                                        className='form-nav__button--danger'
+                            }
+                        >
+                            <Formik
+                                innerRef={formikRef}
+                                validationSchema={InventoryFormSchema({
+                                    initialVIN,
+                                    initialStockNo,
+                                    debouncedCheckStockNoAvailability,
+                                    debouncedCheckVINAvailability,
+                                    isSubmitting,
+                                })}
+                                initialValues={
+                                    {
+                                        VIN: inventory?.VIN || "",
+                                        Make: inventory.Make,
+                                        Model: inventory.Model,
+                                        Year: inventory.Year,
+                                        TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
+                                        StockNo: inventory?.StockNo || "",
+                                        locationuid: inventory?.locationuid || currentLocation,
+                                        GroupClassName: inventory?.GroupClassName || "",
+                                        purPurchaseEmail: inventoryExtData?.purPurchaseEmail || "",
+                                        purPurchasePhone: inventoryExtData?.purPurchasePhone || "",
+                                        titleHolderPhone: inventoryExtData?.titleHolderPhone || "",
+                                        titlePrevPhone: inventoryExtData?.titlePrevPhone || "",
+                                    } as PartialInventory
+                                }
+                                enableReinitialize
+                                validateOnChange={false}
+                                validateOnBlur={false}
+                                validateOnMount={validateOnMount}
+                                onSubmit={() => handleSubmit(id)}
+                            >
+                                <Form name='inventoryForm' className='w-full'>
+                                    <EntityFormSteps
+                                        sections={inventorySections}
+                                        stepActiveIndex={stepActiveIndex}
+                                        loaderClassName='inventory-loader'
+                                        panelClassName='entity-form-panel inventory-form'
+                                        titleClassName='entity-form-panel__title inventory-form__title'
                                     >
-                                        Delete
-                                    </FormNavButton>
-                                ) : (
-                                    <FormNavButton
-                                        onClick={handleSaveInventoryForm}
-                                        severity={isFormChanged ? "success" : "secondary"}
-                                        disabled={!isFormChanged}
-                                    >
-                                        {id ? "Update" : "Save"}
-                                    </FormNavButton>
-                                )}
-                            </FormNav>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                        {stepActiveIndex === printActiveIndex && (
+                                            <div className='entity-form-panel inventory-form'>
+                                                <div className='entity-form-panel__title inventory-form__title uppercase'>
+                                                    Print history
+                                                </div>
+                                                <PrintForms />
+                                            </div>
+                                        )}
+                                        {stepActiveIndex === deleteActiveIndex && (
+                                            <DeleteForm
+                                                attemptedSubmit={attemptedSubmit}
+                                                isDeleteConfirm={isDeleteConfirm}
+                                            />
+                                        )}
+                                    </EntityFormSteps>
+                                </Form>
+                            </Formik>
+                        </EntityFormBody>
+                        <EntityFormFooter
+                            stepActiveIndex={stepActiveIndex}
+                            itemsMenuCount={itemsMenuCount}
+                            isOnDeleteStep={stepActiveIndex === deleteActiveIndex}
+                            isSaveDisabled={!isFormChanged}
+                            isEditMode={!!id}
+                            onBack={handleOnBackClick}
+                            onNext={handleOnNextClick}
+                            onSave={handleSaveInventoryForm}
+                            onDelete={() =>
+                                deleteReason.length
+                                    ? setConfirmDeleteVisible(true)
+                                    : setAttemptedSubmit(true)
+                            }
+                        />
+                    </EntityFormContent>
+                </EntityFormCard>
+            </EntityFormPage>
             <ConfirmModalComponent />
             {confirmDeleteVisible && (
                 <ConfirmModal

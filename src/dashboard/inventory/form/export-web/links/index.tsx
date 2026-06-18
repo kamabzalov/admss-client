@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { observer } from "mobx-react-lite";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement } from "react";
@@ -23,7 +24,7 @@ export const ExportWebLinks = observer((): ReactElement => {
                 </span>
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-12'>
                 <span className='p-float-label'>

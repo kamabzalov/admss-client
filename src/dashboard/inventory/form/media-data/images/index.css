@@ -1,8 +1,17 @@
-.media-images__image {
+.media-images__item .p-image-preview-container {
+    width: 75px;
+    height: 75px;
+    overflow: hidden;
     border-radius: 5px;
-    .presentation {
-        height: 100%;
-    }
+    flex-shrink: 0;
+}
+
+.media-images__image {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
 }
 
 .media-images__item {
@@ -20,20 +29,6 @@
 
 .media-close.media-close--green {
     color: var(--admss-app-primary-main-green);
-}
-
-.media .p-fileupload-row .presentation .presentation__content {
-    display: flex;
-    align-items: center;
-    width: 88%;
-    gap: 10px;
-}
-
-.media .p-fileupload-row .presentation .presentation__content .presentation__label {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .presentation__image {

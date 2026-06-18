@@ -2,6 +2,11 @@
     border-radius: var(--admss-app-dialog-border-radius);
 }
 
+.p-dialog-top {
+    padding-top: 25vh;
+    box-sizing: border-box;
+}
+
 .p-dialog > .p-dialog-content {
     padding: 0 50px;
 }

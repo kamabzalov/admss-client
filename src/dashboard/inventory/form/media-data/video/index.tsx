@@ -18,6 +18,7 @@ import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TruncatedText } from "dashboard/common/display";
 import { generateVideoThumbnailFromFirstSeconds } from "common/utils/video-thumbnail";
 import {
     createMediaChooseTemplate,
@@ -263,13 +264,11 @@ export const VideoMedia = observer((): ReactElement => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
+                <div className='presentation__content'>
                     <div className='media-preview'>
                         <i className='icon adms-play-button media-preview__icon' />
                     </div>
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
+                    <TruncatedText className='presentation__label' text={file.name} withTooltip />
                 </div>
                 <Button
                     type='button'

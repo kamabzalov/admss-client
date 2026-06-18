@@ -102,6 +102,10 @@
     --admss-app-datatable-records-end-line-height: 3px;
     --admss-app-datatable-records-end-line-color: var(--admss-app-light-blue);
     --admss-app-datatable-header-height: 50px;
+    --admss-app-datatable-scrollbar-header-offset: calc(
+        var(--admss-app-datatable-header-height) + 17px
+    );
+    --admss-app-windows-font-family: "Segoe UI";
 }
 
 html {

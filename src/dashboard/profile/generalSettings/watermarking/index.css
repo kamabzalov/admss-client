@@ -155,7 +155,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
+        }
+
+        .media__upload-info-row {
+            display: flex;
+            align-items: center;
+            gap: 38px;
+        }
+
+        .media__upload-info-row > * {
+            margin: 0;
+        }
+
+        .media__upload-tags {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         grid-template-areas:
             "fileupload choose"
@@ -163,11 +178,12 @@
 
         grid-template-columns: 1fr 1fr;
 
-        .p-tag {
+        .p-tag,
+        .media__upload-tag.p-tag {
             background-color: var(--admss-app-light-blue);
             font-weight: 600;
             font-size: 14px;
-            margin-left: 6px;
+            margin: 0;
             color: var(--admss-app-darkest-blue);
         }
 

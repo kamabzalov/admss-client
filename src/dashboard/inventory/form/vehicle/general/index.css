@@ -12,18 +12,6 @@
     width: 30px;
 }
 
-.vehicle-general__line {
-    border: none;
-    border-top: 1px solid var(--admss-app-light-grey);
-    margin-top: 12px;
-}
-
-.vehicle-general__title {
-    font-size: 18px;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
 .p-inputnumber .p-inputtext.p-inputnumber-input {
     width: 100%;
 }

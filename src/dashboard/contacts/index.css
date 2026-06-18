@@ -88,10 +88,6 @@
 
 .contact-form {
     width: 100%;
-    padding: 0 40px;
-    min-height: 705px;
-    border-right: 2px solid var(--admss-app-light-blue);
-    border-left: 2px solid var(--admss-app-light-blue);
     overflow: hidden;
 
     .p-tabview-nav-content {
@@ -146,6 +142,10 @@
         border-radius: 0;
         border-bottom: 2px solid var(--admss-app-main-blue);
     }
+}
+
+.contact-form:not(.entity-form-panel) {
+    padding: 0 var(--entity-form-edge-spacing, 60px) 0 var(--entity-form-panel-padding-left, 50px);
 }
 
 .contact-form__title {

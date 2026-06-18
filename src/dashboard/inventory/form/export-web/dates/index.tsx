@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { DateInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
@@ -22,7 +23,7 @@ export const ExportWebDates = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-3'>
                 <DateInput date={LastModifiedDate} disabled name='Last Modified Date' />

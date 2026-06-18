@@ -1,3 +1,44 @@
+.export-web-history__table.p-datatable {
+    margin-top: 10px;
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .p-datatable-thead > tr > th:first-child,
+    .p-datatable-tbody > tr > td:first-child {
+        padding-left: 6px;
+    }
+
+    .p-datatable-thead > tr > th:not(:first-child),
+    .p-datatable-tbody > tr > td:not(:first-child) {
+        border-left: 1px solid var(--admss-app-medium-blue);
+    }
+}
+
 .export-web-history__table.p-datatable .p-datatable-emptymessage {
     color: var(--admss-app-medium-grey);
+}
+
+.inventory-form .export-web-history__table.p-datatable .p-datatable-thead > tr > th {
+    border: none;
+}
+
+.inventory-form .export-web-history__table.p-datatable .p-datatable-thead > tr > th:not(:first-child) {
+    border-left: 1px solid var(--admss-app-medium-blue);
+}
+
+.inventory-form
+    .export-web-history__table.p-datatable
+    .p-datatable-thead
+    > tr
+    > th.export-web-history__column--listprice,
+.inventory-form
+    .export-web-history__table.p-datatable
+    .p-datatable-tbody
+    > tr
+    > td.export-web-history__column--listprice {
+    border-left: 1px solid var(--admss-app-medium-blue);
 }

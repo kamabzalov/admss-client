@@ -1,5 +1,4 @@
 .vehicle-options {
-
     position: relative;
 
     .vehicle-options__list {
@@ -15,6 +14,42 @@
     &::-webkit-scrollbar {
         height: 4px;
     }
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options--no-group),
+.entity-form-panel.inventory-form:has(.vehicle-options--empty) {
+    display: grid;
+    grid-template-columns: 4px 1fr;
+    column-gap: 12px;
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options--no-group)::before,
+.entity-form-panel.inventory-form:has(.vehicle-options--empty)::before {
+    content: "";
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    background-color: var(--admss-app-red);
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options--no-group) .inventory-form__title,
+.entity-form-panel.inventory-form:has(.vehicle-options--empty) .inventory-form__title {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 12px;
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options--no-group) .vehicle-options,
+.entity-form-panel.inventory-form:has(.vehicle-options--empty) .vehicle-options {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.vehicle-options__hint {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--admss-app-primary);
 }
 
 .vehicle-options__checkbox {

@@ -17,6 +17,7 @@ import { AppColors } from "common/models/css-variables";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TruncatedText } from "dashboard/common/display";
 import {
     createMediaChooseTemplate,
     MediaUploadFields,
@@ -194,18 +195,9 @@ export const AudioMedia = observer((): ReactElement => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__audio'
-                    />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
+                <div className='presentation__content'>
+                    <i className='icon adms-play presentation__play-icon' />
+                    <TruncatedText className='presentation__label' text={file.name} withTooltip />
                 </div>
                 <Button
                     type='button'
@@ -244,7 +236,7 @@ export const AudioMedia = observer((): ReactElement => {
                 onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className='col-12'
+                className='col-12 audio-upload'
                 style={{ "--upload-text": `"${UPLOAD_TEXT.AUDIO}"` } as React.CSSProperties}
             />
             <MediaUploadFields

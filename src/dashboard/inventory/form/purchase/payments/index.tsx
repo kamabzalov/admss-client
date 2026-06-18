@@ -17,6 +17,7 @@ import { Status } from "common/models/base-response";
 import { usePermissions } from "common/hooks/usePermissions";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useToastMessage } from "common/hooks";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 const TOAST_MESSAGES = {
     SUCCESS: {
@@ -319,14 +320,22 @@ export const PurchasePayments = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        {renderColumnsData.map(({ field, header }) =>
-                            field === "payPack" ? (
+                        {renderColumnsData.map(({ field, header }, index) => {
+                            const isLastColumn = index === renderColumnsData.length - 1;
+
+                            return field === "payPack" ? (
                                 <Column
                                     field={field}
                                     header={header}
                                     key={field}
                                     headerClassName='cursor-move'
-                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    className={`overflow-hidden text-overflow-ellipsis ${
+                                        isLastColumn ? "" : "max-w-16rem"
+                                    }`}
+                                    pt={getColumnPtStyles({
+                                        isLastColumn,
+                                        additionalStyles: isLastColumn ? { width: "100%" } : {},
+                                    })}
                                     body={(options) => (
                                         <>{`$ ${Number(options[field] || 0).toFixed(2)}`}</>
                                     )}
@@ -337,7 +346,13 @@ export const PurchasePayments = observer((): ReactElement => {
                                     header={header}
                                     key={field}
                                     headerClassName='cursor-move'
-                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    className={`overflow-hidden text-overflow-ellipsis ${
+                                        isLastColumn ? "" : "max-w-16rem"
+                                    }`}
+                                    pt={getColumnPtStyles({
+                                        isLastColumn,
+                                        additionalStyles: isLastColumn ? { width: "100%" } : {},
+                                    })}
                                     body={(options) => (
                                         <>
                                             {parseBoolean(options[field])
@@ -352,13 +367,19 @@ export const PurchasePayments = observer((): ReactElement => {
                                     header={header}
                                     key={field}
                                     headerClassName='cursor-move'
-                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    className={`overflow-hidden text-overflow-ellipsis ${
+                                        isLastColumn ? "" : "max-w-16rem"
+                                    }`}
+                                    pt={getColumnPtStyles({
+                                        isLastColumn,
+                                        additionalStyles: isLastColumn ? { width: "100%" } : {},
+                                    })}
                                     body={(options) => (
                                         <>{parseBoolean(options[field]) ? "Yes" : "No"}</>
                                     )}
                                 />
-                            )
-                        )}
+                            );
+                        })}
                         {canDeletePayments() && (
                             <Column body={deleteTemplate} frozen alignFrozen='right' />
                         )}

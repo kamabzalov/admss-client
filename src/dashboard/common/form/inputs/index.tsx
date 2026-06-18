@@ -15,6 +15,7 @@ import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { EMAIL_REGEX } from "common/constants/regex";
 import { TruncatedText } from "dashboard/common/display";
+import { FieldLabel } from "dashboard/common/form/field-label";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -281,12 +282,11 @@ export const CurrencyInput = ({
             className={`flex align-items-center justify-content-between currency-item relative text-input ${showError ? "p-invalid" : ""} ${wrapperClassName || ""}`}
             ref={containerRef}
         >
-            <label
+            <FieldLabel
+                text={title || ""}
                 htmlFor={uniqueId}
                 className={`currency-item__label ${labelPosition === "top" && "label-top"}`}
-            >
-                {title}
-            </label>
+            />
             <div className='currency-item__input flex justify-content-center'>
                 {currencyIcon === CURRENCY_OPTIONS.DOLLAR && (
                     <div className='currency-item__icon input-icon input-icon-left'>
@@ -339,12 +339,11 @@ export const PercentInput = ({
             key={name}
             className={`flex align-items-center justify-content-between percent-item relative text-input ${showError ? "p-invalid" : ""}`}
         >
-            <label
+            <FieldLabel
+                text={title || ""}
                 htmlFor={uniqueId}
                 className={`percent-item__label ${!props.value && floatLabel ? "percent-item__label--empty" : ""} ${labelPosition === "top" && "label-top"}`}
-            >
-                {title}
-            </label>
+            />
             <div className='percent-item__input flex justify-content-center'>
                 <InputNumber
                     min={0}
@@ -374,25 +373,26 @@ export const PercentInput = ({
 export const BorderedCheckbox = ({
     name,
     height = "50px",
+    inputId,
+    className,
+    disabled,
     ...props
 }: CheckboxProps): ReactElement => {
+    const checkboxId = inputId || name;
+
     return (
-        <div
+        <label
+            htmlFor={checkboxId}
             style={{
                 height,
             }}
-            className='p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox'
+            className={`p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox cursor-pointer ${disabled ? "p-disabled" : ""} ${className || ""}`}
         >
-            <label
-                className={`cursor-pointer ${props.disabled ? "p-disabled" : ""}`}
-                htmlFor={name}
-            >
-                {name}
-            </label>
+            <span className='bordered-checkbox__text'>{name}</span>
             <span className='p-inputgroup-addon'>
-                <Checkbox inputId={name} {...props} />
+                <Checkbox inputId={checkboxId} disabled={disabled} {...props} />
             </span>
-        </div>
+        </label>
     );
 };
 
@@ -455,7 +455,7 @@ export const SearchInput = ({
                             },
                         }}
                     />
-                    <label className='float-label search-input__label'>{title}</label>
+                    <FieldLabel text={title || ""} className='float-label search-input__label' />
                 </span>
                 <button
                     className='search-input__icon input-icon input-icon-right'
@@ -550,12 +550,11 @@ export const DateInput = ({
                 {((!checkbox && floatLabel) ||
                     (checkbox && !isChecked && floatLabel) ||
                     (checkbox && checkboxWithLabel && isChecked)) && (
-                    <label
+                    <FieldLabel
+                        text={name || ""}
                         htmlFor={uniqueId}
                         className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
-                    >
-                        {name}
-                    </label>
+                    />
                 )}
                 <div className='date-item__input w-full flex relative'>
                     {checkbox && (
@@ -697,9 +696,7 @@ export const TextInput = ({
                     {infoText}
                 </small>
             )}
-            <label htmlFor={uniqueId} className='float-label'>
-                {label ?? name}
-            </label>
+            <FieldLabel text={label ?? name ?? ""} htmlFor={uniqueId} />
             {showError && errorMessage && (
                 <div className='p-error'>
                     <small>
@@ -750,9 +747,7 @@ export const NumberInput = ({
                     {infoText}
                 </small>
             )}
-            <label htmlFor={uniqueId} className='float-label'>
-                {label ?? name}
-            </label>
+            <FieldLabel text={label ?? name ?? ""} htmlFor={uniqueId} />
             {showError && errorMessage && (
                 <div className='p-error'>
                     <small>{errorMessage}</small>
@@ -764,7 +759,13 @@ export const NumberInput = ({
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
 
-export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
+export const StateDropdown = ({
+    name,
+    colWidth,
+    height = 50,
+    style,
+    ...props
+}: StateDropdownProps): ReactElement => {
     const content = (
         <ComboBox
             optionLabel='label'
@@ -773,7 +774,8 @@ export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps):
             label={name}
             options={STATES_LIST}
             className={`w-full ${props.className || ""}`}
-            style={{ height: `${props.height || 50}px` }}
+            height={height}
+            style={style}
             {...props}
         />
     );
@@ -842,9 +844,7 @@ export const PhoneInput = ({
                 onBlur={(e) => validateAndHandle(e as unknown as InputMaskChangeEvent, true)}
                 {...props}
             />
-            <label htmlFor={uniqueId} className='float-label'>
-                {name}
-            </label>
+            <FieldLabel text={name || ""} htmlFor={uniqueId} />
             {showError && messageToShow && (
                 <div className='p-error'>
                     <small>{messageToShow}</small>
@@ -900,9 +900,7 @@ export const EmailInput = ({
                 onBlur={(e) => validateAndHandle(e, true)}
                 {...props}
             />
-            <label htmlFor={uniqueId} className='float-label'>
-                {name}
-            </label>
+            <FieldLabel text={name || ""} htmlFor={uniqueId} />
             {showError && messageToShow && (
                 <div className='p-error'>
                     <small>{messageToShow}</small>

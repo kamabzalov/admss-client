@@ -1,7 +1,6 @@
-import { ReactElement } from "react";
-import { Tooltip } from "primereact/tooltip";
+import { ReactElement, useMemo } from "react";
 import { Contact } from "common/models/contact";
-import { truncateText } from "common/helpers";
+import { EntityFormHeader, EntityFormHeaderItem } from "dashboard/common/entity-form-layout";
 
 interface ContactFormHeaderProps {
     id?: string;
@@ -9,44 +8,29 @@ interface ContactFormHeaderProps {
 }
 
 export default function ContactFormHeader({ id, contact }: ContactFormHeaderProps): ReactElement {
-    return (
-        <div className='card-header'>
-            <h2 className='card-header__title uppercase m-0 pr-2'>
-                {id ? "Edit" : "Create new"} contact
-            </h2>
-            {id && (
-                <div className='card-header-info'>
-                    <Tooltip target='.tooltip-target' className='tooltip-tail-bottom' />
+    const metadata = useMemo((): EntityFormHeaderItem[] => {
+        if (!id) {
+            return [];
+        }
 
-                    {(contact.firstName || contact.lastName) && (
-                        <>
-                            Full Name
-                            <span
-                                className='card-header-info__data tooltip-target'
-                                data-pr-tooltip={`${contact.firstName || ""} ${contact.lastName || ""}`}
-                                data-pr-position='top'
-                            >
-                                {truncateText(
-                                    `${contact.firstName || ""} ${contact.lastName || ""}`
-                                )}
-                            </span>
-                        </>
-                    )}
+        const items: EntityFormHeaderItem[] = [];
 
-                    {contact?.businessName && (
-                        <>
-                            Company name
-                            <span
-                                className='card-header-info__data tooltip-target'
-                                data-pr-tooltip={contact.businessName}
-                                data-pr-position='top'
-                            >
-                                {truncateText(contact.businessName)}
-                            </span>
-                        </>
-                    )}
-                </div>
-            )}
-        </div>
-    );
+        if (contact.firstName || contact.lastName) {
+            items.push({
+                label: "Full Name",
+                value: `${contact.firstName || ""} ${contact.lastName || ""}`.trim(),
+            });
+        }
+
+        if (contact.businessName) {
+            items.push({
+                label: "Company name",
+                value: contact.businessName,
+            });
+        }
+
+        return items;
+    }, [id, contact.firstName, contact.lastName, contact.businessName]);
+
+    return <EntityFormHeader title={`${id ? "Edit" : "Create new"} contact`} metadata={metadata} />;
 }
