@@ -1,5 +1,6 @@
 import "./index.css";
-import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
+import { Splitter } from "dashboard/common/display";
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     deleteInventoryMake,
     deleteInventoryModel,
@@ -24,12 +25,16 @@ import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import { useToast } from "dashboard/common/toast";
 import { UserGroup } from "common/models/user";
 import { DropdownChangeEvent } from "primereact/dropdown";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
+
+const sortMakesByName = (list: MakesListData[]): MakesListData[] =>
+    [...list].sort((left, right) => left.name.localeCompare(right.name));
 
 const parseMileage = (mileage: string): number => {
     return parseFloat(mileage.replace(/,/g, ""));
@@ -68,6 +73,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
     const [activeGroupClassList, setActiveGroupClassList] = useState<UserGroup[]>([]);
+    const makeAutoCompleteRef = useRef<AutoComplete>(null);
 
     const groupClassId = useMemo<string>(() => {
         return (
@@ -423,9 +429,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='col-12'>
-                <hr className='form-line' />
-            </div>
+            <Splitter />
             {inventory.GroupClassName === EQUIPMENT ? (
                 <div className='col-6 relative'>
                     <TextInput
@@ -518,15 +522,24 @@ export const VehicleGeneral = observer((): ReactElement => {
                     }`}
                 >
                     <AutoComplete
+                        ref={makeAutoCompleteRef}
                         {...getFieldProps("Make")}
                         value={values.Make}
                         suggestions={automakesList}
+                        minLength={0}
                         completeMethod={({ query }) => {
+                            const sortedMakes = sortMakesByName(initialAutoMakesList);
                             setAutomakesList(
-                                initialAutoMakesList.filter((item) =>
-                                    item.name.includes(query.toUpperCase())
-                                )
+                                query
+                                    ? sortedMakes.filter((item) =>
+                                          item.name.includes(query.toUpperCase())
+                                      )
+                                    : sortedMakes
                             );
+                        }}
+                        onFocus={(event) => {
+                            setAutomakesList(sortMakesByName(initialAutoMakesList));
+                            makeAutoCompleteRef.current?.search(event, "", "dropdown");
                         }}
                         dropdown
                         onChange={({ value }) => {
@@ -548,13 +561,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }}
                         itemTemplate={(option) => handleDeleteInventoryRecord(option)}
                         selectedItemTemplate={selectedAutoMakesTemplate}
-                        placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
                         panelClassName='vehicle-general__panel'
                     />
-                    <label className='float-label'>Make (required)</label>
+                    <FieldLabel text='Make (required)' />
                     {errors.Make && (
                         <div className='p-error'>
                             <small>{errors.Make}</small>
@@ -666,10 +678,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='flex col-12'>
-                <h3 className='vehicle-general__title m-0 pr-3'>Vehicle status</h3>
-                <hr className='vehicle-general__line flex-1' />
-            </div>
+            <Splitter title='Vehicle status' />
 
             <div className='col-3'>
                 <ComboBox

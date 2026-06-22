@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
@@ -132,7 +133,7 @@ export const PurchaseConsign = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-3 flex align-items-center'>
                 <div className='purchase-consign__checkbox'>
@@ -211,7 +212,7 @@ export const PurchaseConsign = observer((): ReactElement => {
                 </span>
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-3'>
                 <CurrencyInput

@@ -1,5 +1,4 @@
-import { ReactElement, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "primereact/button";
+import { ReactElement, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     ContactSection,
     createContactSections,
@@ -32,6 +31,13 @@ import { PartialContact } from "dashboard/contacts/form/common/types";
 import ContactFormHeader from "dashboard/contacts/form/components/ContactFormHeader";
 import ContactFormContent from "dashboard/contacts/form/components/ContactFormContent";
 import ContactFormFooter from "dashboard/contacts/form/components/ContactFormFooter";
+import {
+    EntityFormBody,
+    EntityFormCard,
+    EntityFormContent as EntityFormContentArea,
+    EntityFormDeleteNavButton,
+    EntityFormPage,
+} from "dashboard/common/entity-form-layout";
 import ContactFormDialogs from "dashboard/contacts/form/components/ContactFormDialogs";
 import ContactValidationDialog, {
     ValidationErrorType,
@@ -256,6 +262,23 @@ export const ContactForm = observer((): ReactElement => {
         return "";
     };
 
+    const accordionFooter = useMemo(() => {
+        if (!id) {
+            return undefined;
+        }
+
+        return (
+            <EntityFormDeleteNavButton
+                disabled={!contactPermissions.canDelete()}
+                onClick={() =>
+                    contactPermissions.canDelete() && setStepActiveIndex(deleteActiveIndex)
+                }
+            >
+                Delete contact
+            </EntityFormDeleteNavButton>
+        );
+    }, [id, contactPermissions, deleteActiveIndex]);
+
     const renderSectionHeader = (section: ContactSection) => {
         const formValues = buildFormValues(contact, contactExtData);
         const filledTabsCount = section.items.reduce(
@@ -284,17 +307,12 @@ export const ContactForm = observer((): ReactElement => {
 
     return (
         <Suspense>
-            <div className='grid relative'>
-                <Button
-                    icon='pi pi-times'
-                    className='p-button close-button'
-                    onClick={handleCloseClick}
-                />
-                <div className='col-12'>
-                    <div className='card contact'>
-                        <ContactFormHeader id={id} contact={contact} />
-                        <div className='card-content contact__card'>
-                            <div className='grid flex-nowrap card-content__wrapper'>
+            <EntityFormPage onClose={handleCloseClick}>
+                <EntityFormCard entityClassName='contact'>
+                    <ContactFormHeader id={id} contact={contact} />
+                    <EntityFormContentArea>
+                        <EntityFormBody
+                            sidebar={
                                 <FormStepAccordion
                                     sections={contactSections}
                                     stepActiveIndex={stepActiveIndex}
@@ -303,65 +321,52 @@ export const ContactForm = observer((): ReactElement => {
                                     onStepChange={handleStepChange}
                                     errorSections={errorSections}
                                     resolveStepClassName={resolveStepClassName}
-                                    accordionClassName='contact__accordion'
+                                    accordionClassName='entity-form-accordion'
                                     stepClassName='border-circle contact-step'
                                     renderSectionHeader={renderSectionHeader}
                                     navigationRef={stepsRef}
                                     expandMode='sync-with-step'
                                     wrapperClassName='p-0'
-                                    footer={
-                                        id ? (
-                                            <Button
-                                                icon='pi pi-times'
-                                                className='p-button gap-2 contact__delete-nav w-full'
-                                                disabled={!contactPermissions.canDelete()}
-                                                onClick={() =>
-                                                    contactPermissions.canDelete() &&
-                                                    setStepActiveIndex(deleteActiveIndex)
-                                                }
-                                            >
-                                                Delete contact
-                                            </Button>
-                                        ) : undefined
-                                    }
+                                    footer={accordionFooter}
                                 />
-                                <ContactFormContent
-                                    formikRef={formikRef}
-                                    contactSections={contactSections}
-                                    stepActiveIndex={stepActiveIndex}
-                                    deleteActiveIndex={deleteActiveIndex}
-                                    validateOnMount={validateOnMount}
-                                    contact={contact}
-                                    contactExtData={contactExtData}
-                                    canDelete={contactPermissions.canDelete()}
-                                    attemptedSubmit={attemptedSubmit}
-                                    isDeleteConfirm={isDeleteConfirm}
-                                    onSubmit={() => setValidateOnMount(false)}
-                                />
-                            </div>
-                            <ContactFormFooter
+                            }
+                        >
+                            <ContactFormContent
+                                formikRef={formikRef}
+                                contactSections={contactSections}
                                 stepActiveIndex={stepActiveIndex}
-                                itemsMenuCount={itemsMenuCount}
                                 deleteActiveIndex={deleteActiveIndex}
-                                activeTab={activeTab}
+                                validateOnMount={validateOnMount}
+                                contact={contact}
+                                contactExtData={contactExtData}
                                 canDelete={contactPermissions.canDelete()}
-                                deleteReason={deleteReason}
-                                isContactChanged={isContactChanged}
-                                hasContactType={!!contact.type}
-                                isEditMode={!!id}
-                                onBack={handleOnBackClick}
-                                onNext={handleOnNextClick}
-                                onSave={handleSaveContactForm}
-                                onDeleteClick={() =>
-                                    deleteReason.length
-                                        ? setConfirmActive(true)
-                                        : setAttemptedSubmit(true)
-                                }
+                                attemptedSubmit={attemptedSubmit}
+                                isDeleteConfirm={isDeleteConfirm}
+                                onSubmit={() => setValidateOnMount(false)}
                             />
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </EntityFormBody>
+                        <ContactFormFooter
+                            stepActiveIndex={stepActiveIndex}
+                            itemsMenuCount={itemsMenuCount}
+                            deleteActiveIndex={deleteActiveIndex}
+                            activeTab={activeTab}
+                            canDelete={contactPermissions.canDelete()}
+                            deleteReason={deleteReason}
+                            isContactChanged={isContactChanged}
+                            hasContactType={!!contact.type}
+                            isEditMode={!!id}
+                            onBack={handleOnBackClick}
+                            onNext={handleOnNextClick}
+                            onSave={handleSaveContactForm}
+                            onDeleteClick={() =>
+                                deleteReason.length
+                                    ? setConfirmActive(true)
+                                    : setAttemptedSubmit(true)
+                            }
+                        />
+                    </EntityFormContentArea>
+                </EntityFormCard>
+            </EntityFormPage>
             <ContactFormDialogs
                 isConfirmVisible={isConfirmVisible}
                 confirmTitle={confirmTitle}

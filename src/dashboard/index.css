@@ -1,5 +1,6 @@
 @import "dashboard/common/form/index.css";
 @import "dashboard/common/form-nav/index.css";
+@import "dashboard/common/entity-form-layout/index.css";
 
 .color-dusty-blue {
     color: var(--admss-app-dusty-blue);
@@ -86,6 +87,9 @@
     padding-left: 1.75rem;
     display: flex;
     align-items: center;
+    font-weight: 400;
+    font-size: 20px;
+    font-family: var(--admss-app-font-condensed);
 }
 
 .card-header-info__data {
@@ -419,7 +423,9 @@
 }
 
 @supports (font: -apple-system-body) {
-    .p-datatable-wrapper:not(.thin-scrollbar)::-webkit-scrollbar-button:single-button:vertical:decrement {
+    .p-datatable-wrapper:not(
+            .thin-scrollbar
+        )::-webkit-scrollbar-button:single-button:vertical:decrement {
         height: 8px;
     }
 

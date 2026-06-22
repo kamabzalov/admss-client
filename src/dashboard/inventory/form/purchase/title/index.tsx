@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { STATES_LIST } from "common/constants/states";
 import { TITLE_STATUS_LIST } from "common/constants/title-status";
 import { InventoryExtData } from "common/models/inventory";
@@ -128,7 +129,7 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-6'>
                 <CompanySearch
@@ -210,7 +211,7 @@ export const PurchaseTitle = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-6'>
                 <CompanySearch

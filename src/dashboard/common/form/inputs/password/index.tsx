@@ -3,6 +3,7 @@ import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constant
 import "./index.css";
 import { useEffect, useId, useMemo } from "react";
 import { TruncatedText } from "dashboard/common/display";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 interface PasswordInputProps extends PasswordProps {
@@ -126,9 +127,7 @@ const PasswordField = ({
                 panelClassName='password-field-panel'
                 {...passwordProps}
             />
-            <label htmlFor={id} className='float-label'>
-                {label}
-            </label>
+            <FieldLabel text={label} htmlFor={id} />
             {!!error && (
                 <div className='p-error'>
                     <TruncatedText text={errorMessage} withTooltip={true} width='full' />

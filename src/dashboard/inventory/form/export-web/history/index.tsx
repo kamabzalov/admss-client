@@ -5,6 +5,7 @@ import { ReactElement } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { InventoryExportWebHistory } from "common/models/inventory";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 export const ExportWebHistory = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -27,20 +28,26 @@ export const ExportWebHistory = observer((): ReactElement => {
             <div className='col-12'>
                 <DataTable
                     showGridlines
-                    className='mt-6 export-web-history__table'
+                    className='export-web-history__table'
                     value={inventoryExportWebHistory}
                     emptyMessage='No exports yet.'
                     reorderableColumns
                     resizableColumns
                 >
-                    {renderColumnsData.map(({ field, header }) => (
-                        <Column
-                            field={field}
-                            header={header}
-                            key={field}
-                            headerClassName='cursor-move'
-                        />
-                    ))}
+                    {renderColumnsData.map(({ field, header }, index) => {
+                        const isLastColumn = index === renderColumnsData.length - 1;
+
+                        return (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                headerClassName={`cursor-move export-web-history__column export-web-history__column--${field}`}
+                                bodyClassName={`export-web-history__column export-web-history__column--${field}`}
+                                pt={getColumnPtStyles({ isLastColumn })}
+                            />
+                        );
+                    })}
                 </DataTable>
             </div>
         </div>

@@ -1,12 +1,28 @@
+.vehicle-disclosures .splitter__title {
+    color: var(--admss-app-red);
+}
+
 .vehicle-disclosures__text-area {
     height: 50px;
+    min-height: 50px;
+    max-height: 50px;
     resize: none;
     padding: 10px;
     line-height: 1.5;
+    box-sizing: border-box;
     &:not(:focus) + .float-label {
         padding-top: 8px;
     }
 }
 .vehicle-disclosures__text-area.p-filled + .float-label {
     padding-top: 0px;
+}
+
+.vehicle-disclosures .bordered-checkbox {
+    margin-top: 0;
+}
+
+.vehicle-disclosures .p-float-label .combo-box.p-dropdown {
+    height: 50px;
+    min-height: 50px;
 }

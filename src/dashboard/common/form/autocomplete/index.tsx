@@ -1,6 +1,7 @@
 import { AutoComplete, AutoCompleteProps } from "primereact/autocomplete";
 import { Button } from "primereact/button";
-import { ReactElement, useState, useRef, useEffect } from "react";
+import { FocusEvent, ReactElement, useState, useRef, useEffect } from "react";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import "./index.css";
 
 interface AutoCompleteDropdownProps extends AutoCompleteProps {
@@ -15,6 +16,8 @@ export const AutoCompleteDropdown = ({
     clearButton = false,
     dropdown = true,
     value,
+    onFocus,
+    minLength,
     ...props
 }: AutoCompleteDropdownProps): ReactElement => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -44,6 +47,13 @@ export const AutoCompleteDropdown = ({
         onClear?.();
     };
 
+    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+        onFocus?.(event);
+        if (dropdown) {
+            autoCompleteRef.current?.search(event, "", "dropdown");
+        }
+    };
+
     return (
         <div className='p-inputgroup autocomplete-dropdown' ref={containerRef}>
             <span className='p-float-label'>
@@ -51,8 +61,10 @@ export const AutoCompleteDropdown = ({
                     {...props}
                     value={value}
                     dropdown={dropdown}
+                    minLength={minLength ?? (dropdown ? 0 : undefined)}
                     inputClassName='autocomplete-dropdown__input'
                     ref={autoCompleteRef}
+                    onFocus={handleFocus}
                     onShow={() => setIsDropdownVisible(true)}
                     onHide={() => setIsDropdownVisible(false)}
                     onDropdownClick={() => {
@@ -91,7 +103,7 @@ export const AutoCompleteDropdown = ({
                         },
                     }}
                 />
-                <label className='float-label'>{label}</label>
+                <FieldLabel text={label} />
             </span>
             {clearButton && !!value && (
                 <Button

@@ -8,6 +8,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { InventoryOptions, OptionsListData } from "common/models/inventory";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AccordionItems } from "dashboard/inventory/common";
 import { Button } from "primereact/button";
 
 const OPTION_PATH = "/dashboard/settings?section=inventory-settings&tab=1";
@@ -74,38 +75,57 @@ export const VehicleOptions = observer((): ReactElement => {
         navigate(OPTION_PATH);
     };
 
-    return (
-        <div className='grid flex-column vehicle-options'>
-            <Button
-                label='Edit options'
-                type='button'
-                className='p-button vehicle-options__button'
-                onClick={handleNavigateToOptions}
-            />
-            {!id && !inventoryGroupID && (
-                <p className='vehicle-options__title'>
-                    Select inventory group first for getting options
-                </p>
-            )}
+    const hasInventoryGroup = Boolean(inventoryGroupID);
+    const showSelectGroupHint = !hasInventoryGroup;
+    const showNoOptionsHint = !id && hasInventoryGroup && !options.length;
 
-            {!id && inventoryGroupID && !options?.length && (
-                <p className='vehicle-options__title'>Inventory group has no options</p>
-            )}
-            <div className='vehicle-options__list'>
-                {options?.map(({ name, index }) => (
-                    <div key={index} className='vehicle-options__checkbox flex align-items-center'>
-                        <Checkbox
-                            inputId={name}
-                            name={name}
-                            onChange={() => changeInventoryOptions(name)}
-                            checked={inventoryOptions.includes(name)}
-                        />
-                        <label htmlFor={name} className='ml-2'>
-                            {name}
-                        </label>
-                    </div>
-                ))}
+    return (
+        <>
+            <div className='vehicle-options__header'>
+                <div className='entity-form-panel__title inventory-form__title uppercase heading-condensed'>
+                    {AccordionItems.OPTIONS}
+                </div>
+                <Button
+                    label='Edit options'
+                    type='button'
+                    className='p-button vehicle-options__button'
+                    onClick={handleNavigateToOptions}
+                />
             </div>
-        </div>
+            <div
+                className={`grid flex-column vehicle-options ${
+                    showSelectGroupHint ? "vehicle-options--no-group" : ""
+                } ${showNoOptionsHint ? "vehicle-options--empty" : ""}`}
+            >
+                {showSelectGroupHint && (
+                    <p className='vehicle-options__hint'>
+                        Select inventory group first for getting options
+                    </p>
+                )}
+                {showNoOptionsHint && (
+                    <p className='vehicle-options__hint'>Inventory group has no options</p>
+                )}
+                {hasInventoryGroup && (
+                    <div className='vehicle-options__list'>
+                        {options.map(({ name, index }) => (
+                            <div
+                                key={index}
+                                className='vehicle-options__checkbox flex align-items-center'
+                            >
+                                <Checkbox
+                                    inputId={name}
+                                    name={name}
+                                    onChange={() => changeInventoryOptions(name)}
+                                    checked={inventoryOptions.includes(name)}
+                                />
+                                <label htmlFor={name} className='ml-2'>
+                                    {name}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </>
     );
 });

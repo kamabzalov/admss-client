@@ -14,6 +14,7 @@ import { ListData } from "common/models";
 import { MakesListData } from "common/models/inventory";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import { useDateRange } from "common/hooks";
 import { validateDates } from "common/helpers";
 import { AutoComplete } from "primereact/autocomplete";
@@ -480,9 +481,7 @@ export const AdvancedSearchDialog = <T,>({
                             )}
 
                             {!comboBoxHasLabel && (
-                                <label htmlFor={uniqueId} className='float-label'>
-                                    {label || key}
-                                </label>
+                                <FieldLabel text={label || key} htmlFor={uniqueId} />
                             )}
                         </span>
                     );

@@ -45,14 +45,18 @@ export const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions
     <>
         <div className='image-choose'>{chooseButton}</div>
         <div className='upload-info'>
-            <span className='media__upload-text-info'>
-                Max resolution: {limitations.maxResolution}px
-            </span>
-            <span className='media__upload-text-info'>Max size is {limitations.maxSize} Mb</span>
-            <div className='media__upload-formats'>
-                {limitations.formats.map((format) => (
-                    <Tag key={format} className='media__upload-tag' value={format} />
-                ))}
+            <div className='media__upload-info-row'>
+                <span className='media__upload-text-info'>
+                    Max resolution: {limitations.maxResolution}px
+                </span>
+                <span className='media__upload-text-info'>
+                    Max size is {limitations.maxSize} Mb
+                </span>
+                <div className='media__upload-tags'>
+                    {limitations.formats.map((format) => (
+                        <Tag key={format} className='media__upload-tag' value={format} />
+                    ))}
+                </div>
             </div>
         </div>
     </>

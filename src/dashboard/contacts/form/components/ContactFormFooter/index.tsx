@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { FormNav, FormNavButton } from "dashboard/common/form-nav";
+import { EntityFormFooter } from "dashboard/common/entity-form-layout";
 
 interface ContactFormFooterProps {
     stepActiveIndex: number;
@@ -32,47 +32,21 @@ export default function ContactFormFooter({
     onSave,
     onDeleteClick,
 }: ContactFormFooterProps): ReactElement {
-    const isOnDeleteStep = stepActiveIndex === deleteActiveIndex && canDelete;
-    const isBackDisabled = stepActiveIndex <= 0 && !activeTab;
-    const isNextDisabled = stepActiveIndex >= itemsMenuCount;
-
     return (
-        <FormNav>
-            <FormNavButton
-                onClick={onBack}
-                outlined
-                disabled={isBackDisabled}
-                severity={isBackDisabled ? "secondary" : "success"}
-            >
-                Back
-            </FormNavButton>
-            <FormNavButton
-                onClick={onNext}
-                disabled={isNextDisabled}
-                severity={isNextDisabled ? "secondary" : "success"}
-                outlined
-            >
-                Next
-            </FormNavButton>
-            {isOnDeleteStep ? (
-                <FormNavButton
-                    onClick={onDeleteClick}
-                    disabled={!deleteReason.length}
-                    {...(!deleteReason.length && { severity: "secondary" })}
-                    className='form-nav__button--danger'
-                >
-                    Delete
-                </FormNavButton>
-            ) : (
-                <FormNavButton
-                    type='button'
-                    onClick={onSave}
-                    disabled={!isContactChanged || !hasContactType}
-                    severity={isContactChanged && hasContactType ? "success" : "secondary"}
-                >
-                    {isEditMode ? "Update" : "Save"}
-                </FormNavButton>
-            )}
-        </FormNav>
+        <EntityFormFooter
+            stepActiveIndex={stepActiveIndex}
+            itemsMenuCount={itemsMenuCount}
+            deleteActiveIndex={deleteActiveIndex}
+            activeTab={activeTab}
+            isOnDeleteStep={stepActiveIndex === deleteActiveIndex}
+            canDeleteOnStep={canDelete}
+            deleteDisabled={!deleteReason.length}
+            isSaveDisabled={!isContactChanged || !hasContactType}
+            isEditMode={isEditMode}
+            onBack={onBack}
+            onNext={onNext}
+            onSave={onSave}
+            onDelete={onDeleteClick}
+        />
     );
 }

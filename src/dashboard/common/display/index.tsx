@@ -15,6 +15,7 @@ interface SplitterProps {
     children?: React.ReactNode;
     padding?: string;
     className?: string;
+    width?: string;
 }
 
 export const TruncatedText = ({
@@ -55,9 +56,18 @@ export const TruncatedText = ({
     );
 };
 
-export const Splitter = ({ title, children, padding = "pr-3", className }: SplitterProps) => {
+export const Splitter = ({
+    title,
+    children,
+    padding = "pr-3",
+    className,
+    width,
+}: SplitterProps) => {
     return (
-        <div className={`splitter ${className ?? ""}`}>
+        <div
+            className={["splitter", !width && "col-12", className].filter(Boolean).join(" ")}
+            style={width ? { width } : undefined}
+        >
             {title && (
                 <h3 className={`splitter__title m-0 ${padding ? "" : "pr-3"}`} style={{ padding }}>
                     {title}

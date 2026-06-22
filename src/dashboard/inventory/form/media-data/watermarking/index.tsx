@@ -1,4 +1,5 @@
 import "./index.css";
+import { Splitter } from "dashboard/common/display";
 import { ReactElement, useEffect, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
@@ -281,9 +282,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                     />
                 </div>
 
-                <div className='col-12 py-0'>
-                    <hr className='form-line' />
-                </div>
+                <Splitter />
 
                 <div className='col-12 watermarking__logo-settings'>
                     <Checkbox

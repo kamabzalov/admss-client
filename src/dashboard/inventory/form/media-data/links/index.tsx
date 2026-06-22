@@ -401,27 +401,25 @@ export const LinksMedia = observer((): ReactElement => {
             <div className='media-links mt-4 col-12'>
                 <div className='inventory-content w-full'>
                     {isLoading && <Loader />}
-                    {!isLoading && links.length ? (
-                        <DataTable
-                            value={links}
-                            rowExpansionTemplate={rowExpansionTemplate}
-                            expandedRows={expandedRows}
-                            onRowToggle={handleRowToggle}
-                            className='media-links-table'
-                        >
-                            <Column body={linkControlTemplate} />
-                            <Column header='#' body={numberColumnTemplate} />
-                            <Column
-                                className='media-links__url-ellipsis'
-                                header='URL'
-                                style={{ width: "70%", maxWidth: "34vw" }}
-                                body={urlColumnTemplate}
-                            />
-                            <Column body={actionColumnTemplate} />
-                        </DataTable>
-                    ) : (
-                        <div className='media-links__empty'>No links added yet.</div>
-                    )}
+                    <DataTable
+                        value={links}
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={handleRowToggle}
+                        className='media-links-table'
+                        tableStyle={{ tableLayout: "fixed" }}
+                        emptyMessage='No links added yet.'
+                    >
+                        <Column body={linkControlTemplate} style={{ width: "92px" }} />
+                        <Column header='#' body={numberColumnTemplate} style={{ width: "92px" }} />
+                        <Column
+                            className='media-links__url-ellipsis'
+                            header='URL'
+                            style={{ width: "70%", maxWidth: "34vw" }}
+                            body={urlColumnTemplate}
+                        />
+                        <Column body={actionColumnTemplate} style={{ width: "120px" }} />
+                    </DataTable>
                 </div>
             </div>
             <ConfirmModal

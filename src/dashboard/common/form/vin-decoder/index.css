@@ -8,7 +8,7 @@
     border-radius: 4px 0 0 4px;
 }
 
-.vin-decoder__decode-button {
+.vin-decoder__decode-button.p-button {
     flex: 0 1 152px;
     border-radius: 0 4px 4px 0;
     display: inline-flex;
@@ -17,6 +17,11 @@
     text-transform: uppercase;
     font-size: 18px;
     font-weight: 700;
+    &:active:enabled {
+        box-shadow: none;
+        background-color: var(--admss-app-dark-green);
+        border-color: var(--admss-app-dark-green);
+    }
     &.vin-decoder__decode-button--loading {
         flex-direction: row-reverse;
         .loader-wrapper {

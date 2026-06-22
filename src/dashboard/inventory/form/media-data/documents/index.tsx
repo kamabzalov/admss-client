@@ -17,6 +17,7 @@ import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { TruncatedText } from "dashboard/common/display";
 import {
     createMediaChooseTemplate,
     MediaUploadFields,
@@ -163,18 +164,11 @@ export const DocumentsMedia = observer((): ReactElement => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__document'
-                    />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
+                <div className='presentation__content'>
+                    <div className='presentation__icon'>
+                        <i className='icon adms-pdf' />
+                    </div>
+                    <TruncatedText className='presentation__label' text={file.name} withTooltip />
                 </div>
                 <Button
                     type='button'

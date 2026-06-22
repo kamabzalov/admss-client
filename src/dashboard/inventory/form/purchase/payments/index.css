@@ -31,27 +31,21 @@
 
 .purchase-payments__table.p-datatable {
     --datatable-header-height: 44px;
+    --admss-app-datatable-header-height: var(--datatable-header-height);
     margin-top: 50px;
 
     .p-datatable-thead {
         height: var(--datatable-header-height);
     }
 
-    ::-webkit-scrollbar {
-        background: linear-gradient(
-            to bottom,
-            var(--admss-app-light-blue) var(--datatable-header-height),
-            transparent var(--datatable-header-height)
-        );
-    }
+    .p-datatable-wrapper.thin-scrollbar {
+        &::-webkit-scrollbar-thumb {
+            background: var(--admss-app-medium-blue);
+        }
 
-    ::-webkit-scrollbar-track {
-        margin-top: var(--datatable-header-height);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--admss-app-medium-blue);
-        border-radius: 5px;
+        &::-webkit-scrollbar-button:single-button:vertical:decrement {
+            height: var(--datatable-header-height);
+        }
     }
 
     .p-datatable-wrapper {
@@ -65,6 +59,11 @@
 
     .p-column-header-content {
         justify-content: flex-start;
+    }
+
+    .p-datatable-table {
+        width: 100%;
+        min-width: 100%;
     }
 }
 

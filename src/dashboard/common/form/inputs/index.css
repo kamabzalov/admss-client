@@ -207,13 +207,31 @@
 }
 
 .bordered-checkbox {
+    display: flex;
+    align-items: center;
     border: 1px solid var(--admss-app-light-grey);
     border-radius: 5px;
     padding-left: 10px;
+    height: 50px;
+    min-height: 50px;
+    box-sizing: border-box;
+}
+
+.bordered-checkbox__text {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.2;
 }
 
 .bordered-checkbox .p-inputgroup-addon {
     height: 100%;
+    min-height: 50px;
+    width: 50px;
+    min-width: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
     border-left: 1px solid var(--admss-app-light-grey);
 }

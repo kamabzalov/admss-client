@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
 import { ReactElement } from "react";
@@ -40,7 +41,7 @@ export const ExportWebPrice = observer((): ReactElement => {
                 Export to Web
             </label>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -111,7 +112,7 @@ export const ExportWebPrice = observer((): ReactElement => {
                 />
             </div>
 
-            <hr className='form-line' />
+            <Splitter />
 
             <div className='col-12'>
                 <span className='p-float-label'>

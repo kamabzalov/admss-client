@@ -1,7 +1,4 @@
 .vehicle-options {
-
-    position: relative;
-
     .vehicle-options__list {
         display: flex;
         flex-wrap: wrap;
@@ -17,8 +14,36 @@
     }
 }
 
+.entity-form-panel.inventory-form:has(.vehicle-options__header) > .inventory-form__title {
+    display: none;
+}
+
+.vehicle-options__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.vehicle-options__header .inventory-form__title {
+    margin-bottom: 0;
+}
+
+.vehicle-options__hint {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    padding-left: 10px;
+    color: var(--admss-app-primary);
+}
+
 .vehicle-options__checkbox {
     width: calc(33.33% - 20px);
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options__header) .vehicle-options__button {
+    margin-right: -30px;
 }
 
 .vehicle-options__button {
@@ -34,10 +59,7 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-
-    position: absolute;
-    right: 0;
-    top: -58px;
+    flex-shrink: 0;
 
     .p-button-label {
         white-space: nowrap;

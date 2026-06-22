@@ -1,11 +1,11 @@
-import { ReactElement, RefObject, Suspense } from "react";
+import { ReactElement, RefObject } from "react";
 import { Form, Formik, FormikProps } from "formik";
 import { Contact, ContactExtData } from "common/models/contact";
-import { Loader } from "dashboard/common/loader";
 import { ContactSection } from "dashboard/contacts/common/step-navigation";
 import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { ContactFormSchema, buildFormValues } from "dashboard/contacts/form/common/validation";
 import { PartialContact } from "dashboard/contacts/form/common/types";
+import { EntityFormSteps } from "dashboard/common/entity-form-layout";
 
 interface ContactFormContentProps {
     formikRef: RefObject<FormikProps<PartialContact>>;
@@ -35,51 +35,31 @@ export default function ContactFormContent({
     onSubmit,
 }: ContactFormContentProps): ReactElement {
     return (
-        <div className='w-full flex flex-column p-0'>
-            <div className='flex flex-grow-1'>
-                <Formik
-                    innerRef={formikRef}
-                    validationSchema={ContactFormSchema}
-                    initialValues={buildFormValues(contact, contactExtData)}
-                    enableReinitialize
-                    validateOnChange={false}
-                    validateOnBlur={false}
-                    validateOnMount={validateOnMount}
-                    onSubmit={onSubmit}
+        <Formik
+            innerRef={formikRef}
+            validationSchema={ContactFormSchema}
+            initialValues={buildFormValues(contact, contactExtData)}
+            enableReinitialize
+            validateOnChange={false}
+            validateOnBlur={false}
+            validateOnMount={validateOnMount}
+            onSubmit={onSubmit}
+        >
+            <Form name='contactForm' className='w-full'>
+                <EntityFormSteps
+                    sections={contactSections}
+                    stepActiveIndex={stepActiveIndex}
+                    panelClassName='entity-form-panel contact-form'
+                    titleClassName='entity-form-panel__title contact-form__title'
                 >
-                    <Form name='contactForm' className='w-full'>
-                        {contactSections.map((section) =>
-                            section.items.map((item) => (
-                                <div
-                                    key={item.itemIndex}
-                                    className={`${
-                                        stepActiveIndex === item.itemIndex
-                                            ? "block contact-form"
-                                            : "hidden"
-                                    }`}
-                                >
-                                    <div className='contact-form__title uppercase heading-condensed'>
-                                        {item.itemLabel}
-                                    </div>
-                                    {stepActiveIndex === item.itemIndex && (
-                                        <Suspense
-                                            fallback={<Loader className='contact-form__loader' />}
-                                        >
-                                            {item.component}
-                                        </Suspense>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </Form>
-                </Formik>
-                {stepActiveIndex === deleteActiveIndex && canDelete && (
-                    <DeleteForm
-                        attemptedSubmit={attemptedSubmit}
-                        isDeleteConfirm={isDeleteConfirm}
-                    />
-                )}
-            </div>
-        </div>
+                    {stepActiveIndex === deleteActiveIndex && canDelete && (
+                        <DeleteForm
+                            attemptedSubmit={attemptedSubmit}
+                            isDeleteConfirm={isDeleteConfirm}
+                        />
+                    )}
+                </EntityFormSteps>
+            </Form>
+        </Formik>
     );
 }
