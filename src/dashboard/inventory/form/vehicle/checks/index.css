@@ -1,6 +1,8 @@
 .vehicle-checks__top,
 .vehicle-checks__bottom {
     row-gap: 25px;
+    column-gap: 45px;
+    padding-top: 10px;
 }
 
 .vehicle-checks__top {

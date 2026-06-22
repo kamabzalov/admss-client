@@ -89,8 +89,7 @@
 
 .purchase-expenses__delete-button.p-button:enabled:focus,
 .purchase-expenses__delete-button.p-button.p-button-text:enabled:hover,
-.purchase-expenses__delete-button.p-button-icon-only:active,
-.p-button.p-button-text:enabled:active {
+.purchase-expenses__delete-button.p-button-icon-only:active {
     border: none;
     box-shadow: none;
     background: transparent;

@@ -826,7 +826,7 @@ export const InventoryForm = observer(() => {
                                         {stepActiveIndex === printActiveIndex && (
                                             <div className='entity-form-panel inventory-form'>
                                                 <div className='entity-form-panel__title inventory-form__title uppercase'>
-                                                    Print history
+                                                    Print forms
                                                 </div>
                                                 <PrintForms />
                                             </div>

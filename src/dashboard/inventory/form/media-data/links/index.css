@@ -11,6 +11,10 @@
         }
     }
 
+    .media-input {
+        padding: 0px 10px;
+    }
+
     .p-datatable {
         .p-datatable-thead {
             .p-column-header-content,

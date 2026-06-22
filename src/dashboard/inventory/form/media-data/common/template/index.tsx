@@ -54,7 +54,7 @@ export function createMediaChooseTemplate({
                             </div>
                         </div>
                         <div className='media-tooltip'>
-                            <InfoOverlayPanel panelTitle='Limitations:'>
+                            <InfoOverlayPanel disablePulse panelTitle='Limitations:'>
                                 {tooltipContent}
                             </InfoOverlayPanel>
                         </div>

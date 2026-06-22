@@ -74,7 +74,7 @@ export const PrintForms = observer((): ReactElement => {
 
     const ActionButton = (rowData: InventoryPrintForm): ReactElement => {
         return (
-            <div className='flex gap-3'>
+            <div className='inventory-print__row-actions'>
                 <Button
                     type='button'
                     className='p-button inventory-print__action-button'
@@ -102,7 +102,7 @@ export const PrintForms = observer((): ReactElement => {
             {isLoading && <Loader overlay />}
             <div className='col-12'>
                 <DataTable
-                    className='mt-6 inventory-print__table'
+                    className='mt-2 inventory-print__table'
                     ref={ref}
                     value={printList}
                     emptyMessage='No exports yet.'
@@ -112,11 +112,26 @@ export const PrintForms = observer((): ReactElement => {
                         event: DataTableSelectionMultipleChangeEvent<InventoryPrintForm[]>
                     ) => setSelectedPrints(event.value)}
                     dataKey='itemuid'
-                    scrollHeight='32vh'
+                    scrollHeight='40vh'
+                    tableStyle={{ tableLayout: "fixed" }}
                 >
-                    <Column selectionMode='multiple' headerStyle={{ width: "3rem" }}></Column>
-                    <Column field='name' header='Form' />
-                    <Column body={ActionButton} className='inventory-print__table-action' />
+                    <Column
+                        selectionMode='multiple'
+                        headerStyle={{ width: "44px" }}
+                        style={{ width: "44px" }}
+                    />
+                    <Column
+                        field='name'
+                        header='Form'
+                        headerStyle={{ width: "calc(100% - 264px)" }}
+                        style={{ width: "calc(100% - 264px)" }}
+                    />
+                    <Column
+                        body={ActionButton}
+                        className='inventory-print__table-action'
+                        headerStyle={{ width: "220px" }}
+                        style={{ width: "220px" }}
+                    />
                 </DataTable>
                 <div className='inventory-print__control'>
                     <Button

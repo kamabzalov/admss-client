@@ -1,9 +1,50 @@
+.inventory-print .inventory-print__table .p-datatable-header,
+.inventory-print .inventory-print__table .p-datatable-footer {
+    display: none;
+}
+
+.inventory-print .inventory-print__table .p-datatable-thead > tr > th {
+    height: 38px;
+    background: var(--admss-app-light-blue);
+    border: none;
+}
+
+.inventory-print .inventory-print__table .p-datatable-thead > tr > th:first-child {
+    padding-left: 18px;
+}
+
+.inventory-print .inventory-print__table .p-datatable-tbody > tr > td {
+    border-color: #c8d5ef;
+    height: 44px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.inventory-print .inventory-print__table .p-datatable-tbody > tr > td:first-child {
+    padding-left: 18px;
+}
+
+.inventory-print .inventory-print__table .p-datatable-tbody > tr.p-highlight {
+    background: #ddfee6;
+    color: var(--admss-app-blue-text);
+}
+
+.inventory-print .inventory-print__table-action {
+    padding-right: 12px;
+}
+
+.inventory-print__row-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
 .p-button.inventory-print__action-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    gap: 10px;
+    height: 40px;
     font-weight: 600;
 }
 
@@ -11,33 +52,17 @@
     font-size: 20px;
 }
 
-.inventory-print__table-action {
-    width: 4rem;
-}
-
-.p-datatable.inventory-print__table .p-datatable-tbody > tr.p-highlight {
-    background: #ddfee6;
-    color: var(--admss-app-blue-text);
-}
-
-.inventory-print .p-datatable-thead tr th {
-    border: none;
-}
-
-.inventory-print .p-datatable .p-button {
-    height: 40px;
-}
-
 .inventory-print__control {
-    margin-top: 40px;
+    margin-top: 26px;
     display: flex;
-    gap: 25px;
+    gap: 16px;
 }
 
 .inventory-print__button {
+    width: 220px;
+    min-height: 52px;
     font-weight: 700;
     font-size: 24px;
-    width: 245px;
     display: inline-flex;
     justify-content: center;
     align-items: center;

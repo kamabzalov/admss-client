@@ -1,6 +1,4 @@
 .vehicle-options {
-    position: relative;
-
     .vehicle-options__list {
         display: flex;
         flex-wrap: wrap;
@@ -16,32 +14,19 @@
     }
 }
 
-.entity-form-panel.inventory-form:has(.vehicle-options--no-group),
-.entity-form-panel.inventory-form:has(.vehicle-options--empty) {
-    display: grid;
-    grid-template-columns: 4px 1fr;
-    column-gap: 12px;
+.entity-form-panel.inventory-form:has(.vehicle-options__header) > .inventory-form__title {
+    display: none;
 }
 
-.entity-form-panel.inventory-form:has(.vehicle-options--no-group)::before,
-.entity-form-panel.inventory-form:has(.vehicle-options--empty)::before {
-    content: "";
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    background-color: var(--admss-app-red);
+.vehicle-options__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
 }
 
-.entity-form-panel.inventory-form:has(.vehicle-options--no-group) .inventory-form__title,
-.entity-form-panel.inventory-form:has(.vehicle-options--empty) .inventory-form__title {
-    grid-column: 2;
-    grid-row: 1;
-    margin-bottom: 12px;
-}
-
-.entity-form-panel.inventory-form:has(.vehicle-options--no-group) .vehicle-options,
-.entity-form-panel.inventory-form:has(.vehicle-options--empty) .vehicle-options {
-    grid-column: 2;
-    grid-row: 2;
+.vehicle-options__header .inventory-form__title {
+    margin-bottom: 0;
 }
 
 .vehicle-options__hint {
@@ -49,11 +34,16 @@
     font-size: 16px;
     font-weight: 400;
     line-height: 1.4;
+    padding-left: 10px;
     color: var(--admss-app-primary);
 }
 
 .vehicle-options__checkbox {
     width: calc(33.33% - 20px);
+}
+
+.entity-form-panel.inventory-form:has(.vehicle-options__header) .vehicle-options__button {
+    margin-right: -30px;
 }
 
 .vehicle-options__button {
@@ -69,10 +59,7 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-
-    position: absolute;
-    right: 0;
-    top: -58px;
+    flex-shrink: 0;
 
     .p-button-label {
         white-space: nowrap;
