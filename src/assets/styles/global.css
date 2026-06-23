@@ -146,8 +146,22 @@ html.app-header-scrolled {
 }
 
 textarea::-webkit-resizer {
-    background: transparent;
+    width: 10px;
+    height: 10px;
+    background:
+        linear-gradient(135deg, transparent 0 46%, var(--admss-app-medium-grey) 46% 100%),
+        linear-gradient(
+            135deg,
+            transparent 0 68%,
+            color-mix(in srgb, var(--admss-app-medium-grey) 55%, white) 68% 100%
+        );
+    background-repeat: no-repeat;
+    background-position: calc(100% - 4px) calc(100% - 4px);
+    background-size:
+        10px 10px,
+        10px 10px;
     border: none;
+    border-radius: 4px;
 }
 
 .main .container {
