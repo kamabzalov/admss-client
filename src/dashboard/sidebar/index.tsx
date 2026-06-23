@@ -1,5 +1,5 @@
 import "./index.css";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState, useEffect, ReactElement } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
@@ -51,7 +51,8 @@ export const Sidebar = observer((): ReactElement => {
         to: string,
         icon: string | ReactElement,
         label: string,
-        className: string = ""
+        className: string = "",
+        end: boolean = false
     ): ReactElement => {
         const itemId = `nav-item-${to.replace(/\//g, "-")}`;
         return (
@@ -59,7 +60,14 @@ export const Sidebar = observer((): ReactElement => {
                 {settings.isSidebarCollapsed && (
                     <Tooltip target={`#${itemId}`} content={label} position='right' />
                 )}
-                <Link to={to} id={itemId} className='sidebar-nav__link'>
+                <NavLink
+                    to={to}
+                    id={itemId}
+                    end={end}
+                    className={({ isActive }) =>
+                        `sidebar-nav__link ${isActive ? "sidebar-nav__link--active" : ""}`
+                    }
+                >
                     {typeGuards.isString(icon) ? (
                         <div className={`sidebar-nav__icon ${icon}`}></div>
                     ) : (
@@ -74,7 +82,7 @@ export const Sidebar = observer((): ReactElement => {
                     >
                         {label}
                     </span>
-                </Link>
+                </NavLink>
             </li>
         );
     };
@@ -86,7 +94,7 @@ export const Sidebar = observer((): ReactElement => {
             onMouseLeave={handleMouseLeave}
         >
             <ul className='sidebar-nav'>
-                {renderNavItem(DASHBOARD_PAGE, "home", "Home")}
+                {renderNavItem(DASHBOARD_PAGE, "home", "Home", "", true)}
                 {inventoryPermissions.canSeeInMenu() &&
                     renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
                 {salesPermissions.canShowContacts() &&

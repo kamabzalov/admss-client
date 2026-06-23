@@ -240,100 +240,108 @@ export const AddTaskDialog = observer(
                 className='dialog dialog__add-task task-dialog'
             >
                 <div className='p-dialog-content-body' tabIndex={0}>
-                    <ComboBox
-                        label='Assign to (required)'
-                        value={taskState.useruid || authUser?.useruid || ""}
-                        options={assignToData || []}
-                        optionLabel='username'
-                        optionValue='useruid'
-                        required
-                        className='flex align-items-center'
-                        onChange={(e) => handleInputChange("useruid", e.value)}
-                    />
-
-                    <div className='flex flex-column md:flex-row column-gap-3 relative'>
-                        <div className='p-inputgroup'>
-                            <DateInput
-                                value={
-                                    new Date(taskState.startdate || formatDateForServer(new Date()))
-                                }
-                                date={
-                                    new Date(taskState.startdate || formatDateForServer(new Date()))
-                                }
-                                name='Start Date'
-                                showTime
-                                hourFormat='12'
-                                onChange={(e) => handleDateChange(DATE_TYPE.START, e.value as Date)}
-                            />
-                        </div>
-                        <div className='p-inputgroup'>
-                            <DateInput
-                                value={
-                                    new Date(
-                                        taskState.deadline ||
-                                            formatDateForServer(getDefaultDeadlineDate())
-                                    )
-                                }
-                                date={
-                                    new Date(
-                                        taskState.deadline ||
-                                            formatDateForServer(getDefaultDeadlineDate())
-                                    )
-                                }
-                                name='Due Date'
-                                showTime
-                                hourFormat='12'
-                                onChange={(e) =>
-                                    handleDateChange(DATE_TYPE.DEADLINE, e.value as Date)
-                                }
-                            />
-                        </div>
-                        {dateError && <small className='p-error'>{dateError}</small>}
-                    </div>
-
-                    <AccountSearch
-                        value={taskState.accountname?.trim() || ""}
-                        returnedField={ALL_FIELDS}
-                        getFullInfo={handleGetAccountInfo}
-                        onChange={({ target: { value } }) => handleAccountNameChange(value)}
-                        onClear={handleAccountClear}
-                        validateOnBlur
-                        hasValidSelection={!!taskState.accountuid}
-                        name='Account (optional)'
-                    />
-
-                    <DealSearch
-                        value={taskState.dealname?.trim() || ""}
-                        returnedField={ALL_FIELDS}
-                        getFullInfo={handleGetDealInfo}
-                        onChange={({ target: { value } }) => handleDealNameChange(value)}
-                        onClear={handleDealClear}
-                        validateOnBlur
-                        hasValidSelection={!!taskState.dealuid}
-                        name='Deal (optional)'
-                    />
-
-                    <CompanySearch
-                        value={taskState.contactname?.trim() || ""}
-                        returnedField={ALL_FIELDS}
-                        getFullInfo={handleGetCompanyInfo}
-                        onChange={({ target: { value } }) => handleContactNameChange(value)}
-                        name='Contact (optional)'
-                    />
-                    <PhoneInput
-                        value={taskState.phone || ""}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        name='Phone Number (optional)'
-                        withValidationMessage={false}
-                    />
-                    <span className='p-float-label relative'>
-                        <InputTextarea
-                            value={taskState.description || ""}
-                            onChange={(e) => handleInputChange("description", e.target.value)}
-                            className='p-dialog-description'
+                    <div className='p-dialog-content-body__inner'>
+                        <ComboBox
+                            label='Assign to (required)'
+                            value={taskState.useruid || authUser?.useruid || ""}
+                            options={assignToData || []}
+                            optionLabel='username'
+                            optionValue='useruid'
+                            required
+                            className='flex align-items-center'
+                            onChange={(e) => handleInputChange("useruid", e.value)}
                         />
-                        <label className='float-label'>Description</label>
-                    </span>
+
+                        <div className='flex flex-column md:flex-row column-gap-3 relative'>
+                            <div className='p-inputgroup'>
+                                <DateInput
+                                    value={
+                                        new Date(
+                                            taskState.startdate || formatDateForServer(new Date())
+                                        )
+                                    }
+                                    date={
+                                        new Date(
+                                            taskState.startdate || formatDateForServer(new Date())
+                                        )
+                                    }
+                                    name='Start Date'
+                                    showTime
+                                    hourFormat='12'
+                                    onChange={(e) =>
+                                        handleDateChange(DATE_TYPE.START, e.value as Date)
+                                    }
+                                />
+                            </div>
+                            <div className='p-inputgroup'>
+                                <DateInput
+                                    value={
+                                        new Date(
+                                            taskState.deadline ||
+                                                formatDateForServer(getDefaultDeadlineDate())
+                                        )
+                                    }
+                                    date={
+                                        new Date(
+                                            taskState.deadline ||
+                                                formatDateForServer(getDefaultDeadlineDate())
+                                        )
+                                    }
+                                    name='Due Date'
+                                    showTime
+                                    hourFormat='12'
+                                    onChange={(e) =>
+                                        handleDateChange(DATE_TYPE.DEADLINE, e.value as Date)
+                                    }
+                                />
+                            </div>
+                            {dateError && <small className='p-error'>{dateError}</small>}
+                        </div>
+
+                        <AccountSearch
+                            value={taskState.accountname?.trim() || ""}
+                            returnedField={ALL_FIELDS}
+                            getFullInfo={handleGetAccountInfo}
+                            onChange={({ target: { value } }) => handleAccountNameChange(value)}
+                            onClear={handleAccountClear}
+                            validateOnBlur
+                            hasValidSelection={!!taskState.accountuid}
+                            name='Account (optional)'
+                        />
+
+                        <DealSearch
+                            value={taskState.dealname?.trim() || ""}
+                            returnedField={ALL_FIELDS}
+                            getFullInfo={handleGetDealInfo}
+                            onChange={({ target: { value } }) => handleDealNameChange(value)}
+                            onClear={handleDealClear}
+                            validateOnBlur
+                            hasValidSelection={!!taskState.dealuid}
+                            name='Deal (optional)'
+                        />
+
+                        <CompanySearch
+                            value={taskState.contactname?.trim() || ""}
+                            returnedField={ALL_FIELDS}
+                            getFullInfo={handleGetCompanyInfo}
+                            onChange={({ target: { value } }) => handleContactNameChange(value)}
+                            name='Contact (optional)'
+                        />
+                        <PhoneInput
+                            value={taskState.phone || ""}
+                            onChange={(e) => handleInputChange("phone", e.target.value)}
+                            name='Phone Number (optional)'
+                            withValidationMessage={false}
+                        />
+                        <span className='p-float-label relative'>
+                            <InputTextarea
+                                value={taskState.description || ""}
+                                onChange={(e) => handleInputChange("description", e.target.value)}
+                                className='p-dialog-description'
+                            />
+                            <label className='float-label'>Description</label>
+                        </span>
+                    </div>
                 </div>
 
                 <div className='task-dialog__footer'>
