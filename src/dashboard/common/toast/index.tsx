@@ -1,14 +1,14 @@
 import { Toast } from "primereact/toast";
 import { ReactElement, ReactNode, createContext, useContext, useRef } from "react";
 import "./index.css";
-const ToastContext = createContext<React.RefObject<Toast> | null>(null);
+const ToastContext = createContext<React.RefObject<Toast | null> | null>(null);
 
 interface ToastProviderProps {
     children: ReactNode;
 }
 
 export const ToastProvider = ({ children }: ToastProviderProps): ReactElement => {
-    const toast = useRef<Toast>(null);
+    const toast = useRef<Toast | null>(null);
     return (
         <ToastContext.Provider value={toast}>
             {children}

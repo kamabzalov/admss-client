@@ -65,6 +65,17 @@
     cursor: pointer;
 }
 
+.user-help .p-checkbox {
+    position: relative;
+}
+
+.user-help .p-checkbox .p-checkbox-input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+}
+
 .user-help__link {
     color: var(--admss-app-deep-blue);
     text-decoration: none;

@@ -8,7 +8,7 @@ import {
     setReportAccessList,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { Checkbox, CheckboxClickEvent } from "primereact/checkbox";
+import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { TextInput } from "dashboard/common/form/inputs";
@@ -212,8 +212,7 @@ export const EditAccessDialog = ({
         setSelectedRole(newSelectedValues.filter(Boolean));
     };
 
-    const handleCheckboxClick = (event: CheckboxClickEvent, data: ReportAccess) => {
-        event.stopPropagation();
+    const handleCheckboxClick = (_event: CheckboxChangeEvent, data: ReportAccess) => {
         if (data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()) {
             return;
         }
@@ -237,7 +236,7 @@ export const EditAccessDialog = ({
             >
                 <Checkbox
                     className='access-field__checkbox'
-                    onClick={(event) => handleCheckboxClick(event, data)}
+                    onChange={(event) => handleCheckboxClick(event, data)}
                     disabled={data.userrole.toLowerCase() === ACCESS_ADMIN_ROLE.toLowerCase()}
                     checked={!!data.enabled}
                 />

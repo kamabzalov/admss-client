@@ -38,6 +38,10 @@
     gap: 10px;
 }
 
+.general-settings__tabs > .p-tabview-nav-container .p-tabview-nav > li {
+    width: 100%;
+}
+
 .general-settings__tabs .p-tabview-panels {
     flex: 1;
     padding: 0;
@@ -55,6 +59,8 @@
 }
 
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    display: flex;
+    width: 100%;
     color: var(--admss-app-primary);
     border: none;
 }

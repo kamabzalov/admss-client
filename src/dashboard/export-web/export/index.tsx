@@ -751,9 +751,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                         header={
                             <Checkbox
                                 checked={selectedInventories.every((checkbox) => !!checkbox)}
-                                onClick={({ checked }) => {
+                                onChange={(e) => {
                                     setSelectedInventories(
-                                        selectedInventories.map(() => !!checked)
+                                        selectedInventories.map(() => !!e.checked)
                                     );
                                 }}
                             />

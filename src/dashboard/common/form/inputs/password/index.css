@@ -2,6 +2,52 @@
     width: 100%;
 }
 
+.password-field.p-password {
+    width: 100%;
+    display: flex;
+}
+
+.password-field .p-icon-field {
+    position: relative;
+    width: 100%;
+    display: flex;
+}
+
+.password-field .p-password-input {
+    width: 100%;
+    padding-right: 2.75rem;
+}
+
+.password-field .p-input-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+}
+
+.password-field .p-password-input + .p-input-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    color: var(--admss-app-light-grey);
+}
+
+.password-field .p-password-input + .p-input-icon:hover {
+    color: var(--admss-app-medium-grey);
+}
+
+.password-field .p-password-input + .p-input-icon i {
+    font-size: 24px;
+    color: inherit;
+}
+
+.password-field .p-password-input + .p-input-icon i:before {
+    color: inherit;
+}
+
 .password-field-container {
     position: relative;
     .p-error {

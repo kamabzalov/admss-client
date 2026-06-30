@@ -100,13 +100,12 @@
 
 .role-main__tabs .p-tabview-nav-content {
     background-color: var(--admss-app-white);
-    height: 60px;
     z-index: 11;
+    border-bottom: 2px solid var(--admss-app-light-grey);
 }
 
 .role-main__tabs .p-tabview-nav-container {
-    height: 35px;
-    padding-bottom: 40px;
+    padding-bottom: 0;
 }
 
 .role-main__tabs .p-tabview-nav {
@@ -117,11 +116,10 @@
     flex: 0 0;
     width: auto;
     border: none;
-    border-bottom: 2px solid var(--admss-app-light-grey);
+    min-height: auto;
     text-transform: uppercase;
     font-weight: 700;
     gap: 10px;
-    margin-bottom: 50px;
     margin-right: 14px;
 }
 
@@ -136,11 +134,12 @@
 .role-main__tabs .p-tabview-nav-container a.p-tabview-nav-link {
     color: var(--admss-app-primary);
     border: none;
+    margin: 0;
     font-size: 18px;
     font-weight: 700;
 }
 
-.role-main__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+.role-main__tabs .p-tabview-nav-container .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
     border-radius: 0;
     border-bottom: 2px solid var(--admss-app-main-blue);

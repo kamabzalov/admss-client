@@ -39,7 +39,7 @@ export interface FormStepAccordionProps {
     stepClassName?: string;
     renderSectionHeader?: (section: FormStepSection) => ReactNode;
     footer?: ReactNode;
-    navigationRef?: RefObject<HTMLDivElement>;
+    navigationRef?: RefObject<HTMLDivElement | null>;
     expandMode?: FormStepAccordionExpandMode;
     collapseOnStepIndices?: number[];
     preventEmptyAccordion?: boolean;

@@ -355,6 +355,9 @@
 .inventory-location.p-splitbutton {
     display: inline-flex;
     align-items: stretch;
+    border-radius: 999px;
+    overflow: visible;
+    background: var(--admss-app-dark-blue);
 }
 
 .inventory-location .p-button {
@@ -366,10 +369,11 @@
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
-    background: var(--admss-app-dark-blue);
+    background: transparent;
     border: none;
     padding-top: 0;
     padding-bottom: 0;
+    border-radius: 0;
 }
 
 .inventory-location .inventory-location__label {
@@ -380,10 +384,12 @@
 .inventory-location .p-button.p-splitbutton-defaultbutton {
     flex: 1;
     min-width: 0;
-    background: var(--admss-app-dark-blue);
+    background: transparent;
     border: none;
+    border-right: 0;
     box-shadow: none;
     cursor: default;
+    border-radius: 999px 0 0 999px;
 }
 
 .inventory-location .p-button.p-splitbutton-menubutton {
@@ -393,16 +399,25 @@
     padding: 0;
     flex-shrink: 0;
     border-left: 1px solid #292a2e33;
+    position: relative;
+    background: transparent;
+    border-radius: 0 999px 999px 0;
 }
 
 .inventory-location .p-button.p-splitbutton-menubutton:hover,
 .inventory-location .p-button.p-splitbutton-menubutton:focus,
 .inventory-location .p-button.p-splitbutton-menubutton:active {
-    background: var(--admss-app-dark-blue);
+    background: transparent;
     filter: brightness(0.8);
     border: none;
     border-left: 1px solid #292a2e33;
     box-shadow: none;
+}
+
+.inventory-location .p-button.p-splitbutton-menubutton[aria-expanded="true"] {
+    background: rgba(0, 0, 0, 0.12);
+    filter: none;
+    border-left: 1px solid #292a2e33;
 }
 
 .inventory-location .p-button.p-splitbutton-menubutton svg {
@@ -461,12 +476,6 @@
     border: none;
 }
 
-.inventory-form__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
-    color: var(--admss-app-primary);
-    border-radius: 0;
-    border-bottom: 2px solid var(--admss-app-primary);
-}
-
 .p-tabview.inventory-form__tabs {
     .p-tabview-nav-container .p-tabview-nav-content .p-tabview-nav .p-tabview-nav-link {
         font-weight: 700;
@@ -482,6 +491,7 @@
         li.p-highlight
         .p-tabview-nav-link {
         color: var(--admss-app-main-blue);
+        border-radius: 0;
         border-bottom: 2px solid var(--admss-app-main-blue);
     }
 }

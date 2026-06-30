@@ -20,9 +20,10 @@
     color: var(--admss-app-primary);
     font-weight: 700;
     border: none;
+    margin: 0;
 }
 
-.additional-settings__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+.additional-settings__tabs .p-tabview-nav-container .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
     border-radius: 0;
     border-bottom: 2px solid var(--admss-app-main-blue);

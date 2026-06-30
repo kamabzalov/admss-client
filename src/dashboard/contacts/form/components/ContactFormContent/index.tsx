@@ -8,7 +8,7 @@ import { PartialContact } from "dashboard/contacts/form/common/types";
 import { EntityFormSteps } from "dashboard/common/entity-form-layout";
 
 interface ContactFormContentProps {
-    formikRef: RefObject<FormikProps<PartialContact>>;
+    formikRef: RefObject<FormikProps<PartialContact> | null>;
     contactSections: ContactSection[];
     stepActiveIndex: number;
     deleteActiveIndex: number;

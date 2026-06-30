@@ -75,22 +75,28 @@ type Range<
     T extends any[] = Push<Start, []>,
 > = T["length"] extends End ? never : T["length"] | Range<Start, End, [any, ...T]>;
 
-interface DateInputProps extends CalendarProps {
+interface DateInputProps extends Omit<CalendarProps, "value" | "onChange"> {
     date?: number | Date | string;
+    value?: CalendarProps["value"] | string | number;
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
+    checked?: boolean;
+    onCheckboxChange?: (e: CheckboxChangeEvent) => void;
     checkboxWithLabel?: boolean;
     emptyDate?: boolean;
     clearButton?: boolean;
     floatLabel?: boolean;
     hideTodayHighlight?: boolean;
     onClearAction?: () => void;
+    error?: boolean;
+    errorMessage?: string;
+    onChange?: (e: { value: Date | null | undefined; target: { value: string } }) => void;
 }
 
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
     clearButton?: boolean;
-    ref?: React.RefObject<HTMLInputElement>;
+    ref?: React.RefObject<HTMLInputElement | null>;
     wrapperClassName?: string;
     infoText?: string;
     error?: boolean;
@@ -100,7 +106,7 @@ interface TextInputProps extends InputTextProps {
 
 interface NumberInputProps extends InputNumberProps {
     colWidth?: Range<1, 13>;
-    ref?: React.RefObject<InputNumber>;
+    ref?: React.RefObject<InputNumber | null>;
     wrapperClassName?: string;
     infoText?: string;
     error?: boolean;
@@ -128,13 +134,6 @@ interface EmailInputProps extends Omit<InputTextProps, "onChange" | "onBlur"> {
 
 interface StateDropdownProps extends DropdownProps {
     colWidth?: Range<1, 13>;
-}
-
-interface DateInputProps extends CalendarProps {
-    checked?: boolean;
-    onCheckboxChange?: (e: CheckboxChangeEvent) => void;
-    error?: boolean;
-    errorMessage?: string;
 }
 
 export const DashboardRadio = ({
@@ -489,6 +488,7 @@ export const DateInput = ({
     checked = false,
     hideTodayHighlight,
     onClearAction,
+    onChange,
     error,
     errorMessage,
     ...props
@@ -582,7 +582,13 @@ export const DateInput = ({
                         panelClassName={mergedPanelClassName || undefined}
                         onChange={(e) => {
                             handleDateChange(e.value as Date | null);
-                            calendarProps.onChange?.(e);
+                            const selectedDate = e.value as Date | null | undefined;
+                            onChange?.({
+                                value: selectedDate,
+                                target: {
+                                    value: selectedDate ? String(selectedDate.getTime()) : "",
+                                },
+                            });
                         }}
                         {...calendarProps}
                     />

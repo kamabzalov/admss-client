@@ -122,8 +122,8 @@ const PasswordField = ({
                 onPaste={handlePaste}
                 content={passwordContent}
                 feedback={true}
-                showIcon='adms-hide'
-                hideIcon='adms-show'
+                showIcon={<i className='adms-hide' />}
+                hideIcon={<i className='adms-show' />}
                 panelClassName='password-field-panel'
                 {...passwordProps}
             />

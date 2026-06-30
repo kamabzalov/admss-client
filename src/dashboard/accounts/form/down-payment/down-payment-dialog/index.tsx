@@ -29,11 +29,8 @@ export const DownPaymentDialog = ({
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const currentTime = useMemo(
-        () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-        []
-    );
-    const [paymentDate, setPaymentDate] = useState<string>(currentTime);
+    const currentTime = useMemo(() => new Date(), []);
+    const [paymentDate, setPaymentDate] = useState<Date | null>(currentTime);
     const [paymentType, setPaymentType] = useState<ACCOUNT_PAYMENT_METHODS_NAMES | null>(null);
     const [checkNumber, setCheckNumber] = useState<string>("");
     const [amount, setAmount] = useState<number>(0);
@@ -76,10 +73,10 @@ export const DownPaymentDialog = ({
             <div className='flex flex-column gap-4 pt-3'>
                 <DateInput
                     name='Payment Date'
-                    date={paymentDate}
+                    date={paymentDate ?? undefined}
                     value={paymentDate}
                     emptyDate
-                    onChange={(e) => setPaymentDate(e.target.value as string)}
+                    onChange={(e) => setPaymentDate(e.value as Date | null)}
                 />
 
                 <ComboBox
