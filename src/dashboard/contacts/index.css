@@ -92,13 +92,12 @@
 
     .p-tabview-nav-content {
         background-color: var(--admss-app-white);
-        height: 60px;
         z-index: 11;
+        border-bottom: 1px solid var(--admss-app-light-grey);
     }
 
     .contact-form__tabs .p-tabview-nav-container {
-        height: 35px;
-        padding-bottom: 40px;
+        padding-bottom: 0;
     }
 
     .contact-form__tabs .p-tabview-nav {
@@ -114,11 +113,9 @@
         width: auto;
         border: none;
         min-height: auto;
-        border-bottom: 1px solid var(--admss-app-light-grey);
         text-transform: uppercase;
         font-weight: 700;
         gap: 10px;
-        margin-bottom: 50px;
         margin-right: 14px;
     }
 
@@ -133,11 +130,12 @@
     .p-tabview-nav-container a.p-tabview-nav-link {
         color: var(--admss-app-primary);
         border: none;
+        margin: 0;
         font-size: 18px;
         font-weight: 700;
     }
 
-    .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    .p-tabview-nav-container .p-tabview-nav li.p-highlight .p-tabview-nav-link {
         color: var(--admss-app-main-blue);
         border-radius: 0;
         border-bottom: 2px solid var(--admss-app-main-blue);

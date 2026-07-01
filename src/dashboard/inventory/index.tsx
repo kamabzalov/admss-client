@@ -103,6 +103,7 @@ export default function Inventories({
     useEffect(() => {
         if (dataTableRef.current) {
             const table = dataTableRef.current.getTable();
+            if (!table) return;
             const columns = table.querySelectorAll("th");
             const columnWidths = Array.from(columns).map((column) => {
                 const field = column!
@@ -505,11 +506,7 @@ export default function Inventories({
                         ]}
                         rounded
                         appendTo='self'
-                        pt={{
-                            menu: {
-                                className: "inventory-location__menu",
-                            },
-                        }}
+                        menuClassName='inventory-location__menu'
                     />
                 )}
             </div>

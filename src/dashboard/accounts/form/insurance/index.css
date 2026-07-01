@@ -27,8 +27,8 @@
     box-shadow: none;
 }
 
-.account-insurance__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"],
-.take-payment__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+.account-insurance__tabs .p-tabview-nav-container .p-tabview-nav li.p-highlight .p-tabview-nav-link,
+.take-payment__tabs .p-tabview-nav-container .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     color: var(--admss-app-primary);
     border-radius: 0;
     border-bottom: 2px solid var(--admss-app-primary);

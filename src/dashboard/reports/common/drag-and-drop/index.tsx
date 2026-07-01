@@ -1,8 +1,9 @@
 import { TreeNodeEvent } from "common/models";
 import { ReportCollection, NODE_TYPES, ReportDocument, REPORT_TYPES } from "common/models/reports";
 import { TreeNode } from "primereact/treenode";
+import { ReactElement } from "react";
 
-export const transformLabel = (label: string): JSX.Element | string => {
+export const transformLabel = (label: string): ReactElement | string => {
     const regex = /^([^(]+)\s*\((.+)\)$/;
     const match = label.match(regex);
 

@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 import { DateInput, TextInput } from "dashboard/common/form/inputs";
-import { CalendarChangeEvent } from "primereact/calendar";
 
 interface EditableFieldProps {
     label: string;
@@ -17,8 +16,8 @@ export const InsuranceInfoField = ({
     onChange,
     inputType = "text",
 }: EditableFieldProps): ReactElement => {
-    const handleDateChange = (e: CalendarChangeEvent) => {
-        const selectedDate = e.value as Date | null;
+    const handleDateChange = (e: { value: Date | null | undefined }) => {
+        const selectedDate = e.value as Date | null | undefined;
         if (selectedDate && onChange) {
             const dateInMs = selectedDate.getTime();
             onChange(dateInMs.toString());

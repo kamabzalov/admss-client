@@ -54,11 +54,11 @@ export const ReportColumnSelect = observer((): ReactElement => {
         setRightSelection([]);
     }, [dataSet]);
 
-    const scrollToTop = (ref: React.RefObject<HTMLDivElement>) => {
+    const scrollToTop = (ref: React.RefObject<HTMLDivElement | null>) => {
         ref.current?.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
+    const scrollToBottom = (ref: React.RefObject<HTMLDivElement | null>) => {
         ref.current?.scrollTo({
             top: ref.current?.scrollHeight ?? 0,
             behavior: "smooth",

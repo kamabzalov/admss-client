@@ -77,8 +77,8 @@ export const SettingsExportWeb = (): ReactElement => {
     const controlColumnHeader = (): ReactElement => (
         <Checkbox
             checked={selectedRows.length > 0 && selectedRows.every((checkbox) => !!checkbox)}
-            onClick={({ checked }) => {
-                setSelectedRows(selectedRows.map(() => !!checked));
+            onChange={(e) => {
+                setSelectedRows(selectedRows.map(() => !!e.checked));
             }}
         />
     );

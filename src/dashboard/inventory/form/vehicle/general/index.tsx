@@ -543,7 +543,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }}
                         dropdown
                         onChange={({ value }) => {
-                            let make = typeof value === "string" ? value : value.name;
+                            let make = "";
+                            if (typeof value === "string") {
+                                make = value;
+                            } else if (value && !Array.isArray(value) && "name" in value) {
+                                make = value.name;
+                            }
 
                             if (make.trim()) {
                                 const normalizedInput = make.trim();

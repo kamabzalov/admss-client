@@ -15,6 +15,13 @@
     padding: 0;
     border: none;
 
+    .p-tree-container,
+    .p-treenode-children {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
     & .p-treenode-content:has(.reports-accordion-header__info) {
         .p-tree-toggler {
             visibility: visible;
@@ -22,16 +29,27 @@
     }
 
     .p-treenode-children {
-        padding: 0;
-
         .p-treenode-children {
             padding-left: 1.25rem;
         }
     }
 
     .p-treenode-content {
+        display: flex;
+        align-items: center;
         border: 1px solid var(--admss-app-primary-main-green);
         height: 56px;
+        border-radius: 5px;
+
+        .p-tree-toggler {
+            flex-shrink: 0;
+            margin-top: 4px;
+            margin-left: 14px;
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            background: transparent;
+        }
 
         &:has(.edit-collection),
         &:has(.report-parameters) {
@@ -60,6 +78,8 @@
         width: 100%;
         display: flex;
         align-items: center;
+        flex: 1;
+        min-width: 0;
     }
 
     .reports__list-item:hover {
@@ -74,6 +94,10 @@
     }
 
     .p-treenode-leaf {
+        > .p-treenode-content .p-tree-toggler {
+            visibility: hidden;
+        }
+
         .p-treenode-content:has(.reports__list-item--inner) {
             border: none;
         }

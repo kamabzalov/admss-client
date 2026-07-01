@@ -10,7 +10,10 @@ export const limitations: MediaLimits = {
     maxSize: 2,
 };
 
-export const itemTemplate = (image: File | string, fileUploadRef?: React.RefObject<FileUpload>) => {
+export const itemTemplate = (
+    image: File | string,
+    fileUploadRef?: React.RefObject<FileUpload | null>
+) => {
     const isFilePath = typeof image === "string";
 
     const alt = isFilePath ? "watermark image" : image?.name;

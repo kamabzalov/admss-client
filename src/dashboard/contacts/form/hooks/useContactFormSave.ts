@@ -12,7 +12,7 @@ import { PartialContact } from "dashboard/contacts/form/common/types";
 import { ValidationErrorType } from "dashboard/contacts/form/components/ContactValidationDialog";
 
 interface UseContactFormSaveParams {
-    formikRef: RefObject<FormikProps<PartialContact>>;
+    formikRef: RefObject<FormikProps<PartialContact> | null>;
     store: ContactStore;
     contact: ContactStore["contact"];
     contactExtData: ContactStore["contactExtData"];

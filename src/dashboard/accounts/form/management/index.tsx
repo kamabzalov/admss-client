@@ -177,8 +177,8 @@ export const AccountManagement = (): ReactElement => {
     const controlColumnHeader = (): ReactElement => (
         <Checkbox
             checked={selectedRows.every((checkbox) => !!checkbox)}
-            onClick={({ checked }) => {
-                setSelectedRows(selectedRows.map(() => !!checked));
+            onChange={(e) => {
+                setSelectedRows(selectedRows.map(() => !!e.checked));
             }}
         />
     );

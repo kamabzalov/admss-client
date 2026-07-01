@@ -3,12 +3,13 @@ import "./index.css";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { formatDateTimeForDisplay } from "common/helpers";
 import { Task } from "common/models/tasks";
+import { ReactElement } from "react";
 
 interface TaskSummaryDialogProps extends DialogProps {
     currentTask?: Task;
 }
 
-const TaskSummaryRow = ({ title, value }: { title: string; value: string }): JSX.Element => (
+const TaskSummaryRow = ({ title, value }: { title: string; value: string }): ReactElement => (
     <div className='task-summary__row'>
         <div className='task-summary__row-title'>{title}</div>
         <div className='task-summary__row-value white-space-nowrap overflow-hidden text-overflow-ellipsis'>

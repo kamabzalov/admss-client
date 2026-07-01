@@ -1,7 +1,7 @@
 import { DashboardDialog } from "dashboard/common/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
 import { createOrUpdateSupportMessage } from "http/services/support.service";
@@ -16,7 +16,7 @@ const SUPPORT_CONTACT_TOPICS: ReadonlyArray<string> = [
     "General",
 ];
 
-export const SupportContactDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
+export const SupportContactDialog = ({ visible, onHide }: DialogProps): ReactElement => {
     const toast = useToast();
     const [email, setEmail] = useState<string>("");
     const [topic, setTopic] = useState<string>("");
